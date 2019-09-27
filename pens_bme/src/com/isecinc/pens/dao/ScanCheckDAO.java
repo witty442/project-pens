@@ -18,7 +18,8 @@ import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -180,7 +181,7 @@ public class ScanCheckDAO extends PickConstants{
 				
 				ps = conn.prepareStatement(sql.toString());
 					
-				Date checkDate = Utils.parse( o.getCheckOutDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date checkDate = DateUtil.parse( o.getCheckOutDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				int c =1;
 				
@@ -356,7 +357,7 @@ public class ScanCheckDAO extends PickConstants{
 			   h.setNo(r);
 			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
 			   h.setBoxNo(Utils.isNull(rst.getString("box_no")));
-			   h.setCheckOutDate(Utils.stringValue(rst.getTimestamp("Checkout_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCheckOutDate(DateUtil.stringValue(rst.getTimestamp("Checkout_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStatus(Utils.isNull(rst.getString("status"))); 
 			   h.setStatusDesc(PickConstants.getStatusDesc(Utils.isNull(rst.getString("status")))); 
 			   h.setStoreCode(Utils.isNull(rst.getString("Customer_no"))); 
@@ -617,7 +618,7 @@ public class ScanCheckDAO extends PickConstants{
 			   h.setNo(r);
 			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
 			   h.setBoxNo(o.getBoxNo());
-			   h.setCheckOutDate(Utils.stringValue(rst.getTimestamp("Checkout_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCheckOutDate(DateUtil.stringValue(rst.getTimestamp("Checkout_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStatus(Utils.isNull(rst.getString("status"))); 
 			   h.setStatusDesc(PickConstants.getStatusDesc(Utils.isNull(rst.getString("status")))); 
 			   h.setStoreCode(Utils.isNull(rst.getString("Customer_no"))); 

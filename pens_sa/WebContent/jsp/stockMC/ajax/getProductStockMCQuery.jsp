@@ -1,6 +1,6 @@
 <%@page import="com.isecinc.pens.web.stockmc.StockMCDAO"%>
 <%@page import="com.isecinc.pens.web.stockmc.StockMCBean"%>
-<%@page import="util.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>

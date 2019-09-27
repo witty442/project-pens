@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="com.isecinc.pens.web.stock.StockCallCardCreditReport"%>
 <%@page import="com.isecinc.pens.web.stock.StockForm"%>
 <%@page import="com.isecinc.pens.web.stock.StockBean"%>
-<%@page import="util.*"%>
+<%@page import="com.pens.util.*"%>
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%
@@ -11,7 +11,7 @@ StockBean bean = ((StockForm)session.getAttribute("stockForm")).getBean();
 User user = (User)session.getAttribute("user");
 
 //check user login is map cust sales TT to fillter search customer popup 
-boolean isUserMapCustSalesTT = StockCallCardCreditReport.isUserMapCustSalesTT(user);
+boolean isUserMapCustSalesTT = GeneralDAO.isUserMapCustSalesTT(user);
 
 String screenWidth = "";
 if(session.getAttribute("screenWidth") != null){ 

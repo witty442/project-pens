@@ -858,10 +858,10 @@ public class SummaryExport {
 	
 	public StringBuffer genOnhandAsOfKingHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
-		String colspan = "10";
+		String colspan = "11";
 		try{
 			if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
-				colspan = "9";
+				colspan = "10";
 			}
 			h.append(ExcelHeader.EXCEL_HEADER);
 			
@@ -903,6 +903,7 @@ public class SummaryExport {
 				  h.append("<td class='colum_head'>Initial Stock</td> \n");
 				  h.append("<td class='colum_head'>Sale In Qty</td> \n");
 				  h.append("<td class='colum_head'>Sale Out Qty</td> \n");
+				  h.append("<td class='colum_head'>Adjust Qty</td> \n");
 				  h.append("<td class='colum_head'>Return Qty </td> \n");
 				  h.append("<td class='colum_head'>Onhand Qty </td> \n");
 				h.append("</tr> \n");
@@ -920,6 +921,7 @@ public class SummaryExport {
 					  h.append("<td class='num'>"+s.getInitSaleQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleInQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getAdjustQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleReturnQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getOnhandQty()+"</td> \n");
 					h.append("</tr>");
@@ -934,6 +936,7 @@ public class SummaryExport {
 					  h.append("<td class='num_currency_bold'>"+sum.getInitSaleQty()+"</td> \n");
 					  h.append("<td class='num_currency_bold'>"+sum.getSaleInQty()+"</td> \n");
 					  h.append("<td class='num_currency_bold'>"+sum.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num_currency_bold'>"+sum.getAdjustQty()+"</td> \n");
 					  h.append("<td class='num_currency_bold'>"+sum.getSaleReturnQty()+"</td> \n");
 					  h.append("<td class='num_currency_bold'>"+sum.getOnhandQty()+"</td> \n");
 				   h.append("</tr>");
@@ -1118,7 +1121,7 @@ public class SummaryExport {
 	public StringBuffer genOnhandSizeColorKingHTML(HttpServletRequest request,SummaryForm form,User user){
 		StringBuffer h = new StringBuffer("");
 		String a= "@";
-		String colSpan ="12";
+		String colSpan ="13";
 		try{
 			h.append(ExcelHeader.EXCEL_HEADER);
 			//Header
@@ -1165,6 +1168,7 @@ public class SummaryExport {
 				  h.append("<td>Initial Stock</td> \n");
 				  h.append("<td>Sale In Qty</td> \n");
 				  h.append("<td>Sale Out Qty</td> \n");
+				  h.append("<td>Adjust Qty</td> \n");
 				  h.append("<td>Return Qty </td> \n");
 				  h.append("<td>Onhand Qty </td> \n");
 				h.append("</tr> \n");
@@ -1182,6 +1186,7 @@ public class SummaryExport {
 					  h.append("<td class='num'>"+s.getInitSaleQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleInQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num'>"+s.getAdjustQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getSaleReturnQty()+"</td> \n");
 					  h.append("<td class='num'>"+s.getOnhandQty()+"</td> \n");
 					h.append("</tr>");

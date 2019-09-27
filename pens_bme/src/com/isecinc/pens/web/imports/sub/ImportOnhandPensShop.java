@@ -22,8 +22,9 @@ import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.imports.ImportForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
@@ -62,11 +63,11 @@ public class ImportOnhandPensShop {
 			String fileName = dataFile.getFileName();
 			logger.debug("dateSubStr:"+fileName.substring(12,20));
 			
-			java.util.Date fileNameAsOfDate = Utils.parse(fileName.substring(12,20),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+			java.util.Date fileNameAsOfDate = DateUtil.parse(fileName.substring(12,20),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 			// Get LastFileNameImport 
 			String lastFileNameImport = importDAO.getLastFileNameImport7Catalog(conn);
 			if( !Utils.isNull(lastFileNameImport).equals("")){
-				java.util.Date lastFileNameAsOfDate = Utils.parse(lastFileNameImport.substring(12,20),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+				java.util.Date lastFileNameAsOfDate = DateUtil.parse(lastFileNameImport.substring(12,20),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 				
 				if(fileNameAsOfDate.before(lastFileNameAsOfDate)){ //dateImport < lastDateImport
 					request.setAttribute("Message","ชื่อไฟล์ที่  Upload ["+fileName+"] วันที่น้อยกว่า  ชื่อไฟล์วันที่ล่าสุดที่  Upload ["+lastFileNameImport+"] ");
@@ -172,7 +173,7 @@ public class ImportOnhandPensShop {
 				         ImportSummary s = new ImportSummary();
 				         s.setRow(i+1);
 				         OnhandSummary oh = new OnhandSummary();
-				         oh.setAsOfDate(Utils.stringValue(fileNameAsOfDate, Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+				         oh.setAsOfDate(DateUtil.stringValue(fileNameAsOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 				         oh.setItem(Utils.isNull(item));
 				         oh.setItemDesc(Utils.isNull(itemDesc));
 				         oh.setOnhandQty(Utils.isNull(onhandQty+onhandQty2Digit));

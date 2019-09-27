@@ -5,22 +5,22 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
-<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="com.pens.util.EnvProperties"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css?v=<%=SessionIdUtils.getInstance().getIdSession() %>">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css?v=<%=SIdUtils.getInstance().getIdSession() %>">
 <style type="text/css">
 body {
 	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
 	background-repeat: repeat;
 }
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript">
 function MM_swapImgRestore() { //v3.0
   var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;

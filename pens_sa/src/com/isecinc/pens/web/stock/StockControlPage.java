@@ -16,12 +16,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.web.salestarget.SalesTargetBean;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class StockControlPage {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -131,13 +131,13 @@ public class StockControlPage {
 				salesrepCode = user.getUserName().toUpperCase();
 			}
 	
+			//TYPE_SEARCH_LIST
+			dataList = new ArrayList<PopupBean>();
+			dataList.add(new PopupBean("reportType","แสดงสินค้าใกล้หมดอายุ","REPORT_PRODUCT_EXPIRE"));
+			//dataList.add(new PopupBean("reportType","แสดงสินค้าที่ไม่ได้ตรวจนับ ","REPORT_PRODUCT_NO_CHECK_STOCK"));
+			request.getSession().setAttribute("TYPE_SEARCH_LIST",dataList);
+			
 			//REPORT_TYPE_LIST
-			/* - SKU		
-			 - ร้านค้า , SKU		
-			 - พนักงานขาย , ร้านค้า , SKU		
-			 - ภาค , แบรนด์ , SKU		
-			 - ภาค , พนักงานขาย, แบรนด์ , SKU		
-            */
 			dataList = new ArrayList<PopupBean>();
 			dataList.add(new PopupBean("reportType","ร้านค้า,SKU","CUSTOMER_NUMBER,ITEM_NO"));
 			dataList.add(new PopupBean("reportType","พนักงานขาย,ร้านค้า,SKU","SALES_CODE,CUSTOMER_NUMBER,ITEM_NO"));
@@ -243,13 +243,13 @@ public class StockControlPage {
 			rst = stmt.executeQuery(sql.toString());
 			while(rst.next()){
 				item = new PopupBean();
-				requestDate = Utils.parse("01/"+rst.getString("r"), Utils.DD_MM_YYYY_WITH_SLASH);
+				requestDate = DateUtil.parse("01/"+rst.getString("r"), DateUtil.DD_MM_YYYY_WITH_SLASH);
 				cal.setTime(requestDate);
 				logger.debug("Cal:"+cal.getTime());
-				periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+				periodName =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
 				logger.debug("period:"+periodName);
-		        startDate  =  "01-"+Utils.stringValue(cal.getTime(),"MMM-yyyy");
-		        endDate    =   cal.getActualMaximum(Calendar.DAY_OF_MONTH)+"-"+Utils.stringValue(cal.getTime(),"MMM-yyyy");
+		        startDate  =  "01-"+DateUtil.stringValue(cal.getTime(),"MMM-yyyy");
+		        endDate    =   cal.getActualMaximum(Calendar.DAY_OF_MONTH)+"-"+DateUtil.stringValue(cal.getTime(),"MMM-yyyy");
 				item.setKeyName(periodName);
 				item.setValue(periodName+"|"+startDate +"|"+endDate);
 				monthYearList.add(item);	
@@ -327,8 +327,8 @@ public class StockControlPage {
 			//Cur Month
 			item = new PopupBean();
 			cal = Calendar.getInstance();
-			periodValue =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
-			periodName =  Utils.stringValue(cal.getTime(),"MMMMM-yyyy",Utils.local_th).toUpperCase();
+			periodValue =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  DateUtil.stringValue(cal.getTime(),"MMMMM-yyyy",DateUtil.local_th).toUpperCase();
 			item.setKeyName(periodName);
 			item.setValue(periodValue);
 			monthYearList.add(item);
@@ -337,8 +337,8 @@ public class StockControlPage {
 			item = new PopupBean();
 			cal = Calendar.getInstance();
 			cal.add(Calendar.MONTH, -1);//Current-1
-			periodValue =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
-			periodName =  Utils.stringValue(cal.getTime(),"MMMMM-yyyy",Utils.local_th).toUpperCase();
+			periodValue =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  DateUtil.stringValue(cal.getTime(),"MMMMM-yyyy",DateUtil.local_th).toUpperCase();
 			item.setKeyName(periodName);
 			item.setValue(periodValue);
 			monthYearList.add(item);
@@ -347,8 +347,8 @@ public class StockControlPage {
 			item = new PopupBean();
 			cal = Calendar.getInstance();
 			cal.add(Calendar.MONTH, -2);//Current-2
-			periodValue =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
-			periodName =  Utils.stringValue(cal.getTime(),"MMMMM-yyyy",Utils.local_th).toUpperCase();
+			periodValue =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  DateUtil.stringValue(cal.getTime(),"MMMMM-yyyy",DateUtil.local_th).toUpperCase();
 			item.setKeyName(periodName);
 			item.setValue(periodValue);
 			monthYearList.add(item);
@@ -357,8 +357,8 @@ public class StockControlPage {
 			item = new PopupBean();
 			cal = Calendar.getInstance();
 			cal.add(Calendar.MONTH, -3);//Current-3
-			periodValue =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
-			periodName =  Utils.stringValue(cal.getTime(),"MMMMM-yyyy",Utils.local_th).toUpperCase();
+			periodValue = DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  DateUtil.stringValue(cal.getTime(),"MMMMM-yyyy",DateUtil.local_th).toUpperCase();
 			item.setKeyName(periodName);
 			item.setValue(periodValue);
 			monthYearList.add(item);

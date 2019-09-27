@@ -14,12 +14,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.UserUtils;
-import util.Utils;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcessAll;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.UserUtils;
+import com.pens.util.Utils;
 
 public class SalesTargetTTDAO {
 
@@ -1170,7 +1170,7 @@ public class SalesTargetTTDAO {
 		
 	public static SalesTargetBean convertCriteria(SalesTargetBean o) throws Exception{
 		logger.debug("startDate:"+o.getStartDate());
-		Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MMM_YYYY);
+		Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MMM_YYYY);
 		Calendar c = Calendar.getInstance();
 		c.setTime(startDate);
 		//set Month
@@ -2226,24 +2226,20 @@ public class SalesTargetTTDAO {
 				}
 			}
 		}
-	 public static void deleteAllByMKT(Connection conn,SalesTargetBean o) throws Exception{
+	 public static void deleteAllByMKT_TT(Connection conn,SalesTargetBean o) throws Exception{
 			PreparedStatement ps = null;
-			int c =1;
-			logger.debug("deleteAllByMKT ID["+o.getId()+"]");
+			StringBuffer sql = new StringBuffer("");
+			logger.debug("deleteAllByMKT_TT ID["+o.getId()+"]");
 			try{
-				StringBuffer sql = new StringBuffer("");
-				sql.append(" DELETE XXPENS_BI_SALES_TARGET_TT \n");
-			    sql.append(" WHERE ID =? \n");
+				sql.append(" DELETE XXPENS_BI_SALES_TARGET_TT WHERE ID ="+o.getId()+" ");
+				logger.debug("sql:"+sql.toString());
 				ps = conn.prepareStatement(sql.toString());
-				ps.setLong(c++, o.getId());
 				ps.executeUpdate();
 				
 				sql = new StringBuffer("");
-				c=1;
-				sql.append(" DELETE XXPENS_BI_SALES_TARGET_TT_L \n");
-			    sql.append(" WHERE ID =? \n");
+				sql.append(" DELETE XXPENS_BI_SALES_TARGET_TT_L WHERE ID ="+o.getId()+" ");
+				logger.debug("sql:"+sql.toString());
 				ps = conn.prepareStatement(sql.toString());
-				ps.setLong(c++, o.getId());
 				ps.executeUpdate();
 				
 			}catch(Exception e){

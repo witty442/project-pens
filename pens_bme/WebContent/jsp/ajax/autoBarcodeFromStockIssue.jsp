@@ -1,5 +1,5 @@
 
-<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+<%@page import="com.pens.util.DBConnection"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="com.isecinc.pens.bean.Barcode"%>

@@ -25,10 +25,11 @@ import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.MCBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.MCDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 
@@ -83,7 +84,7 @@ public class MCAction extends I_Action {
 			logger.debug("DateString:"+dateString);
 			
 			Calendar calendar = Calendar.getInstance();  
-	        calendar.setTime(Utils.parse(dateString, Utils.DD_MM_YYYY_WITHOUT_SLASH));  
+	        calendar.setTime(DateUtil.parse(dateString, DateUtil.DD_MM_YYYY_WITHOUT_SLASH));  
 	        calendar.add(Calendar.MONTH, 1);  
 	        calendar.set(Calendar.DAY_OF_MONTH, 1);  
 	        calendar.add(Calendar.DATE, -1);  
@@ -393,9 +394,9 @@ public class MCAction extends I_Action {
 		    int maxDayInMonth = b.getMaxDay();
 		    
 		    String dateString = "01"+b.getMonthTrip();//01012015
-		    Date dateObj = Utils.parse(dateString, Utils.DD_MM_YYYY_WITHOUT_SLASH);
-		    monthYearFull = Utils.stringValue(dateObj, Utils.MMMM_YYYY,Utils.local_th);
-		    monthYear = Utils.stringValue(dateObj, Utils.MMM_YYYY,Utils.local_th);
+		    Date dateObj = DateUtil.parse(dateString, DateUtil.DD_MM_YYYY_WITHOUT_SLASH);
+		    monthYearFull = DateUtil.stringValue(dateObj, DateUtil.MMMM_YYYY,Utils.local_th);
+		    monthYear = DateUtil.stringValue(dateObj, DateUtil.MMM_YYYY,Utils.local_th);
 		    
 			//Header
 			h.append("<table border='1' width='100%'> \n");
@@ -490,7 +491,7 @@ public class MCAction extends I_Action {
 			
 			//step  01 what day of week
 			Calendar cDay = Calendar.getInstance(Utils.local_th);
-			cDay.setTime(Utils.parse("01"+monthTrip, Utils.DD_MM_YYYY_WITHOUT_SLASH));
+			cDay.setTime(DateUtil.parse("01"+monthTrip, DateUtil.DD_MM_YYYY_WITHOUT_SLASH));
 			int startDayOfMonth = cDay.get(Calendar.DAY_OF_WEEK);
 			bean.setStartDayOfMonth(startDayOfMonth);
 			

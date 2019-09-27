@@ -26,10 +26,11 @@ import com.isecinc.pens.bean.MCEmpBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.MCEmpDAO;
 import com.isecinc.pens.dao.MCTimeDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.export.ExcelResultBean;
 import com.isecinc.pens.web.export.ExportTimeSheetGroup;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -56,7 +57,7 @@ public class MCTimeAction extends I_Action {
 			if("new".equals(action)){
 				aForm.setResultsSearch(null);
 				MCBean ad = new MCBean();
-			    ad.setStaffMonth(Utils.getCurrentMonth());
+			    ad.setStaffMonth(DateUtil.getCurrentMonth());
 			    logger.debug("currentMonth:"+ad.getStaffMonth());
 			    
 				aForm.setBean(ad);
@@ -145,7 +146,7 @@ public class MCTimeAction extends I_Action {
 				logger.debug("DateString:"+dateString);
 				
 				Calendar calendar = Calendar.getInstance();  
-		        calendar.setTime(Utils.parse(dateString, Utils.DD_MM_YYYY_WITHOUT_SLASH));  
+		        calendar.setTime(DateUtil.parse(dateString, DateUtil.DD_MM_YYYY_WITHOUT_SLASH));  
 		        calendar.add(Calendar.MONTH, 1);  
 		        calendar.set(Calendar.DAY_OF_MONTH, 1);  
 		        calendar.add(Calendar.DATE, -1);  
@@ -176,7 +177,7 @@ public class MCTimeAction extends I_Action {
 					item.setReasonLeave("");
 					item.setNote("");
 					
-					if(Utils.isHoliday(item.getStaffDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)){
+					if(DateUtil.isHoliday(item.getStaffDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)){
 						item.setHoliday(true);
 					}
 					//logger.debug("staffDate:"+item.getStaffDate()+",isHoliday:"+Utils.isHoliday(item.getStaffDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));

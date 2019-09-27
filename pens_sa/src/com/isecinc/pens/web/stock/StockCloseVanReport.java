@@ -10,8 +10,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.web.stockonhand.StockOnhandBean;
-
-import util.Utils;
+import com.pens.util.Utils;
 
 
 public class StockCloseVanReport {

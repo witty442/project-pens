@@ -15,13 +15,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 /**
  * SalesTargetAction
@@ -41,6 +40,7 @@ public class SalesTargetAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String pageName ="";
 		String subPageName = "";//Exp TT
+		String forward ="search";
 		try {
 			String action = Utils.isNull(request.getParameter("action")); 
 			pageName = Utils.isNull(request.getParameter("pageName"));
@@ -118,6 +118,11 @@ public class SalesTargetAction extends I_Action {
 				}else if (SalesTargetConstants.PAGE_MTADMIN.equalsIgnoreCase(pageName)){
 					sales = new SalesTargetBean();
 					SalesTargetTTControlPage.prepareSearchMTADMIN(request, conn, user,pageName);
+					
+				}else if (SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){
+					sales = new SalesTargetBean();
+					SalesTargetPDControlPage.prepareSearchSalesTargetPD(request, conn, user,pageName);
+					forward ="searchPD";
 				}
 				
 				//set bean session
@@ -177,7 +182,7 @@ public class SalesTargetAction extends I_Action {
 			  conn.close();conn=null;
 			}
 		}
-		return mapping.findForward("search");
+		return mapping.findForward(forward);
 	}
 	
 	public ActionForward searchHead(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -187,6 +192,7 @@ public class SalesTargetAction extends I_Action {
 		boolean foundData = false;
 		String pageName = aForm.getPageName();
 		String subPageName = aForm.getSubPageName();
+		String forward ="search";
 		try {
 			logger.debug("search Head :pageName["+pageName+"]");
 			
@@ -281,6 +287,14 @@ public class SalesTargetAction extends I_Action {
 					  request.getSession().setAttribute("salesTargetForm_RESULTS", SalesTargetExport.genResultSearchTargetHeadByMTADMIN(request,aForm.getBean(),user));
 					  foundData = true;
 				   }
+			}else if (SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){
+				   SalesTargetBean salesReuslt = SalesTargetPDDAO.searchTargetPD(aForm.getBean(),user,pageName,false);
+				   aForm.setBean(salesReuslt);
+				   if(salesReuslt.getDataStrBuffer() != null && salesReuslt.getDataStrBuffer().length() >0){
+					  request.getSession().setAttribute("salesTargetForm_RESULTS", salesReuslt.getDataStrBuffer());
+					  foundData = true;
+				   }
+				   forward ="searchPD";
 			}
 			
 			if(foundData==false){
@@ -296,7 +310,7 @@ public class SalesTargetAction extends I_Action {
 		}finally{
 			
 		}
-		return mapping.findForward("search");
+		return mapping.findForward(forward);
 	}
 	
 	/**
@@ -425,12 +439,12 @@ public class SalesTargetAction extends I_Action {
 				//copy all brand by user login config
 				 new SalesTargetTTAction().copyFromLastMonthByTTSUPER(mapping, aForm, request, response);
 				 
-				 //search
-				 SalesTargetBean salesReuslt = SalesTargetTTDAO.searchTargetHeadByTTSUPER_TT(cri,user,pageName);
-			     aForm.setBean(cri);
-			     if(salesReuslt.getItems() != null && salesReuslt.getItems().size() >0){
-				     request.getSession().setAttribute("salesTargetForm_RESULTS", SalesTargetTTExport.genResultSearchTargetHeadByTTSUPER(request,aForm.getBean(),user));
-			     }
+				//search
+				SalesTargetBean salesReuslt = SalesTargetTTDAO.searchTargetHeadByTTSUPER_TT(cri,user,pageName);
+			    aForm.setBean(cri);
+			    if(salesReuslt.getItems() != null && salesReuslt.getItems().size() >0){
+				    request.getSession().setAttribute("salesTargetForm_RESULTS", SalesTargetTTExport.genResultSearchTargetHeadByTTSUPER(request,aForm.getBean(),user));
+			    }
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -488,45 +502,21 @@ public class SalesTargetAction extends I_Action {
 	}
 	
 	public ActionForward deleteAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("Delete All By Marketing");
-		Connection conn = null;
 		SalesTargetForm aForm = (SalesTargetForm) form;
-		User user = (User) request.getSession().getAttribute("user");
+		String pageName = aForm.getPageName();
+		logger.debug("Delete All By PageName:"+pageName);
 		try {
-			conn = DBConnection.getInstance().getConnection();
-			conn.setAutoCommit(false);
-			
-			SalesTargetBean h = aForm.getBean();
-			
-			//delete all;
-			SalesTargetDAO.deleteAllByMKT(conn, h);
-
-			request.setAttribute("Message","ลบข้อมูล เรียบร้อยแล้ว");
-			
-			conn.commit();
-			//reset
-			h.setId(0);
-			h.setTotalOrderAmt12Month("");
-			h.setTotalOrderAmt3Month("");
-			h.setTotalTargetAmount("");
-			h.setTotalTargetQty("");
-			h.setItems(null);
-			h.setItemsList(null);
-			logger.debug("priceListId:"+h.getPriceListId());
-			aForm.setResults(new ArrayList<SalesTargetBean>());
-			aForm.setBean(h);
-			
+			if (SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName) ){
+				return new SalesTargetMTAction().deleteAllMT(mapping,form,request,response);
+				
+			}else if (SalesTargetConstants.PAGE_MKT_TT.equalsIgnoreCase(pageName) ){
+				return new SalesTargetTTAction().deleteAllTT(mapping,form,request,response);
+			}
 		} catch (Exception e) {
-			conn.rollback();
-			
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		} finally {
-			try {
-				if(conn != null){
-					conn.close();conn=null;
-				}
-			} catch (Exception e2) {}
+		
 		}
 		return mapping.findForward("detail");
 	}
@@ -673,6 +663,13 @@ public class SalesTargetAction extends I_Action {
 				  if(resultHtmlTable != null){
 					  foundData = true;
 				 }	
+			 }else  if(SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){
+				   SalesTargetBean salesReuslt = SalesTargetPDDAO.searchTargetPD(aForm.getBean(),user,pageName,true);
+				   aForm.setBean(salesReuslt);
+				   if(salesReuslt.getDataStrBuffer() != null && salesReuslt.getDataStrBuffer().length() >0){
+					   resultHtmlTable = salesReuslt.getDataStrBuffer();
+					   foundData = true;
+				   }
 			 }
 			 
 			  if(foundData){

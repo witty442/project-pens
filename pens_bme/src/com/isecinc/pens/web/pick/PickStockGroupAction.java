@@ -29,8 +29,9 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.PickStockDAO;
 import com.isecinc.pens.dao.PickStockGroupDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 import com.pens.util.pdf.StampBoxNoPickAllBoxReportPdf;
@@ -284,7 +285,7 @@ public class PickStockGroupAction extends I_Action {
 				
 				PickStock p = new PickStock();
 				p.setPickType(PickConstants.PICK_TYPE_GROUP);
-				p.setIssueReqDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				p.setIssueReqDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				p.setCanEdit(true);
 				p.setCanConfirm(false);
 				
@@ -498,7 +499,7 @@ public class PickStockGroupAction extends I_Action {
 			PickStock h = aForm.getBean();
 			  
 			//update status stock Pick to cancel
-			String curDateStr = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String curDateStr = DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			h.setUpdateUser(user.getUserName());
 			h.setConfirmIssueDate(curDateStr);
 			h.setIssueReqStatus(PickStockGroupDAO.STATUS_ISSUED);

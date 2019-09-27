@@ -31,9 +31,10 @@ import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.imports.ImportForm;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 
@@ -123,7 +124,7 @@ public class ImportLoadStockInitProcess {
 				row = sheet.getRow(rowNo);
 				cell = row.getCell((short) 1);
 				salesDate = Utils.isNull(xslUtils.getCellValue(1, cell));
-				java.util.Date salesDateObj = Utils.parse(salesDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				java.util.Date salesDateObj = DateUtil.parse(salesDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				rowNo = 1;
 				row = sheet.getRow(rowNo); 

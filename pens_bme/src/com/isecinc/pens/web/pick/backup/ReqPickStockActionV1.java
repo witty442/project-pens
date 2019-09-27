@@ -23,9 +23,10 @@ import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ReqPickStockDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.pick.ReqPickStockForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -172,7 +173,7 @@ public class ReqPickStockActionV1 extends I_Action {
 				request.getSession().setAttribute("results", null);
 				
 				ReqPickStock p = new ReqPickStock();
-				p.setIssueReqDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				p.setIssueReqDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				p.setCanEdit(true);
 				
 				p.setNewReq(true);
@@ -599,7 +600,7 @@ public class ReqPickStockActionV1 extends I_Action {
 			logger.debug("pickStockItemList:"+pickStockItemList.size());
 			  
 			//update status stock Pick to cancel
-			String curDateStr = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String curDateStr = DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			h.setStatus(ReqPickStockDAO.STATUS_ISSUED);
 			//update DB

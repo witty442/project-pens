@@ -11,9 +11,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import com.isecinc.pens.inf.helper.DBConnection;
+
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.BahtText;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -82,8 +84,8 @@ public class ITStockDAO {
 					sql.append("\n and h.salesrep_code = '"+Utils.isNull(o.getSalesrepCode())+"'");
 				}
 				if(!Utils.isNull(o.getDocDate()).equals("")){
-					Date date = Utils.parse(o.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String dateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date date = DateUtil.parse(o.getDocDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					sql.append("\n and h.doc_date = to_date('"+dateStr+"','dd/mm/yyyy')");
 				}
 				sql.append("\n order by h.id desc ");
@@ -126,8 +128,8 @@ public class ITStockDAO {
 					  sql.append("\n and h.salesrep_code = '"+Utils.isNull(o.getSalesrepCode())+"'");
 				   }
 				   if(!Utils.isNull(o.getDocDate()).equals("")){
-						Date date = Utils.parse(o.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-						String dateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH);
+						Date date = DateUtil.parse(o.getDocDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						String dateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH);
 						sql.append("\n and h.doc_date = to_date('"+dateStr+"','dd/mm/yyyy')");
 				   }
 				   sql.append("\n order by h.id desc ");
@@ -147,7 +149,7 @@ public class ITStockDAO {
 				while(rst.next()) {
 				   h = new ITManageBean();
 				   h.setDocType(Utils.isNull(rst.getString("doc_type")));
-				   h.setDocDate(Utils.stringValue(rst.getDate("doc_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setDocDate(DateUtil.stringValue(rst.getDate("doc_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setSalesrepCode(Utils.isNull(rst.getString("salesrep_code")));
 				   h.setSalesrepFullName(Utils.isNull(rst.getString("salesrep_full_name")));
 				   h.setId(rst.getInt("id"));
@@ -233,7 +235,7 @@ public class ITStockDAO {
 			sql.append(" VALUES(?,?,?,?,?,?,?,?,?)  \n" );
 			ps = conn.prepareStatement(sql.toString());
 			
-            Date docDate = Utils.parse(o.getDocDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+            Date docDate = DateUtil.parse(o.getDocDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
             
             ps.setString(c++, Utils.isNull(o.getId()));
 			ps.setTimestamp(c++, new java.sql.Timestamp(docDate.getTime()));
@@ -300,7 +302,7 @@ public class ITStockDAO {
 			sql.append(" WHERE ID = ?  \n" );
 			ps = conn.prepareStatement(sql.toString());
 			
-            Date docDate = Utils.parse(o.getDocDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+            Date docDate = DateUtil.parse(o.getDocDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 
 			ps.setTimestamp(c++, new java.sql.Timestamp(docDate.getTime()));
 			ps.setString(c++, Utils.isNull(o.getDocType()));

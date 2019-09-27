@@ -16,8 +16,9 @@ import com.isecinc.pens.bean.AdjustStock;
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -41,7 +42,7 @@ public class AdjustStockDAO {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
-			Date tDate  = Utils.parse(h.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date tDate  = DateUtil.parse(h.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			//check documentNo
 			if(Utils.isNull(h.getDocumentNo()).equals("")){
 				//Gen DocNo
@@ -127,7 +128,7 @@ public class AdjustStockDAO {
 			
 			ps = conn.prepareStatement(sql.toString());
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date tDate  = DateUtil.parse(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				ps.setDate(1,new java.sql.Date(tDate.getTime()));
 			}
 			
@@ -185,7 +186,7 @@ public class AdjustStockDAO {
 			
 			ps = conn.prepareStatement(sql.toString());
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date tDate  = DateUtil.parse(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
 			}
 			
@@ -193,7 +194,7 @@ public class AdjustStockDAO {
 			while(rst.next()) {
 				   h = new AdjustStock();
 				   h.setNo(r);
-				   h.setTransactionDate(Utils.stringValue(rst.getDate("transaction_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setTransactionDate(DateUtil.stringValue(rst.getDate("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setDocumentNo(Utils.isNull(rst.getString("document_no")));
 				   h.setSubInv(Utils.isNull(rst.getString("sub_inv")));
 				   h.setOrg(Utils.isNull(rst.getString("org")));
@@ -258,7 +259,7 @@ public class AdjustStockDAO {
 			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date tDate  = DateUtil.parse(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
 			}
 			
@@ -268,7 +269,7 @@ public class AdjustStockDAO {
 			   found = true;
 			   if(r==1)	{
 				   h = new AdjustStock();
-				   h.setTransactionDate(Utils.stringValue(rst.getDate("transaction_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setTransactionDate(DateUtil.stringValue(rst.getDate("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setDocumentNo(Utils.isNull(rst.getString("document_no")));
 				   h.setSubInv(Utils.isNull(rst.getString("sub_inv")));
 				   h.setOrg(Utils.isNull(rst.getString("org")));
@@ -472,7 +473,7 @@ public class AdjustStockDAO {
 			
 			ps = conn.prepareStatement(sql.toString());
 				
-			Date tDate = Utils.parse( o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date tDate = DateUtil.parse( o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			int c =1;
 			
 			ps.setString(c++, o.getDocumentNo());

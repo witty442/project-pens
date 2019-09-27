@@ -2,7 +2,7 @@
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetTTDAO"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
 <%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="util.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="java.util.List"%>

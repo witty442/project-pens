@@ -11,9 +11,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.ColumnBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.ColumnBean;
-import com.isecinc.pens.inf.bean.TableBean;
+import com.pens.util.Constants;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class ExportHelper extends InterfaceUtils{
@@ -142,24 +144,24 @@ public class ExportHelper extends InterfaceUtils{
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
 					  // dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), colBean.getDefaultValue());
-						dataConvertStr = appendRightByLength(Utils.format(rs.getDate(colBean.getColumnName()), colBean.getDefaultValue())," ",colBean.getTextLength());
+						dataConvertStr = appendRightByLength(DateUtil.format(rs.getDate(colBean.getColumnName()), colBean.getDefaultValue())," ",colBean.getTextLength());
 					}
 				}else{
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
 				      // dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), "ddMMyyyy");
-				       dataConvertStr = appendRightByLength(Utils.format(rs.getDate(colBean.getColumnName()), "ddMMyyyy")," ",colBean.getTextLength());
+				       dataConvertStr = appendRightByLength(DateUtil.format(rs.getDate(colBean.getColumnName()), "ddMMyyyy")," ",colBean.getTextLength());
 					}
 				}
 			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
 					  // dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss");
-					   dataConvertStr = appendRightByLength(Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss")," ",colBean.getTextLength());
+					   dataConvertStr = appendRightByLength(DateUtil.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss")," ",colBean.getTextLength());
 					}
 				}else{
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
 				     // dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss");
-					 dataConvertStr = appendRightByLength(Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss")," ",colBean.getTextLength());
+					 dataConvertStr = appendRightByLength(DateUtil.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss")," ",colBean.getTextLength());
 					}
 				}
 	

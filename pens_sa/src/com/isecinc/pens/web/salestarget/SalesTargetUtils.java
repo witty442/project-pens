@@ -13,14 +13,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.buf.C2BConverter;
 
-import util.DBConnection;
-import util.DateToolsUtil;
-import util.SQLHelper;
-import util.UserUtils;
-import util.Utils;
-
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
+import com.pens.util.UserUtils;
+import com.pens.util.Utils;
 
 public class SalesTargetUtils {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -130,7 +129,7 @@ public class SalesTargetUtils {
 			item = new PopupBean();
 			cal = Calendar.getInstance();
 			cal.add(Calendar.MONTH, 3);//Current+1
-			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
 			period = getPeriodList(conn,periodName).get(0);//get Period View
 			item.setKeyName(periodName);
 			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
@@ -140,7 +139,7 @@ public class SalesTargetUtils {
 			item = new PopupBean();
 			cal = Calendar.getInstance();
 			cal.add(Calendar.MONTH, 2);//Current+1
-			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
 			period = getPeriodList(conn,periodName).get(0);//get Period View
 			item.setKeyName(periodName);
 			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
@@ -150,7 +149,7 @@ public class SalesTargetUtils {
 			item = new PopupBean();
 			cal = Calendar.getInstance();
 			cal.add(Calendar.MONTH, 1);//Current+1
-			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
 			period = getPeriodList(conn,periodName).get(0);//get Period View
 			item.setKeyName(periodName);
 			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
@@ -159,7 +158,7 @@ public class SalesTargetUtils {
 			//Current Month
 			item = new PopupBean();
 			cal = Calendar.getInstance();
-			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
 			period = getPeriodList(conn,periodName).get(0);//get Period View
 			item.setKeyName(periodName);
 			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
@@ -168,7 +167,7 @@ public class SalesTargetUtils {
 			//Prev Month
 			item = new PopupBean();
 			cal.add(Calendar.MONTH, -1);//Current-1
-			periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+			periodName =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
 			period = getPeriodList(conn,periodName).get(0);//get Period View
 			item.setKeyName(periodName);
 			item.setValue(periodName+"|"+period.getStartDate() +"|"+period.getEndDate());
@@ -225,7 +224,7 @@ public class SalesTargetUtils {
 			logger.debug("prevMonthDate:"+prevMonthDate);
 			logger.debug("currentMonthDate:"+currentMonthDate);
 			
-			int diffMonth = DateToolsUtil.calcDiffMonthYear(prevMonthDate, currentMonthDate);
+			int diffMonth = DateUtil.calcDiffMonthYear(prevMonthDate, currentMonthDate);
 			logger.debug("diffMonth:"+diffMonth);
 			
 			//loop prevMonth to Current
@@ -233,11 +232,11 @@ public class SalesTargetUtils {
 				//Next Month
 				item = new PopupBean();
 				cal.add(Calendar.MONTH, 1);//
-				periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+				periodName =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
 				logger.debug("periodName:"+periodName);
 				
-				startDate = "01-"+Utils.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
-				endDate = cal.getMaximum(Calendar.DAY_OF_MONTH)+"-"+Utils.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
+				startDate = "01-"+DateUtil.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
+				endDate = cal.getMaximum(Calendar.DAY_OF_MONTH)+"-"+DateUtil.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
 				
 				item.setKeyName(periodName);
 				item.setValue(periodName+"|"+startDate +"|"+endDate);
@@ -252,7 +251,7 @@ public class SalesTargetUtils {
 			
 			logger.debug("currentMonthDate:"+currentMonthDate);
 			logger.debug("nextMonthDate:"+nextMonthDate);
-			diffMonth = DateToolsUtil.calcDiffMonthYear(currentMonthDate, nextMonthDate);
+			diffMonth = DateUtil.calcDiffMonthYear(currentMonthDate, nextMonthDate);
 			logger.debug("diffMonth:"+diffMonth);
 			
 			//loop start Current +nextMonth
@@ -261,11 +260,11 @@ public class SalesTargetUtils {
 				//Next Month
 				item = new PopupBean();
 				cal.add(Calendar.MONTH, 1);//
-				periodName =  Utils.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
+				periodName =  DateUtil.stringValue(cal.getTime(),"MMM-yy").toUpperCase();
 				logger.debug("periodName:"+periodName);
 				
-				startDate = "01-"+Utils.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
-				endDate = cal.getMaximum(Calendar.DAY_OF_MONTH)+"-"+Utils.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
+				startDate = "01-"+DateUtil.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
+				endDate = cal.getMaximum(Calendar.DAY_OF_MONTH)+"-"+DateUtil.stringValue(cal.getTime(),"MMM-yyyy").toUpperCase();
 				
 				item.setKeyName(periodName);
 				item.setValue(periodName+"|"+startDate +"|"+endDate);
@@ -308,8 +307,8 @@ public class SalesTargetUtils {
 			while (rst.next()) {
 			  s = new SalesTargetBean();
 			  s.setPeriod(Utils.isNull(rst.getString("PERIOD_NAME")));
-			  s.setStartDate(Utils.stringValue(rst.getDate("start_date"),Utils.DD_MMM_YYYY));
-			  s.setEndDate(Utils.stringValue(rst.getDate("end_date"),Utils.DD_MMM_YYYY));
+			  s.setStartDate(DateUtil.stringValue(rst.getDate("start_date"),DateUtil.DD_MMM_YYYY));
+			  s.setEndDate(DateUtil.stringValue(rst.getDate("end_date"),DateUtil.DD_MMM_YYYY));
 			  s.setTargetQuarter(Utils.isNull(rst.getString("quarter_num")));
 			  pos.add(s);
 			}//while
@@ -452,7 +451,7 @@ public class SalesTargetUtils {
 		try{
 			sql.append("\n  SELECT unit_price  from apps.xxpens_om_price_list_v M  ");
 			sql.append("\n  where item_no like '"+brand+"%' and uom_code ='CTN'");
-			sql.append("\n  and list_header_id in( "+Utils.converToTextSqlIn(priceListId)+") and rownum =1 ");
+			sql.append("\n  and list_header_id in( "+SQLHelper.converToTextSqlIn(priceListId)+") and rownum =1 ");
 			
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
@@ -1291,8 +1290,8 @@ public class SalesTargetUtils {
 		         logger.debug("minDateOfMonth:"+startDate);
 		        
 		         //maxDateOfMonth
-		         Date date = Utils.parse(startDate, "yyyyMMdd");
-		         String endDate = o.getTargetYear()+o.getTargetMonth()+DateToolsUtil.getMaxDayOfMonth(date);
+		         Date date = DateUtil.parse(startDate, "yyyyMMdd");
+		         String endDate = o.getTargetYear()+o.getTargetMonth()+DateUtil.getMaxDayOfMonth(date);
 		         sql.append("\n  AND V.INVOICE_DATE >= to_date('"+startDate+"','yyyymmdd') ");
 		         sql.append("\n  AND V.INVOICE_DATE <= to_date('"+endDate+"','yyyymmdd')");
 				 

@@ -9,9 +9,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.ColumnBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.ColumnBean;
-import com.isecinc.pens.inf.bean.TableBean;
+import com.pens.util.Constants;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 import com.pens.util.meter.MonitorTime;
@@ -634,7 +637,7 @@ public class InterfaceHelperWacoal extends InterfaceUtils{
 		}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
 			if(!Utils.isNull(value).equals("")){ 
 				//logger.debug("Timestamp:"+Utils.parse(value, Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH));
-				ps.setTimestamp(parameterIndex,new java.sql.Timestamp(Utils.parse(value, Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH).getTime()));
+				ps.setTimestamp(parameterIndex,new java.sql.Timestamp(DateUtil.parse(value, DateUtil.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH).getTime()));
 			}else{
 			    ps.setTimestamp(parameterIndex,null);	
 			}

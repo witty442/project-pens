@@ -8,8 +8,6 @@ import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.EnvProperties;
-
 public class DBCPConnectionProvider {
 
 	private static boolean init = false;

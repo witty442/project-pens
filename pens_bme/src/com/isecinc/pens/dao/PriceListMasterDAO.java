@@ -17,7 +17,7 @@ import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.PriceListMasterBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 

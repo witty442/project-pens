@@ -10,12 +10,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SalesrepDAO;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class PromotionDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -116,7 +116,7 @@ public class PromotionDAO {
 			   h.setCustomerCode(rst.getString("customer_number"));  
 			   h.setCustomerName(Utils.isNull(rst.getString("party_name"))); 
 			   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
-			   h.setRequestDate(Utils.stringValue(rst.getDate("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   h.setBrand(Utils.isNull(rst.getString("brand"))); 
 			   h.setBrandName(Utils.isNull(rst.getString("brand_name"))); 
 			   h.setProductType(Utils.isNull(rst.getString("product_type")));
@@ -161,11 +161,11 @@ public class PromotionDAO {
 		}
 		
 		if( !Utils.isNull(o.getStartDate()).equalsIgnoreCase("")){
-			Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
-			Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n and S.request_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
 			sql.append("\n and S.request_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
@@ -214,7 +214,7 @@ public class PromotionDAO {
 			  RequestPromotion m = new RequestPromotion();
 			  m.setNo(no+"");
 			  m.setRequestNo(rst.getString("request_no"));
-			  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  m.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			  m.setProductCatagory(Utils.isNull(rst.getString("product_category")));
 			  m.setProductCatagoryDesc(Utils.isNull(rst.getString("product_catagory_name")));
 			  m.setProductType(Utils.isNull(rst.getString("product_type")));
@@ -224,8 +224,8 @@ public class PromotionDAO {
 			  m.setCustomerCode(Utils.isNull(rst.getString("customer_number")));
 			  m.setCustomerName(Utils.isNull(rst.getString("customer_name")));
 			  m.setUserId(Utils.isNull(rst.getString("salesrep_id")));
-			  m.setPromotionStartDate(Utils.stringValue(rst.getDate("promotion_start_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			  m.setPromotionEndDate(Utils.stringValue(rst.getDate("promotion_end_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  m.setPromotionStartDate(DateUtil.stringValue(rst.getDate("promotion_start_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+			  m.setPromotionEndDate(DateUtil.stringValue(rst.getDate("promotion_end_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			  m.setRemark(Utils.isNull(rst.getString("remark")));
 	
 			  //Get User SalesRep Description
@@ -236,7 +236,7 @@ public class PromotionDAO {
 				  m.setSalesName(salesrepBean.getSalesrepFullName());
 			  }
 			  if(rst.getDate("printed_date") != null)
-			     m.setPrintDate(Utils.stringValue(rst.getTimestamp("printed_date"),Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH,Utils.local_th));
+			     m.setPrintDate(DateUtil.stringValue(rst.getTimestamp("printed_date"),DateUtil.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH,DateUtil.local_th));
 			  
 			  if(getItem){
 				  //get Cost Line

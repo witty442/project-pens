@@ -15,14 +15,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBConnection;
-import util.ExcelHeader;
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 /**
  * Summary Action
@@ -221,7 +221,7 @@ public class MasterItemStockMCProcess extends I_Action {
 				bean.setMcName("MC NameNaja");
 				bean.setStoreCode("020047-1");*/
 				
-				bean.setStockDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setStockDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				bean.setCanEdit(true);
 				aForm.setBean(bean);
 				aForm.setResults(null);
@@ -297,7 +297,7 @@ public class MasterItemStockMCProcess extends I_Action {
 		Connection conn = null;
 		try {
 			StockMCBean bean = new StockMCBean();
-			bean.setStockDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			bean.setStockDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			bean.setCanEdit(true);
 			aForm.setBean(bean);
 			aForm.setResults(null);

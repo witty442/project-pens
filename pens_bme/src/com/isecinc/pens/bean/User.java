@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 
@@ -68,10 +69,10 @@ public class User extends I_PO implements Serializable {
 	
 		//String dateStr = Utils.stringValue(new Date(rst.getDate("START_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 		if( !Utils.isNull(rst.getString("START_DATE")).equals("")){
-		  setStartDate(Utils.stringValue(new Date(rst.getDate("START_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+		  setStartDate(DateUtil.stringValue(new Date(rst.getDate("START_DATE",Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 		}
 		if( !Utils.isNull(rst.getString("END_DATE")).equals("")){
-		  setEndDate(Utils.stringValue(new Date(rst.getDate("END_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+		  setEndDate(DateUtil.stringValue(new Date(rst.getDate("END_DATE",Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 		}
 		
 		setTerritory(Utils.isNull(rst.getString("TERRITORY")));

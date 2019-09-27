@@ -25,24 +25,25 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.isecinc.pens.bean.MCBean;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.StoreBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
+import com.isecinc.pens.dao.InterfaceDAO;
 import com.isecinc.pens.dao.OrderDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.bean.TableBean;
-import com.isecinc.pens.inf.dao.InterfaceDAO;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.web.export.ExcelStyle;
 import com.isecinc.pens.web.export.ExportTimeSheetGroup;
 import com.isecinc.pens.web.export.HssfExcelStyle;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
@@ -87,7 +88,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			ftpManager.canConnectFTPServer();
 			
 			//Prepare parameter
-			Date date = Utils.parse(batchParamMap.get(PARAM_TRANS_DATE), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date date = DateUtil.parse(batchParamMap.get(PARAM_TRANS_DATE), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			String productType = Utils.isNull(batchParamMap.get(PARAM_PRODUCT_TYPE));
 			String realPathTemp  = batchParamMap.get(PARAM_REAL_PATH_TEMP);
 			
@@ -620,7 +621,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 		ResultSet rs = null;
 		boolean found = false;
 		try{
-			Date date = Utils.parse(transDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date date = DateUtil.parse(transDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select count(*) as c from PENSBME_ORDER where ORDER_DATE = ? \n");
 			sql.append(" and store_type ='"+storeType+"'");
@@ -663,7 +664,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 		List<StoreBean> storeList = new ArrayList<StoreBean>();
 		StringBuilder sql = new StringBuilder();
 		try{
-			Date orderDate = Utils.parse(batchParamMap.get(PARAM_TRANS_DATE), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(batchParamMap.get(PARAM_TRANS_DATE), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			sql.append("\n SELECT DISTINCT A.store_code ,A.store_no ,A.store_name FROM(");
 			
@@ -734,7 +735,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 		String keyMap = "";
 		StoreBean store = null;
 		try {
-			Date orderDate = Utils.parse(batchParamMap.get(PARAM_TRANS_DATE), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(batchParamMap.get(PARAM_TRANS_DATE), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			sql.append("\n SELECT DISTINCT " );
 			sql.append("\n A.mat ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF ");
@@ -850,7 +851,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 		ResultSet rs = null;
 		Map<String,StoreBean> map = new HashMap<String,StoreBean>();
 		try{
-			Date orderDate = Utils.parse(batchParamMap.get(PARAM_TRANS_DATE), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(batchParamMap.get(PARAM_TRANS_DATE), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			StringBuffer sql = new StringBuffer("");
 			sql.append("\n SELECT " );

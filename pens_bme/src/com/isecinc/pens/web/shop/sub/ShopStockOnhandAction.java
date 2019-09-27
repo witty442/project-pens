@@ -15,9 +15,10 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.isecinc.pens.web.shop.ShopForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
@@ -167,12 +168,12 @@ public class ShopStockOnhandAction {
 			//prepare parameter
 			String christSalesDateStr ="";
 			if( !Utils.isNull(c.getAsOfDate()).equals("")){
-				Date d = Utils.parse(c.getAsOfDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				christSalesDateStr = Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date d = DateUtil.parse(c.getAsOfDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				christSalesDateStr = DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			}
 			String initDateStr ="";
 			if( initDate != null){
-				initDateStr = Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				initDateStr = DateUtil.stringValue(initDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			}
 			
 			sql.append("\n SELECT A.* FROM(");

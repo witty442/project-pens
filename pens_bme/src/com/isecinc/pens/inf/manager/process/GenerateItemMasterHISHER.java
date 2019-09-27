@@ -10,14 +10,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
@@ -58,7 +59,7 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			ftpManager.canConnectFTPServer();
 			
 			//Prepare parameter
-			Date date = Utils.parse(batchParamMap.get(PARAM_TRANS_DATE), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date date = DateUtil.parse(batchParamMap.get(PARAM_TRANS_DATE), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			String productType = Utils.isNull(batchParamMap.get(PARAM_PRODUCT_TYPE));
 			
 			//Create Connection
@@ -249,7 +250,7 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			ps.setString(++index, barcode);
 			ps.setString(++index, productCode);
 			ps.setString(++index,userName);
-			ps.setDate(++index,Utils.getSqlCurrentDate());
+			ps.setDate(++index,DateUtil.getSqlCurrentDate());
 			
 			int r = ps.executeUpdate();
 			
@@ -357,8 +358,8 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			/**20 */line += appendRightByLength(Utils.isNull(configMap.get("VAT_TYPE"))," ",2);//VAT_TYPE	รหัสประเภทของ Vat	CHAR(2)
 			        line += debug(no,appendRightByLength(Utils.isNull(configMap.get("VAT_TYPE"))," ",2));no++;
 			        
-			/**21 */line += appendRightByLength(Utils.stringValue(date, Utils.DD_MM_YYYY_WITHOUT_SLASH,Utils.local_th)," ",8);//DATE	วันที่ Online ข้อมูล	CHAR(8)
-			        line += debug(no,appendRightByLength(Utils.stringValue(date, Utils.DD_MM_YYYY_WITHOUT_SLASH,Utils.local_th)," ",8));no++;
+			/**21 */line += appendRightByLength(DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITHOUT_SLASH,Utils.local_th)," ",8);//DATE	วันที่ Online ข้อมูล	CHAR(8)
+			        line += debug(no,appendRightByLength(DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITHOUT_SLASH,Utils.local_th)," ",8));no++;
 			        
 			/**22 */line += appendRightByLength(barcode," ",13);//ITEM_BARCODE	 รหัส Barcode ของสินค้า ที่มี ขนาด , สี และหน่วย Item_Size_Color_Base_UOM_Barcode	CHAR(13)
 			        line += debug(no,appendRightByLength(barcode," ",13));no++;

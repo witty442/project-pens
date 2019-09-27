@@ -5,7 +5,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import util.Utils;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class StockBean implements Comparable<StockBean>,Serializable{
 
@@ -71,9 +72,26 @@ public class StockBean implements Comparable<StockBean>,Serializable{
     private String columnNameSort;
     private String orderSortType;
     private String recordType;
+    private String brandSaveZoneDay;
+    private String productExpireDay;
+    
+    
+	public String getProductExpireDay() {
+		return productExpireDay;
+	}
 
-    
-    
+	public void setProductExpireDay(String productExpireDay) {
+		this.productExpireDay = productExpireDay;
+	}
+
+	public String getBrandSaveZoneDay() {
+		return brandSaveZoneDay;
+	}
+
+	public void setBrandSaveZoneDay(String brandSaveZoneDay) {
+		this.brandSaveZoneDay = brandSaveZoneDay;
+	}
+
 	public String getRecordType() {
 		return recordType;
 	}
@@ -604,8 +622,8 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	            	 Date o1Date = null;
 	            	 Date o2Date = null;
 	            	try{
-	            	  o1Date = Utils.parse(o1.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-	            	  o2Date = Utils.parse(o2.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+	            	  o1Date = DateUtil.parse(o1.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+	            	  o2Date = DateUtil.parse(o2.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 
 	            	}catch(Exception e){}
 	            	return o1Date.compareTo(o2Date);
@@ -617,8 +635,8 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	            	 Date o1Date = null;
 	            	 Date o2Date = null;
 	            	try{
-	            	  o1Date = Utils.parse(o1.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-	            	  o2Date = Utils.parse(o2.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+	            	  o1Date = DateUtil.parse(o1.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+	            	  o2Date = DateUtil.parse(o2.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 
 	            	}catch(Exception e){}
 	            	return o2Date.compareTo(o1Date);
@@ -631,8 +649,8 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	            	 Date o1Date = null;
 	            	 Date o2Date = null;
 	            	try{
-	            	  o1Date = Utils.parse(o1.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-	            	  o2Date = Utils.parse(o2.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+	            	  o1Date = DateUtil.parse(o1.getExpireDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+	            	  o2Date = DateUtil.parse(o2.getExpireDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 
 	            	}catch(Exception e){}
 	            	return o1Date.compareTo(o2Date);
@@ -644,8 +662,8 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	            	 Date o1Date = null;
 	            	 Date o2Date = null;
 	            	try{
-	            	  o1Date = Utils.parse(o1.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-	            	  o2Date = Utils.parse(o2.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+	            	  o1Date = DateUtil.parse(o1.getExpireDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+	            	  o2Date = DateUtil.parse(o2.getExpireDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 
 	            	}catch(Exception e){}
 	            	return o2Date.compareTo(o1Date);
@@ -675,6 +693,19 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	            @Override
 	            public int compare(StockBean o1, StockBean o2) {
 	                return Integer.parseInt(o2.secQty) - Integer.parseInt(o1.secQty);
+	            }
+	        };
+	        
+	        public static Comparator<StockBean> PRODUCT_EXPIRE_DAY_ASC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return Integer.parseInt(o1.productExpireDay) - Integer.parseInt(o2.productExpireDay);
+	            }
+	        };
+	        public static Comparator<StockBean> PRODUCT_EXPIRE_DAY_DESC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return Integer.parseInt(o2.productExpireDay) - Integer.parseInt(o1.productExpireDay);
 	            }
 	        };
 	        

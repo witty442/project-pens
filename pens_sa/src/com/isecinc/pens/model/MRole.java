@@ -10,15 +10,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Role;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.report.salesanalyst.SAConstants;
 import com.isecinc.pens.report.salesanalyst.SAInitial;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 public class MRole {
   

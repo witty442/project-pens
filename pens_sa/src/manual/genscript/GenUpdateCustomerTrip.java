@@ -7,9 +7,8 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 
-import util.Utils;
-
 import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
+import com.pens.util.Utils;
 
 public class GenUpdateCustomerTrip {
 

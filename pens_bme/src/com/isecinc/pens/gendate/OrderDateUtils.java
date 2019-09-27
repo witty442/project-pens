@@ -10,7 +10,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class OrderDateUtils {
@@ -90,7 +91,7 @@ public class OrderDateUtils {
 	private static boolean isBussinessHoliday(Date d,Map<String, String> bussinessHolidayMap) throws Exception{
 		boolean b = false;
         try{
-        	String budishOrderDate = Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+        	String budishOrderDate = DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
         	if(bussinessHolidayMap.get(budishOrderDate) != null){
         		b = true;
         	}
@@ -115,8 +116,8 @@ public class OrderDateUtils {
 			
 			rs = ps.executeQuery();
 			while(rs.next()){
-				Date dd = Utils.parse(rs.getString("interface_value"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String budishDateStr = Utils.stringValue(dd, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date dd = DateUtil.parse(rs.getString("interface_value"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String budishDateStr = DateUtil.stringValue(dd, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				logger.debug("dd["+dd+"]budishDateStr["+budishDateStr+"]");
 				
 				bussinessHolidayMap.put(budishDateStr,budishDateStr);

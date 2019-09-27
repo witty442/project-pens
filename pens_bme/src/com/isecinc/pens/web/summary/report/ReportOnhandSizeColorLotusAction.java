@@ -22,9 +22,10 @@ import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.StoreDAO;
 import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.web.summary.SummaryForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class ReportOnhandSizeColorLotusAction {
@@ -70,7 +71,7 @@ public class ReportOnhandSizeColorLotusAction {
 			storeList.add(storeBean);
 			
 			//Validate Initial Date
-			Date asOfDate = Utils.parse(c.getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date asOfDate = DateUtil.parse(c.getSalesDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			Date initDate = new SummaryDAO().searchInitDateLotus(conn,c.getPensCustCodeFrom());
 			
 			logger.debug("initDate:"+initDate);
@@ -89,7 +90,7 @@ public class ReportOnhandSizeColorLotusAction {
 				
 				if (results != null  && results.size() >0) {
 					summaryForm.setResults(results);
-					summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					summaryForm.getOnhandSummary().setInitDate(DateUtil.stringValue(initDate,DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					
 					ImportDAO importDAO = new ImportDAO();
 					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());

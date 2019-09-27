@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
 public class StockPickQueryDAO extends PickConstants{

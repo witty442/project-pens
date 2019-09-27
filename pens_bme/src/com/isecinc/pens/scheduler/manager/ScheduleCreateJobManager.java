@@ -11,7 +11,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 
 import com.isecinc.pens.scheduler.utils.CronExpressionUtil;
-import com.isecinc.pens.scheduler.utils.DateUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class ScheduleCreateJobManager {
@@ -97,8 +97,8 @@ public class ScheduleCreateJobManager {
 	 * Desc : Run Once
 	 */
 	private Trigger createTriggerByOnce(ScheduleVO param) throws Exception{
-		Date date = Utils.parse(param.getStartDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-		String dateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH);
+		Date date = DateUtil.parse(param.getStartDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+		String dateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH);
 		logger.debug("Trigger dateStr:"+dateStr + param.getStartHour() + param.getStartMinute() + "00");
 		
 		Date startTime = DateUtil.parse(dateStr + param.getStartHour() + param.getStartMinute() + "00", "dd/MM/yyyyHHmmss");

@@ -7,7 +7,7 @@ import java.sql.Statement;
 import java.util.Date;
 
 import com.isecinc.pens.dao.ImportDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
 public class ReUpdateLotus {

@@ -10,16 +10,17 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.FTPFileBean;
 import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.Message;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.FTPFileBean;
-import com.isecinc.pens.inf.bean.TableBean;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.InterfaceHelper;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.Utils;
 
 public class ImportProcess {
@@ -213,7 +214,7 @@ public class ImportProcess {
 				logger.debug("5:"+lineStrArrPipe[5]);
 				logger.debug("6:"+lineStrArrPipe[6]);*/
 				
-				Date docDate = Utils.parse(lineStrArrPipe[1], Utils.DD_MM_YYYY_WITHOUT_SLASH);
+				Date docDate = DateUtil.parse(lineStrArrPipe[1], DateUtil.DD_MM_YYYY_WITHOUT_SLASH);
 				
 				psH.setString(1,lineStrArrPipe[0].substring(1,lineStrArrPipe[0].length()));//docNo
 				psH.setDate(2, new java.sql.Date(docDate.getTime()));//docDate

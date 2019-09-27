@@ -19,11 +19,11 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 

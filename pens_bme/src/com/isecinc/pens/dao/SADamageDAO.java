@@ -12,8 +12,9 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.SADamageBean;
 import com.isecinc.pens.bean.SAEmpBean;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class SADamageDAO {
@@ -143,7 +144,7 @@ public class SADamageDAO {
 					bean.setOracleRefId(Utils.isNull(rst.getString("ACCOUNT_NUMBER")));
 					bean.setOracleRefName(Utils.isNull(rst.getString("PARTY_NAME")));
 					bean.setTotalDamage(Utils.decimalFormat(rst.getDouble("AMOUNT_DUE_ORIGINAL"),Utils.format_current_2_disgit));
-					bean.setInvoiceDate(Utils.stringValueNull(rst.getDate("TRX_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					bean.setInvoiceDate(DateUtil.stringValueNull(rst.getDate("TRX_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					
 					//Get EMP
 					SAEmpBean em = getEmpByOracleRefId(conn,bean.getOracleRefId());
@@ -310,7 +311,7 @@ public class SADamageDAO {
 				ps.setString(c++, Utils.isNull(o.getType())); //2
 				ps.setString(c++, Utils.isNull(o.getInvRefwal()));//3
 				if( !Utils.isNull(o.getTranDate()).equals("")){//4
-					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getTranDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+					 ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getTranDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
@@ -323,7 +324,7 @@ public class SADamageDAO {
 				ps.setString(c++, Utils.isNull(o.getBranch()));//10
 				
 				if( !Utils.isNull(o.getCheckStockDate()).equals("")){//11
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getCheckStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getCheckStockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 				   ps.setTimestamp(c++,null);
 				}
@@ -334,7 +335,7 @@ public class SADamageDAO {
 				ps.setString(c++, o.getCreateUser());//15
 				
 				if( !Utils.isNull(o.getInvoiceDate()).equals("")){//16
-					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getInvoiceDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+					 ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getInvoiceDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
@@ -365,7 +366,7 @@ public class SADamageDAO {
 				
 				ps = conn.prepareStatement(sql.toString());
 				if( !Utils.isNull(o.getCheckStockDate()).equals("")){//1
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getCheckStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getCheckStockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 				   ps.setTimestamp(c++,null);
 				}
@@ -415,7 +416,7 @@ public class SADamageDAO {
 				ps.setString(c++, Utils.isNull(o.getPayType()));//5
 				
 				if( !Utils.isNull(o.getPayDate()).equals("")){//6
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getPayDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getPayDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 				   ps.setTimestamp(c++,null);
 				}
@@ -452,7 +453,7 @@ public class SADamageDAO {
 				ps.setString(c++, Utils.isNull(o.getPayType()));//1
 				
 				if( !Utils.isNull(o.getPayDate()).equals("")){//2
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getPayDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getPayDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 				   ps.setTimestamp(c++,null);
 				}
@@ -563,14 +564,14 @@ public class SADamageDAO {
 					sql.append("\n and S.inv_refwal = '"+Utils.isNull(o.getInvRefwal())+"'");
 				}
 				if( !Utils.isNull(o.getTranDate()).equals("")){
-					Date salesDateFromParam = Utils.parse(o.getTranDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String date = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date salesDateFromParam = DateUtil.parse(o.getTranDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String date = DateUtil.stringValue(salesDateFromParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and trunc(S.tran_date) = to_date('"+date+"','dd/mm/yyyy') \n");
 				}
 				if( !Utils.isNull(o.getCheckStockDate()).equals("")){
-					Date salesDateFromParam = Utils.parse(o.getCheckStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String date = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date salesDateFromParam = DateUtil.parse(o.getCheckStockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String date = DateUtil.stringValue(salesDateFromParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and trunc(S.check_stock_date) = to_date('"+date+"','dd/mm/yyyy') \n");
 				}
@@ -607,16 +608,16 @@ public class SADamageDAO {
 				   h.setTotalDamage(Utils.decimalFormat(rst.getDouble("total_damage"),Utils.format_current_2_disgit));
 				   
 				   if(rst.getDate("tran_date") !=null){
-				     h.setTranDate(Utils.stringValue(rst.getDate("tran_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				     h.setTranDate(DateUtil.stringValue(rst.getDate("tran_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					 h.setTranDate("");
 				   }
 				   if(rst.getDate("check_stock_date") !=null){
-				     h.setCheckStockDate(Utils.stringValue(rst.getDate("check_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				     h.setCheckStockDate(DateUtil.stringValue(rst.getDate("check_stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					 h.setCheckStockDate("");
 				   }
-				   h.setInvoiceDate(Utils.stringValueNull(rst.getDate("invoice_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setInvoiceDate(DateUtil.stringValueNull(rst.getDate("invoice_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   
 				   if("edit".equalsIgnoreCase(mode)){
 					   h.setDisableTextClass("disableText");
@@ -669,7 +670,7 @@ public class SADamageDAO {
 					item.setLineId(rst.getString("line_id"));
 					item.setPayType(Utils.isNull(rst.getString("paytype")));
 					if(rst.getDate("paydate") !=null){
-					    item.setPayDate(Utils.stringValue(rst.getDate("paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					    item.setPayDate(DateUtil.stringValue(rst.getDate("paydate"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					 }else{
 						item.setPayDate("");
 					 }

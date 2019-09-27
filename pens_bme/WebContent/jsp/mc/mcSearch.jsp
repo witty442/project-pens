@@ -469,7 +469,7 @@ function loadRoute(){
 										  String key = ((i+"").length()==1?"0"+i:i)+ mc.getMonthTrip();
 										  String dayDetail = Utils.isNull(dayMapDetail.get(key));
 										  String tdClass ="td_text";
-										  if(Utils.isHoliday(key)){
+										  if(DateUtil.isHoliday(key)){
 											  tdClass="holiday";
 										  }
 										  //System.out.println("key["+key+"]value["+dayDetail+"]");

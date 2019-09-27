@@ -10,11 +10,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 public class StockMCUtils {
 	protected static Logger logger = Logger.getLogger("PENS");

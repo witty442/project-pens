@@ -2,10 +2,10 @@
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.model.MUser"%>
 <%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="com.isecinc.pens.inf.dao.InterfaceDAO" %>
+<%@page import="com.isecinc.pens.dao.InterfaceDAO" %>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.inf.helper.*" %>
-<%@page import="com.isecinc.pens.inf.bean.*" %>
+<%@page import="com.isecinc.pens.bean.*" %>
 <%
 String id = (String) request.getParameter("id");
 

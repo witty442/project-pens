@@ -29,10 +29,11 @@ import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.exception.LogisticException;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.exception.LogisticException;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -95,7 +96,7 @@ public class OrderDAO {
 		List<Order> pos = new ArrayList<Order>();
 		StringBuilder sql = new StringBuilder();
 		try {
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			sql.append("\n  SELECT *  from PENSBME_ONHAND_BME  ");
 			sql.append("\n  where 1=1 AND onhand_qty <> 0 and status <> 'ERROR' ORDER BY ITEM ASC ");
@@ -179,7 +180,7 @@ public class OrderDAO {
 		List<Order> pos = new ArrayList<Order>();
 		StringBuilder sql = new StringBuilder();
 		try {
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			sql.append("\n SELECT * FROM( ");
 			sql.append("\n SELECT a.*, rownum r__ ");
@@ -321,8 +322,8 @@ public class OrderDAO {
 			sql.append(" SELECT count(*) as total_row  from PENSBME_ORDER    \n");
 			sql.append(" where 1=1  \n");
 			if( !Utils.isNull(o.getOrderDate()).equals("")){
-				Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String dateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append(" and order_date = to_date('"+dateStr+"','dd/mm/yyyy')  \n");
 			}
@@ -368,18 +369,18 @@ public class OrderDAO {
 			if( !Utils.isNull(o.getSalesDateFrom()).equals("") 
 				&& !Utils.isNull(o.getSalesDateTo()).equals("") ){
 				
-				Date orderFromDate = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String dateFromStr = Utils.stringValue(orderFromDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date orderFromDate = DateUtil.parse(o.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateFromStr = DateUtil.stringValue(orderFromDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
-				Date orderToDate = Utils.parse(o.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String dateToStr = Utils.stringValue(orderToDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date orderToDate = DateUtil.parse(o.getSalesDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateToStr = DateUtil.stringValue(orderToDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append(" and order_date >= to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
 				sql.append(" and order_date <= to_date('"+dateToStr+"','dd/mm/yyyy')  \n");
 				
 			}else if( !Utils.isNull(o.getSalesDateFrom()).equals("")){
-				Date orderFromDate = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String dateFromStr = Utils.stringValue(orderFromDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date orderFromDate = DateUtil.parse(o.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateFromStr = DateUtil.stringValue(orderFromDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append(" and order_date = to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
 				
 			}
@@ -439,7 +440,7 @@ public class OrderDAO {
 		List<StoreBean> storeListFoundInOrder = new ArrayList<StoreBean>();
 		
 		try {
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			sql.append("\n SELECT * FROM( ");
 			sql.append("\n SELECT a.*, rownum r__ ");
@@ -457,7 +458,7 @@ public class OrderDAO {
 				sql.append("\n  where 1=1  ");
 				
 				if( !Utils.isNull(o.getOrderDate()).equals("")){
-					String dateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					String dateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and h.order_date = to_date('"+dateStr+"','dd/mm/yyyy')  \n");
 				}
@@ -594,18 +595,18 @@ public class OrderDAO {
 				if( !Utils.isNull(o.getSalesDateFrom()).equals("") 
 						&& !Utils.isNull(o.getSalesDateTo()).equals("") ){
 						
-					Date orderFromDate = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String dateFromStr = Utils.stringValue(orderFromDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date orderFromDate = DateUtil.parse(o.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateFromStr = DateUtil.stringValue(orderFromDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
-					Date orderToDate = Utils.parse(o.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String dateToStr = Utils.stringValue(orderToDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date orderToDate = DateUtil.parse(o.getSalesDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateToStr = DateUtil.stringValue(orderToDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and h.order_date >= to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
 					sql.append(" and h.order_date <= to_date('"+dateToStr+"','dd/mm/yyyy')  \n");
 						
 				}else if( !Utils.isNull(o.getSalesDateFrom()).equals("") ){
-					Date orderFromDate = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String dateFromStr = Utils.stringValue(orderFromDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date orderFromDate = DateUtil.parse(o.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateFromStr = DateUtil.stringValue(orderFromDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					sql.append(" and h.order_date = to_date('"+dateFromStr+"','dd/mm/yyyy')  \n");
 					
 				}
@@ -649,7 +650,7 @@ public class OrderDAO {
 			while (rst.next()) {
 				Order item = new Order();
 				item.setStoreCode(rst.getString("STORE_CODE"));
-				item.setOrderDate(Utils.stringValue(rst.getDate("order_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				item.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				item.setGroupCode(rst.getString("GROUP_CODE"));
 				item.setItem(rst.getString("item"));
 				item.setBarcode(rst.getString("BARCODE"));
@@ -732,7 +733,7 @@ public class OrderDAO {
 	
 	public void genOrderLotNoProcess(Connection conn,User user,String orderDateStr) throws Exception {
 		try{
-			Date orderDate = Utils.parse(orderDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(orderDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			//logger.debug("sql:"+sql);
 			List<Order> storeOrderList = findStoreOrderList(conn, user, orderDate);
 			if(storeOrderList != null && storeOrderList.size() >0){
@@ -978,7 +979,7 @@ public class OrderDAO {
 		ImportDAO importDAO = new ImportDAO();
 		try {
 
-			Date orderDate = Utils.parse(orderDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(orderDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			sql.append(" select A.* from ( \n ");
 			sql.append("  select o.order_lot_no,o.bar_on_box, TO_CHAR(o.ORDER_DATE, 'ddmmyyyy') as order_date, \n ");
 			sql.append("  o.barcode, o.qty, 'PC' as uom ,o.store_code ,o.bill_type ,o.valid_from,o.valid_to, \n ");
@@ -1153,7 +1154,7 @@ public class OrderDAO {
 			   h.append("<td>retail_price_bf \n </td>");
             h.append("</tbody> \n");    
 	            
-			Date orderDate = Utils.parse(orderDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(orderDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			sql.append("  select o.order_no,TO_CHAR(o.ORDER_DATE, 'ddmmyyyy') as order_date, b.material_master, \n ");
 			sql.append("  o.barcode, o.qty, 'PC' as uom ,o.store_code ,\n ");
 			sql.append("  ( SELECT s.pens_desc2 FROM PENSBME_MST_REFERENCE s WHERE s.reference_code ='Store' and s.pens_value = o.store_code ) as  store_name, \n ");
@@ -1924,7 +1925,7 @@ public class OrderDAO {
 		ResultSet rs = null;
 		Map<String, OrderKeyBean> orderNoMapByStore = new HashMap<String, OrderKeyBean>();
 		try{
-			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select order_no,bar_on_box,store_code \n");
@@ -2116,8 +2117,8 @@ public class OrderDAO {
 		ResultSet rs = null;
         boolean exist = false;
 		try{
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			StringBuffer sql = new StringBuffer("");
 			sql.append("select count(*) as c from pensbi.pensbme_order where 1=1 \n");
@@ -2163,7 +2164,7 @@ public class OrderDAO {
 			
 			ps = conn.prepareStatement(sql.toString());
 	
-			Date orderDate = Utils.parse( o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse( o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			BigDecimal id= SequenceProcess.getNextValueBig("ID_BME_ORDER");
 			
 			ps.setString(1, o.getOrderNo());
@@ -2427,7 +2428,7 @@ public class OrderDAO {
 			   h.append("<td>retail_price_bf \n </td>");
             h.append("</tbody> \n");    
 	            
-			Date orderDate = Utils.parse(orderDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(orderDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			sql.append("  select o.order_no,TO_CHAR(o.ORDER_DATE, 'ddmmyyyy') as order_date, b.material_master, \n ");
 			sql.append("  o.barcode, o.qty, 'PC' as uom ,o.store_code ,\n ");
 			sql.append("  ( SELECT s.pens_desc2 FROM PENSBME_MST_REFERENCE s WHERE s.reference_code ='Store' and s.pens_value = o.store_code ) as  store_name, \n ");
@@ -2540,8 +2541,8 @@ public class OrderDAO {
 		List<StoreBean> customerCodelist = new ArrayList<StoreBean>();
 		StringBuilder sql = new StringBuilder();
 		try {
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n  SELECT distinct store_code"
 					+ ",(select max(pens_desc) from PENSBME_MST_REFERENCE M WHERE reference_code='Store' "
@@ -2577,8 +2578,8 @@ public class OrderDAO {
 		StringBuilder sql = new StringBuilder();
 		String statusCheck = "";
 		try {
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n SELECT distinct intflag from PENSBME_AUTOPO_HH  ");
 			sql.append("\n where cust_group ='"+Constants.STORE_TYPE_HISHER_CODE+"'");
@@ -2621,8 +2622,8 @@ public class OrderDAO {
 		StringBuilder sql = new StringBuilder();
 		String groupCodeError = "";
 		try {
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			//Select order data
 			sql.append("\n  SELECT distinct group_code from PENSBI.PENSBME_ORDER O ");
@@ -2662,8 +2663,8 @@ public class OrderDAO {
 		StringBuilder sqlDeleteH = new StringBuilder();
 		StringBuilder sql = new StringBuilder();
 		try {
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			//Check old data  exist
 			if(dataPOHHCheck != null){
@@ -2679,7 +2680,7 @@ public class OrderDAO {
 					//update AutoPO HH 
 					sql = new StringBuilder();
 					sql.append("\n  update PENSBI.PENSBME_AUTOPO_HH ");
-					sql.append("\n  set update_date = to_date('"+Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+					sql.append("\n  set update_date = to_date('"+DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
 					sql.append("\n  ,update_user = '"+o.getCreateUser()+"'");
 					sql.append("\n  where cust_group ='"+Constants.STORE_TYPE_HISHER_CODE+"'");
 					sql.append("\n  and customer_code ='"+o.getStoreCode()+"'");

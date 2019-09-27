@@ -11,7 +11,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -21,7 +20,6 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 
 /**
  *	General utilities.
@@ -29,28 +27,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
  */
 public class Utils {
 	protected static Logger logger = Logger.getLogger("PENS");
-	public static final String DD_MM_YYYY_WITH_SLASH = "dd/MM/yyyy";
-	public static final String DD_MM_YYYY__HH_mm_ss_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss";
-	public static final String DD_MM_YYYY_HH_mm_ss_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
-	public static final String YYYY_MM_DD_WITH_SLASH = "yyyy/MM/dd";
-	public static final String YYYY_MM_DD_WITHOUT_SLASH = "yyyyMMdd";
-	public static final String DD_MM_YYYY_WITHOUT_SLASH = "ddMMyyyy";
-	public static final String DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH = "ddMMyyyy HHmmss";
-	public static final String DD_MM_YYYY_HH_mm_WITHOUT_SLASH = "ddMMyyyy-HHmm";
-	
-	public static final String DD_MM_YYYY_HH_MM_SS_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
-	
-	public static final String YYYYMMDDHH_mm_ss_SSSSSS = "yyyyMMddHHmmss.SSSSSS";
-	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
-	public static final String DD_MMM_YY = "dd-MMM-yy";
-	public static final String YYYYMM = "yyyyMM";
-	
-	//Thai date
-	public static final String MMMM_YYYY = "MMMM-yyyy";
-	public static final String MMMMYYYY = "MMMMyyyy";
-	public static final String MMM_YYYY = "MMM-yyyy";
-	public static final String MMM_YY = "MMM-yy";
-	public static final String DD_MMMM_YYYY = "dd MMMM yyyy";
+
 	
 	public static final Locale local_th= new Locale("th","TH");
 
@@ -112,38 +89,7 @@ public class Utils {
 		return r;
 	}
 	
-    public static boolean isHoliday(String dateString){
-	   boolean re = false;
-	   try{
-		   Calendar c = Calendar.getInstance();
-		   c.setTime(Utils.parse(dateString, Utils.DD_MM_YYYY_WITHOUT_SLASH));
-		   int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-	   
-		   if(dayOfWeek==Calendar.SATURDAY || dayOfWeek==Calendar.SUNDAY){
-			   re = true;
-		   }
-	   }catch(Exception e){
-		   e.printStackTrace();
-	   }
-	   return re;
-	}
-    
-    public static boolean isHoliday(String dateString,String dateFormat,Locale locale){
- 	   boolean re = false;
- 	   try{
- 		   Calendar c = Calendar.getInstance();
- 		   c.setTime(Utils.parse(dateString, dateFormat,locale));
- 		   int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
- 	   
- 		   if(dayOfWeek==Calendar.SATURDAY || dayOfWeek==Calendar.SUNDAY){
- 			   re = true;
- 		   }
- 	   }catch(Exception e){
- 		   e.printStackTrace();
- 	   }
- 	   return re;
- 	}
-	  
+   
 	public static int calcTotalPage(int totalRow,int maxPerPage){
 		double totalPageF = new Double(totalRow)/new Double(maxPerPage);
 		//System.out.println("totalPageF:"+totalPageF);
@@ -160,7 +106,7 @@ public class Utils {
 	public static String genFileName(String prefix){
 		String fileName = "";
 		try{
-		  String dateTimeStr = Utils.stringValue(new Date(),DD_MM_YYYY_HH_mm_WITHOUT_SLASH , local_th);
+		  String dateTimeStr = DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_HH_mm_WITHOUT_SLASH , local_th);
 		  fileName = prefix+"-"+dateTimeStr;
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -385,20 +331,6 @@ public class Utils {
 	    bd = bd.setScale(decimalPlace,roundType);
 	    return bd.doubleValue();
 	  }
-	//20081223   09 42 34.572
-	//2008-12-23 09:42:34.572000
-	
-	
-	
-	
-	public static BigDecimal getCurrentTimestampLong() throws Exception{
-		long curr = System.currentTimeMillis();
-		Timestamp ti = new Timestamp(curr);
-		System.out.println("currMil:"+curr +" new Big:"+new BigDecimal(curr));
-		//String dateLong = stringValue(ti, YYYYMMDDHH_mm_ss_SSSSSS);
-		//System.out.println("dateLong:"+dateLong+",BigDecimal["+(new BigDecimal(dateLong))+"]");
-		return new BigDecimal(curr);
-	}
 	/**
 	 * 
 	 * @param provinceName  Exception Chrecter "¨."
@@ -433,193 +365,7 @@ public class Utils {
 		return result.trim();
 	}
 	
-	/**
-	 * Parse from {@link String} to {@link Date}
-	 * @param dateString the string of date
-	 * @param format the format of date
-	 * @return {@link Date}
-	 */
-	public static Date parse(String dateString, String format) throws Exception {
-		Date date = null;
-		SimpleDateFormat ft = new SimpleDateFormat(format, Locale.US);
-		try {
-			date = ft.parse(dateString);
-		} catch (Exception e) {	
-		}
-		return date;
-	}
 	
-	/**
-	 * 
-	 * @param dateString
-	 * @param format
-	 * @return
-	 * @throws Exception
-	 */
-	public static Date parseToBudishDate(String dateString, String format) throws Exception {
-		Date date = null;
-		SimpleDateFormat ft = new SimpleDateFormat(format, new Locale("TH","th"));
-		
-		try {
-			date = ft.parse(dateString);
-		} catch (Exception e) {
-			
-		}
-		
-		return date;
-	}
-	
-	/**
-	 * 
-	 * @param dateString - the string of date
-	 * @param format - the format of date
-	 * @param locale - the locale of date
-	 * @return {@link java.util.Date}
-	 * @throws Exception
-	 */
-	public static Date parse(String dateString, String format ,String locale) throws Exception {
-		Date date = null;
-		SimpleDateFormat ft = new SimpleDateFormat(format, new Locale(locale.toLowerCase()));
-		
-		try {
-			date = ft.parse(dateString);
-		} catch (Exception e) {
-			
-		}
-		
-		return date;
-	}
-	
-	
-	public static Date parse(String dateString, String format ,Locale locale) throws Exception {
-		Date date = null;
-		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
-		
-		try {
-			date = ft.parse(dateString);
-		} catch (Exception e) {
-			
-		}
-		
-		return date;
-	}
-	
-	/**
-	 * Convert {@link Date} to {@link String} and return date string
-	 * @param date
-	 * @param format the format that you want to convert
-	 * @return date string
-	 */
-	public static String stringValue(Date date, String format) throws Exception {
-		String dateStr = null;		
-		SimpleDateFormat ft = new SimpleDateFormat(format, Locale.US);
-		
-		try {
-			dateStr = ft.format(date);
-		} catch (Exception e) {
-			
-		}
-
-		return dateStr;
-	}
-	
-	
-	public static String stringValue(Timestamp date, String format) throws Exception {
-		String dateStr = null;		
-		SimpleDateFormat ft = new SimpleDateFormat(format, Locale.US);
-		
-		try {
-			dateStr = ft.format(date);
-		} catch (Exception e) {
-			
-		}
-
-		return dateStr;
-	}
-	
-	/**
-	 * Convert {@link java.util.Date} to {@link java.lang.String} and return date string
-	 * @param date - {@link java.util.Date} object
-	 * @param format - the format that you want to convert
-	 * @param locale - the locale of date
-	 * @return String
-	 * @throws Exception
-	 */
-	public static String stringValue(Date date, String format ,String locale) throws Exception {
-		String dateStr = null;		
-		SimpleDateFormat ft = new SimpleDateFormat(format, new Locale(locale.toLowerCase()));
-		try {
-			dateStr = ft.format(date);
-		} catch (Exception e) {
-		}
-		return dateStr;
-	}
-	
-	public static String stringValue(Date date, String format ,Locale locale) throws Exception {
-		String dateStr = null;		
-		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
-		try {
-			dateStr = ft.format(date);
-		} catch (Exception e) {
-		}
-		return dateStr;
-	}
-	
-	public static String stringValueNull(Date date, String format ,Locale locale) throws Exception {
-		String dateStr = null;		
-		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
-		try {
-			if(date != null){
-			   dateStr = ft.format(date);
-			}else{
-			   dateStr = "";
-			}
-		} catch (Exception e) {
-		}
-		return dateStr;
-	}
-	
-	public static String stringValueSpecial(long dateBigdecimal, String format ,Locale locale) throws Exception {
-		String dateStr = null;		
-		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
-		try {
-			//logger.debug("date Long>>"+dateBigdecimal.doubleValue());
-			//logger.debug("date Long>>"+dateBigdecimal.doubleValue());
-			Timestamp ti = new Timestamp(dateBigdecimal);
-			//logger.debug("date timestamp>>"+ti);
-			dateStr = ft.format(ti);
-		} catch (Exception e) {
-		}
-		return dateStr;
-	}
-	
-	public static Timestamp getCurrentTimestamp() {
-		return new Timestamp(System.currentTimeMillis());
-	}
-	
-	public static Date getCurrentDate() {
-		return new Date(System.currentTimeMillis());
-	}
-	
-	public static java.sql.Date getSqlCurrentDate() {
-		return new java.sql.Date(System.currentTimeMillis());
-	}
-	
-	public static String getCurrentMonth() {
-		String mm = "";
-		Calendar c = Calendar.getInstance(local_th);
-		mm = (c.get(Calendar.MONTH)+1)+"";
-		mm = mm.length()==1?"0"+mm:mm;
-		return mm;
-	}
-	
-	public static String format(Date date, String pattern) {
-		if (date == null) {
-			return "";
-		}
-		return new SimpleDateFormat(pattern, Locale.US).format(date);
-	}
-
 	public static String isNull(String str) {
 		if (str ==null){
 			return "";
@@ -985,123 +731,7 @@ public class Utils {
 	}
 	
 	
-	public static String excQuery(String sql) {
-	    PreparedStatement ps =null;
-		ResultSet rs = null;
-        Connection conn = null;
-        ResultSetMetaData rsm = null;
-        int columnCount = 0;
-        StringBuffer str = new StringBuffer("");
-		try{
-			System.out.println("sql:"+sql);   
-			conn = DBConnection.getInstance().getConnection();
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			rsm = rs.getMetaData();
-			columnCount = rsm.getColumnCount();
-			
-			//getColumnHeader 
-			 str.append("<table align='center' border='1' cellpadding='3' cellspacing='1' class='result'> \n");
-			 str.append("<tr>");  
-			 for(int i=1;i<=columnCount;i++){
-				    //System.out.println("["+i+"]"+rsm.getColumnName(i));
-				    str.append("<th> \n");
-	            	str.append(rsm.getColumnName(i));
-	            	str.append("</th>");
-			   }
-			 str.append("</tr> \n"); 
-			 
-			 //Gen Detail
-			 while(rs.next()){
-				 str.append("<tr> \n");  
-				 for(int i=1;i<=columnCount;i++){
-					    str.append("<td class='lineE'>");
-		            	str.append(isNull(rs.getString(rsm.getColumnName(i))));
-		            	str.append("</td>");
-				   }
-				 str.append("</tr> ");  
-			 }
-			
-			str.append("</table> \n");
-			
-		}catch(Exception e){
-	      e.printStackTrace();
-	      str.append("ERROR: \n"+e.getMessage());
-		}finally{
-			try{
-				if(ps != null){
-				   ps.close();ps = null;
-				}
-				if(rs != null){
-				   rs.close();rs = null;
-				}
-				
-				if(conn != null){
-					conn.close();
-				}
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-		return str.toString();
-  }
 	
-	
-	public static String excUpdate(String sql) {
-	    PreparedStatement ps =null;
-        Connection conn = null;
-        StringBuffer str = new StringBuffer("");
-		try{  
-			conn = DBConnection.getInstance().getConnection();
-			String[] sqlArr = sql.split("\\;");
-			if(sqlArr != null && sqlArr.length>0){
-			   for(int i=0;i<sqlArr.length;i++){
-				 
-				 if( !isNull(sqlArr[i]).equals("")){
-				     ps = conn.prepareStatement(sqlArr[i]);
-				     int recordUpdate = ps.executeUpdate();
-				     str.append("<br>["+i+"] SQL Execute  :"+sqlArr[i]);
-				     str.append("<br>- Result Effect:"+recordUpdate+"");
-			     }
-			   }
-			}
-		}catch(Exception e){
-	      e.printStackTrace();
-	      str.append("ERROR: \n"+e.getMessage());
-		}finally{
-			try{
-				if(ps != null){
-				   ps.close();ps = null;
-				}
-				if(conn != null){
-					conn.close();
-				}
-			}catch(Exception e){
-				logger.error(e.getMessage(),e);
-			}
-		}
-		return str.toString();
-  }
-	
-	public static int excUpdateOneSql(Connection conn,String sqlOne) {
-	    PreparedStatement ps =null;
-	    int recordUpdate = 0;
-		try{  
-		    ps = conn.prepareStatement(sqlOne);
-			recordUpdate = ps.executeUpdate();
-		}catch(Exception e){
-	      logger.error(e.getMessage(),e);
-		}finally{
-			try{
-				if(ps != null){
-				   ps.close();ps = null;
-				}
-			}catch(Exception e){
-				logger.error(e.getMessage(),e);
-			}
-		}
-		return recordUpdate;
-  }
 		
 	/**
 	 * 
@@ -1166,18 +796,7 @@ public class Utils {
 		return StringUtils.join(valuesText, ","); 
 	}
 	
-   public static String converToTextSqlIn(List<StoreBean> value){
-		List<String> valuesText = new ArrayList<String>() ;
-		
-		if(value != null && value.size() >0){
-			for(int i=0;i<value.size();i++){
-				StoreBean s= value.get(i);
-				valuesText.add("'"+s.getStoreCode()+"'");
-			}
-		}
-		return StringUtils.join(valuesText, ","); 
-	}
-   
+
  //Case null retun ""
  	public static String stringValueSpecial2(long dateBigdecimal, String format ,Locale locale) throws Exception {
  		String dateStr = "";		
@@ -1223,4 +842,20 @@ public class Utils {
 		String str = (String) obj;
 		return str.trim();
 	}
+	public static String convertSciToDecimal(String scientificNotation){
+		//String scientificNotation = "8.854922341299E12";
+		Double scientificDouble = Double.parseDouble(scientificNotation);
+		NumberFormat nf = new DecimalFormat("################################################.###########################################");
+		String decimalString = nf.format(scientificDouble);
+		
+		//System.out.println(decimalString);
+		return decimalString;
+	}
+	
+	// Create Utility for rounding double value
+	public static double round1(double d, int decimalPlace,int roundType){
+	    BigDecimal bd = new BigDecimal(Double.toString(d));
+	    bd = bd.setScale(decimalPlace,roundType);
+	    return bd.doubleValue();
+	  }
 }

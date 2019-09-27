@@ -16,9 +16,10 @@ import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.MTTBean;
 import com.isecinc.pens.bean.PickReportBean;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.mtt.MTTAction;
 import com.isecinc.pens.web.shop.ShopBean;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 public class PickReportDAO{
@@ -163,7 +164,7 @@ public class PickReportDAO{
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code"))); 
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
 			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no"))); 
-			   h.setIssueReqDate(Utils.stringValue(rst.getDate("issue_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setIssueReqDate(DateUtil.stringValue(rst.getDate("issue_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setUserRequest(Utils.isNull(rst.getString("requestor")));
 			   h.setIssueQty(Utils.decimalFormat(rst.getInt("issue_qty"),Utils.format_current_no_disgit));
 			   h.setRemark(Utils.isNull(rst.getString("remark")));
@@ -249,7 +250,7 @@ public class PickReportDAO{
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code"))); 
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
 			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no"))); 
-			   h.setIssueReqDate(Utils.stringValue(rst.getDate("issue_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setIssueReqDate(DateUtil.stringValue(rst.getDate("issue_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setPensItem(Utils.isNull(rst.getString("pens_item")));
 			   h.setMaterialMaster(Utils.isNull(rst.getString("material_master")));
 			   h.setGroupCode(Utils.isNull(rst.getString("group_code")));
@@ -416,8 +417,8 @@ public class PickReportDAO{
 			}
 		}
 		if( !Utils.isNull(o.getIssueReqDateFrom()).equals("")){
-			Date fDate  = Utils.parse(o.getIssueReqDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date fDate  = DateUtil.parse(o.getIssueReqDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String fStr = DateUtil.stringValue(fDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			if("PENSBME_PICK_STOCK".equalsIgnoreCase(tableName)){
 			   sql.append("\n and trunc(S.CONFIRM_ISSUE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
@@ -427,8 +428,8 @@ public class PickReportDAO{
 		}
 		
 		if( !Utils.isNull(o.getIssueReqDateTo()).equals("")){
-			Date tDate  = Utils.parse(o.getIssueReqDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getIssueReqDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 
 			if("PENSBME_PICK_STOCK".equalsIgnoreCase(tableName)){
 			   sql.append("\n and trunc(S.CONFIRM_ISSUE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
@@ -438,8 +439,8 @@ public class PickReportDAO{
 		}
 		
 		if( !Utils.isNull(o.getIssueReqDateTo()).equals("")){
-			Date tDate  = Utils.parse(o.getIssueReqDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getIssueReqDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 
 			if("PENSBME_PICK_STOCK".equalsIgnoreCase(tableName)){
 			   sql.append("\n and trunc(S.CONFIRM_ISSUE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
@@ -506,8 +507,8 @@ public class PickReportDAO{
 			}
 			
 			if( !Utils.isNull(o.getDocDate()).equals("")){
-				Date fDate  = Utils.parse(o.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date fDate  = DateUtil.parse(o.getDocDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String fStr = DateUtil.stringValue(fDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n and trunc(DOC_DATE) = to_date('"+fStr+"','dd/mm/yyyy') ");
 			}
@@ -531,7 +532,7 @@ public class PickReportDAO{
 			   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
 			   h.setCustGroup(rst.getString("cust_group"));
 			   h.setCustGroupName(rst.getString("cust_group_name"));
-			   h.setDocDate(Utils.stringValue(rst.getTimestamp("doc_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setDocDate(DateUtil.stringValue(rst.getTimestamp("doc_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
                h.setGroupCode(Utils.isNull(rst.getString("GROUP_CODE")));
@@ -612,7 +613,7 @@ public class PickReportDAO{
 			   h.setLineId(rst.getInt("line_id"));
 			   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
 			   h.setCustGroup(rst.getString("cust_group"));
-			   h.setSaleDate(Utils.stringValue(rst.getTimestamp("sale_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setSaleDate(DateUtil.stringValue(rst.getTimestamp("sale_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
                h.setBarcode(Utils.isNull(rst.getString("barcode")));
                h.setMaterialMaster(Utils.isNull(rst.getString("MATERIAL_MASTER")));
@@ -884,7 +885,7 @@ public class PickReportDAO{
 				
 				ps = conn.prepareStatement(sql.toString());
 					
-				Date saleDate = Utils.parse( o.getSaleDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date saleDate = DateUtil.parse( o.getSaleDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				int c =1;
 				ps.setTimestamp(c++, new java.sql.Timestamp(saleDate.getTime()));

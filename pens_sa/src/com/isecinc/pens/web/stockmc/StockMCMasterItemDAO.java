@@ -10,9 +10,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.process.SequenceProcessAll;
-
-import util.DBConnection;
-import util.Utils;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class StockMCMasterItemDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -89,8 +89,8 @@ public class StockMCMasterItemDAO {
 			   h.setProductPackSize(Utils.isNull(rst.getString("packsize")));
 			   h.setProductAge(Utils.isNull(rst.getString("product_age")));
 			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price"), Utils.format_current_2_disgit));
-			   h.setStartDate(Utils.stringValueChkNull(rst.getDate("start_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			   h.setEndDate(Utils.stringValueChkNull(rst.getDate("end_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStartDate(DateUtil.stringValueChkNull(rst.getDate("start_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+			   h.setEndDate(DateUtil.stringValueChkNull(rst.getDate("end_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   items.add(h);
 			}//while
 		} catch (Exception e) {
@@ -144,8 +144,8 @@ public class StockMCMasterItemDAO {
 			   h.setProductPackSize(Utils.isNull(rst.getString("packsize")));
 			   h.setProductAge(Utils.isNull(rst.getString("product_age")));
 			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price"), Utils.format_current_2_disgit));
-			   h.setStartDate(Utils.stringValueChkNull(rst.getDate("start_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			   h.setEndDate(Utils.stringValueChkNull(rst.getDate("end_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStartDate(DateUtil.stringValueChkNull(rst.getDate("start_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+			   h.setEndDate(DateUtil.stringValueChkNull(rst.getDate("end_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			}//while
 
 		} catch (Exception e) {

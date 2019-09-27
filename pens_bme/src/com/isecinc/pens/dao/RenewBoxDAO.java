@@ -17,7 +17,8 @@ import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.RenewBox;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -38,7 +39,7 @@ public class RenewBoxDAO extends PickConstants{
 				   Barcode bhNew = new Barcode();
 				   bhNew.setBoxNo(genBoxNo(conn, new Date()));
 				   bhNew.setJobId(l.getJobId());
-				   bhNew.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   bhNew.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   bhNew.setStatus(STATUS_CLOSE);
 				   bhNew.setCreateUser(h.getCreateUser());
 				   bhNew.setUpdateUser(h.getUpdateUser());

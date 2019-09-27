@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
 public class StoreDAO {

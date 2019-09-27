@@ -9,7 +9,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.Utils;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class MoveOrderDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -99,7 +100,7 @@ public class MoveOrderDAO {
 			   h = new MoveOrderBean();
 			   h.setDocType(Utils.isNull(rst.getString("doc_type")));
 			   h.setRequestNumber(Utils.isNull(rst.getString("request_number")));
-			   h.setRequestDate(Utils.stringValue(rst.getDate("date_required"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setRequestDate(DateUtil.stringValue(rst.getDate("date_required"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   h.setSalesrepCode(Utils.isNull(rst.getString("sales_code")));
 			   h.setSalesrepName(Utils.isNull(rst.getString("sales_name")));
 			   h.setPdCode(Utils.isNull(rst.getString("pd_code")));
@@ -107,7 +108,7 @@ public class MoveOrderDAO {
 			   h.setCtnQty(Utils.decimalFormat(rst.getDouble("ctn_qty"), Utils.format_current_no_disgit));
 			   h.setPcsQty(Utils.decimalFormat(rst.getDouble("pcs_qty"), Utils.format_current_no_disgit));
 			   h.setAmount(Utils.decimalFormat(rst.getDouble("amount"), Utils.format_current_2_disgit));
-			   h.setStatusDate(Utils.stringValueChkNull(rst.getDate("status_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStatusDate(DateUtil.stringValueChkNull(rst.getDate("status_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   h.setRemark(Utils.isNull(rst.getString("comments")));
 			   h.setReason(Utils.isNull(rst.getString("reason_name")));
 			   h.setMoveDay(rst.getInt("move_day"));
@@ -153,22 +154,22 @@ public class MoveOrderDAO {
 		sql.append("\n  )");
 		}
 		if( !Utils.isNull(o.getStartDate()).equalsIgnoreCase("") && !Utils.isNull(o.getEndDate()).equalsIgnoreCase("")){
-			Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
-			Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n and H.date_required >= to_date('"+startDateStr+"','dd/mm/yyyy')");
 			sql.append("\n and H.date_required <= to_date('"+endDateStr+"','dd/mm/yyyy')");
 		}else if(!Utils.isNull(o.getStartDate()).equalsIgnoreCase("") ){
-			Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n and H.date_required = to_date('"+startDateStr+"','dd/mm/yyyy')");;
 		}else if(!Utils.isNull(o.getEndDate()).equalsIgnoreCase("") ){
-			Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n and H.date_required = to_date('"+endDateStr+"','dd/mm/yyyy')");;
 		}

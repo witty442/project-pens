@@ -138,11 +138,11 @@ public class ControlAllReportProcess extends I_ReportProcess<ControlAllReport>{
 		Map<String, String> chkDup = new HashMap<String, String>();
 		int no = 0;
 		try {
-			sql.append("\n SELECT o.order_no ,o.order_date  ");
+			sql.append("\n SELECT o.order_no ,o.order_date ,doc_status ");
 			sql.append("\n  from t_order o ");
 			sql.append("\n  where 1=1 ");
 			sql.append("\n  and o.USER_ID = " + user.getId());
-			sql.append("\n  and o.doc_status ='SV' ");
+			//sql.append("\n  and o.doc_status ='SV' "); get All status 14/09/2562
 			sql.append("\n  and o.order_date >= '" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "' ");
 			sql.append("\n  and o.order_date <= '" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "' ");
 			sql.append("\n  order by o.order_date,o.order_no asc");
@@ -161,8 +161,12 @@ public class ControlAllReportProcess extends I_ReportProcess<ControlAllReport>{
 				}else{
 					detailedSales.setDate("");
 				}
-				detailedSales.setDocNo(Utils.isNull(rs.getString("order_no")));
-
+				if("VO".equalsIgnoreCase(rs.getString("doc_status"))){
+				   detailedSales.setDocNo(Utils.isNull(rs.getString("order_no")) +"   (ยกเลิก)");
+				}else{
+				   detailedSales.setDocNo(Utils.isNull(rs.getString("order_no")));
+				}
+				
 				lstData.add(detailedSales);
 				//set for check dup date
 				chkDup.put(rs.getString("order_date"), rs.getString("order_date"));

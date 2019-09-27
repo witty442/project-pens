@@ -47,6 +47,17 @@ public class ExternalProcess {
 				  ClearDupDB.clearDupCustDB();
 				  logger.info("--- 3.End Run clearDupCustDB processAfterImport ---");
 			  }
+			  if(ControlCode.canExecuteMethod("ClearDupDB", "clearDupCustAddressDB")){
+				  logger.info("--- 3.Start Run clearDupCustAddressDB processAfterImport ---");
+				  ClearDupDB.clearDupCustAddressDB();
+				  logger.info("--- 3.End Run clearDupCustAddressDB processAfterImport ---");
+			  }
+			  
+			  if(ControlCode.canExecuteMethod("ClearDupDB", "clearDupCustContactDB")){
+				  logger.info("--- 3.Start Run clearDupCustContactDB processAfterImport ---");
+				  ClearDupDB.clearDupCustContactDB();
+				  logger.info("--- 3.End Run clearDupCustContactDB processAfterImport ---");
+			  }
 		  }
 	}
 

@@ -67,6 +67,9 @@ public class SalesTargetBean implements Serializable{
 	private String estimateQty;
 	private String estimateAmt;
 	
+	private String pdCode;
+	private String pdDesc;
+	
 	//total
 	private String totalTargetQty;
 	private String totalTargetAmount;
@@ -89,11 +92,36 @@ public class SalesTargetBean implements Serializable{
 	private String periodDesc;
 	private String reportType;
 	private String dispType;
+	private String pdQty;
 	
 	private List<SalesTargetBean> itemsList;
+	StringBuffer dataStrBuffer;
 	
-    
 	
+	public StringBuffer getDataStrBuffer() {
+		return dataStrBuffer;
+	}
+	public void setDataStrBuffer(StringBuffer dataStrBuffer) {
+		this.dataStrBuffer = dataStrBuffer;
+	}
+	public String getPdDesc() {
+		return pdDesc;
+	}
+	public void setPdDesc(String pdDesc) {
+		this.pdDesc = pdDesc;
+	}
+	public String getPdQty() {
+		return pdQty;
+	}
+	public void setPdQty(String pdQty) {
+		this.pdQty = pdQty;
+	}
+	public String getPdCode() {
+		return pdCode;
+	}
+	public void setPdCode(String pdCode) {
+		this.pdCode = pdCode;
+	}
 	public String getInvoicedAmt() {
 		return invoicedAmt;
 	}

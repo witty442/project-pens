@@ -16,11 +16,12 @@ import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.LockItemOrderBean;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.autocn.AutoCNBean;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.toolmanage.ToolManageBean;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 import com.pens.util.helper.SequenceProcessAll;
@@ -78,7 +79,7 @@ public class ToolManageDAO extends PickConstants{
 			while(rst.next()) {
 			   h = new ToolManageBean();
 			   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
-			   h.setDocDate(Utils.stringValue(rst.getDate("doc_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setDocDate(DateUtil.stringValue(rst.getDate("doc_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setCustGroup(Utils.isNull(rst.getString("cust_group")));
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
@@ -200,8 +201,8 @@ public class ToolManageDAO extends PickConstants{
 		}
 	    
 	    if( !Utils.isNull(o.getDocDate()).equals("")){
-	       Date date = Utils.parse(Utils.isNull(o.getDocDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-	       sql.append("\n and j.doc_date = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+	       Date date = DateUtil.parse(Utils.isNull(o.getDocDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+	       sql.append("\n and j.doc_date = to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
 	    }
 		 return sql;
 	}
@@ -307,7 +308,7 @@ public class ToolManageDAO extends PickConstants{
 				ps = conn.prepareStatement(sql.toString());
 	
 				ps.setString(c++, Utils.isNull(head.getDocNo()));
-				ps.setDate(c++, new java.sql.Date(Utils.parse(head.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime())); 
+				ps.setDate(c++, new java.sql.Date(DateUtil.parse(head.getDocDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime())); 
 				ps.setString(c++, Utils.isNull(head.getDocType())); 
 				ps.setString(c++, Utils.isNull(head.getRefRtn())); 
 				ps.setString(c++, Utils.isNull(head.getCustGroup())); 
@@ -345,7 +346,7 @@ public class ToolManageDAO extends PickConstants{
 				
 				ps = conn.prepareStatement(sql.toString());
 	
-				ps.setDate(c++, new java.sql.Date(Utils.parse(head.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime())); 
+				ps.setDate(c++, new java.sql.Date(DateUtil.parse(head.getDocDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime())); 
 				ps.setString(c++, Utils.isNull(head.getRefRtn())); 
 				ps.setString(c++, Utils.isNull(head.getCustGroup()));
 				ps.setString(c++, Utils.isNull(head.getStoreCode())); 

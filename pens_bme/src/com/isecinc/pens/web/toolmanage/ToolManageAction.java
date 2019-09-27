@@ -21,8 +21,9 @@ import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ToolManageDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -233,7 +234,7 @@ public class ToolManageAction extends I_Action {
 				//set PageName
 				bean.setPageName(aForm.getBean().getPageName());
 				bean.setDocType(aForm.getBean().getDocType());
-				bean.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setDocDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				bean.setCanSave(true);
 				bean.setMode(action);
 	

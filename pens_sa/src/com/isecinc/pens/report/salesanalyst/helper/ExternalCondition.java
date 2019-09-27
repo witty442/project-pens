@@ -1,8 +1,7 @@
 package com.isecinc.pens.report.salesanalyst.helper;
 
-import util.Utils;
-
 import com.isecinc.pens.report.salesanalyst.SABean;
+import com.pens.util.Utils;
 
 public class ExternalCondition {
 

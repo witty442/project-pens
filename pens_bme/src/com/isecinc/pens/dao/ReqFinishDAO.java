@@ -18,7 +18,8 @@ import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.ReqFinish;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -84,7 +85,7 @@ public class ReqFinishDAO extends PickConstants{
 			logger.debug("sql:"+sql);
 			ps = conn.prepareStatement(sql.toString());
 			if( !Utils.isNull(h.getRequestDate()).equals("")){
-				Date tDate  = Utils.parse(h.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date tDate  = DateUtil.parse(h.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
 			}
 			
@@ -92,8 +93,8 @@ public class ReqFinishDAO extends PickConstants{
 			while(rst.next()) {
 	
 				   h.setNo(r);
-				   h.setRequestDate(Utils.stringValue(rst.getTimestamp("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   h.setConfirmDate(Utils.stringValue(rst.getTimestamp("confirm_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setRequestDate(DateUtil.stringValue(rst.getTimestamp("request_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setConfirmDate(DateUtil.stringValue(rst.getTimestamp("confirm_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   
 				   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
 				   h.setStatus(Utils.isNull(rst.getString("status"))); 
@@ -191,7 +192,7 @@ public class ReqFinishDAO extends PickConstants{
 			while(rst.next()) {
 				   h = new ReqFinish();
 				   h.setNo(r);
-				   h.setRequestDate(Utils.stringValue(rst.getTimestamp("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setRequestDate(DateUtil.stringValue(rst.getTimestamp("request_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
 				   h.setStatus(Utils.isNull(rst.getString("status"))); 
 				   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("status")))); 
@@ -228,8 +229,8 @@ public class ReqFinishDAO extends PickConstants{
 		StringBuffer sql = new StringBuffer("");
 		if( !Utils.isNull(o.getRequestDate()).equals("")){
 			//BudishDate
-			Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateChristStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateChristStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			sql.append("\n 		and i.request_date = to_date('"+dateChristStr+"','dd/mm/yyyy')");
 		}
 		if( !Utils.isNull(o.getStatus()).equals("")){
@@ -631,7 +632,7 @@ public class ReqFinishDAO extends PickConstants{
 				
 				ps = conn.prepareStatement(sql.toString());
 				
-				Date openDate = Utils.parse( o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date openDate = DateUtil.parse( o.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				ps.setTimestamp(c++, new java.sql.Timestamp(openDate.getTime()));
 				ps.setString(c++, o.getRequestNo());
@@ -666,7 +667,7 @@ public class ReqFinishDAO extends PickConstants{
 				sql.append(" WHERE  REQUEST_NO = ?  \n" );
 
 				ps = conn.prepareStatement(sql.toString());
-				Date openDate = Utils.parse( o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date openDate = DateUtil.parse( o.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				ps.setString(c++, o.getRemark());
 				ps.setTimestamp(c++, new java.sql.Timestamp(openDate.getTime()));

@@ -21,11 +21,12 @@ import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.PayBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.PayWhiteDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 
@@ -196,7 +197,7 @@ public class PayWhiteAction extends I_Action {
 				c.setDocNo(docNo);
 				//PayBean bean = PayWhiteDAO.searchHead(c,true).getItems().get(0);
 				PayBean bean = PayWhiteDAO.searchHead(c,true,false,1,pageSize).getItems().get(0);
-				bean.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setDocDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				bean.setDocNo("");
 				
 				List<PayBean> items = new ArrayList<PayBean>();
@@ -215,7 +216,7 @@ public class PayWhiteAction extends I_Action {
 				  PayBean bean = PayWhiteDAO.searchHead(c,true,false,1,pageSize).getItems().get(0);
 				  aForm.setBean(bean);
 				}else{
-				   c.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   c.setDocDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   aForm.setBean(c);
 				}
 			}

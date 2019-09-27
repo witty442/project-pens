@@ -16,10 +16,11 @@ import org.apache.struts.action.ActionForm;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.isecinc.pens.web.shop.ShopForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
@@ -130,8 +131,8 @@ public class ShopBillSummaryAction {
 		boolean newVersion = false;
 		try {
 			//Date > 201904 = newVersion
-			Date dateCheck = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			int YYYYMM = Utils.convertStrToInt(Utils.stringValue(dateCheck, Utils.YYYYMM));
+			Date dateCheck = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			int YYYYMM = Utils.convertStrToInt(DateUtil.stringValue(dateCheck, DateUtil.YYYYMM));
 			int YYYYNN_DATECUT_OFF = Utils.convertStrToInt(ControlConstantsDB.getValueByConCode(ControlConstantsDB.MAY_REPORT_TYPE, "DATE_CUT_OFF"));
 			logger.debug("YYYYMM:"+YYYYMM);
 			logger.debug("YYYYNN_DATECUT_OFF:"+YYYYNN_DATECUT_OFF);
@@ -201,17 +202,17 @@ public class ShopBillSummaryAction {
 				sql.append("\n    AND MP.MATERIAL_MASTER ='"+Utils.isNull(o.getGroupCode())+"'");
 			}
 			if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("") ){
-				dateTemp = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				dateTemp = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n    AND H.ORDER_DATE >= to_date('"+dateStr+"','dd/mm/yyyy')");
 				
-				dateTemp = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				dateTemp = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n    AND H.ORDER_DATE <= to_date('"+dateStr+"','dd/mm/yyyy')");
 				
 			}else if( !Utils.isNull(o.getStartDate()).equals("") && Utils.isNull(o.getEndDate()).equals("") ){
-				dateTemp = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				dateTemp = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n    AND H.ORDER_DATE = to_date('"+dateStr+"','dd/mm/yyyy')");
 			}
 			sql.append("\n        group by H.order_date,MP.MATERIAL_MASTER");
@@ -315,8 +316,8 @@ public class ShopBillSummaryAction {
 		boolean newVersion = false;
 		try {
 			//Date > 201904 = newVersion
-			Date dateCheck = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			int YYYYMM = Utils.convertStrToInt(Utils.stringValue(dateCheck, Utils.YYYYMM));
+			Date dateCheck = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			int YYYYMM = Utils.convertStrToInt(DateUtil.stringValue(dateCheck, DateUtil.YYYYMM));
 			int YYYYNN_DATECUT_OFF = Utils.convertStrToInt(ControlConstantsDB.getValueByConCode(ControlConstantsDB.MAY_REPORT_TYPE, "DATE_CUT_OFF"));
 			logger.debug("YYYYMM:"+YYYYMM);
 			logger.debug("YYYYNN_DATECUT_OFF:"+YYYYNN_DATECUT_OFF);
@@ -381,17 +382,17 @@ public class ShopBillSummaryAction {
 				sql.append("\n    AND MP.MATERIAL_MASTER ='"+Utils.isNull(o.getGroupCode())+"'");
 			}
 			if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("") ){
-				dateTemp = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				dateTemp = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n    AND H.ORDER_DATE >= to_date('"+dateStr+"','dd/mm/yyyy')");
 				
-				dateTemp = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				dateTemp = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n    AND H.ORDER_DATE <= to_date('"+dateStr+"','dd/mm/yyyy')");
 				
 			}else if( !Utils.isNull(o.getStartDate()).equals("") && Utils.isNull(o.getEndDate()).equals("") ){
-				dateTemp = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				dateTemp = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n    AND H.ORDER_DATE = to_date('"+dateStr+"','dd/mm/yyyy')");
 			}
 			sql.append("\n        group by H.order_date,MP.MATERIAL_MASTER");

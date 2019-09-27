@@ -22,8 +22,8 @@ import com.isecinc.pens.dao.AutoCNHISHERDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 

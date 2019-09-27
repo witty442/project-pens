@@ -29,10 +29,10 @@ import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.OnhandDAO;
 import com.isecinc.pens.dao.PickStockDAO;
 import com.isecinc.pens.dao.RenewBoxDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 

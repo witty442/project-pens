@@ -25,11 +25,12 @@ import com.isecinc.pens.dao.ConfirmReturnWacoalDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.ReqFinishDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.pick.process.ControlOhand;
 import com.isecinc.pens.pick.process.ControlOnhandBean;
 import com.isecinc.pens.pick.process.OnhandProcess;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -200,7 +201,7 @@ public class ConfFinishAction extends I_Action {
 			if( !"".equals(requestNo) && !"".equals(requestNo)){
 			   //get Head Detail
 				c = ReqFinishDAO.searchReqFinishing(conn,c, false);
-				c.setConfirmDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
+				c.setConfirmDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
 				
 			    //Item not confirm
 			    listData.addAll(ConfFinishDAO.searchItemByGroupCode(conn, c)); 
@@ -274,7 +275,7 @@ public class ConfFinishAction extends I_Action {
 			
 			ReqFinish h = aForm.getBean();
 			h.setStatus(PickConstants.STATUS_FINISH);
-			h.setConfirmDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			h.setConfirmDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			h.setCreateUser(user.getUserName());
 			h.setUpdateUser(user.getUserName());
 			

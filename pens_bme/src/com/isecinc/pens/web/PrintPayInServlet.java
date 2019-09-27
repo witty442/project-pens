@@ -21,12 +21,12 @@ import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.PayBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.PayDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialParameter;
 import com.isecinc.pens.model.MUser;
 import com.isecinc.pens.web.pay.PayForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 

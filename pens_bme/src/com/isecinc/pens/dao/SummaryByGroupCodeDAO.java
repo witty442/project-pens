@@ -27,10 +27,11 @@ import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.inf.exception.LogisticException;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.exception.LogisticException;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.web.order.OrderAction;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class SummaryByGroupCodeDAO {
@@ -184,14 +185,14 @@ public class SummaryByGroupCodeDAO {
 			sql.append("\n where 1=1  ");
 
 			if( !Utils.isNull(o.getSalesDateFrom()).equals("")){
-				 Date dateFrom = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				 String dateFromStrCH = Utils.stringValue(dateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
+				 Date dateFrom = DateUtil.parse(o.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				 String dateFromStrCH = DateUtil.stringValue(dateFrom, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				 sql.append("\n AND h.sale_date >= to_date('"+dateFromStrCH+"','dd/MM/yyyy')");
 			}
 				
 			if( !Utils.isNull(o.getSalesDateTo()).equals("")){
-			    Date dateTo = Utils.parse(o.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			    String dateFromStrCH = Utils.stringValue(dateTo, Utils.DD_MM_YYYY_WITH_SLASH);
+			    Date dateTo = DateUtil.parse(o.getSalesDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    String dateFromStrCH = DateUtil.stringValue(dateTo, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n AND h.sale_date <= to_date('"+dateFromStrCH+"','dd/MM/yyyy')");
 			}
 			
@@ -310,14 +311,14 @@ public class SummaryByGroupCodeDAO {
 		    sql.append(" from PENSBME_SALES_OUT m WHERE 1=1  \n");
 		    
 		    if( !Utils.isNull(o.getSalesDateFrom()).equals("")){
-				 Date dateFrom = Utils.parse(o.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				 String dateFromStrCH = Utils.stringValue(dateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
+				 Date dateFrom = DateUtil.parse(o.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				 String dateFromStrCH = DateUtil.stringValue(dateFrom, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				 sql.append("\n AND m.sale_date >= to_date('"+dateFromStrCH+"','dd/MM/yyyy')");
 			}
 				
 			if( !Utils.isNull(o.getSalesDateTo()).equals("")){
-			    Date dateTo = Utils.parse(o.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			    String dateFromStrCH = Utils.stringValue(dateTo, Utils.DD_MM_YYYY_WITH_SLASH);
+			    Date dateTo = DateUtil.parse(o.getSalesDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    String dateFromStrCH = DateUtil.stringValue(dateTo, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n AND m.sale_date <= to_date('"+dateFromStrCH+"','dd/MM/yyyy')");
 			}
 			

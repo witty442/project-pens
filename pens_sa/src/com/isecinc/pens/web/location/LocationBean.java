@@ -23,6 +23,7 @@ public class LocationBean implements  Serializable,Comparable<LocationBean>{
 	private String salesChannelNo;
 	private String salesrepId;
 	private String salesrepCode;
+	private String salesCode;
 	private String salesrepName;
 	private String dispAllStore;
 	private String dispAllOrder;
@@ -65,6 +66,14 @@ public class LocationBean implements  Serializable,Comparable<LocationBean>{
 	private String salesZone;
 
 	
+	public String getSalesCode() {
+		return salesCode;
+	}
+
+	public void setSalesCode(String salesCode) {
+		this.salesCode = salesCode;
+	}
+
 	public String getSalesZone() {
 		return salesZone;
 	}

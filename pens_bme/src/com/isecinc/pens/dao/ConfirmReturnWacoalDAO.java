@@ -17,7 +17,8 @@ import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.ReqReturnWacoal;
 import com.isecinc.pens.bean.ReturnBoxReport;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -59,12 +60,12 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 			String returnDateStr = "";
 			
 			if( !Utils.isNull(o.getRequestDate()).equals("")){
-				Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				requestDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(o.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				requestDateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			}
 			if( !Utils.isNull(o.getReturnDate()).equals("")){
-				Date tDate  = Utils.parse(o.getReturnDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(o.getReturnDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				returnDateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			}
 			
 			sql.append("\n SELECT A.* FROM( ");
@@ -238,7 +239,7 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 			while(rst.next()) {
 				   h = new ConfirmReturnWacoal();
 				   h.setNo(r+"");
-				   h.setRequestDate(Utils.stringValue(rst.getTimestamp("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setRequestDate(DateUtil.stringValue(rst.getTimestamp("request_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   
 				   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
 				   h.setRequestStatus(Utils.isNull(rst.getString("request_status"))); 
@@ -248,7 +249,7 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 				   h.setTotalBox(rst.getInt("total_box"));
 				   h.setTotalQty(rst.getInt("total_qty"));
 				   
-				   h.setReturnDate(Utils.stringValue(rst.getTimestamp("return_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setReturnDate(DateUtil.stringValue(rst.getTimestamp("return_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setReturnNo(Utils.isNull(rst.getString("return_no")));
 				   h.setReturnStatus(Utils.isNull(rst.getString("return_status"))); 
 				   h.setReturnStatusDesc(getStatusDesc(Utils.isNull(rst.getString("return_status")))); 
@@ -330,7 +331,7 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 			while(rst.next()) {
 			   h = new ConfirmReturnWacoal();
 			  // h.setNo(r);
-			   h.setRequestDate(Utils.stringValue(rst.getTimestamp("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setRequestDate(DateUtil.stringValue(rst.getTimestamp("request_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   
 			   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
 			   h.setRequestStatus(Utils.isNull(rst.getString("request_status"))); 
@@ -384,8 +385,8 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 			sql.append("\n where 1=1  ");
 
 			if( !Utils.isNull(o.getReturnDate()).equals("")){
-				Date tDate  = Utils.parse(o.getReturnDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String dateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(o.getReturnDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n and return_date = to_date('"+dateStr+"','dd/mm/yyyy')");
 			}
 			logger.debug("sql:"+sql);
@@ -420,8 +421,8 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 			sql.append("\n where 1=1  ");
 			sql.append("\n and return_status ='"+STATUS_RETURN+"'");
 			if( !Utils.isNull(o.getReturnDate()).equals("")){
-				Date tDate  = Utils.parse(o.getReturnDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String dateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(o.getReturnDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n and return_date = to_date('"+dateStr+"','dd/mm/yyyy')");
 			}
 			sql.append("\n group by return_date ");
@@ -476,8 +477,8 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 			sql.append("\n where 1=1  ");
 			
 			if( !Utils.isNull(o.getRequestDate()).equals("")){
-				Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String dateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(o.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n and R.REQUEST_DATE = to_date('"+dateStr+"','dd/mm/yyyy') ");
 			}
 			
@@ -490,8 +491,8 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 			}
 			
 			if( !Utils.isNull(o.getReturnDate()).equals("")){
-				Date tDate  = Utils.parse(o.getReturnDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String dateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(o.getReturnDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n and C.RETURN_DATE = to_date('"+dateStr+"','dd/mm/yyyy') ");
 			}
 			
@@ -513,7 +514,7 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 			while(rst.next()) {
 				   h = new ConfirmReturnWacoal();
 				  // h.setNo(r);
-				   h.setRequestDate(Utils.stringValue(rst.getTimestamp("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setRequestDate(DateUtil.stringValue(rst.getTimestamp("request_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   
 				   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
 				   h.setRequestStatus(Utils.isNull(rst.getString("request_status"))); 
@@ -523,7 +524,7 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 				   h.setTotalBox(rst.getInt("total_box"));
 				   h.setTotalQty(rst.getInt("total_qty"));
 				   
-				   h.setReturnDate(Utils.stringValue(rst.getTimestamp("return_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setReturnDate(DateUtil.stringValue(rst.getTimestamp("return_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setReturnNo(Utils.isNull(rst.getString("return_no")));
 				   h.setReturnStatus(Utils.isNull(rst.getString("return_status"))); 
 				   h.setReturnStatusDesc(getStatusDesc(Utils.isNull(rst.getString("return_status")))); 
@@ -1061,7 +1062,7 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 				//1 day 1 CNNO
 				String cnNo = searchCnNoByDate(conn,h);
 				if(Utils.isNull(cnNo).equals("")){
-					Date returnDate  = Utils.parse(h.getReturnDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					Date returnDate  = DateUtil.parse(h.getReturnDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					cnNo = genCnNo(conn, returnDate);
 				}
 				h.setCnNo(cnNo);
@@ -1167,7 +1168,7 @@ public class ConfirmReturnWacoalDAO extends PickConstants{
 				
 				ps = conn.prepareStatement(sql.toString());
 				
-				Date returnDate = Utils.parse( o.getReturnDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date returnDate = DateUtil.parse( o.getReturnDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				ps.setTimestamp(c++, new java.sql.Timestamp(returnDate.getTime()));
 				ps.setString(c++, o.getReturnNo());

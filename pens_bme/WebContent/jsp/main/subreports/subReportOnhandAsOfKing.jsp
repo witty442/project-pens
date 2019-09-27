@@ -1,4 +1,4 @@
-<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.OnhandSummary"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
@@ -36,8 +36,8 @@ if(queryStr.indexOf("d-") != -1){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <style type="text/css">
 <!--
 body {
@@ -83,7 +83,8 @@ body {
 			    
 			    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" class="lotus_saleInQty"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
-			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	   
+			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>
+			    <display:column  title="Adjust Qty" property="adjustQty"  sortable="false" class="lotus_saleReturnQty"/>	   
 			    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
 			    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>			
 			   
@@ -94,6 +95,7 @@ body {
 			          <td class="td_number"><bean:write name="summary" property="initSaleQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>
+			          <td class="td_number"><bean:write name="summary" property="adjustQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="onhandQty"/></td>
 			      </tr>
@@ -115,6 +117,7 @@ body {
 			    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" class="lotus_saleInQty"/>	
 			    <display:column  title="Sale In Qty" property="saleInQty"  sortable="false" class="lotus_saleInQty"/>	
 			    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="lotus_saleOutQty"/>	
+			    <display:column  title="Adjust Qty" property="adjustQty"  sortable="false" class="lotus_saleReturnQty"/>	   
 			    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="lotus_saleReturnQty"/>
 			    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" class="lotus_onhandQty"/>	
 			    
@@ -125,6 +128,7 @@ body {
 			          <td class="td_number"><bean:write name="summary" property="initSaleQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>
+			           <td class="td_number"><bean:write name="summary" property="adjustQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
 			          <td class="td_number"><bean:write name="summary" property="onhandQty"/></td>
 			      </tr>

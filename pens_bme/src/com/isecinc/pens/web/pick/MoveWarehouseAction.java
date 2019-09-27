@@ -17,8 +17,9 @@ import com.isecinc.pens.bean.MoveWarehouse;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.MoveWarehoseDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -42,8 +43,8 @@ public class MoveWarehouseAction extends I_Action {
 		try {
 			//save old criteria
 			MoveWarehouse w = new MoveWarehouse();
-			w.setOpenDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			w.setCloseDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			w.setOpenDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			w.setCloseDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			
 			aForm.setBean(w);
 			aForm.setResults(null);
@@ -209,8 +210,8 @@ public class MoveWarehouseAction extends I_Action {
 		MoveWarehouseForm aForm = (MoveWarehouseForm) form;
 		try {
 			MoveWarehouse w = new MoveWarehouse();
-			w.setOpenDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			w.setCloseDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			w.setOpenDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			w.setCloseDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			
 			aForm.setBean(w);
 			aForm.setResults(null);

@@ -16,7 +16,8 @@ import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
@@ -46,7 +47,7 @@ public class GenerateMonthEndLotus {
 			
 			//Validate last day of month
 			Calendar ca = Calendar.getInstance();
-			ca.setTime(Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ca.setTime(DateUtil.parse(c.getSalesDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			int lastDayofMonth = ca.getActualMaximum(Calendar.DAY_OF_MONTH);
 			int dayAsOfDate = ca.get(Calendar.DATE);
 			logger.debug("lastDayofMonth:"+lastDayofMonth+"dayAsOfDate:"+dayAsOfDate);
@@ -115,13 +116,13 @@ public class GenerateMonthEndLotus {
 			boolean unionAllFlag = false;
 			try {
 				onhandDateAsOfConfigStr = ControlConstantsDB.getOnhandDateAsOfControl(conn,ControlConstantsDB.TYPE_ONHAND_DATE_LOTUS_AS_OF);
-				onhandDateAsOfConfig = Utils.parse(onhandDateAsOfConfigStr,Utils.DD_MM_YYYY_WITHOUT_SLASH);
+				onhandDateAsOfConfig = DateUtil.parse(onhandDateAsOfConfigStr,DateUtil.DD_MM_YYYY_WITHOUT_SLASH);
 				
 				//prepare parameter
 				String christSalesDateStr ="";
 				if( !Utils.isNull(c.getSalesDate()).equals("")){
-					asofDate = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					christSalesDateStr = Utils.stringValue(asofDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					asofDate = DateUtil.parse(c.getSalesDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					christSalesDateStr = DateUtil.stringValue(asofDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				}
 				sql.append("\n SELECT A.* FROM(");
 				sql.append("\n SELECT M.*");

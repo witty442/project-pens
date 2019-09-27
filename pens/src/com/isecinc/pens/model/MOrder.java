@@ -992,4 +992,36 @@ public class MOrder extends I_Model<Order> {
 		return haveVat;
 	}
 	
+	public void updatePrintTaxInvoiceStamp(Connection conn ,String orderNo,String reportName)  throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		logger.debug("updatePrintTaxInvoiceStamp ");
+		String sql = "";
+		int printCount = 1;
+		try{
+			//current time 
+			String dateTime = Utils.stringValue(new java.util.Date(), Utils.DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH,Utils.local_th);
+			
+			//sql get last count by order,reportName
+			sql  = "select max(print_count) as max_print_count from  t_stamp_print_order ";
+			sql += "WHERE order_no = '"+orderNo+"' and report_name ='"+reportName+"' ";
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			if(rs.next()){
+				printCount = rs.getInt("max_print_count")+1;
+			}
+			
+			//sql insert n
+			sql  = "insert into t_stamp_print_order(order_no,report_name,date,print_count)";
+			sql += "values('"+orderNo+"','"+reportName+"','"+dateTime+"',"+printCount+") ";
+			ps = conn.prepareStatement(sql);
+			ps.executeUpdate();
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
 }

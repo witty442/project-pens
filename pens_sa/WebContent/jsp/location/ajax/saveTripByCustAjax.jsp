@@ -1,11 +1,12 @@
 
-<%@page import="util.DBConnection"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.DBConnection"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.isecinc.pens.web.location.LocationBean"%>
 <%@page import="com.isecinc.pens.web.location.TripAction"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
-<%@page import="util.Utils"%>
+
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>

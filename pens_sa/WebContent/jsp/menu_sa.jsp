@@ -1,7 +1,8 @@
-<%@page import="util.UserUtils"%>
+<%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
+<%@page import="com.pens.util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.stock.StockConstants"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
-<%@page import="util.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -96,7 +97,9 @@
 	</li> 
 <%}%>
 	
-<%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MT_SALES,User.DD_SALES,User.MKT,User.MTMGR,User.TTSUPER,User.TTMGR}) ){
+<%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MT_SALES,User.DD_SALES
+		,User.MKT,User.MTMGR,User.TTSUPER,User.TTMGR
+		,User.PD}) ){
 	no=0;
 %>
 	<li><a href="javascript: void(0)" class="parent"><span>Sale Target</span></a>
@@ -192,6 +195,14 @@
 		                  <span>3 <bean:message key="ReportSalesTargetAll" bundle="sysprop"/></span>
 		             </a>  --%>
 	           </li> 
+	           
+	         <%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.PD}) ){ %>
+                  <li>
+                    <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_SALES_TARGET_PD%>&action=new';">
+                      <span><%no++;out.print(no+"."); %><bean:message key="<%=SalesTargetConstants.PAGE_SALES_TARGET_PD%>" bundle="sysprop"/></span>
+                    </a>
+                 </li>  
+             <%} %>
 		 </ul>
 	</li>
 <%} %>
@@ -232,7 +243,7 @@
 	             </li> 
              <%} %>
               <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN,User.STOCKCR,User.STOCKCRSALE})){ %>
-                 <li>
+                  <li>
 	               <a href="#" class="parent" 
 	               onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareSearch&pageName=<%=StockConstants.PAGE_STOCK_CR_EXPIRE%>&action=new';">
 	               <span><%no++;out.print(no);%>.<bean:message key="<%=StockConstants.PAGE_STOCK_CR_EXPIRE%>" bundle="sysprop"/></span>
@@ -272,6 +283,14 @@
                 </a>  
               </li>   
             <%} %>
+             <%if ( UserUtils.userInRole("ROLE_VANDOC",user,new String[]{User.ADMIN, User.VANDOC}) ){ %>
+               <li>
+                <a href="#" class="parent" 
+                 onclick="window.location='${pageContext.request.contextPath}/jsp/vanAction.do?do=prepareSearch&action=new&pageName=OrderVanVO';">
+                 <span><%no++;out.print(no);%>.<bean:message key="OrderVanVO" bundle="sysprop"/></span>
+                </a> 
+              </li>  
+           <%} %>
 		</ul>
 	</li>  
 <%}%>
@@ -299,7 +318,24 @@
 		</ul>
 	</li>  
 <%}%>
-
+<!-- ************************************************************************** -->
+<%if ( UserUtils.userInRole("ROLE_B2B",user,new String[]{User.ADMIN, User.B2B}) ){ 
+	  no=0;
+%>
+ <%--  <li><a href="javascript: void(0)" class="parent" ><span>B2B</span></a>
+		<ul>
+          <%if (UserUtils.userInRole("ROLE_B2B",user,new String[]{User.ADMIN,User.B2B}) ){ %>
+               <li>
+               <a href="#" class="parent"  
+               onclick="window.location='${pageContext.request.contextPath}/jsp/b2bAction.do?do=prepareSearch&action=new&pageName=B2BMakro';">
+               <span><%no++;out.print(no);%>.<bean:message key="B2BMakro" bundle="sysprop"/></span>
+               </a>
+             </li>  
+		   <%} %>
+	 	</ul>
+	</li>       --%>  
+<%}%>
+<!-- ************************************************************************** -->
 <li>
    <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/changePassword.jsp';"><span>เปลี่ยนรหัสผ่าน</span></a>	
 </li>

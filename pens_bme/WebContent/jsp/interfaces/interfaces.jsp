@@ -1,11 +1,11 @@
 <%@page import="java.util.Date"%>
 <%@page import="com.isecinc.pens.inf.helper.InterfaceUtils"%>
-<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
+<%@page import="com.pens.util.EnvProperties"%>
 <%@page import="com.isecinc.pens.inf.manager.external.process.ControlInterfaceICC"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
-<%@page import="com.isecinc.pens.inf.bean.MonitorBean"%>
-<%@page import="com.isecinc.pens.inf.helper.Constants"%>
+<%@page import="com.isecinc.pens.bean.MonitorBean"%>
+<%@page import="com.pens.util.Constants"%>
 <%@page import="com.pens.util.*"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -798,8 +798,8 @@ body {
 									   <%if(Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){ 
 										   String path = EnvProperties.getInstance().getProperty("path.icc.hisher.import.dlyr")+"/";
 										   out.print("    Example file :");
-										   out.print(path+InterfaceUtils.getImportNameICC("PENSBME_ICC_HEAD",Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
-										   out.print("      &nbsp;&nbsp;,"+path+InterfaceUtils.getImportNameICC("PENSBME_ICC_DLYR",Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
+										   out.print(path+InterfaceUtils.getImportNameICC("PENSBME_ICC_HEAD",DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
+										   out.print("      &nbsp;&nbsp;,"+path+InterfaceUtils.getImportNameICC("PENSBME_ICC_DLYR",DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
 										}else if( Constants.TYPE_IMPORT_WACOAL_STOCK.equals(pageName)){ 
 										    String path = EnvProperties.getInstance().getProperty("path.import.wacoal.stock")+"/";
 										    out.print("    Path :"+path);

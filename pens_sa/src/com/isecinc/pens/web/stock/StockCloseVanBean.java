@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import util.Utils;
+import com.pens.util.Utils;
 
 public class StockCloseVanBean implements Serializable{
 

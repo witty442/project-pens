@@ -8,9 +8,10 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.ExcelHeader;
-import util.Utils;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 public class LocationReport {
 	private static Logger logger = Logger.getLogger("PENS");
@@ -57,11 +58,12 @@ public class LocationReport {
 					//filter case move customer to another sales
 					//use order_number =SaleCode
 					
+					html.append("<td class='"+tdTextCenterClass+"' width='2%'>"+r+"</td>");
 					if("report1".equalsIgnoreCase(c.getReportType())){
 						html.append("<td class='"+tdTextClass+"' width='15%'>"+Utils.isNull(rst.getString("customer_code"))+"-"+Utils.isNull(rst.getString("customer_desc"))+"</td>");
 						html.append("<td class='"+tdTextClass+"' width='24%'>"+Utils.isNull(rst.getString("address"))+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='8%'>"+Utils.isNull(rst.getString("order_number"))+"</td>");
-						html.append("<td class='"+tdTextCenterClass+"' width='8%'>"+Utils.stringValueChkNull(rst.getDate("checkin_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>");
+						html.append("<td class='"+tdTextCenterClass+"' width='8%'>"+DateUtil.stringValueChkNull(rst.getDate("checkin_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th)+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+genFlagVisit(rst.getString("flag_sales"),rst.getString("flag_visit"))+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.isNull(rst.getString("flag_sales"))+"</td>");
 						
@@ -73,7 +75,7 @@ public class LocationReport {
 						html.append("<td class='"+tdTextClass+"' width='15%'>"+Utils.isNull(rst.getString("address"))+"</td>");
 						html.append("<td class='"+tdTextClass+"' width='15%'>"+Utils.isNull(rst.getString("google_address"))+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='8%'>"+Utils.isNull(rst.getString("order_number"))+"</td>");
-						html.append("<td class='"+tdTextCenterClass+"' width='8%'>"+Utils.stringValueChkNull(rst.getDate("checkin_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>");
+						html.append("<td class='"+tdTextCenterClass+"' width='8%'>"+DateUtil.stringValueChkNull(rst.getDate("checkin_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th)+"</td>");
 
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+genFlagVisit(rst.getString("flag_sales"),rst.getString("flag_visit"))+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.isNull(rst.getString("flag_sales"))+"</td>");
@@ -85,7 +87,7 @@ public class LocationReport {
 						html.append("<td class='"+tdTextClass+"' width='12%'>"+Utils.isNull(rst.getString("customer_code"))+"-"+Utils.isNull(rst.getString("customer_desc"))+"</td>");
 						html.append("<td class='"+tdTextClass+"' width='15%'>"+Utils.isNull(rst.getString("address"))+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='8%'>"+Utils.isNull(rst.getString("order_number"))+"</td>");
-						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.stringValueChkNull(rst.getDate("checkin_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>");
+						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+DateUtil.stringValueChkNull(rst.getDate("checkin_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th)+"</td>");
 						
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+genFlagVisit(rst.getString("flag_sales"),rst.getString("flag_visit"))+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.isNull(rst.getString("flag_sales"))+"</td>");
@@ -98,7 +100,7 @@ public class LocationReport {
 						html.append("<td class='"+tdTextClass+"' width='15%'>"+Utils.isNull(rst.getString("customer_code"))+"-"+Utils.isNull(rst.getString("customer_desc"))+"</td>");
 						html.append("<td class='"+tdTextClass+"' width='20%'>"+Utils.isNull(rst.getString("address"))+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.isNull(rst.getString("order_number"))+"</td>");
-						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.stringValueChkNull(rst.getDate("checkin_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>");
+						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+DateUtil.stringValueChkNull(rst.getDate("checkin_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th)+"</td>");
 						
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+genFlagVisit(rst.getString("flag_sales"),rst.getString("flag_visit"))+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.isNull(rst.getString("flag_sales"))+"</td>");
@@ -113,7 +115,7 @@ public class LocationReport {
 						html.append("<td class='"+tdTextClass+"' width='15%'>"+Utils.isNull(rst.getString("customer_code"))+"-"+Utils.isNull(rst.getString("customer_desc"))+"</td>");
 						html.append("<td class='"+tdTextClass+"' width='20%'>"+Utils.isNull(rst.getString("address"))+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.isNull(rst.getString("order_number"))+"</td>");
-						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.stringValueChkNull(rst.getDate("checkin_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>");
+						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+DateUtil.stringValueChkNull(rst.getDate("checkin_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th)+"</td>");
 						
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+genFlagVisit(rst.getString("flag_sales"),rst.getString("flag_visit"))+"</td>");
 						html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.isNull(rst.getString("flag_sales"))+"</td>");
@@ -226,7 +228,7 @@ public class LocationReport {
 				}
 				
 			    sql.append("\n from xxpens_om_trip_checkin tc , ");
-				sql.append("\n xxpens_ar_cust_sales_all cs ,  ");
+				sql.append("\n apps.xxpens_ar_cust_sales_vl cs ,  ");
 				sql.append("\n xxpens_salesreps_v s , ");
 				sql.append("\n xxpens_ar_customer_all_v c  ");
 				sql.append("\n where 1=1 ");
@@ -240,17 +242,17 @@ public class LocationReport {
 				sql.append("\n and tc.sales_code = s.code ");
 				
 				if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
-					  Date startDate = Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					  String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					  Date startDate = DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+					  String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					  
 					  if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-						  Date endDate = Utils.parse(c.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-						  String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+						  Date endDate = DateUtil.parse(c.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+						  String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 						  
-						  sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
-						  sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+						  sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
+						  sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 					  }else{
-						  sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+						  sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 					  }//if
 				}//if
 					
@@ -318,16 +320,16 @@ public class LocationReport {
 			try {
 				
 				if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
-				   Date startDate = Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				   startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				   Date startDate = DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+				   startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					  
 				   Calendar cal = Calendar.getInstance();
 				   cal.setTime(startDate);
 				   startTrip = cal.get(Calendar.DAY_OF_MONTH);
 				  
 				   if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-					  Date endDate = Utils.parse(c.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					  endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					  Date endDate = DateUtil.parse(c.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+					  endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					  
 					  cal.setTime(endDate);
 					  endTrip = cal.get(Calendar.DAY_OF_MONTH);
@@ -369,7 +371,7 @@ public class LocationReport {
 				sql.append("\n ,cs.province ,cs.amphur ");
 	            sql.append("\n ,s.region ,s.region_name ");
 				sql.append("\n from");
-				sql.append("\n xxpens_ar_cust_sales_all cs ,  ");
+				sql.append("\n apps.xxpens_ar_cust_sales_vl cs ,  ");
 				sql.append("\n xxpens_salesreps_v s , ");
 				sql.append("\n xxpens_ar_customer_all_v c  ");
 				sql.append("\n where 1=1 ");
@@ -406,10 +408,10 @@ public class LocationReport {
 				sql.append("\n from xxpens_om_trip_checkin tc where 1=1");
 				if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
 					 if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-						 sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
-						 sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+						 sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
+						 sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 					 }else{
-						 sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+						 sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 					 }//if
 				}//if
 					
@@ -438,16 +440,16 @@ public class LocationReport {
 			String endDateStr = "";
 			try {
 				if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
-				   Date startDate = Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				   startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				   Date startDate = DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+				   startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					  
 				   Calendar cal = Calendar.getInstance();
 				   cal.setTime(startDate);
 				   startTrip = cal.get(Calendar.DAY_OF_MONTH);
 				  
 				   if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-					  Date endDate = Utils.parse(c.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					  endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					  Date endDate = DateUtil.parse(c.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+					  endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					  
 					  cal.setTime(endDate);
 					  endTrip = cal.get(Calendar.DAY_OF_MONTH);
@@ -485,7 +487,7 @@ public class LocationReport {
 				//gen select column
 				sql.append(genSelectColumnSqlSearchCustomerCheckInData(conn, c));
 				sql.append("\n from  ");
-				sql.append("\n xxpens_ar_cust_sales_all cs ,  ");
+				sql.append("\n apps.xxpens_ar_cust_sales_vl cs ,  ");
 				sql.append("\n xxpens_salesreps_v s , ");
 				sql.append("\n xxpens_ar_customer_all_v c  ");
 				sql.append("\n inner join ");
@@ -493,10 +495,10 @@ public class LocationReport {
 				sql.append("\n select tc.* from xxpens_om_trip_checkin tc where 1=1");
 				if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
 				   if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-					  sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
-					  sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+					  sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
+					  sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 				   }else{
-					  sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+					  sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 				   }//if
 				}//if
 					
@@ -557,16 +559,16 @@ public class LocationReport {
 			String endDateStr = "";
 			try {
 				if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
-				   Date startDate = Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				   startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				   Date startDate = DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+				   startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					  
 				   Calendar cal = Calendar.getInstance();
 				   cal.setTime(startDate);
 				   startTrip = cal.get(Calendar.DAY_OF_MONTH);
 				  
 				   if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-					  Date endDate = Utils.parse(c.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					  endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					  Date endDate = DateUtil.parse(c.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+					  endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					  
 					  cal.setTime(endDate);
 					  endTrip = cal.get(Calendar.DAY_OF_MONTH);
@@ -600,7 +602,7 @@ public class LocationReport {
 				//gen select column
 				sql.append(genSelectColumnSqlSearchCustomerCheckInData(conn, c));
 				sql.append("\n from  ");
-				sql.append("\n xxpens_ar_cust_sales_all cs ,  ");
+				sql.append("\n apps.xxpens_ar_cust_sales_vl cs ,  ");
 				sql.append("\n xxpens_salesreps_v s , ");
 				sql.append("\n xxpens_ar_customer_all_v c  ");
 				sql.append("\n left outer join ");
@@ -608,10 +610,10 @@ public class LocationReport {
 				sql.append("\n select tc.* from xxpens_om_trip_checkin tc where 1=1");
 				if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
 					 if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-						 sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
-						 sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+						 sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
+						 sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 					 }else{
-						 sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+						 sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 					 }//if
 				}//if
 					
@@ -665,7 +667,7 @@ public class LocationReport {
 				//gen select column
 				sql.append(genSelectColumnSqlSearchCustomerCheckInData(conn, c));
 				sql.append("\n from  ");
-				sql.append("\n xxpens_ar_cust_sales_all cs ,  ");
+				sql.append("\n apps.xxpens_ar_cust_sales_vl cs ,  ");
 				sql.append("\n xxpens_salesreps_v s , ");
 				sql.append("\n xxpens_ar_customer_all_v c  ");
 				sql.append("\n inner join ");
@@ -673,10 +675,10 @@ public class LocationReport {
 				sql.append("\n select tc.* from xxpens_om_trip_checkin tc where 1=1");
 				if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
 				   if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-					  sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
-					  sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+					  sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
+					  sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 				   }else{
-					  sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+					  sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 				   }//if
 				}//if
 					
@@ -892,6 +894,7 @@ public class LocationReport {
 			
 			h.append("<table id='tblProduct' align='center' border='1' width='"+width+"' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
 			h.append("<tr> \n");
+			  h.append(" <th nowrap >ลำดับ </th> \n");
 			if("report1".equalsIgnoreCase(c.getReportType())){
 			  h.append(" <th nowrap >ร้านค้า </th> \n");
 			  h.append(" <th nowrap >ที่อยู่ </th> \n");

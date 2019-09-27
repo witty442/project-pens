@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="com.isecinc.pens.web.stock.StockForm"%>
 <%@page import="com.isecinc.pens.web.stock.StockBean"%>
-<%@page import="util.*"%>
+<%@page import="com.pens.util.*"%>
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%
@@ -147,25 +147,29 @@ function setDataPopupValue(code,desc,pageName){
 		form.itemCode.value = code;
 	}
 } 
+function popupBrandSaveZone(path){
+	var url = path + "/jsp/stock/popup/brandSaveZonePopup.jsp";
+	PopupCenterFullHeight(url,"",500);
+}
 </script>
 <table align="center" border="0" cellpadding="3" cellspacing="0" >
            
 	       <tr>
-                <td> วันที่<font color="red">*</font></td>
+                <td align="right"> วันที่<font color="red">*</font></td>
 				<td >					
-					 <html:text property="bean.startDate" styleId="startDate" size="20" readonly="true" styleClass="disableText"/>
+					 <html:text property="bean.startDate" styleId="startDate" size="20" readonly="true" styleClass=""/>
 				       -
-					 <html:text property="bean.endDate" styleId="endDate" size="20" readonly="true" styleClass="disableText"/>
+					 <html:text property="bean.endDate" styleId="endDate" size="20" readonly="true" styleClass=""/>
 				</td>
-				<td colspan="2">
-				   รูปแบบการแสดงผล  <font color="red">*</font>
-				   <html:select property="bean.reportType" styleId="reportType">
-						<html:options collection="REPORT_TYPE_LIST" property="reportValue" labelProperty="reportType"/>
+				<td colspan="2">ประเภทรายงาน:
+				 <font color="red"></font>
+				   <html:select property="bean.typeSearch" styleId="typeSearch">
+						<html:options collection="TYPE_SEARCH_LIST" property="reportValue" labelProperty="reportType"/>
 				    </html:select> 
 				</td>
 			</tr>
 			<tr>
-                <td> ประเภทขาย </td>
+                <td align="right"> ประเภทขาย </td>
 				<td colspan="2">
 				 <html:select property="bean.custCatNo" styleId="custCatNo">
 						<html:options collection="CUST_CAT_LIST" property="custCatNo" labelProperty="custCatDesc"/>
@@ -188,7 +192,7 @@ function setDataPopupValue(code,desc,pageName){
 				</td>
 			</tr>	
 			<tr>
-                <td> แบรนด์ </td>
+                <td align="right"> แบรนด์ </td>
 				<td colspan="2">
 				   <html:text property="bean.brand" styleId="brand" size="20" styleClass="\" autoComplete=\"off" />
 				    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','BrandStock')"/>   
@@ -202,7 +206,15 @@ function setDataPopupValue(code,desc,pageName){
 				     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','ItemStock')"/>   
 				</td>
 			</tr>	
-	   </table>
+			<tr>
+                <td align="right"> รูปแบบการแสดงผล  <font color="red">*</font></td>
+				<td colspan="2">
+				   <html:select property="bean.reportType" styleId="reportType">
+						<html:options collection="REPORT_TYPE_LIST" property="reportValue" labelProperty="reportType"/>
+				    </html:select> 
+			  </td>
+		    </tr>
+	    </table>
 	   <table  border="0" cellpadding="3" cellspacing="0" >
 			<tr>
 				<td align="left">
@@ -215,6 +227,10 @@ function setDataPopupValue(code,desc,pageName){
 					&nbsp;
 					<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 					  <input type="button" value="   Clear   " class="newPosBtnLong">
+					</a>
+					&nbsp;
+					<a href="javascript:popupBrandSaveZone('${pageContext.request.contextPath}')">
+					  <input type="button" value="เช็คตาราง Save Zone ของแต่ละแบรนด์" class="newPosBtnLong">
 					</a>			
 				</td>
 			</tr>

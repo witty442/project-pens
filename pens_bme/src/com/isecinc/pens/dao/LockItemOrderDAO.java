@@ -15,8 +15,9 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.LockItemOrderBean;
 import com.isecinc.pens.bean.Master;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.lockitem.LockItemOrderErrorBean;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcessAll;
 
@@ -99,8 +100,8 @@ public class LockItemOrderDAO {
 				String lockDateStr  ="";
 				try {
 					if( !Utils.isNull(o.getLockDate()).equals("") ){
-					   Date lockDate = Utils.parse(Utils.isNull(o.getLockDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					   lockDateStr = Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					   Date lockDate = DateUtil.parse(Utils.isNull(o.getLockDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					   lockDateStr = DateUtil.stringValue(lockDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					}
 				   sql.append("\n select E.* " );
 				   sql.append("\n ,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Customer' AND M.pens_value =E.group_store)as group_store_name" );
@@ -137,8 +138,8 @@ public class LockItemOrderDAO {
 					   }else{
 						  h.setStoreName("ทุกร้านค้า");
 					   }
-					   h.setLockDate(Utils.isNull(Utils.stringValue(rst.getDate("lock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
-					   h.setUnlockDate(Utils.isNull(Utils.stringValue(rst.getDate("unlock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
+					   h.setLockDate(Utils.isNull(DateUtil.stringValue(rst.getDate("lock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
+					   h.setUnlockDate(Utils.isNull(DateUtil.stringValue(rst.getDate("unlock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)));
 					   
 					   if( "ALL".equalsIgnoreCase(h.getStoreCode())){
 						 h.setAllStore("true");  
@@ -218,8 +219,8 @@ public class LockItemOrderDAO {
 			String key = "";
 			String oldValue = "";
 			try {
-				Date lockDate = Utils.parse(Utils.isNull(o.getLockDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String lockDateStr = Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date lockDate = DateUtil.parse(Utils.isNull(o.getLockDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String lockDateStr = DateUtil.stringValue(lockDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n select group_code, group_store ,store_no from PENSBME_LOCK_ITEM where 1=1");
 				sql.append("\n and group_code = '"+o.getGroupCode()+"' \n");
@@ -300,12 +301,12 @@ public class LockItemOrderDAO {
 				
 				ps.setString(c++, Utils.isNull(o.getGroupCode()));//1
 				if( !Utils.isNull(o.getLockDate()).equals("")){//4
-					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getLockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+					 ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getLockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
 				if( !Utils.isNull(o.getUnlockDate()).equals("")){//4
-					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getUnlockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+					 ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getUnlockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
@@ -328,7 +329,7 @@ public class LockItemOrderDAO {
 	 
 	 public static int updateModel(Connection conn,LockItemOrderBean o) throws Exception{
 			PreparedStatement ps = null;
-			Date lockDate = Utils.parse(o.getLockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date lockDate = DateUtil.parse(o.getLockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			logger.debug("updateHeadModel");
 			int c =1;
 			try{
@@ -336,7 +337,7 @@ public class LockItemOrderDAO {
 				sql.append("UPDATE PENSBME_LOCK_ITEM \n");
 				sql.append("SET unlock_date =?,UPDATE_DATE=?, UPDATE_USER=? \n");
 				sql.append("WHERE group_code=? AND group_store =? AND store_no=?  " +
-						"AND lock_date = to_date('"+Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");//7
+						"AND lock_date = to_date('"+DateUtil.stringValue(lockDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");//7
 				
 				//logger.debug("sql:"+sql.toString());
 				
@@ -344,7 +345,7 @@ public class LockItemOrderDAO {
 				
 
 				if( !Utils.isNull(o.getUnlockDate()).equals("")){//4
-					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getUnlockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+					 ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getUnlockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
@@ -370,13 +371,13 @@ public class LockItemOrderDAO {
 	 public static boolean isDataAllStore(Connection conn,LockItemOrderBean o) throws Exception{
 			PreparedStatement ps = null;
 			ResultSet rs= null;
-			Date lockDate = Utils.parse(o.getLockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date lockDate = DateUtil.parse(o.getLockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			int c =1;
 			try{
 				StringBuffer sql = new StringBuffer("");
 				sql.append("select count(*) as c FROM PENSBME_LOCK_ITEM \n");
 				sql.append("WHERE group_code=? AND group_store =?  AND store_no ='ALL' " +
-						"AND lock_date = to_date('"+Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");//7
+						"AND lock_date = to_date('"+DateUtil.stringValue(lockDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");//7
 				
 				logger.debug("sql:"+sql.toString());
 				ps = conn.prepareStatement(sql.toString());
@@ -403,14 +404,14 @@ public class LockItemOrderDAO {
 	 public static int deleteLockItem(Connection conn,String groupCode,String groupStore,String storeCode,String lockDateStr) throws Exception{
 			PreparedStatement ps = null;
 			ResultSet rs= null;
-			Date lockDate = Utils.parse(lockDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date lockDate = DateUtil.parse(lockDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			StringBuffer sql = new StringBuffer("");
 			try{
 				sql.append("delete FROM PENSBME_LOCK_ITEM \n");
 				sql.append("WHERE group_code= '"+Utils.isNull(groupCode)+"' \n"
 						+ "AND group_store = '"+Utils.isNull(groupStore)+"' \n"
 						+ "AND store_no = '"+Utils.isNull(storeCode)+"' \n"
-						+ "AND lock_date = to_date('"+Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");
+						+ "AND lock_date = to_date('"+DateUtil.stringValue(lockDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");
 				
 				logger.debug("sql:"+sql.toString());
 				ps = conn.prepareStatement(sql.toString());
@@ -427,7 +428,7 @@ public class LockItemOrderDAO {
 	 public static String getStoreCodeArrExist(Connection conn,LockItemOrderBean o) throws Exception{
 			PreparedStatement ps = null;
 			ResultSet rs= null;
-			Date lockDate = Utils.parse(o.getLockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date lockDate = DateUtil.parse(o.getLockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			int c =1;
 			String storeCodeArr = "";
 			try{
@@ -458,14 +459,14 @@ public class LockItemOrderDAO {
 	 
 	 public static int deleteModel(Connection conn,LockItemOrderBean o) throws Exception{
 			PreparedStatement ps = null;
-			Date lockDate = Utils.parse(o.getLockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date lockDate = DateUtil.parse(o.getLockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			logger.debug("deleteModel");
 			int c =1;
 			try{
 				StringBuffer sql = new StringBuffer("");
 				sql.append("DELETE FROM PENSBME_LOCK_ITEM \n");
 				sql.append("WHERE group_code='"+Utils.isNull(o.getGroupCode())+"' AND group_store ='"+Utils.isNull(o.getGroupStore())+"' " +
-						"AND lock_date = to_date('"+Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");//7
+						"AND lock_date = to_date('"+DateUtil.stringValue(lockDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");//7
 				
 				//logger.debug("sql:"+sql.toString());
 				ps = conn.prepareStatement(sql.toString());
@@ -490,9 +491,9 @@ public class LockItemOrderDAO {
 			String[] errors = new String[2];
 			String storeCodeError = "";
 			try{
-				lockDate = Utils.parse(o.getLockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				lockDate = DateUtil.parse(o.getLockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				if( !Utils.isNull(o.getUnlockDate()).equals("")){
-					unlockDate = Utils.parse(o.getUnlockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					unlockDate = DateUtil.parse(o.getUnlockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				}
 				
 				//Step 1 check group_store is set to AllStore
@@ -501,7 +502,7 @@ public class LockItemOrderDAO {
 				sql.append(" WHERE group_code='"+Utils.isNull(o.getGroupCode())+"' \n" );
 				sql.append(" AND group_store ='"+Utils.isNull(o.getGroupStore())+"'\n");
 				if("edit".equals(o.getMode())){
-					sql.append(" and lock_date <> to_date('"+Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')  \n ");
+					sql.append(" and lock_date <> to_date('"+DateUtil.stringValue(lockDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')  \n ");
 				}
 				sql.append(" order by unlock_date asc \n");
 				logger.debug("sql:"+sql.toString());
@@ -569,9 +570,9 @@ public class LockItemOrderDAO {
 			LockItemOrderErrorBean errorBean = new LockItemOrderErrorBean();
 			String storeCodeError = "";
 			try{
-				lockDate = Utils.parse(o.getLockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				lockDate = DateUtil.parse(o.getLockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				if( !Utils.isNull(o.getUnlockDate()).equals("")){
-					unlockDate = Utils.parse(o.getUnlockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					unlockDate = DateUtil.parse(o.getUnlockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				}
 				
 				//Step 1 check group_store is set to AllStore
@@ -584,7 +585,7 @@ public class LockItemOrderDAO {
 				
 				// Case Edit No Check Owner record
 				if("edit".equals(o.getMode())){
-					sql.append(" and lock_date <> to_date('"+Utils.stringValue(lockDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')  \n ");
+					sql.append(" and lock_date <> to_date('"+DateUtil.stringValue(lockDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')  \n ");
 				}
 				sql.append(" order by unlock_date asc \n");
 				logger.debug("sql:"+sql.toString());
@@ -633,10 +634,10 @@ public class LockItemOrderDAO {
 				
 				if(error){
 					errorBean.setErrorCode("ERROR_1");
-					String lockDateDBStr = Utils.stringValue(lockDateDB, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String lockDateDBStr = DateUtil.stringValue(lockDateDB, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					String unlokcDateDBStr = "*";
 					if(unlockDateDB !=null){
-						unlokcDateDBStr = Utils.stringValue(unlockDateDB, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						unlokcDateDBStr = DateUtil.stringValue(unlockDateDB, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					}
 					
 					if("ALL".equalsIgnoreCase(storeCodeError)){

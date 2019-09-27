@@ -1,9 +1,9 @@
 <%@page import="com.isecinc.pens.web.shop.ShopAction"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
-<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
+<%@page import="com.pens.util.EnvProperties"%>
 <%@page import="java.net.InetAddress"%>
-<%@page import="com.isecinc.pens.inf.helper.Constants"%>
+<%@page import="com.pens.util.Constants"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -601,11 +601,11 @@
 	             </li> 
 		    <%} %>
 		    <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){ %>
-	           <%--  <li>
-		          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/manualStockAction.do?do=prepareSearch&action=new');">
-		          <span><%no++;out.print(no);%>.<bean:message key="ManualStock" bundle="sysprop"/>
-		          </span></a>
-		        </li> --%>
+	           <%--   <li>
+		           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/manualStockAction.do?do=prepareSearch&action=new');">
+		           <span><%no++;out.print(no);%>.<bean:message key="ManualStock" bundle="sysprop"/>
+		           </span></a>
+		        </li>  --%>
 		    <%} %>
 		</ul>
 	</li>

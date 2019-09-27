@@ -1,7 +1,7 @@
 
 <%@page import="com.isecinc.pens.web.billplan.BillPlanBean"%>
 <%@page import="java.util.List"%>
-<%@page import="util.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="billPlanForm" class="com.isecinc.pens.web.billplan.BillPlanForm" scope="session" />

@@ -15,19 +15,20 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.InterfaceDAO;
 import com.isecinc.pens.dao.StoreDAO;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.dao.InterfaceDAO;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.sql.ReportEndDateLotusSQL;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
@@ -153,8 +154,8 @@ public class GenerateReportEndDateLotus {
 	    int c =1;
 	    List<StoreBean> storeList = null;
 		try{
-			Date asofDate = Utils.parse(cri.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String asOfDateStr = Utils.stringValue(asofDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date asofDate = DateUtil.parse(cri.getSalesDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String asOfDateStr = DateUtil.stringValue(asofDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			if( !Utils.isNull(cri.getPensCustCodeFrom()).equals("ALL")){
 				//Get By Store
@@ -241,7 +242,7 @@ public class GenerateReportEndDateLotus {
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				if(rst.next()){
-					r = Utils.stringValue(rst.getDate("max_ending_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					r = DateUtil.stringValue(rst.getDate("max_ending_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				}
 				
 				return r;

@@ -21,12 +21,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBConnection;
-import util.DateToolsUtil;
-import util.ExcelHeader;
-import util.SQLHelper;
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.PopupBean;
@@ -34,6 +28,11 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.stock.StockBean;
 import com.isecinc.pens.web.stock.StockReport;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 /**
  * Summary Action
@@ -63,7 +62,7 @@ public class StockCVProcess  {
 				aForm.setResultsSearch(null);
 				//prepare bean
 				StockOnhandBean bean = new StockOnhandBean();
-				bean.setTransDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setTransDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				aForm.setBean(bean);
 			}else if("back".equals(action)){
 				//clear session 
@@ -71,7 +70,7 @@ public class StockCVProcess  {
 				aForm.setResultsSearch(null);
 				//prepare bean
 				StockOnhandBean bean = new StockOnhandBean();
-				bean.setTransDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setTransDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				//logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
 				aForm.setBean(bean);
 			}
@@ -176,6 +175,7 @@ public class StockCVProcess  {
 		double stockCoverageDay = 0;
 		int rowspanByBrand = 0;
 		Map<String, String> mapRowSpanByBrand = new HashMap<String, String>();
+		String brandTemp = "";
 		try{
 			//create connection
 			conn = DBConnection.getInstance().getConnectionApps();
@@ -210,7 +210,8 @@ public class StockCVProcess  {
 			  }else{
 			      item.setStockCoverageDay(Utils.decimalFormat(rst.getDouble("coverage_day"), Utils.format_current_2_disgit));
 			  } 
-			  if(rst.getDouble("brand_day") != 0){
+			  //OLD CODE
+			  /*if(rst.getDouble("brand_day") != 0){
 			      item.setStockCoverageDayByBrand(Utils.decimalFormat(rst.getDouble("brand_day"), Utils.format_current_2_disgit));
 			      rowspanByBrand =1;
 			  }else{
@@ -218,7 +219,20 @@ public class StockCVProcess  {
 				  rowspanByBrand++;
 				  
 				  mapRowSpanByBrand.put(item.getBrand(), rowspanByBrand+"");
+			  }*/
+			  
+			  //NEW CODE
+			  if( !brandTemp.equalsIgnoreCase(item.getBrand())){
+				  item.setStockCoverageDayByBrand(Utils.decimalFormat(rst.getDouble("brand_day"), Utils.format_current_2_disgit));
+			      rowspanByBrand =1;
+			  }else{
+				  item.setStockCoverageDayByBrand(""); 
+				  rowspanByBrand++;
+				  
+				  mapRowSpanByBrand.put(item.getBrand(), rowspanByBrand+"");
 			  }
+			  brandTemp = item.getBrand();
+			  
 			  //add to List
 			  itemList.add(item);
 			  
@@ -315,7 +329,7 @@ public class StockCVProcess  {
 			h.append("</tr> \n");
 			h.append("<tr> \n");
 			h.append(" <td colspan="+colspan+"> \n");
-			h.append(" วันที่พิมพ์ : &nbsp;"+DateToolsUtil.getCurrentDateTime(Utils.DD_MM_YYYY_HH_MM_SS_WITH_SLASH)+"</td> \n");
+			h.append(" วันที่พิมพ์ : &nbsp;"+DateUtil.getCurrentDateTime(DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH)+"</td> \n");
 			h.append("</tr> \n");
 			h.append("</table> \n");
 		}

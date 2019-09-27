@@ -19,7 +19,6 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.AutoCNDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.autocn.AutoCNBean;
 import com.isecinc.pens.web.autocn.AutoCNForm;
@@ -29,6 +28,8 @@ import com.isecinc.pens.web.shop.sub.ShopBillDetailAction;
 import com.isecinc.pens.web.shop.sub.ShopBillSummaryAction;
 import com.isecinc.pens.web.shop.sub.ShopPromotionAction;
 import com.isecinc.pens.web.shop.sub.TerminalStockOnhandAction;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -63,8 +64,8 @@ public class ShopAction extends I_Action {
 				 if(P_MAYA_SALEOUT.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 bean.setCustGroup(PickConstants.STORE_TYPE_PENSHOP_CODE);
-					 bean.setStartDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-					 bean.setEndDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 bean.setStartDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 bean.setEndDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 }else if(P_MAYA_STOCK_ONHAND.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 bean.setCustGroup(PickConstants.STORE_TYPE_PENSHOP_CODE);
@@ -72,8 +73,8 @@ public class ShopAction extends I_Action {
 				 }else if(P_TM_SALEOUT.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 bean.setCustGroup(PickConstants.STORE_TYPE_TERMINAL_CODE);
-					 bean.setStartDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-					 bean.setEndDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 bean.setStartDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 bean.setEndDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 }else if(P_TM_STOCK_ONHAND.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 bean.setCustGroup(PickConstants.STORE_TYPE_TERMINAL_CODE);

@@ -12,11 +12,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.DateToolsUtil;
-import util.ExcelHeader;
-import util.SQLHelper;
-import util.Utils;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 public class StockOnhandReport {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -298,7 +298,7 @@ public class StockOnhandReport {
 			h.append("</tr> \n");
 			h.append("<tr> \n");
 			h.append(" <td colspan="+((columnNameArr.length*2)+2)+"> \n");
-			h.append(" วันที่พิมพ์ : &nbsp;"+DateToolsUtil.getCurrentDateTime(Utils.DD_MM_YYYY_HH_MM_SS_WITH_SLASH)+"</td> \n");
+			h.append(" วันที่พิมพ์ : &nbsp;"+DateUtil.getCurrentDateTime(DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH)+"</td> \n");
 			h.append("</tr> \n");
 			h.append("</table> \n");
 		}

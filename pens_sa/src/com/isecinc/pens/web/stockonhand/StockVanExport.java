@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.ExcelHeader;
-import util.Utils;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 public class StockVanExport {
 	public static Logger logger = Logger.getLogger("PENS");

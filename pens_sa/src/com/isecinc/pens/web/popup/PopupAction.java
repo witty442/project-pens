@@ -11,12 +11,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -162,6 +161,9 @@ public class PopupAction extends I_Action {
 			}else if("PDStockVan".equalsIgnoreCase(popupForm.getPageName()) ){
 				 results = PopupDAO.searchPDStockVanList(popupForm); 
 				 
+			}else if("Item".equalsIgnoreCase(popupForm.getPageName()) ){
+				results = PopupDAO.searchItemList(popupForm);
+				
 			}else if("ItemStockVan".equalsIgnoreCase(popupForm.getPageName()) ){
 				 results = PopupDAO.searchItemStockVanList(popupForm); 
 				 
@@ -170,16 +172,25 @@ public class PopupAction extends I_Action {
 				
 			}else if("SubInvOnhand".equalsIgnoreCase(popupForm.getPageName()) ){
 				results = PopupDAO.searchSubInvList(popupForm);
-				
-			}else if("Item".equalsIgnoreCase(popupForm.getPageName()) ){
-				results = PopupDAO.searchItemList(popupForm);
-				
+
 			}else if("SalesrepCreditSales".equalsIgnoreCase(popupForm.getPageName()) ){
 				results = PopupDAO.searchSalesrepCreditSalesList(popupForm);
 				
 			}else if("CustomerCreditSales".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For SalesTarget
 				 results = PopupDAO.searchCustomerCreditSalesList(popupForm);
+				 
+			/*}else if("ItemSalesTargetPD".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For SalestargetPD
+				 results = PopupDAO.searchSalestargetPDList(popupForm,"ItemSalesTargetPD");
+			
+			}else if("BrandSalesTargetPD".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For SalestargetPD
+				 results = PopupDAO.searchSalestargetPDList(popupForm,"BrandSalesTargetPD");*/
+				 
+			}else if("PD".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For SalestargetPD
+				 results = PopupDAO.searchPDList(popupForm,"P");
 			}
 			
 			 if(results != null && results.size() >0){

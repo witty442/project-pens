@@ -31,13 +31,14 @@ import com.isecinc.pens.dao.LockItemOrderDAO;
 import com.isecinc.pens.dao.OrderDAO;
 import com.isecinc.pens.dao.StockLimitDAO;
 import com.isecinc.pens.dao.constants.Constants;
+import com.isecinc.pens.exception.LogisticException;
 import com.isecinc.pens.gendate.OrderDateUtils;
-import com.isecinc.pens.inf.exception.LogisticException;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.managepath.ManagePath;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -92,7 +93,7 @@ public class OrderAction extends I_Action {
 				 // order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 
 				 //new set to Current Date
-				 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 order.setOrderDate(DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 summaryForm.setOrder(order);
 				 
 				 ImportDAO importDAO = new ImportDAO();
@@ -332,7 +333,7 @@ public class OrderAction extends I_Action {
 				throw new Exception("ไม่พบ ข้อมูลห้าง หรือ วันที่ Order Exception");
 			}
 			/* Convert DateStr to Date obj **/
-			orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			  
 			/** Get OrderNoInDB key by StoreCode   **/
 			Map<String,OrderKeyBean> mapOrderNoByStoreMap = orderDAO.getOrderNoByStoreMap(conn, orderForm.getOrder().getStoreType(),orderDate);
@@ -538,8 +539,8 @@ public class OrderAction extends I_Action {
 			orderDAO.genOrderLotNoProcess(conn, user, orderForm.getOrder().getOrderDate());
 			
 			//LOTUS_OH_20130509.txt
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateFileName = Utils.stringValue(orderDate, Utils.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateFileName = DateUtil.stringValue(orderDate, DateUtil.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
 			String fileName = "PNBIL_"+dateFileName;
 
 			data = orderDAO.genOrderToTextAll(conn, user, orderForm.getOrder().getOrderDate());
@@ -587,8 +588,8 @@ public class OrderAction extends I_Action {
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			//LOTUS_OH_20130509.txt
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateFileName = Utils.stringValue(orderDate, Utils.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateFileName = DateUtil.stringValue(orderDate, DateUtil.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
 			String refCode = Utils.isNull(STORE_TYPE_MAP.get(orderForm.getOrder().getStoreType()));
 			String fileName = refCode+"TS_"+dateFileName;
 			
@@ -647,8 +648,8 @@ public class OrderAction extends I_Action {
 		Connection conn = null;
 		try {
 			conn = DBConnection.getInstance().getConnection();
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateFileName = Utils.stringValue(orderDate, Utils.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateFileName = DateUtil.stringValue(orderDate, DateUtil.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
 			
 			String refCode = Utils.isNull(STORE_TYPE_MAP.get(orderForm.getOrder().getStoreType()))+"_";
 			String fileName = refCode+"SUM_"+dateFileName;
@@ -680,8 +681,8 @@ public class OrderAction extends I_Action {
 		logger.debug("export Summary All ToExcel");
 		OrderForm orderForm = (OrderForm) form;
 		try {
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateFileName = Utils.stringValue(orderDate, Utils.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateFileName = DateUtil.stringValue(orderDate, DateUtil.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
 			
 			String fileName = "SummaryAll_"+dateFileName+".xls";
 			StringBuffer htmlTable = OrderExport.exportSummaryAll(orderForm.getOrder().getOrderDate());
@@ -734,8 +735,8 @@ public class OrderAction extends I_Action {
 		Connection conn = null;
 		try {
 			conn = DBConnection.getInstance().getConnection();
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateFileName = Utils.stringValue(orderDate, Utils.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateFileName = DateUtil.stringValue(orderDate, DateUtil.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
 			String refCode = Utils.isNull(STORE_TYPE_MAP.get(orderForm.getOrder().getStoreType()))+"_";
 			String fileName = refCode+"SUM_DETAIL_"+dateFileName;
 			
@@ -773,7 +774,7 @@ public class OrderAction extends I_Action {
 			 request.getSession().setAttribute("itemErrorMap", null);
 			 
 			 Order order = new Order();
-			 order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			 order.setOrderDate(DateUtil.stringValue(OrderDateUtils.getOrderDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 summaryForm.setOrder(order);
 			
 		} catch (Exception e) {
@@ -809,7 +810,7 @@ public class OrderAction extends I_Action {
 				 // order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 
 				 //new set to Current Date
-				 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 order.setOrderDate(DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 summaryForm.setOrder(order);
 				 
 				 ImportDAO importDAO = new ImportDAO();
@@ -860,7 +861,7 @@ public class OrderAction extends I_Action {
 				 // order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 
 				 //new set to Current Date
-				 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 order.setOrderDate(DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 summaryForm.setOrder(order);
 				 
 				 ImportDAO importDAO = new ImportDAO();
@@ -915,7 +916,7 @@ public class OrderAction extends I_Action {
 			action = Utils.isNull(request.getParameter("action")).equals("")?Utils.isNull(request.getAttribute("action")):Utils.isNull(request.getParameter("action"));
 			logger.debug("searchView action:"+action);
 	
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 
 			logger.debug("pageNumber["+request.getParameter("pageNumber")+"]");
 			if("newsearch".equals(action)){
@@ -991,7 +992,7 @@ public class OrderAction extends I_Action {
 			action = Utils.isNull(request.getParameter("action")).equals("")?Utils.isNull(request.getAttribute("action")):Utils.isNull(request.getParameter("action"));
 			logger.debug("searchHistory action:"+action);
 	
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 
 			logger.debug("pageNumber["+request.getParameter("pageNumber")+"]");
 			if("newsearch".equals(action)){
@@ -1114,7 +1115,7 @@ public class OrderAction extends I_Action {
 			 request.getSession().setAttribute("itemErrorMap", null);
 			 
 			 Order order = new Order();
-			 order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			 order.setOrderDate(DateUtil.stringValue(OrderDateUtils.getOrderDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 summaryForm.setOrder(order);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -1132,7 +1133,7 @@ public class OrderAction extends I_Action {
 			 request.getSession().setAttribute("itemErrorMap", null);
 			 
 			 Order order = new Order();
-			 order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			 order.setOrderDate(DateUtil.stringValue(OrderDateUtils.getOrderDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 summaryForm.setOrder(order);
 			
 		} catch (Exception e) {
@@ -1162,7 +1163,7 @@ public class OrderAction extends I_Action {
 				 // order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 
 				 //new set to Current Date
-				 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 order.setOrderDate(DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 summaryForm.setOrder(order);
 				 
 				 ImportDAO importDAO = new ImportDAO();
@@ -1208,7 +1209,7 @@ public class OrderAction extends I_Action {
 			action = Utils.isNull(request.getParameter("action")).equals("")?Utils.isNull(request.getAttribute("action")):Utils.isNull(request.getParameter("action"));
 			logger.debug("searchHistory action:"+action);
 	
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 
 			logger.debug("pageNumber["+request.getParameter("pageNumber")+"]");
 			if("newsearch".equals(action)){

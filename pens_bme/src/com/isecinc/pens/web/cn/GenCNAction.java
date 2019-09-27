@@ -22,8 +22,9 @@ import com.isecinc.pens.dao.GenCNDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -166,7 +167,7 @@ public class GenCNAction extends I_Action {
 			ad.setJobId(job.getJobId());
 			ad.setStatus(PickConstants.STATUS_ISSUED);
 			ad.setName("");
-			ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			ad.setStoreCode(job.getStoreCode());
 			ad.setStoreNo(job.getStoreNo());
 			ad.setSubInv(job.getSubInv());

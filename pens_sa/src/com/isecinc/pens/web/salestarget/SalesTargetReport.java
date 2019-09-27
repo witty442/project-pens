@@ -12,11 +12,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-
-import util.DBConnection;
-import util.ExcelHeader;
-import util.SQLHelper;
-import util.Utils;
+import com.pens.util.DBConnection;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 public class SalesTargetReport {
 	protected static Logger logger = Logger.getLogger("PENS");

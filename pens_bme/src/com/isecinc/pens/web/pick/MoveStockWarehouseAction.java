@@ -19,8 +19,9 @@ import com.isecinc.pens.bean.MoveStockWarehouseBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.MoveStockWarehoseDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -235,7 +236,7 @@ public class MoveStockWarehouseAction extends I_Action {
 		    	//add Transfer Finishing warehouse 
 		    	//gen new Transfer_no and default transfer_date = current date
 		    	h.setTransferNo(MoveStockWarehoseDAO.genTransferNo(new Date()));
-		    	h.setTransferDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+		    	h.setTransferDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 		    	MoveStockWarehoseDAO.processUpdateStockTransferFinishingToWarehouse(conn, h);
 		    	
 		    	//add Update Stock Finish warehouse To

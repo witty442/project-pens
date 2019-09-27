@@ -13,12 +13,11 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
-import util.CConstants;
-import util.DBConnection;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.CConstantsBean;
 import com.isecinc.pens.bean.PopupBean;
+import com.pens.util.CConstants;
+import com.pens.util.DBConnection;
 
 public class LocationInitial extends LocationControlPage {
    

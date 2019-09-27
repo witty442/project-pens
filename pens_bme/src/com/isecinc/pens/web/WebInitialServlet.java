@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServlet;
 import org.apache.log4j.Logger;
 
 import com.isecinc.core.init.I_Initial;
-import com.isecinc.pens.inf.dao.InterfaceDAO;
+import com.isecinc.pens.dao.InterfaceDAO;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialParameter;
 

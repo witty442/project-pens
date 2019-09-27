@@ -9,7 +9,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.Utils;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class ProdShowDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -105,7 +106,7 @@ public class ProdShowDAO {
 			   h.setPic1(Utils.isNull(rst.getString("pic1"))); 
 			   h.setPic2(Utils.isNull(rst.getString("pic2"))); 
 			   h.setPic3(Utils.isNull(rst.getString("pic3"))); 
-			   h.setShowDate(Utils.stringValueChkNull(rst.getDate("show_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setShowDate(DateUtil.stringValueChkNull(rst.getDate("show_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   items.add(h);
 			}//while
 
@@ -146,21 +147,21 @@ public class ProdShowDAO {
 		}
 		
 		if( !Utils.isNull(o.getStartDate()).equalsIgnoreCase("") && !Utils.isNull(o.getEndDate()).equalsIgnoreCase("")){
-			Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
-			Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n and H.show_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
 			sql.append("\n and H.show_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
 		}else if(!Utils.isNull(o.getStartDate()).equalsIgnoreCase("")){
-			Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			sql.append("\n and H.show_date = to_date('"+startDateStr+"','dd/mm/yyyy')");
 		}else if(!Utils.isNull(o.getEndDate()).equalsIgnoreCase("")){
-			Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			sql.append("\n and H.show_date = to_date('"+endDateStr+"','dd/mm/yyyy')");
 		}
 		return sql;

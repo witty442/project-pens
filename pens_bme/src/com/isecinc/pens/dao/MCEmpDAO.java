@@ -10,7 +10,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.MCEmpBean;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -46,7 +47,7 @@ public class MCEmpDAO {
 				ps.setString(c++, o.getMobile1());
 				ps.setString(c++, o.getMobile2());
 				ps.setString(c++, o.getStatus());
-				ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				ps.setString(c++, Utils.isNull(o.getNote()));
 				ps.setString(c++, Utils.isNull(o.getRegion()));
 				
@@ -92,12 +93,12 @@ public class MCEmpDAO {
 				ps.setString(c++, o.getUpdateUser());
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				if( !Utils.isNull(o.getStartDate()).equals("")){
-				    ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				    ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 				    ps.setTimestamp(c++,null);	
 				}
 				if( !Utils.isNull(o.getEndDate()).equals("")){
-				    ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				    ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 				    ps.setTimestamp(c++,null);	
 				}
@@ -217,9 +218,9 @@ public class MCEmpDAO {
 				   h.setRegionDesc(Utils.isNull(rst.getString("region_desc")));
 				   h.setEmpRouteName(Utils.isNull(rst.getString("emp_route_name")));
 				   
-				   h.setStartDate(Utils.stringValue(rst.getDate("start_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setStartDate(DateUtil.stringValue(rst.getDate("start_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   if(rst.getDate("end_date") !=null){
-				     h.setEndDate(Utils.stringValue(rst.getDate("end_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				     h.setEndDate(DateUtil.stringValue(rst.getDate("end_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					 h.setEndDate("");
 				   }

@@ -28,13 +28,14 @@ import com.isecinc.pens.dao.AutoCNDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ReqPickStockDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.autocn.AutoCNBean;
 import com.isecinc.pens.web.autocn.AutoCNForm;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
@@ -328,7 +329,7 @@ public class ReqPickStockAction extends I_Action {
 					
 					ReqPickStock p = new ReqPickStock();
 					p.setWareHouse(aForm.getBean().getWareHouse());
-					p.setIssueReqDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					p.setIssueReqDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 
 					//Test value
 					/*p.setCustGroup("020049");

@@ -12,6 +12,7 @@ import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
@@ -422,8 +423,8 @@ public class ReportEndDateLotusSQL {
             String maxEndDate = "";
 			try {
 				//Budish to ChristDate
-				Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date asofDateTemp = DateUtil.parse(asOfdate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String christAsOfDateStr = DateUtil.stringValue(asofDateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				//Get Max End Date By StoreCode and asOfdate
 				maxEndDate =  getMaxEndDateByStoreCode(conn,storeCode);
@@ -463,7 +464,7 @@ public class ReportEndDateLotusSQL {
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				if(rst.next()){
-					yearMonth = Utils.stringValue(rst.getDate("ending_date"),Utils.DD_MM_YYYY_WITH_SLASH);
+					yearMonth = DateUtil.stringValue(rst.getDate("ending_date"),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				}
 				
 			} catch (Exception e) {

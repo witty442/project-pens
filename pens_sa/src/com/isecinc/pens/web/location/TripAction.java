@@ -18,17 +18,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 
-import util.DBConnection;
-import util.ExcelHeader;
-import util.MonitorTime;
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SalesrepDAO;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.SequenceProcessAll;
+import com.pens.util.DBConnection;
+import com.pens.util.MonitorTime;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 
 public class TripAction {

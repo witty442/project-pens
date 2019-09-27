@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.User;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -76,8 +77,8 @@ public class MUser extends I_Model<User> {
 		Object[] values = { user.getId(), Utils.isNull(user.getPassword()).trim(),
 				user.getUserGroupId(), activeUserID 
 				,(user.getName()) ,(user.getUserName())
-				,new java.sql.Timestamp(Utils.parse(user.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())
-				,(user.getEndDate()).equals("")?null:new java.sql.Timestamp(Utils.parse(user.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())};
+				,new java.sql.Timestamp(DateUtil.parse(user.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())
+				,(user.getEndDate()).equals("")?null:new java.sql.Timestamp(DateUtil.parse(user.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())};
 		return super.save(TABLE_NAME, columns, values, user.getId(), conn);
 	}
 	

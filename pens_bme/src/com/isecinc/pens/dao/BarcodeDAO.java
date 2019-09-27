@@ -14,7 +14,8 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -148,7 +149,7 @@ public class BarcodeDAO extends PickConstants{
 			   h.setNo(r);
 			   h.setJobId(rst.getString("job_id"));
 			   h.setBoxNo(rst.getString("box_no"));
-			   h.setTransactionDate(Utils.stringValue(rst.getTimestamp("transaction_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setTransactionDate(DateUtil.stringValue(rst.getTimestamp("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   
 			   h.setName(Utils.isNull(rst.getString("name"))); 
 			   h.setRemark(Utils.isNull(rst.getString("remark"))); 
@@ -224,8 +225,8 @@ public class BarcodeDAO extends PickConstants{
 			}
 			
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String dateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String dateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n and i.TRANSACTION_DATE = to_date('"+dateStr+"','dd/mm/yyyy') ");
 				foundCriteria = true;
@@ -328,7 +329,7 @@ public class BarcodeDAO extends PickConstants{
 			   h.setNo(r);
 			   h.setJobId(rst.getString("job_id"));
 			   h.setBoxNo(rst.getString("box_no"));
-			   h.setTransactionDate(Utils.stringValue(rst.getTimestamp("transaction_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setTransactionDate(DateUtil.stringValue(rst.getTimestamp("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   
 			   h.setName(Utils.isNull(rst.getString("name"))); 
 			   h.setRemark(Utils.isNull(rst.getString("remark"))); 
@@ -390,7 +391,7 @@ public class BarcodeDAO extends PickConstants{
 			ps = conn.prepareStatement(sql.toString());
 			
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date tDate  = DateUtil.parse(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
 			}
 			
@@ -400,7 +401,7 @@ public class BarcodeDAO extends PickConstants{
 			   h.setNo(r);
 			   h.setJobId(rst.getString("job_id"));
 			   h.setBoxNo(rst.getString("box_no"));
-			   h.setTransactionDate(Utils.stringValue(rst.getDate("transaction_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setTransactionDate(DateUtil.stringValue(rst.getDate("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 
 			   h.setName(Utils.isNull(rst.getString("name"))); 
 			   h.setRemark(Utils.isNull(rst.getString("remark"))); 
@@ -812,7 +813,7 @@ public class BarcodeDAO extends PickConstants{
 				
 				ps = conn.prepareStatement(sql.toString());
 					
-				Date openDate = Utils.parse( o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date openDate = DateUtil.parse( o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				int c =1;
 				
@@ -850,7 +851,7 @@ public class BarcodeDAO extends PickConstants{
 				
 				ps = conn.prepareStatement(sql.toString());
 					
-				Date openDate = Utils.parse( o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date openDate = DateUtil.parse( o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				int c =1;
 				

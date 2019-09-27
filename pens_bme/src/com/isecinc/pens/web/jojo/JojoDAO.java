@@ -5,6 +5,8 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
+import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class JojoDAO {
@@ -37,20 +39,20 @@ public class JojoDAO {
 			sql.append("\n where 1=1 ");
 			//genWHereCondSql
 			if( !Utils.isNull(startDate).equals("")){
-				Date tDate  = Utils.parse(startDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String tDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String tDateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n and ORDER_DATE >= to_date('"+tDateStr+"','dd/mm/yyyy')");
 			}
 			if( !Utils.isNull(endDate).equals("")){
-				Date tDate  = Utils.parse(endDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String tDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String tDateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n and ORDER_DATE <= to_date('"+tDateStr+"','dd/mm/yyyy')");
 			}
 			sql.append("\n group by store_type ,group_code,to_char(order_date,'yyyymm'),whole_price_bf,retail_price_bf ");
 			sql.append("\n order by to_char(order_date,'yyyymm'),store_type,group_code ");
 			logger.debug("sql:"+sql);
 			
-			result = Utils.excQuery(sql.toString());
+			result = SQLHelper.excQuery(sql.toString());
 			
 			logger.debug("result:\n"+result);
 		} catch (Exception e) {

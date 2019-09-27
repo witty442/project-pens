@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorBean;
 
 /**
  * @author WITTY
@@ -32,7 +32,7 @@ public class BatchTaskProcessWorker extends BatchTaskWorker {
     		
     		//int parameter MonitorBean
     		Class[] classParamMonitorBean = new Class[1];
-    		classParamMonitorBean[0] = Class.forName("com.isecinc.pens.inf.bean.MonitorBean");
+    		classParamMonitorBean[0] = Class.forName("com.isecinc.pens.bean.MonitorBean");
     		
     		Method method = cls.getDeclaredMethod("run", classParamMonitorBean);
     		method.invoke(obj, this.monitorModel);

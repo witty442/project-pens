@@ -23,10 +23,11 @@ import com.isecinc.pens.bean.SADamageBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SADamageDAO;
 import com.isecinc.pens.dao.SATranDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 
@@ -177,7 +178,7 @@ public class SADamageAction extends I_Action {
 			logger.debug("prepare edit empId:"+empId+",action:"+action);
 			if("add".equalsIgnoreCase(action)){
 				//init default value
-				bean.setTranDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setTranDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				bean.setType("BME");
 			}else{
 				SADamageBean c = new SADamageBean();
@@ -227,8 +228,8 @@ public class SADamageAction extends I_Action {
 				logger.debug("add");
 				//init default value
 				bean = new SADamageBean();
-				bean.setInvoiceDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				bean.setTranDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setInvoiceDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setTranDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				bean.setType("BME"); //default case new add
 				mode ="add";
 			}else{
@@ -742,7 +743,7 @@ public class SADamageAction extends I_Action {
 			aForm.setResults(new ArrayList<SADamageBean>());
 			
 			SADamageBean bean = new SADamageBean();
-			bean.setTranDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			bean.setTranDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			bean.setType("BME");
 			//can Edit
 			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){
@@ -767,7 +768,7 @@ public class SADamageAction extends I_Action {
 			aForm.setResults(new ArrayList<SADamageBean>());
 			
 			SADamageBean bean = new SADamageBean();
-			bean.setTranDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			bean.setTranDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			bean.setType("BME");
 			//can Edit
 			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){

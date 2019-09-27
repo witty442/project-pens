@@ -9,7 +9,7 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 
 /**
  * SequenceProcess Class

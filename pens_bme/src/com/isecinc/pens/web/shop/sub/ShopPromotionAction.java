@@ -15,11 +15,12 @@ import org.apache.struts.action.ActionForm;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.autocn.AutoCNBean;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.isecinc.pens.web.shop.ShopForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -291,8 +292,8 @@ public class ShopPromotionAction {
 			   h = new ShopBean();
 			   h.setPromoId(rst.getLong("promo_id"));
 			   h.setPromoName(Utils.isNull(rst.getString("PROMO_NAME")));
-			   h.setStartDate(Utils.stringValueNull(rst.getDate("start_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			   h.setEndDate(Utils.stringValueNull(rst.getDate("end_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStartDate(DateUtil.stringValueNull(rst.getDate("start_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setEndDate(DateUtil.stringValueNull(rst.getDate("end_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  
 			   h.setCanEdit(true);
 			   
@@ -425,8 +426,8 @@ public class ShopPromotionAction {
 				
 				ps.setLong(c++, head.getPromoId());
 				ps.setString(c++, Utils.isNull(head.getPromoName()));  
-				ps.setDate(c++, new java.sql.Date(Utils.parse(head.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())); 
-				ps.setDate(c++, new java.sql.Date(Utils.parse(head.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime()));
+				ps.setDate(c++, new java.sql.Date(DateUtil.parse(head.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())); 
+				ps.setDate(c++, new java.sql.Date(DateUtil.parse(head.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime()));
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, head.getUserName());
 				
@@ -456,8 +457,8 @@ public class ShopPromotionAction {
 				
 				ps = conn.prepareStatement(sql.toString());
 				ps.setString(c++, Utils.isNull(head.getPromoName()));
-				ps.setDate(c++, new java.sql.Date(Utils.parse(head.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())); 
-				ps.setDate(c++, new java.sql.Date(Utils.parse(head.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime()));
+				ps.setDate(c++, new java.sql.Date(DateUtil.parse(head.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())); 
+				ps.setDate(c++, new java.sql.Date(DateUtil.parse(head.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime()));
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, head.getUserName());
 				ps.setLong(c++, head.getPromoId()); 

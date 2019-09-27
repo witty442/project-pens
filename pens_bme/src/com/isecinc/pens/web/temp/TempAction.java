@@ -26,10 +26,10 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.ConfirmReturnWacoalDAO;
 import com.isecinc.pens.dao.ReqReturnWacoalDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 

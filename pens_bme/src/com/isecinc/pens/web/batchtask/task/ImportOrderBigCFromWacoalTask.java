@@ -9,15 +9,16 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 import com.pens.util.meter.MonitorTime;
@@ -175,7 +176,7 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 		boolean exist = false;
 		Map<String, String> batchParamMap = monitorModel.getBatchParamMap();
 		try{
-			String asOfDate =Utils.stringValue(Utils.parse(batchParamMap.get(PARAM_AS_OF_DATE),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH) ;
+			String asOfDate =DateUtil.stringValue(DateUtil.parse(batchParamMap.get(PARAM_AS_OF_DATE),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH) ;
 
 			sql.append("\n SELECT count(*) as c");
 			sql.append("\n FROM PENSBME_ORDER O");
@@ -222,7 +223,7 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 		BigDecimal headId = null;
 		Map<String, String> batchParamMap = monitorModel.getBatchParamMap();
 		try{
-			String asOfDate = Utils.stringValue(Utils.parse(batchParamMap.get(PARAM_AS_OF_DATE),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH) ;
+			String asOfDate = DateUtil.stringValue(DateUtil.parse(batchParamMap.get(PARAM_AS_OF_DATE),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH) ;
 
 			sql.append("\n SELECT DISTINCT ");
 			sql.append("\n  O.STORE_CODE");

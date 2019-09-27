@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 

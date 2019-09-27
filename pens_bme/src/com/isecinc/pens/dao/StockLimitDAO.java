@@ -12,7 +12,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.StoreBean;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class StockLimitDAO {
@@ -26,7 +27,7 @@ public class StockLimitDAO {
 		StringBuffer sql = new StringBuffer("");
 		try{
 			conn = DBConnection.getInstance().getConnection();
-			java.util.Date orderDate = Utils.parse(orderDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			java.util.Date orderDate = DateUtil.parse(orderDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			sql = new StringBuffer("");
 			sql.append("delete from PENSBME_ORDER  \n");	

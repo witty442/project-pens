@@ -14,9 +14,9 @@ import org.apache.struts.upload.FormFile;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
-import com.pens.util.DateToolsUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.UploadXLSUtil;
 
 
@@ -122,7 +122,7 @@ public class MemberImportAction extends I_Action {
 				  }
 			   }
 					
-				actionForm.setNextYear(Integer.parseInt(DateToolsUtil.getCurrentDateTime("yyyy")) + 1);
+				actionForm.setNextYear(Integer.parseInt(DateUtil.getCurrentDateTime("yyyy")) + 1);
 	
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc()
 						+ " �?�?อมูล " + allCount + " ราย�?าร, สำเร�?�? " + successCount + " ราย�?าร, �?ม�?สำเร�?�? "

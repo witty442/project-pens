@@ -27,13 +27,14 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.NSDAO;
 import com.isecinc.pens.dao.constants.ConstantBean;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.isecinc.pens.web.shop.ShopForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
@@ -234,7 +235,7 @@ public class NSAction extends I_Action {
 			}else{
 				
 			   c.setOrderId("");
-			   c.setOrderDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   c.setOrderDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   c.setCanSave(true);
 			   c.setMode(mode);
 			   aForm.setBean(c);

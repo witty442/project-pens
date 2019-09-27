@@ -9,11 +9,11 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcessAll;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class SalesTargetTTCopy {
 
@@ -30,7 +30,7 @@ public class SalesTargetTTCopy {
 			conn.setAutoCommit(false);
 
 			//setDate CurrentMonth 
-			Date startDate = Utils.parse(destBean.getStartDate(), Utils.DD_MMM_YYYY);
+			Date startDate = DateUtil.parse(destBean.getStartDate(), DateUtil.DD_MMM_YYYY);
 			curCal.setTime(startDate);
 			logger.debug("curDate Time["+curCal.getTime()+"]");
 			
@@ -44,10 +44,10 @@ public class SalesTargetTTCopy {
 				//setDate prevMonth
 				sourceBean = new SalesTargetBean();
 				curCal.add(Calendar.MONTH, -1);
-				sourceBean.setStartDate(Utils.stringValue(curCal.getTime(), Utils.DD_MMM_YYYY));
+				sourceBean.setStartDate(DateUtil.stringValue(curCal.getTime(), DateUtil.DD_MMM_YYYY));
 				logger.debug("prevDate Time["+curCal.getTime()+"]");
 				//convert
-				sourceBean.setPeriod(Utils.stringValue(curCal.getTime(),"MMM-yy").toUpperCase());
+				sourceBean.setPeriod(DateUtil.stringValue(curCal.getTime(),"MMM-yy").toUpperCase());
 				sourceBean.setBrand(destBean.getBrand());
 				
 				// Get Data from User Login

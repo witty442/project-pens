@@ -25,8 +25,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;

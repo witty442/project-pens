@@ -32,12 +32,13 @@ import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.autocn.AutoCNBean;
 import com.isecinc.pens.web.autocn.AutoCNForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
@@ -162,7 +163,7 @@ public class BarcodeAction extends I_Action {
 			aForm.setJob(new Barcode());
 			
 			Barcode ad = new Barcode();
-			ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			aForm.setJob(ad);
 			
 		} catch (Exception e) {
@@ -214,7 +215,7 @@ public class BarcodeAction extends I_Action {
 				Barcode ad = new Barcode();
 				ad.setCanEdit(true);
 				ad.setCanEditGrNo(true);
-				ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				aForm.setJob(ad);
 				
 				aForm.setMode(mode);//Mode Add new
@@ -393,7 +394,7 @@ public class BarcodeAction extends I_Action {
 			aForm.setResults(new ArrayList<Barcode>());
 			
 			Barcode ad = new Barcode();
-			ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			ad.setCanEdit(true);
 			aForm.setJob(ad);
 			
@@ -412,7 +413,7 @@ public class BarcodeAction extends I_Action {
 			Barcode ad = new Barcode();
 			ad.setJobId(aForm.getJob().getJobId());
 			ad.setName(aForm.getJob().getName());
-			ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			
 			ad.setStoreCode(aForm.getJob().getStoreCode());
 			ad.setStoreName(aForm.getJob().getStoreName());
@@ -593,7 +594,7 @@ public class BarcodeAction extends I_Action {
 	
 		
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date tDate  = DateUtil.parse(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				ps.setDate(1,new java.sql.Date(tDate.getTime()));
 			}
 			

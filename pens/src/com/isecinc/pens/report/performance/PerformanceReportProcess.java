@@ -150,16 +150,21 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			startDate = DateToolsUtil.convertToString(c.getTime());
 
 			sql.delete(0, sql.length());
-			sql.append("\n  SELECT SUM((SELECT SUM(DISCOUNT) FROM t_order_line ");
-			sql.append("\n  WHERE t_order_line.ORDER_ID = od.ORDER_ID AND t_order_line.ISCANCEL ='N')) AS DISCOUNT, ");
+			sql.append("\n  SELECT ");
+			sql.append("\n   SUM((SELECT SUM(DISCOUNT) FROM t_order_line ");
+			sql.append("\n   WHERE t_order_line.ORDER_ID = od.ORDER_ID AND t_order_line.ISCANCEL ='N')) AS DISCOUNT, ");
+			
+			sql.append("\n   SUM((SELECT SUM(LINE_AMOUNT) FROM t_order_line ");
+			sql.append("\n   WHERE t_order_line.ORDER_ID = od.ORDER_ID AND t_order_line.ISCANCEL ='N')) AS NET_AMOUNT_NODIS_NONVAT, ");
+			
 			sql.append("\n  SUM(od.VAT_AMOUNT) AS VAT_AMOUNT, SUM(od.NET_AMOUNT) AS NET_AMOUNT, ");
-			sql.append("\n  (SELECT SUM(m_sales_target_new.TARGET_QTY) FROM m_sales_target_new ");
+			
+			/*sql.append("\n  (SELECT SUM(m_sales_target_new.TARGET_QTY) FROM m_sales_target_new ");
 			sql.append("\n  INNER JOIN ad_user ON m_sales_target_new.USER_ID = ad_user.USER_ID ");
-			sql.append("\n  WHERE m_sales_target_new.TARGET_FROM >= '" + DateToolsUtil.convertToTimeStamp(startDate)
-					+ "' ");
-			sql.append("\n  AND m_sales_target_new.TARGET_TO <= '" + DateToolsUtil.convertToTimeStamp(t.getOrderDate())
-					+ "' ");
-			sql.append("\n  AND ad_user.USER_ID = us.USER_ID ) AS TARGET_QTY, ");
+			sql.append("\n  WHERE m_sales_target_new.TARGET_FROM >= '" + DateToolsUtil.convertToTimeStamp(startDate)+ "' ");
+			sql.append("\n  AND m_sales_target_new.TARGET_TO <= '" + DateToolsUtil.convertToTimeStamp(t.getOrderDate())+ "' ");
+			sql.append("\n  AND ad_user.USER_ID = us.USER_ID ) AS TARGET_QTY, ");*/
+			
 			sql.append("\n  SUM(CASE od.ISCASH WHEN 'Y' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_CASH_AMT, ");
 			sql.append("\n  SUM(CASE od.ISCASH WHEN 'N' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_RECEIPT_AMT ");
 
@@ -183,8 +188,10 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 				p.setAllNetAmount(rst.getDouble("NET_AMOUNT"));
 				p.setAllVatCashAmount(rst.getDouble("VAT_CASH_AMT"));
 				p.setAllVatReceiptAmount(rst.getDouble("VAT_RECEIPT_AMT"));
+				//Edit 13/09/2562 add TOTAL_NET_NODIS_NONVAT
+				p.setAllNetAmountNoDisNonVat(rst.getDouble("NET_AMOUNT_NODIS_NONVAT"));
 			}
-
+			
 			// Get cash amount & receipt amount.
 			sql.delete(0, sql.length());
 			sql.append("\n  SELECT ");

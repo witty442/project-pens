@@ -5,7 +5,7 @@
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%> 
 <%@page import="com.pens.util.printer.*"%>
-<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
+<%@page import="com.pens.util.EnvProperties"%>
 <%@page import="com.pens.util.*"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%

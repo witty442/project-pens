@@ -12,11 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 public class SalesTargetTTControlPage {
 	protected static Logger logger = Logger.getLogger("PENS");

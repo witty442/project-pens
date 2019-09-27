@@ -88,7 +88,13 @@ public class ExportSQL {
 					"	FROM t_order t ,m_customer m	\n"+
 					"	where t.CUSTOMER_ID = m.CUSTOMER_ID	\n"+
 					"   and  m.user_id = "+userBean.getId()+" \n"+
-					"   and  t.DOC_STATUS = 'SV' \n"+
+					
+					//"   and  t.DOC_STATUS = 'SV' \n"+
+					//EDIT 13/09/2562 WIT GET ALl DOC_STATUS start 01/10/2562
+					//"	and t.order_date >='2019-10-01' \n"+
+					//for test 
+					"	and t.order_date >='2019-09-01' \n"+
+					
 					"   and ( t.EXPORTED  = 'N' OR t.EXPORTED  IS NULL OR TRIM(t.EXPORTED) ='') \n"+
 					"   ORDER BY t.ORDER_NO \n";
 			}

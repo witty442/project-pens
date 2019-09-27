@@ -15,7 +15,8 @@ import com.isecinc.pens.bean.MasterBean;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.ProductBean;
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -454,7 +455,7 @@ public class ImportDAO {
 		    logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			if(psCountDate){
-			   ps.setTimestamp(++index, new java.sql.Timestamp(Utils.parse(countDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			   ps.setTimestamp(++index, new java.sql.Timestamp(DateUtil.parse(countDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
 			}
 			rs = ps.executeQuery();
 			if(rs.next()){
@@ -941,7 +942,7 @@ public class ImportDAO {
 			rst = ps.executeQuery();
 			if(rst.next()){
 				item = new OnhandSummary();
-				item.setAsOfDate(Utils.stringValue(rst.getDate("as_of_date"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+				item.setAsOfDate(DateUtil.stringValue(rst.getDate("as_of_date"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 				item.setMaterialMaster(rst.getString("Material_master"));
 				item.setBarcode(rst.getString("BARCODE"));
 				item.setOnhandQty(rst.getString("Onhand_QTY"));

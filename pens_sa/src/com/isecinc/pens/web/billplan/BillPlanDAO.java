@@ -9,7 +9,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.Utils;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class BillPlanDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -103,7 +104,7 @@ public class BillPlanDAO {
 			   h.setSalesrepCode(Utils.isNull(rst.getString("code")));
 			   h.setSalesrepName(Utils.isNull(rst.getString("salesrep_full_name")));
 			   h.setBillTNo(Utils.isNull(rst.getString("shipment_num")));
-			   h.setBillTDate(Utils.stringValue(rst.getDate("creation_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setBillTDate(DateUtil.stringValue(rst.getDate("creation_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   if("detail".equalsIgnoreCase(o.getDispType())){
 				   h.setItem(Utils.isNull(rst.getString("segment1")));
 				   h.setItemName(Utils.isNull(rst.getString("description")));

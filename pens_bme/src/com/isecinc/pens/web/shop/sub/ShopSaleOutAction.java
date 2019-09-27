@@ -14,9 +14,10 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.isecinc.pens.web.shop.ShopForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -42,7 +43,7 @@ public class ShopSaleOutAction {
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
 				ShopBean item = new ShopBean();
-				item.setOrderDate(Utils.stringValue(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				item.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				item.setOrderNo(Utils.isNull(rst.getString("ORDER_NUMBER")));
 				item.setPensItem(Utils.isNull(rst.getString("pens_item")));
 				item.setBarcode(rst.getString("barcode"));
@@ -306,17 +307,17 @@ public class ShopSaleOutAction {
 			sql.append("\n AND M.CUSTOMER_NUMBER ='"+f.getBean().getCustGroup()+"' ");
 			
 			if( !Utils.isNull(f.getBean().getStartDate()).equals("") && !Utils.isNull(f.getBean().getEndDate()).equals("") ){
-				dateTemp = Utils.parse(f.getBean().getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				dateTemp = DateUtil.parse(f.getBean().getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n AND ORDER_DATE >= to_date('"+dateStr+"','dd/mm/yyyy')");
 				
-				dateTemp = Utils.parse(f.getBean().getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				dateTemp = DateUtil.parse(f.getBean().getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n AND ORDER_DATE <= to_date('"+dateStr+"','dd/mm/yyyy')");
 				
 			}else if( !Utils.isNull(f.getBean().getStartDate()).equals("") && Utils.isNull(f.getBean().getEndDate()).equals("") ){
-				dateTemp = Utils.parse(f.getBean().getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateStr = Utils.stringValue(dateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				dateTemp = DateUtil.parse(f.getBean().getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n AND ORDER_DATE = to_date('"+dateStr+"','dd/mm/yyyy')");
 			}
 			sql.append("\n GROUP BY M.ORDER_DATE ,M.ORDER_NUMBER");

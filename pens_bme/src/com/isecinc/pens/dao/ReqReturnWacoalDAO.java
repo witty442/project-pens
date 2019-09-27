@@ -15,8 +15,9 @@ import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.ReqReturnWacoal;
 import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.pick.ReqReturnWacoalAction;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -85,7 +86,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 			while(rst.next()) {
 				   h = new ReqReturnWacoal();
 				   h.setNo(r);
-				   h.setRequestDate(Utils.stringValue(rst.getTimestamp("request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setRequestDate(DateUtil.stringValue(rst.getTimestamp("request_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
 				   h.setStatus(Utils.isNull(rst.getString("request_status"))); 
 				   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("request_status")))); 
@@ -128,8 +129,8 @@ public class ReqReturnWacoalDAO extends PickConstants{
 			sql.append("\n and i.request_no = '"+Utils.isNull(o.getRequestNo())+"'");
 		}
 		if( !Utils.isNull(o.getRequestDate()).equals("")){
-			Date tDate  = Utils.parse(o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String tDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tDateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			sql.append("\n and i.REQUEST_DATE = to_date('"+tDateStr+"','dd/mm/yyyy')");
 		}
 		return sql;
@@ -412,7 +413,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 				
 				ps = conn.prepareStatement(sql.toString());
 				
-				Date openDate = Utils.parse( o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date openDate = DateUtil.parse( o.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				ps.setTimestamp(c++, new java.sql.Timestamp(openDate.getTime()));
 				ps.setString(c++, o.getRequestNo());
@@ -446,7 +447,7 @@ public class ReqReturnWacoalDAO extends PickConstants{
 				sql.append(" WHERE  REQUEST_NO = ?  \n" );
 
 				ps = conn.prepareStatement(sql.toString());
-				Date openDate = Utils.parse( o.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date openDate = DateUtil.parse( o.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				ps.setString(c++, o.getRemark());
 				ps.setTimestamp(c++, new java.sql.Timestamp(openDate.getTime()));

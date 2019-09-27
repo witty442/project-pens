@@ -37,6 +37,7 @@ public class PerformanceReport implements Serializable {
 	/** For sum all start month to date selected. **/
 	private double allDiscount;
 	private double allNetAmount;
+	private double allNetAmountNoDisNonVat;
 	private double allCashAmount;
 	private double allReceiptAmount;
 	private double allVatAmount;
@@ -47,6 +48,14 @@ public class PerformanceReport implements Serializable {
 	private double allAirpayAmount;
 	
 	
+	public double getAllNetAmountNoDisNonVat() {
+		return allNetAmountNoDisNonVat;
+	}
+
+	public void setAllNetAmountNoDisNonVat(double allNetAmountNoDisNonVat) {
+		this.allNetAmountNoDisNonVat = allNetAmountNoDisNonVat;
+	}
+
 	public double getAllAirpayAmount() {
 		return allAirpayAmount;
 	}

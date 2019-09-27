@@ -3,8 +3,8 @@ package test;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.pens.util.EnvProperties;
 
 public class TestALL {
    

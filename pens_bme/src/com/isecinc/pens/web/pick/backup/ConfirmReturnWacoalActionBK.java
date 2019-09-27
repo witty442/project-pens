@@ -29,11 +29,12 @@ import com.isecinc.pens.bean.ReturnBoxReport;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ConfirmReturnWacoalDAO;
 import com.isecinc.pens.dao.ReqReturnWacoalDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.pick.ConfirmReturnWacoalForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 
@@ -155,7 +156,7 @@ public class ConfirmReturnWacoalActionBK extends I_Action {
 			ConfirmReturnWacoal h = null;
 			if(listData != null && listData.size() >0){
 			   h = (ConfirmReturnWacoal)listData.get(0);
-			   h.setReturnDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setReturnDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				
 			   //Get maxQtyLimitReturn
 			   h.setMaxQtyLimitReturn(ReqReturnWacoalDAO.getMaxQtyLimitReturn(conn));
@@ -325,7 +326,7 @@ public class ConfirmReturnWacoalActionBK extends I_Action {
 			aForm.setResults(new ArrayList<ConfirmReturnWacoal>());
 			
 			ConfirmReturnWacoal ad = new ConfirmReturnWacoal();
-			ad.setReturnDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setReturnDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			ad.setCanEdit(true);
 			
 			aForm.setBean(ad);
@@ -466,7 +467,7 @@ public class ConfirmReturnWacoalActionBK extends I_Action {
 			if(dataList != null && dataList.size()> 0){
 				//Head
 				parameterMap.put("p_title", title);
-				parameterMap.put("p_printDate",Utils.stringValue(new Date(), Utils.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,Utils.local_th));
+				parameterMap.put("p_printDate",DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,Utils.local_th));
 				
 				//Gen Report
 				String fileName = "return_box_report";

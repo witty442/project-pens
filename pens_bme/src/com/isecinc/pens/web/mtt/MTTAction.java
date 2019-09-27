@@ -26,12 +26,13 @@ import com.isecinc.pens.bean.MTTBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.MTTBeanDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.isecinc.pens.web.shop.ShopForm;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
@@ -200,7 +201,7 @@ public class MTTAction extends I_Action {
 					aForm.setResults(new ArrayList<MTTBean>());
 					MTTBean ad = new MTTBean();
 					ad.setCanEdit(true);
-					ad.setSaleDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					ad.setSaleDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					aForm.setBean(ad);
 					
 					aForm.setMode(mode);//Mode Add new
@@ -422,7 +423,7 @@ public class MTTAction extends I_Action {
 			aForm.setBean(new MTTBean());
 			
 			MTTBean ad = new MTTBean();
-			ad.setSaleDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setSaleDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			
 			aForm.setBean(ad);
 			
@@ -595,7 +596,7 @@ public class MTTAction extends I_Action {
 			ad.setCustGroup(aForm.getBean().getCustGroup());
 			ad.setStoreCode(aForm.getBean().getStoreCode());
 			ad.setStoreName(aForm.getBean().getStoreName());
-			ad.setSaleDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setSaleDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			ad.setCanEdit(true);
 			aForm.setBean(ad);
 			
@@ -614,7 +615,7 @@ public class MTTAction extends I_Action {
 			MTTBean ad = new MTTBean();
 			//ad.setJobId(aForm.getBean().getJobId());
 			//ad.setName(aForm.getBean().getName());
-			ad.setSaleDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setSaleDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			
 			/*ad.setStoreCode(aForm.getBean().getStoreCode());
 			ad.setStoreName(aForm.getBean().getStoreName());
@@ -836,7 +837,7 @@ public class MTTAction extends I_Action {
 			aForm.setResults(new ArrayList<MTTBean>());
 			
 			MTTBean ad = new MTTBean();
-			ad.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setDocDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			ad.setCanEdit(true);
 			aForm.setBean(ad);
 			

@@ -17,10 +17,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.scheduler.dao.SearchTaskDAO;
 import com.isecinc.pens.scheduler.forms.ScheduleForm;
 import com.isecinc.pens.scheduler.utils.JobUtils;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
 /**

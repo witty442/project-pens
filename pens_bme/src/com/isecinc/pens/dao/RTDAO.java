@@ -15,9 +15,10 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.RTBean;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.rt.RTConstant;
 import com.pens.util.BahtText;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -62,8 +63,8 @@ public class RTDAO {
 						sql.append("\n and h.Authorize_no = '"+Utils.isNull(o.getDocNo())+"'");
 					}
 					if( !Utils.isNull(o.getDocDate()).equals("")){
-						docDate  = Utils.parse(o.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-						String dateStr = Utils.stringValue(docDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+						docDate  = DateUtil.parse(o.getDocDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						String dateStr = DateUtil.stringValue(docDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 						sql.append("\n and h.tran_date = to_date('"+dateStr+"','dd/mm/yyyy')");
 					    
 					}
@@ -88,8 +89,8 @@ public class RTDAO {
 					}
 					
 					if( !Utils.isNull(o.getDeliveryDate()).equals("")){
-						docDate  = Utils.parse(o.getDeliveryDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-						String dateStr = Utils.stringValue(docDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+						docDate  = DateUtil.parse(o.getDeliveryDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						String dateStr = DateUtil.stringValue(docDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 						sql.append("\n and h.delivery_date = to_date('"+dateStr+"','dd/mm/yyyy')");
 					    
 					}
@@ -111,7 +112,7 @@ public class RTDAO {
 					while(rst.next()) {
 					   h = new RTBean();
 					   h.setDocNo(Utils.isNull(rst.getString("Authorize_no")));
-					   h.setDocDate(Utils.stringValue(rst.getDate("tran_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					   h.setDocDate(DateUtil.stringValue(rst.getDate("tran_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 
 					   h.setRefDoc(Utils.isNull(rst.getString("ref_doc")));
 					   h.setCustGroup(Utils.isNull(rst.getString("Cust_group")));
@@ -125,7 +126,7 @@ public class RTDAO {
 					   h.setRtnQtyEA(Utils.isNull(rst.getString("RTN_Qty_EA")));
 					   
 					   if(rst.getDate("PIC_RCV_DATE") != null){
-					      h.setPicRcvDate(Utils.stringValue(rst.getDate("PIC_RCV_DATE"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					      h.setPicRcvDate(DateUtil.stringValue(rst.getDate("PIC_RCV_DATE"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					   }else{
 						  h.setPicRcvDate("");
 					   }
@@ -137,7 +138,7 @@ public class RTDAO {
 					    
 					   h.setDeliveryBy(Utils.isNull(rst.getString("delivery_by")));
 					   if(rst.getDate("delivery_date") != null){
-					     h.setDeliveryDate(Utils.stringValue(rst.getDate("delivery_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					     h.setDeliveryDate(DateUtil.stringValue(rst.getDate("delivery_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					   }else{
 						 h.setDeliveryDate("");
 					   }
@@ -200,8 +201,8 @@ public class RTDAO {
 
 					sql.append("\n and h.Authorize_no = '"+Utils.isNull(o.getDocNo())+"'");
 					
-					docDate  = Utils.parse(o.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String dateStr = Utils.stringValue(docDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					docDate  = DateUtil.parse(o.getDocDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateStr = DateUtil.stringValue(docDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 					sql.append("\n and h.tran_date = to_date('"+dateStr+"','dd/mm/yyyy')");
 					
 					sql.append("\n and h.cust_no ='"+o.getStoreCode()+"'");
@@ -215,7 +216,7 @@ public class RTDAO {
 				while(rst.next()) {
 				   h = new RTBean();
 				   h.setDocNo(Utils.isNull(rst.getString("Authorize_no")));
-				   h.setDocDate(Utils.stringValue(rst.getDate("tran_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setDocDate(DateUtil.stringValue(rst.getDate("tran_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 
 				   h.setRefDoc(Utils.isNull(rst.getString("ref_doc")));
 				   h.setCustGroup(Utils.isNull(rst.getString("Cust_group")));
@@ -229,7 +230,7 @@ public class RTDAO {
 				   h.setRtnQtyEA(Utils.isNull(rst.getString("RTN_Qty_EA")));
 				   
 				   if(rst.getDate("PIC_RCV_DATE") != null){
-				      h.setPicRcvDate(Utils.stringValue(rst.getDate("PIC_RCV_DATE"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				      h.setPicRcvDate(DateUtil.stringValue(rst.getDate("PIC_RCV_DATE"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					  h.setPicRcvDate("");
 				   }
@@ -241,7 +242,7 @@ public class RTDAO {
 				    
 				   h.setDeliveryBy(Utils.isNull(rst.getString("delivery_by")));
 				   if(rst.getDate("delivery_date") != null){
-				     h.setDeliveryDate(Utils.stringValue(rst.getDate("delivery_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				     h.setDeliveryDate(DateUtil.stringValue(rst.getDate("delivery_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					 h.setDeliveryDate("");
 				   }
@@ -300,7 +301,7 @@ public class RTDAO {
 			
 			ps = conn.prepareStatement(sql.toString());
 			
-			Date docDate = Utils.parse(o.getDocDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date docDate = DateUtil.parse(o.getDocDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			int c =1;
 			ps.setString(c++, o.getDocNo());
@@ -320,7 +321,7 @@ public class RTDAO {
 			
 			ps.setString(c++, Utils.isNull(o.getDeliveryBy()));
 			if( !Utils.isNull(o.getDeliveryDate()).equals("")){
-			   Date d = Utils.parse(Utils.isNull(o.getDeliveryDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			   Date d = DateUtil.parse(Utils.isNull(o.getDeliveryDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			   ps.setDate(c++, new java.sql.Date(d.getTime()));
 			}else{
 			   ps.setDate(c++,null);
@@ -396,7 +397,7 @@ public class RTDAO {
 			
 			ps.setString(c++, Utils.isNull(o.getDeliveryBy()));
 			if( !Utils.isNull(o.getDeliveryDate()).equals("")){
-			   Date d = Utils.parse(Utils.isNull(o.getDeliveryDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			   Date d = DateUtil.parse(Utils.isNull(o.getDeliveryDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			   ps.setDate(c++, new java.sql.Date(d.getTime()));
 			}else{
 			   ps.setDate(c++,null);
@@ -434,7 +435,7 @@ public class RTDAO {
 			ps = conn.prepareStatement(sql.toString());
 			
 			if( !Utils.isNull(o.getPicRcvDate()).equals("") ){
-			    picRcvDate = Utils.parse(o.getPicRcvDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    picRcvDate = DateUtil.parse(o.getPicRcvDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			}
 			
 			ps.setString(c++, Utils.isNull(o.getStatus()));

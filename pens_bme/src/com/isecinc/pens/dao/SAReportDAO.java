@@ -14,8 +14,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.SAReportBean;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class SAReportDAO {
@@ -193,15 +194,15 @@ public class SAReportDAO {
 				   sql.append("\n  where  M.emp_id = E.emp_id ");
 				   
 				   if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
-					    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-					    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+					    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getPayDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+					    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getPayDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 					    
 						sql.append("\n and M.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 						sql.append("\n and M.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 					}
 				   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
-					    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-					    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+					    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+					    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 					    
 						sql.append("\n and M.count_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 						sql.append("\n and M.count_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
@@ -227,16 +228,16 @@ public class SAReportDAO {
 				   sql.append("\n    WHERE H.emp_id = T.emp_id AND H.type = T.type AND H.inv_refwal=T.inv_refwal ");
 				   
 				   if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
-					    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-					    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+					    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getPayDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+					    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getPayDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 					    
 						sql.append("\n and T.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 						sql.append("\n and T.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 					}
 				   
 				   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
-					    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-					    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+					    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+					    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 					    
 						sql.append("\n and T.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 						sql.append("\n and T.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
@@ -338,22 +339,22 @@ public class SAReportDAO {
 					sql.append("\n\t\t and E.GROUP_STORE = '"+Utils.isNull(o.getGroupStore())+"'");
 				}
 				if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getPayDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getPayDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t\t and T.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t\t and T.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 				}
 			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t\t and M.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t\t and M.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 				}
 			   if( !Utils.isNull(o.getInvoiceDateFrom()).equals("") && !Utils.isNull(o.getInvoiceDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getInvoiceDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getInvoiceDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getInvoiceDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getInvoiceDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t\t and M.invoice_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t\t and M.invoice_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
@@ -407,15 +408,15 @@ public class SAReportDAO {
 			   sql.append("\n     where 1=1 ");
 			   sql.append("\n     AND M.count_stock_date is not null");
 			   if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getPayDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getPayDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t AND M.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND M.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 				}
 			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t AND M.count_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND M.count_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
@@ -451,20 +452,20 @@ public class SAReportDAO {
 			   sql.append("\n     AND H.check_stock_date is not null");
 			   
 			   if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getPayDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getPayDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 					sql.append("\n\t AND T.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND T.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 			   }
 			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 					sql.append("\n\t AND H.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND H.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 			   }
 			   if( !Utils.isNull(o.getInvoiceDateFrom()).equals("") && !Utils.isNull(o.getInvoiceDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getInvoiceDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getInvoiceDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getInvoiceDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getInvoiceDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t\t and H.invoice_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t\t and H.invoice_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
@@ -500,7 +501,7 @@ public class SAReportDAO {
 				   h.setInvoiceNo(Utils.isNull(rst.getString("inv_refwal")));
 				   
 				   //TRAN
-				   h.setCountStockDate(Utils.stringValue(rst.getDate("count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setCountStockDate(DateUtil.stringValue(rst.getDate("count_stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setRewardMonth(Utils.isNull(rst.getString("reward_month")));
 				   h.setRewardMonthCount(calcDiffYearMonth(rst.getString("min_year_month"),rst.getString("max_year_month")));
 				   h.setRewardAmt(Utils.decimalFormat(rst.getDouble("reward_amt"),Utils.format_current_2_disgit));
@@ -563,22 +564,22 @@ public class SAReportDAO {
 					sql.append("\n\t\t and E.GROUP_STORE = '"+Utils.isNull(o.getGroupStore())+"'");
 				}
 				if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getPayDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getPayDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t\t and T.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t\t and T.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 				}
 			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t\t and M.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t\t and M.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 				}
 			   if( !Utils.isNull(o.getInvoiceDateFrom()).equals("") && !Utils.isNull(o.getInvoiceDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getInvoiceDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getInvoiceDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getInvoiceDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getInvoiceDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t\t and M.invoice_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t\t and M.invoice_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
@@ -595,15 +596,15 @@ public class SAReportDAO {
 			   sql.append("\n     where 1=1 ");
 			   sql.append("\n     AND M.count_stock_date is not null");
 			   if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getPayDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getPayDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t AND M.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND M.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 				}
 			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t AND M.count_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND M.count_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
@@ -640,20 +641,20 @@ public class SAReportDAO {
 			   sql.append("\n     AND H.check_stock_date is not null");
 			   
 			   if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getPayDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getPayDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 					sql.append("\n\t AND T.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND T.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 			   }
 			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 					sql.append("\n\t AND H.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND H.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 			   }
 			   if( !Utils.isNull(o.getInvoiceDateFrom()).equals("") && !Utils.isNull(o.getInvoiceDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getInvoiceDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getInvoiceDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getInvoiceDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getInvoiceDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t\t and H.invoice_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t\t and H.invoice_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
@@ -679,20 +680,20 @@ public class SAReportDAO {
 			   sql.append("\n     AND H.check_stock_date is not null");
 			   sql.append("\n     AND T.payType='3. หักเงินเดือน' ");
 			   if( !Utils.isNull(o.getPayDateFrom()).equals("") && !Utils.isNull(o.getPayDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getPayDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getPayDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getPayDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getPayDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 					sql.append("\n\t AND T.paydate >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND T.paydate <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 			   }
 			   if( !Utils.isNull(o.getCountStockDateFrom()).equals("") && !Utils.isNull(o.getCountStockDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getCountStockDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getCountStockDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getCountStockDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 					sql.append("\n\t AND H.check_stock_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t AND H.check_stock_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
 			   }
 			   if( !Utils.isNull(o.getInvoiceDateFrom()).equals("") && !Utils.isNull(o.getInvoiceDateTo()).equals("") ){
-				    String payDateFrom = Utils.stringValue(Utils.parse(o.getInvoiceDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
-				    String payDateTo = Utils.stringValue(Utils.parse(o.getInvoiceDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th),Utils.DD_MM_YYYY_WITH_SLASH);
+				    String payDateFrom = DateUtil.stringValue(DateUtil.parse(o.getInvoiceDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
+				    String payDateTo = DateUtil.stringValue(DateUtil.parse(o.getInvoiceDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 				    
 					sql.append("\n\t\t and H.invoice_date >= to_date('"+payDateFrom+"','dd/mm/yyyy')");
 					sql.append("\n\t\t and H.invoice_date <= to_date('"+payDateTo+"','dd/mm/yyyy')");
@@ -727,7 +728,7 @@ public class SAReportDAO {
 				   h.setInvoiceNo(Utils.isNull(rst.getString("inv_refwal")));
 				   
 				   //TRAN
-				   h.setCountStockDate(Utils.stringValue(rst.getDate("count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setCountStockDate(DateUtil.stringValue(rst.getDate("count_stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setRewardMonth(Utils.isNull(rst.getString("reward_month")));
 				   h.setRewardMonthCount(calcDiffYearMonth(rst.getString("min_year_month"),rst.getString("max_year_month")));
 				   h.setRewardAmt(Utils.decimalFormat(rst.getDouble("reward_amt"),Utils.format_current_2_disgit));
@@ -741,7 +742,7 @@ public class SAReportDAO {
 				   h.setPayType4Amt(Utils.decimalFormat(rst.getDouble("payType4_amt"),Utils.format_current_2_disgit));
 				   
 				   //หักเงินเดือน
-				   h.setPayDate(Utils.stringValueNull(rst.getDate("paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setPayDate(DateUtil.stringValueNull(rst.getDate("paydate"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setPayAmt(Utils.decimalFormat(rst.getDouble("pay_amt"),Utils.format_current_2_disgit));
 				   
 				   items.add(h);
@@ -803,7 +804,7 @@ public class SAReportDAO {
 				List<SAReportBean> items = new ArrayList<SAReportBean>();
 				int r = 1;
 				try {
-					asOfDate = Utils.parse(o.getAsOfDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					asOfDate = DateUtil.parse(o.getAsOfDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					
 				   sql.append(" \n select distinct E.* " );
 				   sql.append(" \n,(SELECT M.pens_desc FROM PENSBME_MST_REFERENCE M where M.reference_code = 'Region' AND M.pens_value =E.region)as region_desc" );
@@ -1012,7 +1013,7 @@ public class SAReportDAO {
 		double totalPayment = 0;
 		double totalDelayPayment = 0;
 		try {
-			 Date asOfDate = Utils.parse(cri.getAsOfDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			 Date asOfDate = DateUtil.parse(cri.getAsOfDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			 
 		     sql.append("\n select distinct H.type,H.inv_refwal,H.emp_id,h.tran_date,h.total_damage");
 		     sql.append("\n  FROM SA_DAMAGE_HEAD H,SA_DAMAGE_TRAN T");
@@ -1035,7 +1036,7 @@ public class SAReportDAO {
 			   h.setEmpId(cri.getEmpId());
 			   h.setType(Utils.isNull(rst.getString("type")));
 			   h.setInvRefwal(Utils.isNull(rst.getString("Inv_refwal")));
-			   h.setTranDate(Utils.stringValue(rst.getDate("tran_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setTranDate(DateUtil.stringValue(rst.getDate("tran_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setTotalDamage(Utils.decimalFormat(rst.getDouble("total_damage"),Utils.format_current_2_disgit));
 			   h.setMonth(cri.getMonth());//Set 
 			   h.setAsOfDate(cri.getAsOfDate());
@@ -1095,7 +1096,7 @@ public class SAReportDAO {
 		String payDateStr = "";
 		try {
 			  //01102016
-			  Date asOfDate = Utils.parse(h.getAsOfDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			  Date asOfDate = DateUtil.parse(h.getAsOfDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			//  logger.debug("criYYYYMMLong:"+criYYYYMMLong);
 			 
 			   sql.append(" \n select line_id,paytype,paydate,pay_amt " );
@@ -1114,7 +1115,7 @@ public class SAReportDAO {
 				   if(r==1){
 					   h.setLineId(Utils.isNull(rst.getString("line_id")));
 					   h.setPayType(Utils.isNull(rst.getString("paytype")));
-					   h.setPayDate(Utils.stringValue(rst.getDate("paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					   h.setPayDate(DateUtil.stringValue(rst.getDate("paydate"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 
 					   if(rst.getDate("paydate") != null){
 						   //payDateStr = Utils.stringValue(rst.getDate("paydate"), Utils.DD_MM_YYYY_WITHOUT_SLASH);
@@ -1144,7 +1145,7 @@ public class SAReportDAO {
 					   
 					   h.setLineId(Utils.isNull(rst.getString("line_id")));
 					   h.setPayType(Utils.isNull(rst.getString("paytype")));
-					   h.setPayDate(Utils.stringValue(rst.getDate("paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					   h.setPayDate(DateUtil.stringValue(rst.getDate("paydate"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					   h.setPayAmt(Utils.decimalFormat(rst.getDouble("pay_amt"),Utils.format_current_2_disgit));
 					   
 					   if(rst.getDate("paydate") != null){
@@ -1211,7 +1212,7 @@ public class SAReportDAO {
 		//long payDateYYYYMMLong = 0;
 		try {
 			logger.debug("asOfDate:"+cri.getAsOfDate());
-			asOfDate = Utils.parse(cri.getAsOfDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			asOfDate = DateUtil.parse(cri.getAsOfDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			 //01102016
 			  //criYYYYMMLong = new Long(cri.getMonth().substring(4,8)+cri.getMonth().substring(2,4)).longValue();
 			 // logger.debug("criYYYYMMLong:"+criYYYYMMLong);
@@ -1276,7 +1277,7 @@ public class SAReportDAO {
 			   
 			   h.setLineId(Utils.isNull(rst.getString("line_id")));
 			   h.setPayType(Utils.isNull(rst.getString("paytype")));
-			   h.setPayDate(Utils.stringValue(rst.getDate("paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setPayDate(DateUtil.stringValue(rst.getDate("paydate"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   
 			   payDate = rst.getDate("paydate");
 			  // payDateYYYYMMLong = new Long(payDateStr.substring(4,8)+payDateStr.substring(2,4)).longValue();
@@ -1293,7 +1294,7 @@ public class SAReportDAO {
 				   h.setPayAmt(Utils.decimalFormat(rst.getDouble("pay_amt"),Utils.format_current_2_disgit));   
 			   }
 			   
-			   h.setCountStockDate(Utils.stringValue(rst.getDate("count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCountStockDate(DateUtil.stringValue(rst.getDate("count_stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setRewardMonth(Utils.isNull(rst.getString("reward_month")));
 			   h.setRewardAmt(Utils.decimalFormat(rst.getDouble("reward_amt"),Utils.format_current_2_disgit));
 			   
@@ -1340,10 +1341,10 @@ public class SAReportDAO {
 			try {
 				
 				//Convert Month Christ = Budish Date
-			    Date asOfDate = Utils.parse("01"+o.getMonth(),Utils.DD_MM_YYYY_WITHOUT_SLASH);
+			    Date asOfDate = DateUtil.parse("01"+o.getMonth(),DateUtil.DD_MM_YYYY_WITHOUT_SLASH);
 			    Calendar asOfDateCalendar = Calendar.getInstance();
 			    asOfDateCalendar.setTime(asOfDate);
-			    asOfMonth =  Utils.stringValue(asOfDateCalendar.getTime(), "MMyyyy",Utils.local_th);
+			    asOfMonth =  DateUtil.stringValue(asOfDateCalendar.getTime(), "MMyyyy",Utils.local_th);
 	
 				
 			   sql.append(" \n select E.* ");

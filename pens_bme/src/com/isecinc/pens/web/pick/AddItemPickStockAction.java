@@ -19,8 +19,8 @@ import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.OnhandProcessDAO;
 import com.isecinc.pens.dao.ReqPickStockDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
 /**

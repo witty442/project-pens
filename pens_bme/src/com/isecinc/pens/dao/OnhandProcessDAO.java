@@ -17,7 +17,7 @@ import com.isecinc.pens.bean.Onhand;
 import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
 public class OnhandProcessDAO {

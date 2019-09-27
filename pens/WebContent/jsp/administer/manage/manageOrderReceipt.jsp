@@ -1,3 +1,5 @@
+<%@page import="java.util.Date"%>
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="util.SessionGen"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -5,15 +7,20 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<% 
-
-%>
 <jsp:useBean id="manageOrderReceiptForm" class="com.isecinc.pens.web.admin.ManageOrderReceiptForm" scope="request" />
 <%@page import="com.isecinc.pens.SystemProperties"%>
-
 <%@page import="com.isecinc.pens.bean.Order"%>
 <%@page import="java.text.DecimalFormat"%>
-<%@page import="com.isecinc.pens.bean.Receipt"%><html>
+<%@page import="com.isecinc.pens.bean.Receipt"%>
+<html>
+
+<% 
+  //default current date
+ // System.out.println("docuDate["+Utils.isNull(manageOrderReceiptForm.getDocumentDate())+"]");
+  if( "".equals(Utils.isNull(manageOrderReceiptForm.getDocumentDate()))){
+	  manageOrderReceiptForm.setDocumentDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+  }
+%>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>

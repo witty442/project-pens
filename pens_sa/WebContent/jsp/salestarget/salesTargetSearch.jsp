@@ -1,8 +1,9 @@
-<%@page import="util.SessionUtils"%>
-<%@page import="util.UserUtils"%>
+<%@page import="com.pens.util.PageVisit"%>
+<%@page import="com.pens.util.SessionUtils"%>
+<%@page import="com.pens.util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
-<%@page import="util.Utils"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -35,7 +36,7 @@ if(subPageName.equals("")){
 System.out.println("subPageName:"+subPageName);
 System.out.println("salesTargetForm Bean:"+salesTargetForm.getBean());
  */
-String pageNameTemp = "";
+String pageNameTemp = pageName;
 if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){ 
 	pageNameTemp = "MKT_SalesTarget";
 }else if(SalesTargetConstants.PAGE_MTSALES.equalsIgnoreCase(pageName)){ 
@@ -66,6 +67,9 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 	pageNameTemp = "MTADMIN_SalesTarget";
 }
 //System.out.println("pageNameTemp:"+pageNameTemp);
+
+/** Count Visit Page */
+PageVisit.processPageVisit(request,pageNameTemp);
 %>
 <html>
 <head>
@@ -76,7 +80,17 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-
+<style>
+  #scroll {
+    width:<%=(String)session.getAttribute("screenWidth")%>px;
+    height:400px;
+    background:#FFFFFF;
+	border:1px solid #000;
+	overflow:auto;
+	white-space:nowrap;
+	box-shadow:0 0 25px #000;
+	}
+</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -155,6 +169,8 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 						        <jsp:include page="criteria/TTADMIN_Criteria.jsp" flush="true" />   
 						     <%}else if(SalesTargetConstants.PAGE_MTADMIN.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/MTADMIN_Criteria.jsp" flush="true" />   
+						     <%}else if(SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){ %>
+						        <jsp:include page="criteria/SalesTargetPDCriteria.jsp" flush="true"/> 
 						     <%} %>
 					    </div>
 					  
@@ -162,7 +178,13 @@ if(SalesTargetConstants.PAGE_MKT.equalsIgnoreCase(pageName)){
 					  <%
 					  //System.out.println("Results:"+request.getSession().getAttribute("salesTargetForm_RESULTS"));
 					  if(request.getSession().getAttribute("salesTargetForm_RESULTS") != null) {
-					     out.println(request.getSession().getAttribute("salesTargetForm_RESULTS"));
+						  if(SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){ 
+							  out.println("<div id ='scroll' >");
+						       out.println(request.getSession().getAttribute("salesTargetForm_RESULTS"));
+						      out.println("</div>");
+						  }else{ 
+					          out.println(request.getSession().getAttribute("salesTargetForm_RESULTS"));
+					      } 
 					  
 					  %>
 						<!-- ************************Result ***************************************************-->

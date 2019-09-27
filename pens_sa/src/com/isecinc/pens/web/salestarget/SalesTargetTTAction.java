@@ -13,12 +13,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -382,7 +381,7 @@ public class SalesTargetTTAction  {
 			SalesTargetBean h = aForm.getBean();
 			
 			//delete all;
-			SalesTargetTTDAO.deleteAllByMKT(conn, h);
+			SalesTargetTTDAO.deleteAllByMKT_TT(conn, h);
 
 			request.setAttribute("Message","ลบข้อมูล เรียบร้อยแล้ว");
 			
@@ -411,7 +410,7 @@ public class SalesTargetTTAction  {
 				}
 			} catch (Exception e2) {}
 		}
-		return mapping.findForward("detail");
+		return mapping.findForward("detailTTMKT");
 	}
 	
 	public ActionForward updateStatusManualTT(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -665,6 +664,6 @@ public class SalesTargetTTAction  {
 		return mapping.findForward("search");
 	}
 	
-	
+
 	
 }

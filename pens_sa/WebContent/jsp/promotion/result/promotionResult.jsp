@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.web.promotion.PromotionBean"%>
 <%@page import="java.util.List"%>
-<%@page import="util.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <jsp:useBean id="promotionForm" class="com.isecinc.pens.web.promotion.PromotionForm" scope="session" />
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 

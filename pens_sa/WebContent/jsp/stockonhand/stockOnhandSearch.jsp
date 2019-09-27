@@ -1,9 +1,9 @@
 
-<%@page import="util.PageVisit"%>
-<%@page import="util.SessionUtils"%>
+<%@page import="com.pens.util.PageVisit"%>
+<%@page import="com.pens.util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.stockonhand.StockOnhandAction"%>
-<%@page import="util.Utils"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>

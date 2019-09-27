@@ -17,12 +17,12 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.report.salesanalyst.ProfileProcess;
 import com.isecinc.pens.report.salesanalyst.SABean;
 import com.isecinc.pens.report.salesanalyst.SAGenerate;
 import com.isecinc.pens.report.salesanalyst.SAInitial;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
 

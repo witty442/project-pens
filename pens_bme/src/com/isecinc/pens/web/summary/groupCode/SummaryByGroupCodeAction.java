@@ -29,9 +29,10 @@ import com.isecinc.pens.dao.SummaryByGroupCodeDAO;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.gendate.OrderDateUtils;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.managepath.ManagePath;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -77,7 +78,7 @@ public class SummaryByGroupCodeAction extends I_Action {
 				 // order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 
 				 //new set to Current Date
-				 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 order.setOrderDate(DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 summaryForm.setOrder(order);
 				 
 				 ImportDAO importDAO = new ImportDAO();
@@ -364,7 +365,7 @@ public class SummaryByGroupCodeAction extends I_Action {
 			 request.getSession().setAttribute("itemErrorMap", null);
 			 
 			 Order order = new Order();
-			 order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			 order.setOrderDate(DateUtil.stringValue(OrderDateUtils.getOrderDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 summaryForm.setOrder(order);
 			
 		} catch (Exception e) {

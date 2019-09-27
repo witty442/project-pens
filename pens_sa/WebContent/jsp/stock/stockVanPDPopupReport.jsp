@@ -1,6 +1,6 @@
 <%@page import="com.isecinc.pens.web.stock.StockConstants"%>
-<%@page import="util.Utils"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.ArrayList"%>

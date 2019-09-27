@@ -10,11 +10,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class PromotionUtils {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -48,13 +48,13 @@ public class PromotionUtils {
 			rst = stmt.executeQuery(sql.toString());
 			while(rst.next()){
 				item = new PopupBean();
-				requestDate = Utils.parse("01/"+rst.getString("r"), Utils.DD_MM_YYYY_WITH_SLASH);
+				requestDate = DateUtil.parse("01/"+rst.getString("r"), DateUtil.DD_MM_YYYY_WITH_SLASH);
 				cal.setTime(requestDate);
 				logger.debug("Cal:"+cal.getTime());
-				periodName =  Utils.stringValue(cal.getTime(),"MMM-yy",Utils.local_th).toUpperCase();
+				periodName =  DateUtil.stringValue(cal.getTime(),"MMM-yy",DateUtil.local_th).toUpperCase();
 				logger.debug("period:"+periodName);
-		        startDate  =  "01/"+Utils.stringValue(cal.getTime(),"MM/yyyy",Utils.local_th);
-		        endDate    =   cal.getActualMaximum(Calendar.DAY_OF_MONTH)+"/"+Utils.stringValue(cal.getTime(),"MM/yyyy",Utils.local_th);
+		        startDate  =  "01/"+DateUtil.stringValue(cal.getTime(),"MM/yyyy",DateUtil.local_th);
+		        endDate    =   cal.getActualMaximum(Calendar.DAY_OF_MONTH)+"/"+DateUtil.stringValue(cal.getTime(),"MM/yyyy",DateUtil.local_th);
 				item.setKeyName(periodName);
 				item.setValue(periodName+"|"+startDate +"|"+endDate);
 				monthYearList.add(item);	
@@ -63,9 +63,9 @@ public class PromotionUtils {
 			}
 			if(monthYearList.size()==0){
 				cal.setTime(new Date());
-				periodName =  Utils.stringValue(cal.getTime(),"MMM-yy",Utils.local_th).toUpperCase();
-				startDate  =  "01/"+Utils.stringValue(cal.getTime(),"MM/yyyy",Utils.local_th);
-			    endDate    =   cal.getActualMaximum(Calendar.DAY_OF_MONTH)+"/"+Utils.stringValue(cal.getTime(),"MM/yyyy",Utils.local_th);
+				periodName =  DateUtil.stringValue(cal.getTime(),"MMM-yy",DateUtil.local_th).toUpperCase();
+				startDate  =  "01/"+DateUtil.stringValue(cal.getTime(),"MM/yyyy",DateUtil.local_th);
+			    endDate    =   cal.getActualMaximum(Calendar.DAY_OF_MONTH)+"/"+DateUtil.stringValue(cal.getTime(),"MM/yyyy",DateUtil.local_th);
 			    
 			    item.setKeyName(periodName);
 				item.setValue(periodName+"|"+startDate +"|"+endDate);
@@ -92,7 +92,7 @@ public class PromotionUtils {
 			  
 			  yyyy = String.valueOf(cal.get(Calendar.YEAR)+543);
 			  
-			  s.setPeriod(Utils.isNull(Utils.stringValue(cal.getTime(), Utils.MMM_YY,Utils.local_th)));
+			  s.setPeriod(Utils.isNull(DateUtil.stringValue(cal.getTime(), DateUtil.MMM_YY,DateUtil.local_th)));
 			  s.setStartDate("01/"+mm+"/"+yyyy);
 			  s.setEndDate(cal.getActualMaximum(Calendar.DAY_OF_MONTH)+"/"+mm+"/"+yyyy);
 		}catch(Exception e){

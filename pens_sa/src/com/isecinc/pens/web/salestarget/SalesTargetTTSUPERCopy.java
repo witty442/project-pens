@@ -11,11 +11,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcessAll;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class SalesTargetTTSUPERCopy {
 
@@ -32,13 +32,14 @@ public class SalesTargetTTSUPERCopy {
 			conn.setAutoCommit(false);
 
 			//setDate CurrentMonth 
-			Date startDate = Utils.parse(destBean.getStartDate(), Utils.DD_MMM_YYYY);
+			Date startDate = DateUtil.parse(destBean.getStartDate(), DateUtil.DD_MMM_YYYY);
 			curCal.setTime(startDate);
 			logger.debug("curDate Time["+curCal.getTime()+"]");
 			
 			//validate cur month data Exist (all status)
 			destBean = SalesTargetDAO.convertCriteria(destBean);
-			boolean curDataExist = salesTargetIsExistTEMP(conn,destBean,user,"");
+			boolean curDataExist = false;//salesTargetIsExistTEMP(conn,destBean,user,"");
+			//if(true){
 			if(curDataExist ==true){
 				errorCode ="DATA_CUR_EXIST_EXCEPTION";
 				logger.debug("ErrorCode["+errorCode+"]");
@@ -46,21 +47,26 @@ public class SalesTargetTTSUPERCopy {
 				//setDate prevMonth
 				sourceBean = new SalesTargetBean();
 				curCal.add(Calendar.MONTH, -1);
-				sourceBean.setStartDate(Utils.stringValue(curCal.getTime(), Utils.DD_MMM_YYYY));
+				sourceBean.setStartDate(DateUtil.stringValue(curCal.getTime(), DateUtil.DD_MMM_YYYY));
 				logger.debug("prevDate Time["+curCal.getTime()+"]");
 				//convert
-				sourceBean.setPeriod(Utils.stringValue(curCal.getTime(),"MMM-yy").toUpperCase());
+				sourceBean.setPeriod(DateUtil.stringValue(curCal.getTime(),"MMM-yy").toUpperCase());
 				
 				//convert to criteria
 				sourceBean = SalesTargetDAO.convertCriteria(sourceBean);
 				sourceBean.setStatus(SalesTargetConstants.STATUS_FINISH);// get only status Finish
+				sourceBean.setBrand(destBean.getBrand());
+				sourceBean.setCustCatNo(destBean.getCustCatNo());
+				sourceBean.setSalesZone(destBean.getSalesZone());
 				
 				logger.info("Copy from Period["+sourceBean.getPeriod()+"] to ["+destBean.getPeriod()+"]");
 				
 				//validate prev month data is exist (Status=Finish)
 				boolean prevDataExist = salesTargetIsExistTEMP(conn,sourceBean,user,SalesTargetConstants.STATUS_FINISH);
+				logger.debug("prevDataExist:"+prevDataExist);
 				
 				boolean foundDataMKTPost = chkAllTargetIsMKTPost(conn,destBean,user);
+				logger.debug("foundDataMKTPost:"+foundDataMKTPost);
 				
 				if(prevDataExist == false){
 					errorCode ="DATA_PREV_NOT_FOUND";
@@ -95,13 +101,13 @@ public class SalesTargetTTSUPERCopy {
 		boolean h = false;
 		String priceListId  ="";
 		BigDecimal idNew = new BigDecimal("0");
-		boolean foundDataMKTPost = false;
 		String keyPriceListMap = "";
 		Map<String,String> priceListMap = new HashMap<String, String>();
+		boolean curBrandExist = false;
 		try {
 			sourceBean = SalesTargetDAO.convertCriteria(sourceBean);
 			
-			sql.append("\n select M.id ,M.customer_category ,M.salesrep_id ");
+			sql.append("\n select M.id ,M.customer_category ,M.salesrep_id ,M.salesrep_code ");
 			sql.append("\n ,M.customer_id ,M.sales_channel ,Z.zone,M.brand");
 			sql.append("\n from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
 			sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
@@ -111,6 +117,18 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n and M.target_month = '"+Utils.isNull(sourceBean.getTargetMonth())+"'");
 			sql.append("\n and M.target_quarter = '"+Utils.isNull(sourceBean.getTargetQuarter())+"'");
 			sql.append("\n and M.target_year = '"+Utils.isNull(sourceBean.getTargetYear())+"'");
+			
+			//filter by criteria
+			if( !Utils.isNull(sourceBean.getBrand()).equals("")){
+				sql.append("\n and M.brand = '"+sourceBean.getBrand()+"'");
+			}
+			if( !Utils.isNull(sourceBean.getCustCatNo()).equals("")){
+				sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(sourceBean.getCustCatNo())+"'");
+			}
+			if( !Utils.isNull(sourceBean.getSalesZone()).equals("")){
+				sql.append("\n and Z.zone = '"+Utils.isNull(sourceBean.getSalesZone())+"'");
+			}
+			
 			//filter by user login Except admin
 		    if( !user.getUserName().equalsIgnoreCase("admin")){
 		    	sql.append("\n  and (M.CUSTOMER_CATEGORY,Z.zone) in(");
@@ -133,6 +151,15 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n  	and M.target_month = '"+Utils.isNull(destBean.getTargetMonth())+"'");
 			sql.append("\n  	and M.target_quarter = '"+Utils.isNull(destBean.getTargetQuarter())+"'");
 			sql.append("\n  	and M.target_year = '"+Utils.isNull(destBean.getTargetYear())+"'");
+			if( !Utils.isNull(sourceBean.getBrand()).equals("")){
+				sql.append("\n  	and M.brand = '"+sourceBean.getBrand()+"'");
+			}
+			if( !Utils.isNull(sourceBean.getCustCatNo()).equals("")){
+				sql.append("\n  	and M.CUSTOMER_CATEGORY = '"+Utils.isNull(sourceBean.getCustCatNo())+"'");
+			}
+			if( !Utils.isNull(sourceBean.getSalesZone()).equals("")){
+				sql.append("\n  	and M.zone = '"+Utils.isNull(sourceBean.getSalesZone())+"'");
+			}
 		    sql.append("\n  )");
 		    
 			logger.debug("sql:"+sql);
@@ -143,17 +170,19 @@ public class SalesTargetTTSUPERCopy {
 				destBean.setCustCatNo(Utils.isNull(rst.getString("customer_category")));
 				destBean.setSalesZone(Utils.isNull(rst.getString("zone")));
 				destBean.setBrand(Utils.isNull(rst.getString("brand")));
-				//validate brand MKT Post TO Sales 
+				destBean.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
 				
-				//foundDataMKTPost = getBrandIsMKTPost(conn,destBean,user);
+				curBrandExist = salesTargetIsExistTEMP(conn,destBean,user,"");
+				logger.debug("*****Check CurBrandExist by salesrepID ********");
+				logger.debug("custCatNo["+destBean.getCustCatNo()+"]");
+				logger.debug("Zone["+destBean.getSalesZone()+"]");
+				logger.debug("brand["+destBean.getBrand()+"]");
+				logger.debug("salesrepCode["+rst.getString("salesrep_code")+"]");
+				logger.debug("***** curBrandExist["+curBrandExist+"] ********");
 				
-				 if(true){//if(foundDataMKTPost){
+				if(!curBrandExist){
 					//insert head
 					idNew = insertHeadTTSUPER(conn, destBean, rst.getBigDecimal("id"));
-					//set for get Avg Order
-					destBean.setCustCatNo(Utils.isNull(rst.getString("customer_category")));
-					destBean.setSalesZone(Utils.isNull(rst.getString("zone")));
-					destBean.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
 					
 					keyPriceListMap = Utils.isNull(rst.getString("zone"))+"_"+Utils.isNull(rst.getString("customer_category"));
 					if(priceListMap.get(keyPriceListMap) != null){
@@ -303,7 +332,7 @@ public class SalesTargetTTSUPERCopy {
 		boolean h = false;
 		try {
 			cri = SalesTargetDAO.convertCriteria(cri);
-			sql.append("\n  select M.id ");
+			sql.append("\n  select count(*) as c");
 			sql.append("\n  from XXPENS_BI_SALES_TARGET_TEMP M ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n  where M.salesrep_id = Z.salesrep_id");
 			sql.append("\n  and M.division = 'B' ");//B = credit,van sales
@@ -313,6 +342,22 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n  and M.target_month = '"+Utils.isNull(cri.getTargetMonth())+"'");
 			sql.append("\n  and M.target_quarter = '"+Utils.isNull(cri.getTargetQuarter())+"'");
 			sql.append("\n  and M.target_year = '"+Utils.isNull(cri.getTargetYear())+"'");
+			
+			//filter by criteria
+			if( !Utils.isNull(cri.getBrand()).equals("")){
+				sql.append("\n  and M.brand = '"+cri.getBrand()+"'");
+			}
+			if( !Utils.isNull(cri.getCustCatNo()).equals("")){
+				sql.append("\n  and M.CUSTOMER_CATEGORY = '"+Utils.isNull(cri.getCustCatNo())+"'");
+			}
+			if( !Utils.isNull(cri.getSalesZone()).equals("")){
+				sql.append("\n  and Z.zone = '"+Utils.isNull(cri.getSalesZone())+"'");
+			}
+			
+			//Case check by Exist By brand salesrepId
+			if( !Utils.isNull(cri.getSalesrepId()).equals("")){
+				sql.append("\n  and M.salesrep_id = "+Utils.isNull(cri.getSalesrepId())+"");
+			}
 			
 			//filter by user login Except admin
 		    if( !user.getUserName().equalsIgnoreCase("admin")){
@@ -331,7 +376,7 @@ public class SalesTargetTTSUPERCopy {
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 			if(rst.next()) {
-			   if(rst.getInt("id") >0){
+			   if(rst.getInt("c") >0){
 				   h = true;
 			   }
 			}//if
@@ -353,14 +398,22 @@ public class SalesTargetTTSUPERCopy {
 		boolean h = false;
 		try {
 			cri = SalesTargetDAO.convertCriteria(cri);
-			sql.append("\n  select M.id ");
-			sql.append("\n  from XXPENS_BI_SALES_TARGET_TT M ");
+			sql.append("\n  select M.id from PENSBI.XXPENS_BI_SALES_TARGET_TT M ");
 			sql.append("\n  where 1=1");
-			
 			sql.append("\n  and M.status ='"+SalesTargetConstants.STATUS_POST+"'");
 			sql.append("\n  and M.target_month = '"+Utils.isNull(cri.getTargetMonth())+"'");
 			sql.append("\n  and M.target_quarter = '"+Utils.isNull(cri.getTargetQuarter())+"'");
 			sql.append("\n  and M.target_year = '"+Utils.isNull(cri.getTargetYear())+"'");
+			//filter by criteria
+			if( !Utils.isNull(cri.getBrand()).equals("")){
+				sql.append("\n   and M.brand = '"+cri.getBrand()+"'");
+			}
+			if( !Utils.isNull(cri.getCustCatNo()).equals("")){
+				sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(cri.getCustCatNo())+"'");
+			}
+			if( !Utils.isNull(cri.getSalesZone()).equals("")){
+				sql.append("\n and M.zone = '"+Utils.isNull(cri.getSalesZone())+"'");
+			}
 			
 			//filter by user login Except admin
 		    if( !user.getUserName().equalsIgnoreCase("admin")){

@@ -19,10 +19,11 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
@@ -187,7 +188,7 @@ public class ITStockAction extends I_Action {
 				c.setId(Utils.convertStrToInt(id));
 				ITManageBean bean = ITStockDAO.searchHead(c,true,false,1,pageSize).getItems().get(0);
 				
-				bean.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setDocDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				bean.setId(0);;
 				
 				List<ITManageBean> items = new ArrayList<ITManageBean>();
@@ -205,7 +206,7 @@ public class ITStockAction extends I_Action {
 				   ITManageBean bean = ITStockDAO.searchHead(c,true,false,1,pageSize).getItems().get(0);
 				   aForm.setBean(bean);
 				}else{
-				   c.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   c.setDocDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   aForm.setBean(c);
 				}
 			}
@@ -366,7 +367,7 @@ public class ITStockAction extends I_Action {
 				    
 					 //set for new insert
 					 ITManageBean c = new ITManageBean();
-					 c.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 c.setDocDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					 aForm.setBean(c);
 				     aForm.setMode("add");//Mode Edit
 				

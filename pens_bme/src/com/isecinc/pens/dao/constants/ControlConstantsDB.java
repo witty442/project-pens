@@ -10,7 +10,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.BMEControlBean;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class ControlConstantsDB {
@@ -106,8 +107,8 @@ public class ControlConstantsDB {
 			try {
 				
 				//Budish to ChristDate
-				Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date asofDateTemp = DateUtil.parse(asOfdate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String christAsOfDateStr = DateUtil.stringValue(asofDateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				//Get YearMonth By StoreCode and asOfdate
 				yearMonthAsOfDate = getYearMonthByAsOfDate(conn,storeCode,asOfdate);
@@ -265,8 +266,8 @@ public class ControlConstantsDB {
 			StringBuilder sql = new StringBuilder();
 			BMEControlBean bean = new BMEControlBean();
 			try {
-				Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date asofDateTemp = DateUtil.parse(asOfdate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String christAsOfDateStr = DateUtil.stringValue(asofDateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n select distinct max(year_month) as year_month FROM PENSBME_ENDING_STOCK WHERE 1=1 ");
 				sql.append("\n and store_code ='"+storeCode+"'");
@@ -370,7 +371,7 @@ public class ControlConstantsDB {
 			String[] results = new String[3];
 			//int diffMonth = 0;
 			try {
-				Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date asofDateTemp = DateUtil.parse(asOfdate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				//String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n select distinct max(ending_date) as max_ending_date FROM PENSBME_ENDDATE_STOCK WHERE 1=1 ");
@@ -423,8 +424,8 @@ public class ControlConstantsDB {
 			String[] results = new String[3];
 			int diffMonth = 0;
 			try {
-				Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date asofDateTemp = DateUtil.parse(asOfdate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String christAsOfDateStr = DateUtil.stringValue(asofDateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n select distinct max(year_month) as max_year_month FROM PENSBME_ENDING_STOCK WHERE 1=1 ");
 				sql.append("\n and store_code ='"+storeCode+"'");

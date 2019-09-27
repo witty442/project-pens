@@ -43,7 +43,9 @@
 		<form-bean name="adminConsoleForm" type="com.isecinc.pens.web.adminconsole.AdminConsoleForm" />
 		<form-bean name="billPlanForm" type="com.isecinc.pens.web.billplan.BillPlanForm" />
 		<form-bean name="manageProfileSearchForm" type="com.isecinc.pens.web.profilesearch.ManageProfileSearchForm" />
-		
+		<form-bean name="batchTaskForm" type="com.isecinc.pens.web.batchtask.BatchTaskForm"/>
+		<form-bean name="b2bForm" type="com.isecinc.pens.web.b2b.B2BForm"/>
+		<form-bean name="vanForm" type="com.isecinc.pens.web.van.VanForm"/>
 	</form-beans>
 	
 	<global-forwards>
@@ -131,6 +133,7 @@
 		
 		<action name="salesTargetForm" path="/jsp/salesTargetAction" parameter="do" scope="session" type="com.isecinc.pens.web.salestarget.SalesTargetAction">
 			<forward name="search" path="/jsp/salestarget/salesTargetSearch.jsp" />
+			<forward name="searchPD" path="/jsp/salestarget/salesTargetPDSearch.jsp" />
 			<forward name="detail" path="/jsp/salestarget/salesTarget.jsp" />
 			<forward name="detailTTMKT" path="/jsp/salestarget/salesTargetTTMKT.jsp" />
 			<forward name="detailTTSUPER" path="/jsp/salestarget/salesTargetTTSUPER.jsp" />
@@ -147,6 +150,10 @@
 		</action>
 		<action name="stockOnhandForm" path="/jsp/stockOnhandAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockonhand.StockOnhandAction">
 			<forward name="search" path="/jsp/stockonhand/stockOnhandSearch.jsp" />
+		</action>
+		<action name="vanForm" path="/jsp/vanAction" parameter="do" scope="session" type="com.isecinc.pens.web.van.VanAction">
+			<forward name="search" path="/jsp/van/vanSearch.jsp" />
+			<forward name="detail" path="/jsp/van/vanDetail.jsp" />
 		</action>
 		<action name="promotionForm" path="/jsp/promotionAction" parameter="do" scope="session" type="com.isecinc.pens.web.promotion.PromotionAction">
 			<forward name="search" path="/jsp/promotion/promotionSearch.jsp" />
@@ -172,6 +179,15 @@
 		<action name="adminConsoleForm" path="/jsp/adminConsole" parameter="do" scope="request" type="com.isecinc.pens.web.adminconsole.AdminConsoleAction" >
 			<forward name="process" path="/jsp/adminConsole/adminConsole.jsp" />
 		</action>
+		<action  name="batchTaskForm" path="/jsp/batchTaskAction" parameter="do" 
+		     scope="session" type="com.isecinc.pens.web.batchtask.BatchTaskAction" >
+           <forward name="search" path="/jsp/batchtask/batchTask.jsp"></forward>
+        </action>
+        <action  name="b2bForm" path="/jsp/b2bAction" parameter="do" 
+		     scope="session" type="com.isecinc.pens.web.b2b.B2BAction" >
+           <forward name="search" path="/jsp/b2b/b2bSearch.jsp"></forward>
+        </action>
+        
 	</action-mappings>
  
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

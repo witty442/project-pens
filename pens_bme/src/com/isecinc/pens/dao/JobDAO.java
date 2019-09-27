@@ -18,7 +18,8 @@ import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -119,8 +120,8 @@ public class JobDAO extends PickConstants{
 				   h.setCustGroup(Utils.isNull(rst.getString("cust_group")));
 				   h.setCustGroupDesc(Utils.isNull(rst.getString("cust_group_desc")));
 				   h.setJobId(rst.getString("job_id"));
-				   h.setOpenDate(Utils.stringValue(rst.getTimestamp("open_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   h.setCloseDate(Utils.stringValueNull(rst.getDate("close_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));  
+				   h.setOpenDate(DateUtil.stringValue(rst.getTimestamp("open_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setCloseDate(DateUtil.stringValueNull(rst.getDate("close_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));  
 				   h.setName(Utils.isNull(rst.getString("name"))); 
 				   h.setStatus(Utils.isNull(rst.getString("status"))); 
 				   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("status")))); 
@@ -199,13 +200,13 @@ public class JobDAO extends PickConstants{
 			sql.append("\n and STATUS = '"+Utils.isNull(o.getStatus())+"' ");
 		}
 		if( !Utils.isNull(o.getOpenDate()).equals("")){
-			Date tDate  = Utils.parse(o.getOpenDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String tDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getOpenDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tDateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			sql.append("\n and OPEN_DATE = to_date('"+tDateStr+"','dd/mm/yyyy')");
 		}
 		if( !Utils.isNull(o.getCloseDate()).equals("")){
-			Date tDate  = Utils.parse(o.getCloseDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String tDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getCloseDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tDateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			sql.append("\n and CLOSE_DATE = to_date('"+tDateStr+"','dd/mm/yyyy')");
 		}
 		if( !Utils.isNull(o.getCustGroup()).equals("")){
@@ -281,13 +282,13 @@ public class JobDAO extends PickConstants{
 				sql.append("\n and name like '%"+Utils.isNull(o.getName())+"%'  ");
 			}
 			if( !Utils.isNull(o.getOpenDate()).equals("")){
-				Date tDate  = Utils.parse(o.getOpenDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String cDate = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+				Date tDate  = DateUtil.parse(o.getOpenDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String cDate = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 				sql.append("\n and OPEN_DATE = to_date('"+cDate+"','dd/mm/yyyy') ");
 			}
 			if( !Utils.isNull(o.getCloseDate()).equals("")){
-				Date tDate  = Utils.parse(o.getCloseDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String cDate = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+				Date tDate  = DateUtil.parse(o.getCloseDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String cDate = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 				sql.append("\n and CLOSE_DATE = to_date('"+cDate+"','dd/mm/yyyy') ");
 			}
 			sql.append("\n order by job_id asc ");
@@ -300,10 +301,10 @@ public class JobDAO extends PickConstants{
 				   h.setNo(r);
 				   h.setJobId(rst.getString("job_id"));
 				   h.setCustGroup(Utils.isNull(rst.getString("cust_group")));
-				   h.setOpenDate(Utils.stringValue(rst.getDate("open_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setOpenDate(DateUtil.stringValue(rst.getDate("open_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   
 				   if(rst.getDate("close_date") !=null){
-				      h.setCloseDate(Utils.stringValue(rst.getDate("close_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				      h.setCloseDate(DateUtil.stringValue(rst.getDate("close_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }
 				   h.setName(Utils.isNull(rst.getString("name"))); 
 				   h.setStatus(Utils.isNull(rst.getString("status"))); 
@@ -570,7 +571,7 @@ public class JobDAO extends PickConstants{
 				
 				ps = conn.prepareStatement(sql.toString());
 					
-				Date openDate = Utils.parse( o.getOpenDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date openDate = DateUtil.parse( o.getOpenDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				int c =1;
 				
@@ -615,8 +616,8 @@ public class JobDAO extends PickConstants{
 				
 				ps = conn.prepareStatement(sql.toString());
 					
-				Date openDate = Utils.parse( o.getOpenDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				Date closeDate = Utils.parse( o.getCloseDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date openDate = DateUtil.parse( o.getOpenDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date closeDate = DateUtil.parse( o.getCloseDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				int c =1;
 				
 				ps.setInt(c++, Integer.parseInt(o.getJobId()));
@@ -653,13 +654,13 @@ public class JobDAO extends PickConstants{
 				sql.append(" UPDATE PENSBI.PENSBME_PICK_JOB SET NAME = ? \n");
 				sql.append(" ,STATUS = ?   \n");
 				if( !Utils.isNull(o.getOpenDate()).equals("")){
-				   Date tDate  = Utils.parse(o.getOpenDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				   String cDate = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+				   Date tDate  = DateUtil.parse(o.getOpenDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				   String cDate = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 				   sql.append(" ,OPEN_DATE = to_date('"+cDate+"','dd/mm/yyyy')  \n");
 				}
 				if( !Utils.isNull(o.getCloseDate()).equals("")){
-					 Date tDate  = Utils.parse(o.getCloseDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					 String cDate = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					 Date tDate  = DateUtil.parse(o.getCloseDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					 String cDate = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 					 sql.append(" ,CLOSE_DATE = to_date('"+cDate+"','dd/mm/yyyy')  \n");
 				}
 				

@@ -13,7 +13,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.dao.ToolManageDAO;
-import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -93,7 +93,7 @@ public class ToolManageReport {
 					   h.append("<td class='text' align='left' width='15%'>"+store.getCustGroup()+"-"+store.getCustGroupName()+"</td> \n");
 					}else{
 					   h.append("<td class='text' align='left' width='15%'>"+store.getStoreCode()+"-"+store.getStoreName()+"</td> \n");
-					   h.append("<td class='text' align='left' width='5%'>"+Utils.stringValue(store.getCountStkDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td> \n");
+					   h.append("<td class='text' align='left' width='5%'>"+DateUtil.stringValue(store.getCountStkDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td> \n");
 					}
 					//Loop Item
 					for(int c=0;c<itemList.size();c++){
@@ -155,7 +155,7 @@ public class ToolManageReport {
 				ToolManageBean bean = storeList.get(i);
 				if( bean.getCountStkDate() != null){
 					countStkDate = bean.getCountStkDate();
-					asOfDate = Utils.parse(Utils.isNull(asOfDateStr), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					asOfDate = DateUtil.parse(Utils.isNull(asOfDateStr), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					logger.debug("countStkDate:"+countStkDate);
 					logger.debug("asOfDate:"+asOfDate);
 					if(asOfDate.before(countStkDate) || asOfDate.equals(countStkDate)){
@@ -175,7 +175,7 @@ public class ToolManageReport {
 		Date countStkDate = null;
 		if( bean.getCountStkDate() != null){
 			countStkDate = bean.getCountStkDate();
-			asOfDate = Utils.parse(Utils.isNull(asOfDateStr), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			asOfDate = DateUtil.parse(Utils.isNull(asOfDateStr), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			logger.debug("countStkDate:"+countStkDate);
 			logger.debug("asOfDate:"+asOfDate);
 			if(asOfDate.before(countStkDate) || asOfDate.equals(countStkDate)){
@@ -428,7 +428,7 @@ public class ToolManageReport {
      	       sql.append("\n and H.store_code = '"+Utils.isNull(bean.getStoreCode())+"' ");
      	    }
      	    if( countStkDate != null){
-     	       sql.append("\n and H.Count_stk_date = to_date('"+Utils.stringValue(countStkDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+     	       sql.append("\n and H.Count_stk_date = to_date('"+DateUtil.stringValue(countStkDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
      	    }
             sql.append("\n  UNION ");
             
@@ -451,7 +451,7 @@ public class ToolManageReport {
      	       sql.append("\n and H.store_code = '"+Utils.isNull(bean.getStoreCode())+"' ");
      	    }
      	    if( countStkDate != null){
-     	       sql.append("\n and H.Count_stk_date = to_date('"+Utils.stringValue(countStkDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+     	       sql.append("\n and H.Count_stk_date = to_date('"+DateUtil.stringValue(countStkDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
      	    }
 		    sql.append("\n   group by H.store_code,D.item");
 		    sql.append("\n )INIT ON M.store_code=INIT.store_code and M.item = INIT.item ");
@@ -514,12 +514,12 @@ public class ToolManageReport {
 		StringBuffer sql = new StringBuffer("");
 
 		if(o.getCountStkDate() != null){
-			 Date asOfDate = Utils.parse(Utils.isNull(o.getDocDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			 sql.append("\n AND H.doc_date > to_date('"+Utils.stringValue(o.getCountStkDate(), Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')  ");
-			 sql.append("\n AND H.doc_date <= to_date('"+Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')  ");
+			 Date asOfDate = DateUtil.parse(Utils.isNull(o.getDocDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			 sql.append("\n AND H.doc_date > to_date('"+DateUtil.stringValue(o.getCountStkDate(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')  ");
+			 sql.append("\n AND H.doc_date <= to_date('"+DateUtil.stringValue(asOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')  ");
 		}else{
-			 Date asOfDate = Utils.parse(Utils.isNull(o.getDocDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-		     sql.append("\n and H.doc_date <= to_date('"+Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+			 Date asOfDate = DateUtil.parse(Utils.isNull(o.getDocDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+		     sql.append("\n and H.doc_date <= to_date('"+DateUtil.stringValue(asOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
 		}
 
 	    if( !Utils.isNull(o.getCustGroup()).equals("")){

@@ -3,7 +3,6 @@ package com.isecinc.pens.web.imports;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,6 +28,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
+import com.isecinc.pens.bean.FTPFileBean;
 import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.MasterBean;
@@ -38,11 +38,10 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.inf.bean.FTPFileBean;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.export.ExportReturnWacoal;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
-import com.pens.util.NumberUtil;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 
@@ -319,7 +318,7 @@ public class ImportProcess {
 				logger.debug("select sheet(" + (sheetNo + 1) + ") name: " + sheet.getSheetName());
 	            logger.debug("getLastRowNum:"+sheet.getLastRowNum());
 	            
-	            Date countDate = Utils.parse( importForm.getCountDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+	            Date countDate = DateUtil.parse( importForm.getCountDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 	            String custCode = importForm.getCustCode();
 	            String barcode = "";
 	            
@@ -936,7 +935,7 @@ public class ImportProcess {
 						  //SALES_DATE
 						  java.util.Date asOfDate =  (java.util.Date) cellValue;
 						  logger.debug("Date:"+asOfDate);
-						  salesDate = Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH);
+						  salesDate = DateUtil.stringValue(asOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 						  logger.debug("salesDate:"+salesDate);
 						  ps.setTimestamp(12, new java.sql.Timestamp(asOfDate.getTime()));  
 						}else if(colNo==12){
@@ -1357,7 +1356,7 @@ public class ImportProcess {
 							cellValue  = cell.getDateCellValue();
 							java.util.Date asOfDate =  (java.util.Date) cellValue;
 							//logger.debug("Date:"+asOfDate);
-							salesDate = Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH);
+							salesDate = DateUtil.stringValue(asOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 							logger.debug("salesDate:"+salesDate);
 							
 							logger.debug("1index:"+index);
@@ -1837,7 +1836,7 @@ public class ImportProcess {
 						if(colNo==0){
 							String sciValue = String.valueOf((Double)xslUtils.getCellValue(colNo, cell));
 							logger.debug("sciVal:"+sciValue);
-							ps.setString(index++,NumberUtil.convertSciToDecimal(sciValue));
+							ps.setString(index++,Utils.convertSciToDecimal(sciValue));
 						}else if(colNo==1){
 						   //Desc
 							desc = Utils.isNull(cellValue);
@@ -1928,7 +1927,7 @@ public class ImportProcess {
 			         }
 
 			         //SALES_DATE
-			         ps.setDate(index++, new java.sql.Date(Utils.parse(salesDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			         ps.setDate(index++, new java.sql.Date(DateUtil.parse(salesDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
 			         //CUST_GROUP
 			         ps.setString(index++, storeGroup);
 			         //CUST_NO
@@ -2200,7 +2199,7 @@ public class ImportProcess {
 						  //SALES_DATE
 						  java.util.Date asOfDate =  (java.util.Date) cellValue;
 						  logger.debug("Date:"+asOfDate);
-						  salesDate = Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH);
+						  salesDate = DateUtil.stringValue(asOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 						  logger.debug("salesDate:"+salesDate);
 						  ps.setDate(8, new java.sql.Date(asOfDate.getTime()));  
 						}else if(colNo==8){
@@ -2458,11 +2457,11 @@ public class ImportProcess {
 			
 			/** Step 1 Validate Name Date of File ,Must more than old import  **/
 			String fileName = dataFile.getFileName();
-			java.util.Date fileNameAsOfDate = Utils.parse(fileName.substring(9,17),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+			java.util.Date fileNameAsOfDate = DateUtil.parse(fileName.substring(9,17),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 			// Get LastFileNameImport 
 			String lastFileNameImport = importDAO.getLastFileNameImport(conn);
 			if( !Utils.isNull(lastFileNameImport).equals("")){
-				java.util.Date lastFileNameAsOfDate = Utils.parse(lastFileNameImport.substring(9,17),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+				java.util.Date lastFileNameAsOfDate = DateUtil.parse(lastFileNameImport.substring(9,17),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 				if(fileNameAsOfDate.before(lastFileNameAsOfDate)){ //dateImport < lastDateImport
 					request.setAttribute("Message","ชื่อไฟล์ที่  Upload ["+fileName+"] วันที่น้อยกว่า  ชื่อไฟล์วันที่ล่าสุดที่  Upload ["+lastFileNameImport+"] ");
 					return mapping.findForward("success");
@@ -2576,7 +2575,7 @@ public class ImportProcess {
 				         ImportSummary s = new ImportSummary();
 				         s.setRow(i+1);
 				         OnhandSummary oh = new OnhandSummary();
-				         oh.setAsOfDate(Utils.stringValue(fileNameAsOfDate, Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+				         oh.setAsOfDate(DateUtil.stringValue(fileNameAsOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 				         oh.setItem(Utils.isNull(item));
 				         oh.setItemDesc(Utils.isNull(itemDesc));
 				         oh.setOnhandQty(Utils.isNull(onhandQty+onhandQty2Digit));
@@ -2817,11 +2816,11 @@ public class ImportProcess {
 			String fileName = dataFile.getFileName();
 			logger.debug("dateSubStr:"+fileName.substring(10,18));
 			
-			java.util.Date fileNameAsOfDate = Utils.parse(fileName.substring(10,18),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+			java.util.Date fileNameAsOfDate = DateUtil.parse(fileName.substring(10,18),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 			// Get LastFileNameImport 
 			String lastFileNameImport = importDAO.getLastFileNameImportFriday(conn);
 			if( !Utils.isNull(lastFileNameImport).equals("")){
-				java.util.Date lastFileNameAsOfDate = Utils.parse(lastFileNameImport.substring(10,18),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+				java.util.Date lastFileNameAsOfDate = DateUtil.parse(lastFileNameImport.substring(10,18),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 				
 				if(fileNameAsOfDate.before(lastFileNameAsOfDate)){ //dateImport < lastDateImport
 					request.setAttribute("Message","ชื่อไฟล์ที่  Upload ["+fileName+"] วันที่น้อยกว่า  ชื่อไฟล์วันที่ล่าสุดที่  Upload ["+lastFileNameImport+"] ");
@@ -2937,7 +2936,7 @@ public class ImportProcess {
 				         ImportSummary s = new ImportSummary();
 				         s.setRow(i+1);
 				         OnhandSummary oh = new OnhandSummary();
-				         oh.setAsOfDate(Utils.stringValue(fileNameAsOfDate, Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+				         oh.setAsOfDate(DateUtil.stringValue(fileNameAsOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 				         oh.setItem(Utils.isNull(item));
 				         oh.setItemDesc(Utils.isNull(itemDesc));
 				         oh.setOnhandQty(Utils.isNull(onhandQty+onhandQty2Digit));
@@ -3184,11 +3183,11 @@ public class ImportProcess {
 			String fileName = dataFile.getFileName();
 			logger.debug("dateSubStr:"+fileName.substring(12,20));
 			
-			java.util.Date fileNameAsOfDate = Utils.parse(fileName.substring(12,20),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+			java.util.Date fileNameAsOfDate = DateUtil.parse(fileName.substring(12,20),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 			// Get LastFileNameImport 
 			String lastFileNameImport = importDAO.getLastFileNameImportTVDirect(conn);
 			if( !Utils.isNull(lastFileNameImport).equals("")){
-				java.util.Date lastFileNameAsOfDate = Utils.parse(lastFileNameImport.substring(12,20),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+				java.util.Date lastFileNameAsOfDate = DateUtil.parse(lastFileNameImport.substring(12,20),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 				
 				if(fileNameAsOfDate.before(lastFileNameAsOfDate)){ //dateImport < lastDateImport
 					request.setAttribute("Message","ชื่อไฟล์ที่  Upload ["+fileName+"] วันที่น้อยกว่า  ชื่อไฟล์วันที่ล่าสุดที่  Upload ["+lastFileNameImport+"] ");
@@ -3296,7 +3295,7 @@ public class ImportProcess {
 				         ImportSummary s = new ImportSummary();
 				         s.setRow(i+1);
 				         OnhandSummary oh = new OnhandSummary();
-				         oh.setAsOfDate(Utils.stringValue(fileNameAsOfDate, Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+				         oh.setAsOfDate(DateUtil.stringValue(fileNameAsOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 				         oh.setItem(Utils.isNull(item));
 				         oh.setItemDesc(Utils.isNull(itemDesc));
 				         oh.setOnhandQty(Utils.isNull(onhandQty+onhandQty2Digit));
@@ -3515,11 +3514,11 @@ public class ImportProcess {
 			String fileName = dataFile.getFileName();
 			logger.debug("dateSubStr:"+fileName.substring(12,20));
 			
-			java.util.Date fileNameAsOfDate = Utils.parse(fileName.substring(12,20),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+			java.util.Date fileNameAsOfDate = DateUtil.parse(fileName.substring(12,20),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 			// Get LastFileNameImport 
 			String lastFileNameImport = importDAO.getLastFileNameImport7Catalog(conn);
 			if( !Utils.isNull(lastFileNameImport).equals("")){
-				java.util.Date lastFileNameAsOfDate = Utils.parse(lastFileNameImport.substring(12,20),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+				java.util.Date lastFileNameAsOfDate = DateUtil.parse(lastFileNameImport.substring(12,20),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 				
 				if(fileNameAsOfDate.before(lastFileNameAsOfDate)){ //dateImport < lastDateImport
 					request.setAttribute("Message","ชื่อไฟล์ที่  Upload ["+fileName+"] วันที่น้อยกว่า  ชื่อไฟล์วันที่ล่าสุดที่  Upload ["+lastFileNameImport+"] ");
@@ -3627,7 +3626,7 @@ public class ImportProcess {
 				         ImportSummary s = new ImportSummary();
 				         s.setRow(i+1);
 				         OnhandSummary oh = new OnhandSummary();
-				         oh.setAsOfDate(Utils.stringValue(fileNameAsOfDate, Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+				         oh.setAsOfDate(DateUtil.stringValue(fileNameAsOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 				         oh.setItem(Utils.isNull(item));
 				         oh.setItemDesc(Utils.isNull(itemDesc));
 				         oh.setOnhandQty(Utils.isNull(onhandQty+onhandQty2Digit));
@@ -3845,7 +3844,7 @@ public class ImportProcess {
 			String fileName = dataFile.getFileName();
 			logger.debug("dateSubStr:"+fileName.substring(14,22));
 			
-			java.util.Date fileNameAsOfDate = Utils.parse(fileName.substring(14,22),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+			java.util.Date fileNameAsOfDate = DateUtil.parse(fileName.substring(14,22),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 			// Get LastFileNameImport 
 			String lastFileNameImport = importDAO.getLastFileNameImportOShopping(conn);
 			logger.debug("lastFileNameImport:"+lastFileNameImport);
@@ -3853,7 +3852,7 @@ public class ImportProcess {
 			if( !Utils.isNull(lastFileNameImport).equals("")){
 				logger.debug(lastFileNameImport.substring(14,22));
 				
-				java.util.Date lastFileNameAsOfDate = Utils.parse(lastFileNameImport.substring(14,22),Utils.YYYY_MM_DD_WITHOUT_SLASH);
+				java.util.Date lastFileNameAsOfDate = DateUtil.parse(lastFileNameImport.substring(14,22),DateUtil.YYYY_MM_DD_WITHOUT_SLASH);
 				logger.debug("lastFileNameAsOfDate:"+lastFileNameAsOfDate);
 				
 				if(fileNameAsOfDate.before(lastFileNameAsOfDate)){ //dateImport < lastDateImport
@@ -3962,7 +3961,7 @@ public class ImportProcess {
 				         ImportSummary s = new ImportSummary();
 				         s.setRow(i+1);
 				         OnhandSummary oh = new OnhandSummary();
-				         oh.setAsOfDate(Utils.stringValue(fileNameAsOfDate, Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+				         oh.setAsOfDate(DateUtil.stringValue(fileNameAsOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 				         oh.setItem(Utils.isNull(item));
 				         oh.setItemDesc(Utils.isNull(itemDesc));
 				         oh.setOnhandQty(Utils.isNull(onhandQty+onhandQty2Digit));
@@ -4206,7 +4205,7 @@ public class ImportProcess {
 							
 							psH.setString(1,lineStrArrPipe[0].substring(1,lineStrArrPipe[0].length()));//docNo
 							
-							Date docDate = Utils.parse(lineStrArrPipe[1], Utils.DD_MM_YYYY_WITHOUT_SLASH);
+							Date docDate = DateUtil.parse(lineStrArrPipe[1], DateUtil.DD_MM_YYYY_WITHOUT_SLASH);
 							psH.setDate(2, new java.sql.Date(docDate.getTime()));
 							psH.setString(3,lineStrArrPipe[2]);//custGroup
 							psH.setString(4,lineStrArrPipe[3]);//custNo

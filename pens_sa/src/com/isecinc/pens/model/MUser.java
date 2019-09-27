@@ -1,6 +1,6 @@
 package com.isecinc.pens.model;
 
-import static util.ConvertNullUtil.convertToString;
+import static com.pens.util.ConvertNullUtil.convertToString;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,13 +10,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import util.ConvertNullUtil;
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.ConvertNullUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * I_Model Class
@@ -86,8 +86,8 @@ public class MUser extends I_Model<User> {
 		Object[] values = { user.getId(), ConvertNullUtil.convertToString(user.getPassword()).trim(),
 				user.getUserGroupId(), activeUserID 
 				,Utils.isNull(user.getName()) ,Utils.isNull(user.getUserName())
-				,new java.sql.Timestamp(Utils.parse(user.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())
-				,Utils.isNull(user.getEndDate()).equals("")?null:new java.sql.Timestamp(Utils.parse(user.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())};
+				,new java.sql.Timestamp(DateUtil.parse(user.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th).getTime())
+				,Utils.isNull(user.getEndDate()).equals("")?null:new java.sql.Timestamp(DateUtil.parse(user.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th).getTime())};
 		return super.save(TABLE_NAME, columns, values, user.getId(), conn);
 	}
 	
@@ -96,8 +96,8 @@ public class MUser extends I_Model<User> {
 		Object[] values = { id, ConvertNullUtil.convertToString(user.getPassword()).trim(),
 				user.getUserGroupId(), activeUserID 
 				,Utils.isNull(user.getName()) ,Utils.isNull(user.getUserName())
-				,new java.sql.Timestamp(Utils.parse(user.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())
-				,Utils.isNull(user.getEndDate()).equals("")?null:new java.sql.Timestamp(Utils.parse(user.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th).getTime())};
+				,new java.sql.Timestamp(DateUtil.parse(user.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th).getTime())
+				,Utils.isNull(user.getEndDate()).equals("")?null:new java.sql.Timestamp(DateUtil.parse(user.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th).getTime())};
 		    
 		  super.saveNew(TABLE_NAME, columns, values,0, conn);
 		return id;
@@ -174,10 +174,10 @@ public class MUser extends I_Model<User> {
 			
 				//String dateStr = Utils.stringValue(new Date(rst.getDate("START_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				if( !Utils.isNull(rst.getString("START_DATE")).equals("")){
-				  u.setStartDate(Utils.stringValue(new Date(rst.getDate("START_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  u.setStartDate(DateUtil.stringValue(new Date(rst.getDate("START_DATE",Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				}
 				if( !Utils.isNull(rst.getString("END_DATE")).equals("")){
-				  u.setEndDate(Utils.stringValue(new Date(rst.getDate("END_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  u.setEndDate(DateUtil.stringValue(new Date(rst.getDate("END_DATE",Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				}
 				u.setTerritory(convertToString(rst.getString("TERRITORY")));
 
@@ -188,7 +188,7 @@ public class MUser extends I_Model<User> {
 		         
 				u.setUserGroupId(rst.getInt("USER_GROUP_ID"));
 				u.setUserGroupName(rst.getString("user_group_name"));
-				u.setActiveLabel(Utils.isStatusActiveByDate(u.getStartDate(),u.getEndDate())?"Active":"InActive");
+				u.setActiveLabel(DateUtil.isStatusActiveByDate(u.getStartDate(),u.getEndDate())?"Active":"InActive");
 				u.setRoleSalesTarget(convertToString(rst.getString("ROLE_SALESTARGET")));
 				
 				dataList.add(u);

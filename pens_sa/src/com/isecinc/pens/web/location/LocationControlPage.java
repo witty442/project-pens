@@ -9,11 +9,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.PopupBean;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 public class LocationControlPage {
 	protected static Logger logger = Logger.getLogger("PENS");

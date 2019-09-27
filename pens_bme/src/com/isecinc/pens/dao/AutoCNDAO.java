@@ -11,22 +11,19 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.Barcode;
-import com.isecinc.pens.bean.LockItemOrderBean;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.autocn.AutoCNBean;
 import com.isecinc.pens.web.popup.PopupForm;
-import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcessAll;
 
 public class AutoCNDAO extends PickConstants{
 	
 	protected static Logger logger = Logger.getLogger("PENS");
 	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
-	static String priceListId = "10012";//Fix
+	public static String priceListId = "10012";//Fix
 	
 	public static List<AutoCNBean> searchJobList(Connection conn,AutoCNBean o,boolean allRec ,int currPage,int pageSize) throws Exception {
 		PreparedStatement ps = null;
@@ -160,13 +157,14 @@ public class AutoCNDAO extends PickConstants{
 		StringBuilder sql = new StringBuilder();
 		AutoCNBean h = null;
 		List<AutoCNBean> items = new ArrayList<AutoCNBean>();
-		try {
+		try { 
 			sql.append("\n select A.* ");
 			sql.append("\n ,nvl((A.qty * A.unit_price),0) as amount");
 			sql.append("\n from (");
             sql.append("\n    select ");
 			sql.append("\n    j.pens_item");
 			sql.append("\n  , M.description as item_name,M.INVENTORY_ITEM_ID ");
+			
 			sql.append("\n  ,(select unit_price from pensbme_unit_price_v ");
 			sql.append("\n    where customer_code = '"+o.getStoreCode()+"' ");
 			sql.append("\n    and inventory_item_id = M.INVENTORY_ITEM_ID  ");
@@ -176,6 +174,10 @@ public class AutoCNDAO extends PickConstants{
 			sql.append("\n     where P.product_id =M.INVENTORY_ITEM_ID " );
 			sql.append("\n     and P.primary_uom_code ='Y' " );
 			sql.append("\n     and P.pricelist_id ="+priceListId+") as unit_price");*/
+			
+			/*sql.append("\n  ,(SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
+			sql.append("\n   where P.INVENTORY_ITEM_ID =M.INVENTORY_ITEM_ID " );
+			sql.append("\n   and P.list_header_id ="+priceListId+") as unit_price");*/
 			
 			sql.append("\n  , nvl(count(*),0) as qty");
 		    sql.append("\n   from pensbme_pick_barcode_item j ,xxpens_om_item_mst_v M ");
@@ -322,7 +324,7 @@ public class AutoCNDAO extends PickConstants{
 			   h.setSeq(rst.getInt("line_number")+"");
 			   h.setRmaOrder(Utils.isNull(rst.getString("rma_order")));
 			   h.setCnNo(Utils.isNull(rst.getString("cn_no")));
-			   h.setCnDate(Utils.stringValueNull(rst.getDate("cn_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCnDate(DateUtil.stringValueNull(rst.getDate("cn_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setRefInv(Utils.isNull(rst.getString("ref_inv")));
 			   h.setPensItem(Utils.isNull(rst.getString("pens_item")));
 			   h.setItemName(Utils.isNull(rst.getString("item_name")));
@@ -409,8 +411,8 @@ public class AutoCNDAO extends PickConstants{
 	       sql.append("\n and j.rtn_no = '"+Utils.isNull(o.getRtnNo())+"' ");
 	    }
 	    if( !Utils.isNull(o.getCuttOffDate()).equals("")){
-	       Date date = Utils.parse(Utils.isNull(o.getCuttOffDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-	       sql.append("\n and j.close_date >= to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+	       Date date = DateUtil.parse(Utils.isNull(o.getCuttOffDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+	       sql.append("\n and j.close_date >= to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
 	    }
 		 return sql;
 	}
@@ -680,15 +682,20 @@ public class AutoCNDAO extends PickConstants{
 				sql.append("\n select MS.pens_value as pens_item ");
 				sql.append("\n ,M.description as item_name,M.INVENTORY_ITEM_ID ");
 				
-				/*sql.append("\n  ,(SELECT max(P.price) from xxpens_bi_mst_price_list P " );
-				sql.append("\n    where P.product_id =M.INVENTORY_ITEM_ID " );
-				sql.append("\n    and P.primary_uom_code ='Y' " );
-				sql.append("\n    and P.pricelist_id ="+priceListId+") as unit_price");
-				*/
 				sql.append("\n  ,(select unit_price from pensbme_unit_price_v ");
 				sql.append("\n    where customer_code = '"+storeCode+"' ");
 				sql.append("\n    and inventory_item_id = M.INVENTORY_ITEM_ID  ");
 				sql.append("\n    and rownum = 1 ) as unit_price");
+				
+				/*sql.append("\n  ,(SELECT max(P.price) from xxpens_bi_mst_price_list P " );
+				sql.append("\n    where P.product_id =M.INVENTORY_ITEM_ID " );
+				sql.append("\n    and P.primary_uom_code ='Y' " );
+				sql.append("\n    and P.pricelist_id ="+priceListId+") as unit_price");*/
+			
+				
+				/*sql.append("\n  ,(SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
+				sql.append("\n   where P.INVENTORY_ITEM_ID =M.INVENTORY_ITEM_ID " );
+				sql.append("\n   and P.list_header_id ="+priceListId+") as unit_price");*/
 				
 				sql.append("\n FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE MS ,PENSBI.xxpens_om_item_mst_v M ");

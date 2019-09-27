@@ -6,7 +6,7 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
+import com.pens.util.DBConnection;
 
 /**
  * SequenceProcess Class

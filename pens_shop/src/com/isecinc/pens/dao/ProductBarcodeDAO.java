@@ -31,6 +31,7 @@ public class ProductBarcodeDAO {
 		 try{
 			 //Init Connection
 			 conn = DBConnection.getInstance().getConnection();
+			 
 			 productBarcode = ProductBarcodeDAO.getProductCodeByBarcodeModel(conn,barcode);
 			 
 			 if(  !Utils.isNull(productBarcode.getProductCode()).equals("") ){
@@ -46,6 +47,7 @@ public class ProductBarcodeDAO {
 			    	productCatalog.setProductName(itemProd.getProductName());
 			    	productCatalog.setUom1(itemProd.getUom1());
 			    	productCatalog.setUom2(itemProd.getUom2());
+			    	
 			    	//productCatalog.setPrice1(itemProd.getPrice1());
 			    	//New Edit 20/11/2018 (price*vat 7%)
 			    	if(itemProd.getPrice1()==0){
@@ -54,13 +56,25 @@ public class ProductBarcodeDAO {
 			    	   //calc price include vat 
 			    	   productCatalog.setPrice1(calePriceIncludeVat(itemProd.getPrice1()));
 			    	}
-			    	productCatalog.setPrice2(0);
-			    	productCatalog.setTaxable(itemProd.getTaxable());
-			    	productCatalog.setQty1(Integer.parseInt(inputQty));//get  from screen input
-			    	productCatalog.setQty2(0);
-			    	//calc from qty1*price1
-			    	Double lineAmt = itemProd.getQty1()*itemProd.getPrice1();
-			    	productCatalog.setLineNetAmt(lineAmt);
+			    	
+			    	/** Case witty:03/09/2562 :Case Product Premium default inputQty = uom2 allway */
+			    	if(productCatalog.getPrice1() == 0){//Product premium price==0     
+			    		productCatalog.setPrice2(0);
+				    	productCatalog.setTaxable(itemProd.getTaxable());
+				    	productCatalog.setQty1(0);
+				    	productCatalog.setQty2(Integer.parseInt(inputQty));//get from screen input
+				    	//calc from qty1*price1
+				    	Double lineAmt = itemProd.getQty2()*itemProd.getPrice1();
+				    	productCatalog.setLineNetAmt(lineAmt);
+			    	}else{
+				    	productCatalog.setPrice2(0);
+				    	productCatalog.setTaxable(itemProd.getTaxable());
+				    	productCatalog.setQty1(Integer.parseInt(inputQty));//get  from screen input
+				    	productCatalog.setQty2(0);
+				    	//calc from qty1*price1
+				    	Double lineAmt = itemProd.getQty1()*itemProd.getPrice1();
+				    	productCatalog.setLineNetAmt(lineAmt);
+			    	}
 			    	
 			    	itemList.add(productCatalog);
 			    	//for test
@@ -76,7 +90,12 @@ public class ProductBarcodeDAO {
 			    }//if itemProd found
 			}//if 
 		 }catch(Exception e){
-			 e.printStackTrace();
+			 //e.printStackTrace();
+			 logger.error(e.getMessage(),e);
+		 }finally{
+			 if(conn != null){
+				 conn.close();conn=null;
+			 }
 		 }
 		 return productBarcode;
 	 }

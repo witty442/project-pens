@@ -1,6 +1,6 @@
-<%@page import="com.isecinc.pens.inf.bean.MonitorItemResultBean"%>
+<%@page import="com.isecinc.pens.bean.MonitorItemResultBean"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.pens.inf.bean.MonitorItemBean"%>
+<%@page import="com.isecinc.pens.bean.MonitorItemBean"%>
 <%@page import="com.isecinc.pens.web.summary.SummaryAction"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

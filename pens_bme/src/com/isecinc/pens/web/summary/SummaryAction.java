@@ -35,6 +35,7 @@ import com.isecinc.pens.web.summary.report.ReportOnhandBigCOracleAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandSizeColorBigCAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandSizeColorKingAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandSizeColorLotusAction;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -308,7 +309,7 @@ public class SummaryAction extends I_Action {
 					 }
 				}else if("ReportStockWacoalLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					//Validate Initial Date
-					Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					Date asOfDate = DateUtil.parse(summaryForm.getOnhandSummary().getSalesDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					
 					Date initDate = new SummaryDAO().searchInitDateWacoalStock(summaryForm.getOnhandSummary().getPensCustCodeFrom());
 					
@@ -338,14 +339,14 @@ public class SummaryAction extends I_Action {
 						}
 						if (results != null  && results.size() >0) {
 							summaryForm.setResults(results);
-							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+							summaryForm.getOnhandSummary().setInitDate(DateUtil.stringValue(initDate,DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 							//get Branch Name
 							GeneralDAO DAO = new GeneralDAO();
 							summaryForm.getOnhandSummary().setPensCustNameFrom(DAO.getBranchName(summaryForm.getOnhandSummary().getPensCustCodeFrom()));
-							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+							summaryForm.getOnhandSummary().setInitDate(DateUtil.stringValue(initDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 						} else {
 							summaryForm.setResults(null);
-							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+							summaryForm.getOnhandSummary().setInitDate(DateUtil.stringValue(initDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 							request.setAttribute("Message", "äÁè¾º¢èÍÁÙÅ");
 						}
 					}
@@ -424,7 +425,7 @@ public class SummaryAction extends I_Action {
 				}else if("onhandMTT".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					request.getSession().setAttribute("summary" ,null);
 					//Validate Initial Date
-					Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					Date asOfDate = DateUtil.parse(summaryForm.getOnhandSummary().getSalesDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					Date initDate = new SummaryDAO().searchInitDateMTT(summaryForm.getOnhandSummary().getPensCustCodeFrom());
 					
 					logger.debug("initDate:"+initDate);
@@ -446,7 +447,7 @@ public class SummaryAction extends I_Action {
 						if (results != null  && results.size() >0) {
 							summaryForm.setResults(results);
 							request.getSession().setAttribute("summary" ,r.getSummary());
-							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+							summaryForm.getOnhandSummary().setInitDate(DateUtil.stringValue(initDate,DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 							
 							ImportDAO importDAO = new ImportDAO();
 							Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
@@ -462,7 +463,7 @@ public class SummaryAction extends I_Action {
 					}
 				}else if("onhandMTTDetail".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					//Validate Initial Date
-					Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					Date asOfDate = DateUtil.parse(summaryForm.getOnhandSummary().getSalesDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					Date initDate = new SummaryDAO().searchInitDateMTT(summaryForm.getOnhandSummary().getPensCustCodeFrom());
 					
 					logger.debug("initDate:"+initDate);
@@ -482,7 +483,7 @@ public class SummaryAction extends I_Action {
 						
 						if (results != null  && results.size() >0) {
 							summaryForm.setOnhandSummaryMTTDetailResults(results);
-							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+							summaryForm.getOnhandSummary().setInitDate(DateUtil.stringValue(initDate,DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 							
 							ImportDAO importDAO = new ImportDAO();
 							Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
@@ -684,7 +685,7 @@ public class SummaryAction extends I_Action {
 
 				}else if("onhandBigCSP".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					//Validate Initial Date
-					Date asOfDate = Utils.parse(summaryForm.getOnhandSummary().getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					Date asOfDate = DateUtil.parse(summaryForm.getOnhandSummary().getSalesDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					Date initDate = new SummaryDAO().searchInitDateBigC(summaryForm.getOnhandSummary().getPensCustCodeFrom());
 					
 					logger.debug("initDate:"+initDate);
@@ -707,7 +708,7 @@ public class SummaryAction extends I_Action {
 						
 						if (results != null  && results.size() >0) {
 							summaryForm.setResults(results);
-							summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+							summaryForm.getOnhandSummary().setInitDate(DateUtil.stringValue(initDate,DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 							
 							ImportDAO importDAO = new ImportDAO();
 							Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());

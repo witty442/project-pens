@@ -28,21 +28,22 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetDimension;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.GenCNBean;
 import com.isecinc.pens.bean.ImportSummary;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.TaskStoreBean;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.OrderDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
@@ -282,7 +283,7 @@ public class ImportOrderToOracleFromExcelTask extends BatchTask implements Batch
 						   //ordered_date
 						   ordered_dateDate =  (java.util.Date) cellValue;
 						   logger.debug("ordered_dateDate:"+ordered_dateDate);
-						   orderedDateStr = Utils.stringValue(ordered_dateDate, Utils.DD_MM_YYYY_WITH_SLASH);
+						   orderedDateStr = DateUtil.stringValue(ordered_dateDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 						   logger.debug("ordered_date Str:"+orderedDateStr);
 						}else if(colNo==2){
 						   //account_number

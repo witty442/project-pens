@@ -731,7 +731,7 @@
 		</action>
 		<action name="manualStockForm" path="/jsp/manualStockAction" parameter="do" scope="session" type="com.isecinc.pens.web.manualstock.ManualStockAction">
 			<forward name="search" path="/jsp/manualStock/manualStockSearch.jsp" />
-			<forward name="detail" path="/jsp/manualstock/manualStock.jsp" />
+			<forward name="detail" path="/jsp/manualStock/manualStock.jsp" />
 		</action>
 	</action-mappings>
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

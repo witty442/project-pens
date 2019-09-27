@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.dao.constants.Constants;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
@@ -17,10 +18,10 @@ public class ReportStockWacoalLotus_SQL {
 		StringBuilder sql = new StringBuilder();
 		String storeCode = "LOTUS";
 		try {
-			String christAsOfDateStr = Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			String christAsOfDateStr = DateUtil.stringValue(asOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			String initDateStr ="";
 			if( initDate != null){
-				initDateStr = Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				initDateStr = DateUtil.stringValue(initDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			}
 			sql.append("\n SELECT A.* FROM(");
 			sql.append("\n SELECT M.*");

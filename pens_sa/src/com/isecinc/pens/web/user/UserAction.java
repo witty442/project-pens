@@ -11,14 +11,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.model.MGroupRole;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * User Action Class
@@ -110,7 +110,6 @@ public class UserAction extends I_Action {
 			if( !Utils.isNull(request.getParameter("action")).equals("init")){
 				//validate newPassword = reNewPassord
 				if( !Utils.isNull(userForm.getUser().getNewPassword()).equals(Utils.isNull(userForm.getUser().getReNewPassword()))){
-					 //request.setAttribute("Message", "New Password not Math Confirm New Password ");
 					 request.setAttribute("Message", SystemMessages.getCaption("NewPasswordNotMatch", Locale.getDefault()));
 				}else{
 					//validate UserName && Password
@@ -118,22 +117,17 @@ public class UserAction extends I_Action {
 					if(user == null){
 						request.setAttribute("Message", SystemMessages.getCaption("NoMemberCodeFor", Locale.getDefault())+userForm.getUser().getUserName());
 					}else{
-						if( userForm.getUser().getPassword().equals(userSession.getPassword())){
-							logger.debug("Password old match");
-							
-							conn = DBConnection.getInstance().getConnection();
-							conn.setAutoCommit(false);
-							new MUser().changePassword(conn, userSession.getId(), Utils.isNull(userForm.getUser().getNewPassword()));
-							//request.setAttribute("Message", "Change Password Success");
-							request.setAttribute("Message", SystemMessages.getCaption("SaveSucess", Locale.getDefault()));
-							conn.commit();
-							
-							request.setAttribute("changePassword", "success");	
-						}else{
-							logger.debug("Password old not match");
-							
-							request.setAttribute("Message", SystemMessages.getCaption("OldPassWrong", Locale.getDefault()));
-						}
+						logger.debug("Password old match");
+						
+						conn = DBConnection.getInstance().getConnection();
+						conn.setAutoCommit(false);
+						new MUser().changePassword(conn, userSession.getId(), Utils.isNull(userForm.getUser().getNewPassword()));
+						//request.setAttribute("Message", "Change Password Success");
+						request.setAttribute("Message", SystemMessages.getCaption("SaveSucess", Locale.getDefault()));
+						conn.commit();
+						
+						request.setAttribute("changePassword", "success");	
+						
 					}
 				}
 			}
@@ -185,7 +179,7 @@ public class UserAction extends I_Action {
 	try {
 		User u = new User();
 		u.setUserName("");
-		u.setStartDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+		u.setStartDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 		userForm.setUser(u);
 		
 	} catch (Exception e) {

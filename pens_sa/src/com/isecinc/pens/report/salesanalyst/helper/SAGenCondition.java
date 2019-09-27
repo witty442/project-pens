@@ -9,13 +9,12 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import util.ControlCode;
-import util.DateToolsUtil;
-import util.Utils;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.SABean;
 import com.isecinc.pens.report.salesanalyst.SAInitial;
+import com.pens.util.ControlCode;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class SAGenCondition {
 	
@@ -124,8 +123,8 @@ public class SAGenCondition {
 		        	  logger.debug("minDateOfMonth:"+yyyymmdd);
 		        	  
 		        	  //maxDateOfMonth
-		        	  date = Utils.parse(yyyymmdd, "yyyyMMdd");
-		        	  yyyymmdd = allYYYYMM_ARR[i]+DateToolsUtil.getMaxDayOfMonth(date);
+		        	  date = DateUtil.parse(yyyymmdd, "yyyyMMdd");
+		        	  yyyymmdd = allYYYYMM_ARR[i]+DateUtil.getMaxDayOfMonth(date);
 		        	  dateReturnArrSort[indexArr] = Integer.parseInt(yyyymmdd);
 		        	  dateReturnArr[indexArr] = yyyymmdd;indexArr++;
 		        	  
@@ -145,8 +144,8 @@ public class SAGenCondition {
 	        	logger.debug("minDateOfMonth:"+yyyymmdd);
 	        	  
 	        	//maxDateOfMonth
-	        	date = Utils.parse(yyyymmdd, "yyyyMMdd");
-	        	yyyymmdd = allYYYYMM+DateToolsUtil.getMaxDayOfMonth(date);
+	        	date = DateUtil.parse(yyyymmdd, "yyyyMMdd");
+	        	yyyymmdd = allYYYYMM+DateUtil.getMaxDayOfMonth(date);
 	        	dateReturnArr[indexArr] = yyyymmdd;indexArr++;
 	        	  
 	        	logger.debug("maxDateOfMonth:"+yyyymmdd);
@@ -258,8 +257,8 @@ public class SAGenCondition {
 		        	  logger.debug("minDateOfMonth:"+yyyymmdd);
 		        	  
 		        	  //maxDateOfMonth
-		        	  date = Utils.parse(yyyy+mm[1]+"01", "yyyyMMdd");
-		        	  yyyymmdd = yyyy+mm[1]+DateToolsUtil.getMaxDayOfMonth(date);
+		        	  date = DateUtil.parse(yyyy+mm[1]+"01", "yyyyMMdd");
+		        	  yyyymmdd = yyyy+mm[1]+DateUtil.getMaxDayOfMonth(date);
 		        	  dateReturnArrSort[indexArr] = Integer.parseInt(yyyymmdd);
 		        	  dateReturnArr[indexArr] = yyyymmdd;indexArr++;
 		        	  
@@ -286,8 +285,8 @@ public class SAGenCondition {
 	        	logger.debug("minDateOfMonth:"+yyyymmdd);
 	        	  
 	        	//maxDateOfMonth
-	        	date = Utils.parse(yyyy+mm[1]+"01", "yyyyMMdd");
-	        	yyyymmdd = yyyy+mm[1]+DateToolsUtil.getMaxDayOfMonth(date);
+	        	date = DateUtil.parse(yyyy+mm[1]+"01", "yyyyMMdd");
+	        	yyyymmdd = yyyy+mm[1]+DateUtil.getMaxDayOfMonth(date);
 	        	dateReturnArr[indexArr] = yyyymmdd;indexArr++;
 	        	  
 	        	logger.debug("maxDateOfMonth:"+yyyymmdd);
@@ -383,8 +382,8 @@ public class SAGenCondition {
 		if( !"-1".equals(Utils.isNull(salesBean.getCondName1())) &&  !"-1".equals(Utils.isNull(salesBean.getCondValue1()))){
 			if(Utils.isNull(salesBean.getCondName1()).equalsIgnoreCase("invoice_date")|| Utils.isNull(salesBean.getCondName1()).equalsIgnoreCase("SALES_ORDER_DATE")){
 				logger.debug("CondValue1:"+salesBean.getCondValue1());
-				Date date = Utils.parseToBudishDate(salesBean.getCondValue1(), Utils.DD_MM_YYYY_WITH_SLASH);
-				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
+				Date date = DateUtil.parseToBudishDate(salesBean.getCondValue1(), DateUtil.DD_MM_YYYY_WITH_SLASH);
+				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
 			
 			}else if(Utils.isNull(salesBean.getCondName1()).equalsIgnoreCase("BrandXX")){
 				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName1()))){
@@ -418,8 +417,8 @@ public class SAGenCondition {
 		}
 		if( !"-1".equals(Utils.isNull(salesBean.getCondName2())) &&  !"-1".equals(Utils.isNull(salesBean.getCondValue2()))){
 			if(Utils.isNull(salesBean.getCondName2()).equalsIgnoreCase("invoice_date") || Utils.isNull(salesBean.getCondName2()).equalsIgnoreCase("SALES_ORDER_DATE")){
-				Date date = Utils.parseToBudishDate(salesBean.getCondValue2(), Utils.DD_MM_YYYY_WITH_SLASH);
-				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
+				Date date = DateUtil.parseToBudishDate(salesBean.getCondValue2(), DateUtil.DD_MM_YYYY_WITH_SLASH);
+				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
 			
 			}else if(Utils.isNull(salesBean.getCondName2()).equalsIgnoreCase("BrandXX")){
 				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName2()))){
@@ -455,8 +454,8 @@ public class SAGenCondition {
 		}
 		if( !"-1".equals(Utils.isNull(salesBean.getCondName3())) &&  !"-1".equals(Utils.isNull(salesBean.getCondValue3()))){
 			if(Utils.isNull(salesBean.getCondName3()).equalsIgnoreCase("invoice_date") || Utils.isNull(salesBean.getCondName3()).equalsIgnoreCase("SALES_ORDER_DATE")){
-				Date date = Utils.parseToBudishDate(salesBean.getCondValue2(), Utils.DD_MM_YYYY_WITH_SLASH);
-				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
+				Date date = DateUtil.parseToBudishDate(salesBean.getCondValue2(), DateUtil.DD_MM_YYYY_WITH_SLASH);
+				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
 			
 			}else if(Utils.isNull(salesBean.getCondName3()).equalsIgnoreCase("BrandXX")){
 				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName3()))){
@@ -492,8 +491,8 @@ public class SAGenCondition {
 		}
 		if( !"-1".equals(Utils.isNull(salesBean.getCondName4())) &&  !"-1".equals(Utils.isNull(salesBean.getCondValue4()))){
 			if(Utils.isNull(salesBean.getCondName4()).equalsIgnoreCase("invoice_date")|| Utils.isNull(salesBean.getCondName4()).equalsIgnoreCase("SALES_ORDER_DATE")){
-				Date date = Utils.parseToBudishDate(salesBean.getCondValue2(), Utils.DD_MM_YYYY_WITH_SLASH);
-				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
+				Date date = DateUtil.parseToBudishDate(salesBean.getCondValue2(), DateUtil.DD_MM_YYYY_WITH_SLASH);
+				sql +=" and  "+aliasSub+salesBean.getCondName1()+" = to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n";
 			
 			}else if(Utils.isNull(salesBean.getCondName4()).equalsIgnoreCase("BrandXX")){
 				if(SAInitial.MULTI_SELECTION_LIST.contains(Utils.isNull(salesBean.getCondName4()))){
@@ -731,8 +730,8 @@ public class SAGenCondition {
 		}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 			sql.append(" AND (1=1 AND "+alias+"invoice_year = '"+colGroupName+"' ) \n");
 		}else{
-			 Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH);
-			 sql.append(" AND (1=1 AND  "+alias+"INVOICE_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy') ) \n");
+			 Date date = DateUtil.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH);
+			 sql.append(" AND (1=1 AND  "+alias+"INVOICE_DATE = to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy') ) \n");
 		}
 		return sql;
 	}
@@ -769,8 +768,8 @@ public class SAGenCondition {
 				//sql.append(""+" AND sales_order_year = '"+colGroupName+"' \n");
 				sql.append("\t"+SAGenCondition.genWhereCondSQLCaseByYEAR("ORDER",colGroupName));
 			}else{
-				Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo() , Utils.DD_MM_YYYY_WITH_SLASH);
-				sql.append("\t\t"+"AND  SALES_ORDER_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n"); 
+				Date date = DateUtil.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo() , DateUtil.DD_MM_YYYY_WITH_SLASH);
+				sql.append("\t\t"+"AND  SALES_ORDER_DATE = to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n"); 
 			}
 			
 			//Include Pos or not
@@ -801,8 +800,8 @@ public class SAGenCondition {
 				//sql.append(""+" AND invoice_year = '"+colGroupName+"' \n");
 				sql.append("\t"+SAGenCondition.genWhereCondSQLCaseByYEAR("INVOICE",colGroupName));
 			}else{
-				Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH);
-				sql.append("\t\t"+" AND  INVOICE_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
+				Date date = DateUtil.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH);
+				sql.append("\t\t"+" AND  INVOICE_DATE = to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
 			}
 			
 			//Include Pos or not

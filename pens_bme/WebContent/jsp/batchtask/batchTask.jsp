@@ -1,36 +1,42 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.web.batchtask.task.BatchTaskListBean"%>
-<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Map"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskInfo"%>
 <%@page import="com.pens.util.*"%>
-<%@page import="java.util.Date"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="com.isecinc.pens.inf.bean.MonitorBean"%>
+<%@page import="com.isecinc.pens.bean.MonitorBean"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%> 
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="batchTaskForm" class="com.isecinc.pens.web.batchtask.BatchTaskForm" scope="session" />
 <%
 /*clear session form other page */
-SessionUtils.clearSessionUnusedForm(request, "batchTaskForm");
+//SessionUtils.clearSessionUnusedForm(request, "batchTaskForm");
 
 try{
 User user = (User) session.getAttribute("user");
 String pageName = Utils.isNull(request.getParameter("pageName"));
-String buttonName = "";
+String initBatchAction = Utils.isNull(request.getParameter("initBatchAction"));
+String batchAction = Utils.isNull(request.getParameter("batchAction"));
+
+System.out.println("pageName:"+pageName);
+System.out.println("action:"+request.getAttribute("action"));
+System.out.println("initBatchAction:"+initBatchAction);
+System.out.println("batchAction:"+batchAction);
+
+//String buttonName = "";
 BatchTaskInfo taskInfo = batchTaskForm.getTaskInfo();
-//Map<String,BatchTaskInfo> paramMap = null;//old code
+String buttonName = "";
 List<BatchTaskInfo> paramList = null;
 if(taskInfo != null){
 	//paramMap = taskInfo.getParamMap();//old code
+	
 	paramList = taskInfo.getParamList();
 	buttonName = taskInfo.getButtonName();
 	
@@ -46,15 +52,15 @@ if(taskInfo != null){
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME%>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.8.2.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
 
 <!-- Calendar -->
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -88,8 +94,21 @@ body {
 
 <Script>
     function loadme(){
+    	/** Case onload from popup Page summited Batch**/
+      	 <%if( "initBatchFromPageByPopup".equalsIgnoreCase(initBatchAction)){%>
+      	     submitBatchFromPageByPopup(document.getElementById("path").value);
+      	 <%}%>
+      	 
+      	 /** Case onload Task Success and search to display Case from popup Page summited Batch */
+      	 /** refresh main page searchBatch and data BatchTaskList from session **/
+      	 <%if( "searchTaskFinishFromPopupPage".equals(request.getAttribute("action"))){%>
+	         window.opener.searchBatch('<%=request.getContextPath()%>');
+	         window.close();
+	     <%}%>
+	        
+      	 /** start check batchTask by Ajax **/
        	<%if( "submited".equals(request.getAttribute("action"))){%>
-       	   startBatch();
+       	   startCheckBatch();
        	<%}%>
        	
        	//load calendar parameter date
@@ -98,23 +117,13 @@ body {
 		        BatchTaskInfo task = paramList.get(n);   
 		        if(task.getParamType().equalsIgnoreCase("DATE")){%> 
 		           new Epoch('epoch_popup', 'th', document.getElementById('<%=task.getParamName()%>'));
-		   <%   }//if
+		 <%   }//if
 		     }//while
 		   }//if 
-		   %>
+		 %>
     }
-    
-	function disableF5(e) {
-		if (e.which == 116) e.preventDefault(); 
-	}
-	//To re-enable f5
-	$(document).unbind("keydown", disableF5);
-	
-	//clear cach
-	$.ajaxSetup({cache: false});
-	
-	/** Start Batch**/
-	function runBatch(path) {
+    /** Start Batch**/
+	function submitBatch(path) {
 		var confirmText = "ยืนยัน Process ";
 		if(validate()){
 		  if(confirm(confirmText)){
@@ -125,8 +134,31 @@ body {
 		}
 		return false; 
 	}
+	
+	/** Start Batch from Page By Popup Page**/
+	function submitBatchFromPageByPopup(path) {
+		//alert("path:"+path+",runBatchFromPopup");
+		document.batchTaskForm.action = path + "/jsp/batchTaskAction.do?do=runBatchFromPageByPopup&action=submited";
+		document.batchTaskForm.submit();
+		return true;
+	}
+	function disableF5(e) {
+		if (e.which == 116) e.preventDefault(); 
+	}
+	//To re-enable f5
+	$(document).unbind("keydown", disableF5);
+	
+	//clear cach
+	$.ajaxSetup({cache: false});
+	
+
 	function search(path, type) {
-		document.batchTaskForm.action = path + "/jsp/batchTaskAction.do?do=search";
+		var param = "";
+		 <%if( "initBatchFromPageByPopup".equalsIgnoreCase(batchAction)){%>
+		    param +="&batchAction=initBatchFromPageByPopup";
+		 <%}%>
+		 //alert(param);
+		document.batchTaskForm.action = path + "/jsp/batchTaskAction.do?do=search"+param;
 		document.batchTaskForm.submit();
 		return true;
 	}
@@ -159,7 +191,7 @@ body {
 
 	   /** Onload Window    */
 	   var startDate = new Date();
-	   function startBatch(){
+	   function startCheckBatch(){
     	   var status = document.getElementsByName("monitorBean.status")[0]; 
             
     	 // alert(status.value);
@@ -239,10 +271,10 @@ body {
 	    		   
 	    		   /** Task Success ***/
 	    		   updateProgress(status);
-	    		   
+                   
 	    		   //search display
 	    		   search('<%=request.getContextPath()%>', 'admin');
-                 
+                   
 	    	   }else { //Task Running
 	    		   /** Task Not Success  and Re Check Status**/
 		    	   updateProgress(status);
@@ -274,10 +306,13 @@ body {
 	    	</table>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
-	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="<%=pageName%>"/>
-			</jsp:include>
-			
+	    	<!-- Case submit from page by popu no display Name Batch-->
+	    	 <%if( !"initBatchFromPageByPopup".equalsIgnoreCase(initBatchAction)
+	    		&& !"initBatchFromPageByPopup".equalsIgnoreCase(batchAction) ){%>
+		      	<jsp:include page="../program.jsp">
+					<jsp:param name="function" value="<%=pageName%>"/>
+				</jsp:include>
+			<%} %>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -368,8 +403,8 @@ body {
 							</tr>
 							<tr>
 								<td align="center" width ="100%">
-								      <input type="button" name ="import" value="<%=buttonName%>" class="newPosBtnLong" onClick="javascript:runBatch('${pageContext.request.contextPath}','sales')">
-								       <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')">
+								      <input type="button" name ="process" value="<%=buttonName%>" class="newPosBtnLong" onClick="javascript:submitBatch('${pageContext.request.contextPath}')">
+								      <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')">
 								      <input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
 								</td>
 							</tr>
@@ -444,7 +479,8 @@ body {
 						
 						<html:hidden property="monitorBean.status"  styleClass="disableText"/>
 						<input type="hidden" name="pageName"  id="pageName" value="<%=pageName%>"/>
-					
+					    <input type="hidden" name="path"  id="path" value="${pageContext.request.contextPath}"/>
+					    <input type="hidden" name="batchAction"  id="batchAction" value="<%=initBatchAction%>"/>
 					</html:form>
 					<!-- BODY -->   
 					</td>
@@ -476,7 +512,8 @@ function showDivInfo(){
 	document.getElementById("divInfo").style.display = "block";
 }
 </script>
-<%}catch(Exception e){
+<%
+}catch(Exception e){
 	e.printStackTrace();
 } %>
 

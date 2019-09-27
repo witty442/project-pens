@@ -19,13 +19,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -244,7 +243,7 @@ public class SalesTargetMTAction  {
 		return mapping.findForward("search");
 	}
 	
-	public ActionForward deleteAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	public ActionForward deleteAllMT(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("Delete All By Marketing");
 		Connection conn = null;
 		SalesTargetForm aForm = (SalesTargetForm) form;

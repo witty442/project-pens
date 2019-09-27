@@ -10,9 +10,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.ColumnBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.ColumnBean;
-import com.isecinc.pens.inf.bean.TableBean;
+import com.pens.util.Constants;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -83,7 +85,7 @@ public class ExternalFunctionHelper {
 				id = "Y";
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_DATE")){	
-				id = Utils.format(new Date(), Utils.DD_MM_YYYY_WITH_SLASH);
+				id = DateUtil.format(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH);
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_USER")){	
 				id = String.valueOf(userBean.getUserName());
@@ -96,7 +98,7 @@ public class ExternalFunctionHelper {
 				}
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_TIMESTAMP")){	
-				id = Utils.format(new Date(), Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH);
+				id = DateUtil.format(new Date(), DateUtil.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH);
 				//logger.debug("GET_CURRENT_TIMESTAMP:"+id);
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_FILE_NAME_IMPORT")){	

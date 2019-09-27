@@ -18,10 +18,11 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.StoreDAO;
 import com.isecinc.pens.dao.SummaryDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.sql.ReportOnhandAsOfKingSQL;
 import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.web.summary.SummaryForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /** Like  KingPower = Duty-free **/
@@ -64,7 +65,7 @@ public class ReportOnhandAsOfKingAction {
 			storeList.add(storeBean);
 			
 			//Validate Initial Date
-			Date asOfDate = Utils.parse(c.getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date asOfDate = DateUtil.parse(c.getSalesDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			Date initDate = new SummaryDAO().searchInitDateMTT(conn,c.getPensCustCodeFrom());
 			
 			logger.debug("initDate:"+initDate);
@@ -85,7 +86,7 @@ public class ReportOnhandAsOfKingAction {
 				if (results != null  && results.size() >0) {
 					request.getSession().setAttribute("summary" ,summary.getSummary());
 					summaryForm.setResults(results);
-					summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					summaryForm.getOnhandSummary().setInitDate(DateUtil.stringValue(initDate,DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					
 					ImportDAO importDAO = new ImportDAO();
 					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
@@ -206,6 +207,7 @@ public class ReportOnhandAsOfKingAction {
 		    double saleInQtyTemp = 0;
 		    double saleReturnQtyTemp = 0;
 		    double saleOutQtyTemp = 0;
+		    double adjustQtyTemp = 0;
 		    double onhandQtyTemp = 0;
 			try {
 				sql = ReportOnhandAsOfKingSQL.genSQL(conn, c, user, initDate,summaryType);
@@ -225,12 +227,14 @@ public class ReportOnhandAsOfKingAction {
 					item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
 					item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("sale_return_qty"),Utils.format_current_no_disgit));
 					item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("sale_out_qty"),Utils.format_current_no_disgit));
+					item.setAdjustQty(Utils.decimalFormat(rst.getDouble("adjust_qty"),Utils.format_current_no_disgit));
 					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("onhand_qty"),Utils.format_current_no_disgit));
 					
 					initSaleQty += Utils.convertStrToDouble(item.getInitSaleQty());
 					saleInQtyTemp += Utils.convertStrToDouble(item.getSaleInQty());
 					saleReturnQtyTemp +=Utils.convertStrToDouble(item.getSaleReturnQty());
 					saleOutQtyTemp +=Utils.convertStrToDouble(item.getSaleOutQty());
+					adjustQtyTemp +=Utils.convertStrToDouble(item.getAdjustQty());
 					onhandQtyTemp +=Utils.convertStrToDouble(item.getOnhandQty());
 					
 					pos.add(item);
@@ -247,6 +251,7 @@ public class ReportOnhandAsOfKingAction {
 				item.setSaleInQty(Utils.decimalFormat(saleInQtyTemp,Utils.format_current_no_disgit));
 				item.setSaleReturnQty(Utils.decimalFormat(saleReturnQtyTemp,Utils.format_current_no_disgit));
 				item.setSaleOutQty(Utils.decimalFormat(saleOutQtyTemp,Utils.format_current_no_disgit));
+				item.setAdjustQty(Utils.decimalFormat(adjustQtyTemp,Utils.format_current_no_disgit));
 				item.setOnhandQty(Utils.decimalFormat(onhandQtyTemp,Utils.format_current_no_disgit));
 				c.setSummary(item);
 				c.setItemsList(pos);

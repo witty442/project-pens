@@ -12,8 +12,9 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.SADamageBean;
 import com.isecinc.pens.bean.SAEmpBean;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -187,12 +188,12 @@ public class SAEmpDAO {
 				ps.setString(c++, Utils.isNull(o.getGroupStore()));//12
 				ps.setString(c++, Utils.isNull(o.getBranch()));//13
 				if( !Utils.isNull(o.getStartDate()).equals("")){//14
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 				   ps.setTimestamp(c++,null);
 				}
 				if( !Utils.isNull(o.getLeaveDate()).equals("")){//15
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getLeaveDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getLeaveDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 				   ps.setTimestamp(c++,null);
 				}
@@ -200,21 +201,21 @@ public class SAEmpDAO {
 				ps.setInt(c++, Utils.convertStrToInt(o.getRewardBme()));//17
 				
 				if( !Utils.isNull(o.getStartRewardBmeDate()).equals("")){//18
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartRewardBmeDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStartRewardBmeDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					ps.setTimestamp(c++,null);
 				}
                 ps.setInt(c++, Utils.convertStrToInt(o.getRewardWacoal()));//19
 				
 				if( !Utils.isNull(o.getStartRewardWacoalDate()).equals("")){//20
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartRewardWacoalDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStartRewardWacoalDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					ps.setTimestamp(c++,null);
 				}
 				ps.setInt(c++, Utils.convertStrToInt(o.getSuretyBond()));//21
 					
 				if( !Utils.isNull(o.getStartSuretyBondDate()).equals("")){//22
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartSuretyBondDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStartSuretyBondDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					ps.setTimestamp(c++,null);
 				}
@@ -263,7 +264,7 @@ public class SAEmpDAO {
 				ps.setString(c++, Utils.isNull(o.getGroupStore()));//10
 				ps.setString(c++, Utils.isNull(o.getBranch()));//11
 				if( !Utils.isNull(o.getLeaveDate()).equals("")){//12
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getLeaveDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getLeaveDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 				   ps.setTimestamp(c++,null);
 				}
@@ -271,21 +272,21 @@ public class SAEmpDAO {
 				ps.setInt(c++, Utils.convertStrToInt(o.getRewardBme()));//14
 				
 				if( !Utils.isNull(o.getStartRewardBmeDate()).equals("")){//15
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartRewardBmeDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStartRewardBmeDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					ps.setTimestamp(c++,null);
 				}
                 ps.setInt(c++, Utils.convertStrToInt(o.getRewardWacoal()));//16
 				
 				if( !Utils.isNull(o.getStartRewardWacoalDate()).equals("")){//17
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartRewardWacoalDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStartRewardWacoalDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					ps.setTimestamp(c++,null);
 				}
 				ps.setInt(c++, Utils.convertStrToInt(o.getSuretyBond()));//18
 					
 				if( !Utils.isNull(o.getStartSuretyBondDate()).equals("")){//19
-				   ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartSuretyBondDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				   ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStartSuretyBondDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					ps.setTimestamp(c++,null);
 				}
@@ -294,7 +295,7 @@ public class SAEmpDAO {
 				ps.setString(c++, o.getCreateUser());//21
 				
 				if( !Utils.isNull(o.getStartDate()).equals("")){//21
-					ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+					ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					ps.setTimestamp(c++,null);
 				}
@@ -416,18 +417,18 @@ public class SAEmpDAO {
 				   h.setBankAccount(Utils.isNull(rst.getString("bank_account")));
 				   h.setIdCard(Utils.isNull(rst.getString("idcard")));
 				   h.setEmail(Utils.isNull(rst.getString("email")));
-				   h.setStartDate(Utils.stringValue(rst.getDate("start_working_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setStartDate(DateUtil.stringValue(rst.getDate("start_working_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setGroupStore(Utils.isNull(rst.getString("group_store")));
 				   h.setBranch(Utils.isNull(rst.getString("branch")));
 				   
 				   if(rst.getDate("leave_date") !=null){
-				     h.setLeaveDate(Utils.stringValue(rst.getDate("leave_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				     h.setLeaveDate(DateUtil.stringValue(rst.getDate("leave_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					 h.setLeaveDate("");
 				   }
 				   h.setLeaveReason(Utils.isNull(rst.getString("leave_reason")));
 				   if(rst.getDate("start_reward_bme_date") !=null){
-				      h.setStartRewardBmeDate(Utils.stringValue(rst.getDate("start_reward_bme_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				      h.setStartRewardBmeDate(DateUtil.stringValue(rst.getDate("start_reward_bme_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					  h.setStartRewardBmeDate("");
 				   }
@@ -437,7 +438,7 @@ public class SAEmpDAO {
 					  h.setRewardBme("");
 				   }
 				   if(rst.getDate("start_reward_wacoal_date") !=null){
-				      h.setStartRewardWacoalDate(Utils.stringValue(rst.getDate("start_reward_wacoal_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				      h.setStartRewardWacoalDate(DateUtil.stringValue(rst.getDate("start_reward_wacoal_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					  h.setStartRewardWacoalDate("");
 				   }
@@ -447,7 +448,7 @@ public class SAEmpDAO {
 					   h.setRewardWacoal("");  
 				   }
 				   if(rst.getDate("start_surety_bond_date") !=null){
-				      h.setStartSuretyBondDate(Utils.stringValue(rst.getDate("start_surety_bond_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				      h.setStartSuretyBondDate(DateUtil.stringValue(rst.getDate("start_surety_bond_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					  h.setStartSuretyBondDate("");
 				   }

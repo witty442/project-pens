@@ -24,6 +24,7 @@ import com.isecinc.pens.dao.SAEmpDAO;
 import com.isecinc.pens.dao.SAReportDAO;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -78,8 +79,8 @@ public class SAReportAction extends I_Action {
 						c.set(Calendar.DAY_OF_MONTH, 1);
 					    c.set(Calendar.MONTH, i);
 					    PopupForm p = new PopupForm();
-					    p.setCode(Utils.stringValue(c.getTime(), Utils.DD_MM_YYYY_WITHOUT_SLASH));
-					    p.setDesc(Utils.stringValue(c.getTime(), Utils.MMM_YY,Utils.local_th));
+					    p.setCode(DateUtil.stringValue(c.getTime(), DateUtil.DD_MM_YYYY_WITHOUT_SLASH));
+					    p.setDesc(DateUtil.stringValue(c.getTime(), DateUtil.MMM_YY,Utils.local_th));
 					    monthList.add(p);
 					}
 					request.getSession().setAttribute("monthList", monthList);
@@ -87,7 +88,7 @@ public class SAReportAction extends I_Action {
 					//Set current Month
 					c = Calendar.getInstance();
 					c.set(Calendar.DAY_OF_MONTH, 1);
-				    ad.setMonth(Utils.stringValue(c.getTime(), Utils.DD_MM_YYYY_WITHOUT_SLASH));
+				    ad.setMonth(DateUtil.stringValue(c.getTime(), DateUtil.DD_MM_YYYY_WITHOUT_SLASH));
 				    
 				    logger.debug("currentMonth:"+ad.getMonth());
 					
@@ -109,15 +110,15 @@ public class SAReportAction extends I_Action {
 						c.set(Calendar.DAY_OF_MONTH, 1);
 					    c.set(Calendar.MONTH, i);
 					    PopupForm p = new PopupForm();
-					    p.setCode(Utils.stringValue(c.getTime(), "MMyyyy"));
-					    p.setDesc(Utils.stringValue(c.getTime(), Utils.MMM_YY,Utils.local_th));
+					    p.setCode(DateUtil.stringValue(c.getTime(), "MMyyyy"));
+					    p.setDesc(DateUtil.stringValue(c.getTime(), DateUtil.MMM_YY,Utils.local_th));
 					    monthList.add(p);
 					}
 					request.getSession().setAttribute("monthList", monthList);
 					
 					//Set current Month
 					c = Calendar.getInstance();
-				    ad.setMonth(Utils.stringValue(c.getTime(),"MMyyyy"));
+				    ad.setMonth(DateUtil.stringValue(c.getTime(),"MMyyyy"));
 				    
 				    logger.debug("currentMonth:"+ad.getMonth());
 					
@@ -402,13 +403,13 @@ public class SAReportAction extends I_Action {
 				//Set current Month
 				Calendar c = Calendar.getInstance();
 				c.set(Calendar.DAY_OF_MONTH, 1);
-			    bean.setMonth(Utils.stringValue(c.getTime(), Utils.DD_MM_YYYY_WITHOUT_SLASH));
+			    bean.setMonth(DateUtil.stringValue(c.getTime(), DateUtil.DD_MM_YYYY_WITHOUT_SLASH));
 			}else 	if("saOrisoftReport".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 				request.getSession().setAttribute("SA_ORISOFT_REPORT_LIST",null);
 
 				//Set current Month
 				Calendar c = Calendar.getInstance();
-			    bean.setMonth(Utils.stringValue(c.getTime(), "MMyyyy"));
+			    bean.setMonth(DateUtil.stringValue(c.getTime(), "MMyyyy"));
 			}
 			
 			aForm.setBean(bean);

@@ -33,12 +33,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.CConstants;
-import util.DBConnection;
-import util.ReportUtilServlet;
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.SalesrepBean;
@@ -47,6 +41,12 @@ import com.isecinc.pens.dao.SalesrepDAO;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.lowagie.text.pdf.BaseFont;
+import com.pens.util.BeanParameter;
+import com.pens.util.CConstants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.ReportUtilServlet;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -239,6 +239,21 @@ public class StockAction extends I_Action {
 
 			    out.flush();
 			    out.close();
+			}else if(StockConstants.PAGE_STOCK_CR_EXPIRE.equalsIgnoreCase(pageName)){
+				StockBean stockResult = StockCreditExpireReport.searchReport(request.getContextPath(),aForm.getBean(),true,user);
+				resultHtmlTable = stockResult.getDataStrBuffer();
+				
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(resultHtmlTable.toString());
+			    w.flush();
+			    w.close();
+
+			    out.flush();
+			    out.close();
 			}else if(StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){
 				StockBean stockResult = StockCallCardCreditReport.searchReport(request.getContextPath(),aForm.getBean(),user,true);
 				resultHtmlTable = stockResult.getDataStrBuffer();
@@ -279,8 +294,8 @@ public class StockAction extends I_Action {
                 	lstData = beanReport.getItemsList();
                 }
                 //set parameterMap
-                Date periodDate = Utils.parse(criBean.getPeriod(), Utils.MMM_YY);
-                String thPeriodDate = Utils.stringValue(periodDate, Utils.MMMM_YYYY,Utils.local_th);
+                Date periodDate = DateUtil.parse(criBean.getPeriod(), DateUtil.MMM_YY);
+                String thPeriodDate = DateUtil.stringValue(periodDate, DateUtil.MMMM_YYYY,Utils.local_th);
 				parameterMap.put("period",thPeriodDate);
 				
 				//summary map
@@ -346,8 +361,8 @@ public class StockAction extends I_Action {
                 	lstData = beanReport.getItemsList();
                 }
                 //set parameterMap
-                Date periodDate = Utils.parse(criBean.getPeriod(), Utils.MMM_YY);
-                String thPeriodDate = Utils.stringValue(periodDate, Utils.MMMM_YYYY,Utils.local_th);
+                Date periodDate = DateUtil.parse(criBean.getPeriod(), DateUtil.MMM_YY);
+                String thPeriodDate = DateUtil.stringValue(periodDate, DateUtil.MMMM_YYYY,Utils.local_th);
 				parameterMap.put("period",thPeriodDate);
 				
 				//summary map

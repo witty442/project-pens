@@ -10,6 +10,9 @@ import java.util.Map;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class InterfaceUtils {
@@ -56,7 +59,7 @@ public class InterfaceUtils {
 		String fileName ="";
 		Connection conn = null;
 		try{
-			   String currentDate = Utils.stringValue(Utils.getCurrentDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			   String currentDate = DateUtil.stringValue(DateUtil.getCurrentDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			   conn = DBConnection.getInstance().getConnection();
 			   //dd/mm/yyyy
 			   String curDD = currentDate.substring(0,2);

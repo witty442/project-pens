@@ -15,12 +15,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.CConstantsBean;
 import com.isecinc.pens.bean.User;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -53,7 +52,7 @@ public class LocationAction extends I_Action {
 	
 			if(foundData==false){
 			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   request.getSession().setAttribute("RESULTS",null);
+			   request.getSession().setAttribute("locationForm_RESULT",null);
 			   aForm.getBean().setItemsList(null);
 			}
 			logger.debug("pageName:"+aForm.getPageName());
@@ -99,7 +98,7 @@ public class LocationAction extends I_Action {
 				    aForm.setBean(bean);
 				    aForm.setPageName(pageName);
 				    request.getSession().removeAttribute("CUST_LOC_LIST");
-				    request.getSession().removeAttribute("RESULTS");
+				    request.getSession().removeAttribute("locationForm_RESULT");
 				    
 				    forwardPage="spider";
 				 }
@@ -123,7 +122,7 @@ public class LocationAction extends I_Action {
 				    aForm.setBean(bean);
 				    aForm.setPageName(pageName);
 				    request.getSession().removeAttribute("CUST_LOC_LIST");
-				    request.getSession().removeAttribute("RESULTS");
+				    request.getSession().removeAttribute("locationForm_RESULT");
 				    /** Clear Session Detail Page */
 					request.getSession().removeAttribute("RESULTS_DETAIL");
 					
@@ -207,7 +206,7 @@ public class LocationAction extends I_Action {
 				forwardPage ="spider";
 				List<LocationBean> allList = new ArrayList<LocationBean>();
 				request.getSession().removeAttribute("CUST_LOC_LIST");
-				request.getSession().removeAttribute("RESULTS");
+				request.getSession().removeAttribute("locationForm_RESULT");
 				
 				LocationBean bean = aForm.getBean();
 				if("MAP".equalsIgnoreCase(bean.getDispType())){
@@ -235,9 +234,9 @@ public class LocationAction extends I_Action {
 					boolean excel = false;
 					StringBuffer html = LocationReport.searchCustomerCheckInDataList(bean,excel);
 					if(html.length() >0){
-				       request.getSession().setAttribute("RESULTS", html);
+				       request.getSession().setAttribute("locationForm_RESULT", html);
 					}else{
-						request.getSession().setAttribute("RESULTS", html);
+						request.getSession().setAttribute("locationForm_RESULT", html);
 					    request.setAttribute("Message", "ไม่พบข้อมูล");
 					}
 				}// oracle
@@ -252,9 +251,9 @@ public class LocationAction extends I_Action {
 				boolean excel = false;
 				StringBuffer html = MonitorSpiderReport.searchMonitorReport(path,bean,excel,constantsMap);
 				if(html.length() >0){
-			       request.getSession().setAttribute("RESULTS", html);
+			       request.getSession().setAttribute("locationForm_RESULT", html);
 				}else{
-					request.getSession().setAttribute("RESULTS", html);
+				   request.getSession().setAttribute("locationForm_RESULT", html);
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				}
 				
@@ -305,13 +304,13 @@ public class LocationAction extends I_Action {
 				
 				//get constants config all by ref_code
 				Map<String, CConstantsBean> constantsMap = (Map<String, CConstantsBean>)request.getSession().getAttribute("CONSTANTS_MAP");
-				if(request.getSession().getAttribute("RESULTS") != null){
-					resultHtmlTable = (StringBuffer)request.getSession().getAttribute("RESULTS");
+				if(request.getSession().getAttribute("locationForm_RESULT") != null){
+					resultHtmlTable = (StringBuffer)request.getSession().getAttribute("locationForm_RESULT");
 				}else{
 				    resultHtmlTable = MonitorSpiderReport.searchMonitorReport(path,bean,excel,constantsMap);
 				}
 				if(resultHtmlTable.length() >0){
-			       request.getSession().setAttribute("RESULTS", resultHtmlTable);
+			       request.getSession().setAttribute("locationForm_RESULT", resultHtmlTable);
 				}else{
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				}

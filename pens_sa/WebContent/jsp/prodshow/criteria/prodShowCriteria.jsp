@@ -1,6 +1,6 @@
 <%@page import="com.isecinc.pens.web.prodshow.ProdShowForm"%>
 <%@page import="com.isecinc.pens.web.prodshow.ProdShowBean"%>
-<%@page import="util.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%
 ProdShowBean bean = ((ProdShowForm)session.getAttribute("prodShowForm")).getBean();
@@ -231,10 +231,10 @@ function openImage(path,fileName){
 			<tr>
                 <td> แบรนด์  </td>
 				<td colspan="2">
-				 <html:text property="bean.brand" styleId="brand" size="10"/>
+				 <html:text property="bean.brand" styleId="brand" size="10"  styleClass="\" autoComplete=\"off"/>
 				    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','BrandProdShow')"/>   
 				รหัสร้านค้า
-				   <html:text property="bean.customerCode" styleId="customerCode" size="10"/>
+				   <html:text property="bean.customerCode" styleId="customerCode" size="10"  styleClass="\" autoComplete=\"off"/>
 				     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','CustomerVanProdShow')"/>   
 				    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				  

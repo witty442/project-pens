@@ -11,8 +11,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
@@ -27,6 +25,7 @@ import com.isecinc.pens.web.stockmc.StockMCDAO;
 import com.isecinc.pens.web.stockmc.StockMCForm;
 import com.isecinc.pens.web.stockmc.StockMCMasterItemProcess;
 import com.isecinc.pens.web.stockmc.StockMCProcess;
+import com.pens.util.Utils;
 
 
 /**

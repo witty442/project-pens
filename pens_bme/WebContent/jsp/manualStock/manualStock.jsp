@@ -1,20 +1,19 @@
-<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
-<%@page import="com.pens.util.*"%>
+<%@page import="com.pens.util.SessionUtils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="manualStockForm" class="com.isecinc.pens.web.manualstock.ManualStockForm" scope="session" />
 
 <%
+
  /*clear session form other page */
  SessionUtils.clearSessionUnusedForm(request, "manualStockForm");
 
@@ -26,35 +25,34 @@
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <style type="text/css"></style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 
 function loadMe(){
-	 new Epoch('epoch_popup', 'th', document.getElementById('saleDate'));
+	 new Epoch('epoch_popup', 'th', document.getElementById('transDate'));
 	 
 	 <%if( !mode.equals("view")){ %>
 	    addRow();
 	 <%}%>
-	 calcTotalRow();
 }
 function clearForm(path){
 	var form = document.manualStockForm;
-	form.action = path + "/jsp/mttAction.do?do=clear";
+	form.action = path + "/jsp/manualStockAction.do?do=clear";
 	form.submit();
 	return true;
 }
 function printReport(path){
 	var form = document.manualStockForm;
-	form.action = path + "/jsp/mttAction.do?do=printReport";
+	form.action = path + "/jsp/manualStockAction.do?do=printReport";
 	form.submit();
 	return true;
 }
@@ -62,7 +60,7 @@ function printReport(path){
 function cancel(path){
 	if(confirm("กรุณายืนยัน การลบข้อมูลขายทั้งเอกสาร")){
 		var form = document.manualStockForm;
-		form.action = path + "/jsp/mttAction.do?do=cancel";
+		form.action = path + "/jsp/manualStockAction.do?do=cancel";
 		form.submit();
 		return true;
 	}
@@ -71,7 +69,7 @@ function cancel(path){
 
 function back(path){
 	var form = document.manualStockForm;
-	form.action = path + "/jsp/mttAction.do?do=prepare2&action=back";
+	form.action = path + "/jsp/manualStockAction.do?do=prepare2&action=back";
 	form.submit();
 	return true;
 }
@@ -101,7 +99,7 @@ function save(path){
 		return false;
 	}
 	
-	form.action = path + "/jsp/mttAction.do?do=save";
+	form.action = path + "/jsp/manualStockAction.do?do=save";
 	form.submit();
 	return true;
 }
@@ -227,48 +225,33 @@ function addRow(){
 	}
 
 	var lineId = rows+1;
-	
 	//alert("lineId["+lineId+"]");
 	
 	var rowData ="<tr class='"+className+"'>"+
-	
-	   // "<td class='data_no'> <input type='text' tabindex ='-1' name='no' size='5' readonly class='disableText' value='"+lineId+"'/></td>"+
-	    "<td class='data_linechk'> <input type='checkbox' tabindex ='-1' name='linechk' value='0'/>"+
+	    "<td class='td_text_center'> <input type='checkbox' tabindex ='-1' name='linechk' value='0'/>"+
 	    "  <input type='hidden' tabindex ='-1' name='lineId' />"+
 	    "</td>"+
-	    "<td class='data_barcode'> <input type='text' name='barcode' size='30'  "+
-	    " onkeypress='getProductKeypress(event,this,"+lineId+")' "+
-	  //  " onchange='getProductModel(this,"+lineId+")' "+
-	    " />  </td>"+
-	    "<td class='data_materialMaster'> <input type='text' tabindex ='-1' name='materialMaster' size='25' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
-	    "<td class='data_groupCode'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+
-	    "<td class='data_pensItem'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableText' size='20' /></td>"+
-	    
-	    "<td class='data_retailPriceBF'>"+ 
-	    "<input type='text' tabindex ='-1' name='retailPriceBF' readonly class='disableNumber' size='20'/></td>"+
-	    "<input type='hidden' tabindex ='-1' name='wholePriceBF' readonly class='disableNumber' size='20' />"+
-	    "<td class='data_pensItem'> "+
-	    "  <input type='text' tabindex ='-1' id='statusDesc' name='statusDesc' value='NEW' readonly class='disableText' size='20' />"+
-	    "  <input type='hidden' tabindex ='-1' id='status' name='status' value='N' readonly class='disableText' size='20' />"+
+	   
+	    "<td class='td_text_center'> "+
+	    "  <input type='text' "+
+	    "   onkeypress=getAutoKeypress(event,this,"+lineId+",'BMEProduct','pensItem') "+
+	    "   name='pensItem'  size='10' autoComplete='off' />"+
 	    "</td>"+
-	    "</tr>";
+	    "<td class='td_text_center'> "+
+	    "  <input type='text' tabindex ='' "+
+	    "   onkeypress=getAutoKeypress(event,this,"+lineId+",'BMEProduct','materialMaster') "+
+	    "   name='materialMaster' size='15' autoComplete='off' />"+
+	    "</td>"+
+	    
+	    "<td class='td_text_center'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+
+	    "<td class='td_text_center'> <input type='text' name='qty' readonly class='' size='10' autoComplete='off'/></td>"+
 
+	    "</tr>";
+ 
     $('#tblProduct').append(rowData);
     //set focus default
-    var barcode = document.getElementsByName("barcode");
-    barcode[lineId-1].focus();
-}
-
-
-function calcTotalRow(){
-	var rows = $('#tblProduct tr').length-1;//1,head row ,2 blank row
-	var barcodeLastRow = document.getElementsByName("barcode")[rows-1]; //alert(barcodeLastRow.value);
-	if(barcodeLastRow.value ==''){
-		rows = rows-1;// blank row
-	}
-	//Calc Row
-    var totalRow = document.getElementsByName("totalRow");
-    totalRow[0].value = rows;
+    var pensItem = document.getElementsByName("pensItem");
+    pensItem[lineId-1].focus();
 }
 
 function removeRow(path){
@@ -322,187 +305,69 @@ function checkAll(chkObj){
 	}
 }
 
-
-function getProductKeypress(e,barcodeObj,lineId){
-	//materialMaster groupCode pensItem wholePriceBF retailPriceBF
-	//alert(barcode.value);
-	
-	var barcode = document.getElementsByName("barcode");
-	var materialMaster = document.getElementsByName("materialMaster");
-	var groupCode = document.getElementsByName("groupCode");
-	var pensItem = document.getElementsByName("pensItem");
-	var wholePriceBF = document.getElementsByName("wholePriceBF");
-	var retailPriceBF = document.getElementsByName("retailPriceBF");
-	
-	var storeCode =$('#storeName').val();
-	if(storeCode =="" ){
-		alert("กรุณากรอก รหัสร้านค้า ");
-		return false;
-	}
-	
+function getAutoKeypress(e,obj,lineId,pageName,inputName){
+	var form = document.manualStockForm;
 	if(e != null && e.keyCode == 13){
-	
-		if(barcodeObj.value ==''){
-			
-			materialMaster[lineId-1].value = '';
-			groupCode[lineId-1].value = '';
-			pensItem[lineId-1].value = '';
-			wholePriceBF[lineId-1].value = '';
-			retailPriceBF[lineId-1].value = '';
-		}else{
-			var found = getProductModel(barcodeObj,lineId);
-			if(found){
-				calcTotalRow();
-				
-				//Add New Row Auto
-				addRow();
-				
-				barcode[lineId].focus();
-				
-				//Set Prev row readonly 
-				barcode[lineId-1].className ="disableText";
-				barcode[lineId-1].readOnly = true;
+		if(obj.value ==''){
+			if("BMEProduct" == pageName){
+				document.getElementsByName("materialMaster")[lineId-1].value = '';
+				document.getElementsByName("groupCode")[lineId-1].value = '';
+				document.getElementsByName("pensItem")[lineId-1].value = '';
 			}
+		}else{
+			getAutoDetail(obj,lineId,pageName,inputName);
 		}
 	}
 }
 
-function getProductModel(barcodeObj,lineId){
-	var found = false;
-	var barcode = document.getElementsByName("barcode");
-	var materialMaster = document.getElementsByName("materialMaster");
-	var groupCode = document.getElementsByName("groupCode");
-	var pensItem = document.getElementsByName("pensItem");
-	var wholePriceBF = document.getElementsByName("wholePriceBF");
-	var retailPriceBF = document.getElementsByName("retailPriceBF");
-	
+function getAutoDetail(obj,lineId,pageName,inputName){
 	var returnString = "";
-	var form = document.mttForm;
+	var form = document.manualStockForm;
+	
+	//prepare parameter
+	var param = "";
+	if("BMEProduct"==pageName){
+		
+		param  ="pageName="+pageName;
+		param +="&custGroup="+form.custGroup.value
+		if(inputName=='pensItem'){
+		   param +="&pensItem="+obj.value;
+		}else{
+		   param +="&materialMaster="+obj.value;
+		}
+	}
 	var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcode.jsp",
-			data : "itemCode=" + barcodeObj.value+"&storeCode="+form.storeCode.value,
+			url: "${pageContext.request.contextPath}/jsp/ajax/getAutoKeypressAjax.jsp",
+			data : param,
 			async: false,
-			cache: true,
+			cache: false,
 			success: function(getData){
 			  returnString = jQuery.trim(getData);
 			}
 		}).responseText;
-
-	   // alert("x:"+returnString);
-	    
-		if(returnString==''){
-			alert("ไม่พบข้อมูลสินค้า  "+barcodeObj.value);
-			barcodeObj.focus();
+	 
+	if("BMEProduct" == pageName){
+		var retArr = returnString.split("|");
+		if(retArr[0] !=-1){
+			document.getElementsByName("pensItem")[lineId-1].value = retArr[1];;
+			document.getElementsByName("materialMaster")[lineId-1].value = retArr[2];
+			document.getElementsByName("groupCode")[lineId-1].value = retArr[3];
 			
-			barcode[lineId-1].value = '';
-			materialMaster[lineId-1].value = '';
-			groupCode[lineId-1].value = '';
-			pensItem[lineId-1].value = '';
-			wholePriceBF[lineId-1].value = '';
-			retailPriceBF[lineId-1].value = '';
 		}else{
-			var s = returnString.split("|");
-			
-			barcode[lineId-1].value = s[0];
-			materialMaster[lineId-1].value = s[1];
-			groupCode[lineId-1].value = s[2];
-			pensItem[lineId-1].value = s[3];
-			wholePriceBF[lineId-1].value = s[4];
-			retailPriceBF[lineId-1].value = s[5];
-			
-			found = true;
-		}
-	return found;
-}
-
-function getProductKeypressByMat(e,matObj,lineId){
-	//materialMaster groupCode pensItem wholePriceBF retailPriceBF
-	//alert(barcode.value);
-	
-	var barcode = document.getElementsByName("barcode");
-	var materialMaster = document.getElementsByName("materialMaster");
-	var groupCode = document.getElementsByName("groupCode");
-	var pensItem = document.getElementsByName("pensItem");
-	var wholePriceBF = document.getElementsByName("wholePriceBF");
-	var retailPriceBF = document.getElementsByName("retailPriceBF");
-	
-	if(e != null && e.keyCode == 13){
-	
-		if(matObj.value ==''){
-			
-			barcode[lineId-1].value = '';
-			groupCode[lineId-1].value = '';
-			pensItem[lineId-1].value = '';
-			wholePriceBF[lineId-1].value = '';
-			retailPriceBF[lineId-1].value = '';
-		}else{
-			var found = getProductModelByMat(matObj,lineId);
-			if(found){
-				calcTotalRow();
-				
-				//Add New Row Auto
-				addRow();
-				
-				barcode[lineId].focus();
-				
-				//Set Prev row readonly 
-				materialMaster[lineId-1].className ="disableText";
-				materialMaster[lineId-1].readOnly = true;
+			alert("ไม่พบข้อมูล");
+			if(inputName=='pensItem'){
+				document.getElementsByName("pensItem")[lineId-1].focus();
+			}else{
+				document.getElementsByName("materialMaster")[lineId-1].focus();
 			}
+			document.getElementsByName("pensItem")[lineId-1].value = '';
+			document.getElementsByName("materialMaster")[lineId-1].value = '';
+			document.getElementsByName("groupCode")[lineId-1].value = '';
 		}
 	}
-}
-
-function getProductModelByMat(matObj,lineId){
-	var found = false;
-	var barcode = document.getElementsByName("barcode");
-	var materialMaster = document.getElementsByName("materialMaster");
-	var groupCode = document.getElementsByName("groupCode");
-	var pensItem = document.getElementsByName("pensItem");
-	var wholePriceBF = document.getElementsByName("wholePriceBF");
-	var retailPriceBF = document.getElementsByName("retailPriceBF");
-	
-	var returnString = "";
-	var form = document.mttForm;
-	var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/autoBarcode.jsp",
-			data : "matCode="+matObj.value+"&storeCode="+form.storeCode.value,
-			async: false,
-			cache: true,
-			success: function(getData){
-			  returnString = jQuery.trim(getData);
-			}
-		}).responseText;
-
-	   // alert("x:"+returnString);
-	    
-		if(returnString==''){
-			alert("ไม่พบข้อมูลสินค้า  "+matObj.value);
-			matObj.focus();
-			
-			barcode[lineId-1].value = '';
-			materialMaster[lineId-1].value = '';
-			groupCode[lineId-1].value = '';
-			pensItem[lineId-1].value = '';
-			wholePriceBF[lineId-1].value = '';
-			retailPriceBF[lineId-1].value = '';
-		}else{
-			var s = returnString.split("|");
-			
-			barcode[lineId-1].value = s[0];
-			materialMaster[lineId-1].value = s[1];
-			groupCode[lineId-1].value = s[2];
-			pensItem[lineId-1].value = s[3];
-			wholePriceBF[lineId-1].value = s[4];
-			retailPriceBF[lineId-1].value = s[5];
-			
-			found = true;
-		}
-	return found;
 }
 
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -547,7 +412,7 @@ function getProductModelByMat(matObj,lineId){
 						       <tr>
                                     <td> Sale Date<font color="red">*</font></td>
 									<td>					
-									   <html:text property="bean.saleDate" styleId="saleDate" size="20"/>
+									   <html:text property="bean.transDate" styleId="transDate" size="20"/>
 									   Doc No
 									    <html:text property="bean.docNo" styleId="docNo" size="20" styleClass="disableText"/>
 									</td>
@@ -582,22 +447,19 @@ function getProductModelByMat(matObj,lineId){
 						   
 				 <!-- Table Data -->
 				<c:if test="${manualStockForm.results != null}">
-	                     <!-- <div align="left">
+	                      <div align="left">
 							<input type="button" class="newPosBtn" value="เพิ่มรายการ" onclick="addRow();"/>	
 							<input type="button" class="newPosBtn" value="ลบรายการ" onclick="removeRow();"/>	
-					    </div> -->
+					    </div>
 				       	
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						    <tr>
 							<!-- 	<th >No</th> -->
 								<th ><input type="checkbox" name="chkAll" onclick="checkAll(this)"/></th>
-								<th >Barcode</th>
-								<th >Wacoal Mat.</th>
-								<th >Group Code</th>
 								<th >PENS Item</th>
-								<!-- <th >ราคาขายส่งก่อน VAT</th> -->
-								<th >ราคาขายปลีกก่อน VAT</th>	
-								<th >Status</th>						
+								<th >Material Master.</th>
+								<th >Group Code</th>
+								<th >QTY</th>						
 							</tr>
 							<c:forEach var="results" items="${manualStockForm.results}" varStatus="rows">
 								<c:choose>
@@ -615,51 +477,36 @@ function getProductModelByMat(matObj,lineId){
 										  <input type="hidden" name="lineId" value="${results.lineId}" />
 										</td>
 										<td class="td_text_center" width="10%">
-										    <input type="text" name="barcode" id="barcode" value ="${results.barcode}" size="30" 
-											    onkeypress="getProductKeypress(event,this,${results.lineId})"
-											    readonly="${results.barcodeReadonly}" class="${results.barcodeStyle}" 
-											   <%--  onchange="getProductModel(this,${results.lineId})" --%>
-											    />
-                                        </td>
+										   <input onkeypress="getAutoKeypress(event,this,${results.lineId},'BMEProduct','pensItem')"
+										   type="text" name="pensItem" value ="${results.pensItem}" size="20" readonly class="disableText"/>
+										
+										</td>
 										<td class="td_text_center" width="10%">
-											<input  onkeypress="getProductKeypressByMat(event,this,${results.lineId})" type="text" name="materialMaster" value ="${results.materialMaster}" size="25"/>
+											<input  onkeypress="getAutoKeypress(event,this,${results.lineId},'BMEProduct','materialMaster')" 
+											type="text" name="materialMaster" value ="${results.materialMaster}" size="25"/>
 										</td>
 										<td class="td_text_center" width="10%">
 										   <input type="text" name="groupCode" value ="${results.groupCode}" size="30" readonly class="disableText"/>
 										</td>
 										<td class="td_text_center" width="10%">
-										   <input type="text" name="pensItem" value ="${results.pensItem}" size="20" readonly class="disableText"/>
+										   <input type="text" name="qty" value ="${results.qty}" size="20" readonly class="disableNumber"/>
 										</td>
-										<%-- <td class="data_wholePriceBF">
-										   <input type="text" name="wholePriceBF" value ="${results.wholePriceBF}" size="20" readonly class="disableNumber"/>
-										</td> --%>
-										<td class="td_text_center" width="10%">
-										  
-										   <input type="text" name="retailPriceBF" value ="${results.retailPriceBF}" size="20" readonly class="disableNumber"/>
-										   <input type="hidden" name="wholePriceBF" value ="${results.wholePriceBF}" size="20" readonly class="disableNumber"/>
-										</td>
-										<td class="td_text_center" width="10%">
-										<input type="text" name="statusDesc" id="statusDesc" value ="${results.statusDesc}" size="20" readonly class="disableText"/>
-										<input type="hidden" name="status" id="status" value ="${results.status}" size="20" readonly class="disableText"/>
-										</td>
+										
 									</tr>
 							
 							  </c:forEach>
 					</table>
-						 <div align="left">
-							<font size="3"> <b>สรุปยอดจำนวนตัว <input type="text" name ="totalRow" class="disableNumber" value="" readonly/></b>	</font>
-							 
-						</div>
+						 
 				</c:if>
 						   <!-- Table Data -->
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
-									    <c:if test="${mttForm.bean.canEdit == true}">
+									   <%--  <c:if test="${mttForm.bean.canEdit == true}"> --%>
 											<a href="javascript:save('${pageContext.request.contextPath}')">
 												  <input type="button" value="    บันทึก      " class="newPosBtnLong"> 
 											 </a>
-										</c:if>
+										<%-- </c:if> --%>
 										
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">

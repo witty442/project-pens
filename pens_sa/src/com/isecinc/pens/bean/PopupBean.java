@@ -27,6 +27,7 @@ public class PopupBean implements Serializable{
 	private String reportValue;
 	private String salesrepCode;
 	private String salesrepId;
+	private String salesrepName;
 	private String status;
 	
 	private String province;
@@ -41,6 +42,12 @@ public class PopupBean implements Serializable{
 	private String pdDesc;
 	
 	
+	public String getSalesrepName() {
+		return salesrepName;
+	}
+	public void setSalesrepName(String salesrepName) {
+		this.salesrepName = salesrepName;
+	}
 	public String getPdCode() {
 		return pdCode;
 	}

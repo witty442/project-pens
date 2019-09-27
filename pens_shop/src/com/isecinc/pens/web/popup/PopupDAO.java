@@ -23,21 +23,21 @@ public class PopupDAO {
 			try {
 				logger.debug("searchItemBarcodeList");
 				
-				sql.append("\n SELECT * from m_barcode M \n");
-				sql.append("\n where product_code in \n");
-				sql.append("\n ( select code from m_product p,m_product_price pr \n");
-				sql.append("\n  where p.product_id =pr.product_id and p.isactive ='Y' ) \n");
+				sql.append("\n SELECT * from m_barcode M ");
+				sql.append("\n where product_code in ");
+				sql.append("\n ( select code from m_product p,m_product_price pr ");
+				sql.append("\n  where p.product_id =pr.product_id and p.isactive ='Y' ) ");
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
-					sql.append("\n and M.product_code ='"+c.getCodeSearch()+"' \n");
+					sql.append("\n and M.product_code like'"+c.getCodeSearch()+"%' ");
 				}
 				if( !Utils.isNull(c.getDescSearch()).equals("")){
-					sql.append("\n and M.material_master LIKE '%"+c.getDescSearch()+"%' \n");
+					sql.append("\n and M.material_master LIKE '%"+c.getDescSearch()+"%' ");
 				}
 				if( !Utils.isNull(c.getBarcodeSearch()).equals("")){
-					sql.append("\n and M.barcode ='"+c.getBarcodeSearch()+"' \n");
+					sql.append("\n and M.barcode ='"+c.getBarcodeSearch()+"' ");
 				}
 				
-				sql.append("\n  ORDER BY M.product_code asc \n");
+				sql.append("\n  ORDER BY M.product_code asc ");
 				
 				logger.debug("sql:"+sql);
 				conn = DBConnection.getInstance().getConnection();

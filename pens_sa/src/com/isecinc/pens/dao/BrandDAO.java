@@ -9,13 +9,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.SQLHelper;
-import util.Utils;
-
 import com.isecinc.pens.bean.BrandBean;
 import com.isecinc.pens.bean.CustomerBean;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
 
 public class BrandDAO {
 	private static Logger logger = Logger.getLogger("PENS");

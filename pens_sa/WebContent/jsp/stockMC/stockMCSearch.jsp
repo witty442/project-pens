@@ -1,11 +1,11 @@
 <%@page import="com.isecinc.pens.web.stockmc.StockMCAction"%>
-<%@page import="util.UserUtils"%>
-<%@page import="util.SessionUtils"%>
+<%@page import="com.pens.util.UserUtils"%>
+<%@page import="com.pens.util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.stockmc.StockMCBean"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@page import="util.Utils"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.ArrayList"%>

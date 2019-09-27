@@ -25,21 +25,22 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetDimension;
 
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.GenCNBean;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.TaskStoreBean;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.OrderDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
@@ -371,7 +372,7 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 							
 						/** Get Detail From OnhandMap for validate **/
 						orderOnhandMap = onhandMap.get(orderSave.getMaterialMaster());
-						orderSave.setOrderDate(Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+						orderSave.setOrderDate(DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 						
 						if(orderOnhandMap != null){
 							orderSave.setWholePriceBF(orderOnhandMap.getWholePriceBF());
@@ -609,7 +610,7 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select order_no,bar_on_box,store_code \n"
 					+ "from PENSBME_ORDER \n"
-					+ "WHERE trunc(order_date) =to_date('"+Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");
+					+ "WHERE trunc(order_date) =to_date('"+DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 		    
@@ -639,7 +640,7 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 		StringBuilder sql = new StringBuilder();
 		boolean isExist = false;
 		try {
-			String orderDateStr = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH);
+			String orderDateStr = DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH);
 			sql.append("\n SELECT count(*) as c FROM PENSBME_ORDER ");
 			sql.append("\n WHERE trunc(order_date) =to_date('"+orderDateStr+"','dd/mm/yyyy')");
 			logger.debug("sql:"+sql);

@@ -1,7 +1,7 @@
 
 <%@page import="com.isecinc.pens.web.moveorder.MoveOrderForm"%>
 <%@page import="com.isecinc.pens.web.moveorder.MoveOrderBean"%>
-<%@page import="util.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%
 MoveOrderBean bean = ((MoveOrderForm)session.getAttribute("moveOrderForm")).getBean();

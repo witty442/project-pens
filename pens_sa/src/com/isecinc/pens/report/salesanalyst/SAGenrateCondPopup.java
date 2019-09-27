@@ -14,13 +14,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class SAGenrateCondPopup {
 	protected static  Logger logger = Logger.getLogger("PENS");
@@ -345,13 +345,13 @@ public class SAGenrateCondPopup {
 			}else if("Invoice_Date".equalsIgnoreCase(condType)){
 				sql = "select invoice_date from XXPENS_BI_MST_INVOICE_DATE where invoice_date is not null ";
 				if(!Utils.isNull(code).equals("")){
-					Date date = Utils.parseToBudishDate(code, Utils.DD_MM_YYYY_WITH_SLASH);
-					String chrisDateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					Date date = DateUtil.parseToBudishDate(code, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String chrisDateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 					sql += " and invoice_date = to_date('"+chrisDateStr+"','dd/mm/yyyy') \n";
 				}
 				if(!Utils.isNull(desc).equals("")){
-					Date date = Utils.parseToBudishDate(code, Utils.DD_MM_YYYY_WITH_SLASH);
-					String chrisDateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					Date date = DateUtil.parseToBudishDate(code, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String chrisDateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 					sql += " and invoice_date = to_date('"+chrisDateStr+"','dd/mm/yyyy') \n";
 				}
 				sql +="order by invoice_date \n";
@@ -360,20 +360,20 @@ public class SAGenrateCondPopup {
 				rs = ps.executeQuery();
 				while(rs.next()){
 					no++;
-					String dateStr = Utils.stringValue(rs.getDate("invoice_date",Calendar.getInstance(Locale.US)), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+					String dateStr = DateUtil.stringValue(rs.getDate("invoice_date",Calendar.getInstance(Locale.US)), DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th);
 					
 					returnList.add(new DisplayBean(no,dateStr,dateStr,dateStr));
 				}
 			}else if("SALES_ORDER_DATE".equalsIgnoreCase(condType)){
 				sql = "select ORDER_DATE from XXPENS_BI_MST_ORDER_DATE where ORDER_DATE is not null ";
 				if(!Utils.isNull(code).equals("")){
-					Date date = Utils.parseToBudishDate(code, Utils.DD_MM_YYYY_WITH_SLASH);
-					String chrisDateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					Date date = DateUtil.parseToBudishDate(code, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String chrisDateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 					sql += " and ORDER_DATE = to_date('"+chrisDateStr+"','dd/mm/yyyy') \n";
 				}
 				if(!Utils.isNull(desc).equals("")){
-					Date date = Utils.parseToBudishDate(code, Utils.DD_MM_YYYY_WITH_SLASH);
-					String chrisDateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					Date date = DateUtil.parseToBudishDate(code, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String chrisDateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 					sql += " and ORDER_DATE = to_date('"+chrisDateStr+"','dd/mm/yyyy') \n";
 				}
 				sql +="order by ORDER_DATE \n";
@@ -384,7 +384,7 @@ public class SAGenrateCondPopup {
 				rs = ps.executeQuery();
 				while(rs.next()){
 					no++;
-					String dateStr = Utils.stringValue(rs.getDate("ORDER_DATE",Calendar.getInstance(Locale.US)), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+					String dateStr = DateUtil.stringValue(rs.getDate("ORDER_DATE",Calendar.getInstance(Locale.US)), DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th);
 					returnList.add(new DisplayBean(no,dateStr,dateStr,dateStr));
 				}
 			}else if("Province".equalsIgnoreCase(condType)){
@@ -1075,13 +1075,13 @@ public class SAGenrateCondPopup {
 				}else if("Invoice_Date".equalsIgnoreCase(currCondType)){
 					sql = "select invoice_date from XXPENS_BI_MST_INVOICE_DATE where invoice_date is not null ";
 					if(!Utils.isNull(code).equals("")){
-						Date date = Utils.parseToBudishDate(code, Utils.DD_MM_YYYY_WITH_SLASH);
-						String chrisDateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+						Date date = DateUtil.parseToBudishDate(code, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						String chrisDateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 						sql += " and invoice_date = to_date('"+chrisDateStr+"','dd/mm/yyyy') \n";
 					}
 					if(!Utils.isNull(desc).equals("")){
-						Date date = Utils.parseToBudishDate(code, Utils.DD_MM_YYYY_WITH_SLASH);
-						String chrisDateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+						Date date = DateUtil.parseToBudishDate(code, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						String chrisDateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 						sql += " and invoice_date = to_date('"+chrisDateStr+"','dd/mm/yyyy') \n";
 					}
 					sql +="order by invoice_date \n";
@@ -1092,19 +1092,19 @@ public class SAGenrateCondPopup {
 					rs = ps.executeQuery();
 					while(rs.next()){
 						no++;
-						String dateStr = Utils.stringValue(rs.getDate("invoice_date",Calendar.getInstance(Locale.US)), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+						String dateStr = DateUtil.stringValue(rs.getDate("invoice_date",Calendar.getInstance(Locale.US)), DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th);
 						returnList.add(new DisplayBean(no,dateStr,dateStr,dateStr));
 					}
 				}else if("SALES_ORDER_DATE".equalsIgnoreCase(currCondType)){
 					sql = "select ORDER_DATE from XXPENS_BI_MST_ORDER_DATE where ORDER_DATE is not null ";
 					if(!Utils.isNull(code).equals("")){
-						Date date = Utils.parseToBudishDate(code, Utils.DD_MM_YYYY_WITH_SLASH);
-						String chrisDateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+						Date date = DateUtil.parseToBudishDate(code, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						String chrisDateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 						sql += " and ORDER_DATE = to_date('"+chrisDateStr+"','dd/mm/yyyy') \n";
 					}
 					if(!Utils.isNull(desc).equals("")){
-						Date date = Utils.parseToBudishDate(code, Utils.DD_MM_YYYY_WITH_SLASH);
-						String chrisDateStr = Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+						Date date = DateUtil.parseToBudishDate(code, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						String chrisDateStr = DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 						sql += " and ORDER_DATE = to_date('"+chrisDateStr+"','dd/mm/yyyy') \n";
 					}
 					sql +="order by ORDER_DATE \n";
@@ -1115,7 +1115,7 @@ public class SAGenrateCondPopup {
 					rs = ps.executeQuery();
 					while(rs.next()){
 						no++;
-						String dateStr = Utils.stringValue(rs.getDate("ORDER_DATE",Calendar.getInstance(Locale.US)), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+						String dateStr = DateUtil.stringValue(rs.getDate("ORDER_DATE",Calendar.getInstance(Locale.US)), DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th);
 						returnList.add(new DisplayBean(no,dateStr,dateStr,dateStr));
 					}
 				}else if("Province".equalsIgnoreCase(currCondType)){

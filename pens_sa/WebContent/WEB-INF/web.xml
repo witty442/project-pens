@@ -5,7 +5,7 @@
  <display-name>PENS Sales Analysis Application.</display-name>
   <filter>
     <filter-name>Set Character Encoding</filter-name>
-    <filter-class>util.SetCharacterEncodingFilterUtil</filter-class>
+    <filter-class>com.pens.util.SetCharacterEncodingFilterUtil</filter-class>
     <init-param>
       <param-name>encoding</param-name>
       <param-value>TIS-620</param-value>
@@ -54,7 +54,7 @@
   
   <servlet>
 	   <servlet-name>PhotoServlet</servlet-name>
-	   <servlet-class>util.PhotoServlet</servlet-class>
+	   <servlet-class>com.pens.util.PhotoServlet</servlet-class>
   </servlet>
   <servlet-mapping>
 	   <servlet-name>PhotoServlet</servlet-name>
@@ -68,7 +68,14 @@
 	   <servlet-name>DownloadStockCloseVanServlet</servlet-name>
 	   <url-pattern>/downloadStockCloseVanServlet</url-pattern>
   </servlet-mapping>
-  
+  <servlet>
+	   <servlet-name>BatchTaskDownloadServlet</servlet-name>
+	   <servlet-class>com.isecinc.pens.web.batchtask.BatchTaskDownloadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	   <servlet-name>BatchTaskDownloadServlet</servlet-name>
+	   <url-pattern>/batchTaskDownloadServlet</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>*.do</url-pattern>

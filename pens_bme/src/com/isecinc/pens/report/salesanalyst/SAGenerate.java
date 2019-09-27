@@ -19,10 +19,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.salesanalyst.SAGenCondition;
 import com.isecinc.pens.web.salesanalyst.SAUtils;
-import com.pens.util.DateToolsUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Debug;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
@@ -57,12 +57,12 @@ public class SAGenerate {
 			if(SAInitial.TYPE_SEARCH_DAY.equalsIgnoreCase(salesBean.getTypeSearch())){
 				/** Set Group Display  **/
 				if( !StringUtils.isEmpty(salesBean.getDay()) && !StringUtils.isEmpty(salesBean.getDayTo())){
-					Date startDate = DateToolsUtil.convertStringToDate(salesBean.getDay());
-					Date endDate = DateToolsUtil.convertStringToDate(salesBean.getDayTo());
+					Date startDate = DateUtil.convertStringToDate(salesBean.getDay());
+					Date endDate = DateUtil.convertStringToDate(salesBean.getDayTo());
 					
 					if(startDate.compareTo(endDate) != 0){
 						while(startDate.compareTo(endDate) <= 0){
-							colGroupList.add(new ConfigBean(DateToolsUtil.convertToString(startDate,"yyyyMMdd"),DateToolsUtil.convertToString(startDate),DateToolsUtil.convertToString(startDate)));
+							colGroupList.add(new ConfigBean(DateUtil.convertToString(startDate,"yyyyMMdd"),DateUtil.convertToString(startDate),DateUtil.convertToString(startDate)));
 							startDate = DateUtils.addDays(startDate, 1); 
 						}
 					}else{
@@ -80,7 +80,7 @@ public class SAGenerate {
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
 				    debug.debug("DateStr:"+salesBean.getDay());
-				    debug.debug("Date:"+Utils.parseToBudishDate(salesBean.getDay(), Utils.DD_MM_YYYY_WITH_SLASH));
+				    debug.debug("Date:"+DateUtil.parseToBudishDate(salesBean.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH));
 				    //debug.debug("Sql:"+sql.toString());
 				    FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString());
 				    
@@ -354,7 +354,7 @@ public class SAGenerate {
 		    /** Gen Timestamp **/
 			Calendar currentTime = Calendar.getInstance(new Locale("th","TH"));
 			htmlStr.append("<tr> \n");
-			htmlStr.append(" <td colspan='"+columnCount+"'>Exported date :"+Utils.stringValue(currentTime.getTime(), Utils.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,new Locale("th","TH"))+"");
+			htmlStr.append(" <td colspan='"+columnCount+"'>Exported date :"+DateUtil.stringValue(currentTime.getTime(), DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,new Locale("th","TH"))+"");
 			htmlStr.append(" ,Created by:"+user.getName()+" </td> \n");
 			htmlStr.append("</tr> \n");
 			htmlStr.append("</table> \n");
@@ -518,7 +518,7 @@ public class SAGenerate {
 		           debug.debug("columnName2:"+columnsArr2[i]);
 		           
 					if("SALES_DATE".equalsIgnoreCase(columnsArr2[i])){
-						String dateStr = Utils.stringValue(new Date(rs.getDate(columnsArr2[i],Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						String dateStr = DateUtil.stringValue(new Date(rs.getDate(columnsArr2[i],Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 						debug.debug("dateStr:"+dateStr);
 					    rowHtml.append(" <td>"+dateStr+"</td>  \n");
 					}else{

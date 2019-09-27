@@ -9,12 +9,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.DateToolsUtil;
-import util.Utils;
-
 import com.isecinc.pens.report.salesanalyst.ConfigBean;
 import com.isecinc.pens.report.salesanalyst.SAInitial;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class BK_LocationDAO {
 	private static Logger logger = Logger.getLogger("PENS");
@@ -165,10 +164,10 @@ public class BK_LocationDAO {
 			        /* (Y and error_flag is not null  ) key fail order */
 					if("Y".equalsIgnoreCase(Utils.isNull(rst.getString("flag")))){
 						 item.setLocationType("order");
-						 item.setOrderDate(Utils.stringValue(rst.getDate("checkin_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+						 item.setOrderDate(DateUtil.stringValue(rst.getDate("checkin_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 					} else if("N".equalsIgnoreCase(Utils.isNull(rst.getString("flag")))){
 						item.setLocationType("visit");
-						item.setVisitDate(Utils.stringValue(rst.getDate("checkin_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+						item.setVisitDate(DateUtil.stringValue(rst.getDate("checkin_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 					}
 					
 					pos.add(item);
@@ -244,17 +243,17 @@ public class BK_LocationDAO {
 					sql.append("\n and cs.amphur = '"+district+"' ");
 				}
 				if("DAY".equalsIgnoreCase(c.getTypeSearch()) && !Utils.isNull(c.getDay()).equals("") ){
-				  Date startDate = Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				  String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				  Date startDate = DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+				  String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				  
 				  if(!Utils.isNull(c.getDay()).equals("") && !Utils.isNull(c.getDayTo()).equals("")){
-					  Date endDate = Utils.parse(c.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					  String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					  Date endDate = DateUtil.parse(c.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+					  String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					  
-					  sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
-					  sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+					  sql.append("\n and trunc(tc.checkin_date) >= to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
+					  sql.append("\n and trunc(tc.checkin_date) <= to_date('"+endDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 				  }else{
-					  sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+Utils.DD_MM_YYYY_WITH_SLASH+"')");
+					  sql.append("\n and trunc(tc.checkin_date) = to_date('"+startDateStr+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 				  }//if
 				}//if
 				

@@ -9,6 +9,7 @@ import com.isecinc.pens.bean.BMEControlBean;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
@@ -26,8 +27,8 @@ public class ReportOnhandBigC_ASOF_SQL_1 {
 			//prepare parameter
 			String christSalesDateStr ="";
 			if( !Utils.isNull(c.getSalesDate()).equals("")){
-				Date d = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				christSalesDateStr = Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date d = DateUtil.parse(c.getSalesDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				christSalesDateStr = DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			}
 			sql.append("\n SELECT A.* FROM(");
 			sql.append("\n SELECT M.* ");

@@ -9,14 +9,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
+import com.pens.util.DBConnection;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
 
 /**
  * Member Receipt Action
@@ -110,10 +110,10 @@ public class AdminConsoleAction extends I_Action {
 				
 				 if( !q1.equals("")){
 				    System.out.println("Query");
-				    resultQ1 =  Utils.excQueryApps(q1);
+				    resultQ1 =  SQLHelper.excQueryApps(q1);
 				 } 
 				 if( !q2.equals("")){
-					 resultQ2 =  Utils.excQueryApps(q2);
+					 resultQ2 =  SQLHelper.excQueryApps(q2);
 				 }
 				
 				 adForm.setResultQ1(resultQ1);
@@ -128,7 +128,7 @@ public class AdminConsoleAction extends I_Action {
 				System.out.println("eSQL:"+eSQL);
 				
 			    if( !eSQL.equals("")){
-			    	eOutput =  Utils.excUpdate(eSQL);
+			    	eOutput =  SQLHelper.excUpdate(eSQL);
 			    	
 			    	System.out.println("eOutput:"+eOutput);
 			    }	

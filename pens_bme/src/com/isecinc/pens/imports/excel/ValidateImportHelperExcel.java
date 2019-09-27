@@ -7,10 +7,10 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.ColumnBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
-import com.isecinc.pens.inf.bean.ColumnBean;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.pens.util.Utils;
 
 /**

@@ -11,13 +11,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.CConstantsBean;
+import com.pens.util.CConstants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 import sun.misc.Cleaner;
-import util.CConstants;
-import util.DBConnection;
-import util.DateToolsUtil;
-import util.ExcelHeader;
-import util.Utils;
 
 public class BK_OfMonitorSpiderReport {
 	private static Logger logger = Logger.getLogger("PENS");
@@ -167,16 +167,16 @@ public class BK_OfMonitorSpiderReport {
 			try {
 				//Get TripDay
 				Calendar cal = Calendar.getInstance();
-				Date startDate = Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date startDate = DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+				startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				c.setStartDate(startDateStr);
 				//
 				cal.setTime(startDate);
 				int startTrip = cal.get(Calendar.DAY_OF_MONTH);
 				
 				if( !Utils.isNull(c.getDayTo()).equals("")){
-					Date endDate = Utils.parse(c.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date endDate = DateUtil.parse(c.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+					endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					c.setEndDate(endDateStr);
 				}
 				
@@ -220,7 +220,7 @@ public class BK_OfMonitorSpiderReport {
 				sql.append(genWhereCondSql(conn, "", c));
 				//genDay trip1
 				if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-					 Date endDate = Utils.parse(c.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					 Date endDate = DateUtil.parse(c.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 					 cal.setTime(endDate);
 					 int endTrip = cal.get(Calendar.DAY_OF_MONTH);
 					  
@@ -242,7 +242,7 @@ public class BK_OfMonitorSpiderReport {
 				sql.append(genWhereCondSql(conn, "", c));
 				//genDay trip1
 				if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-					 Date endDate = Utils.parse(c.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					 Date endDate = DateUtil.parse(c.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 					 cal.setTime(endDate);
 					 int endTrip = cal.get(Calendar.DAY_OF_MONTH);
 					  
@@ -264,7 +264,7 @@ public class BK_OfMonitorSpiderReport {
 				sql.append(genWhereCondSql(conn, "", c));
 				//genDay trip1
 				if(!Utils.isNull(c.getDay()).equals("")  && !Utils.isNull(c.getDayTo()).equals("")){
-					 Date endDate = Utils.parse(c.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					 Date endDate = DateUtil.parse(c.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 					 cal.setTime(endDate);
 					 int endTrip = cal.get(Calendar.DAY_OF_MONTH);
 					  
@@ -662,7 +662,7 @@ public class BK_OfMonitorSpiderReport {
 			/** init Connection **/
 			 conn = DBConnection.getInstance().getConnectionApps();
 			/** Gen TripDay from Date **/
-			 tripDay = DateToolsUtil.getDayOfDate(Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH));
+			 tripDay = DateUtil.getDayOfDate(DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH));
 			 
 			 //Get Config LimitDistince
 			 String maxDistanceStr = CConstants.getConstants(CConstants.SPIDER_REF_CODE, CConstants.MAX_DISTANCE).getValue();
@@ -754,7 +754,7 @@ public class BK_OfMonitorSpiderReport {
 			/** init Connection **/
 			 conn = DBConnection.getInstance().getConnectionApps();
 			/** Gen TripDay from Date **/
-			 tripDay = DateToolsUtil.getDayOfDate(Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH));
+			 tripDay = DateUtil.getDayOfDate(DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH));
 			 
 			 //Get Config LimitDistince
 			 String maxDistanceStr = CConstants.getConstants(CConstants.SPIDER_REF_CODE, CConstants.MAX_DISTANCE).getValue();
@@ -814,7 +814,7 @@ public class BK_OfMonitorSpiderReport {
 				 result.append("\n <td class='td_text_center'>"+Utils.isNull(rs.getString("mst_lat"))+"</td>");
 				 result.append("\n <td class='td_text_center'>"+Utils.isNull(rs.getString("mst_lng"))+"</td>");
 				 result.append("\n <td nowrap class='td_text_center'>"+Utils.isNull(rs.getString("order_number"))+"</td>");
-				 result.append("\n <td nowrap class='td_text_center'>"+Utils.stringValueChkNull(rs.getTimestamp("checkin_date"),Utils.DD_MM_YYYY_HH_MM_WITH_SLASH,Utils.local_th)+"</td>");
+				 result.append("\n <td nowrap class='td_text_center'>"+DateUtil.stringValueChkNull(rs.getTimestamp("checkin_date"),DateUtil.DD_MM_YYYY_HH_MM_WITH_SLASH,DateUtil.local_th)+"</td>");
 				 result.append("\n <td class='td_text_center'>"+Utils.isNull(rs.getString("latitude"))+"</td>");
 				 result.append("\n <td class='td_text_center'>"+Utils.isNull(rs.getString("longitude"))+"</td>");
 				 result.append("\n <td class='td_text_center'>"+Utils.convMeterToKilometer(rs.getString("distance"),2)+"</td>");
@@ -848,7 +848,7 @@ public class BK_OfMonitorSpiderReport {
 			/** init Connection **/
 			 conn = DBConnection.getInstance().getConnectionApps();
 			/** Gen TripDay from Date **/
-			 tripDay = DateToolsUtil.getDayOfDate(Utils.parse(c.getDay(), Utils.DD_MM_YYYY_WITH_SLASH));
+			 tripDay = DateUtil.getDayOfDate(DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH));
 			 
 			 //Get Config LimitDistince
 			 String maxDistanceStr = CConstants.getConstants(CConstants.SPIDER_REF_CODE, CConstants.MAX_DISTANCE).getValue();
@@ -902,7 +902,7 @@ public class BK_OfMonitorSpiderReport {
 				 result.append("\n <td nowrap class='td_text'>"+Utils.isNull(rs.getString("account_number"))+"</td>");
 				 result.append("\n <td nowrap class='td_text'>"+Utils.isNull(rs.getString("party_name"))+"</td>");
 				 result.append("\n <td nowrap class='td_text_center'>"+Utils.isNull(rs.getString("order_number"))+"</td>");
-				 result.append("\n <td nowrap class='td_text_center'>"+Utils.stringValueChkNull(rs.getTimestamp("checkin_date"),Utils.DD_MM_YYYY_HH_MM_WITH_SLASH,Utils.local_th)+"</td>");
+				 result.append("\n <td nowrap class='td_text_center'>"+DateUtil.stringValueChkNull(rs.getTimestamp("checkin_date"),DateUtil.DD_MM_YYYY_HH_MM_WITH_SLASH,DateUtil.local_th)+"</td>");
 				 result.append("\n <td class='td_text_center'>"+Utils.isNull(rs.getString("trip"))+"</td>");
 				 result.append("\n </tr>");
 			 }

@@ -23,7 +23,6 @@ import com.isecinc.pens.bean.TransactionSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.sql.ReportEndDateLotusSQL;
 import com.isecinc.pens.sql.ReportMonthEndLotusSQL;
 import com.isecinc.pens.sql.ReportOnhandAsOfKingSQL;
@@ -39,6 +38,8 @@ import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.sql.ReportStockWacoalLotus_SQL;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.summary.SummaryForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
@@ -118,7 +119,7 @@ public class SummaryDAO {
 				
 				while (rst.next()) {
 					OnhandSummary item = new OnhandSummary();
-					item.setAsOfDate(Utils.stringValue(rst.getDate("as_of_date"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setAsOfDate(DateUtil.stringValue(rst.getDate("as_of_date"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setMaterialMaster(rst.getString("Material_master"));
 					item.setBarcode(rst.getString("BARCODE"));
 					item.setOnhandQty(rst.getString("Onhand_QTY"));
@@ -166,11 +167,11 @@ public class SummaryDAO {
 
 				if( !Utils.isNull(c.getCountDateFrom()).equals("") && !Utils.isNull(c.getCountDateTo()).equals("")){
 					
-					Date salesDateFromParam = Utils.parse(c.getCountDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					Date salesDateToParam = Utils.parse(c.getCountDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					Date salesDateFromParam = DateUtil.parse(c.getCountDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					Date salesDateToParam = DateUtil.parse(c.getCountDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					
-					String dateFrom = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
-					String dateTo = Utils.stringValue(salesDateToParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					String dateFrom = DateUtil.stringValue(salesDateFromParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String dateTo = DateUtil.stringValue(salesDateToParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and trunc(p.count_date) >= to_date('"+dateFrom+"','dd/mm/yyyy') \n");
 					sql.append(" and trunc(p.count_date) <= to_date('"+dateTo+"','dd/mm/yyyy') \n");
@@ -178,14 +179,14 @@ public class SummaryDAO {
 				if( Utils.isNull(c.getCountDateFrom()).equals("") || Utils.isNull(c.getCountDateTo()).equals("")){
 					
 					if( !Utils.isNull(c.getCountDateFrom()).equals("") ){
-						Date salesDateFromParam = Utils.parse(c.getCountDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-						String dateFrom = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
+						Date salesDateFromParam = DateUtil.parse(c.getCountDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						String dateFrom = DateUtil.stringValue(salesDateFromParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 						sql.append(" and trunc(p.count_date) = to_date('"+dateFrom+"','dd/mm/yyyy') \n");
 					}
 					
 					if(!Utils.isNull(c.getCountDateTo()).equals("")){
-						Date salesDateToParam = Utils.parse(c.getCountDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-						String dateTo = Utils.stringValue(salesDateToParam, Utils.DD_MM_YYYY_WITH_SLASH);
+						Date salesDateToParam = DateUtil.parse(c.getCountDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						String dateTo = DateUtil.stringValue(salesDateToParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 						sql.append(" and trunc(p.count_date) = to_date('"+dateTo+"','dd/mm/yyyy') \n");
 					}
 				}
@@ -221,9 +222,9 @@ public class SummaryDAO {
 					item.setBarcode(rst.getString("BARCODE"));
 					item.setPensCustCode(rst.getString("cust_code"));
 					item.setPensCustName(rst.getString("cust_name"));
-					item.setCountDate(Utils.stringValue(rst.getDate("count_date"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCountDate(DateUtil.stringValue(rst.getDate("count_date"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setFileName(rst.getString("file_name"));
-					item.setCreateDate(Utils.stringValue(rst.getDate("create_date"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCreateDate(DateUtil.stringValue(rst.getDate("create_date"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					pos.add(item);
 					
 				}//while
@@ -306,11 +307,11 @@ public class SummaryDAO {
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
 					salesDateFlag = true;
 					
-					salesDateFromParam = Utils.parse(c.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					salesDateToParam = Utils.parse(c.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateFromParam = DateUtil.parse(c.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateToParam = DateUtil.parse(c.getSalesDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					
-					String dateFrom = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
-					String dateTo = Utils.stringValue(salesDateToParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					String dateFrom = DateUtil.stringValue(salesDateFromParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String dateTo = DateUtil.stringValue(salesDateToParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and trunc(sales_date) >= to_date('"+dateFrom+"','dd/mm/yyyy') \n");
 					sql.append(" and trunc(sales_date) <= to_date('"+dateTo+"','dd/mm/yyyy') \n");
@@ -351,7 +352,7 @@ public class SummaryDAO {
 					item.setCol(rst.getString("COL"));
 					item.setSizeType(rst.getString("SIZE_TYPE"));
 					item.setSizes(rst.getString("SIZES"));
-					item.setSalesDate(Utils.stringValue(rst.getDate("SALES_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setSalesDate(DateUtil.stringValue(rst.getDate("SALES_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setQty(Utils.decimalFormat(rst.getDouble("QTY"),Utils.format_current_2_disgit));
 					item.setGrossSales(Utils.decimalFormat(rst.getDouble("GROSS_SALES"),Utils.format_current_2_disgit));
 					item.setReturnAmt(Utils.decimalFormat(rst.getDouble("RETURN_AMT"),Utils.format_current_2_disgit));
@@ -374,7 +375,7 @@ public class SummaryDAO {
 					item.setSalesMonth(rst.getString("SALES_MONTH"));
 					item.setFileName(rst.getString("File_name"));
 
-					item.setCreateDate(Utils.stringValue(rst.getDate("CREATE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCreateDate(DateUtil.stringValue(rst.getDate("CREATE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setCreateUser(rst.getString("create_user"));
 					
 					pos.add(item);
@@ -410,11 +411,11 @@ public class SummaryDAO {
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
 					salesDateFlag = true;
 					
-					salesDateFromParam = Utils.parse(c.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					salesDateToParam = Utils.parse(c.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateFromParam = DateUtil.parse(c.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateToParam = DateUtil.parse(c.getSalesDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					
-					String dateFrom = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
-					String dateTo = Utils.stringValue(salesDateToParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					String dateFrom = DateUtil.stringValue(salesDateFromParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String dateTo = DateUtil.stringValue(salesDateToParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and trunc(sales_date) >= to_date('"+dateFrom+"','dd/mm/yyyy') \n");
 					sql.append(" and trunc(sales_date) <= to_date('"+dateTo+"','dd/mm/yyyy') \n");
@@ -455,7 +456,7 @@ public class SummaryDAO {
 					item.setCol(rst.getString("COL"));
 					item.setSizeType(rst.getString("SIZE_TYPE"));
 					item.setSizes(rst.getString("SIZES"));
-					item.setSalesDate(Utils.stringValue(rst.getDate("SALES_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setSalesDate(DateUtil.stringValue(rst.getDate("SALES_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setQty(Utils.decimalFormat(rst.getDouble("QTY"),Utils.format_current_2_disgit));
 					item.setGrossSales(Utils.decimalFormat(rst.getDouble("GROSS_SALES"),Utils.format_current_2_disgit));
 					item.setReturnAmt(Utils.decimalFormat(rst.getDouble("RETURN_AMT"),Utils.format_current_2_disgit));
@@ -478,7 +479,7 @@ public class SummaryDAO {
 					item.setSalesMonth(rst.getString("SALES_MONTH"));
 					item.setFileName(rst.getString("File_name"));
 
-					item.setCreateDate(Utils.stringValue(rst.getDate("CREATE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCreateDate(DateUtil.stringValue(rst.getDate("CREATE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setCreateUser(rst.getString("create_user"));
 					
 					totalQty += Utils.convertStrToDouble(item.getQty());
@@ -529,11 +530,11 @@ public class SummaryDAO {
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
 					salesDateFlag = true;
 					
-					salesDateFromParam = Utils.parse(c.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					salesDateToParam = Utils.parse(c.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateFromParam = DateUtil.parse(c.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateToParam = DateUtil.parse(c.getSalesDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					
-					String dateFrom = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
-					String dateTo = Utils.stringValue(salesDateToParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					String dateFrom = DateUtil.stringValue(salesDateFromParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String dateTo = DateUtil.stringValue(salesDateToParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and trunc(sales_date) >= to_date('"+dateFrom+"','dd/mm/yyyy') \n");
 					sql.append(" and trunc(sales_date) <= to_date('"+dateTo+"','dd/mm/yyyy') \n");
@@ -571,7 +572,7 @@ public class SummaryDAO {
 					item.setStyleNo(rst.getString("STYLE_NO"));
 					item.setDescription(rst.getString("DESCRIPTION"));
 					
-					item.setSalesDate(Utils.stringValue(rst.getDate("SALES_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setSalesDate(DateUtil.stringValue(rst.getDate("SALES_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setQty(Utils.decimalFormat(rst.getDouble("QTY"),Utils.format_current_2_disgit));
 					item.setGpPercent(Utils.decimalFormat(rst.getDouble("GP_PERCENT"),Utils.format_current_2_disgit));
 					item.setTotalWholePriceBF(Utils.decimalFormat(rst.getDouble("TOTAL_WHOLE_PRICE_BF"),Utils.format_current_2_disgit));
@@ -585,7 +586,7 @@ public class SummaryDAO {
 					item.setSalesMonth(rst.getString("SALES_MONTH"));
 					item.setFileName(rst.getString("File_name"));
 
-					item.setCreateDate(Utils.stringValue(rst.getDate("CREATE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCreateDate(DateUtil.stringValue(rst.getDate("CREATE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setCreateUser(rst.getString("create_user"));
 					//Whole_Price_BF NUMBER(11,2),
 					//Retail_Price_BF NUMBER(11,2),
@@ -628,11 +629,11 @@ public class SummaryDAO {
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
 					salesDateFlag = true;
 					
-					salesDateFromParam = Utils.parse(c.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					salesDateToParam = Utils.parse(c.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateFromParam = DateUtil.parse(c.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateToParam = DateUtil.parse(c.getSalesDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					
-					String dateFrom = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
-					String dateTo = Utils.stringValue(salesDateToParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					String dateFrom = DateUtil.stringValue(salesDateFromParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String dateTo = DateUtil.stringValue(salesDateToParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and trunc(sales_date) >= to_date('"+dateFrom+"','dd/mm/yyyy') \n");
 					sql.append(" and trunc(sales_date) <= to_date('"+dateTo+"','dd/mm/yyyy') \n");
@@ -670,7 +671,7 @@ public class SummaryDAO {
 					item.setStyleNo(rst.getString("STYLE_NO"));
 					item.setDescription(rst.getString("DESCRIPTION"));
 					
-					item.setSalesDate(Utils.stringValue(rst.getDate("SALES_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setSalesDate(DateUtil.stringValue(rst.getDate("SALES_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setQty(Utils.decimalFormat(rst.getDouble("QTY"),Utils.format_current_2_disgit));
 					item.setGpPercent(Utils.decimalFormat(rst.getDouble("GP_PERCENT"),Utils.format_current_2_disgit));
 					item.setTotalWholePriceBF(Utils.decimalFormat(rst.getDouble("TOTAL_WHOLE_PRICE_BF"),Utils.format_current_2_disgit));
@@ -684,7 +685,7 @@ public class SummaryDAO {
 					item.setSalesMonth(rst.getString("SALES_MONTH"));
 					item.setFileName(rst.getString("File_name"));
 
-					item.setCreateDate(Utils.stringValue(rst.getDate("CREATE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCreateDate(DateUtil.stringValue(rst.getDate("CREATE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setCreateUser(rst.getString("create_user"));
 					//Whole_Price_BF NUMBER(11,2),
 					//Retail_Price_BF NUMBER(11,2),
@@ -718,11 +719,11 @@ public class SummaryDAO {
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
 					salesDateFlag = true;
 					
-					salesDateFromParam = Utils.parse(c.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					salesDateToParam = Utils.parse(c.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateFromParam = DateUtil.parse(c.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateToParam = DateUtil.parse(c.getSalesDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					
-					String dateFrom = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
-					String dateTo = Utils.stringValue(salesDateToParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					String dateFrom = DateUtil.stringValue(salesDateFromParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String dateTo = DateUtil.stringValue(salesDateToParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and trunc(sales_date) >= to_date('"+dateFrom+"','dd/mm/yyyy') \n");
 					sql.append(" and trunc(sales_date) <= to_date('"+dateTo+"','dd/mm/yyyy') \n");
@@ -748,7 +749,7 @@ public class SummaryDAO {
 				while (rst.next()) {
 					TransactionSummary item = new TransactionSummary();
 					
-					item.setSalesDate(Utils.stringValue(rst.getDate("SALES_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setSalesDate(DateUtil.stringValue(rst.getDate("SALES_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setStoreNo(Utils.isNull(rst.getString("STORE_NO")));
 					item.setStoreName(Utils.isNull(rst.getString("STORE_NAME")));
 					
@@ -787,7 +788,7 @@ public class SummaryDAO {
 					item.setSalesMonth(rst.getString("SALES_MONTH"));
 					item.setFileName(rst.getString("File_name"));
 
-					item.setCreateDate(Utils.stringValue(rst.getDate("CREATE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCreateDate(DateUtil.stringValue(rst.getDate("CREATE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setCreateUser(rst.getString("create_user"));
 					//Whole_Price_BF NUMBER(11,2),
 					//Retail_Price_BF NUMBER(11,2),
@@ -827,11 +828,11 @@ public class SummaryDAO {
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
 					salesDateFlag = true;
 					
-					salesDateFromParam = Utils.parse(c.getSalesDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					salesDateToParam = Utils.parse(c.getSalesDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateFromParam = DateUtil.parse(c.getSalesDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					salesDateToParam = DateUtil.parse(c.getSalesDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					
-					String dateFrom = Utils.stringValue(salesDateFromParam, Utils.DD_MM_YYYY_WITH_SLASH);
-					String dateTo = Utils.stringValue(salesDateToParam, Utils.DD_MM_YYYY_WITH_SLASH);
+					String dateFrom = DateUtil.stringValue(salesDateFromParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					String dateTo = DateUtil.stringValue(salesDateToParam, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append(" and trunc(sale_date) >= to_date('"+dateFrom+"','dd/mm/yyyy') \n");
 					sql.append(" and trunc(sale_date) <= to_date('"+dateTo+"','dd/mm/yyyy') \n");
@@ -860,14 +861,14 @@ public class SummaryDAO {
 				while (rst.next()) {
 					TransactionSummary item = new TransactionSummary();
 					
-					item.setSalesDate(Utils.stringValue(rst.getDate("SALE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setSalesDate(DateUtil.stringValue(rst.getDate("SALE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setCustGroup(Utils.isNull(rst.getString("CUST_GROUP")));
 					item.setStoreNo(Utils.isNull(rst.getString("CUST_NO")));
 					item.setStoreName(Utils.isNull(rst.getString("STORE_NAME")));
 					item.setPensItem(rst.getString("PENS_ITEM"));
 					item.setFileName(rst.getString("File_name"));
 					item.setGroupCode(rst.getString("group_code"));
-					item.setCreateDate(Utils.stringValue(rst.getDate("CREATE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
+					item.setCreateDate(DateUtil.stringValue(rst.getDate("CREATE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th));
 					item.setCreateUser(rst.getString("create_user"));
 					
 					item.setKingCode(rst.getString("code"));
@@ -1588,8 +1589,8 @@ public class SummaryDAO {
 				sql.append("	    AND V.Customer_id IS NOT NULL  \n");
 				sql.append("	    AND V.inventory_item_id IS NOT NULL \n");
 				if( !"".equals(Utils.isNull(c.getAsOfDate()))){
-					Date dateObj = Utils.parse(Utils.isNull(c.getAsOfDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String christDateStr = Utils.stringValue(dateObj, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					Date dateObj = DateUtil.parse(Utils.isNull(c.getAsOfDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String christDateStr = DateUtil.stringValue(dateObj, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 				    sql.append("	AND V.invoice_date <= to_date('"+christDateStr+"','dd/mm/yyyy') \n");
 				}
 				if( !"".equals(Utils.isNull(c.getPensCustCodeFrom()))){
@@ -1614,8 +1615,8 @@ public class SummaryDAO {
 				sql.append("		 AND V.Customer_id IS NOT NULL  \n");
 				sql.append("         AND V.inventory_item_id IS NOT NULL \n");
 				if( !"".equals(Utils.isNull(c.getAsOfDate()))){
-					Date dateObj = Utils.parse(Utils.isNull(c.getAsOfDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String christDateStr = Utils.stringValue(dateObj, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					Date dateObj = DateUtil.parse(Utils.isNull(c.getAsOfDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String christDateStr = DateUtil.stringValue(dateObj, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 				    sql.append("	 AND V.invoice_date <= to_date('"+christDateStr+"','dd/mm/yyyy') \n");
 				}
 				if( !"".equals(Utils.isNull(c.getPensCustCodeFrom()))){
@@ -1642,8 +1643,8 @@ public class SummaryDAO {
 				sql.append("	    AND V.PENS_ITEM = P.INVENTORY_ITEM_CODE \n");
 				sql.append("	    AND C.CUSTOMER_CODE = V.pens_cust_code \n");
 				if( !"".equals(Utils.isNull(c.getAsOfDate()))){
-					Date dateObj = Utils.parse(Utils.isNull(c.getAsOfDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String christDateStr = Utils.stringValue(dateObj, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					Date dateObj = DateUtil.parse(Utils.isNull(c.getAsOfDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String christDateStr = DateUtil.stringValue(dateObj, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 				    sql.append("	AND V.sales_date <= to_date('"+christDateStr+"','dd/mm/yyyy') \n");
 				}
 				if( !"".equals(Utils.isNull(c.getPensCustCodeFrom()))){
@@ -1667,8 +1668,8 @@ public class SummaryDAO {
 				sql.append("	    AND V.ITEM = P.INVENTORY_ITEM_CODE \n");
 				sql.append("	    AND V.cust_code = C.CUSTOMER_CODE \n");
 				if( !"".equals(Utils.isNull(c.getAsOfDate()))){
-					Date dateObj = Utils.parse(Utils.isNull(c.getAsOfDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String christDateStr = Utils.stringValue(dateObj, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+					Date dateObj = DateUtil.parse(Utils.isNull(c.getAsOfDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String christDateStr = DateUtil.stringValue(dateObj, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 				    sql.append("	AND V.count_date <= to_date('"+christDateStr+"','dd/mm/yyyy') \n");
 				}
 				if( !"".equals(Utils.isNull(c.getPensCustCodeFrom()))){
@@ -2132,7 +2133,7 @@ public class SummaryDAO {
 		    double saleOutQtyTemp = 0;
 		    double onhandQtyTemp = 0;
 		    OnhandSummary c = f.getOnhandSummary();
-		    String initDateStr = Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+		    String initDateStr = DateUtil.stringValue(initDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			try {
 				logger.debug("storeCode:"+f.getOnhandSummary().getPensCustCodeFrom());
                 sql = ReportStockWacoalLotus_SQL.genSQL(conn, c,initDate,asOfDate);
@@ -2431,11 +2432,11 @@ public class SummaryDAO {
 				conn = DBConnection.getInstance().getConnection();
 				
 				//prepare parameter
-				Date asofDateFrom = Utils.parse(c.getAsOfDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				christSalesDateFromStr = Utils.stringValue(asofDateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date asofDateFrom = DateUtil.parse(c.getAsOfDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				christSalesDateFromStr = DateUtil.stringValue(asofDateFrom, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
-				Date asofDateTo = Utils.parse(c.getAsOfDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				christSalesDateToStr = Utils.stringValue(asofDateTo, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date asofDateTo = DateUtil.parse(c.getAsOfDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				christSalesDateToStr = DateUtil.stringValue(asofDateTo, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n SELECT A.* FROM(");
 				sql.append("\n SELECT M.*");
@@ -3034,13 +3035,13 @@ public class SummaryDAO {
 				String christSalesDateStrTo ="";
 				
 				if( !Utils.isNull(c.getAsOfDateFrom()).equals("")){
-					Date d = Utils.parse(c.getAsOfDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					christSalesDateStrFrom = Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date d = DateUtil.parse(c.getAsOfDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					christSalesDateStrFrom = DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				}
 
 				if( !Utils.isNull(c.getAsOfDateTo()).equals("")){
-					Date d = Utils.parse(c.getAsOfDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					christSalesDateStrTo = Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date d = DateUtil.parse(c.getAsOfDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					christSalesDateStrTo = DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				}
 				
 				sql.append("\n SELECT A.* FROM(");
@@ -3252,8 +3253,8 @@ public class SummaryDAO {
 				//prepare parameter
 				String christSalesDateStr ="";
 				if( !Utils.isNull(c.getSalesDate()).equals("")){
-					Date d = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					christSalesDateStr = Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH);
+					Date d = DateUtil.parse(c.getSalesDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					christSalesDateStr = DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				}
 				sql.append("\n SELECT A.* FROM(");
 				sql.append("\n SELECT M.* ");

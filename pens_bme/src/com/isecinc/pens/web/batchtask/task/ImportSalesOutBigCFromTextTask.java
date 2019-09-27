@@ -27,22 +27,23 @@ import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetDimension;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.GenCNBean;
 import com.isecinc.pens.bean.Master;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.TaskStoreBean;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.OrderDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
@@ -312,7 +313,7 @@ public class ImportSalesOutBigCFromTextTask extends BatchTask implements BatchTa
 						   ps.setString(index++, lineStrArry[4]);//DESCRIPTION
 						   ps.setString(index++, lineStrArry[5]);//STORE_NO
 						   ps.setString(index++, Utils.isNull( lineHead[4]));//STORE_NAME
-						   ps.setDate(index++, new java.sql.Date(Utils.parse(lineStrArry[6],Utils.YYYY_MM_DD_WITHOUT_SLASH).getTime()));//SALES_DATE
+						   ps.setDate(index++, new java.sql.Date(DateUtil.parse(lineStrArry[6],DateUtil.YYYY_MM_DD_WITHOUT_SLASH).getTime()));//SALES_DATE
 						   ps.setDouble(index++, Utils.convertStrToDouble(lineStrArry[7]));//GP_PERCENT
 						   ps.setInt(index++, Utils.convertStrToInt(lineStrArry[8]));//QTY
 						   ps.setDouble(index++, Utils.convertStrToDouble(lineStrArry[9]));//WHOLE_PRICE_BF

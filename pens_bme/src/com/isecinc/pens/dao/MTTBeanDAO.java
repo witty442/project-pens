@@ -14,9 +14,10 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.MTTBean;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.mtt.MTTAction;
 import com.isecinc.pens.web.shop.ShopBean;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 public class MTTBeanDAO{
@@ -143,8 +144,8 @@ public class MTTBeanDAO{
 			   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
 			   h.setCustGroup(rst.getString("cust_group"));
 			   h.setCustGroupName(rst.getString("cust_group_name"));
-			   h.setSaleDate(Utils.stringValue(rst.getTimestamp("sale_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			   h.setCreateDate(Utils.stringValue(rst.getTimestamp("create_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setSaleDate(DateUtil.stringValue(rst.getTimestamp("sale_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCreateDate(DateUtil.stringValue(rst.getTimestamp("create_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
 			   h.setRemark(Utils.isNull(rst.getString("remark")));
@@ -222,29 +223,29 @@ public class MTTBeanDAO{
 			}
 			
 			if( !Utils.isNull(o.getSaleDateFrom()).equals("")){
-				Date fDate  = Utils.parse(o.getSaleDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date fDate  = DateUtil.parse(o.getSaleDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String fStr = DateUtil.stringValue(fDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n and trunc(SALE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
 			}
 			
 			if( !Utils.isNull(o.getSaleDateTo()).equals("")){
-				Date tDate  = Utils.parse(o.getSaleDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(o.getSaleDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String tStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 
 				sql.append("\n and trunc(SALE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 			}
 			
 			if( !Utils.isNull(o.getCreateDateFrom()).equals("")){
-				Date fDate  = Utils.parse(o.getCreateDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date fDate  = DateUtil.parse(o.getCreateDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String fStr = DateUtil.stringValue(fDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n and trunc(CREATE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
 			}
 			
 			if( !Utils.isNull(o.getCreateDateTo()).equals("")){
-				Date tDate  = Utils.parse(o.getCreateDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date tDate  = DateUtil.parse(o.getCreateDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String tStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 
 				sql.append("\n and trunc(CREATE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 			}
@@ -263,8 +264,8 @@ public class MTTBeanDAO{
 			   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
 			   h.setCustGroup(rst.getString("cust_group"));
 			   h.setCustGroupName(rst.getString("cust_group_name"));
-			   h.setSaleDate(Utils.stringValue(rst.getTimestamp("sale_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			   h.setCreateDate(Utils.stringValue(rst.getTimestamp("create_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setSaleDate(DateUtil.stringValue(rst.getTimestamp("sale_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCreateDate(DateUtil.stringValue(rst.getTimestamp("create_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
 			   h.setRemark(Utils.isNull(rst.getString("remark")));
@@ -328,29 +329,29 @@ public class MTTBeanDAO{
 		}
 		
 		if( !Utils.isNull(o.getSaleDateFrom()).equals("")){
-			Date fDate  = Utils.parse(o.getSaleDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date fDate  = DateUtil.parse(o.getSaleDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String fStr = DateUtil.stringValue(fDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n and trunc(SALE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
 		}
 		
 		if( !Utils.isNull(o.getSaleDateTo()).equals("")){
-			Date tDate  = Utils.parse(o.getSaleDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getSaleDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 
 			sql.append("\n and trunc(SALE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 		}
 		
 		if( !Utils.isNull(o.getCreateDateFrom()).equals("")){
-			Date fDate  = Utils.parse(o.getCreateDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date fDate  = DateUtil.parse(o.getCreateDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String fStr = DateUtil.stringValue(fDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n and trunc(CREATE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
 		}
 		
 		if( !Utils.isNull(o.getCreateDateTo()).equals("")){
-			Date tDate  = Utils.parse(o.getCreateDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getCreateDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 
 			sql.append("\n and trunc(CREATE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 		}
@@ -404,8 +405,8 @@ public class MTTBeanDAO{
 			}
 			
 			if( !Utils.isNull(o.getDocDate()).equals("")){
-				Date fDate  = Utils.parse(o.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				Date fDate  = DateUtil.parse(o.getDocDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String fStr = DateUtil.stringValue(fDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				
 				sql.append("\n and trunc(DOC_DATE) = to_date('"+fStr+"','dd/mm/yyyy') ");
 			}
@@ -429,7 +430,7 @@ public class MTTBeanDAO{
 			   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
 			   h.setCustGroup(rst.getString("cust_group"));
 			   h.setCustGroupName(rst.getString("cust_group_name"));
-			   h.setDocDate(Utils.stringValue(rst.getTimestamp("doc_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setDocDate(DateUtil.stringValue(rst.getTimestamp("doc_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
                h.setGroupCode(Utils.isNull(rst.getString("GROUP_CODE")));
@@ -510,7 +511,7 @@ public class MTTBeanDAO{
 			   h.setLineId(rst.getInt("line_id"));
 			   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
 			   h.setCustGroup(rst.getString("cust_group"));
-			   h.setSaleDate(Utils.stringValue(rst.getTimestamp("sale_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setSaleDate(DateUtil.stringValue(rst.getTimestamp("sale_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
                h.setBarcode(Utils.isNull(rst.getString("barcode")));
                h.setMaterialMaster(Utils.isNull(rst.getString("MATERIAL_MASTER")));
@@ -782,7 +783,7 @@ public class MTTBeanDAO{
 				
 				ps = conn.prepareStatement(sql.toString());
 					
-				Date saleDate = Utils.parse( o.getSaleDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date saleDate = DateUtil.parse( o.getSaleDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				int c =1;
 				ps.setTimestamp(c++, new java.sql.Timestamp(saleDate.getTime()));

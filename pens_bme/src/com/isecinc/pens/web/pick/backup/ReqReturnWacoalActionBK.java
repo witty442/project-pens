@@ -22,9 +22,10 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.ReqReturnWacoalDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.pick.ReqReturnWacoalForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -100,7 +101,7 @@ public class ReqReturnWacoalActionBK extends I_Action {
 			aForm.setBean(new ReqReturnWacoal());
 			
 			ReqReturnWacoal ad = new ReqReturnWacoal();
-			ad.setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setRequestDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			aForm.setBean(ad);
 			
 		} catch (Exception e) {
@@ -159,7 +160,7 @@ public class ReqReturnWacoalActionBK extends I_Action {
 				aForm.setResults(new ArrayList<ReqReturnWacoal>());
 				ReqReturnWacoal ad = new ReqReturnWacoal();
 				ad.setCanEdit(true);
-				ad.setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				ad.setRequestDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				
 				aForm.setResults(ReqReturnWacoalDAO.searchBarcoceItemW1());
 				aForm.setBean(ad);
@@ -322,7 +323,7 @@ public class ReqReturnWacoalActionBK extends I_Action {
 			aForm.setResults(new ArrayList<ReqReturnWacoal>());
 			
 			ReqReturnWacoal ad = new ReqReturnWacoal();
-			ad.setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setRequestDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			ad.setCanEdit(true);
 			
 			aForm.setBean(ad);

@@ -29,12 +29,12 @@ import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.ConfFinishDAO;
 import com.isecinc.pens.dao.ConfirmReturnWacoalDAO;
 import com.isecinc.pens.dao.ReqReturnWacoalDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.pick.ConfFinishForm;
 import com.isecinc.pens.web.temp.TempForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 

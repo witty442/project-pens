@@ -24,9 +24,10 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -219,7 +220,7 @@ public class JobAction extends I_Action {
 				logger.debug("prepare new documentNo");
 				aForm.setResults(new ArrayList<Job>());
 				Job ad = new Job();
-				ad.setOpenDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				ad.setOpenDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				ad.setCanEdit(true);
 				
 				aForm.setJob(ad);
@@ -405,7 +406,7 @@ public class JobAction extends I_Action {
 			
 			Job ad = new Job();
 			ad.setCanEdit(true);
-			ad.setOpenDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setOpenDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			aForm.setJob(ad);
 			aForm.setMode("add");
 			

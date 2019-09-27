@@ -25,15 +25,16 @@ import org.apache.struts.upload.FormFile;
 
 import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.Master;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.dao.InterfaceDAO;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.dao.InterfaceDAO;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
@@ -309,7 +310,7 @@ public class ImportPosProcess extends InterfaceUtils{
 						   //ordered_date
 						  java.util.Date asOfDate =  (java.util.Date) cellValue;
 						   //logger.debug("Date:"+asOfDate);
-						   ordered_date = Utils.stringValue(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH);
+						   ordered_date = DateUtil.stringValue(asOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 						   //logger.debug("salesDate:"+salesDate);
 						   ps.setTimestamp(3, new java.sql.Timestamp(asOfDate.getTime()));  
 						}else if(colNo==3){

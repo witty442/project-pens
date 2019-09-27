@@ -15,8 +15,9 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.AdjustStockSA;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -40,7 +41,7 @@ public class AdjustStockSADAO {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
 			
-			Date tDate  = Utils.parse(h.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date tDate  = DateUtil.parse(h.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			//check documentNo
 			if(Utils.isNull(h.getDocumentNo()).equals("")){
 				//Gen DocNo
@@ -130,7 +131,7 @@ public class AdjustStockSADAO {
 			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date tDate  = DateUtil.parse(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
 			}
 			
@@ -140,7 +141,7 @@ public class AdjustStockSADAO {
 			  
 				   h = new AdjustStockSA();
 				   h.setNo(r);
-				   h.setTransactionDate(Utils.stringValue(rst.getDate("transaction_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setTransactionDate(DateUtil.stringValue(rst.getDate("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setDocumentNo(Utils.isNull(rst.getString("document_no")));
 				   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
 				   h.setStoreName(Utils.isNull(rst.getString("store_name")));
@@ -202,7 +203,7 @@ public class AdjustStockSADAO {
 			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				Date tDate  = Utils.parse(o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date tDate  = DateUtil.parse(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				ps.setDate(c++,new java.sql.Date(tDate.getTime()));
 			}
 			
@@ -212,7 +213,7 @@ public class AdjustStockSADAO {
 			   found = true;
 			   if(r==1)	{
 				   h = new AdjustStockSA();
-				   h.setTransactionDate(Utils.stringValue(rst.getDate("transaction_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setTransactionDate(DateUtil.stringValue(rst.getDate("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setDocumentNo(Utils.isNull(rst.getString("document_no")));
 				   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
 				   h.setStoreName(Utils.isNull(rst.getString("store_name")));
@@ -423,7 +424,7 @@ public class AdjustStockSADAO {
 			
 			ps = conn.prepareStatement(sql.toString());
 				
-			Date tDate = Utils.parse( o.getTransactionDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date tDate = DateUtil.parse( o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			int c =1;
 			
 			ps.setString(c++, o.getDocumentNo());

@@ -3,8 +3,8 @@ package com.isecinc.pens.web.interfaces;
 import org.apache.struts.upload.FormFile;
 
 import com.isecinc.core.web.I_Criteria;
-import com.isecinc.pens.inf.bean.InterfaceBean;
-import com.isecinc.pens.inf.bean.MonitorBean;
+import com.isecinc.pens.bean.InterfaceBean;
+import com.isecinc.pens.bean.MonitorBean;
 
 /**
  * ConversionCriteria Criteria

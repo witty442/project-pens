@@ -21,7 +21,8 @@ import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.ReqReturnWacoal;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -39,7 +40,7 @@ public class PickStockDAO extends PickConstants{
 		result.setResultProcess(true);//default
 		try{
 			
-			Date tDate  = Utils.parse(h.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date tDate  = DateUtil.parse(h.getIssueReqDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			//check documentNo
 			if(Utils.isNull(h.getIssueReqNo()).equals("")){
 				//Gen issueReqNo
@@ -87,7 +88,7 @@ public class PickStockDAO extends PickConstants{
 		Map<String,String> boxNoMapAll = new HashMap<String, String>();
 		try{
 			
-			Date tDate  = Utils.parse(h.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date tDate  = DateUtil.parse(h.getIssueReqDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			//check documentNo
 			if(Utils.isNull(h.getIssueReqNo()).equals("")){
 				//Gen issueReqNo
@@ -476,12 +477,12 @@ public class PickStockDAO extends PickConstants{
 			rst = ps.executeQuery();
 			while(rst.next()) {
 			   h = new PickStock();
-			   h.setIssueReqDate(Utils.stringValue(rst.getDate("issue_req_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setIssueReqDate(DateUtil.stringValue(rst.getDate("issue_req_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
 			   h.setIssueReqStatus(Utils.isNull(rst.getString("issue_req_status")));
 			   h.setIssueReqStatusDesc(getStatusReqDesc(h.getIssueReqStatus()));
 
-			   h.setConfirmIssueDate(Utils.stringValue(rst.getDate("confirm_issue_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)); 
+			   h.setConfirmIssueDate(DateUtil.stringValue(rst.getDate("confirm_issue_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)); 
 			   h.setRemark(Utils.isNull(rst.getString("remark")));
 			   h.setPickUser(Utils.isNull(rst.getString("pick_user")));
 			   h.setPickType(Utils.isNull(rst.getString("pick_type")));
@@ -524,15 +525,15 @@ public class PickStockDAO extends PickConstants{
 		}
 		
 		if( !Utils.isNull(o.getIssueReqDate()).equals("")){
-			Date tDate  = Utils.parse(o.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getIssueReqDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String returnDateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n and ISSUE_REQ_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
 		}
 		
 		if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
-			Date tDate  = Utils.parse(o.getConfirmIssueDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getConfirmIssueDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String returnDateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n and CONFIRM_ISSUE_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
 		}
@@ -861,7 +862,7 @@ public class PickStockDAO extends PickConstants{
 			if(rst.next()) {
 			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
 			   if(rst.getDate("issue_req_date") != null){
-				  String dateStr = Utils.stringValue(rst.getDate("issue_req_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				  String dateStr = DateUtil.stringValue(rst.getDate("issue_req_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			      h.setIssueReqDate(dateStr);
 			   }
 			   h.setIssueReqStatus(rst.getString("issue_req_status"));
@@ -879,7 +880,7 @@ public class PickStockDAO extends PickConstants{
 			   h.setInvoiceNo(Utils.isNull(rst.getString("invoice_no"))); 
 			   
 			   if(rst.getDate("confirm_issue_date") != null){
-				   String dateStr = Utils.stringValue(rst.getDate("confirm_issue_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				   String dateStr = DateUtil.stringValue(rst.getDate("confirm_issue_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				   h.setConfirmIssueDate(dateStr);
 			   }
 			   
@@ -1801,7 +1802,7 @@ public class PickStockDAO extends PickConstants{
 			
 			ps = conn.prepareStatement(sql.toString());
 				
-			Date tDate = Utils.parse( o.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date tDate = DateUtil.parse( o.getIssueReqDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			int c =1;
 			
 			ps.setString(c++, o.getIssueReqNo());
@@ -1851,7 +1852,7 @@ public class PickStockDAO extends PickConstants{
 			ps.setString(c++, o.getUpdateUser());
 			
 			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
-				Date confrimDate = Utils.parse( o.getConfirmIssueDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date confrimDate = DateUtil.parse( o.getConfirmIssueDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			    ps.setTimestamp(c++, new java.sql.Timestamp(confrimDate.getTime()));
 			}
 			

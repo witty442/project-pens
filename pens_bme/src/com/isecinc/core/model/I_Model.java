@@ -10,7 +10,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.core.Database;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 
 /**
  * I_Model Class

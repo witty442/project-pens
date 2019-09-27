@@ -1,8 +1,8 @@
-<%@page import="util.PageVisit"%>
-<%@page import="util.SessionUtils"%>
+<%@page import="com.pens.util.PageVisit"%>
+<%@page import="com.pens.util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.stock.StockConstants"%>
-<%@page import="util.Utils"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -110,8 +110,8 @@ window.onhashchange=function(){window.location.hash="no-back-button";}
 						       <jsp:include page="criteria/stockCloseVanCriteria.jsp" flush="true"/> 
 						   <%}else if(StockConstants.PAGE_STOCK_CLOSEPD_VAN.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/stockPDVanCriteria.jsp" flush="true"/>  
-						    <%}else if(StockConstants.PAGE_STOCK_CR_EXPIRE.equalsIgnoreCase(pageName)){ %>
-						        <jsp:include page="criteria/stockCreditExpireCriteria.jsp" flush="true"/>  
+						   <%}else if(StockConstants.PAGE_STOCK_CR_EXPIRE.equalsIgnoreCase(pageName)){ %>
+						        <jsp:include page="criteria/stockCreditExpireCriteria.jsp" flush="true"/>   
 						   <% } %>
 					    </div>
 					  

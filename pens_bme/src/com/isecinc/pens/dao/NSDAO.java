@@ -15,12 +15,13 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.NSBean;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.nissin.NSConstant;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.rt.RTConstant;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.pens.util.BahtText;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -92,7 +93,7 @@ public class NSDAO {
 				while(rst.next()) {
 				   h = new NSBean();
 				   h.setOrderId(Utils.isNull(rst.getString("order_id")));
-				   h.setOrderDate(Utils.stringValue(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 				   h.setCustomerType(Utils.isNull(rst.getString("customer_type")));
 				   h.setCustomerSubType(Utils.isNull(rst.getString("customer_sub_type")));
@@ -109,7 +110,7 @@ public class NSDAO {
 				   h.setProvinceId(Utils.isNull(rst.getString("province_id")));
 				    
 				   if( rst.getDate("invoice_date") !=null){
-				     h.setInvoiceDate(Utils.stringValue(rst.getDate("invoice_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				     h.setInvoiceDate(DateUtil.stringValue(rst.getDate("invoice_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					   h.setInvoiceDate("");
 				   }
@@ -198,7 +199,7 @@ public class NSDAO {
 				while(rst.next()) {
 				   h = new NSBean();
 				   h.setOrderId(Utils.isNull(rst.getString("order_id")));
-				   h.setOrderDate(Utils.stringValue(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 				   h.setCustomerType(Utils.isNull(rst.getString("customer_type")));
 				   h.setCustomerSubType(Utils.isNull(rst.getString("customer_sub_type")));
@@ -215,7 +216,7 @@ public class NSDAO {
 				   h.setProvinceId(Utils.isNull(rst.getString("province_id")));
 				    
 				   if( rst.getDate("invoice_date") !=null){
-				     h.setInvoiceDate(Utils.stringValue(rst.getDate("invoice_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				     h.setInvoiceDate(DateUtil.stringValue(rst.getDate("invoice_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					   h.setInvoiceDate("");
 				   }
@@ -280,18 +281,18 @@ public class NSDAO {
 		}
 		
 		if( !Utils.isNull(o.getOrderDateFrom()).equals("") &&  !Utils.isNull(o.getOrderDateTo()).equals("")){
-			docDate  = Utils.parse(o.getOrderDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateStr = Utils.stringValue(docDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+			docDate  = DateUtil.parse(o.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateStr = DateUtil.stringValue(docDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 			
 			sql.append("\n and h.order_date >= to_date('"+dateStr+"','dd/mm/yyyy')");
 			
-			docDate  = Utils.parse(o.getOrderDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateStrTo = Utils.stringValue(docDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+			docDate  = DateUtil.parse(o.getOrderDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateStrTo = DateUtil.stringValue(docDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 			sql.append("\n and h.order_date <= to_date('"+dateStrTo+"','dd/mm/yyyy')");
 		    
 		}else if( !Utils.isNull(o.getOrderDateFrom()).equals("")){
-			docDate  = Utils.parse(o.getOrderDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateStr = Utils.stringValue(docDate, Utils.DD_MM_YYYY_WITH_SLASH,Locale.US);
+			docDate  = DateUtil.parse(o.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateStr = DateUtil.stringValue(docDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Locale.US);
 			
 			sql.append("\n and h.order_date = to_date('"+dateStr+"','dd/mm/yyyy')");
 		}
@@ -387,7 +388,7 @@ public class NSDAO {
 			
 			ps = conn.prepareStatement(sql.toString());
 			
-			Date d = Utils.parse(Utils.isNull(o.getOrderDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date d = DateUtil.parse(Utils.isNull(o.getOrderDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			ps.setString(c++, Utils.isNull(o.getOrderId()));
 			ps.setDate(c++, new java.sql.Date(d.getTime()));
@@ -426,7 +427,7 @@ public class NSDAO {
 
 			ps = conn.prepareStatement(sql.toString());
 			
-			Date d = Utils.parse(Utils.isNull(o.getOrderDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date d = DateUtil.parse(Utils.isNull(o.getOrderDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			ps.setDate(c++, new java.sql.Date(d.getTime()));
 			
 			ps.setString(c++, Utils.isNull(o.getCustomerType()));
@@ -501,7 +502,7 @@ public class NSDAO {
 			ps = conn.prepareStatement(sql.toString());
 			
 			if( !Utils.isNull(o.getInvoiceDate()).equals("") ){
-			    picRcvDate = Utils.parse(o.getInvoiceDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    picRcvDate = DateUtil.parse(o.getInvoiceDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			}
 			
 			ps.setString(c++, Utils.isNull(o.getStatus()));

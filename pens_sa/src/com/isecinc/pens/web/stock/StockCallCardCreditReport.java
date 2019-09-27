@@ -19,14 +19,15 @@ import com.isecinc.pens.bean.CustomerBean;
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.CustomerDAO;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.isecinc.pens.web.location.LocationBean;
-
-import util.DBConnection;
-import util.DateToolsUtil;
-import util.ExcelHeader;
-import util.UserUtils;
-import util.Utils;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
+import com.pens.util.UserUtils;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 public class StockCallCardCreditReport {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -54,12 +55,12 @@ public class StockCallCardCreditReport {
 			conn = DBConnection.getInstance().getConnection();
 			
 			//check user login is map cust sales TT
-			boolean isUserMapCustSalesTT = StockCallCardCreditReport.isUserMapCustSalesTT(user);
+			boolean isUserMapCustSalesTT = GeneralDAO.isUserMapCustSalesTT(user);
 
 			//prepare parameter Fix CConstant 
 			logger.debug("startDate:"+o.getStartDate());
-			Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			logger.debug("startDateStr:"+startDateStr);
 			
 			sql.append("\n SELECT M.* FROM (");
@@ -79,17 +80,17 @@ public class StockCallCardCreditReport {
 			if( !Utils.isNull(o.getBrand()).equals("") && !Utils.isNull(o.getBrand()).equals("ALL")){
 				// Brand 504 must show 503494,503544,503681 (Case Special case )
 				if(Utils.isNull(o.getBrand()).indexOf("504") != -1 ){
-					sql.append("\n and ( M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
+					sql.append("\n and ( M.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")");
 					sql.append("\n     or M.item_no in('503494','503544','503681') )");
 				}else{
-					sql.append("\n and M.brand in("+Utils.converToTextSqlIn(o.getBrand())+")");
+					sql.append("\n and M.brand in("+SQLHelper.converToTextSqlIn(o.getBrand())+")");
 				}
 			}
 			if( !Utils.isNull(o.getCustomerCode()).equals("") && !Utils.isNull(o.getCustomerCode()).equals("ALL")){
-				sql.append("\n and M.customer_number in("+Utils.converToTextSqlIn(o.getCustomerCode())+")");
+				sql.append("\n and M.customer_number in("+SQLHelper.converToTextSqlIn(o.getCustomerCode())+")");
 			}
 			if( !Utils.isNull(o.getItemCode()).equals("") && !Utils.isNull(o.getItemCode()).equals("ALL")){
-				sql.append("\n and M.item_no in("+Utils.converToTextSqlIn(o.getItemCode())+")");
+				sql.append("\n and M.item_no in("+SQLHelper.converToTextSqlIn(o.getItemCode())+")");
 			}
 			
 			//Case Sales Login filter show only salesrepCode 
@@ -129,17 +130,17 @@ public class StockCallCardCreditReport {
 			if( !Utils.isNull(o.getBrand()).equals("") && !Utils.isNull(o.getBrand()).equals("ALL")){
 				// Brand 504 must show 503494,503544,503681 (Case Special case )
 				if(Utils.isNull(o.getBrand()).indexOf("504") != -1 ){
-					sql.append("\n and ( M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
+					sql.append("\n and ( M.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")");
 					sql.append("\n     or P.inventory_item_code in('503494','503544','503681') )");
 				}else{
-					sql.append("\n and M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
+					sql.append("\n and M.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")");
 				}
 			}
 			if( !Utils.isNull(o.getCustomerCode()).equals("") && !Utils.isNull(o.getCustomerCode()).equals("ALL")){
-				sql.append("\n and C.customer_code in("+Utils.converToTextSqlIn(o.getCustomerCode())+")");
+				sql.append("\n and C.customer_code in("+SQLHelper.converToTextSqlIn(o.getCustomerCode())+")");
 			}
 			if( !Utils.isNull(o.getItemCode()).equals("") && !Utils.isNull(o.getItemCode()).equals("ALL")){
-				sql.append("\n and P.inventory_item_code in( "+Utils.converToTextSqlIn(o.getItemCode())+")");
+				sql.append("\n and P.inventory_item_code in( "+SQLHelper.converToTextSqlIn(o.getItemCode())+")");
 			}
 			//Case Sales Login filter show only salesrepCode 
 			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
@@ -166,7 +167,7 @@ public class StockCallCardCreditReport {
 			  
 			  //set for display
 			  productMap.put(Utils.isNull(rst.getString("item_no")), Utils.isNull(rst.getString("item_name")));
-			  requestDate = Utils.stringValue(rst.getDate("request_date"), Utils.YYYY_MM_DD_WITHOUT_SLASH,Utils.local_th);
+			  requestDate = DateUtil.stringValue(rst.getDate("request_date"), DateUtil.YYYY_MM_DD_WITHOUT_SLASH,DateUtil.local_th);
 			  requestMAP.put(requestDate, requestDate);
 			  
 			  //set data Map  key= recordType_reuest_date_product
@@ -413,7 +414,7 @@ public class StockCallCardCreditReport {
 			headReport.append(" <td colspan="+colSpan+"><b>แบรนด์ : "+head.getBrand()+"</b> </td>");
 			headReport.append("</tr> \n");
 			headReport.append("<tr> \n");
-			headReport.append(" <td colspan="+colSpan+"><b>พิมพ์วันที่ &nbsp;&nbsp;"+Utils.stringValue(new Date(), Utils.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,Utils.local_th)+"</b> </td>");
+			headReport.append(" <td colspan="+colSpan+"><b>พิมพ์วันที่ &nbsp;&nbsp;"+DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,DateUtil.local_th)+"</b> </td>");
 			headReport.append("</tr> \n");
 			headReport.append("</table> \n");
 			
@@ -521,35 +522,5 @@ public class StockCallCardCreditReport {
 		return h;
 	}
 	
-	//Return is set map :true
-	public static boolean isUserMapCustSalesTT(User user){
-		Statement stmt = null;
-		ResultSet rst = null;
-		StringBuilder sql = new StringBuilder();
-		Connection conn = null;
-		boolean isMap = false;
-		try{
-			sql.append("\n  SELECT count(*) as c from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT M  ");
-			sql.append("\n  where user_name='"+user.getUserName()+"'");
-			
-			logger.debug("sql:"+sql);
-			conn = DBConnection.getInstance().getConnectionApps();
-			stmt = conn.createStatement();
-			rst = stmt.executeQuery(sql.toString());
-			if (rst.next()) {
-				if(rst.getInt("c")>0){
-					isMap = true;
-				}
-			}//while
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		} finally {
-			try {
-				rst.close();
-				stmt.close();
-				conn.close();
-			} catch (Exception e) {}
-		}
-	 return isMap;
-	}
+	
 }

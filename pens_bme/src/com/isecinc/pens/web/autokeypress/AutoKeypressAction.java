@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.pens.bean.PopupBean;
+import com.isecinc.pens.dao.BMEProductDAO;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.Utils;
@@ -36,6 +38,20 @@ public class AutoKeypressAction {
 				PopupForm popupForm = AutoKeypressDAO.searchSalesrepSalesDetail(criteriaForm);
 				if(popupForm != null){
 					resultAjax = "4|"+popupForm.getCode()+"|"+popupForm.getDesc()+"|"+popupForm.getDesc2()+"|"+popupForm.getDesc3();
+				}else{
+					resultAjax = "-1|||";
+				}
+			}else if("BMEProduct".equalsIgnoreCase(pageName) ){
+				
+				//set criteria
+				PopupBean criBean = new PopupBean();
+				criBean.setCustGroup(Utils.isNull(request.getParameter("custGroup")));
+				criBean.setPensItem(Utils.isNull(request.getParameter("pensItem")));
+				criBean.setCustGroup(Utils.isNull(request.getParameter("custGroup")));
+				
+				PopupBean resultPopupBean = BMEProductDAO.searchBMEProduct(criBean);
+				if(resultPopupBean != null){
+					resultAjax = "3|"+resultPopupBean.getPensItem()+"|"+resultPopupBean.getMaterialMaster()+"|"+resultPopupBean.getGroupCode();
 				}else{
 					resultAjax = "-1|||";
 				}

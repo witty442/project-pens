@@ -2,7 +2,7 @@ package com.isecinc.pens.web.stockmc;
 
 import java.util.List;
 
-import util.ExcelHeader;
+import com.pens.util.excel.ExcelHeader;
 
 public class StockMCExport {
 	

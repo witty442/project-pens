@@ -25,6 +25,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.StockQueryDAO;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -141,7 +142,7 @@ public class StockQueryAction extends I_Action {
 			aForm.setResults(new ArrayList<StockQuery>());
 			
 			StockQuery ad = new StockQuery();
-			ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			aForm.setBean(ad);
 			
 		} catch (Exception e) {

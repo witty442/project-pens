@@ -10,7 +10,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import util.Utils;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
 
 public class StockVanDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -482,13 +483,13 @@ public class StockVanDAO {
 			sql.append("\n and subinv.subinventory Like '"+Utils.isNull(o.getPdType())+"%'");
 		}
 		if( !Utils.isNull(o.getPdCode()).equals("")){
-			sql.append("\n and subinv.subinventory in("+Utils.converToTextSqlIn(o.getPdCode())+")");
+			sql.append("\n and subinv.subinventory in("+SQLHelper.converToTextSqlIn(o.getPdCode())+")");
 		}
 		if( !Utils.isNull(o.getBrand()).equals("")){
-			sql.append("\n and P.brand in("+Utils.converToTextSqlIn(o.getBrand())+")");
+			sql.append("\n and P.brand in("+SQLHelper.converToTextSqlIn(o.getBrand())+")");
 		}
 		if( !Utils.isNull(o.getProductCode()).equals("")){
-			sql.append("\n and P.segment1 in("+Utils.converToTextSqlIn(o.getProductCode())+")");
+			sql.append("\n and P.segment1 in("+SQLHelper.converToTextSqlIn(o.getProductCode())+")");
 		}
 		if( !Utils.isNull(o.getSalesZone()).equals("")){
 		    sql.append("\n  and S.code in(");

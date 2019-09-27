@@ -15,7 +15,8 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.SADamageBean;
 import com.isecinc.pens.bean.SAEmpBean;
 import com.isecinc.pens.bean.SATranBean;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class SATranDAO {
@@ -44,8 +45,8 @@ public class SATranDAO {
 						payDate = "01"+"/"+yyyymmPayDate.substring(4,6)+"/"+yyyymmPayDate.substring(0,2);
 					}else{
 						//default now date
-						yyyymmPayDate = Utils.stringValue(new Date(), Utils.YYYYMM,Utils.local_th);
-						payDate = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						yyyymmPayDate = DateUtil.stringValue(new Date(), DateUtil.YYYYMM,Utils.local_th);
+						payDate = DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					}
 				}
 		        
@@ -117,8 +118,8 @@ public class SATranDAO {
 						item.setExistDB(true);
 						
 						//Check canChange Chkbox payDateDB >= payDateScreen 
-						payDateScreen = Utils.parse(payDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-						payDateDB = Utils.parse(dataDB.getPayDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						payDateScreen = DateUtil.parse(payDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						payDateDB = DateUtil.parse(dataDB.getPayDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 						
 						logger.debug("payDateScreen:"+payDateScreen);
 						logger.debug("payDateDB    :"+payDateDB);
@@ -262,8 +263,8 @@ public class SATranDAO {
 				if(rst.next()) {
 					item = new SATranBean();
 					item.setYearMonth(Utils.isNull(rst.getString("year_month")));
-					item.setStartBmeYearMonth(Utils.stringValue(rst.getDate("start_reward_bme_date"), Utils.YYYYMM,Utils.local_th));
-					item.setStartWacoalYearMonth(Utils.stringValue(rst.getDate("start_reward_wacoal_date"), Utils.YYYYMM,Utils.local_th));
+					item.setStartBmeYearMonth(DateUtil.stringValue(rst.getDate("start_reward_bme_date"), DateUtil.YYYYMM,Utils.local_th));
+					item.setStartWacoalYearMonth(DateUtil.stringValue(rst.getDate("start_reward_wacoal_date"), DateUtil.YYYYMM,Utils.local_th));
 					
 					if("BME".equalsIgnoreCase(type)){
 					   item.setAmt(Utils.decimalFormat(rst.getDouble("bme_amt"), Utils.format_current_2_disgit));
@@ -304,12 +305,12 @@ public class SATranDAO {
 					item.setAmt(Utils.decimalFormat(rst.getDouble("amt"), Utils.format_current_2_disgit));
 					
 					if(rst.getDate("paydate") != null){
-						item.setPayDate(Utils.stringValue(rst.getDate("paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+						item.setPayDate(DateUtil.stringValue(rst.getDate("paydate"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					}else{
 						item.setPayDate("");
 					}
 					if(rst.getDate("count_stock_date") != null){
-						item.setCountStockDate(Utils.stringValue(rst.getDate("count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+						item.setCountStockDate(DateUtil.stringValue(rst.getDate("count_stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					}else{
 						item.setCountStockDate("");
 					}
@@ -354,12 +355,12 @@ public class SATranDAO {
 				ps.setString(c++, Utils.isNull(o.getYearMonth())); //2
 			
 				if( !Utils.isNull(o.getPayDate()).equals("")){//4
-					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getPayDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+					 ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getPayDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
 				if( !Utils.isNull(o.getCountStockDate()).equals("")){//4
-					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getCountStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+					 ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getCountStockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
@@ -396,12 +397,12 @@ public class SATranDAO {
 				
 			
 				if( !Utils.isNull(o.getPayDate()).equals("")){//4
-					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getPayDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+					 ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getPayDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
 				if( !Utils.isNull(o.getCountStockDate()).equals("")){//4
-					 ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getCountStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+					 ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getCountStockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				}else{
 					 ps.setTimestamp(c++,null);
 				}
@@ -456,7 +457,7 @@ public class SATranDAO {
 			logger.debug("deleteModel");
 			int c =1;
 			try{
-				Date checkStockDateObj = Utils.parse(o.getCheckStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date checkStockDateObj = DateUtil.parse(o.getCheckStockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				StringBuffer sql = new StringBuffer("");
 				sql.append("UPDATE SA_REWARD_TRAN set DAMAGE_USE_FLAG ='"+flag+"',UPDATE_DATE=?, UPDATE_USER=? \n");
@@ -686,23 +687,23 @@ public class SATranDAO {
 			   h.setWacoalAmt(Utils.decimalFormat(rst.getDouble("wacoal_amt"), Utils.format_current_2_disgit));
 			   
 			   if(rst.getDate("bme_count_stock_date") != null){
-				   h.setBmeCountStockDate(Utils.stringValue(rst.getDate("bme_count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setBmeCountStockDate(DateUtil.stringValue(rst.getDate("bme_count_stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				}else{
 				   h.setBmeCountStockDate("");
 				}
 			   if(rst.getDate("bme_paydate") != null){
-				 h.setBmePayDate(Utils.stringValue(rst.getDate("bme_paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 h.setBmePayDate(DateUtil.stringValue(rst.getDate("bme_paydate"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   }else{
 				 h.setPayDate("");
 			   }
 			   
 			   if(rst.getDate("wacoal_count_stock_date") != null){
-				   h.setWacoalCountStockDate(Utils.stringValue(rst.getDate("wacoal_count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setWacoalCountStockDate(DateUtil.stringValue(rst.getDate("wacoal_count_stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				}else{
 				   h.setWacoalCountStockDate("");
 				}
 			   if(rst.getDate("wacoal_paydate") != null){
-				  h.setWacoalPayDate(Utils.stringValue(rst.getDate("wacoal_paydate"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  h.setWacoalPayDate(DateUtil.stringValue(rst.getDate("wacoal_paydate"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   }else{
 				  h.setPayDate("");
 			   }
@@ -736,7 +737,7 @@ public class SATranDAO {
 			double amt = 0;
 			Date payDate  = null;
 			try {
-				Date checkStockDateObj = Utils.parse(checkStockDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date checkStockDateObj = DateUtil.parse(checkStockDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				sql.append("\n SELECT nvl(sum(amt),0) as amt,paydate FROM SA_REWARD_TRAN");
 				sql.append("\n  WHERE emp_id = '"+empId+"'");
 				sql.append("\n  and type = '"+typeInvoice+"'");
@@ -761,7 +762,7 @@ public class SATranDAO {
 				item.setAmt(Utils.decimalFormat(amt, Utils.format_current_2_disgit));
 			    
 			    if(payDate != null){
-					item.setPayDate(Utils.stringValue(payDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					item.setPayDate(DateUtil.stringValue(payDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				}else{
 			        item.setPayDate("");
 				}

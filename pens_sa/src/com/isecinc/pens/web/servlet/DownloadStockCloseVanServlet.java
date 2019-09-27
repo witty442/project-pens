@@ -15,11 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import util.BeanParameter;
-import util.DBConnection;
-import util.ReportUtilServlet;
-import util.Utils;
-
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
@@ -28,6 +23,10 @@ import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
 import com.isecinc.pens.web.stock.StockBean;
 import com.isecinc.pens.web.stock.StockCloseVanBean;
 import com.isecinc.pens.web.stock.StockCloseVanReport;
+import com.pens.util.BeanParameter;
+import com.pens.util.DBConnection;
+import com.pens.util.ReportUtilServlet;
+import com.pens.util.Utils;
 
 @SuppressWarnings( { "static-access", "serial", "deprecation" })
 public class DownloadStockCloseVanServlet extends HttpServlet {

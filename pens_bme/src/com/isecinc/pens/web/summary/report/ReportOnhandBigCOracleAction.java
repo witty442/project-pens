@@ -20,12 +20,12 @@ import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.StoreDAO;
 import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.sql.ReportOnhandAsOfKingSQL;
 import com.isecinc.pens.sql.ReportOnhandMTTDetailSQL;
 import com.isecinc.pens.sql.ReportOnhandSizeColorKingSQL;
 import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.web.summary.SummaryForm;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 

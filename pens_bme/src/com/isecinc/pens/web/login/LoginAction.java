@@ -15,12 +15,12 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.SessionIdUtils;
 import com.isecinc.pens.process.login.LoginProcess;
 import com.isecinc.pens.scheduler.utils.DateUtil;
 import com.isecinc.pens.web.managepath.ManagePath;
+import com.pens.util.DBConnection;
 import com.pens.util.EncyptUtils;
+import com.pens.util.SIdUtils;
 import com.pens.util.Utils;
 
 /**
@@ -64,7 +64,7 @@ public class LoginAction extends DispatchAction {
 			logger.debug("Locale:"+Locale.getDefault());
 			
 			//remove session id
-			SessionIdUtils.getInstance().clearInstance();
+			SIdUtils.getInstance().clearInstance();
 			
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
@@ -136,7 +136,7 @@ public class LoginAction extends DispatchAction {
 			logger.debug("loginCrossServer Locale:"+Locale.getDefault());
 			
 			//remove session id
-			SessionIdUtils.getInstance().clearInstance();
+			SIdUtils.getInstance().clearInstance();
 			
 			String serverForm = Utils.isNull(request.getParameter("serverUrl"));
 			//payAction|prepare2|new
@@ -208,7 +208,7 @@ public class LoginAction extends DispatchAction {
 		try {
 			logger.debug("loginCrossServer Locale:"+Locale.getDefault());
 			//remove session id
-			SessionIdUtils.getInstance().clearInstance();
+			SIdUtils.getInstance().clearInstance();
 			
 			String serverForm = Utils.isNull(request.getParameter("serverUrl"));
 			//payAction|prepare2|new
@@ -279,7 +279,7 @@ public class LoginAction extends DispatchAction {
 			logger.debug("logoff");
 			
 			//remove session id
-			SessionIdUtils.getInstance().clearInstance();
+			SIdUtils.getInstance().clearInstance();
 			
 			request.getSession().invalidate();
 		} catch (Exception e) {

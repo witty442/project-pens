@@ -11,7 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import util.Paginator;
+import com.pens.util.Paginator;
 
 /**
  * I_Action Class

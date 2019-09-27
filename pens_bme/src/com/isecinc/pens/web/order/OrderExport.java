@@ -8,7 +8,8 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -30,7 +31,7 @@ private static Logger logger = Logger.getLogger("PENS");
 			h.append(ExcelHeader.EXCEL_HEADER);
 			
 			conn = DBConnection.getInstance().getConnection();
-			Date orderDateO = Utils.parse(orderDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDateO = DateUtil.parse(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			//Total Store
 			sql.append(" select count(distinct store_code) as c from PENSBME_ORDER WHERE trunc(order_date) =? \n");

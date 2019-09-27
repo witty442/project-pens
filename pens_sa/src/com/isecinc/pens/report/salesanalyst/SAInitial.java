@@ -20,16 +20,15 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.DateToolsUtil;
-import util.Utils;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.isecinc.pens.report.salesanalyst.helper.SAGenCondition;
 import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class SAInitial {
    
@@ -576,12 +575,12 @@ public class SAInitial {
 					sql.append("\t"+" GROUP BY  "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 				}
 				else {
-					Date date = Utils.parseToBudishDate(salesBean.getDay(), Utils.DD_MM_YYYY_WITH_SLASH);
-					Date dateTo = Utils.parseToBudishDate(salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH);
+					Date date = DateUtil.parseToBudishDate(salesBean.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH);
+					Date dateTo = DateUtil.parseToBudishDate(salesBean.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH);
 					// 
 					if(date != null && dateTo != null){
-						sql.append("\t"+" AND  SALES_ORDER_DATE >= to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
-						sql.append("\t"+" AND  SALES_ORDER_DATE <= to_date('"+Utils.stringValue(dateTo, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
+						sql.append("\t"+" AND  SALES_ORDER_DATE >= to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
+						sql.append("\t"+" AND  SALES_ORDER_DATE <= to_date('"+DateUtil.stringValue(dateTo, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
 						sql.append("\t"+" GROUP BY  "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 					}
 				}
@@ -628,12 +627,12 @@ public class SAInitial {
 					sql.append("\t"+" GROUP BY "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 				}
 				else {
-					Date date = Utils.parseToBudishDate(salesBean.getDay(), Utils.DD_MM_YYYY_WITH_SLASH);
-					Date dateTo = Utils.parseToBudishDate(salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH);
+					Date date = DateUtil.parseToBudishDate(salesBean.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH);
+					Date dateTo = DateUtil.parseToBudishDate(salesBean.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH);
 					// 
 					if(date != null && dateTo != null){
-						sql.append("\t"+" AND  INVOICE_DATE >= to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
-						sql.append("\t"+" AND  INVOICE_DATE <= to_date('"+Utils.stringValue(dateTo, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
+						sql.append("\t"+" AND  INVOICE_DATE >= to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
+						sql.append("\t"+" AND  INVOICE_DATE <= to_date('"+DateUtil.stringValue(dateTo, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
 						sql.append("\t"+" GROUP BY  "+SAGenCondition.genGroupBySQL(Utils.isNull(salesBean.getGroupBy())) +" \n ");
 					}
 				}
@@ -644,7 +643,7 @@ public class SAInitial {
 			String paramDay = salesBean.getDay(); // Temp Parameter Using for Set Back Date Parameter
 			if( !Utils.isNull(salesBean.getDay()).equals("")){
 				logger.debug("salesBean.getDay():"+salesBean.getDay());
-				startDate = DateToolsUtil.convertStringToDate(salesBean.getDay());
+				startDate = DateUtil.convertStringToDate(salesBean.getDay());
 			}
 			
 			/** Gen By Condition From TO dayFrom-DateTo or Month 11-Month 12 or Quarter1-Quarter4 **/
@@ -657,7 +656,7 @@ public class SAInitial {
 				
 				if(startDate != null && i != 0){
 					startDate = DateUtils.addDays(startDate, 1); 
-					salesBean.setDay(DateToolsUtil.convertToString(startDate));
+					salesBean.setDay(DateUtil.convertToString(startDate));
 				}
 				
 				/** Gen SQL not in Case CALL **/

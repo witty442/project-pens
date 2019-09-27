@@ -12,7 +12,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Order;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
@@ -120,8 +121,8 @@ public class OrderValidate {
 		List<String> storeList = new ArrayList<String>();
 		Map<String, String> storeErrorMap = new HashMap<String, String>();
 		try{
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n select order_date ,store_type,store_code,group_code,barcode,count(*) ");
 			sql.append("from pensbi.pensbme_order \n");
@@ -135,7 +136,7 @@ public class OrderValidate {
 			while (rst.next()) {
 				OrderErrorBean item = new OrderErrorBean();
 				item.setStoreCode(rst.getString("store_code"));
-				item.setOrderDate(Utils.stringValue(rst.getDate("order_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				item.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				if(storeErrorMap.get(item.getStoreCode()) == null){
 				   //logger.debug("add storeCode:"+item.getStoreCode());
 					storeList.add(item.getStoreCode());
@@ -159,8 +160,8 @@ public class OrderValidate {
 		StringBuilder sql = new StringBuilder();
 		List<OrderErrorBean> barcodeList = new ArrayList<OrderErrorBean>();
 		try{
-			Date orderDate = Utils.parse(orderDateS, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date orderDate = DateUtil.parse(orderDateS, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n select store_code,group_code,barcode,qty ");
 			sql.append("\n ,(select max(pens_desc) from pensbi.pensbme_mst_reference m where m.reference_code ='Store'"
@@ -204,8 +205,8 @@ public class OrderValidate {
 		StringBuilder sql = new StringBuilder();
 		List<OrderErrorBean> barcodeList = new ArrayList<OrderErrorBean>();
 		try{
-			Date orderDate = Utils.parse(orderDateS, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date orderDate = DateUtil.parse(orderDateS, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n select distinct order_no ");
 			sql.append("from pensbi.pensbme_order \n");
@@ -237,8 +238,8 @@ public class OrderValidate {
 		String key = "";//storeCode+orderNo+barcode
 		Map<String, OrderErrorBean> dataErrorMap = new HashMap<String, OrderErrorBean>();
 		try{
-			Date orderDate = Utils.parse(orderDateS, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String orderDateStr = Utils.stringValue(orderDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date orderDate = DateUtil.parse(orderDateS, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n select order_date ,store_type,store_code,order_no,group_code,barcode,qty ");
 			sql.append("from pensbi.pensbme_order \n");
@@ -252,7 +253,7 @@ public class OrderValidate {
 				OrderErrorBean item = new OrderErrorBean();
 				item.setOrderNo(rst.getString("order_no"));
 				item.setStoreCode(rst.getString("store_code"));
-				item.setOrderDate(Utils.stringValue(rst.getDate("order_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				item.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				item.setStoreType(rst.getString("store_type"));
 				item.setGroupCode(rst.getString("group_code"));
 				item.setBarcode(rst.getString("barcode"));

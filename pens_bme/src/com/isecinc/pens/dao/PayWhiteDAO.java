@@ -13,9 +13,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.PayBean;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.BahtText;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -62,8 +63,8 @@ public class PayWhiteDAO {
 						sql.append("\n and h.doc_date >= ?");
 						sql.append("\n and h.doc_date <= ?");
 						
-					   dateFrom  = Utils.parse(o.getDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					   dateTo  = Utils.parse(o.getDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					   dateFrom  = DateUtil.parse(o.getDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					   dateTo  = DateUtil.parse(o.getDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					}
 					sql.append("\n order by h.doc_no desc ");
 	            sql.append("\n   )A ");
@@ -115,8 +116,8 @@ public class PayWhiteDAO {
 						sql.append("\n and h.doc_date >= ?");
 						sql.append("\n and h.doc_date <= ?");
 						
-					   dateFrom  = Utils.parse(o.getDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					   dateTo  = Utils.parse(o.getDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					   dateFrom  = DateUtil.parse(o.getDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					   dateTo  = DateUtil.parse(o.getDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					}
 					sql.append("\n order by h.doc_no desc ");
 	            sql.append("\n   )A ");
@@ -141,7 +142,7 @@ public class PayWhiteDAO {
 				while(rst.next()) {
 				   h = new PayBean();
 				   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
-				   h.setDocDate(Utils.stringValue(rst.getDate("doc_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setDocDate(DateUtil.stringValue(rst.getDate("doc_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setPayToName(Utils.isNull(rst.getString("pay_to_name")));
 				   h.setDeptId(Utils.isNull(rst.getString("dept_id")));
 				   h.setDeptName(Utils.isNull(rst.getString("dept_name")));
@@ -268,7 +269,7 @@ public class PayWhiteDAO {
 			
 			ps = conn.prepareStatement(sql.toString());
 			
-			Date docDate = Utils.parse(o.getDocDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date docDate = DateUtil.parse(o.getDocDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			int c =1;
 			ps.setString(c++, o.getDocNo());
@@ -351,7 +352,7 @@ public class PayWhiteDAO {
 
 			ps = conn.prepareStatement(sql.toString());
 			
-            Date docDate = Utils.parse(o.getDocDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+            Date docDate = DateUtil.parse(o.getDocDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 
 			ps.setTimestamp(c++, new java.sql.Timestamp(docDate.getTime()));
 			

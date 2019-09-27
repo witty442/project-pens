@@ -18,15 +18,12 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 
-import util.DBConnection;
-import util.DateToolsUtil;
-import util.Debug;
-import util.NumberUtil;
-import util.Utils;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.helper.SAUtils;
-import com.sun.corba.se.spi.extension.ZeroPortPolicy;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Debug;
+import com.pens.util.Utils;
 
 
 
@@ -36,8 +33,10 @@ import com.sun.corba.se.spi.extension.ZeroPortPolicy;
  */
 public class SAGenerate {
    
-	public static  Debug debug = new Debug(true,Debug.level_1);
-    public static SAUtils reportU = new SAUtils();
+	//public static  Debug debug = new Debug(true,Debug.level_0);//debug all
+	public static  Debug debug = new Debug(true,Debug.level_1);//debug some by user
+    
+	public static SAUtils reportU = new SAUtils();
 	
 	
 	/**
@@ -58,12 +57,12 @@ public class SAGenerate {
 			if(SAInitial.TYPE_SEARCH_DAY.equalsIgnoreCase(salesBean.getTypeSearch())){
 				/** Set Group Display  **/
 				if( !StringUtils.isEmpty(salesBean.getDay()) && !StringUtils.isEmpty(salesBean.getDayTo())){
-					Date startDate = DateToolsUtil.convertStringToDate(salesBean.getDay());
-					Date endDate = DateToolsUtil.convertStringToDate(salesBean.getDayTo());
+					Date startDate = DateUtil.convertStringToDate(salesBean.getDay());
+					Date endDate = DateUtil.convertStringToDate(salesBean.getDayTo());
 					
 					if(startDate.compareTo(endDate) != 0){
 						while(startDate.compareTo(endDate) <= 0){
-							colGroupList.add(new ConfigBean(DateToolsUtil.convertToString(startDate,"yyyyMMdd"),DateToolsUtil.convertToString(startDate),DateToolsUtil.convertToString(startDate)));
+							colGroupList.add(new ConfigBean(DateUtil.convertToString(startDate,"yyyyMMdd"),DateUtil.convertToString(startDate),DateUtil.convertToString(startDate)));
 							startDate = DateUtils.addDays(startDate, 1); 
 						}
 					}else{
@@ -81,7 +80,7 @@ public class SAGenerate {
 				if( !Utils.isNull(sql.toString()).equals("")){
 				    ps = conn.prepareStatement(sql.toString());
 				    debug.debug("DateStr:"+salesBean.getDay());
-				    debug.debug("Date:"+Utils.parseToBudishDate(salesBean.getDay(), Utils.DD_MM_YYYY_WITH_SLASH));
+				    debug.debug("Date:"+DateUtil.parseToBudishDate(salesBean.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH));
 				    rs = ps.executeQuery();
 				    
 				    /** Gen Html Code **/
@@ -182,7 +181,7 @@ public class SAGenerate {
 				/** Set Group Display  **/
 				for(int i=0;i<salesBean.getChkYear().length;i++){
 					debug.debug("name:["+i+"]value:["+salesBean.getChkYear()[i]+"]");
-					colGroupList.add(new ConfigBean(salesBean.getChkYear()[i],salesBean.getChkYear()[i],Utils.convertToYearBushdish(Integer.parseInt(salesBean.getChkYear()[i]))+"" ));
+					colGroupList.add(new ConfigBean(salesBean.getChkYear()[i],salesBean.getChkYear()[i],DateUtil.convertToYearBushdish(Integer.parseInt(salesBean.getChkYear()[i]))+"" ));
 					if(i != salesBean.getChkYear().length-1){
 					  allCond +="'"+salesBean.getChkYear()[i]+"',";
 					}else{
@@ -339,7 +338,7 @@ public class SAGenerate {
 						   htmlStr.append( Utils.isNull(SAInitial.getInstance().MONTH_MAP.get(salesBean.getChkMonth()[i])) +", ");
 						}
 					}
-				htmlStr.append("   พ.ศ. :"+Utils.convertToYearBushdish(Integer.parseInt(salesBean.getYear()))+"\n");
+				htmlStr.append("   พ.ศ. :"+DateUtil.convertToYearBushdish(Integer.parseInt(salesBean.getYear()))+"\n");
 				
 				htmlStr.append("</td> \n");
 				htmlStr.append("</tr> \n");
@@ -357,7 +356,7 @@ public class SAGenerate {
 						   htmlStr.append( Utils.isNull(SAInitial.getInstance().QUARTER_MAP.get(salesBean.getChkQuarter()[i])) +", ");
 						}
 					}
-				htmlStr.append("   พ.ศ. "+Utils.convertToYearBushdish(Integer.parseInt(salesBean.getYear()))+"\n");
+				htmlStr.append("   พ.ศ. "+DateUtil.convertToYearBushdish(Integer.parseInt(salesBean.getYear()))+"\n");
 				
 				htmlStr.append("</td> \n");
 				htmlStr.append("</tr> \n");
@@ -370,9 +369,9 @@ public class SAGenerate {
 				htmlStr.append(" <td colspan='"+columnCount+"'>รอบเวลา : ปี  :  \n");
 					for(int i=0;i<salesBean.getChkYear().length;i++){
 						if(i==salesBean.getChkYear().length-1){
-					       htmlStr.append(Utils.convertToYearBushdish(Integer.parseInt(salesBean.getChkYear()[i])));
+					       htmlStr.append(DateUtil.convertToYearBushdish(Integer.parseInt(salesBean.getChkYear()[i])));
 						}else{
-						   htmlStr.append(Utils.convertToYearBushdish(Integer.parseInt(salesBean.getChkYear()[i])) +", ");
+						   htmlStr.append(DateUtil.convertToYearBushdish(Integer.parseInt(salesBean.getChkYear()[i])) +", ");
 						}
 					}
 				htmlStr.append("</td> \n");
@@ -389,7 +388,7 @@ public class SAGenerate {
 		    /** Gen Timestamp **/
 			Calendar currentTime = Calendar.getInstance(new Locale("th","TH"));
 			htmlStr.append("<tr> \n");
-			htmlStr.append(" <td colspan='"+columnCount+"'>Exported date :"+Utils.stringValue(currentTime.getTime(), Utils.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,new Locale("th","TH"))+"");
+			htmlStr.append(" <td colspan='"+columnCount+"'>Exported date :"+DateUtil.stringValue(currentTime.getTime(), DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,new Locale("th","TH"))+"");
 			htmlStr.append(" ,Created by:"+user.getName()+" </td> \n");
 			htmlStr.append("</tr> \n");
 			htmlStr.append("</table> \n");
@@ -579,13 +578,13 @@ public class SAGenerate {
 				StringBuffer rowNoHtml = new StringBuffer("");
                 debug.debug("rs next");
 				if("Invoice_Date".equalsIgnoreCase(groupByBean.getName())){
-					String dateStr = Utils.stringValue(new Date(rs.getDate(groupByBean.getName()+"_DESC",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateStr = DateUtil.stringValue(new Date(rs.getDate(groupByBean.getName()+"_DESC",Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 					debug.debug("dateStr:"+dateStr);
 					if(!isNoDisplayed)
 				    rowHtml.append(" <td>"+dateStr+"</td>  \n");
 
 				}else if("SALES_ORDER_DATE".equalsIgnoreCase(groupByBean.getName())){
-					String dateStr = Utils.stringValue(new Date(rs.getDate(groupByBean.getName()+"_DESC",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String dateStr = DateUtil.stringValue(new Date(rs.getDate(groupByBean.getName()+"_DESC",Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 					debug.debug("dateStr:"+dateStr);
 					if(!isNoDisplayed)
 				    rowHtml.append(" <td>"+dateStr+"</td>  \n");
@@ -614,11 +613,15 @@ public class SAGenerate {
 						
 						debug.debug("resultKey:"+resultKey);
 						
-						/** Case Column CALL Summary CALL_NO DUP  and Type Summary **/
+						/** Case Column CALL Summary CALL= NP_CALL+key(Get distinct customer) DUP  and Type Summary **/
 						if(resultKey.startsWith("CALL") && !resultKey.startsWith("CALL_NEW") && isSummry && SAInitial.SUMMARY_TYPE_SUM.equals(summaryType)){
 							debug.debug("CALL:"+resultKey);
-							value = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal
-							valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(SAInitial.NO_DUP_PREFIX+resultKey));//ND_ Value
+							//value = Utils.isNullToZero(rs.getBigDecimal(SAInitial.NO_DUP_PREFIX+resultKey));//ND_Normal
+							//valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(SAInitial.NO_DUP_PREFIX+resultKey));//ND_ Value
+							
+							value = Utils.isNullToZero(rs.getBigDecimal(resultKey));//ND_Normal
+							valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//ND_ Value
+							
 							valueColSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal
 						}else{
 							value = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal Value

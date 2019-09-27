@@ -4,10 +4,9 @@ import java.sql.Connection;
 
 import javax.servlet.ServletContext;
 
-import util.BeanParameter;
-import util.XmlReadUtil;
-
 import com.isecinc.core.init.I_Initial;
+import com.pens.util.BeanParameter;
+import com.pens.util.XmlReadUtil;
 
 /**
  * Initial Parameter

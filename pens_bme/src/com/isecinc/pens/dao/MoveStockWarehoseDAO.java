@@ -13,8 +13,9 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.MoveStockWarehouseBean;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -33,11 +34,11 @@ public class MoveStockWarehoseDAO extends PickConstants{
 			sql.append("\n SELECT count(*) as c FROM PENSBI.PENSBME_MOVE_STOCK_FINISH_HIS");
 			sql.append("\n WHERE 1=1");
 			if( !Utils.isNull(bean.getDateFrom()).equals("") && !Utils.isNull(bean.getDateTo()).equals("")){
-			    Date dateFrom = Utils.parse(bean.getDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			    String dateFromStr = Utils.stringValue(dateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
+			    Date dateFrom = DateUtil.parse(bean.getDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    String dateFromStr = DateUtil.stringValue(dateFrom, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			   
-			    Date dateTo = Utils.parse(bean.getDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			    String dateToStr = Utils.stringValue(dateTo, Utils.DD_MM_YYYY_WITH_SLASH);
+			    Date dateTo = DateUtil.parse(bean.getDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    String dateToStr = DateUtil.stringValue(dateTo, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			   
 			    sql.append("\n and create_date >= to_date('"+dateFromStr+"','dd/mm/yyyy')");
 			    sql.append("\n and create_date <= to_date('"+dateToStr+"','dd/mm/yyyy')");
@@ -86,11 +87,11 @@ public class MoveStockWarehoseDAO extends PickConstants{
 				sql.append("\n SELECT * FROM PENSBI.PENSBME_MOVE_STOCK_FINISH_HIS");
 				sql.append("\n WHERE 1=1");
 				if( !Utils.isNull(bean.getDateFrom()).equals("") && !Utils.isNull(bean.getDateTo()).equals("")){
-				    Date dateFrom = Utils.parse(bean.getDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				    String dateFromStr = Utils.stringValue(dateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
+				    Date dateFrom = DateUtil.parse(bean.getDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				    String dateFromStr = DateUtil.stringValue(dateFrom, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				   
-				    Date dateTo = Utils.parse(bean.getDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				    String dateToStr = Utils.stringValue(dateTo, Utils.DD_MM_YYYY_WITH_SLASH);
+				    Date dateTo = DateUtil.parse(bean.getDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				    String dateToStr = DateUtil.stringValue(dateTo, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				   
 				    sql.append("\n and create_date >= to_date('"+dateFromStr+"','dd/mm/yyyy')");
 				    sql.append("\n and create_date <= to_date('"+dateToStr+"','dd/mm/yyyy')");
@@ -119,7 +120,7 @@ public class MoveStockWarehoseDAO extends PickConstants{
 
 			while(rst.next()) {
 				MoveStockWarehouseBean item = new MoveStockWarehouseBean();
-				item.setCreateDate(Utils.stringValue(rst.getDate("CREATE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				item.setCreateDate(DateUtil.stringValue(rst.getDate("CREATE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				item.setWarehouseFrom(rst.getString("WAREHOUSE_FROM"));
 				item.setWarehouseTo(rst.getString("WAREHOUSE_TO"));
 		
@@ -477,8 +478,8 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		PreparedStatement ps = null;
 		int r = 0;
 		try{
-			Date transferDate = Utils.parse(o.getTransferDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String transferDateStr = Utils.stringValue(transferDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date transferDate = DateUtil.parse(o.getTransferDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String transferDateStr = DateUtil.stringValue(transferDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" INSERT INTO PENSBI.PENSBME_TRANSFER_FINISHING \n");
@@ -531,8 +532,8 @@ public class MoveStockWarehoseDAO extends PickConstants{
 		PreparedStatement ps = null;
 		int r = 0;
 		try{
-			Date transferDate = Utils.parse(o.getTransferDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String transferDateStr = Utils.stringValue(transferDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date transferDate = DateUtil.parse(o.getTransferDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String transferDateStr = DateUtil.stringValue(transferDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" INSERT INTO PENSBI.PENSBME_TRANSFER_FINISHING \n");

@@ -10,13 +10,14 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.pens.bean.InterfaceBean;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
+import com.isecinc.pens.dao.InterfaceDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.bean.InterfaceBean;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.dao.InterfaceDAO;
-import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Constants;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class InterfacesPrepareManager {
@@ -42,7 +43,7 @@ public class InterfacesPrepareManager {
 				InterfaceBean bean =new InterfaceBean();
 				bean.setCustGroup(PickConstants.STORE_TYPE_HISHER_CODE);
 				bean.setCustGroupDesc(PickConstants.STORE_TYPE_HISHER_CODE+" "+PickConstants.getStoreGroupName(PickConstants.STORE_TYPE_HISHER_CODE));
-				bean.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			    bean.setTextFileName("");
 				bean.setOutputPath("");//Gen
 				
@@ -87,7 +88,7 @@ public class InterfacesPrepareManager {
 				InterfaceBean bean =new InterfaceBean();
 				bean.setCustGroup(PickConstants.STORE_TYPE_HISHER_CODE);
 				bean.setCustGroupDesc(PickConstants.STORE_TYPE_HISHER_CODE+" "+PickConstants.getStoreGroupName(PickConstants.STORE_TYPE_HISHER_CODE));
-				bean.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			    bean.setTextFileName("");
 				bean.setOutputPath("");//Gen
 				
@@ -102,7 +103,7 @@ public class InterfacesPrepareManager {
 				InterfaceBean bean =new InterfaceBean();
 				bean.setCustGroup(PickConstants.STORE_TYPE_HISHER_CODE);
 				bean.setCustGroupDesc(PickConstants.STORE_TYPE_HISHER_CODE+" "+PickConstants.getStoreGroupName(PickConstants.STORE_TYPE_HISHER_CODE));
-				bean.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			    bean.setTextFileName("");
 				bean.setOutputPath("");//Gen
 				
@@ -116,7 +117,7 @@ public class InterfacesPrepareManager {
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
 				//default value
 				InterfaceBean bean =new InterfaceBean();
-				bean.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				bean.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			    bean.setTextFileName("");
 				bean.setOutputPath("");//Gen
 				

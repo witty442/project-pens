@@ -27,11 +27,12 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.OrderFridayDAO;
 import com.isecinc.pens.gendate.OrderDateUtils;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.managepath.ManagePath;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -81,7 +82,7 @@ public class OrderFridayAction extends I_Action {
 				 // order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 
 				 //new set to Current Date
-				 order.setOrderDate(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 order.setOrderDate(DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 summaryForm.setOrder(order);
 				 
 				 ImportDAO importDAO = new ImportDAO();
@@ -157,7 +158,7 @@ public class OrderFridayAction extends I_Action {
 				String[] wholePriceBFArr = request.getParameterValues("wholePriceBF");
 				String[] retailPriceBFArr = request.getParameterValues("retailPriceBF");
 				
-				Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				  
                 Map<String,OrderKeyBean> mapOrderNoByStoreMap = new HashMap<String, OrderKeyBean>();
 				/** Get OrderNoInDB key by StoreCode   **/
@@ -361,7 +362,7 @@ public class OrderFridayAction extends I_Action {
 			}//for 1
 */			
 			if(haveError == false){
-				Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				Map<String,OrderKeyBean> mapOrderNoByStoreMap = new HashMap<String, OrderKeyBean>();
 				/** Get OrderNoInDB key by StoreCode   **/
                 mapOrderNoByStoreMap = orderDAO.getOrderNoMap(conn, orderForm.getOrder().getStoreType(),orderDate);
@@ -501,8 +502,8 @@ public class OrderFridayAction extends I_Action {
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			//LOTUS_OH_20130509.txt
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateFileName = Utils.stringValue(orderDate, Utils.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateFileName = DateUtil.stringValue(orderDate, DateUtil.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
 			String refCode = Utils.isNull(STORE_TYPE_MAP.get(orderForm.getOrder().getStoreType()));
 			String fileName = refCode+"TS_"+dateFileName;
 			
@@ -561,8 +562,8 @@ public class OrderFridayAction extends I_Action {
 		Connection conn = null;
 		try {
 			conn = DBConnection.getInstance().getConnection();
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateFileName = Utils.stringValue(orderDate, Utils.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateFileName = DateUtil.stringValue(orderDate, DateUtil.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
 			
 			String refCode = Utils.isNull(STORE_TYPE_MAP.get(orderForm.getOrder().getStoreType()))+"_";
 			String fileName = refCode+"SUM_"+dateFileName;
@@ -619,8 +620,8 @@ public class OrderFridayAction extends I_Action {
 		Connection conn = null;
 		try {
 			conn = DBConnection.getInstance().getConnection();
-			Date orderDate = Utils.parse(orderForm.getOrder().getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String dateFileName = Utils.stringValue(orderDate, Utils.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
+			Date orderDate = DateUtil.parse(orderForm.getOrder().getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String dateFileName = DateUtil.stringValue(orderDate, DateUtil.YYYY_MM_DD_WITHOUT_SLASH,Locale.US);
 			String refCode = Utils.isNull(STORE_TYPE_MAP.get(orderForm.getOrder().getStoreType()))+"_";
 			String fileName = refCode+"SUM_DETAIL_"+dateFileName;
 			
@@ -656,7 +657,7 @@ public class OrderFridayAction extends I_Action {
 			 request.getSession().setAttribute("itemErrorMap", null);
 			 
 			 Order order = new Order();
-			 order.setOrderDate(Utils.stringValue(OrderDateUtils.getOrderDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			 order.setOrderDate(DateUtil.stringValue(OrderDateUtils.getOrderDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 summaryForm.setOrder(order);
 			
 		} catch (Exception e) {

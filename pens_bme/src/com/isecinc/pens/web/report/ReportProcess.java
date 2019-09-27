@@ -14,9 +14,9 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.ConditionFilterBean;
 import com.isecinc.pens.web.popup.DisplayBean;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
 public class ReportProcess {
@@ -72,7 +72,7 @@ public class ReportProcess {
 		int i = 0;
 		try{
 			logger.debug("Initial Session ");
-			conn = com.isecinc.pens.inf.helper.DBConnection.getInstance().getConnection();
+			conn = com.pens.util.DBConnection.getInstance().getConnection();
 			
 			/** Display Group **/
 			List<References> dispList = new ArrayList<References>();

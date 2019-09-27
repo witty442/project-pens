@@ -24,10 +24,10 @@ import com.isecinc.pens.bean.MCEmpBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.MCDAO;
 import com.isecinc.pens.dao.MCEmpDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
+import com.pens.util.DBConnection;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 

@@ -6,9 +6,9 @@ import java.util.Map;
 import org.apache.struts.upload.FormFile;
 
 import com.isecinc.core.web.I_Form;
-import com.isecinc.pens.inf.bean.InterfaceBean;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
+import com.isecinc.pens.bean.InterfaceBean;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
 
 /**
  * Trip Form

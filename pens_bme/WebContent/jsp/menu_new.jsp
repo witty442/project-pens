@@ -1,9 +1,9 @@
 <%@page import="com.isecinc.pens.web.shop.ShopAction"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
-<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
+<%@page import="com.pens.util.EnvProperties"%>
 <%@page import="java.net.InetAddress"%>
-<%@page import="com.isecinc.pens.inf.helper.Constants"%>
+<%@page import="com.pens.util.Constants"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>

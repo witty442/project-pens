@@ -1,7 +1,7 @@
-<%@page import="util.SessionUtils"%>
+<%@page import="com.pens.util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.stockonhand.StockOnhandBean"%>
 <%@page import="com.isecinc.pens.web.stockonhand.StockOnhandForm"%>
-<%@page import="util.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%
 /*clear session form other page */

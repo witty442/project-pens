@@ -17,11 +17,11 @@ import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.helper.FileUtil;
 import com.isecinc.pens.web.location.LocationBean;
-
-import util.DBConnection;
-import util.DateToolsUtil;
-import util.ExcelHeader;
-import util.Utils;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 public class StockReport {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -128,17 +128,17 @@ public class StockReport {
 			if( !Utils.isNull(o.getBrand()).equals("") && !Utils.isNull(o.getBrand()).equals("ALL")){
 				// Brand 504 must show 503494,503544,503681 (Case Special case )
 				if(Utils.isNull(o.getBrand()).indexOf("504") != -1 ){
-					sql.append("\n and ( M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
+					sql.append("\n and ( M.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")");
 					sql.append("\n     or M.item_no in('503494','503544','503681') )");
 				}else{
-					sql.append("\n and M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
+					sql.append("\n and M.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")");
 				}
 			}
 			if( !Utils.isNull(o.getCustomerCode()).equals("") && !Utils.isNull(o.getCustomerCode()).equals("ALL")){
-				sql.append("\n and M.customer_number in( "+Utils.converToTextSqlIn(o.getCustomerCode())+")");
+				sql.append("\n and M.customer_number in( "+SQLHelper.converToTextSqlIn(o.getCustomerCode())+")");
 			}
 			if( !Utils.isNull(o.getItemCode()).equals("") && !Utils.isNull(o.getItemCode()).equals("ALL")){
-				sql.append("\n and M.item_no in( "+Utils.converToTextSqlIn(o.getItemCode())+")");
+				sql.append("\n and M.item_no in( "+SQLHelper.converToTextSqlIn(o.getItemCode())+")");
 			}
 			//Case Sales Login filter show only salesrepCode 
 			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
@@ -149,11 +149,11 @@ public class StockReport {
 			//TypeSerch Month
 			if(Utils.isNull(o.getTypeSearch()).equals("month")){
 				if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
-					Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MMM_YYYY);
+					Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MMM_YYYY);
 					logger.debug("startDate:"+startDate);
-					String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
-					Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MMM_YYYY);
-					String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MMM_YYYY);
+					String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append("\n and M.request_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
 					sql.append("\n and M.request_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
@@ -161,11 +161,11 @@ public class StockReport {
 			}else{
 				//TypeSearch Day From To
 				if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
-					Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					logger.debug("startDate:"+startDate);
-					String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
-					Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append("\n and M.request_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
 					sql.append("\n and M.request_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
@@ -211,7 +211,7 @@ public class StockReport {
 					}
 			  }//for
 			  if( !Utils.isNull(o.getDispRequestDate()).equals("")){
-			     item.setRequestDate(Utils.stringValue(rst.getDate("REQUEST_DATE"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			     item.setRequestDate(DateUtil.stringValue(rst.getDate("REQUEST_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  }
 			  item.setPriQty(Utils.decimalFormat(rst.getDouble("PRI_QTY"), Utils.format_current_no_disgit)); 
 			  item.setSecQty(Utils.decimalFormat(rst.getDouble("SEC_QTY"), Utils.format_current_no_disgit)); 
@@ -220,7 +220,7 @@ public class StockReport {
 			  if(o.getDispType().equalsIgnoreCase("pri_qty,sec_qty,order_qty")){
 				  item.setOrderQty(Utils.decimalFormat(rst.getDouble("ORDER_QTY"), Utils.format_current_no_disgit));
 			  }else{
-				  item.setExpireDate(Utils.stringValue(rst.getDate("EXPIRE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  item.setExpireDate(DateUtil.stringValue(rst.getDate("EXPIRE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  }
 			  
 			  item.setAvgQty(Utils.decimalFormat(rst.getDouble("AVG_QTY"), Utils.format_current_no_disgit)); 
@@ -297,17 +297,17 @@ public class StockReport {
 				if( !Utils.isNull(o.getBrand()).equals("") && !Utils.isNull(o.getBrand()).equals("ALL")){
 					// Brand 504 must show 503494,503544,503681 (Case Special case )
 					if(Utils.isNull(o.getBrand()).indexOf("504") != -1 ){
-						sql.append("\n and ( V.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")  ");
+						sql.append("\n and ( V.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")  ");
 						sql.append("\n     or P.inventory_item_codein('503494','503544','503681' ) ) ");
 					}else{
-						sql.append("\n and V.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")  ");
+						sql.append("\n and V.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")  ");
 					}
 				}
 				if( !Utils.isNull(o.getCustomerCode()).equals("") && !Utils.isNull(o.getCustomerCode()).equals("ALL")){
-					sql.append("\n  AND C.customer_code in( "+Utils.converToTextSqlIn(o.getCustomerCode())+")  ");
+					sql.append("\n  AND C.customer_code in( "+SQLHelper.converToTextSqlIn(o.getCustomerCode())+")  ");
 				}
 				if( !Utils.isNull(o.getItemCode()).equals("") && !Utils.isNull(o.getItemCode()).equals("ALL")){
-					sql.append("\n AND P.inventory_item_code in( "+Utils.converToTextSqlIn(o.getCustomerCode())+") ");
+					sql.append("\n AND P.inventory_item_code in( "+SQLHelper.converToTextSqlIn(o.getCustomerCode())+") ");
 				}
 				sql.append("\n AND TO_CHAR(V.INVOICE_DATE,'YYYYMM') = '"+yyyymm+"' ");
 				
@@ -388,11 +388,11 @@ public class StockReport {
 			//TypeSerch Month
 			if(Utils.isNull(o.getTypeSearch()).equals("month")){
 				if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
-					Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MMM_YYYY);
+					Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MMM_YYYY);
 					logger.debug("startDate:"+startDate);
-					String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
-					Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MMM_YYYY);
-					String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MMM_YYYY);
+					String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append("\n and a.request_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
 					sql.append("\n and a.request_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
@@ -400,11 +400,11 @@ public class StockReport {
 			}else{
 				//TypeSearch Day From To
 				if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
-					Date startDate = Utils.parse(o.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					logger.debug("startDate:"+startDate);
-					String startDateStr = Utils.stringValue(startDate, Utils.DD_MM_YYYY_WITH_SLASH);
-					Date endDate = Utils.parse(o.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+					Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					
 					sql.append("\n and a.request_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
 					sql.append("\n and a.request_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
@@ -437,17 +437,17 @@ public class StockReport {
 			if( !Utils.isNull(o.getBrand()).equals("") && !Utils.isNull(o.getBrand()).equals("ALL")){
 				// Brand 504 must show 503494,503544,503681 (Case Special case )
 				if(Utils.isNull(o.getBrand()).indexOf("504") != -1 ){
-					sql.append("\n and ( M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
+					sql.append("\n and ( M.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")");
 					sql.append("\n     or M.item_no in('503494','503544','503681') )");
 				}else{
-					sql.append("\n and M.brand in( "+Utils.converToTextSqlIn(o.getBrand())+")");
+					sql.append("\n and M.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")");
 				}
 			}
 			if( !Utils.isNull(o.getCustomerCode()).equals("") && !Utils.isNull(o.getCustomerCode()).equals("ALL")){
-				sql.append("\n and M.customer_number in( "+Utils.converToTextSqlIn(o.getCustomerCode())+")");
+				sql.append("\n and M.customer_number in( "+SQLHelper.converToTextSqlIn(o.getCustomerCode())+")");
 			}
 			if( !Utils.isNull(o.getItemCode()).equals("") && !Utils.isNull(o.getItemCode()).equals("ALL")){
-				sql.append("\n and M.item_no in( "+Utils.converToTextSqlIn(o.getItemCode())+")");
+				sql.append("\n and M.item_no in( "+SQLHelper.converToTextSqlIn(o.getItemCode())+")");
 			}
 			
 			//Case Sales Login filter show only salesrepCode 
@@ -496,7 +496,7 @@ public class StockReport {
 					}
 			  }//for
 			  if( !Utils.isNull(o.getDispRequestDate()).equals("")){
-			     item.setRequestDate(Utils.stringValue(rst.getDate("REQUEST_DATE"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			     item.setRequestDate(DateUtil.stringValue(rst.getDate("REQUEST_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  }
 			  item.setPriQty(Utils.decimalFormat(rst.getDouble("PRI_QTY"), Utils.format_current_no_disgit)); 
 			  item.setSecQty(Utils.decimalFormat(rst.getDouble("SEC_QTY"), Utils.format_current_no_disgit)); 
@@ -505,7 +505,7 @@ public class StockReport {
 			  if(o.getDispType().equalsIgnoreCase("pri_qty,sec_qty,order_qty")){
 				  item.setOrderQty(Utils.decimalFormat(rst.getDouble("ORDER_QTY"), Utils.format_current_no_disgit));
 			  }else{
-				  item.setExpireDate(Utils.stringValue(rst.getDate("EXPIRE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  item.setExpireDate(DateUtil.stringValue(rst.getDate("EXPIRE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  }
 			  
 			  item.setAvgQty(Utils.decimalFormat(rst.getDouble("AVG_QTY"), Utils.format_current_no_disgit)); 

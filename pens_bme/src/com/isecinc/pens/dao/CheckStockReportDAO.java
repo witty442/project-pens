@@ -14,7 +14,8 @@ import com.isecinc.pens.bean.CheckStockReportBean;
 import com.isecinc.pens.bean.StockQuery;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.dao.query.StockQuerySQL;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -211,7 +212,7 @@ public class CheckStockReportDAO extends PickConstants{
 			  /*h.append("<td class='num' width='5%'>"+r+"</td> \n");*/
 			  h.append("<td class='text' width='20%'>"+Utils.isNull(rst.getString("mat_style"))+"</td> \n");
 			  h.append("<td class='text' width='20%'>"+Utils.isNull(rst.getString("material_master"))+"</td> \n");
-			  h.append("<td class='text' width='20%'>"+Utils.stringValue(rst.getDate("transaction_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td> \n");
+			  h.append("<td class='text' width='20%'>"+DateUtil.stringValue(rst.getDate("transaction_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td> \n");
 			  h.append("<td class='text' width='20%'>"+Utils.isNull(rst.getString("transaction_no"))+"</td> \n");
 			  h.append("<td class='num' width='20%'>"+Utils.decimalFormat(rst.getDouble("qty"),Utils.format_current_no_disgit)+"</td> \n");
 			  h.append("</tr>");
@@ -240,8 +241,8 @@ public class CheckStockReportDAO extends PickConstants{
 		   sql.append("\n"+space+"AND D.material_master ='"+Utils.isNull(o.getMaterialMaster())+"'");
 		}
 		if( !Utils.isNull(o.getInitDate()).equals("")){
-			Date initDate = Utils.parse(o.getInitDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String initDateC = Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date initDate = DateUtil.parse(o.getInitDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String initDateC = DateUtil.stringValue(initDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			if("FINISHING".equalsIgnoreCase(grouType)){
 				 sql.append("\n"+space+"AND H.confirm_date >= to_date('"+initDateC+"','dd/mm/yyyy')");
 			}else if("TRANSFER".equalsIgnoreCase(grouType)){
@@ -262,8 +263,8 @@ public class CheckStockReportDAO extends PickConstants{
 		   sql.append("\n"+space+"AND D.material_master ='"+Utils.isNull(o.getMaterialMaster())+"'");
 		}
 		if( !Utils.isNull(o.getInitDate()).equals("")){
-			Date initDate = Utils.parse(o.getInitDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String initDateC = Utils.stringValue(initDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date initDate = DateUtil.parse(o.getInitDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String initDateC = DateUtil.stringValue(initDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			if("FINISHING".equalsIgnoreCase(grouType)){
 				 sql.append("\n"+space+"AND H.confirm_date >= to_date('"+initDateC+"','dd/mm/yyyy')");
 			}else if("TRANSFER".equalsIgnoreCase(grouType)){

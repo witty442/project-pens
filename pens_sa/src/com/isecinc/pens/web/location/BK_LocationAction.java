@@ -14,8 +14,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.Utils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
@@ -24,6 +22,7 @@ import com.isecinc.pens.web.stock.StockBean;
 import com.isecinc.pens.web.stock.StockConstants;
 import com.isecinc.pens.web.stock.StockForm;
 import com.isecinc.pens.web.stock.StockReport;
+import com.pens.util.Utils;
 
 /**
  * Summary Action

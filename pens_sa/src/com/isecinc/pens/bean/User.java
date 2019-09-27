@@ -1,6 +1,6 @@
 package com.isecinc.pens.bean;
 
-import static util.ConvertNullUtil.convertToString;
+import static com.pens.util.ConvertNullUtil.convertToString;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -10,11 +10,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import util.Utils;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.model.MGroupRole;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 
 /**
@@ -48,8 +48,10 @@ public class User extends I_PO implements Serializable {
 	public static final String TTSUPER = "TTSUPER";//Supper
 	public static final String TTMGR = "TTMGR";//ManagerSale
 	
+	public static final String PD ="PD";
 	public static final String VANSALES = "VANSALES";
 	public static final String COVERAGE = "COVERAGE";
+	public static final String B2B = "B2B";
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -78,10 +80,10 @@ public class User extends I_PO implements Serializable {
 	
 		//String dateStr = Utils.stringValue(new Date(rst.getDate("START_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 		if( !Utils.isNull(rst.getString("START_DATE")).equals("")){
-		  setStartDate(Utils.stringValue(new Date(rst.getDate("START_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+		  setStartDate(DateUtil.stringValue(new Date(rst.getDate("START_DATE",Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 		}
 		if( !Utils.isNull(rst.getString("END_DATE")).equals("")){
-		  setEndDate(Utils.stringValue(new Date(rst.getDate("END_DATE",Calendar.getInstance(Locale.US)).getTime()),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+		  setEndDate(DateUtil.stringValue(new Date(rst.getDate("END_DATE",Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 		}
 		
 		setTerritory(convertToString(rst.getString("TERRITORY")));
@@ -108,6 +110,7 @@ public class User extends I_PO implements Serializable {
 		setRoleSA(convertToString(rst.getString("ROLE_SA")));
 		setRoleOnhand(convertToString(rst.getString("ROLE_ONHAND")));
 		setRoleCoverage(convertToString(rst.getString("ROLE_COVERAGE")));
+		setRoleB2B(convertToString(rst.getString("ROLE_B2B")));
 		
 		//System.out.println("setRoleMC:"+getRoleMC()+";"+convertToString(rst.getString("ROLE_MC")));
 		// set display label
@@ -117,7 +120,7 @@ public class User extends I_PO implements Serializable {
 		// customer type, sales group, order type
 		activeRoleInfo();
        
-		setActiveLabel(Utils.isStatusActiveByDate(getStartDate(),getEndDate())?"Active":"InActive");
+		setActiveLabel(DateUtil.isStatusActiveByDate(getStartDate(),getEndDate())?"Active":"InActive");
 	}
   
 	
@@ -221,8 +224,17 @@ public class User extends I_PO implements Serializable {
     private String roleVanSales;
     private String roleOnhand;
     private String roleCoverage;
+    private String roleB2B;
     
     
+	public String getRoleB2B() {
+		return roleB2B;
+	}
+
+	public void setRoleB2B(String roleB2B) {
+		this.roleB2B = roleB2B;
+	}
+
 	public String getRoleCoverage() {
 		return roleCoverage;
 	}

@@ -13,7 +13,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.isecinc.pens.bean.MCBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class ExportTimeSheetGroup extends Excel{
@@ -202,7 +203,7 @@ public class ExportTimeSheetGroup extends Excel{
 
 	           XSSFCell cell1 = dataRow.createCell(0);
 	           cell1.setCellStyle(style.dataLineStyle);
-	           cell1.setCellValue(Utils.stringValue(rst.getDate("staff_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+	           cell1.setCellValue(DateUtil.stringValue(rst.getDate("staff_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 	           
 	           XSSFCell cell2 = dataRow.createCell(1);
 	           cell2.setCellStyle(style.dataLineStyle);

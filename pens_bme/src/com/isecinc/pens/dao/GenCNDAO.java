@@ -19,7 +19,8 @@ import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.ProductBean;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.sun.org.apache.xpath.internal.FoundIndex;
 
@@ -62,7 +63,7 @@ public class GenCNDAO extends PickConstants{
 			while(rst.next()) {
 			   h = new GenCNBean();
 			   h.setLineId(no);
-			   h.setInvoiceDate(Utils.stringValue(rst.getDate("invoice_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setInvoiceDate(DateUtil.stringValue(rst.getDate("invoice_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setCnNo(Utils.isNull(rst.getString("invoice_no")));
 			   h.setStoreCode(Utils.isNull(rst.getString("customer_code")));
 			   h.setStoreName(Utils.isNull(rst.getString("customer_desc")));

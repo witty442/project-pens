@@ -27,11 +27,12 @@ import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.inf.exception.LogisticException;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.exception.LogisticException;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.order.OrderAction;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class OrderFridayDAO {
@@ -79,7 +80,7 @@ public class OrderFridayDAO {
 		List<Order> pos = new ArrayList<Order>();
 		StringBuilder sql = new StringBuilder();
 		try {
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			sql.delete(0, sql.length());
 			sql.append("\n  SELECT *  from PENSBME_ONHAND_BME_FRIDAY  ");
@@ -165,7 +166,7 @@ public class OrderFridayDAO {
 		List<Order> pos = new ArrayList<Order>();
 		StringBuilder sql = new StringBuilder();
 		try {
-			Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			sql.append("\n SELECT * FROM( \n");
 			sql.append("\n SELECT a.*, rownum r__ \n");
@@ -289,7 +290,7 @@ public class OrderFridayDAO {
 	
 	public void genOrderLotNoProcess(Connection conn,User user,String orderDateStr) throws Exception {
 		try{
-			Date orderDate = Utils.parse(orderDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(orderDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			//logger.debug("sql:"+sql);
 			List<Order> storeOrderList = findStoreOrderList(conn, user, orderDate);
 			if(storeOrderList != null && storeOrderList.size() >0){
@@ -452,7 +453,7 @@ public class OrderFridayDAO {
 		ImportDAO importDAO = new ImportDAO();
 		try {
 
-			Date orderDate = Utils.parse(orderDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(orderDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			sql.append(" select A.* from ( \n ");
 			sql.append("  select o.order_lot_no,o.bar_on_box, TO_CHAR(o.ORDER_DATE, 'ddmmyyyy') as order_date, \n ");
 			sql.append("  o.barcode, o.qty, 'PC' as uom ,o.store_code ,o.bill_type ,o.valid_from,o.valid_to, \n ");
@@ -592,7 +593,7 @@ public class OrderFridayDAO {
 			   h.append("<td>retail_price_bf \n </td>");
             h.append("</tbody> \n");    
 	            
-			Date orderDate = Utils.parse(orderDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse(orderDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			sql.append("  select o.order_no,TO_CHAR(o.ORDER_DATE, 'ddmmyyyy') as order_date, b.material_master, \n ");
 			sql.append("  o.barcode, o.qty, 'PC' as uom ,o.store_code ,\n ");
 			sql.append("  ( SELECT s.pens_desc2 FROM PENSBME_MST_REFERENCE s WHERE s.reference_code ='Store' and s.pens_value = o.store_code ) as  store_name, \n ");
@@ -1530,7 +1531,7 @@ public class OrderFridayDAO {
 			ps = conn.prepareStatement(sql.toString());
 				
 			int index =1;
-			Date orderDate = Utils.parse( o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date orderDate = DateUtil.parse( o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			ps.setString(1, o.getOrderNo());
 			ps.setTimestamp(2, new java.sql.Timestamp(orderDate.getTime()));

@@ -12,6 +12,7 @@ import com.isecinc.pens.bean.SATranBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SAReportDAO;
 import com.isecinc.pens.dao.SATranDAO;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -249,7 +250,7 @@ public class SAExportExcel {
 		String colSpan= "9";
 		try{
 			
-			Date asOfDate = Utils.parse(bean.getAsOfDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date asOfDate = DateUtil.parse(bean.getAsOfDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			//include style header
 			h.append(ExcelHeader.EXCEL_HEADER);
@@ -266,11 +267,11 @@ public class SAExportExcel {
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='center' colspan='"+colSpan+"'  ><b> ณ  วันที่&nbsp;&nbsp;:&nbsp;&nbsp;"+Utils.stringValue(asOfDate,Utils.DD_MMMM_YYYY,Utils.local_th)+"</b></td> \n");
+			h.append("<td align='center' colspan='"+colSpan+"'  ><b> ณ  วันที่&nbsp;&nbsp;:&nbsp;&nbsp;"+DateUtil.stringValue(asOfDate,DateUtil.DD_MMMM_YYYY,Utils.local_th)+"</b></td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='right' colspan='"+colSpan+"' > run report on : "+Utils.stringValue(new Date(), Utils.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,Utils.local_th)+"</td> \n");
+			h.append("<td align='right' colspan='"+colSpan+"' > run report on : "+DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,Utils.local_th)+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("</table> \n");
@@ -335,7 +336,7 @@ public class SAExportExcel {
 		Map<String,String> invMap = new HashMap<String, String>();
 		Map<String,String> rewardMap = new HashMap<String, String>();
 		try{
-			Date asOfDate = Utils.parse(bean.getAsOfDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date asOfDate = DateUtil.parse(bean.getAsOfDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			//include style header
 			h.append(ExcelHeader.EXCEL_HEADER);
 		
@@ -345,10 +346,10 @@ public class SAExportExcel {
 			h.append("<td align='center' colspan='"+colSpan+"' ><b>Statement ค่าความเสียหาย </b></td> \n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
-			h.append("<td align='center' colspan='"+colSpan+"'  ><b> ณ  วันที่&nbsp;&nbsp;:&nbsp;&nbsp;"+Utils.stringValue(asOfDate,Utils.DD_MMMM_YYYY,Utils.local_th)+"</b></td> \n");
+			h.append("<td align='center' colspan='"+colSpan+"'  ><b> ณ  วันที่&nbsp;&nbsp;:&nbsp;&nbsp;"+DateUtil.stringValue(asOfDate,DateUtil.DD_MMMM_YYYY,Utils.local_th)+"</b></td> \n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
-			h.append("<td align='right' colspan='"+colSpan+"' > run report on : "+Utils.stringValue(new Date(), Utils.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,Utils.local_th)+"</td> \n");
+			h.append("<td align='right' colspan='"+colSpan+"' > run report on : "+DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,Utils.local_th)+"</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("</table> \n");
@@ -524,8 +525,8 @@ public class SAExportExcel {
 		String colSpan= "11";
 		double totalAmt = 0;
 		try{
-			Date date = Utils.parse("01"+bean.getMonth(), Utils.DD_MM_YYYY_WITHOUT_SLASH);
-			String MMMMYYYY= Utils.stringValue(date, "MMMM yyyy",Utils.local_th);
+			Date date = DateUtil.parse("01"+bean.getMonth(), DateUtil.DD_MM_YYYY_WITHOUT_SLASH);
+			String MMMMYYYY= DateUtil.stringValue(date, "MMMM yyyy",Utils.local_th);
 		
 			//include style header
 			h.append(ExcelHeader.EXCEL_HEADER);

@@ -18,8 +18,8 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.StyleMappingLotusMasterBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.StyleMappingLotusMasterDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
 /**

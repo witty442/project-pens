@@ -34,14 +34,14 @@ import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.isecinc.pens.bean.FTPFileBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.FTPFileBean;
-import com.isecinc.pens.inf.bean.TableBean;
-import com.isecinc.pens.inf.exception.FTPException;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.EnvProperties;
+import com.isecinc.pens.exception.FTPException;
 import com.isecinc.pens.inf.helper.InterfaceHelper;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
+import com.pens.util.Constants;
+import com.pens.util.EnvProperties;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 

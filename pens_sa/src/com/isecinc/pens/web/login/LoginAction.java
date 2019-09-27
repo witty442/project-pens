@@ -12,15 +12,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import util.DBConnection;
-import util.SIdUtils;
-import util.UserUtils;
-import util.Utils;
-
 import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SalesrepDAO;
 import com.isecinc.pens.process.login.LoginProcess;
+import com.pens.util.DBConnection;
+import com.pens.util.SIdUtils;
+import com.pens.util.UserUtils;
+import com.pens.util.Utils;
 
 /**
  * Login Action Class
@@ -134,7 +133,7 @@ public class LoginAction extends DispatchAction {
 			String pageName = Utils.isNull(request.getParameter("pageName"));
 			
 			//decode
-			password = util.EncyptUtils.base64decode(password);
+			password = com.pens.util.EncyptUtils.base64decode(password);
 			
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;

@@ -7,14 +7,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
-import util.DBConnection;
-
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.SystemConfig;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.init.InitialSystemConfig;
 import com.isecinc.pens.model.MSysConfig;
+import com.pens.util.DBConnection;
 
 /**
  * Sysconfig Action Class

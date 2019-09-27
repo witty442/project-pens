@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="performance_report_mainreport" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="3.0"/>
-	<property name="ireport.x" value="727"/>
-	<property name="ireport.y" value="83"/>
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="113"/>
 	<parameter name="order_date" class="java.lang.String"/>
 	<parameter name="userPrint" class="java.lang.String"/>
 	<parameter name="total_discount" class="java.lang.Double"/>
@@ -10,6 +10,7 @@
 	<parameter name="total_ap_amount" class="java.lang.Double"/>
 	<parameter name="total_vat" class="java.lang.Double"/>
 	<parameter name="total_net" class="java.lang.Double"/>
+	<parameter name="total_net_nodis_nonvat" class="java.lang.Double"/>
 	<parameter name="target_amount" class="java.lang.Double"/>
 	<parameter name="logo" class="java.lang.String"/>
 	<parameter name="total_receipt" class="java.lang.Double"/>
@@ -512,7 +513,7 @@
 	<summary>
 		<band height="300" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="64" width="114" height="20"/>
+				<reportElement x="0" y="64" width="165" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -522,7 +523,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<text><![CDATA[เป้าหมาย]]></text>
+				<text><![CDATA[เป้าหมาย / ยอดขายไม่หักส่วนลด(ก่อน Vat)]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="84" width="555" height="15"/>
@@ -574,21 +575,8 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$P{target_amount}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_net_nodis_nonvat}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="121" y="65" width="49" height="20"/>
-				<box>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
 			<staticText>
 				<reportElement x="121" y="119" width="49" height="20"/>
 				<box>
@@ -616,19 +604,6 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="328" y="64" width="50" height="20"/>
-				<box>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
 				<reportElement x="474" y="64" width="80" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
@@ -640,19 +615,6 @@
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="438" y="63" width="35" height="20"/>
-				<box>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<text><![CDATA[100%]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="438" y="98" width="35" height="20"/>
@@ -798,7 +760,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_net}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="438" y="44" width="35" height="20"/>
+				<reportElement x="437" y="64" width="35" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -808,7 +770,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[($P{target_amount}.equals(new java.lang.Double(0))? "0%" : new java.text.DecimalFormat("#,##0.00").format(($P{total_net}*100) / $P{target_amount}) + "%")]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[($P{target_amount}.equals(new java.lang.Double(0))? "0%" : new java.text.DecimalFormat("#,##0.00").format(($P{total_net_nodis_nonvat}*100) / $P{target_amount}) + "%")]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
 				<reportElement x="121" y="3" width="49" height="20"/>
@@ -996,19 +958,6 @@
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_net}]]></textFieldExpression>
 			</textField>
-			<textField pattern="">
-				<reportElement x="438" y="2" width="35" height="20"/>
-				<box>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[($P{target_amount}.equals(new java.lang.Double(0)) ? "0%" : new java.text.DecimalFormat("#,##0.00").format(($V{v_sum_net}*100) / $P{target_amount}) + "%")]]></textFieldExpression>
-			</textField>
 			<line>
 				<reportElement x="0" y="43" width="555" height="1"/>
 				<graphicElement>
@@ -1084,6 +1033,19 @@
 				</textElement>
 				<text><![CDATA[ข้อมูลการโอนเงินวันนี้]]></text>
 			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="319" y="65" width="58" height="20"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{target_amount}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>

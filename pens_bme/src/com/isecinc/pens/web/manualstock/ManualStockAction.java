@@ -22,9 +22,10 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.MTTBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -160,14 +161,14 @@ public class ManualStockAction extends I_Action {
 		 */
 		protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 				throws Exception {
-			String forward = "prepare";
+			String forward = "detail";
 			ManualStockForm aForm = (ManualStockForm) form;
 			User user = (User) request.getSession().getAttribute("user");
 			try {
 				//save old criteria
 				aForm.setBeanCriteria(aForm.getBean());
 				
-	            String saleDate = Utils.isNull(request.getParameter("sale_date"));
+	            //String saleDate = Utils.isNull(request.getParameter("sale_date"));
 	            String docNo = Utils.isNull(request.getParameter("docNo"));
 	            String mode = Utils.isNull(request.getParameter("mode"));
 	            
@@ -185,12 +186,11 @@ public class ManualStockAction extends I_Action {
 					aForm.setBean(bean);
 					aForm.setMode(mode);//Mode Edit
 				}else{
-					
 					logger.debug("prepare new docNo");
 					aForm.setResults(new ArrayList<ManualStockBean>());
 					ManualStockBean ad = new ManualStockBean();
 					ad.setCanEdit(true);
-					ad.setTransDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					ad.setTransDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					aForm.setBean(ad);
 					
 					aForm.setMode(mode);//Mode Add new
@@ -206,56 +206,6 @@ public class ManualStockAction extends I_Action {
 			return forward;
 		}
 
-		
-	public ActionForward prepareReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("prepareReport");
-		ManualStockForm aForm = (ManualStockForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		try {
-			String action = Utils.isNull(request.getParameter("action"));
-			if("new".equals(action)){
-				aForm.setResults(null);
-				ManualStockBean ad = new ManualStockBean();
-				//ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
-				request.getSession().setAttribute("summary",null);
-				aForm.setBean(ad);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally{
-			
-		}
-		return mapping.findForward("report");
-	}
-	
-	public ActionForward searchReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("searchReport");
-		ManualStockForm aForm = (ManualStockForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		String msg = "";
-		try {
-			aForm.setBean(ManualStockDAO.searchHead(aForm.getBean()));
-			aForm.setResults(aForm.getBean().getItems());
-			
-			//set summary
-			MTTBean summary = new MTTBean();
-			summary.setTotalQty(aForm.getBean().getTotalQty());
-			request.getSession().setAttribute("summary", summary);
-			
-			if(aForm.getResults().size() <=0){
-			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResults(null);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
-			throw e;
-		}finally{
-			
-		}
-		return mapping.findForward("report");
-	}
 	
 	public ActionForward exportReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("export");
@@ -285,7 +235,7 @@ public class ManualStockAction extends I_Action {
 		}finally{
 			
 		}
-		return mapping.findForward("report");
+		return mapping.findForward("detail");
 	}
 	
 	private StringBuffer genExportReport(HttpServletRequest request,ManualStockForm form,User user) throws Exception{
@@ -406,7 +356,7 @@ public class ManualStockAction extends I_Action {
 			aForm.setBean(new ManualStockBean());
 			
 			ManualStockBean ad = new ManualStockBean();
-			ad.setTransDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setTransDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			
 			aForm.setBean(ad);
 			
@@ -414,7 +364,7 @@ public class ManualStockAction extends I_Action {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("clear2");
+		return mapping.findForward("detail");
 	}
 	
 	
@@ -479,25 +429,21 @@ public class ManualStockAction extends I_Action {
 			List<ManualStockBean> itemList = new ArrayList<ManualStockBean>();
 			//Set Item
 			String[] lineId = request.getParameterValues("lineId");
-			String[] barcode = request.getParameterValues("barcode");
+			String[] pensItem = request.getParameterValues("pensItem");
 			String[] materialMaster = request.getParameterValues("materialMaster");
 			String[] groupCode = request.getParameterValues("groupCode");
-			String[] pensItem = request.getParameterValues("pensItem");
-			//String[] wholePriceBF = request.getParameterValues("wholePriceBF");
-			String[] retailPriceBF = request.getParameterValues("retailPriceBF");
-			String[] status = request.getParameterValues("status");
-			
-			logger.debug("barcode:"+barcode.length);
+			String[] qty = request.getParameterValues("qty");
+			logger.debug("pensItem:"+pensItem.length);
 			int maxLineId = 0;
 			
 			if( !"".equals(h.getDocNo())){
-				maxLineId = ManualStockDAO.getMaxLineIdFromMTTByDocNo(h);
+				maxLineId = ManualStockDAO.getMaxLineIdByDocNo(h);
 			}
 			
 			//add value to Results
-			if(barcode != null && barcode.length > 0){
-				for(int i=0;i<barcode.length;i++){
-					if( !Utils.isNull(barcode[i]).equals("") && !Utils.isNull(materialMaster[i]).equals("")){
+			if(pensItem != null && pensItem.length > 0){
+				for(int i=0;i<pensItem.length;i++){
+					if( !Utils.isNull(pensItem[i]).equals("") && !Utils.isNull(materialMaster[i]).equals("")){
 						ManualStockBean l = new ManualStockBean();
 						 
 						 if( Utils.isNull(lineId[i]).equals("") ||  Utils.isNull(lineId[i]).equals("0")){
@@ -507,15 +453,11 @@ public class ManualStockAction extends I_Action {
 						 }
 						 
 						 l.setLineId(maxLineId);
-						 
-						 l.setBarcode(Utils.isNull(barcode[i]));
+					
 						 l.setMaterialMaster(Utils.isNull(materialMaster[i]));
 						 l.setGroupCode(Utils.isNull(groupCode[i]));
 						 l.setPensItem(Utils.isNull(pensItem[i]));
-						// l.setWholePriceBF(Utils.isNull(wholePriceBF[i]));
-						 l.setRetailPriceBF(Utils.isNull(retailPriceBF[i]));
-						 l.setStatus(Utils.isNull(status[i]));
-						 
+						 l.setQty(Utils.convertCurrentcyToInt(qty[i]));
 						 l.setCreateUser(user.getUserName());
 						 l.setUpdateUser(user.getUserName());
 						 itemList.add(l);
@@ -579,7 +521,7 @@ public class ManualStockAction extends I_Action {
 			ad.setCustGroup(aForm.getBean().getCustGroup());
 			ad.setStoreCode(aForm.getBean().getStoreCode());
 			ad.setStoreName(aForm.getBean().getStoreName());
-			ad.setTransDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setTransDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			ad.setCanEdit(true);
 			aForm.setBean(ad);
 			
@@ -601,7 +543,6 @@ public class ManualStockAction extends I_Action {
 			
 			ManualStockBean h = aForm.getBean();
 			h.setUpdateUser(user.getUserName());
-			h.setStatus(ManualStockDAO.STATUS_CANCEL);
 			
 			ManualStockDAO.updateMTTStatusByDocNo(conn, h);
 			

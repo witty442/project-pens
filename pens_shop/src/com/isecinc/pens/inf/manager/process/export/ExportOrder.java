@@ -110,7 +110,7 @@ public class ExportOrder {
 	           //   priceExcludeVat new edit 11/2561(wit)
 	            "	(select p.price from m_product_price p ,c_config c "+
 	            "   where d.product_id = p.product_id and p.pricelist_id = c.pricelist_id \n"+
-	            "   and p.isactive ='Y' ) AS	price,	\n"+
+	            "   and p.isactive ='Y' and p.uom_id = d.uom_id) AS	price,	\n"+
 	            "	d.LINE_AMOUNT	AS	LINE_AMOUNT, \n"+
 	            "	d.DISCOUNT	AS	DISCOUNT,	\n"+
 	            "	d.TOTAL_AMOUNT	AS	TOTAL_AMOUNT, \n"+
@@ -132,7 +132,8 @@ public class ExportOrder {
 	            "	left outer join ad_user a	\n"+
 	            "	on h.USER_ID = a.USER_ID	\n"+
 	            "   WHERE d.order_id ="+orderId;
-  
+            
+          
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while(rs.next()){

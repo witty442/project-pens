@@ -15,17 +15,18 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
+import com.isecinc.pens.bean.MonitorItemDetailBean;
+import com.isecinc.pens.bean.MonitorItemResultBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
-import com.isecinc.pens.inf.bean.MonitorItemResultBean;
-import com.isecinc.pens.inf.bean.TableBean;
-import com.isecinc.pens.inf.dao.InterfaceDAO;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.dao.InterfaceDAO;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
@@ -640,7 +641,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 				m.setCreateUser(rs.getString("create_user"));
 				m.setCreateDate(rs.getDate("create_date"));
 				m.setSubmitDate(rs.getTimestamp("submit_date"));
-				m.setSubmitDateDisp(Utils.stringValue(rs.getTimestamp("submit_date"),Utils.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,Utils.local_th));
+				m.setSubmitDateDisp(DateUtil.stringValue(rs.getTimestamp("submit_date"),DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,Utils.local_th));
 	            m.setFileCount(rs.getInt("file_count"));
 	            m.setSuccessCount(rs.getInt("success_count"));
 	            if( !Utils.isNull(rs.getString("error_msg")).equals("")){
@@ -784,10 +785,10 @@ public class BatchTaskDAO extends InterfaceUtils{
 			   sql.append(" and monitor.create_user LIKE '%"+mc.getUserName()+"%' \n");
 			}
             if( !Utils.isNull(mc.getSubmitDateFrom()).equals("")){
-            	sql.append(" and date(monitor.submit_date) >= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
+            	sql.append(" and date(monitor.submit_date) >= STR_TO_DATE('"+DateUtil.format(DateUtil.parseToBudishDate(mc.getSubmitDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
 			}
             if( !Utils.isNull(mc.getSubmitDateTo()).equals("")){
-            	sql.append(" and date(monitor.submit_date) <= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
+            	sql.append(" and date(monitor.submit_date) <= STR_TO_DATE('"+DateUtil.format(DateUtil.parseToBudishDate(mc.getSubmitDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
 			}
             if( !Utils.isNull(mc.getRequestTable()).equals("")){
             	sql.append(" and monitor_item.table_name LIKE '%"+mc.getRequestTable()+"%' \n");

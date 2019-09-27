@@ -20,8 +20,9 @@ import com.isecinc.pens.bean.AdjustStockSA;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.AdjustStockDAO;
 import com.isecinc.pens.dao.AdjustStockSADAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -136,7 +137,7 @@ public class AdjustStockSAAction extends I_Action {
 			}else{
 				logger.debug("prepare new documentNo");
 				AdjustStockSA ad = new AdjustStockSA();
-				ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				
 				aForm.setAdjustStockSA(ad);
 				aForm.setVerify(true);
@@ -408,7 +409,7 @@ public class AdjustStockSAAction extends I_Action {
 		AdjustStockSAForm aForm = (AdjustStockSAForm) form;
 		try {
 			AdjustStockSA ad = new AdjustStockSA();
-			ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			aForm.setAdjustStockSA(ad);
 			
 			//add Row blank 1 row

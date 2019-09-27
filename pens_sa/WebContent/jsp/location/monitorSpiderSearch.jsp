@@ -1,14 +1,15 @@
-<%@page import="util.PageVisit"%>
-<%@page import="util.SessionUtils"%>
-<%@page import="util.CConstants"%>
+<%@page import="com.pens.util.CConstants"%>
+<%@page import="com.pens.util.PageVisit"%>
+<%@page import="com.pens.util.SessionUtils"%>
+<%@page import="com.pens.util.CConstants"%>
 <%@page import="com.isecinc.pens.bean.CConstantsBean"%>
 <%@page import="java.util.Map"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@page import="util.Utils"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
-<%@page import="util.GoogleMapJavaScriptAPI"%>
+<%@page import="com.pens.util.GoogleMapJavaScriptAPI"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -325,8 +326,8 @@ function viewDetail(detailType,salesrepId,tripDate){
 				    <!-- ************************Result ***************************************************-->
 					  <%
 					 // System.out.println("Results:"+request.getSession().getAttribute("RESULTS"));
-					  if(request.getSession().getAttribute("RESULTS") != null) {
-					     out.println(request.getSession().getAttribute("RESULTS"));
+					  if(request.getSession().getAttribute("locationForm_RESULT") != null) {
+					     out.println(request.getSession().getAttribute("locationForm_RESULT"));
 					  }
 					  %>
 					<!-- ************************Result ***************************************************-->

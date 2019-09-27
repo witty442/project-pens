@@ -1,5 +1,5 @@
 <%@page import="com.isecinc.pens.web.manualstock.ManualStockBean"%>
-<%@page import="com.isecinc.pens.inf.helper.SessionIdUtils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
@@ -26,15 +26,15 @@ SessionUtils.clearSessionUnusedForm(request, "manualStockForm");
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css"></style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/DateUtils.js?v=<%=SessionIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/DateUtils.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -58,51 +58,20 @@ function exportExcel(path){
 
 function search(path){
 	var form = document.manualStockForm;
-	 if( $('#saleDateFrom').val()=="" && $('#saleDateTo').val()==""
-		&& $('#custGroup').val()=="" && $('#storeCode').val()==""
-	    && $('#groupCode').val()=="" && $('#createDateFrom').val()=="" && $('#createDateTo').val()==""){
-		alert("กรุณากรอก ข้อมูลค้นหาอย่างน้อย 1 รายการ");
-		return false;
-	}else{
-		if($('#custGroup').val()!=""){
-			 if( $('#saleDateFrom').val()=="" && $('#saleDateTo').val()==""
-				&& $('#storeCode').val()==""&& $('#groupCode').val()=="" 
-				&& $('#createDateFrom').val()=="" && $('#createDateTo').val()==""){
-			alert("ท่านเลือกกล่มร้านค้า  กรุณาเลือกข้อมูลค้นหาเพิ่มอีกอย่างน้อย 1 รายการ เนื่องจากข้อมูลที่จะแสดงมีมากเกินไป");
-			return false;
-		   }//if
-		}//if
-	}
-	 //validate date from to in same month
-	 if( $('#saleDateFrom').val() !="" && $('#saleDateTo').val() !=""){
-		 if(!dateFromToInSameMonth($('#saleDateFrom').val(),$('#saleDateTo').val())){
-			 alert("กรุณาเลือกวันที่ ในช่วงเดือนเดียวกันเท่านั้น")
-			 $('#saleDateTo').focus();
-			 return false;
-		 }
-	 }
-	
-	form.action = path + "/jsp/manualStockAction.do?do=search2&action=newsearch";
+
+	form.action = path + "/jsp/manualStockAction.do?do=searchHead&action=newsearch";
 	form.submit();
 	return true;
 }
 function gotoPage(path,currPage){
 	var form = document.manualStockForm;
-	form.action = path + "/jsp/manualStockAction.do?do=search2&currPage="+currPage;
+	form.action = path + "/jsp/manualStockAction.do?do=searchHead&currPage="+currPage;
     form.submit();
     return true;
 }
 
 function openEdit(path,docNo){
 	var form = document.manualStockForm;
-	/* var param ="&docNo="+$('#docNo').val();
-	param +="&custGroup="+$('#custGroup').val();
-	param +="&storeCode="+$('#storeCode').val();
-	param +="&barcode="+$('#barcode').val();
-	param +="&groupCode="+$('#groupCode').val();
-	param +="&materialMaster="+$('#materialMaster').val();
-	param +="&pensItem="+$('#pensItem').val(); */
-	
 	var param ="&docNo="+docNo
 	form.action = path + "/jsp/manualStockAction.do?do=prepare"+param;
 	form.submit();

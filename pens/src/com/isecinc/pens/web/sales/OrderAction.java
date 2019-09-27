@@ -1865,19 +1865,20 @@ public class OrderAction extends I_Action {
 				}
 			}*/
 			logger.info("Report Name:"+fileName);
-			
 			String fileJasper = BeanParameter.getReportPath() + fileName;
-           
 			reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
-			
 			//reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName, lstData);
+		
+			//stamp dateTime print
+			new MOrder().updatePrintTaxInvoiceStamp(conn,order.getOrderNo(), pReportTitle);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 		} finally {
 			try {
-				 conn.close();
+				 conn.close();conn=null;
 			} catch (Exception e2) {}
 		}
 		return mapping.findForward("print");

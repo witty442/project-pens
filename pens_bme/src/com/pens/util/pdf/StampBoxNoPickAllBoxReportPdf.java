@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.PickStock;
 import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.dao.ScanCheckDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -27,6 +26,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.pens.util.BeanParameter;
+import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
 

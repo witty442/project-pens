@@ -10,9 +10,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.process.SequenceProcessAll;
-
-import util.DBConnection;
-import util.Utils;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
 
 public class StockMCDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -81,7 +82,7 @@ public class StockMCDAO {
 			while(rst.next()) {
 			   h = new StockMCBean();
 			   h.setId(rst.getInt("id"));
-			   h.setStockDate(Utils.stringValueChkNull(rst.getDate("stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStockDate(DateUtil.stringValueChkNull(rst.getDate("stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 			   h.setCustomerName(Utils.isNull(rst.getString("customer_name")));
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
@@ -133,7 +134,7 @@ public class StockMCDAO {
 			if(rst.next()) {
 			   h = new StockMCBean();
 			   h.setId(rst.getInt("id"));
-			   h.setStockDate(Utils.stringValueChkNull(rst.getDate("stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStockDate(DateUtil.stringValueChkNull(rst.getDate("stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 			   h.setCustomerName(Utils.isNull(rst.getString("customer_name")));
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
@@ -196,15 +197,15 @@ public class StockMCDAO {
 			   //1
 			   h.setFrontendQty1(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_1"), Utils.format_current_no_disgit)));
 			   h.setUom1(Utils.isNull(rst.getString("uom_1")));
-			   h.setExpireDate1(Utils.stringValueChkNull(rst.getDate("EXPIRE_DATE_1"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setExpireDate1(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_1"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   //2
 			   h.setFrontendQty2(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_2"), Utils.format_current_no_disgit)));
 			   h.setUom2(Utils.isNull(rst.getString("uom_2")));
-			   h.setExpireDate2(Utils.stringValueChkNull(rst.getDate("EXPIRE_DATE_2"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setExpireDate2(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_2"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   //3
 			   h.setFrontendQty3(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_3"), Utils.format_current_no_disgit)));
 			   h.setUom3(Utils.isNull(rst.getString("uom_3")));
-			   h.setExpireDate3(Utils.stringValueChkNull(rst.getDate("EXPIRE_DATE_3"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setExpireDate3(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_3"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			
 			   items.add(h);
 			}//while
@@ -236,7 +237,7 @@ public class StockMCDAO {
 			sql.append("\n  and M.item_pens = D.product_code and M.barcode = D.barcode) as description");
 			sql.append("\n FROM PENSBI.MC_COUNTSTK_HEADER H,PENSBI.MC_COUNTSTK_DETAIL D");
 			sql.append("\n WHERE H.id = D.id ");
-			sql.append("\n AND D.id in( "+Utils.converToTextSqlIn(idSelected)+")");
+			sql.append("\n AND D.id in( "+SQLHelper.converToTextSqlIn(idSelected)+")");
 			sql.append("\n ORDER BY H.stock_date,H.customer_code,H.store_code , D.line_id asc");
 			
 			logger.debug("sql:"+sql);
@@ -246,7 +247,7 @@ public class StockMCDAO {
 			while(rst.next()) {
 			   no++;
 			   h = new StockMCBean();
-			   h.setStockDate(Utils.stringValueChkNull(rst.getDate("stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStockDate(DateUtil.stringValueChkNull(rst.getDate("stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 			   h.setCustomerName(Utils.isNull(rst.getString("customer_name")));
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
@@ -270,15 +271,15 @@ public class StockMCDAO {
 			   //1
 			   h.setFrontendQty1(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_1"), Utils.format_current_no_disgit)));
 			   h.setUom1(Utils.isNull(rst.getString("uom_1")));
-			   h.setExpireDate1(Utils.stringValueChkNull(rst.getDate("EXPIRE_DATE_1"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setExpireDate1(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_1"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   //2
 			   h.setFrontendQty2(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_2"), Utils.format_current_no_disgit)));
 			   h.setUom2(Utils.isNull(rst.getString("uom_2")));
-			   h.setExpireDate2(Utils.stringValueChkNull(rst.getDate("EXPIRE_DATE_2"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setExpireDate2(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_2"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   //3
 			   h.setFrontendQty3(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_3"), Utils.format_current_no_disgit)));
 			   h.setUom3(Utils.isNull(rst.getString("uom_3")));
-			   h.setExpireDate3(Utils.stringValueChkNull(rst.getDate("EXPIRE_DATE_3"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setExpireDate3(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_3"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			
 			   items.add(h);
 			}//while
@@ -306,8 +307,8 @@ public class StockMCDAO {
 			sql.append("\n and H.store_code = '"+Utils.isNull(o.getStoreCode())+"'");
 		}
 	     if(!Utils.isNull(o.getStockDate()).equalsIgnoreCase("")){
-			Date endDate = Utils.parse(o.getStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String endDateStr = Utils.stringValue(endDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date endDate = DateUtil.parse(o.getStockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+			String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			sql.append("\n and H.stock_date = to_date('"+endDateStr+"','dd/mm/yyyy')");
 		}
 		return sql;
@@ -338,7 +339,7 @@ public class StockMCDAO {
 			   h.setProductPackSize(Utils.isNull(rst.getString("packsize")));
 			   h.setProductAge(Utils.isNull(rst.getString("PRODUCT_AGE")));
 			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price"), Utils.format_current_2_disgit));
-			   h.setStartDate(Utils.stringValueChkNull(rst.getDate("start_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStartDate(DateUtil.stringValueChkNull(rst.getDate("start_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			  
 			   h.setPromotionPrice("");
 			   h.setLegQty("");
@@ -402,8 +403,8 @@ public class StockMCDAO {
 			   h.setProductPackSize(Utils.isNull(rst.getString("packsize")));
 			   h.setProductAge(rst.getString("PRODUCT_AGE"));
 			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price"), Utils.format_current_2_disgit));
-			   h.setStartDate(Utils.stringValueChkNull(rst.getDate("start_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			   h.setExpireDate1(Utils.stringValueChkNull(rst.getDate("expired"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setStartDate(DateUtil.stringValueChkNull(rst.getDate("start_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+			   h.setExpireDate1(DateUtil.stringValueChkNull(rst.getDate("expired"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			}//while
 
 		} catch (Exception e) {
@@ -512,7 +513,7 @@ public class StockMCDAO {
 			ps = conn.prepareStatement(sql.toString());
 			
 			ps.setLong(++index, model.getId());
-			ps.setDate(++index, new java.sql.Date(Utils.parse(model.getStockDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			ps.setDate(++index, new java.sql.Date(DateUtil.parse(model.getStockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			ps.setString(++index, Utils.isNull(model.getCustomerCode()));
 			ps.setString(++index, Utils.isNull(model.getStoreCode()));
 			ps.setString(++index, Utils.isNull(model.getMcName()));
@@ -603,7 +604,7 @@ public class StockMCDAO {
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getFrontendQty1()));//12
 			ps.setString(++index, line.getUom1());//13
 			if( !Utils.isNull(line.getExpireDate1()).equals("")){//14
-				 ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate1(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				 ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getExpireDate1(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			}else{
 				 ps.setNull(++index,java.sql.Types.DATE);
 			}
@@ -611,7 +612,7 @@ public class StockMCDAO {
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getFrontendQty2()));//15
 			ps.setString(++index, line.getUom2());//16
 			if( !Utils.isNull(line.getExpireDate2()).equals("")){//17
-				 ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate2(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				 ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getExpireDate2(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			}else{
 				 ps.setNull(++index,java.sql.Types.DATE);
 			}
@@ -619,7 +620,7 @@ public class StockMCDAO {
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getFrontendQty3()));//18
 			ps.setString(++index, line.getUom3());//19
 			if( !Utils.isNull(line.getExpireDate3()).equals("")){//20
-				 ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate3(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				 ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getExpireDate3(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			}else{
 				 ps.setNull(++index,java.sql.Types.DATE);
 			}
@@ -669,7 +670,7 @@ public class StockMCDAO {
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getFrontendQty1()));
 			ps.setString(++index, line.getUom1());
 			if( !Utils.isNull(line.getExpireDate1()).equals("")){
-				 ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate1(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				 ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getExpireDate1(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			}else{
 				 ps.setNull(++index,java.sql.Types.DATE);
 			}
@@ -677,7 +678,7 @@ public class StockMCDAO {
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getFrontendQty2()));
 			ps.setString(++index, line.getUom2());
 			if( !Utils.isNull(line.getExpireDate2()).equals("")){ //11
-				 ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate2(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				 ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getExpireDate2(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			}else{
 				 ps.setNull(++index,java.sql.Types.DATE);
 			}
@@ -685,7 +686,7 @@ public class StockMCDAO {
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getFrontendQty3()));
 			ps.setString(++index, line.getUom3());
 			if( !Utils.isNull(line.getExpireDate3()).equals("")){
-				 ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate3(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				 ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getExpireDate3(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			}else{
 				 ps.setNull(++index,java.sql.Types.DATE);
 			}
@@ -717,7 +718,7 @@ public class StockMCDAO {
 		try {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" DELETE PENSBI.MC_COUNTSTK_DETAIL  \n");
-			sql.append(" WHERE ID = "+id+" AND LINE_ID IN("+Utils.converToTextSqlIn(lineIdDelete)+") \n");
+			sql.append(" WHERE ID = "+id+" AND LINE_ID IN("+SQLHelper.converToTextSqlIn(lineIdDelete)+") \n");
 
 			logger.debug("SQL:"+sql);
 

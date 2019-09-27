@@ -11,11 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.DBConnection;
-import util.Utils;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.process.SequenceProcessAll;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class SalesTargetTTCopyNMonth {
 
@@ -30,7 +30,7 @@ public class SalesTargetTTCopyNMonth {
 			destBean.setPeriod("OCT-17");
 			
 			//Source Date Month 8
-			Date sourceDate = Utils.parse("01/08/2017", Utils.DD_MM_YYYY_WITH_SLASH);
+			Date sourceDate = DateUtil.parse("01/08/2017", DateUtil.DD_MM_YYYY_WITH_SLASH);
 
 			//copyFromNMonth(destBean,sourceDate);
 		}catch(Exception e){
@@ -43,7 +43,7 @@ public class SalesTargetTTCopyNMonth {
 		try{
 			logger.debug("** Start Copy From["+fromPeriod+"]TO["+toPeriod+"]**");
 			//From Date
-			Date dateSource = Utils.parse(Utils.isNull(fromStartDate), Utils.DD_MMM_YYYY);
+			Date dateSource = DateUtil.parse(Utils.isNull(fromStartDate), DateUtil.DD_MMM_YYYY);
 
 			// toDate
 			SalesTargetBean destBean = new SalesTargetBean();
@@ -71,7 +71,7 @@ public class SalesTargetTTCopyNMonth {
 			conn.setAutoCommit(false);
 
 			//setDate CurrentMonth 
-			Date startDate = Utils.parse(destBean.getStartDate(), Utils.DD_MMM_YYYY);
+			Date startDate = DateUtil.parse(destBean.getStartDate(), DateUtil.DD_MMM_YYYY);
 			logger.debug("startDate:"+startDate);
 			curCal.setTime(startDate);
 			logger.debug("curDate Time["+curCal.getTime()+"]");
@@ -87,10 +87,10 @@ public class SalesTargetTTCopyNMonth {
 				sourceBean = new SalesTargetBean();
 				curCal.setTime(dateSource);
 				
-				sourceBean.setStartDate(Utils.stringValue(curCal.getTime(), Utils.DD_MMM_YYYY));
+				sourceBean.setStartDate(DateUtil.stringValue(curCal.getTime(), DateUtil.DD_MMM_YYYY));
 				logger.debug("prevDate Time["+curCal.getTime()+"]");
 				//convert
-				sourceBean.setPeriod(Utils.stringValue(curCal.getTime(),"MMM-yy").toUpperCase());
+				sourceBean.setPeriod(DateUtil.stringValue(curCal.getTime(),"MMM-yy").toUpperCase());
 				sourceBean = SalesTargetDAO.convertCriteria(sourceBean);
 				sourceBean.setStatus(SalesTargetConstants.STATUS_FINISH);// get only status Finish
 				

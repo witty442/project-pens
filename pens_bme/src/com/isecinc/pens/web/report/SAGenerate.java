@@ -14,7 +14,8 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 
@@ -128,7 +129,7 @@ public class SAGenerate {
 			    /** Gen Timestamp **/
 				Calendar currentTime = Calendar.getInstance(new Locale("th","TH"));
 				htmlStr.append("<tr> \n");
-				htmlStr.append(" <td colspan='"+columnCount+"'>Exported date :"+Utils.stringValue(currentTime.getTime(), Utils.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,new Locale("th","TH"))+"");
+				htmlStr.append(" <td colspan='"+columnCount+"'>Exported date :"+DateUtil.stringValue(currentTime.getTime(), DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,new Locale("th","TH"))+"");
 				htmlStr.append(" ,Created by:"+user.getName()+" </td> \n");
 				htmlStr.append("</tr> \n");
 				htmlStr.append("</table> \n");
@@ -263,16 +264,16 @@ public class SAGenerate {
 				htmlStr.append(" <td align='left'>"+Utils.isNull(rs.getString("store_name"))+"</td>  \n");
 				htmlStr.append(" <td align='left'>"+Utils.isNull(rs.getString("style"))+"</td>  \n");
 			}else if("disp_4".equalsIgnoreCase(salesBean.getDispBy())){
-				htmlStr.append(" <td align='left'>"+Utils.stringValue(rs.getDate("sales_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>  \n");
+				htmlStr.append(" <td align='left'>"+DateUtil.stringValue(rs.getDate("sales_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>  \n");
 				htmlStr.append(" <td align='left'>"+Utils.isNull(rs.getString("store_no"))+"</td>  \n");
 				htmlStr.append(" <td align='left'>"+Utils.isNull(rs.getString("store_name"))+"</td>  \n");
 			}else if("disp_5".equalsIgnoreCase(salesBean.getDispBy())){
-				htmlStr.append(" <td align='left'>"+Utils.stringValue(rs.getDate("sales_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>  \n");
+				htmlStr.append(" <td align='left'>"+DateUtil.stringValue(rs.getDate("sales_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>  \n");
 				htmlStr.append(" <td align='left'>"+Utils.isNull(rs.getString("store_no"))+"</td>  \n");
 				htmlStr.append(" <td align='left'>"+Utils.isNull(rs.getString("store_name"))+"</td>  \n");
 				htmlStr.append(" <td align='left'>"+Utils.isNull(rs.getString("style"))+"</td>  \n");
 			}else if("disp_6".equalsIgnoreCase(salesBean.getDispBy())){
-				htmlStr.append(" <td align='left'>"+Utils.stringValue(rs.getDate("sales_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>  \n");
+				htmlStr.append(" <td align='left'>"+DateUtil.stringValue(rs.getDate("sales_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td>  \n");
 				htmlStr.append(" <td align='left'>"+Utils.isNull(rs.getString("store_no"))+"</td>  \n");
 				htmlStr.append(" <td align='left'>"+Utils.isNull(rs.getString("store_name"))+"</td>  \n");
 				htmlStr.append(" <td align='left'>"+Utils.isNull(rs.getString("style"))+"</td>  \n");
@@ -396,11 +397,11 @@ public class SAGenerate {
 		
 		//Date
 		if(ReportProcess.TYPE_SEARCH_DAY.equalsIgnoreCase(salesBean.getTypeSearch())){
-		   Date dateFrom = Utils.parse(salesBean.getDay(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
-		   Date dateTo = Utils.parse(salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+		   Date dateFrom = DateUtil.parse(salesBean.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+		   Date dateTo = DateUtil.parse(salesBean.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
 		
-		   String dateFromStr = Utils.stringValue(dateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
-		   String dateToStr = Utils.stringValue(dateTo, Utils.DD_MM_YYYY_WITH_SLASH);
+		   String dateFromStr = DateUtil.stringValue(dateFrom, DateUtil.DD_MM_YYYY_WITH_SLASH);
+		   String dateToStr = DateUtil.stringValue(dateTo, DateUtil.DD_MM_YYYY_WITH_SLASH);
 		   
 		   sql.append("AND SALES_DATE >= TO_DATE('"+dateFromStr+"','dd/mm/yyyy') \n");
 		   sql.append("AND SALES_DATE <= TO_DATE('"+dateToStr+"','dd/mm/yyyy') \n");

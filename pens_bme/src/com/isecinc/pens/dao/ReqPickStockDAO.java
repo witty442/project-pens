@@ -17,7 +17,8 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 
@@ -30,7 +31,7 @@ public class ReqPickStockDAO extends PickConstants{
 		h.setResultProcess(true);//default
 		try{
 			logger.debug("h.getIssueReqDate():"+h.getIssueReqDate());
-			Date tDate  = Utils.parse(h.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date tDate  = DateUtil.parse(h.getIssueReqDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 
 			//check documentNo
 			if(Utils.isNull(h.getIssueReqNo()).equals("")){
@@ -143,7 +144,7 @@ public class ReqPickStockDAO extends PickConstants{
 			rst = ps.executeQuery();
 			while(rst.next()) {
 			   h = new ReqPickStock();
-			   h.setIssueReqDate(Utils.stringValue(rst.getDate("issue_req_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setIssueReqDate(DateUtil.stringValue(rst.getDate("issue_req_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
 			   h.setStatus(Utils.isNull(rst.getString("status")));
 			   h.setStatusDesc(getStatusDesc(h.getStatus()));
@@ -218,8 +219,8 @@ public class ReqPickStockDAO extends PickConstants{
 			sql.append("\n and H.remark = '"+Utils.isNull(o.getRemark())+"'  ");
 		}
 		if( !Utils.isNull(o.getIssueReqDate()).equals("")){
-			Date tDate  = Utils.parse(o.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String returnDateStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getIssueReqDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String returnDateStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n and H.ISSUE_REQ_DATE = to_date('"+returnDateStr+"','dd/mm/yyyy') ");
 		}
@@ -807,11 +808,11 @@ public class ReqPickStockDAO extends PickConstants{
 				
 			   h.setIssueReqNo(Utils.isNull(rst.getString("issue_req_no")));
 			   if(rst.getDate("issue_req_date") != null){
-				  String dateStr = Utils.stringValue(rst.getDate("issue_req_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				  String dateStr = DateUtil.stringValue(rst.getDate("issue_req_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			      h.setIssueReqDate(dateStr);
 			   }
 			   if(rst.getDate("need_date") != null){
-				  String dateStr = Utils.stringValue(rst.getDate("need_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				  String dateStr = DateUtil.stringValue(rst.getDate("need_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				  h.setNeedDate(dateStr);
 			    }
 			   h.setStatus(rst.getString("status"));
@@ -2002,8 +2003,8 @@ public class ReqPickStockDAO extends PickConstants{
 			
 			ps = conn.prepareStatement(sql.toString());
 				
-			Date issueDate = Utils.parse( o.getIssueReqDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			Date needDate = Utils.parse( o.getNeedDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date issueDate = DateUtil.parse( o.getIssueReqDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date needDate = DateUtil.parse( o.getNeedDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			int c =1;
 			
 			ps.setString(c++, o.getIssueReqNo());
@@ -2036,7 +2037,7 @@ public class ReqPickStockDAO extends PickConstants{
 		PreparedStatement ps = null;
 		logger.debug("updateHeadModel");
 		try{
-			Date needDate = Utils.parse( o.getNeedDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date needDate = DateUtil.parse( o.getNeedDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBME_STOCK_ISSUE \n");

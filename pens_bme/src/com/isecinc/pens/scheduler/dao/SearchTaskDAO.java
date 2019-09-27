@@ -12,12 +12,12 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.scheduler.bean.BatchTaskDTO;
 import com.isecinc.pens.scheduler.bean.TaskConditionDTO;
 import com.isecinc.pens.scheduler.manager.ScheduleVO;
-import com.isecinc.pens.scheduler.utils.DateUtil;
 import com.isecinc.pens.scheduler.utils.EnvSchedulerProperties;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class SearchTaskDAO {
@@ -367,9 +367,9 @@ public class SearchTaskDAO {
         dto.setDestPath(rs.getString("DEST_PATH"));
         dto.setMessage(Utils.isNull(rs.getString("MESSAGE")));
         
-        dto.setBatchDateTime(Utils.stringValue(rs.getTimestamp("batch_date"),"dd/MM/yyyy HH:mm:ss" ,Utils.local_th));
-        dto.setLastRunDate(Utils.stringValue(rs.getTimestamp("LAST_RUN_DATE"),"dd/MM/yyyy HH:mm:ss",Utils.local_th));
-        dto.setNextRunDate(Utils.stringValue(rs.getTimestamp("NEXT_RUN_DATE"),"dd/MM/yyyy HH:mm:ss",Utils.local_th));
+        dto.setBatchDateTime(DateUtil.stringValue(rs.getTimestamp("batch_date"),"dd/MM/yyyy HH:mm:ss" ,Utils.local_th));
+        dto.setLastRunDate(DateUtil.stringValue(rs.getTimestamp("LAST_RUN_DATE"),"dd/MM/yyyy HH:mm:ss",Utils.local_th));
+        dto.setNextRunDate(DateUtil.stringValue(rs.getTimestamp("NEXT_RUN_DATE"),"dd/MM/yyyy HH:mm:ss",Utils.local_th));
         
         dto.setParamRegen(rs.getString("PARAM_REGEN"));
         

@@ -2,7 +2,7 @@ package test;
 
 import java.sql.Connection;
 
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 
 public class TestConnection {
 

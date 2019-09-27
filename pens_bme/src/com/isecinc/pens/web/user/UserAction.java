@@ -14,8 +14,9 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -170,7 +171,7 @@ public class UserAction extends I_Action {
 	try {
 		User u = new User();
 		u.setUserName("");
-		u.setStartDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+		u.setStartDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 		userForm.setUser(u);
 		
 	} catch (Exception e) {

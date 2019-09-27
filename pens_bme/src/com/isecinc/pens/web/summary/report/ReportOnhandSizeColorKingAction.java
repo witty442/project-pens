@@ -19,12 +19,13 @@ import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.StoreDAO;
 import com.isecinc.pens.dao.SummaryDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.sql.ReportOnhandAsOfKingSQL;
 import com.isecinc.pens.sql.ReportOnhandMTTDetailSQL;
 import com.isecinc.pens.sql.ReportOnhandSizeColorKingSQL;
 import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.web.summary.SummaryForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class ReportOnhandSizeColorKingAction {
@@ -44,6 +45,7 @@ public class ReportOnhandSizeColorKingAction {
 	double sale_in_qty = 0;
 	double sale_out_qty = 0;
 	double sale_return_qty = 0;
+	double adjust_qty = 0;
 	double onhand_qty = 0;
 	List<OnhandSummary> rowAllList = new ArrayList<OnhandSummary>();
 	OnhandSummary item = null;
@@ -68,7 +70,7 @@ public class ReportOnhandSizeColorKingAction {
 			storeList.add(storeBean);
 			
 			//Validate Initial Date
-			Date asOfDate = Utils.parse(c.getSalesDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date asOfDate = DateUtil.parse(c.getSalesDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			Date initDate = new SummaryDAO().searchInitDateMTT(conn,c.getPensCustCodeFrom());
 			
 			logger.debug("initDate:"+initDate);
@@ -89,7 +91,7 @@ public class ReportOnhandSizeColorKingAction {
 				if (results != null  && results.size() >0) {
 					request.getSession().setAttribute("summary" ,summary.getSummary());
 					summaryForm.setResults(results);
-					summaryForm.getOnhandSummary().setInitDate(Utils.stringValue(initDate,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					summaryForm.getOnhandSummary().setInitDate(DateUtil.stringValue(initDate,DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					
 					ImportDAO importDAO = new ImportDAO();
 					Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
@@ -142,6 +144,7 @@ public class ReportOnhandSizeColorKingAction {
 						item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
 						item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("sale_return_qty"),Utils.format_current_no_disgit));
 						item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("sale_out_qty"),Utils.format_current_no_disgit));
+						item.setAdjustQty(Utils.decimalFormat(rst.getDouble("adjust_qty"),Utils.format_current_no_disgit));
 						item.setOnhandQty(Utils.decimalFormat(rst.getDouble("onhand_qty"),Utils.format_current_no_disgit));
 						
 						rowAllList.add(item);
@@ -151,6 +154,7 @@ public class ReportOnhandSizeColorKingAction {
 						sale_in_qty += rst.getDouble("sale_in_qty");
 						sale_return_qty += rst.getDouble("sale_return_qty");
 						sale_out_qty += rst.getDouble("sale_out_qty");
+						adjust_qty += rst.getDouble("adjust_qty");
 						onhand_qty += rst.getDouble("onhand_qty");
 
 					}//while
@@ -167,6 +171,7 @@ public class ReportOnhandSizeColorKingAction {
 				item.setSaleInQty(Utils.decimalFormat(sale_in_qty,Utils.format_current_no_disgit));
 				item.setSaleReturnQty(Utils.decimalFormat(sale_return_qty,Utils.format_current_no_disgit));
 				item.setSaleOutQty(Utils.decimalFormat(sale_out_qty,Utils.format_current_no_disgit));
+				item.setAdjustQty(Utils.decimalFormat(adjust_qty,Utils.format_current_no_disgit));
 				item.setOnhandQty(Utils.decimalFormat(onhand_qty,Utils.format_current_no_disgit));
 				
 				//Sort by StoreCode,GroupCode
@@ -232,6 +237,7 @@ public class ReportOnhandSizeColorKingAction {
 					item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
 					item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("sale_return_qty"),Utils.format_current_no_disgit));
 					item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("sale_out_qty"),Utils.format_current_no_disgit));
+					item.setAdjustQty(Utils.decimalFormat(rst.getDouble("adjust_qty"),Utils.format_current_no_disgit));
 					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("onhand_qty"),Utils.format_current_no_disgit));
 					
 					pos.add(item);

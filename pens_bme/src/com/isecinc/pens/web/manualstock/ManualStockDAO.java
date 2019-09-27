@@ -13,8 +13,9 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Job;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.mtt.MTTAction;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
 public class ManualStockDAO{
@@ -23,9 +24,6 @@ public class ManualStockDAO{
 	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
 	protected static SimpleDateFormat dfUs = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
 	
-	public static String STATUS_NEW ="N";
-	public static String STATUS_CANCEL ="AB";
-	
 	public static int searchHeadTotalRecList(Connection conn,ManualStockBean o) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -33,18 +31,11 @@ public class ManualStockDAO{
 		int totalRec = 0;
 		try {
 			sql.append("\n select count(*) as c  from (");
-			sql.append("\n   select doc_no,sale_date ,cust_group,cust_no,barcode," );
-			sql.append("\n   MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF ,remark,create_date");
-			sql.append("\n   ,status,count(*) as qty");
-			sql.append("\n   ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1 ");
-			sql.append("\n     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  ");
-			sql.append("\n   ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  ");
-			sql.append("\n     and M.reference_code = 'Idwacoal' and M.pens_value = S.cust_group) as cust_group_name ");
-			sql.append("\n   from PENSBME_SALES_OUT S");
+			sql.append("\n   select *" );
+			sql.append("\n   from PENSBI.PENSBME_MANUAL_STOCK S");
 		    sql.append("\n   where 1=1 ");
 		    //Where Condition
 		    sql.append("   "+genWhereSearchHeadList(o).toString());
-			sql.append("\n    group by doc_no,sale_date ,cust_group,cust_no,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,status,remark,create_date");
             sql.append("\n   )A ");
          
 			logger.debug("sql:"+sql);
@@ -70,8 +61,8 @@ public class ManualStockDAO{
 		StringBuilder sql = new StringBuilder();
 		ManualStockBean h = null;
 		try {
-			sql.append("\n  select count(*) as qty");;
-			sql.append("\n  from PENSBME_SALES_OUT S");
+			sql.append("\n  select sum(qty) as qty");;
+			sql.append("\n  from PENSBI.PENSBME_MANUAL_STOCK S");
 		    sql.append("\n  where 1=1 ");
 		    //Where Condition
 		    sql.append("   "+genWhereSearchHeadList(o).toString());
@@ -105,19 +96,12 @@ public class ManualStockDAO{
 		try {
 			sql.append("\n select M.* from (");
 			sql.append("\n select A.* ,rownum as r__ from (");
-			sql.append("\n   select doc_no,sale_date ,cust_group,cust_no,barcode," );
-			sql.append("\n   MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF ,remark,create_date");
-			sql.append("\n   ,status,count(*) as qty");
-			sql.append("\n   ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1 ");
-			sql.append("\n     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  ");
-			sql.append("\n   ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  ");
-			sql.append("\n     and M.reference_code = 'Idwacoal' and M.pens_value = S.cust_group) as cust_group_name ");
-			sql.append("\n   from PENSBME_SALES_OUT S");
+			sql.append("\n   select S.*" );
+			sql.append("\n   from PENSBI.PENSBME_MANUAL_STOCK S");
 		    sql.append("\n   where 1=1 ");
 		    //Where Condition
 		    sql.append("   "+genWhereSearchHeadList(o).toString());
-			sql.append("\n    group by doc_no,sale_date ,cust_group,cust_no,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,status,remark,create_date");
-			sql.append("\n    order by doc_no desc,GROUP_CODE desc ");
+			sql.append("\n    order by doc_no desc ");
             sql.append("\n   )A ");
          
      	    // get record start to end 
@@ -131,7 +115,7 @@ public class ManualStockDAO{
 			logger.debug("sql:"+sql);
 			
 			//strart no by currPage
-			r = Utils.calcStartNoInPage(currPage, MTTAction.pageSize);
+			r = Utils.calcStartNoInPage(currPage, ManualStockAction.pageSize);
 
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
@@ -142,7 +126,7 @@ public class ManualStockDAO{
 			   h.setCustGroup(rst.getString("cust_group"));
 			   h.setCustGroupName(rst.getString("cust_group_name"));
 			  // h.setSaleDate(Utils.stringValue(rst.getTimestamp("sale_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			   h.setCreateDate(Utils.stringValue(rst.getTimestamp("create_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCreateDate(DateUtil.stringValue(rst.getTimestamp("create_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
 			   h.setRemark(Utils.isNull(rst.getString("remark")));
@@ -194,21 +178,10 @@ public class ManualStockDAO{
 		int c = 1;
 		int totalQty = 0;
 		try {
-			sql.append("\n  select doc_no,sale_date ,cust_group,cust_no,barcode," +
-					"\n MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF ,remark,create_date" +
-		            "\n ,status,count(*) as qty"+
-					"\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
-					"     and M.reference_code = 'Store' and M.pens_value = S.cust_no) as store_name  "+
-					"\n ,(select pens_desc FROM PENSBME_MST_REFERENCE M WHERE 1=1  " +
-					"     and M.reference_code = 'Idwacoal' and M.pens_value = S.cust_group) as cust_group_name  "+
-					" from PENSBME_SALES_OUT S");
-			
+			sql.append("\n  select * from PENSBI.PENSBME_MANUAL_STOCK S");
 			sql.append("\n where 1=1   \n");
-			sql.append("\n and status <> '"+STATUS_CANCEL+"' \n");
 		    sql.append(""+genWhereSearchHeadList(o));
-			
-			sql.append("\n group by doc_no,sale_date ,cust_group,cust_no,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,status,remark,create_date");
-			sql.append("\n order by doc_no desc,GROUP_CODE desc ");
+			sql.append("\n order by doc_no desc ");
 			logger.debug("sql:"+sql);
 			
 			conn = DBConnection.getInstance().getConnection();
@@ -222,7 +195,7 @@ public class ManualStockDAO{
 			   h.setCustGroup(rst.getString("cust_group"));
 			   h.setCustGroupName(rst.getString("cust_group_name"));
 			  // h.setSaleDate(Utils.stringValue(rst.getTimestamp("sale_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			   h.setCreateDate(Utils.stringValue(rst.getTimestamp("create_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCreateDate(DateUtil.stringValue(rst.getTimestamp("create_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
 			   h.setRemark(Utils.isNull(rst.getString("remark")));
@@ -270,33 +243,32 @@ public class ManualStockDAO{
 	}
 	public static StringBuffer genWhereSearchHeadList(ManualStockBean o) throws Exception{
 		StringBuffer sql = new StringBuffer("");
-		sql.append("\n and status <> '"+STATUS_CANCEL+"' \n");
 		
 		if( !Utils.isNull(o.getDocNo()).equals("")){
 			sql.append("\n and doc_no = '"+Utils.isNull(o.getDocNo())+"'");
 		}
-		if( !Utils.isNull(o.getCustGroup()).equals("")){
-			sql.append("\n and cust_group = '"+Utils.isNull(o.getCustGroup())+"'  ");
-		}
 		if( !Utils.isNull(o.getStoreCode()).equals("")){
-			sql.append("\n and cust_no = '"+Utils.isNull(o.getStoreCode())+"'  ");
+			sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
+		}
+		if( !Utils.isNull(o.getStoreName()).equals("")){
+			sql.append("\n and store_name = '"+Utils.isNull(o.getStoreName())+"'  ");
 		}
 		if( !Utils.isNull(o.getGroupCode()).equals("")){
 			sql.append("\n and group_code = '"+Utils.isNull(o.getGroupCode())+"'  ");
 		}
 		
 		if( !Utils.isNull(o.getTransDateFrom()).equals("")){
-			Date fDate  = Utils.parse(o.getTransDateFrom(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String fStr = Utils.stringValue(fDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date fDate  = DateUtil.parse(o.getTransDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String fStr = DateUtil.stringValue(fDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
-			sql.append("\n and trunc(SALE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
+			sql.append("\n and trunc(TRANS_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
 		}
 		
 		if( !Utils.isNull(o.getTransDateTo()).equals("")){
-			Date tDate  = Utils.parse(o.getTransDateTo(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			String tStr = Utils.stringValue(tDate, Utils.DD_MM_YYYY_WITH_SLASH);
+			Date tDate  = DateUtil.parse(o.getTransDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			String tStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 
-			sql.append("\n and trunc(SALE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
+			sql.append("\n and trunc(TRANS_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 		}
 
 		return sql;
@@ -334,7 +306,6 @@ public class ManualStockDAO{
 					" from PENSBME_SALES_OUT ");
 			
 			sql.append("\n where 1=1   \n");
-			sql.append("\n and status <> '"+STATUS_CANCEL+"' \n");
 			if( !Utils.isNull(o.getDocNo()).equals("")){
 				sql.append("\n and doc_no = '"+Utils.isNull(o.getDocNo())+"'");
 			}
@@ -388,14 +359,14 @@ public class ManualStockDAO{
 		return o;
 	}
 	
-	public static int getMaxLineIdFromMTTByDocNo(ManualStockBean o ) throws Exception {
+	public static int getMaxLineIdByDocNo(ManualStockBean o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
         int maxLineId= 0;
 		try {
-			sql.append("\n select max(line_id) as max_line_id from PENSBME_SALES_OUT ");
+			sql.append("\n select max(line_id) as max_line_id from PENSBI.PENSBME_MANUAL_STOCK ");
 			sql.append("\n where 1=1   \n");
 			sql.append("\n and doc_no = '"+Utils.isNull(o.getDocNo())+"'");
 			logger.debug("sql:"+sql);
@@ -495,19 +466,19 @@ public class ManualStockDAO{
 				   for(int i=0;i<h.getItems().size();i++){
 					   ManualStockBean l = (ManualStockBean)h.getItems().get(i);
 					   l.setDocNo(h.getDocNo());
-					   l.setStatus(STATUS_NEW);
 					   l.setTransDate(h.getTransDate());
-					   l.setCustGroup(h.getCustGroup());
 					   l.setStoreCode(h.getStoreCode());
-					   l.setRemark(h.getRemark());
+					   l.setStoreName(h.getStoreName());
+					   l.setStoreNo(h.getStoreNo());
+					   l.setSubInv(h.getSubInv());
 					   
 				       saveModel(conn, l);
 				   }
 				}
 			}else{
 				
-				//delete item by doc no
-				//deleteModel(conn, h);
+				//delete all item by doc no
+				deleteModel(conn, h);
 				
 				//save line
 				if(h.getItems() != null && h.getItems().size()>0){
@@ -517,12 +488,11 @@ public class ManualStockDAO{
 					   l.setTransDate(h.getTransDate());
 					   l.setCustGroup(h.getCustGroup());
 					   l.setStoreCode(h.getStoreCode());
-					   l.setRemark(h.getRemark());
+					   l.setStoreName(h.getStoreName());
+					   l.setStoreNo(h.getStoreNo());
+					   l.setSubInv(h.getSubInv());
 					   
-					   int update = updateModel(conn, l);
-					   if(update==0){
-				         saveModel(conn, l);
-					   }
+				       saveModel(conn, l);
 				   }
 				}
 			}
@@ -552,7 +522,7 @@ public class ManualStockDAO{
 			   int curMonth = Integer.parseInt(d1[1]);
 			 
 			 //get Seq
-			   int seq = SequenceProcess.getNextValue(conn,"SalesMTT","DOC_NO",date);
+			   int seq = SequenceProcess.getNextValue(conn,"MANUAL_STOCK","DOC_NO",date);
 			   
 			   docNo = new DecimalFormat("00").format(curYear)+new DecimalFormat("00").format(curMonth)+new DecimalFormat("0000").format(seq);
 		   }catch(Exception e){
@@ -571,32 +541,30 @@ public class ManualStockDAO{
 			logger.debug("Insert");
 			try{
 				StringBuffer sql = new StringBuffer("");
-				sql.append(" INSERT INTO PENSBI.PENSBME_SALES_OUT \n");
-				sql.append(" (SALE_DATE,DOC_NO, LINE_ID,   \n");
-				sql.append("  CUST_GROUP, CUST_NO, BARCODE,MATERIAL_MASTER, ");
-				sql.append("  GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,STATUS,CREATE_DATE,CREATE_USER,REMARK)  \n");
+				sql.append(" INSERT INTO saveModel \n");
+				sql.append(" (TRANS_DATE,DOC_NO, LINE_ID,   \n");
+				sql.append("  STORE_CODE, STORE_NAME, STORE_NAME, \n");
+				sql.append("  PENS_ITEM, MATERIAL_MASTER, GROUP_CODE,QTY ,\n");
+				sql.append("  CREATE_DATE,CREATE_USER)  \n");
 			
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ? ,? , ?, ?, ?,?,?) \n");
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ? ,? , ?, ?, ?) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 					
-				Date saleDate = Utils.parse( o.getTransDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date saleDate = DateUtil.parse( o.getTransDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				int c =1;
 				ps.setTimestamp(c++, new java.sql.Timestamp(saleDate.getTime()));
 				ps.setString(c++, o.getDocNo());
 				ps.setInt(c++, o.getLineId());
-				ps.setString(c++, o.getCustGroup());
 				ps.setString(c++, o.getStoreCode());
-				ps.setString(c++, o.getBarcode());
+				ps.setString(c++, o.getStoreName());
+				ps.setString(c++, o.getPensItem());
 				ps.setString(c++, o.getMaterialMaster());
 				ps.setString(c++, o.getGroupCode());
-				ps.setString(c++, o.getPensItem());
-				ps.setDouble(c++, Utils.convertStrToDouble(o.getRetailPriceBF()));
-				ps.setString(c++, o.getStatus());
+				ps.setDouble(c++, o.getQty());
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, o.getCreateUser());
-				ps.setString(c++, Utils.isNull(o.getRemark()));
 				
 				ps.executeUpdate();
 				
@@ -609,23 +577,17 @@ public class ManualStockDAO{
 			}
 		}
 
-		public static int updateModel(Connection conn,ManualStockBean o) throws Exception{
+		public static int deleteModel(Connection conn,ManualStockBean o) throws Exception{
 			PreparedStatement ps = null;
 			logger.debug("Update");
 			int  c = 1;
 			try{
 				StringBuffer sql = new StringBuffer("");
-				sql.append(" UPDATE PENSBME_SALES_OUT SET  \n");
-				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ? ,REMARK =?   \n");
+				sql.append(" DELETE FROM PENSBI.PENSBME_MANUAL_STOCK    \n");
 				sql.append(" WHERE DOC_NO = ? and LINE_ID = ? \n" );
 
 				ps = conn.prepareStatement(sql.toString());
-					
-				ps.setString(c++, o.getStatus());
-				ps.setString(c++, o.getUpdateUser());
-				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
-				ps.setString(c++, Utils.isNull(o.getRemark()));
-				
+
 				ps.setString(c++, Utils.isNull(o.getDocNo()));
 				ps.setInt(c++, o.getLineId());
 				

@@ -267,19 +267,19 @@ window.onload = function(){
 	</tr>
 	<tr height="21px" class="txt1">
 		<td width="15%" align="right"><b><%=codeSearchTxtName %></b>  </td>
-		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
+		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px" styleClass="\" autoComplete=\"off"/>
 		&nbsp;&nbsp;
 		<input type="button" name="search"  class="newPosBtnLong"  value=" ค้นหา " onclick="searchPopup('<%=request.getContextPath()%>')" />
 		</td>
 	</tr>
 	<tr height="21px" class="txt1">
 		<td nowrap align="right"><b><%=descSearchTxtName %></b></td>
-		<td ><html:text property="descSearch"  size="40" style="height:20px"/></td>
+		<td ><html:text property="descSearch"  size="40" style="height:20px" styleClass="\" autoComplete=\"off"/></td>
 	</tr>
 	<%if("Itembarcode".equalsIgnoreCase(pageName) ) {%>
 	<tr height="21px" class="txt1">
 		<td nowrap align="right"><b><%=descSearchTxtName2 %></b></td>
-		<td ><html:text property="barcodeSearch"  size="40" style="height:20px"/></td>
+		<td ><html:text property="barcodeSearch"  size="40" style="height:20px" styleClass="\" autoComplete=\"off"/></td>
 	</tr>
 	<%} %>
 </table>

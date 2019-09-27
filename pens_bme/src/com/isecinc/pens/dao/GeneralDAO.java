@@ -23,9 +23,10 @@ import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class GeneralDAO {
@@ -253,7 +254,7 @@ public class GeneralDAO {
 					item.setTotalReqQty(rst.getString("total_req_qty"));
 					item.setRequestor(Utils.isNull(rst.getString("requestor")));
 					item.setCustGroup(Utils.isNull(rst.getString("cust_group")));
-					item.setIssueReqDate(Utils.stringValue(rst.getDate("issue_req_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					item.setIssueReqDate(DateUtil.stringValue(rst.getDate("issue_req_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					item.setRemark(Utils.isNull(rst.getString("remark")));
 				
 					//get sum all not in current box_no
@@ -1680,7 +1681,7 @@ public class GeneralDAO {
 			Connection conn = null;
 			try {
 				conn = DBConnection.getInstance().getConnection();
-				asOfDate = Utils.parse(asOfDateStr, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				asOfDate = DateUtil.parse(asOfDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				sql.append("\n select MAX(ENDING_DATE) as ENDING_DATE FROM PENSBME_ENDDATE_STOCK WHERE 1=1 ");
 				sql.append("\n and STORE_CODE = '"+storeCode+"' \n");
@@ -1758,4 +1759,6 @@ public class GeneralDAO {
 			}
 			return items;
 		}
+	 
+	
 }

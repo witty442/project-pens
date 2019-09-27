@@ -1,4 +1,5 @@
-<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+
+<%@page import="com.pens.util.DBConnection"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.web.itmanage.ITStockDAO"%>
 <%@page import="com.isecinc.pens.web.itmanage.ITManageBean"%>

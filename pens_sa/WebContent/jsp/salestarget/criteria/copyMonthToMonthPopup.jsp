@@ -4,7 +4,7 @@
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetUtils"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="util.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetForm"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetBean"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>

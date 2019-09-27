@@ -85,4 +85,22 @@
 	<pageFooter>
 		<band splitType="Stretch"/>
 	</pageFooter>
+	<summary>
+		<band height="23">
+			<textField pattern="dd-MM-yyyy HH:mm:ss">
+				<reportElement x="45" y="3" width="162" height="18"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="3" width="43" height="18"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<text><![CDATA[พิมพ์วันที่ : ]]></text>
+			</staticText>
+		</band>
+	</summary>
 </jasperReport>

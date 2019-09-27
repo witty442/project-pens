@@ -10,8 +10,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.scheduler.utils.JobUtils;
+import com.pens.util.DBConnection;
 
 public class ScheduleServletContextListener implements ServletContextListener {
 public ScheduleServletContextListener() {

@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.SABean;
 import com.isecinc.pens.report.salesanalyst.SAInitial;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 
@@ -221,8 +222,8 @@ public class SAGenCondition {
 		}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 			sql.append(" AND (1=1 AND "+alias+"invoice_year = '"+colGroupName+"' ) \n");
 		}else{
-			 Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH);
-			 sql.append(" AND (1=1 AND  "+alias+"INVOICE_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy') ) \n");
+			 Date date = DateUtil.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH);
+			 sql.append(" AND (1=1 AND  "+alias+"INVOICE_DATE = to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy') ) \n");
 		}
 		return sql;
 	}
@@ -247,8 +248,8 @@ public class SAGenCondition {
 		}else if(SAInitial.TYPE_SEARCH_YEAR.equalsIgnoreCase(salesBean.getTypeSearch())){
 			sql.append("\t\t\t\t"+" AND sales_year = '"+colGroupName+"' \n");
 		}else{
-			Date date = Utils.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), Utils.DD_MM_YYYY_WITH_SLASH);
-			sql.append("\t\t\t\t"+" AND  sales_DATE = to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
+			Date date = DateUtil.parseToBudishDate(!StringUtils.isEmpty(salesBean.getDay())?salesBean.getDay():salesBean.getDayTo(), DateUtil.DD_MM_YYYY_WITH_SLASH);
+			sql.append("\t\t\t\t"+" AND  sales_DATE = to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH, Locale.US)+"','dd/mm/yyyy')  \n");
 		}
 		
 		//Include Pos or not

@@ -12,6 +12,8 @@ import oracle.jdbc.driver.OracleConnection;
 
 import org.apache.log4j.Logger;
 
+import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class CopyDB {
@@ -61,6 +63,9 @@ public class CopyDB {
 			//processUATToProduction("PENSBI","PENSBME_PICK_JOB","where job_id in ( 11897 ,11866, 11865,11864,11863,11862,11861,11860 )");
 			//processUATToProduction("PENSBI","PENSBME_PICK_BARCODE","where job_id in ( 11897 ,11866, 11865,11864,11863,11862,11861,11860 )");
 			//processUATToProduction("PENSBI","PENSBME_PICK_BARCODE_ITEM","where job_id in ( 11897 ,11866, 11865,11864,11863,11862,11861,11860 )");
+		
+			//processUATToProduction("PENSBI","XXPENS_BI_SALES_TARGET_TEMP","where id in (539,540,541,546,589,591,593 )");
+			//processUATToProduction("PENSBI","XXPENS_BI_SALES_TARGET_TEMP_L","where id in (539,540,541,546,589,591,593 )");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -198,13 +203,13 @@ public class CopyDB {
 						}
 					}else if(config.getType().toLowerCase().startsWith(("date"))){
 						if(rsSelect.getDate(config.getField()) != null){
-						   values +="TO_DATE('"+Utils.stringValue(rsSelect.getDate(config.getField()),Utils.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
+						   values +="TO_DATE('"+DateUtil.stringValue(rsSelect.getDate(config.getField()),DateUtil.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
 						}else{
 						   values += "NULL,";
 						}
 					}else if(config.getType().toLowerCase().startsWith(("timstamp"))){
 						if(rsSelect.getDate(config.getField()) != null){
-						   values +="TO_DATE('"+Utils.stringValue(rsSelect.getDate(config.getField()),Utils.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
+						   values +="TO_DATE('"+DateUtil.stringValue(rsSelect.getDate(config.getField()),DateUtil.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
 						}else{
 						   values += "NULL,";
 						}
@@ -220,7 +225,7 @@ public class CopyDB {
 					sqlInsert = "insert into "+schema+"."+tableName+"("+columns+") values ("+values+")";
 					//logger.debug("sqlInsert:"+sqlInsert);
 					//insert to DB Dest
-					int update =Utils.excUpdateOneSql(connDest, sqlInsert);
+					int update =SQLHelper.excUpdateOneSql(connDest, sqlInsert);
 					
 					countIns +=update;
 					logger.debug("Row:"+countIns);

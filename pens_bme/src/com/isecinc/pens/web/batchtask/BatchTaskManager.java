@@ -13,14 +13,15 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.upload.FormFile;
 
 import com.isecinc.core.bean.Messages;
+import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.EnvProperties;
 import com.pens.util.Utils;
 
 public class BatchTaskManager {
@@ -95,7 +96,67 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 		}
 		return mapping.findForward("search");
 	}
+public ActionForward runBatchFromPageByPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	
+	logger.debug("runBatchFromPopupPage");
+	BatchTaskForm batchTaskForm = (BatchTaskForm) form;
+	User userLogin = (User) request.getSession().getAttribute("user");
+	BatchTaskDAO dao = new BatchTaskDAO();
+	boolean canRunBatch = false;
+	EnvProperties env = EnvProperties.getInstance();
+	String pageName = Utils.isNull(request.getParameter("pageName"));
+	try {
+			String status = dao.findControlMonitor(pageName);
+			logger.info("status["+status+"]");
+			
+			if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+			    canRunBatch = true;
+			}
+		
+			if(canRunBatch){
+				//logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+				/** Import Data */
 
+				/** insert to monitor_interface **/
+				MonitorBean monitorModel = new MonitorBean();
+				monitorModel.setName(pageName);
+				monitorModel.setType(pageName);
+				monitorModel.setStatus(Constants.STATUS_START);
+				monitorModel.setCreateUser(userLogin.getUserName());
+				
+				/** Set Param Batch Map **/
+				//Case popup from Get from session (by page set parameter)
+				Map<String,String> batchParamMap = (HashMap<String, String>)request.getSession().getAttribute("BATCH_PARAM_MAP");
+				monitorModel.setBatchParamMap(batchParamMap);
+				
+				/** Case Form File **/
+				//Case popup from Get from session 
+				logger.debug("dataFromFile:"+request.getSession().getAttribute("DATA_FILE"));
+				monitorModel.setDataFile((FormFile)request.getSession().getAttribute("DATA_FILE"));
+				
+				//clear session from (by page prepare)
+				request.getSession().removeAttribute("DATA_FILE");
+				request.getSession().removeAttribute("PARAM_MAP");
+				
+				//Set User
+				monitorModel.setUser(userLogin);
+			
+				
+				//create Batch Task
+				MonitorBean m = createBatchTask(monitorModel,userLogin,request);
+			   
+				/** Set for Progress Bar Opoup **/
+				request.setAttribute("action", "submited");
+				request.setAttribute("id", m.getTransactionId());
+			}else{
+				request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
+			}
+	} catch (Exception e) {
+		logger.error(e.getMessage(),e);
+		request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+	}
+	return mapping.findForward("search");
+}
 	public MonitorBean createBatchTask(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
 		Connection connMonitor = null;
 		BatchTaskDAO dao = new BatchTaskDAO();

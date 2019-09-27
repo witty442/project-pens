@@ -7,11 +7,11 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.quartz.JobExecutionContext;
 
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.scheduler.manager.ScheduleServiceManager;
 import com.isecinc.pens.scheduler.manager.ScheduleVO;
 import com.isecinc.pens.scheduler.manager.SchedulerConstant;
 import com.isecinc.pens.scheduler.taskaction.RecoveryScheduleAction;
+import com.pens.util.DBConnection;
 
 public class RecoveryScheduleTask implements org.quartz.Job{
 	

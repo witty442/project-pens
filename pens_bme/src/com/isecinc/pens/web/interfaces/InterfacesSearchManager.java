@@ -8,12 +8,12 @@ import org.apache.struts.action.ActionForm;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.dao.InterfaceDAO;
-import com.isecinc.pens.inf.helper.Constants;
+import com.isecinc.pens.dao.InterfaceDAO;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.Constants;
 import com.pens.util.Utils;
 
 public class InterfacesSearchManager  {

@@ -8,8 +8,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class PopupDAO {
@@ -189,7 +190,7 @@ public class PopupDAO {
 					PopupForm item = new PopupForm();
 					no++;
 					item.setNo(no);
-					item.setCheckStockDate(Utils.stringValue(rst.getDate("count_stock_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					item.setCheckStockDate(DateUtil.stringValue(rst.getDate("count_stock_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					pos.add(item);
 					
 				}//while

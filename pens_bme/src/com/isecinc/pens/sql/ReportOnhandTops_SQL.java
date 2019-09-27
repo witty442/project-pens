@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
@@ -23,13 +24,13 @@ public class ReportOnhandTops_SQL {
 			logger.debug("SummaryType:"+summaryType);
 			
 			onhandDateAsOfConfigStr = ControlConstantsDB.getOnhandDateAsOfControl(conn,ControlConstantsDB.TYPE_ONHAND_DATE_TOPS_AS_OF);
-			onhandDateAsOfConfig = Utils.parse(onhandDateAsOfConfigStr,Utils.DD_MM_YYYY_WITHOUT_SLASH);
+			onhandDateAsOfConfig = DateUtil.parse(onhandDateAsOfConfigStr,DateUtil.DD_MM_YYYY_WITHOUT_SLASH);
 			
 			//prepare parameter
 			String christSalesDateStr ="";
 			if( !Utils.isNull(c.getSalesDate()).equals("")){
-				asofDate = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				christSalesDateStr = Utils.stringValue(asofDate, Utils.DD_MM_YYYY_WITH_SLASH);
+				asofDate = DateUtil.parse(c.getSalesDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				christSalesDateStr = DateUtil.stringValue(asofDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			}
 			sql.append("\n SELECT A.*");
 			sql.append("\n,(SELECT NVL(MAX(RETAIL_PRICE_BF),0) ");

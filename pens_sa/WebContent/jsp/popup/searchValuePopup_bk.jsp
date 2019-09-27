@@ -1,8 +1,8 @@
-<%@page import="util.SIdUtils"%>
+
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="java.sql.Connection"%>
-<%@page import="util.*"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.report.salesanalyst.SAInitial"%>
 
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>

@@ -14,12 +14,13 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.ExportFileBean;
 import com.isecinc.pens.bean.MTTBean;
 import com.isecinc.pens.dao.MTTBeanDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.FTPManagerWacoal;
 import com.isecinc.pens.scheduler.manager.ScheduleVO;
 import com.isecinc.pens.scheduler.manager.SchedulerConstant;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
@@ -35,7 +36,7 @@ public class BME001Action {
 			now.setTime(asOfDate);
 			now.add(Calendar.DATE, -1);
 			
-		    return "saleout_"+Utils.stringValue(now.getTime(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".xls";
+		    return "saleout_"+DateUtil.stringValue(now.getTime(), DateUtil.YYYY_MM_DD_WITHOUT_SLASH)+".xls";
 		}catch(Exception e){}
 		return "";
 	}
@@ -51,7 +52,7 @@ public class BME001Action {
 			//Get Param 
 			Map<String, String> paramMap = param.getParamMap();
 			if(paramMap != null && paramMap.get(PARAM_AS_OF_DATE) != null){
-			    asOfDate = Utils.parse(paramMap.get(PARAM_AS_OF_DATE),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    asOfDate = DateUtil.parse(paramMap.get(PARAM_AS_OF_DATE),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			    
 			    logger.debug("Param asOfDate:"+asOfDate);
 			}else{
@@ -124,7 +125,7 @@ public class BME001Action {
 			now.setTime(asOfDate);
 			now.add(Calendar.DATE, -1);
 			
-			date = Utils.stringValue(now.getTime(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			date = DateUtil.stringValue(now.getTime(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			bean = getDataList(bean,now.getTime(),now.getTime());
 			
@@ -217,10 +218,10 @@ public class BME001Action {
 			sql.append("\n where 1=1   \n");
 			sql.append("\n and status <> '"+MTTBeanDAO.STATUS_CANCEL+"' \n");
 		
-			String fStr = Utils.stringValue(createDateFrom, Utils.DD_MM_YYYY_WITH_SLASH);
+			String fStr = DateUtil.stringValue(createDateFrom, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			sql.append("\n and trunc(CREATE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
 
-			String tStr = Utils.stringValue(createDateTo, Utils.DD_MM_YYYY_WITH_SLASH);
+			String tStr = DateUtil.stringValue(createDateTo, DateUtil.DD_MM_YYYY_WITH_SLASH);
             sql.append("\n and trunc(CREATE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
 			
 			sql.append("\n group by doc_no,sale_date ,cust_group,cust_no,barcode,MATERIAL_MASTER,GROUP_CODE,PENS_ITEM,RETAIL_PRICE_BF,status,remark,create_date");
@@ -237,8 +238,8 @@ public class BME001Action {
 			   h.setDocNo(Utils.isNull(rst.getString("doc_no")));
 			   h.setCustGroup(rst.getString("cust_group"));
 			   h.setCustGroupName(rst.getString("cust_group_name"));
-			   h.setSaleDate(Utils.stringValue(rst.getTimestamp("sale_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			   h.setCreateDate(Utils.stringValue(rst.getTimestamp("create_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setSaleDate(DateUtil.stringValue(rst.getTimestamp("sale_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setCreateDate(DateUtil.stringValue(rst.getTimestamp("create_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setStoreCode(Utils.isNull(rst.getString("cust_no"))); 
 			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
 			   h.setRemark(Utils.isNull(rst.getString("remark")));

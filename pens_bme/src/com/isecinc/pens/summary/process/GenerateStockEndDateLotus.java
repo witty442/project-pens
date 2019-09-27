@@ -13,16 +13,17 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.InterfaceDAO;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.dao.InterfaceDAO;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.exception.ExceptionHandle;
+import com.pens.util.Constants;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 import com.pens.util.helper.SequenceProcess;
@@ -148,7 +149,7 @@ public class GenerateStockEndDateLotus {
 	    //String yearMonth = "";
 	    int result =0;
 		try{
-			Date asofDate = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			Date asofDate = DateUtil.parse(c.getSalesDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			//validate 
 			//results = BMECControlDAO.canGenEndDateLotus(conn,c.getPensCustCodeFrom(),c.getSalesDate());
@@ -211,13 +212,13 @@ public class GenerateStockEndDateLotus {
 			Date asofDate = null;
 			try {
 				onhandDateAsOfConfigStr = ControlConstantsDB.getOnhandDateAsOfControl(conn,ControlConstantsDB.TYPE_ONHAND_DATE_LOTUS_AS_OF);
-				onhandDateAsOfConfig = Utils.parse(onhandDateAsOfConfigStr,Utils.DD_MM_YYYY_WITHOUT_SLASH);
+				onhandDateAsOfConfig = DateUtil.parse(onhandDateAsOfConfigStr,DateUtil.DD_MM_YYYY_WITHOUT_SLASH);
 				
 				//prepare parameter
 				String christSalesDateStr ="";
 				if( !Utils.isNull(c.getSalesDate()).equals("")){
-					asofDate = Utils.parse(c.getSalesDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					christSalesDateStr = Utils.stringValue(asofDate, Utils.DD_MM_YYYY_WITH_SLASH);
+					asofDate = DateUtil.parse(c.getSalesDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					christSalesDateStr = DateUtil.stringValue(asofDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				}
 				logger.debug("asofDate:"+asofDate);
 				logger.debug("onhandDateAsOfConfig:"+onhandDateAsOfConfig);
@@ -711,7 +712,7 @@ public class GenerateStockEndDateLotus {
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				if(rst.next()){
-					r = Utils.stringValue(rst.getDate("max_ending_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					r = DateUtil.stringValue(rst.getDate("max_ending_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				}
 				
 				return r;
@@ -746,7 +747,7 @@ public class GenerateStockEndDateLotus {
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
 				if(rst.next()){
-					r = Utils.stringValue(rst.getDate("max_ending_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					r = DateUtil.stringValue(rst.getDate("max_ending_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				}
 				
 				return r;
@@ -770,7 +771,7 @@ public class GenerateStockEndDateLotus {
 			Connection conn = null;
 			String r = "";
 			try {
-				Date asofDateTemp = Utils.parse(asOfDate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date asofDateTemp = DateUtil.parse(asOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				sql.append("\n select distinct max(sales_date) as max_ending_date FROM PENSBME_SALES_FROM_LOTUS WHERE 1=1 ");
 				sql.append("\n and pens_cust_code ='"+storeCode+"'");
@@ -781,7 +782,7 @@ public class GenerateStockEndDateLotus {
 				rst = stmt.executeQuery(sql.toString());
 				if(rst.next()){
 					if(rst.getDate("max_ending_date").before(asofDateTemp)){
-					   r = Utils.stringValue(rst.getDate("max_ending_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					   r = DateUtil.stringValue(rst.getDate("max_ending_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					}else{
 					   r = asOfDate;
 					}

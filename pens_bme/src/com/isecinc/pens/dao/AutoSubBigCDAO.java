@@ -13,9 +13,10 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.web.autosub.AutoSubBigCBean;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class AutoSubBigCDAO extends PickConstants{
@@ -349,8 +350,8 @@ public class AutoSubBigCDAO extends PickConstants{
 		       sql.append("\n and j.job_id = "+Utils.isNull(o.getJobId())+" ");
 		}
 	    if( !Utils.isNull(o.getCuttOffDate()).equals("")){
-	       Date date = Utils.parse(Utils.isNull(o.getCuttOffDate()), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-	       sql.append("\n and j.close_date >= to_date('"+Utils.stringValue(date, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+	       Date date = DateUtil.parse(Utils.isNull(o.getCuttOffDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+	       sql.append("\n and j.close_date >= to_date('"+DateUtil.stringValue(date, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
 	    }
 		 return sql;
 	}

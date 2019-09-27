@@ -10,7 +10,8 @@ public class PopupHelper {
 		String[] headTextArr = new String[3];
 		 /** Criteria Name **/
 	    if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)
-	       || "BrandProdShow".equalsIgnoreCase(pageName)|| "BrandStockVan".equalsIgnoreCase(pageName)	){
+	       || "BrandProdShow".equalsIgnoreCase(pageName)|| "BrandStockVan".equalsIgnoreCase(pageName)	
+	       || "BrandSalesTargetPD".equalsIgnoreCase(pageName) ){
 	    	headName = "แบรนด์("+pageName+")";
 	    	codeSearchTxtName = "Brand";
 	    	descSearchTxtName = "Brand Name";
@@ -28,19 +29,24 @@ public class PopupHelper {
 	    	codeSearchTxtName = "Customer Code";
 	    	descSearchTxtName = "Customer Name";
 	    }else  if("ItemStock".equalsIgnoreCase(pageName) || "ItemCreditPromotion".equalsIgnoreCase(pageName)
-	    	       || "ItemCreditPromotion".equalsIgnoreCase(pageName)|| "ItemStockVan".equalsIgnoreCase(pageName)  	){
+	    	       || "ItemCreditPromotion".equalsIgnoreCase(pageName)|| "ItemStockVan".equalsIgnoreCase(pageName)  	
+	    	       || "ItemSalesTargetPD".equalsIgnoreCase(pageName)){
 	    	headName = "รหัสสินค้า("+pageName+")";
 	    	codeSearchTxtName = "รหัสสินค้า";
 	    	descSearchTxtName = "ชื่อสินค้า";
-	    }else  if("PDStockVan".equalsIgnoreCase(pageName)){
+	    }else  if("PDStockVan".equalsIgnoreCase(pageName) ){
 		 	headName = "PD/หน่วยรถ("+pageName+")";
 		 	codeSearchTxtName = "PD/หน่วยรถ";
 		 	descSearchTxtName = "ชื่อ PD/หน่วยรถ";
+	    }else  if("PD".equalsIgnoreCase(pageName)){
+		 	headName = "PD("+pageName+")";
+		 	codeSearchTxtName = "PD";
+		 	descSearchTxtName = "ชื่อ PD";
 	    }else  if("SubInvOnhand".equalsIgnoreCase(pageName)){
 		 	headName = "Sub Inv (Stock Onhand)";
 		 	codeSearchTxtName = "SubInv";
 		 	descSearchTxtName = "SubInv Name";
-	    }else  if("Item".equalsIgnoreCase(pageName)){
+	    }else  if("Item".equalsIgnoreCase(pageName) ){
 		 	headName = "สินค้า";
 		 	codeSearchTxtName = "Product Code";
 		 	descSearchTxtName = "Product Name";

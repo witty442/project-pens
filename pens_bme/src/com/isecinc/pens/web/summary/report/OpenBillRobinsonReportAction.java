@@ -21,11 +21,12 @@ import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.StoreDAO;
 import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.dao.constants.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.sql.ReportOnhandAsOfKingSQL;
 import com.isecinc.pens.sql.ReportOnhandAsOfRobinsonSQL;
 import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.web.summary.SummaryForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
@@ -264,8 +265,8 @@ public static SummaryForm process(HttpServletRequest request,User user,SummaryFo
 				//robinson only
 				sql.append(" and O.store_type = '100002' \n");
 				if( !Utils.isNull(cri.getAsOfDate()).equals("")){
-					Date dateObj = Utils.parse(cri.getAsOfDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					sql.append(" and O.order_date = to_date('"+Utils.stringValue(dateObj, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') ");
+					Date dateObj = DateUtil.parse(cri.getAsOfDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					sql.append(" and O.order_date = to_date('"+DateUtil.stringValue(dateObj, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') ");
 				}
 				
 				//for test 2 orderLotNo 
@@ -290,8 +291,8 @@ public static SummaryForm process(HttpServletRequest request,User user,SummaryFo
 				//robinson only
 				sql.append(" and H.cust_group = '100002' \n");
 				if( !Utils.isNull(cri.getAsOfDate()).equals("")){
-					Date dateObj = Utils.parse(cri.getAsOfDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					sql.append(" and H.confirm_issue_date = to_date('"+Utils.stringValue(dateObj, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') ");
+					Date dateObj = DateUtil.parse(cri.getAsOfDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					sql.append(" and H.confirm_issue_date = to_date('"+DateUtil.stringValue(dateObj, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') ");
 				}
 				
 				sql.append(" Group by H.store_code,H.issue_req_no,O.group_code,O.pens_item  \n");
@@ -311,8 +312,8 @@ public static SummaryForm process(HttpServletRequest request,User user,SummaryFo
 				//robinson only
 				sql.append(" and H.cust_group = '100002' \n");
 				if( !Utils.isNull(cri.getAsOfDate()).equals("")){
-					Date dateObj = Utils.parse(cri.getAsOfDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					sql.append(" and H.status_date = to_date('"+Utils.stringValue(dateObj, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') ");
+					Date dateObj = DateUtil.parse(cri.getAsOfDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					sql.append(" and H.status_date = to_date('"+DateUtil.stringValue(dateObj, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') ");
 				}
 				
 				sql.append(" Group by H.customer_no,H.issue_req_no,O.group_code,O.pens_item \n");

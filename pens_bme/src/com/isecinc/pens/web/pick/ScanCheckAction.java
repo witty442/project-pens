@@ -33,9 +33,10 @@ import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.ScanCheckDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 import com.pens.util.pdf.StampBoxNoReportPdf;
@@ -212,7 +213,7 @@ public class ScanCheckAction extends I_Action {
 			aForm.setBean(new ScanCheckBean());
 			
 			ScanCheckBean ad = new ScanCheckBean();
-			ad.setCheckOutDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
+			ad.setCheckOutDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));//default Current date
 			aForm.setBean(ad);
 			
 		} catch (Exception e) {
@@ -270,7 +271,7 @@ public class ScanCheckAction extends I_Action {
 				ad.setWareHouse("");
 				ad.setIssueReqNo("");
 				ad.setCanEdit(true);
-				ad.setCheckOutDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				ad.setCheckOutDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			
 				aForm.setBean(ad);
 				aForm.setMode(mode);//Mode Add new
@@ -474,7 +475,7 @@ public class ScanCheckAction extends I_Action {
 			ad.setWareHouse("");
 			ad.setIssueReqNo("");
 			ad.setCanEdit(true);
-			ad.setCheckOutDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setCheckOutDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			aForm.setBean(ad);
 			
 			aForm.setMode("add");

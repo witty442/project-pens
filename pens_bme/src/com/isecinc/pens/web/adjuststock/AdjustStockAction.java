@@ -19,8 +19,9 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.AdjustStock;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.AdjustStockDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -171,7 +172,7 @@ public class AdjustStockAction extends I_Action {
 			aForm.setVerify(false);
 			
 			AdjustStock ad = new AdjustStock();
-			ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			aForm.setAdjustStock(ad);
 			
 		} catch (Exception e) {
@@ -213,7 +214,7 @@ public class AdjustStockAction extends I_Action {
 				logger.debug("prepare new documentNo");
 				aForm.setResults(new ArrayList<AdjustStock>());
 				AdjustStock ad = new AdjustStock();
-				ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				
 				aForm.setAdjustStock(ad);
 				aForm.setVerify(false);
@@ -536,7 +537,7 @@ public class AdjustStockAction extends I_Action {
 			aForm.setVerify(false);
 			
 			AdjustStock ad = new AdjustStock();
-			ad.setTransactionDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			aForm.setAdjustStock(ad);
 			
 		} catch (Exception e) {

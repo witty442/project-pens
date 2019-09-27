@@ -1,16 +1,15 @@
-
-<%@page import="util.PageVisit"%>
-<%@page import="util.SessionUtils"%>
+<%@page import="com.pens.util.PageVisit"%>
+<%@page import="com.pens.util.SessionUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@page import="com.isecinc.pens.web.location.LocationInitial"%>
-<%@page import="util.Utils"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
-<%@page import="util.GoogleMapJavaScriptAPI"%>
+<%@page import="com.pens.util.GoogleMapJavaScriptAPI"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -353,8 +352,8 @@ function loadMe(path){
 				    <!-- ************************Result ***************************************************-->
 					  <%
 					 // System.out.println("Results:"+request.getSession().getAttribute("RESULTS"));
-					  if(request.getSession().getAttribute("RESULTS") != null) {
-					     out.println(request.getSession().getAttribute("RESULTS"));
+					  if(request.getSession().getAttribute("locationForm_RESULT") != null) {
+					     out.println(request.getSession().getAttribute("locationForm_RESULT"));
 					  }
 					  %>
 					<!-- ************************Result ***************************************************-->

@@ -145,6 +145,7 @@ public class PerformanceReportActionSubReport extends I_Action  {
 				parameterMap.put("total_receipt", p.getAllReceiptAmount());
 				parameterMap.put("total_vat", p.getAllVatAmount());
 				parameterMap.put("total_net", p.getAllNetAmount());
+				parameterMap.put("total_net_nodis_nonvat", p.getAllNetAmountNoDisNonVat());
 				parameterMap.put("target_amount", p.getAllTargetAmount());
 				parameterMap.put("total_vat_cash", p.getAllVatCashAmount());
 				parameterMap.put("total_vat_receipt", p.getAllVatReceiptAmount());
@@ -179,7 +180,7 @@ public class PerformanceReportActionSubReport extends I_Action  {
 			
 			File rptMainReportFile = null;
 			File rptFileSubReport = null;
-			String fileName = "performance_subreport.pdf";
+			String fileName = "performance.pdf";
 		
 			logger.debug("pathReport:"+BeanParameter.getReportPath()+"performance_report_mainreport" + ".jasper");
 			

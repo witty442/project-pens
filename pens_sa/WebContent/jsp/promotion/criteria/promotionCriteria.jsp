@@ -1,7 +1,7 @@
 
 <%@page import="com.isecinc.pens.web.promotion.PromotionForm"%>
 <%@page import="com.isecinc.pens.web.promotion.PromotionBean"%>
-<%@page import="util.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%
 PromotionBean bean = ((PromotionForm)session.getAttribute("promotionForm")).getBean();

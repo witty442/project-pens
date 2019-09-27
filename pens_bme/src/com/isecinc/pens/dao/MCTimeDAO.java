@@ -10,7 +10,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.MCBean;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 public class MCTimeDAO {
@@ -66,7 +67,7 @@ public class MCTimeDAO {
 				int c =1;
 				ps.setInt(c++, Utils.convertStrToInt(o.getEmpRefId()));
 				ps.setInt(c++, Utils.convertStrToInt(o.getEmpId()));
-				ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStaffDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStaffDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				
 				ps.setString(c++, o.getStartTime());
 				ps.setString(c++, o.getEndTime());
@@ -111,7 +112,7 @@ public class MCTimeDAO {
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				
 				ps.setInt(c++, Utils.convertStrToInt(o.getEmpRefId()));
-				ps.setTimestamp(c++, new java.sql.Timestamp((Utils.parse(o.getStaffDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+				ps.setTimestamp(c++, new java.sql.Timestamp((DateUtil.parse(o.getStaffDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 				
 				return ps.executeUpdate();
 				
@@ -286,14 +287,14 @@ public class MCTimeDAO {
 					   h = new MCBean();
 					   h.setNo(r);
 					   h.setEmpRefId(Utils.isNull(rst.getString("emp_ref_id")));
-					   h.setStaffDate(Utils.stringValue(rst.getDate("staff_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					   h.setStaffDate(DateUtil.stringValue(rst.getDate("staff_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					   h.setStartTime(Utils.isNull(rst.getString("start_time")));
 					   h.setEndTime(Utils.isNull(rst.getString("end_time")));
 					   h.setTotalTime(Utils.isNull(rst.getString("total_time")));
 					   h.setReasonLeave(Utils.isNull(rst.getString("reason_leave")));
 					   h.setNote(Utils.isNull(rst.getString("note")));
 
-					   if(Utils.isHoliday(h.getStaffDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)){
+					   if(DateUtil.isHoliday(h.getStaffDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)){
 							h.setHoliday(true);
 						}
 					   items.add(h);
