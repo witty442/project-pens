@@ -5,14 +5,8 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -24,31 +18,20 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.struts.upload.FormFile;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetDimension;
 
-import com.isecinc.pens.bean.Barcode;
-import com.isecinc.pens.bean.GenCNBean;
-import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.Order;
-import com.isecinc.pens.bean.TaskStoreBean;
-import com.isecinc.pens.dao.GeneralDAO;
-import com.isecinc.pens.dao.OrderDAO;
-import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.exception.ExceptionHandle;
-import com.isecinc.pens.process.OrderKeyBean;
-import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
-import com.pens.util.EnvProperties;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
-import com.pens.util.excel.ExcelUtils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.excel.ExcelHelper;
 import com.pens.util.meter.MonitorTime;
+import com.pens.util.seq.SequenceProcess;
 
 public class ImportItemBarcodeCrossRefToOracleFromExcelTask extends BatchTask implements BatchTaskInterface{
 	public static Logger logger = Logger.getLogger("PENS");
@@ -69,6 +52,9 @@ public class ImportItemBarcodeCrossRefToOracleFromExcelTask extends BatchTask im
 	}
 	public String getDevInfo(){
 		return "{call xxpens_inv_item_cross_pkg.import_cust_item(150, 600)} <br/> , apps.XXPENS_OM_CUST_ITEM_TMP";
+	}
+	public boolean isDispDetail(){
+		return true;
 	}
 	public String getValidateScript(){
 		String script ="";
@@ -267,15 +253,15 @@ public class ImportItemBarcodeCrossRefToOracleFromExcelTask extends BatchTask im
 						Object cellValue = xslUtils.getCellValue(colNo, cell);
 						if(colNo==0){
 						   //accountNumber
-							accountNumber = ExcelUtils.isCellNumberOrText(cellValue);
+							accountNumber = ExcelHelper.isCellNumberOrText(cellValue);
 							logger.debug("accountNumber:"+accountNumber);
 						}else if(colNo==1){
 							//item
-							item = ExcelUtils.isCellNumberOrText(cellValue);
+							item = ExcelHelper.isCellNumberOrText(cellValue);
 							logger.debug("item:"+item);
 						}else if(colNo==2){
 							//barcode
-							barcode = ExcelUtils.isCellNumberOrText(cellValue);
+							barcode = ExcelHelper.isCellNumberOrText(cellValue);
 							logger.debug("barcode:"+accountNumber);
 						}
 					}//for column

@@ -19,6 +19,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class GenerateMonthEndLotus {
@@ -164,14 +165,14 @@ public class GenerateMonthEndLotus {
 		                    sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n AND C.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n AND C.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						sql.append("\n UNION ");
 						
@@ -196,14 +197,14 @@ public class GenerateMonthEndLotus {
 	                        sql.append("\n AND J.close_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n AND J.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n AND J.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						
                       sql.append("\n UNION ");
@@ -219,14 +220,14 @@ public class GenerateMonthEndLotus {
                         sql.append("\n AND L.sales_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					  }
 					  if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.PENS_CUST_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					  }
 					  if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					  }
 					  if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.PENS_GROUP_TYPE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					  }
 					  
 					  sql.append("\n UNION");
@@ -242,14 +243,14 @@ public class GenerateMonthEndLotus {
 			                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-							sql.append("\n AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+							sql.append("\n AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND L.item_issue >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND L.item_issue <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND L.item_issue_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND L.item_issue_desc IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						
 						sql.append("\n UNION");
@@ -265,14 +266,14 @@ public class GenerateMonthEndLotus {
 			                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-							sql.append("\n AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+							sql.append("\n AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND L.item_receipt >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND L.item_receipt <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND L.item_receipt_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND L.item_receipt_desc IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						
 						sql.append("\n UNION");
@@ -288,14 +289,14 @@ public class GenerateMonthEndLotus {
 			                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-							sql.append("\n AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+							sql.append("\n AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND L.item_adjust >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND L.item_adjust <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND L.item_adjust_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND L.item_adjust_desc IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						
               sql.append("\n )M ");
@@ -312,14 +313,14 @@ public class GenerateMonthEndLotus {
 	                        sql.append("\n AND L.sales_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-							sql.append("\n AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+							sql.append("\n AND L.PENS_CUST_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND L.PENS_GROUP_TYPE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						sql.append("\n  GROUP BY ");
 						sql.append("\n  L.PENS_CUST_CODE,L.PENS_ITEM, ");
@@ -350,14 +351,14 @@ public class GenerateMonthEndLotus {
 	                        sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 						}
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n AND C.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n AND C.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 							
 						sql.append("\n GROUP BY ");
@@ -395,14 +396,14 @@ public class GenerateMonthEndLotus {
 		                        sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 							}
 							if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-							    sql.append("\n AND C.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+							    sql.append("\n AND C.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 							}
 							if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 								sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 								sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 							}
 							if( !Utils.isNull(c.getGroup()).equals("")){
-								sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+								sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 							}
 							sql.append("\n GROUP BY ");
 							sql.append("\n C.customer_code ,P.inventory_item_code,  ");
@@ -431,14 +432,14 @@ public class GenerateMonthEndLotus {
 		                        sql.append("\n AND V.invoice_date < to_date('"+onhandDateAsOfConfigStr+"','ddmmyyyy')  ");
 							}
 							if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-							    sql.append("\n AND C.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+							    sql.append("\n AND C.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 							}
 							if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 								sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 								sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 							}
 							if( !Utils.isNull(c.getGroup()).equals("")){
-								sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+								sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 							}
 							sql.append("\n GROUP BY ");
 							sql.append("\n C.customer_code ,P.inventory_item_code,  ");
@@ -467,14 +468,14 @@ public class GenerateMonthEndLotus {
 		                        sql.append("\n AND J.close_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 							}
 							if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-							    sql.append("\n AND J.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+							    sql.append("\n AND J.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 							}
 							if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 								sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 								sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 							}
 							if( !Utils.isNull(c.getGroup()).equals("")){
-								sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+								sql.append("\n AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 							}
 							sql.append("\n GROUP BY ");
 							sql.append("\n J.store_code ,I.pens_item ,I.group_code ");
@@ -498,14 +499,14 @@ public class GenerateMonthEndLotus {
                   sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 				}
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					sql.append("\n AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					sql.append("\n AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				}
 				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n AND L.item_issue >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n AND L.item_issue <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND L.item_issue_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND L.item_issue_desc IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				}
 				sql.append("\n  GROUP BY ");
 				sql.append("\n  L.STORE_CODE,L.item_issue, ");
@@ -526,14 +527,14 @@ public class GenerateMonthEndLotus {
                   sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 				}
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					sql.append("\n AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					sql.append("\n AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				}
 				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n AND L.item_receipt >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n AND L.item_receipt <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND L.item_receipt_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND L.item_receipt_desc IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				}
 				sql.append("\n  GROUP BY ");
 				sql.append("\n  L.STORE_CODE,L.item_receipt, ");
@@ -553,14 +554,14 @@ public class GenerateMonthEndLotus {
                   sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 				}
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					sql.append("\n AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					sql.append("\n AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				}
 				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n AND L.item_adjust >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n AND L.item_adjust <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND L.item_adjust_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND L.item_adjust_desc IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				}
 				sql.append("\n  GROUP BY ");
 				sql.append("\n  L.STORE_CODE,L.item_adjust, ");

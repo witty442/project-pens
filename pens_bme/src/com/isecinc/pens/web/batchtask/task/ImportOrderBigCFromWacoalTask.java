@@ -20,8 +20,8 @@ import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.EnvProperties;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
 import com.pens.util.meter.MonitorTime;
+import com.pens.util.seq.SequenceProcess;
 
 public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 	public static Logger logger = Logger.getLogger("PENS");
@@ -42,6 +42,9 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 	}
 	public String getDevInfo(){
 		return "Import Order(PENSBME_ORDER) Bigc To Oracle (apps.XXPENS_PO_ORDER_IMPORT_MST,apps.XXPENS_PO_ORDER_IMPORT_DT) ";
+	}
+	public boolean isDispDetail(){
+		return true;
 	}
 	public String getValidateScript(){
 		String script ="";

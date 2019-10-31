@@ -25,11 +25,14 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.PickStock;
+import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.AutoSubOutDAO;
 import com.isecinc.pens.dao.PickStockDAO;
 import com.isecinc.pens.dao.PickStockGroupDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.autosubin.AutoSubInBean;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
@@ -482,6 +485,66 @@ public class PickStockGroupAction extends I_Action {
 			} catch (Exception e2) {}
 		}
 		return mapping.findForward("prepareByGroup");
+	}
+	
+	public ActionForward saveAutoSubOut(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("saveAutoSubOut Action");
+		PickStockForm aForm = (PickStockForm) form;
+		Connection conn = null;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+			PickStock confPickStock = aForm.getBean();
+			
+			//prepare bean
+			AutoSubInBean autoSubBean = new AutoSubInBean();
+			autoSubBean.setJobId(confPickStock.getIssueReqNo());
+			autoSubBean.setCustGroup(confPickStock.getCustGroup());
+			autoSubBean.setStoreCode(confPickStock.getStoreCode());
+			autoSubBean.setSubInv(confPickStock.getSubInv());
+		    autoSubBean.setTotalBox(""+confPickStock.getTotalBox());//old
+			autoSubBean.setTotalQty(""+confPickStock.getTotalQty());//old
+			autoSubBean.setForwarder(confPickStock.getForwarder());
+			autoSubBean.setForwarderBox(""+confPickStock.getTotalBox());
+			autoSubBean.setUserName(user.getUserName());
+			
+			boolean exist = AutoSubOutDAO.isAutoSubTransOutExist(autoSubBean.getJobId()); 
+			if( !exist){
+			   AutoSubOutDAO.saveSubTransOutPickStockByGroup(conn, autoSubBean);
+			   conn.commit();
+
+			   request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+			   
+			    //new search
+				boolean getItems = true;
+				boolean getOldDataOnly = true;
+				PickStock p = PickStockGroupDAO.searchPickStock(conn,confPickStock,getItems,getOldDataOnly);
+				
+				List<PickStock>  allList = new ArrayList<PickStock>();
+				allList.addAll(p.getItems());
+				
+				logger.debug(""+p.isCanCancel());
+				
+				p.setCanConfirm(false);
+				
+				aForm.setBean(p);
+				aForm.setResults(allList);
+			}else{
+			   request.setAttribute("Message", "RefNo นี้ เคยมีการบันทึกการใช้งานไปแล้ว");
+			}
+			
+		} catch (Exception e) {
+			conn.rollback();
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("search");
 	}
 	
 	public ActionForward confirmAction(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {

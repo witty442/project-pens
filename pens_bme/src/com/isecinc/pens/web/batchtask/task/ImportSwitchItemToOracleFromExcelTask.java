@@ -4,14 +4,8 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -23,32 +17,21 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.struts.upload.FormFile;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetDimension;
 
-import com.isecinc.pens.bean.Barcode;
-import com.isecinc.pens.bean.GenCNBean;
-import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.Order;
-import com.isecinc.pens.bean.TaskStoreBean;
-import com.isecinc.pens.dao.GeneralDAO;
-import com.isecinc.pens.dao.OrderDAO;
-import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.exception.ExceptionHandle;
-import com.isecinc.pens.process.OrderKeyBean;
-import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
-import com.pens.util.EnvProperties;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
-import com.pens.util.excel.ExcelUtils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.excel.ExcelHelper;
 import com.pens.util.meter.MonitorTime;
+import com.pens.util.seq.SequenceProcess;
 
 public class ImportSwitchItemToOracleFromExcelTask extends BatchTask implements BatchTaskInterface{
 	public static Logger logger = Logger.getLogger("PENS");
@@ -69,6 +52,9 @@ public class ImportSwitchItemToOracleFromExcelTask extends BatchTask implements 
 	}
 	public String getDevInfo(){
 		return "apps.xxpens_inv_vanmisc_temp";
+	}
+	public boolean isDispDetail(){
+		return true;
 	}
 	public String getValidateScript(){
 		String script ="";
@@ -267,7 +253,7 @@ public class ImportSwitchItemToOracleFromExcelTask extends BatchTask implements 
 						
 						if(colNo==0){
 						   //ORGANIZATION_CODE
-							ORGANIZATION_CODE = ExcelUtils.isCellNumberOrText(cellValue);
+							ORGANIZATION_CODE = ExcelHelper.isCellNumberOrText(cellValue);
 							logger.debug("ORGANIZATION_CODE:"+SUBINVENTORY);
 						}else if(colNo==1){
 						   //ordered_date
@@ -277,23 +263,23 @@ public class ImportSwitchItemToOracleFromExcelTask extends BatchTask implements 
 						   logger.debug("TRANSACTION_DATE_STR Str:"+TRANSACTION_DATE_STR);
 						}else if(colNo==2){
 						   //SUBINVENTORY
-							SUBINVENTORY = ExcelUtils.isCellNumberOrText(cellValue);
+							SUBINVENTORY = ExcelHelper.isCellNumberOrText(cellValue);
 						   logger.debug("SUBINVENTORY:"+SUBINVENTORY);
 						}else if(colNo==3){
 						    //ITEM_NO
-							ITEM_NO = ExcelUtils.isCellNumberOrText(cellValue);
+							ITEM_NO = ExcelHelper.isCellNumberOrText(cellValue);
 							logger.debug("ITEM_NO:"+ITEM_NO);
 						}else if(colNo==4){
 						   //TRANSACTION_QTY
-							TRANSACTION_QTY = ExcelUtils.isCellDouble(cellValue);
+							TRANSACTION_QTY = ExcelHelper.isCellDouble(cellValue);
 							logger.debug("TRANSACTION_QTY:"+TRANSACTION_QTY);
 						}else if(colNo==5){
 						  //UOM_CODE
-							UOM_CODE = ExcelUtils.isCellNumberOrText(cellValue);
+							UOM_CODE = ExcelHelper.isCellNumberOrText(cellValue);
 							logger.debug("UOM_CODE:"+UOM_CODE);
 						}else if(colNo==6){
 						   //GL_ACCOUNT
-							GL_ACCOUNT = ExcelUtils.isCellNumberOrText(cellValue);
+							GL_ACCOUNT = ExcelHelper.isCellNumberOrText(cellValue);
 							logger.debug("GL_ACCOUNT:"+GL_ACCOUNT);
 						}
 					}//for column

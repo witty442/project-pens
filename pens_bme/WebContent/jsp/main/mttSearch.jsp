@@ -260,7 +260,8 @@ function resetStore(){
 									<td >รหัสร้านค้า
 									</td>
 									<td align="left"> 
-									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									  <html:text property="bean.storeCode" styleId="storeCode" size="20" styleClass="\" autoComplete=\"off"
+									   onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 									
@@ -271,15 +272,15 @@ function resetStore(){
 								<tr>
                                     <td> Group Code </td>
 									<td>		
-										 <html:text property="bean.groupCode" styleId="groupCode"/>
+										 <html:text property="bean.groupCode" styleId="groupCode" styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>
 								<tr>
                                     <td> จากวันที่ Scan </td>
 									<td>		
-										 <html:text property="bean.createDateFrom" styleId="createDateFrom"/>
+										 <html:text property="bean.createDateFrom" styleId="createDateFrom" styleClass="\" autoComplete=\"off"/>
 										 ถึงวันที่ Scan
-										 <html:text property="bean.createDateTo" styleId="createDateTo"/>
+										 <html:text property="bean.createDateTo" styleId="createDateTo" styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>
 						   </table>
@@ -454,3 +455,4 @@ function resetStore(){
 </table>
 </body>
 </html>
+ 

@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="tax_invoice_summary_new_report" language="groovy" pageWidth="210" pageHeight="220" columnWidth="208" leftMargin="1" rightMargin="1" topMargin="1" bottomMargin="1">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="239"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="p_report_title" class="java.lang.String"/>
 	<parameter name="custName" class="java.lang.String"/>
 	<parameter name="custAddress1" class="java.lang.String"/>
@@ -59,7 +59,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="6" isBold="false"/>
 				</textElement>
-				<text><![CDATA[662/19-20 ถนนพระราม 3 แขวงบางโพงพาง เขตยานนาวา กรุงเทพฯ 10120
+				<text><![CDATA[662/18-20 ถนนพระราม 3 แขวงบางโพงพาง เขตยานนาวา กรุงเทพฯ 10120
  โทร. 0-2294-7300 โทรสาร. 0-2294-7560 สำนักงานใหญ่]]></text>
 			</staticText>
 			<textField pattern="">

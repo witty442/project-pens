@@ -40,8 +40,30 @@ public class Job implements Serializable{
 	//optional
 	private boolean canEdit = false;
 	private boolean canCancel = false;
+	private boolean canAutoSubTransfer = false;
+	
+	private String forwarder;
+	private String forwarderBox;
 	
 	
+	public String getForwarder() {
+		return forwarder;
+	}
+	public void setForwarder(String forwarder) {
+		this.forwarder = forwarder;
+	}
+	public String getForwarderBox() {
+		return forwarderBox;
+	}
+	public void setForwarderBox(String forwarderBox) {
+		this.forwarderBox = forwarderBox;
+	}
+	public boolean isCanAutoSubTransfer() {
+		return canAutoSubTransfer;
+	}
+	public void setCanAutoSubTransfer(boolean canAutoSubTransfer) {
+		this.canAutoSubTransfer = canAutoSubTransfer;
+	}
 	public String getYear() {
 		return year;
 	}

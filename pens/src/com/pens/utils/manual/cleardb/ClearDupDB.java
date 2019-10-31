@@ -31,6 +31,7 @@ public class ClearDupDB {
 		clearDupCustDB();
 		clearDupCustAddressDB();
 		clearDupCustContactDB();
+		
 	}
 	
 	//Cust dup
@@ -42,11 +43,12 @@ public class ClearDupDB {
 		StringBuffer sql = new StringBuffer("");
 		boolean isFoundCustIdInOrder = false;
 		String customerIdMain = "";
+		String customerIdDupAll = "";
 		try{
 			msgHead.append("*** Start Clear Duplicate Customer DB***************\n");
 			
 			sql.append("  select c.CODE  ,count(*) from m_customer c \n");
-			//sql.append("  where code ='235010002' \n");
+			//sql.append("  where code ='3385009068' \n");
 			sql.append("  group by c.CODE \n");
 			sql.append("  having count(*) >1  \n");
 			  
@@ -58,32 +60,53 @@ public class ClearDupDB {
 			rs = ps.executeQuery();
 			while(rs.next()){
 				toatlCustomer++;
-				
+				customerIdDupAll = "";
+				customerIdMain ="";
 				List<String> customerIdList = getCustomerIdList(conn, rs.getString("code"));
 				if(customerIdList != null && customerIdList.size()>0){
 					 for(int i=0;i<customerIdList.size();i++){
 						 String customerId = customerIdList.get(i);
 						 
 						 isFoundCustIdInOrder = isFoundCustIdInOrder(conn,customerId);
-						 logger.debug("customerId["+customerId+"]isFoundCustIdInOrder["+isFoundCustIdInOrder+"]");
-						 if(isFoundCustIdInOrder==false){
+						 logger.debug("customerIdMain["+customerIdMain+"]customerId["+customerId+"]isFoundCustIdInOrder["+isFoundCustIdInOrder+"]");
+						 
+						 if(isFoundCustIdInOrder==false || !"".equals(customerIdMain)){
 							 logger.debug("not found in order -> delete customerCode["+rs.getString("code")+"]customerId["+customerId+"]");
 							 String delCustomer =  "delete from m_customer where customer_id="+customerId;
 							 logger.debug(delCustomer);
 							 excUpdate(conn,delCustomer);
+							 
+							 customerIdDupAll +=customerId+",";
 						 }else{
 							 customerIdMain = customerId; 
 						 }
 					 }//for
 					 
-					 String sqlUpdateCustIdAddress = "update  m_address set  customer_id="+customerIdMain +" where \n";
-					 sqlUpdateCustIdAddress += "customer_id in(select customer_id from m_customer where code ='"+rs.getString("code")+"') \n";
+					 customerIdDupAll +="-999";//11,-999
+					 
+					 /*** update t_order(dup customerId) set customer_id=customerIdMain **/
+					 String sqlUpdateCustIdOrder= "update t_order set  customer_id="+customerIdMain +" where customer_id in("+customerIdDupAll+")";
+					 logger.debug(sqlUpdateCustIdOrder);
+					 excUpdate(conn,sqlUpdateCustIdOrder);
+					 
+					 /*** update t_receipt(dup customerId) set customer_id=customerIdMain **/
+					 String sqlUpdateCustIdReceipt= "update t_receipt set  customer_id="+customerIdMain +" where customer_id in("+customerIdDupAll+")";
+					 logger.debug(sqlUpdateCustIdReceipt);
+					 excUpdate(conn,sqlUpdateCustIdReceipt);
+					 
+					 /*** update t_receipt(dup customerId) set customer_id=customerIdMain **/
+					 String sqlUpdateCustIdPdReceiptHis= "update t_pd_receipt_his set  customer_id="+customerIdMain +" where customer_id in("+customerIdDupAll+")";
+					 logger.debug(sqlUpdateCustIdPdReceiptHis);
+					 excUpdate(conn,sqlUpdateCustIdPdReceiptHis);
+					 
+					 /** update address to customerId main ***/
+					 String sqlUpdateCustIdAddress = "update  m_address set  customer_id="+customerIdMain +" where customer_id in("+customerIdDupAll+")";
 					 
 					 logger.debug(sqlUpdateCustIdAddress);
 					 excUpdate(conn,sqlUpdateCustIdAddress);
 					 
-					 String sqlUpdateCustIdContact = "update  m_contact set  customer_id="+customerIdMain +" where \n";
-					 sqlUpdateCustIdContact += "customer_id in(select customer_id from m_customer where code ='"+rs.getString("code")+"') \n";
+					 /*** update m_contact  to customerId main ***/
+					 String sqlUpdateCustIdContact = "update  m_contact set  customer_id="+customerIdMain +" where customer_id in("+customerIdDupAll+")";
 					 
 					 logger.debug(sqlUpdateCustIdContact);
 					 excUpdate(conn,sqlUpdateCustIdContact);
@@ -98,6 +121,7 @@ public class ClearDupDB {
 			
 			logger.error("End Process");
 		}catch(Exception e){
+			e.printStackTrace();
 			logger.error(e.getMessage(),e);
 		}finally{
 			try{

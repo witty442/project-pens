@@ -31,8 +31,8 @@ import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
 import com.pens.util.meter.MonitorTime;
+import com.pens.util.seq.SequenceProcess;
 
 public class GenerateReportEndDateLotus {
 	private static Logger logger = Logger.getLogger("PENS");

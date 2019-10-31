@@ -51,8 +51,15 @@ public class PayBean implements Serializable{
 
 	private boolean canPrint;
 	private List<PayBean> items;
+	private String employeeName;
 	
 	
+	public String getEmployeeName() {
+		return employeeName;
+	}
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
+	}
 	public String getCashFlag() {
 		return cashFlag;
 	}

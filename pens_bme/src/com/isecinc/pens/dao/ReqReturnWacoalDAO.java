@@ -19,7 +19,7 @@ import com.isecinc.pens.web.pick.ReqReturnWacoalAction;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 public class ReqReturnWacoalDAO extends PickConstants{
 

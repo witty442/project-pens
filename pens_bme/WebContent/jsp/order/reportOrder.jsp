@@ -433,6 +433,7 @@ function setGroupMainValue(code,desc,types){
 					
 					<table align="center" border="1" cellpadding="3" cellspacing="0" class="result">
 		                <tbody>
+		                  <tr>
 		                  <th width="3%">Store Code</th>
 		                  <th width="4%">Order Date</th>
 		                  <th width="3%">Pens Item</th>
@@ -444,6 +445,7 @@ function setGroupMainValue(code,desc,types){
 		                  <th width="3%">Retail Price</th>
 		                  <th width="5%">Invoice No</th>
 		                  <th width="5%">Order Lot No</th>
+		                  </tr>
 		               </tbody>    
 					 <!-- HEAD -->
 					 

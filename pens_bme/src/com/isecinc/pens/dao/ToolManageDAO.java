@@ -23,8 +23,8 @@ import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
-import com.pens.util.helper.SequenceProcessAll;
+import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class ToolManageDAO extends PickConstants{
 	

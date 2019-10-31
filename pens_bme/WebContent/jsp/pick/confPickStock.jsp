@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.ReqPickStock"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
@@ -10,7 +11,6 @@
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -20,6 +20,9 @@
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <jsp:useBean id="confPickStockForm" class="com.isecinc.pens.web.pick.ConfPickStockForm" scope="session" />
 <html>
+<%
+User user = (User)session.getAttribute("user");
+%>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
@@ -29,8 +32,6 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 
-<style type="text/css">
-</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
@@ -304,7 +305,47 @@ function sumQty(){
 		}).responseText;
 	});
 }
-
+function autoSubOut(path){
+	var form = document.confPickStockForm;
+	var valid = true;
+	if( validAutoSubOut(form.issueReqNo.value)==false){
+		valid =false;
+	}
+	if(form.status.value !='I'){//ISSUE
+		alert("ทำได้เฉพาะ Request ที่ได้ ISSUE แล้วเท่านั้น");
+		valid = false;
+	}
+	if(valid ==true){
+		if( confirm("ยันยันการส่งข้อมูลเพื่อทำ Auto Sub Transfer")){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			  
+			form.action = path + "/jsp/confPickStockAction.do?do=saveAutoSubOut";
+			form.submit();
+			return true;
+		}
+	}
+	return false;
+}
+//refNo=jobId
+function validAutoSubOut(refNo){
+	var returnString = "";
+	var form = document.confPickStockForm;
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/validAutoSubOutAjax.jsp",
+			data : "refNo=" + refNo,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	if(returnString =='false'){
+		alert("RefNo นี้ เคยมีการบันทึกการใช้งานไปแล้ว");
+		return false;
+	}	
+	return true;
+}
 </script>
 
 </head>		
@@ -364,6 +405,7 @@ function sumQty(){
 								 <tr>
                                     <td> Issue request status</td>
                                       <td>
+                                        <html:hidden property="bean.status" styleId="status"/>
                                         <html:text property="bean.statusDesc" styleId="statusDesc" size="20" readonly="true" styleClass="disableText"/>
                                      </td>
 									<td align="right"> ผู้เบิก</td>
@@ -561,12 +603,18 @@ function sumQty(){
 						<table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
 								<td align="left">
+								<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
+									<a href="javascript:autoSubOut('${pageContext.request.contextPath}')">
+									   <input type="button" value="ส่งข้อมูลเพื่อทำ Auto Sub Transfer" class="newPosBtnLong"> 
+									</a>
+								<%} %>
+								 &nbsp; &nbsp; &nbsp; &nbsp;
 								 <c:if test="${confPickStockForm.bean.canCancel == true}">
 									<a href="javascript:cancelAction('${pageContext.request.contextPath}')">
 									  <input type="button" value=" ยกเลิก Request นี้" class="newPosBtnLong"> 
 									</a>
 								 </c:if> 
-								 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+								  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 								 <c:if test="${confPickStockForm.bean.canPrint == true}">
 								    <a href="javascript:printMini('${pageContext.request.contextPath}')">
 									  <input type="button" value=" พิมพ์ ใบเบิกสินค้าแบบย่อ " class="newPosBtnLong"> 

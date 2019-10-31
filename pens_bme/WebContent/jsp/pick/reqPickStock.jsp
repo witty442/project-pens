@@ -13,7 +13,6 @@
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <jsp:useBean id="reqPickStockForm" class="com.isecinc.pens.web.pick.ReqPickStockForm" scope="session" />
 <%
 String wareHouse = reqPickStockForm.getBean().getWareHouse();
@@ -144,6 +143,11 @@ function validateForm(){
 	if(needDate ==""){
 		alert("กรุณากรอก Need Date");
 		$('#needDate').focus();
+		return false;
+	}
+	if($('#forwarder').val()==""){
+		alert("กรุณาระบุขนส่ง")
+		$('#forwarder').focus();
 		return false;
 	}
 	return true;
@@ -313,6 +317,7 @@ function addItemPickStock(path,index,groupCode,pensItem){
 	var storeNo =$('#storeNo').val();
 	var subInv =$('#subInv').val();
 	var wareHouse =$('#wareHouse').val();
+	var forwarder =$('#forwarder').val();
 	
 	//validate from
 	if(validateForm()){
@@ -329,6 +334,7 @@ function addItemPickStock(path,index,groupCode,pensItem){
 	     param += "&groupCode="+groupCode;
 	     param += "&pensItem="+pensItem;
 	     param += "&wareHouse="+wareHouse;
+	     param += "&forwarder="+forwarder;
 	     param += "&index="+index;
 	        
 		url = path + "/jsp/addItemPickStockAction.do?do=prepare&action=new"+param;
@@ -630,6 +636,11 @@ function currencyToNum(str){
 								      <html:text property="bean.needDate" styleId="needDate" size="20"  readonly="true"  styleClass="\" autoComplete=\"off"/>
 								              หมายเหตุ  
                                       <html:text property="bean.remark" styleId="remark" size="60"  styleClass="\" autoComplete=\"off"/>
+                                     &nbsp;&nbsp;
+                                                                                                ขนส่งโดย  <font color="red">*</font>
+                                         <html:select property="bean.forwarder" styleId="forwarder" >
+                                            <html:options collection="forwarderList" property="code" labelProperty="desc"/>
+                                         </html:select>
                                      </td>
 								</tr>	
 						   </table>

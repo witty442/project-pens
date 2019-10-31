@@ -14,6 +14,7 @@ public class B2BForm extends I_Form {
 
 	private static final long serialVersionUID = 8932109820314224488L;
     private List<B2BBean> results = new ArrayList<B2BBean>();
+    private List<B2BBean> resultsSearch = new ArrayList<B2BBean>();
     
     private String pageName;
     private B2BBean bean ;
@@ -21,6 +22,12 @@ public class B2BForm extends I_Form {
     private FormFile dataFormFile;
     
     
+	public List<B2BBean> getResultsSearch() {
+		return resultsSearch;
+	}
+	public void setResultsSearch(List<B2BBean> resultsSearch) {
+		this.resultsSearch = resultsSearch;
+	}
 	public FormFile getDataFormFile() {
 		return dataFormFile;
 	}

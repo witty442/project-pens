@@ -17,9 +17,6 @@ public class ReqPickStockForm extends I_Form {
     private ReqPickStock bean ;
     private ReqPickStock beanCriteria ;
     
-  
-
-    
 	public List<ReqPickStock> getResults() {
 		return results;
 	}

@@ -65,9 +65,16 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String branchName;
 	
 	private String pageName;
+	private String saleChannel;
 	private Map<String, String> criteriaMap; 
 	
-
+   
+	public String getSaleChannel() {
+		return saleChannel;
+	}
+	public void setSaleChannel(String saleChannel) {
+		this.saleChannel = saleChannel;
+	}
 	public String getDesc2() {
 		return desc2;
 	}

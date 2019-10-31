@@ -3,14 +3,8 @@ package com.isecinc.pens.web.batchtask.task;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -22,24 +16,17 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.struts.upload.FormFile;
 
-
-
-
-
-
-
-
 import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.exception.ExceptionHandle;
-import com.isecinc.pens.process.SequenceProcessAll;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
+import com.pens.util.SQLHelper;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
-import com.pens.util.excel.ExcelUtils;
+import com.pens.util.excel.ExcelHelper;
 import com.pens.util.meter.MonitorTime;
 
 public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskInterface{
@@ -50,13 +37,17 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 	 * Return :P Name|P label|P Type|default value|valid,P2...$processName,Button Name|....
 	*/
 	public String getParam(){
-		return "dataType|ระบุประเภทไฟล์|LIST||VALID,dataFormFile|เลือกไฟล์|FROMFILE||VALID$import,Import ข้อมูล";
+		return "dataType|ระบุประเภทไฟล์|LIST||VALID,dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
 	}
 	public String getDescription(){
 		return "Import B2B Makro From File Excel";
 	}
 	public String getDevInfo(){
 		return "APPS.XXPENS_OM_PUSH_ORDER_ITEM,APPS.XXPENS_OM_PUSH_ORDER_TEMP  ";
+	}
+	//Show detail BatchTaskResult or no
+	public boolean isDispDetail(){
+		return true;
 	}
 	public List<BatchTaskListBean> getParamListBox(){
 		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();
@@ -242,7 +233,7 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 			FormFile dataFile = monitorModel.getDataFile();
 			
 			String fileName = dataFile.getFileName();
-			String fileType = fileName.substring(fileName.indexOf(".")+1,fileName.length());
+			String fileType = fileName.substring(fileName.lastIndexOf(".")+1,fileName.length());
 			if("xls".equalsIgnoreCase(fileType)){
 			   wb1 = new HSSFWorkbook(dataFile.getInputStream());//97-2003
 			   sheet = wb1.getSheetAt(sheetNo);
@@ -272,7 +263,7 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 			}
 			
             //delete prev all data
-			deleteTableDataAll(conn, "apps.XXPENS_OM_PUSH_ORDER_ITEM ");
+			SQLHelper.excUpdate(conn, "delete from apps.XXPENS_OM_PUSH_ORDER_ITEM ");
 			
 			//prepare insert
 			sql.append("INSERT INTO apps.XXPENS_OM_PUSH_ORDER_ITEM(ITEM_NUMBER,DESCRIPTION,BARCODE,COVERDAY)VALUES(?,?,?,?)");
@@ -316,16 +307,16 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 					cellObjValue = xslUtils.getCellValue(colNo, cell);
 					
 					if(colNo ==0){
-						 pensItem = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+						 pensItem = ExcelHelper.getCellValue(cellObjValue,"STRING","");
 					}
 					if(colNo ==1){
-						description =ExcelUtils.isCellNumberOrText(cellObjValue,"");
+						description =ExcelHelper.getCellValue(cellObjValue,"STRING","");
 					}
 					if(colNo ==2){
-						barcode = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+						barcode = ExcelHelper.getCellValue(cellObjValue,"STRING",Utils.format_number_no_digit);
 					}
 					if(colNo ==3){
-						coverday = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+						coverday = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
 					}
 					
 				}//for colNo
@@ -341,7 +332,7 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 				//insert log to display
 				lineMsg = (r+1)+"|"+pensItem+"|"+description+"|"+barcode+"|"+coverday;
 				
-				logger.debug("lineMsg:"+lineMsg);
+				//logger.debug("lineMsg:"+lineMsg);
 				//is valid
 				if(passValid){
 					successCount++;
@@ -408,7 +399,7 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 		Row row = null;
 		Cell cell = null;
 		int sheetNo = 0; // xls sheet no. or name
-		int rowNo = 15; // row of begin data
+		int rowNo = 0; // row of begin data
 		boolean passValid = false;String lineMsg = "";
 		int colNo = 0 ;int r = 0;
 		boolean foundError = false;
@@ -439,13 +430,14 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 			   sheet = wb2.getSheetAt(sheetNo);
 			   logger.debug("number of sheet: " + wb2.getNumberOfSheets());
 			}
-			  /** Validate dataType != data col DataType */
-			row = sheet.getRow(14);
+			
+			/** Validate dataType != data col DataType */
+			row = sheet.getRow(2);
 			cellCheck = row.getCell((short) 0);
 		    cellCheckValue = xslUtils.getCellValue(0, cellCheck);
 			logger.debug("DataType cellCheckValue["+cellCheckValue+"]");
 			try{
-			    if( !"Supplier Number".equalsIgnoreCase(Utils.isNull(cellCheckValue).trim())){
+			    if( !"Supplier".equalsIgnoreCase(Utils.isNull(cellCheckValue).trim())){
 			    	monitorItemBean.setStatus(Constants.STATUS_FAIL);;
 					monitorItemBean.setErrorMsg("ข้อมูลภายในไฟล์ ไม่ตรงกับประเภทไฟล์ ที่ระบุในหน้าจอ ");
 					return monitorItemBean;
@@ -456,12 +448,29 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 				return monitorItemBean;
 			}
 			
-            //delete prev all data
-			deleteTableDataAll(conn, "apps.XXPENS_OM_PUSH_ORDER_TEMP ");
+			//Get RowNo Start for Data Table
+			/** Loop Row **/
+			for (r = 0; r <=sheet.getLastRowNum() ; r++) {
+				row = sheet.getRow(r);
+				//logger.debug("read row["+r+"]");
+				
+				//Check Stop Loop Col 1
+				if(row !=null){
+				   cellCheck = row.getCell((short) 0);
+			       cellCheckValue = xslUtils.getCellValue(0, cellCheck);
+			       logger.debug("check row["+r+"][0]="+cellCheckValue);
+			       if(cellCheckValue != null && Utils.isNull(cellCheckValue.toString()).equalsIgnoreCase("Supplier Number")){
+			    	   rowNo = r;
+			    	   rowNo++;
+			    	   break;
+			       }
+				}
+			}//for
 			
-			/*  String supplierNumber  = "",locationNumber = "",locationName = "";
-		    String eohQty="",onOrderInTransitQty ="",makroUnit="";
-		    String avgNetSalesQty="",stockCoverDay="";*/
+			logger.debug("rowNo="+rowNo);
+			
+            //delete prev all data
+			SQLHelper.excUpdate(conn, "delete from apps.XXPENS_OM_PUSH_ORDER_TEMP ");
 			
 			//prepare insert
 			sql.append("INSERT INTO apps.XXPENS_OM_PUSH_ORDER_TEMP");
@@ -502,34 +511,34 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 				//cell = row.getCell((short) colNo);
 				
 				cellObjValue = xslUtils.getCellValue(colNo, row.getCell((short) 0));
-				supplierNumber = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+				supplierNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 1));
-				locationNumber =ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+				locationNumber =ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 2));
-				locationName = ExcelUtils.isCellNumberOrText(cellObjValue,"");
+				locationName = ExcelHelper.getCellValue(cellObjValue,"STRING","");
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 5));
-				itemNumber = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+				itemNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 6));
-				barcode = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+				barcode = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 8));
-				eohQty = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+				eohQty = ExcelHelper.getCellValue(cellObjValue,"NUMBER",Utils.format_current_2_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 9));
-				onOrderInTransitQty = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+				onOrderInTransitQty = ExcelHelper.getCellValue(cellObjValue,"NUMBER",Utils.format_current_2_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 11));
-				makroUnit = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+				makroUnit = ExcelHelper.getCellValue(cellObjValue,"STRING",Utils.format_number_no_digit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 12));
-				avgNetSalesQty = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+				avgNetSalesQty = ExcelHelper.getCellValue(cellObjValue,"NUMBER",Utils.format_current_2_disgit);
 				
-				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 17));
-				stockCoverDay = ExcelUtils.isCellNumberOrText(cellObjValue,Utils.format_number_no_digit);
+				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 16));
+				stockCoverDay = ExcelHelper.getCellValue(cellObjValue,"NUMBER",Utils.format_current_2_disgit);
 				
 				//Reset Value By Line Loop
 				lineMsg = "";
@@ -548,7 +557,7 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 				lineMsg += itemNumber+"|"+barcode+"|"+eohQty+"|";
 				lineMsg += onOrderInTransitQty+"|"+makroUnit+"|"+avgNetSalesQty+"|"+stockCoverDay;
 				
-				logger.debug("lineMsg:"+lineMsg);
+				//logger.debug("lineMsg:"+lineMsg);
 				//is valid
 				if(passValid){
 					successCount++;
@@ -567,11 +576,11 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 				    ps.setString(4, Utils.isNull(itemNumber));
 				    ps.setString(5, Utils.isNull(barcode));
 				    
-				    ps.setInt(6, Utils.convertStrToInt(eohQty));
-				    ps.setInt(7, Utils.convertStrToInt(onOrderInTransitQty));
-				    ps.setInt(8, Utils.convertStrToInt(makroUnit));
-				    ps.setInt(9, Utils.convertStrToInt(avgNetSalesQty));
-				    ps.setInt(10, Utils.convertStrToInt(stockCoverDay));
+				    ps.setDouble(6, Utils.convertStrToDouble(eohQty));
+				    ps.setDouble(7, Utils.convertStrToDouble(onOrderInTransitQty));
+				    ps.setDouble(8, Utils.convertStrToDouble(makroUnit));
+				    ps.setDouble(9, Utils.convertStrToDouble(avgNetSalesQty));
+				    ps.setDouble(10, Utils.convertStrToDouble(stockCoverDay));
 				    
 				    ps.addBatch();
 				}else{
@@ -621,24 +630,5 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 		return monitorItemBean;	
 	}
 
-	 public static boolean deleteTableDataAll(Connection conn,String table) throws Exception {
-			Statement stmt = null;
-			StringBuilder sql = new StringBuilder();
-			boolean r = true;
-			try {
-				sql.append("delete FROM "+table);
-				logger.debug("sql:"+sql.toString());
-				stmt = conn.createStatement();
-				r = stmt.execute(sql.toString());
-			} catch (Exception e) {
-				throw e;
-			} finally {
-				try {
-					stmt.close();
-				} catch (Exception e) {}
-			}
-			return r;
-		}
-
-	 
+	
 }

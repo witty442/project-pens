@@ -11,6 +11,7 @@ import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class ReportOnhandBigC_SPSQL {
@@ -72,14 +73,14 @@ public class ReportOnhandBigC_SPSQL {
 					sql.append("\n AND L.barcode = M.barcode  ");
 					sql.append("\n AND L.STORE_CODE LIKE '"+storeCode+"%'");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND M.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND M.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 				    sql.append("\n UNION ALL");
 				    
@@ -90,14 +91,14 @@ public class ReportOnhandBigC_SPSQL {
 					sql.append("\n FROM  PENSBME_SALES_FROM_BIGC  L");
 					sql.append("\n WHERE 1=1   ");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.PENS_CUST_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND L.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND L.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.PENS_GROUP_TYPE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					sql.append("\n UNION ALL");
 					
@@ -111,14 +112,14 @@ public class ReportOnhandBigC_SPSQL {
 					sql.append("\n AND H.cust_no = L.cust_no  ");
 					sql.append("\n AND L.CUST_NO LIKE '"+storeCode+"%'");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.CUST_NO IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					sql.append("\n UNION ALL");
 					
@@ -161,14 +162,14 @@ public class ReportOnhandBigC_SPSQL {
 					}
 					sql.append("\n AND M.CUSTOMER_CODE LIKE '"+storeCode+"%'");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					    sql.append("\n AND M.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					    sql.append("\n AND M.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 						
 					sql.append("\n UNION ALL  ");
@@ -199,14 +200,14 @@ public class ReportOnhandBigC_SPSQL {
 					}
 					sql.append("\n AND M.STORE_CODE LIKE '"+storeCode+"%'");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					    sql.append("\n AND M.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					    sql.append("\n AND M.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					
 					sql.append("\n UNION ALL  ");
@@ -229,14 +230,14 @@ public class ReportOnhandBigC_SPSQL {
 					}
 					sql.append("\n AND M.CUSTOMER_NO LIKE '"+storeCode+"%'");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					    sql.append("\n AND M.customer_no IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					    sql.append("\n AND M.customer_no IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					
 					sql.append("\n )AA");
@@ -255,14 +256,14 @@ public class ReportOnhandBigC_SPSQL {
 				}
 				sql.append("\n AND L.CUST_NO LIKE '"+storeCode+"%'");
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					sql.append("\n AND L.CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					sql.append("\n AND L.CUST_NO IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				}
 				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				}
 				sql.append("\n  GROUP BY L.CUST_NO,L.PENS_ITEM,L.GROUP_CODE");
 				sql.append("\n )INIT_MTT ");
@@ -284,14 +285,14 @@ public class ReportOnhandBigC_SPSQL {
 				}
 				sql.append("\n AND L.PENS_CUST_CODE LIKE '"+storeCode+"%'");
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					sql.append("\n AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					sql.append("\n AND L.PENS_CUST_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				}
 				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND L.PENS_GROUP_TYPE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				}
 				sql.append("\n  GROUP BY L.PENS_CUST_CODE,L.PENS_ITEM, L.PENS_GROUP_TYPE  ");
 				
@@ -324,14 +325,14 @@ public class ReportOnhandBigC_SPSQL {
 						}
 						sql.append("\n AND M.STORE_CODE LIKE '"+storeCode+"%'");
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n AND M.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n AND M.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND MI.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND MI.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND M.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND M.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						sql.append("\n GROUP BY M.STORE_CODE,MI.pens_item,M.group_code ");
 						
@@ -361,14 +362,14 @@ public class ReportOnhandBigC_SPSQL {
 						}
 						sql.append("\n AND M.STORE_CODE LIKE '"+storeCode+"%'");
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n AND M.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n AND M.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						sql.append("\n GROUP BY M.STORE_CODE,I.pens_item,I.group_code");
 						
@@ -390,14 +391,14 @@ public class ReportOnhandBigC_SPSQL {
 						}
 						sql.append("\n AND M.CUSTOMER_NO LIKE '"+storeCode+"%'");
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n AND M.customer_no IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n AND M.customer_no IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						sql.append("\n GROUP BY M.CUSTOMER_NO,I.pens_item,I.group_code");
 						
@@ -428,14 +429,14 @@ public class ReportOnhandBigC_SPSQL {
 					}
 					sql.append("\n AND J.STORE_CODE LIKE '"+storeCode+"%'");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					    sql.append("\n AND J.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					    sql.append("\n AND J.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					sql.append("\n GROUP BY J.STORE_CODE,I.pens_item ,I.group_code");
 
@@ -460,14 +461,14 @@ public class ReportOnhandBigC_SPSQL {
 				}
 				sql.append("\n AND J.STORE_CODE LIKE '"+storeCode+"%'");
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-				    sql.append("\n AND J.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+				    sql.append("\n AND J.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				}
 				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n AND J.item_adjust >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n AND J.item_adjust <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND J.item_adjust_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND J.item_adjust_desc IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				}
 				sql.append("\n GROUP BY J.STORE_CODE,J.item_adjust , J.item_adjust_desc ");
 

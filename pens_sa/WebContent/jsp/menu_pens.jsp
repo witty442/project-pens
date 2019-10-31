@@ -319,20 +319,49 @@
 	</li>  
 <%}%>
 <!-- ************************************************************************** -->
-<%if ( UserUtils.userInRole("ROLE_B2B",user,new String[]{User.ADMIN, User.B2B}) ){ 
+<%if ( UserUtils.userInRole("ROLE_B2B",user,new String[]{User.ADMIN, User.B2B_MAKRO}) ){ 
 	  no=0;
 %>
-   <li><a href="javascript: void(0)" class="parent" ><span>B2B</span></a>
+    <li><a href="javascript: void(0)" class="parent" ><span>B2B</span></a>
 		<ul>
-          <%if (UserUtils.userInRole("ROLE_B2B",user,new String[]{User.ADMIN,User.B2B}) ){ %>
+          <%if (UserUtils.userInRole("ROLE_B2B",user,new String[]{User.ADMIN,User.B2B_MAKRO}) ){ %>
                <li>
                <a href="#" class="parent"  
                onclick="window.location='${pageContext.request.contextPath}/jsp/b2bAction.do?do=prepareSearch&action=new&pageName=B2BMakro';">
                <span><%no++;out.print(no);%>.<bean:message key="B2BMakro" bundle="sysprop"/></span>
                </a>
              </li>  
+             <li>
+               <a href="#" class="parent"  
+               onclick="window.location='${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=ImportB2BSalesItemMakroFromExcel';">
+               <span><%no++;out.print(no);%>.<bean:message key="ImportB2BSalesItemMakroFromExcel" bundle="sysprop"/></span>
+               </a>
+             </li>  
+               <li>
+               <a href="#" class="parent"  
+               onclick="window.location='${pageContext.request.contextPath}/jsp/b2bAction.do?do=prepareSearch&action=new&pageName=QueryB2BMakroSalesByItem';">
+               <span><%no++;out.print(no);%>.<bean:message key="QueryB2BMakroSalesByItem" bundle="sysprop"/></span>
+               </a>
+             </li>  
 		   <%} %>
 	 	</ul>
+	</li>      
+<%}%>
+<!-- ************************************************************************** -->
+<%if ( UserUtils.userInRole("ROLE_MKT",user,new String[]{User.ADMIN, User.PREORDER}) ){ 
+	  no=0;
+%>
+    <li><a href="javascript: void(0)" class="parent" ><span>Maketing</span></a>
+	  <ul>
+	 <%if ( UserUtils.userInRole("ROLE_MKT",user,new String[]{User.ADMIN,User.PREORDER})) {%>
+	      <li>
+	        <a href="#" class="parent" 
+	         onclick="window.location='${pageContext.request.contextPath}/jsp/stockOnhandAction.do?do=prepareSearch&action=new&pageName=PreOrderNissin';">
+	         <span><%no++;out.print(no);%>.<bean:message key="PreOrderNissin" bundle="sysprop"/></span>
+	        </a> 
+	      </li> 
+	   <%} %>
+	 </ul>
 	</li>      
 <%}%>
 <!-- ************************************************************************** -->

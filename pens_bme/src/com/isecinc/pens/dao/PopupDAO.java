@@ -22,7 +22,12 @@ public class PopupDAO {
 		List<PopupForm> pos = new ArrayList<PopupForm>();
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
+		String saleZone = "";
 		try {
+			logger.debug("criteriaMap:"+c.getCriteriaMap());
+			if(c.getCriteriaMap() != null){          
+				saleZone = c.getCriteriaMap().get("saleZone");
+			}
 			
 			sql.append("\n SELECT distinct code ,salesrep_full_name ,Z.zone ,Z.zone_name" );
 			sql.append("\n from apps.xxpens_salesreps_v M ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
@@ -34,6 +39,9 @@ public class PopupDAO {
 			}
 			if( !Utils.isNull(c.getDescSearch()).equals("")){
 				sql.append("\n and M.salesrep_full_name LIKE '%"+c.getDescSearch()+"%' ");
+			}
+			if( !Utils.isNull(saleZone).equals("")){
+				sql.append("\n and Z.zone ='"+saleZone+"' ");
 			}
 			sql.append("\n  ORDER BY M.code asc ");
 			

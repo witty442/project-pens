@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.SIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!-- Control Save Lock Screen -->
 <link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
@@ -85,7 +86,7 @@ return "กดปุ่มนี้ ข้อมูลอาจเกิดความเสียหาย ต้องกดใช่หรือไม่.";
     <tr>
 		<td align="left" width ="100%">
 		  <div style="height:50px;align:center">
-		     <h3><b>กรุณารอสักครู่ กำลังบันทึกข้อมูล  &nbsp;
+		     <h3><b>กรุณารอสักครู่ กำลังทำรายการ  &nbsp;
 		     <font color="red"><u>!!! กรุณาอย่ากดปุ่ม Back หรือ  Reload เพราะอาจทำให้ข้อมูลผิดพลาดได้</u></font> </b></h3>
 		  </div>
 		  <div id="progress" style="height:50px;width:100%;align:center;">

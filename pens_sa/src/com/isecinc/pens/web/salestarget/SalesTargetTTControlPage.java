@@ -98,6 +98,12 @@ public class SalesTargetTTControlPage {
 	public static void prepareSearchTTSUPER(HttpServletRequest request,Connection conn,User user,String pageName){
 		try{
 			logger.debug("prepareSearchTTSUPER");
+			
+			//init lock page By userName (init step1 lock by userName ,step2 save success unlock by UserName)
+			if(request.getSession().getAttribute("TTSUPER_LOCKPAGE")==null){
+			   request.getSession().setAttribute("TTSUPER_LOCKPAGE",user.getUserName());
+			}
+			
 			//init monthYearList
 			request.getSession().setAttribute("PERIOD_LIST", SalesTargetTTUtils.initPeriodTT(conn));
 

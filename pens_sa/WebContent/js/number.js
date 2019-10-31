@@ -84,7 +84,6 @@ function isNotNumeric(n) {
 	return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-
 function currenyToNum(object){
 	var temp =  object.value.replace(/\,/g,''); //alert(r);
 	return temp;

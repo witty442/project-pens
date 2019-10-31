@@ -23,6 +23,7 @@ import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.web.summary.SummaryForm;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 /** Like  KingPower = Duty-free **/
@@ -105,7 +106,7 @@ public class ReportOnhandAsOfKingAction {
 				storeList = StoreDAO.getStoreList(conn, "DUTYFREE");
 			}else{
 				//StoreCode more 1> 020047-1,020049-4
-				storeList = StoreDAO.getStoreList(conn, "DUTYFREE",Utils.converToTextSqlIn(storeCodeCheck));
+				storeList = StoreDAO.getStoreList(conn, "DUTYFREE",SQLHelper.converToTextSqlIn(storeCodeCheck));
 			}
 			//Loop By StoreList
 			if(storeList != null && storeList.size() >0){

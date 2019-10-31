@@ -11,6 +11,7 @@ import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class ReportOnhandMTTSQL {
@@ -84,14 +85,14 @@ public class ReportOnhandMTTSQL {
 					}
 					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					    sql.append("\n AND M.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					    sql.append("\n AND M.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					sql.append("\n UNION ALL");
 					
@@ -116,14 +117,14 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n AND M.customer_code = H.cust_no  ");
 					sql.append("\n and H.COUNT_STK_DATE = L.COUNT_STK_DATE  ");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.CUST_NO IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					
 					sql.append("\n UNION ALL");
@@ -164,14 +165,14 @@ public class ReportOnhandMTTSQL {
 					}
 					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.CUST_NO IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					
 					sql.append("\n )AA");
@@ -204,14 +205,14 @@ public class ReportOnhandMTTSQL {
 					 sql.append("\n AND H.COUNT_STK_DATE  = to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 				}
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					sql.append("\n AND L.CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					sql.append("\n AND L.CUST_NO IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				}
 				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				}
 				sql.append("\n  GROUP BY L.CUST_NO,L.PENS_ITEM,L.GROUP_CODE ");
 				sql.append("\n )INIT_MTT ");
@@ -248,14 +249,14 @@ public class ReportOnhandMTTSQL {
 					}
 					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.CUST_NO IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.CUST_NO IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					sql.append("\n  GROUP BY L.CUST_NO,L.PENS_ITEM, L.GROUP_CODE ");
 					sql.append("\n )SALE_OUT ");
@@ -298,14 +299,14 @@ public class ReportOnhandMTTSQL {
 					}
 					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					    sql.append("\n AND M.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					    sql.append("\n AND M.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 						
 					sql.append("\n GROUP BY M.customer_code,P.inventory_item_code, substr(P.inventory_item_desc,0,6) ");
@@ -348,14 +349,14 @@ public class ReportOnhandMTTSQL {
 					}
 
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					    sql.append("\n AND M.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					    sql.append("\n AND M.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					sql.append("\n GROUP BY M.customer_code ,P.inventory_item_code,  substr(P.inventory_item_desc,0,6)" );
 			sql.append("\n )SALE_RETURN ");

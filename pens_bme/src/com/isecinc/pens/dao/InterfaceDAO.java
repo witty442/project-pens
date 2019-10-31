@@ -25,7 +25,7 @@ import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * @author WITTY

@@ -86,17 +86,17 @@ function addRowAction(){
 	    "<td class='td_text_center' width='10%'> "+
 	    "  <input type='text' name='pensItem' id='pensItem' value='' size='10' "+
 	    "    onkeypress = 'getProductKeypress(event,this,"+rowId+")'" +
-	    "  /> "+
+	    "   autocomplete='off'/> "+
 	    "  <input type='hidden' name='inventoryItemId' id='inventoryItemId' value=''/>"+
 	    "</td>"+
 	    "<td class='td_text' width='45%'> "+
 	    "  <input type='text' name='itemName' id='itemName'  value='' size='60' readonly class='disableText'/> "+
 	    "</td>"+
 	    "<td class='td_number' width='10%'> "+
-	    "  <input type='text' name='unitPrice' id='unitPrice'  value='' size='10' class='enableNumber' onblur='isNum2Digit(this);sumTotalInRow("+rowId+")' /> "+
+	    "  <input type='text' name='unitPrice' id='unitPrice' autocomplete='off' value='' size='10' class='enableNumber' onblur='isNum2Digit(this);sumTotalInRow("+rowId+")' /> "+
 	    "</td>"+
 	    "<td class='td_number' width='14%'> "+
-	    "  <input type='text' name='qty' id='qty'  value='' size='14' class='enableNumber' onblur='isNum(this);sumTotalInRow("+rowId+")'/> "+
+	    "  <input type='text' name='qty' id='qty'  value='' autocomplete='off' size='14' class='enableNumber' onblur='isNum(this);sumTotalInRow("+rowId+")'/> "+
 	    "</td>"+
 	    "<td class='td_number' width='16%'> "+
 	    "  <input type='text' name='amount' id='amount'  value='' size='17' class='disableNumber' readonly/> "+
@@ -381,7 +381,7 @@ function sumTotal(){
 									    <input type="text" name="itemName" id="itemName"  value="<%=mc.getItemName() %>" size="60" readonly class='disableText'/>
 									</td><!-- 3 -->
 								    <td class="td_number" width="10%">
-								        <input type="text" name="unitPrice" id="unitPrice"  value="<%=mc.getUnitPrice() %>" size="10"
+								        <input type="text" name="unitPrice" id="unitPrice"  value="<%=mc.getUnitPrice() %>" size="10" autocomplete="off" 
 								         <%if(readonly){ %>
 								             readonly class="disableNumber" 
 								         <%}else{ %> 
@@ -391,7 +391,7 @@ function sumTotal(){
 								          />
                                     </td><!-- 4 -->
 								    <td class="td_number" width="14%">
-								        <input type="text" name="qty" id="qty"  value="<%=mc.getQty() %>" size="14" 
+								        <input type="text" name="qty" id="qty"  value="<%=mc.getQty() %>" size="14" autocomplete="off" 
 								         <%if(readonly){ %>
 								             readonly class="disableNumber" 
 								         <%}else{ %> 

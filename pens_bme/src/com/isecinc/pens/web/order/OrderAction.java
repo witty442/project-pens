@@ -39,6 +39,7 @@ import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.managepath.ManagePath;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -1006,7 +1007,7 @@ public class OrderAction extends I_Action {
 				request.getSession().setAttribute("totalPage", totalPage);
 				request.getSession().setAttribute("totalRow", totalRow);
 				
-				String storeCodeWhereIn = Utils.converToTextSqlIn(orderForm.getOrder().getPensCustCodeFrom());
+				String storeCodeWhereIn = SQLHelper.converToTextSqlIn(orderForm.getOrder().getPensCustCodeFrom());
 				storeList = orderDAO.getStoreList(conn,orderForm.getOrder().getStoreType(),orderForm.getOrder().getRegion(),orderForm.getOrder().getBillType(),storeCodeWhereIn);
 				request.getSession().setAttribute("storeList",storeList);
 				

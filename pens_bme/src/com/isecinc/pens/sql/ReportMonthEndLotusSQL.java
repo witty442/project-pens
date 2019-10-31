@@ -11,6 +11,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.pens.util.FileUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class ReportMonthEndLotusSQL {
@@ -73,14 +74,14 @@ public class ReportMonthEndLotusSQL {
 						//sql.append(genWhereCondDateMonthEnd(control,"V.invoice_date"));
 						
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n\t AND C.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n\t AND C.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n\t AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n\t AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n\t AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n\t AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						sql.append("\n\t UNION ");
 						
@@ -100,14 +101,14 @@ public class ReportMonthEndLotusSQL {
 						//sql.append(genWhereCondDateMonthEnd(control,"J.close_date"));
 						
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n\t AND J.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n\t AND J.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n\t AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n\t AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n\t AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n\t AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						
                  sql.append("\n\t UNION ");
@@ -122,14 +123,14 @@ public class ReportMonthEndLotusSQL {
 					  // sql.append(genWhereCondDateMonthEnd(control,"L.sales_date"));
 						
 					   if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						 sql.append("\n\t AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						 sql.append("\n\t AND L.PENS_CUST_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					   }
 					   if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						 sql.append("\n\t AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						 sql.append("\n\t AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					   }
 					   if( !Utils.isNull(c.getGroup()).equals("")){
-						 sql.append("\n\t AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						 sql.append("\n\t AND L.PENS_GROUP_TYPE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					   }
 					   
 					   sql.append("\n\t UNION ");
@@ -149,14 +150,14 @@ public class ReportMonthEndLotusSQL {
 						}
 						
 					   if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						 sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						 sql.append("\n\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					   }
 					   if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						 sql.append("\n\t AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						 sql.append("\n\t AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					   }
 					   if( !Utils.isNull(c.getGroup()).equals("")){
-						 sql.append("\n\t AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						 sql.append("\n\t AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					   }
 						
          sql.append("\n )M ");
@@ -176,14 +177,14 @@ public class ReportMonthEndLotusSQL {
 					}
 					 
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n\t AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n\t AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n\t AND L.GROUP_CODE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n\t AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					sql.append("\n\t  GROUP BY L.STORE_CODE,L.PENS_ITEM, L.GROUP_CODE ");
 					sql.append("\n ) ENDING ");
@@ -202,14 +203,14 @@ public class ReportMonthEndLotusSQL {
 						sql.append(genWhereCondDateMonthEnd(control,"L.sales_date"));
 						  
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-							sql.append("\n\t AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+							sql.append("\n\t AND L.PENS_CUST_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n\t AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n\t AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n\t AND L.PENS_GROUP_TYPE IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n\t AND L.PENS_GROUP_TYPE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						sql.append("\n\t  GROUP BY L.PENS_CUST_CODE,L.PENS_ITEM,L.PENS_GROUP_TYPE ");
 						sql.append("\n ) SALE_OUT ");
@@ -237,14 +238,14 @@ public class ReportMonthEndLotusSQL {
 						sql.append(genWhereCondDateMonthEnd(control,"V.invoice_date"));
 						
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n\t AND C.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n\t AND C.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n\t AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n\t AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n\t AND substr(P.inventory_item_desc,0,6) IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n\t AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 							
 						sql.append("\n\t GROUP BY C.customer_code,P.inventory_item_code, substr(P.inventory_item_desc,0,6) ");
@@ -268,14 +269,14 @@ public class ReportMonthEndLotusSQL {
 					sql.append("\n\t AND J.cust_group = '020047'");
 					sql.append(genWhereCondDateMonthEnd(control,"J.close_date"));
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					    sql.append("\n\t AND J.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					    sql.append("\n\t AND J.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n\t AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n\t AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n\t AND I.group_code IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n\t AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 					}
 					sql.append("\n\t GROUP BY J.store_code ,I.pens_item ,I.group_code ");
 				sql.append("\n )SALE_RETURN ");
@@ -291,14 +292,14 @@ public class ReportMonthEndLotusSQL {
 				 	// L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
 				 	sql.append(genWhereCondDateMonthEnd(control,"L.transaction_date"));
 				 	if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-				 		sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+				 		sql.append("\n\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				 	}
 				 	if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 				 		sql.append("\n\t AND L.item_issue >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 				 		sql.append("\n\t AND L.item_issue <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				 	}
 				 	if( !Utils.isNull(c.getGroup()).equals("")){
-				 		sql.append("\n\t AND L.item_issue_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+				 		sql.append("\n\t AND L.item_issue_desc IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				 	}
 				 	sql.append("\n\t  GROUP BY L.STORE_CODE,L.item_issue, L.item_issue_desc ");
 				sql.append("\n )STOCK_ISSUE ");
@@ -316,14 +317,14 @@ public class ReportMonthEndLotusSQL {
 				  sql.append(genWhereCondDateMonthEnd(control,"L.transaction_date"));
 				  
 				  if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					sql.append("\n\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				  }
 				  if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n\t AND L.item_receipt >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n\t AND L.item_receipt <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				  }
 				  if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n\t AND L.item_receipt_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n\t AND L.item_receipt_desc IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				 }
 				  sql.append("\n\t  GROUP BY  L.STORE_CODE,L.item_receipt,  L.item_receipt_desc ");
 				sql.append("\n )STOCK_RECEIPT ");
@@ -340,14 +341,14 @@ public class ReportMonthEndLotusSQL {
 				  sql.append(genWhereCondDateMonthEnd(control,"L.transaction_date"));
 				  
 				  if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					  sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					  sql.append("\n\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				  }
 				  if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n\t AND L.item_adjust >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n\t AND L.item_adjust <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				  }
 				  if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n\t AND L.item_adjust_desc IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n\t AND L.item_adjust_desc IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				  }
 				  sql.append("\n\t  GROUP BY L.STORE_CODE,L.item_adjust, L.item_adjust_desc ");
 				sql.append("\n )STOCK_SHORT ");

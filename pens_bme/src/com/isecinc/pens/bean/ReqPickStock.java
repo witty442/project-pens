@@ -76,9 +76,15 @@ public class ReqPickStock implements Serializable{
 	private String rowIndex;
 	private String actionDB;
 	private int totalIssueQty;
+	private String forwarder;
 	
 	
-	
+	public String getForwarder() {
+		return forwarder;
+	}
+	public void setForwarder(String forwarder) {
+		this.forwarder = forwarder;
+	}
 	public String getInvoiceNo() {
 		return invoiceNo;
 	}

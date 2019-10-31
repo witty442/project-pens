@@ -28,7 +28,7 @@ public class CopyDB {
 			//String where =" where id =1";
 
 			/*****************copy  product to test********************/
-			//processProductionToUAT("pensbi","PENSBME_MST_REFERENCE","");
+			processProductionToUAT("pensbi","PENSBME_MST_REFERENCE","");
 			
 		   // processProductionToUAT("pensbi","PENSBME_ONHAND_BME_LOCKED","");
 		   // processProductionToUAT("pensbi","PENSBME_STYLE_MAPPING","");
@@ -55,6 +55,9 @@ public class CopyDB {
 			//whereSQL = "where id in("+
 	         //"select id from XXPENS_BI_SALES_TARGET_TEMP where period ='JUL-19')";
             // processProductionToUAT("pensbi","XXPENS_BI_SALES_TARGET_TEMP_L",whereSQL);
+			
+			//processProductionToUAT("pensbi","PENSBME_PRICELIST","");
+			
 			/*****************copy Test to product********************/
 			//copy Test to product
 			//processUATToProduction("pensbi","PENSBME_ONHAND_BME_LOCKED_FRI","");

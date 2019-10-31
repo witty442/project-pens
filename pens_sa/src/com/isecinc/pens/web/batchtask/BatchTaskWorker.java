@@ -21,7 +21,13 @@ public abstract class BatchTaskWorker extends Thread {
 		logger.info("startTaskStatus transactionId["+transactionId+"]monitorId["+monitorId+"]");
 		updateTaskStatus(transactionId,monitorId,"0"); //Start BatchTask = 0;
 		
-		//control uniq task
+		//control unique task
+		BatchTaskDAO dao = new BatchTaskDAO();
+		dao.updateControlMonitor(transactionId,taskName);
+	}
+	public void startTaskStatusCaseFail(String taskName,BigDecimal transactionId,BigDecimal monitorId) {
+		logger.info("startTaskStatus transactionId["+transactionId+"]monitorId["+monitorId+"]");
+		//control unique task
 		BatchTaskDAO dao = new BatchTaskDAO();
 		dao.updateControlMonitor(transactionId,taskName);
 	}
@@ -30,12 +36,14 @@ public abstract class BatchTaskWorker extends Thread {
 		logger.info("endTaskStatus transactionId["+transactionId+"]monitorId["+monitorId+"]");
 		updateTaskStatus(transactionId,monitorId,"1");//finish BatchTask = 1	
 		
-		//control uniq task set transaction_id = 0 for run next batch
+		//control unique task set transaction_id = 0 for run next batch
 		BatchTaskDAO dao = new BatchTaskDAO();
 		dao.updateControlMonitor(new BigDecimal(0),taskName);
-		
-		/** Stamp Monitor Task Sales**/
-		//MonitorSales.monitorSales(transactionId);
+	}
+	
+	public void endTaskStatusCaseFail(String taskName,BigDecimal transactionId,BigDecimal monitorId) {
+		logger.info("endTaskStatus transactionId["+transactionId+"]monitorId["+monitorId+"]");
+		updateTaskStatus(transactionId,monitorId,"1");//finish BatchTask = 1	
 	}
 	
     public void updateTaskStatus(BigDecimal transactionId,BigDecimal monitorId,String status) {
@@ -56,7 +64,4 @@ public abstract class BatchTaskWorker extends Thread {
         	}
         }
     }
-    
-   
-   
 }

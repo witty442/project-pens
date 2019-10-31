@@ -105,16 +105,16 @@ function stampPrint(){
 	printDateTimePick.value = currentDateStr;
 }
 function changePaymentMethod(paymentMethod){
-	if("CS" ==paymentMethod.value || "ALI" ==paymentMethod.value || "WE" ==paymentMethod.value){
-		document.getElementById("div_credit_1").style.display = "none";
-		document.getElementById("div_credit_2").style.display = "none";
-		document.getElementById("div_credit_3").style.display = "none";
-		document.getElementById("div_credit_4").style.display = "none";
-	}else{
+	if("CR" ==paymentMethod.value){
 		document.getElementById("div_credit_1").style.display = "block";
 		document.getElementById("div_credit_2").style.display = "block";
 		document.getElementById("div_credit_3").style.display = "block";
 		document.getElementById("div_credit_4").style.display = "block";
+	}else{
+		document.getElementById("div_credit_1").style.display = "none";
+		document.getElementById("div_credit_2").style.display = "none";
+		document.getElementById("div_credit_3").style.display = "none";
+		document.getElementById("div_credit_4").style.display = "none";
 	}
 }
 /** Calc Change Amount onkeypress**/

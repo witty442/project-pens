@@ -216,7 +216,8 @@ function getCustName(path,storeCode,fieldName,storeType){
 									</td>
 									<td>		
 									   รหัสร้านค้า<font color="red"></font>
-                                       <html:text property="bean.storeCode" styleId="storeCode" size="15"  onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'storeName')"/>
+                                       <html:text property="bean.storeCode" styleId="storeCode" size="15" styleClass="\" autoComplete=\"off"
+                                       onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'storeName')"/>
 								       <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','StoreCodeBME','true')"/>   
 									  <html:text property="bean.storeName" styleId="storeName" size="30"  styleClass="disableText" readonly="true"/>
 									</td>
@@ -224,11 +225,11 @@ function getCustName(path,storeCode,fieldName,storeType){
 								<tr>
                                     <td align="right">Job Id </td>
 									<td colspan="2">		
-										 <html:text property="bean.jobId" styleId="jobId" size="10"  onkeypress="getJobNameKeypress(event,this)"/>
+										 <html:text property="bean.jobId" styleId="jobId" size="10"  onkeypress="getJobNameKeypress(event,this)" styleClass="\" autoComplete=\"off"/>
 									
 									    <html:text property="bean.jobName" styleId="jobName" size="40" styleClass="disableText"  readonly="true"/>
 									 &nbsp;&nbsp;GR No  &nbsp;&nbsp; &nbsp;&nbsp;
-									 <html:text property="bean.grNo" styleId="grNo" size="20"/>
+									 <html:text property="bean.grNo" styleId="grNo" size="20" styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>
 								<tr>

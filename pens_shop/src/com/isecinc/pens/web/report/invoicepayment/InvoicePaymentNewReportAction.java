@@ -63,11 +63,13 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		parameterMap.put("curCreditCardAmt", dataReport.getTotalCreditCardAmt());
 		parameterMap.put("curAliAmt", dataReport.getTotalAliAmt());
 		parameterMap.put("curWeAmt", dataReport.getTotalWeAmt());
+		parameterMap.put("curGovAmt", dataReport.getTotalGovAmt());
 		
 		parameterMap.put("curCashCnt", process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 1));//currentCashCnt
 		parameterMap.put("curCreditCardCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 2));//curCreditcasrCnt
 		parameterMap.put("curAliCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 6));//curAliCnt
 		parameterMap.put("curWeCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 7));//curWechatCnt
+		parameterMap.put("curGovCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 11));//curGovchatCnt
 		
 		logger.debug("curAliCnt:"+parameterMap.get("curAliCnt"));
 		logger.debug("curWeCnt:"+parameterMap.get("curWeCnt"));
@@ -87,11 +89,14 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		parameterMap.put("aliAmtBefore",aliAmtBefore);
 		double weAmtBefore = process.sumWeAmtBefore(reportForm.getInvoicePaymentReport(), user, conn);
 		parameterMap.put("weAmtBefore",weAmtBefore);
+		double govAmtBefore = process.sumGovAmtBefore(reportForm.getInvoicePaymentReport(), user, conn);
+		parameterMap.put("govAmtBefore",govAmtBefore);
 		
 		parameterMap.put("cashCntBefore", process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 3));
 		parameterMap.put("creditCardCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 4));
 		parameterMap.put("aliCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 9));
 		parameterMap.put("weCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 10));
+		parameterMap.put("govCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 12));
 		/*******************************************************************************************************/		
 		
 		parameterMap.put("reportPath", BeanParameter.getReportPath());
@@ -104,31 +109,37 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		logger.debug("curCreditCardCnt:"+parameterMap.get("curCreditCardCnt"));
 		logger.debug("curAliCnt:"+parameterMap.get("curAliCnt"));
 		logger.debug("curWeCnt:"+parameterMap.get("curWeCnt"));
+		logger.debug("curGovCnt:"+parameterMap.get("curGovCnt"));
 		
 		logger.debug("cashCntBefore:"+parameterMap.get("cashCntBefore"));
 		logger.debug("creditCardCntBefore:"+parameterMap.get("creditCardCntBefore"));
 		logger.debug("aliCntBefore:"+parameterMap.get("aliCntBefore"));
 		logger.debug("weCntBefore:"+parameterMap.get("weCntBefore"));
-       
+		logger.debug("govCntBefore:"+parameterMap.get("govCntBefore"));
+		
 		double p_sum_all_cnt = (Integer)parameterMap.get("curCashCnt");
 		      p_sum_all_cnt += (Integer)parameterMap.get("curCreditCardCnt");
 		      p_sum_all_cnt += (Integer)parameterMap.get("curAliCnt");
 		      p_sum_all_cnt += (Integer)parameterMap.get("curWeCnt");
+		      p_sum_all_cnt += (Integer)parameterMap.get("curGovCnt");
+		      
 		      p_sum_all_cnt += (Integer)parameterMap.get("cashCntBefore");
 		      p_sum_all_cnt += (Integer)parameterMap.get("creditCardCntBefore");
 		      p_sum_all_cnt += (Integer)parameterMap.get("aliCntBefore");
 		      p_sum_all_cnt += (Integer)parameterMap.get("weCntBefore");
-		
+		      p_sum_all_cnt += (Integer)parameterMap.get("govCntBefore");
 
-      double p_sum_all_amt = (Double)parameterMap.get("curCashAmt");
+      double  p_sum_all_amt = (Double)parameterMap.get("curCashAmt");
 		      p_sum_all_amt += (Double)parameterMap.get("curCreditCardAmt");
 		      p_sum_all_amt += (Double)parameterMap.get("curAliAmt");
 		      p_sum_all_amt += (Double)parameterMap.get("curWeAmt");
+		      p_sum_all_amt += (Double)parameterMap.get("curGovAmt");
 		      
 		      p_sum_all_amt += (Double)parameterMap.get("cashAmtBefore");
 		      p_sum_all_amt += (Double)parameterMap.get("creditCardAmtBefore");
 		      p_sum_all_amt += (Double)parameterMap.get("aliAmtBefore");
 		      p_sum_all_amt += (Double)parameterMap.get("weAmtBefore");
+		      p_sum_all_amt += (Double)parameterMap.get("govAmtBefore");
 		      
 		parameterMap.put("p_sum_all_cnt",p_sum_all_cnt);
 		parameterMap.put("p_sum_all_amt",p_sum_all_amt);

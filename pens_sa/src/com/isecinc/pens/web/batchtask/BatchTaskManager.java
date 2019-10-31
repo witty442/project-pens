@@ -34,61 +34,43 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 		logger.debug("runBatch");
 		BatchTaskForm batchTaskForm = (BatchTaskForm) form;
 		User userLogin = (User) request.getSession().getAttribute("user");
-		BatchTaskDAO dao = new BatchTaskDAO();
-		boolean canRunBatch = false;
-		EnvProperties env = EnvProperties.getInstance();
 		String pageName = Utils.isNull(request.getParameter("pageName"));
 		try {
-				String status = dao.findControlMonitor(pageName);
-				logger.info("status["+status+"]");
-				
-				if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
-				    canRunBatch = true;
-				}
-			
-				if(canRunBatch){
-					//logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
-					/** Import Data */
+			//logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+			/** Import Data */
 
-					/** insert to monitor_interface **/
-					MonitorBean monitorModel = new MonitorBean();
-					monitorModel.setName(pageName);
-					monitorModel.setType(pageName);
-					monitorModel.setStatus(Constants.STATUS_START);
-					monitorModel.setCreateUser(userLogin.getUserName());
-					
-					/** Set Param Batch Map **/
-					Map<String, String> batchParamMap = new HashMap<String, String>();
-					Map<String,Object> prepareMap = prepareParam(batchTaskForm, request);
-					batchParamMap = (Map)prepareMap.get("batchParamMap");
-					monitorModel.setBatchParamMap(batchParamMap);
-					/** Case Form File **/
-					logger.debug("dataFromFile:"+batchTaskForm.getDataFormFile());
-					if(batchTaskForm.getDataFormFile() != null){
-						monitorModel.setDataFile(batchTaskForm.getDataFormFile());
-					}
-					
-					//Set User
-					monitorModel.setUser(userLogin);
-					
-					//set param BatchTaskInfo on screen
-					//OLD code
-					//Map<String, BatchTaskInfo> paramMapForm = prepareMap.get("paramMapForm");
-					//batchTaskForm.getTaskInfo().setParamMap(paramMapForm);
-					
-					//New Code
-					List<BatchTaskInfo> paramListForm = (List)prepareMap.get("paramListForm");
-					batchTaskForm.getTaskInfo().setParamList(paramListForm);
-					
-					//create Batch Task
-					MonitorBean m = createBatchTask(monitorModel,userLogin,request);
-				   
-					/** Set for Progress Bar Opoup **/
-					request.setAttribute("action", "submited");
-					request.setAttribute("id", m.getTransactionId());
-				}else{
-					request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
-				}
+			/** insert to monitor_interface **/
+			MonitorBean monitorModel = new MonitorBean();
+			monitorModel.setName(pageName);
+			monitorModel.setType(pageName);
+			monitorModel.setStatus(Constants.STATUS_START);
+			monitorModel.setCreateUser(userLogin.getUserName());
+			
+			/** Set Param Batch Map **/
+			Map<String, String> batchParamMap = new HashMap<String, String>();
+			Map<String,Object> prepareMap = prepareParam(batchTaskForm, request);
+			batchParamMap = (Map)prepareMap.get("batchParamMap");
+			monitorModel.setBatchParamMap(batchParamMap);
+			/** Case Form File **/
+			logger.debug("dataFromFile:"+batchTaskForm.getDataFormFile());
+			if(batchTaskForm.getDataFormFile() != null){
+				monitorModel.setDataFile(batchTaskForm.getDataFormFile());
+			}
+			
+			//Set User
+			monitorModel.setUser(userLogin);
+			
+			//New Code
+			List<BatchTaskInfo> paramListForm = (List)prepareMap.get("paramListForm");
+			batchTaskForm.getTaskInfo().setParamList(paramListForm);
+			
+			//create Batch Task
+			MonitorBean m = createBatchTask(monitorModel,userLogin,request);
+		   
+			/** Set for Progress Bar Opoup **/
+			request.setAttribute("action", "submited");
+			request.setAttribute("id", m.getTransactionId());
+				
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
@@ -96,78 +78,61 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 		return mapping.findForward("search");
 	}
 
-public ActionForward runBatchFromPageByPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-	
-	logger.debug("runBatchFromPopupPage");
-	BatchTaskForm batchTaskForm = (BatchTaskForm) form;
-	User userLogin = (User) request.getSession().getAttribute("user");
-	BatchTaskDAO dao = new BatchTaskDAO();
-	boolean canRunBatch = false;
-	EnvProperties env = EnvProperties.getInstance();
-	String pageName = Utils.isNull(request.getParameter("pageName"));
-	try {
-			String status = dao.findControlMonitor(pageName);
-			logger.info("status["+status+"]");
+	public ActionForward runBatchFromPageByPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("runBatchFromPopupPage");
+		User userLogin = (User) request.getSession().getAttribute("user");
+		String pageName = Utils.isNull(request.getParameter("pageName"));
+		try {
+			/** insert to monitor_interface **/
+			MonitorBean monitorModel = new MonitorBean();
+			monitorModel.setName(pageName);
+			monitorModel.setType(pageName);
+			monitorModel.setStatus(Constants.STATUS_START);
+			monitorModel.setCreateUser(userLogin.getUserName());
 			
-			if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
-			    canRunBatch = true;
-			}
+			/** Set Param Batch Map **/
+			//Case popup from Get from session (by page set parameter)
+			Map<String,String> batchParamMap = (HashMap<String, String>)request.getSession().getAttribute("BATCH_PARAM_MAP");
+			monitorModel.setBatchParamMap(batchParamMap);
+			
+			/** Case Form File **/
+			//Case popup from Get from session 
+			logger.debug("dataFromFile:"+request.getSession().getAttribute("DATA_FILE"));
+			monitorModel.setDataFile((FormFile)request.getSession().getAttribute("DATA_FILE"));
+			
+			//clear session from (by page prepare)
+			request.getSession().removeAttribute("DATA_FILE");
+			request.getSession().removeAttribute("PARAM_MAP");
+			
+			//Set User
+			monitorModel.setUser(userLogin);
 		
-			if(canRunBatch){
-				//logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
-				/** Import Data */
-
-				/** insert to monitor_interface **/
-				MonitorBean monitorModel = new MonitorBean();
-				monitorModel.setName(pageName);
-				monitorModel.setType(pageName);
-				monitorModel.setStatus(Constants.STATUS_START);
-				monitorModel.setCreateUser(userLogin.getUserName());
+			//create Batch Task
+			MonitorBean m = createBatchTask(monitorModel,userLogin,request);
+		   
+			/** Set for Progress Bar popup **/
+			request.setAttribute("action", "submited");
+			request.setAttribute("id", m.getTransactionId());
 				
-				/** Set Param Batch Map **/
-				//Case popup from Get from session (by page set parameter)
-				Map<String,String> batchParamMap = (HashMap<String, String>)request.getSession().getAttribute("BATCH_PARAM_MAP");
-				monitorModel.setBatchParamMap(batchParamMap);
-				
-				/** Case Form File **/
-				//Case popup from Get from session 
-				logger.debug("dataFromFile:"+request.getSession().getAttribute("DATA_FILE"));
-				monitorModel.setDataFile((FormFile)request.getSession().getAttribute("DATA_FILE"));
-				
-				//clear session from (by page prepare)
-				request.getSession().removeAttribute("DATA_FILE");
-				request.getSession().removeAttribute("PARAM_MAP");
-				
-				//Set User
-				monitorModel.setUser(userLogin);
-			
-				
-				//create Batch Task
-				MonitorBean m = createBatchTask(monitorModel,userLogin,request);
-			   
-				/** Set for Progress Bar Opoup **/
-				request.setAttribute("action", "submited");
-				request.setAttribute("id", m.getTransactionId());
-			}else{
-				request.setAttribute("Message","กำลังดึงข้อมูลอยู่ กรุณารอสักครู่  โปรดตรวจสอบสถานะล่าสุด");
-			}
-	} catch (Exception e) {
-		logger.error(e.getMessage(),e);
-		request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("search");
 	}
-	return mapping.findForward("search");
-}
+	
 	public MonitorBean createBatchTask(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
 		Connection connMonitor = null;
 		BatchTaskDAO dao = new BatchTaskDAO();
 		try{
-			connMonitor = DBConnection.getInstance().getConnection();
+			connMonitor = DBConnection.getInstance().getConnectionApps();
 			
+			//Insert BatchTask
 			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
-			
-		    //start Thread
-			new BatchTaskProcessWorker(monitorModel).start();
-			
+				
+			 //start Thread
+		    new BatchTaskProcessWorker(monitorModel).start();
+		    
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{

@@ -30,6 +30,7 @@ public class StockOnhandAction extends I_Action {
 	public static String PAGE_STOCK_VAN ="StockVan";
 	public static String PAGE_STOCK_OH ="StockOnhand";
 	public static String PAGE_STOCK_CV ="StockCoverage";
+	public static String PAGE_PREODER_NISSIN ="PreOrderNissin";
 	
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	
@@ -46,6 +47,8 @@ public class StockOnhandAction extends I_Action {
 				return new StockOnhandProcess().prepareSearch(mapping, aForm, request, response);
 			}else if(PAGE_STOCK_CV.equalsIgnoreCase(pageName)){
 				return new StockCVProcess().prepareSearch(mapping, aForm, request, response);
+			}else if(PAGE_PREODER_NISSIN.equalsIgnoreCase(pageName)){
+				return new PreOrderNissinProcess().prepareSearch(mapping, aForm, request, response);
 			}
 		
 		} catch (Exception e) {
@@ -72,6 +75,8 @@ public class StockOnhandAction extends I_Action {
 			   return new StockOnhandProcess().searchHead(mapping, aForm, request, response);
 			}else if(PAGE_STOCK_CV.equalsIgnoreCase(pageName)){
 			   return new StockCVProcess().searchHead(mapping, aForm, request, response);
+			}else if(PAGE_PREODER_NISSIN.equalsIgnoreCase(pageName)){
+			   return new PreOrderNissinProcess().searchHead(mapping, aForm, request, response);
 			} 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -91,10 +96,6 @@ public class StockOnhandAction extends I_Action {
 	 */
 	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		User user = (User) request.getSession().getAttribute("user");
-		StockOnhandForm aForm = (StockOnhandForm) form;
-		String pageName = aForm.getPageName();
-		
 		return "detail";
 	}
 
@@ -102,27 +103,26 @@ public class StockOnhandAction extends I_Action {
 	 * Save
 	 */
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		Connection conn = null;
 		StockOnhandForm aForm = (StockOnhandForm) form;
-		User user = (User) request.getSession().getAttribute("user");
 		try {
+			String pageName = Utils.isNull(request.getParameter("pageName"));
 			
+		    if(PAGE_PREODER_NISSIN.equalsIgnoreCase(pageName)){
+			   return new PreOrderNissinProcess().save(aForm, request, response);
+			} 
 		} catch (Exception e) {
-			conn.rollback();
+			
             e.printStackTrace();
 			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
 			try {
 				
 			} catch (Exception e2) {}
-			return "detail";
+			return "search";
 		} finally {
 			try {
-				if(conn != null){
-					conn.close();conn=null;
-				}
 			} catch (Exception e2) {}
 		}
-		return "detail";
+		return "search";
 	}
 	
 	public ActionForward exportToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -131,7 +131,6 @@ public class StockOnhandAction extends I_Action {
 		logger.debug("exportToExcel : ");
 		StockOnhandForm stockVanForm = (StockOnhandForm) form;
 		String pageName = stockVanForm.getPageName();
-		Connection conn = null;
 		try {
 			if(PAGE_STOCK_VAN.equalsIgnoreCase(pageName)){
 				return new StockVanProcess().exportToExcel(mapping, stockVanForm, request, response);
@@ -139,17 +138,16 @@ public class StockOnhandAction extends I_Action {
 			    return new StockOnhandProcess().exportToExcel(mapping, stockVanForm, request, response);
 			}else if(PAGE_STOCK_CV.equalsIgnoreCase(pageName)){
 			    return new StockCVProcess().exportToExcel(mapping, stockVanForm, request, response);
+			}else if(PAGE_PREODER_NISSIN.equalsIgnoreCase(pageName)){
+			    return new PreOrderNissinProcess().exportToExcel(mapping, stockVanForm, request, response);
 			} 
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 		} finally {
-			try {
-				 conn.close();
-			} catch (Exception e2) {}
 		}
-		return null;//
+		return null;
 	}
 	
 	

@@ -169,7 +169,7 @@ public class PopupAction extends I_Action {
 				 
 				 //set Criteria From Main Page
 				 String[] queryStr = request.getQueryString().split("\\&");
-				// logger.debug("queryStr:"+queryStr);
+				 logger.debug("queryStr:"+queryStr);
 				 if(queryStr != null && queryStr.length>0){
 					 Map<String, String> criteriaMap = new HashMap<String, String>();
 					 String paramName = "";

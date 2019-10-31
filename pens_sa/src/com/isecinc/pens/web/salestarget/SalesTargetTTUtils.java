@@ -412,9 +412,12 @@ public class SalesTargetTTUtils {
 					"where P.product_id =M.INVENTORY_ITEM_ID " +
 					"and P.primary_uom_code ='Y' " +
 					"and P.pricelist_id ="+priceListId+") as price");*/
-			sql.append("\n  ,(SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " +
-					"where P.INVENTORY_ITEM_ID =M.INVENTORY_ITEM_ID " +
-					"and P.list_header_id ="+priceListId+") as price");
+			
+			sql.append("\n  ,(SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
+			sql.append("\n   where P.INVENTORY_ITEM_ID =M.INVENTORY_ITEM_ID " );
+			//witty edit:21/10/2019 (get only active )
+			sql.append("\n   and P.end_date_active is null ");
+			sql.append("\n   and P.list_header_id ="+priceListId+") as price");
 			
 		//	sql.append("\n  ,(apps.xxpens_bi.Get_Sales_Avg('"+period+"','"+custCatNo+"',"+salesrepId+","+customerId+",INVENTORY_ITEM_ID,12)) as amt_12 ");
 	    //	sql.append("\n  ,(apps.xxpens_bi.Get_Sales_Avg('"+period+"','"+custCatNo+"',"+salesrepId+","+customerId+",INVENTORY_ITEM_ID,3)) as amt_3 ");

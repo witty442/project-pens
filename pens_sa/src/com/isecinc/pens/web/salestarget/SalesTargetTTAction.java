@@ -127,6 +127,7 @@ public class SalesTargetTTAction  {
 		List<SalesTargetBean> productDataSaveListBySalesrep = new ArrayList<SalesTargetBean>();
 		boolean checkFoundInsertQty = false;
 		SalesTargetBean h = null;
+		boolean validProduct =true;
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -179,6 +180,11 @@ public class SalesTargetTTAction  {
 							
 		                    //add product
 							productDataSaveListBySalesrep.add(l);
+							
+							//valid brand head vs product line is equals
+							/*if( !productBean.getItemCode().startsWith(bean.getBrand())){
+								validProduct = false;
+							}*/
 	                    //}
 	        		}//for 2
 	        	    
@@ -206,11 +212,15 @@ public class SalesTargetTTAction  {
 		        	    logger.debug("salesrepCode:"+h.getSalesrepCode()+",id:"+h.getId());
 		        	    
 		        	    salesrepDataSaveList.add(h);
-	        	    }
+	        	    }//if
 	        	    
 	        	}//for 1
 			}
 			
+			if(validProduct==false){
+				request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบว่าไม้ได้ทำการบันทึก สองหน้าจอพร้อมกัน");
+				return "detailTTSUPER";
+			}
 			//save Head target_temp
 			SalesTargetTTDAO.saveModelByTTSUPER_TT(conn, salesrepDataSaveList);
 
@@ -235,6 +245,10 @@ public class SalesTargetTTAction  {
 			aForm.setBean(bean);
 			
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+			
+			//unlock page 
+			request.getSession().removeAttribute("TTSUPER_LOCKPAGE");
+			
 		} catch (Exception e) {
 			conn.rollback();
             e.printStackTrace();

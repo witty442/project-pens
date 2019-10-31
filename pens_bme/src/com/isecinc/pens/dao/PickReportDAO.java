@@ -20,8 +20,9 @@ import com.isecinc.pens.web.mtt.MTTAction;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 public class PickReportDAO{
 
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -216,7 +217,7 @@ public class PickReportDAO{
 		    //Where Condition
 		    sql.append("\n    and S.issue_req_status  ='"+PickConstants.STATUS_ISSUED+"' ");
 		    sql.append("\n    and D.issue_req_status  ='"+PickConstants.STATUS_ISSUED+"' ");
-			sql.append("\n    and S.issue_req_no in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
+			sql.append("\n    and S.issue_req_no in ("+SQLHelper.converToTextSqlIn(o.getIssueReqNoArr())+")");
 			sql.append("\n  )SS ");
 			sql.append("\n   GROUP BY SS.store_code,SS.store_name,SS.issue_req_no ");
 			sql.append("\n   ,SS.issue_date,SS.pens_item,SS.material_master ");
@@ -234,7 +235,7 @@ public class PickReportDAO{
 		    //Where Condition
 		    sql.append("\n   and S.status  ='"+PickConstants.STATUS_ISSUED+"' ");
 		    sql.append("\n   and D.status  ='"+PickConstants.STATUS_ISSUED+"' ");
-		    sql.append("\n   and S.issue_req_no in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
+		    sql.append("\n   and S.issue_req_no in ("+SQLHelper.converToTextSqlIn(o.getIssueReqNoArr())+")");
 		    sql.append("\n   GROUP BY S.customer_no,S.issue_req_no ,S.status_date");
 		    sql.append("\n   ,D.pens_item,D.material_master ,D.group_code");
 		    sql.append("\n   ,S.warehouse,D.barcode");
@@ -294,7 +295,7 @@ public class PickReportDAO{
 		    //Where Condition
 		    sql.append("\n     and S.issue_req_status  ='"+PickConstants.STATUS_ISSUED+"' ");
 		    sql.append("\n     and D.issue_req_status  ='"+PickConstants.STATUS_ISSUED+"' ");
-			sql.append("\n     and S.issue_req_no in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
+			sql.append("\n     and S.issue_req_no in ("+SQLHelper.converToTextSqlIn(o.getIssueReqNoArr())+")");
 			sql.append("\n	)SS ");
 			sql.append("\n  GROUP BY SS.pens_item,SS.group_code");
 			
@@ -306,7 +307,7 @@ public class PickReportDAO{
 		    //Where Condition
 		    sql.append("\n   and S.status  ='"+PickConstants.STATUS_ISSUED+"' ");
 		    sql.append("\n   and D.status  ='"+PickConstants.STATUS_ISSUED+"' ");
-		    sql.append("\n   and S.issue_req_no in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
+		    sql.append("\n   and S.issue_req_no in ("+SQLHelper.converToTextSqlIn(o.getIssueReqNoArr())+")");
 		    sql.append("\n   GROUP BY D.pens_item,D.group_code ");
 		    sql.append("\n   )AA ");
 		    sql.append("\n  group by AA.pens_item,AA.group_code");
@@ -358,7 +359,7 @@ public class PickReportDAO{
 		    //Where Condition
 		    sql.append("\n     and S.issue_req_status  ='"+PickConstants.STATUS_ISSUED+"' ");
 		    sql.append("\n     and D.issue_req_status  ='"+PickConstants.STATUS_ISSUED+"' ");
-		    sql.append("\n     and S.issue_req_no in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
+		    sql.append("\n     and S.issue_req_no in ("+SQLHelper.converToTextSqlIn(o.getIssueReqNoArr())+")");
 			sql.append("\n	)SS ");
 			sql.append("\n  GROUP BY SS.barcode,SS.group_code,SS.pens_item");
 			
@@ -370,7 +371,7 @@ public class PickReportDAO{
 		    //Where Condition
 		    sql.append("\n   and S.status  ='"+PickConstants.STATUS_ISSUED+"' ");
 		    sql.append("\n   and D.status  ='"+PickConstants.STATUS_ISSUED+"' ");
-		    sql.append("\n   and S.issue_req_no in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
+		    sql.append("\n   and S.issue_req_no in ("+SQLHelper.converToTextSqlIn(o.getIssueReqNoArr())+")");
 		    sql.append("\n   GROUP BY D.barcode ,D.group_code ,D.pens_item ");
 		    sql.append("\n   )AA ");
 		    sql.append("\n  group by AA.barcode ,AA.group_code ,AA.pens_item");
@@ -404,7 +405,7 @@ public class PickReportDAO{
 		StringBuffer sql = new StringBuffer("");
 		
 		if( !Utils.isNull(o.getIssueReqNoArr()).equals("")){
-			sql.append("\n and S. in ("+Utils.converToTextSqlIn(o.getIssueReqNoArr())+")");
+			sql.append("\n and S. in ("+SQLHelper.converToTextSqlIn(o.getIssueReqNoArr())+")");
 		}
 		if( !Utils.isNull(o.getCustGroup()).equals("")){
 			sql.append("\n and S.cust_group ='"+o.getCustGroup()+"'");

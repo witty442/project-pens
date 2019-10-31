@@ -772,11 +772,11 @@ public class OrderAction extends I_Action {
 			//For compare after save 
 			double beforeSave_NetAmount = order.getNetAmount(); 
 	
-			//CASH ,ALI,WECHAT
+			//CASH ,ALI,WECHAT,GOV
 			if(Constants.PAYMT_CASH.equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))
 				|| Constants.PAYMT_ALI.equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))
-				|| Constants.PAYMT_WE.equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))){//CASH
-				//CASH
+				|| Constants.PAYMT_WE.equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))
+				|| Constants.PAYMT_GOV.equalsIgnoreCase(Utils.isNull(order.getPaymentMethod()))){
 				order.setCreditCardType("");
 				order.setCreditCardNo("");
 				order.setCreditCardExpireDate("");

@@ -73,8 +73,6 @@ public class BatchTaskAction extends I_Action {
 			logger.debug("pageName:"+Utils.isNull(request.getParameter("pageName")) +",pageAction:"+Utils.isNull(request.getParameter("pageAction")));
 			
 			if("new".equalsIgnoreCase(Utils.isNull(request.getParameter("pageAction")))){
-				//clear Task running for next run
-				dao.updateControlMonitor(new BigDecimal(0),pageName);
 				
 				//Clear Form
 				batchTaskForm.setMonitorBean(new MonitorBean());
@@ -133,6 +131,9 @@ public class BatchTaskAction extends I_Action {
 				//get Script validate
 				String validateScript = getValidateScriptByTaskname(pageName);
 				taskInfo.setValidateScript(validateScript);
+				
+				//get Show BatchTask Detail
+				taskInfo.setDispDetail(getDispDetailByTaskname(pageName));
 				
 				batchTaskForm.setTaskInfo(taskInfo);
 
@@ -325,6 +326,25 @@ public class BatchTaskAction extends I_Action {
 		   Object ob =  method.invoke(obj, null);
 		   
 		   param = (String)ob;
+		   logger.debug("return:"+ob);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return param;
+	}
+	private boolean getDispDetailByTaskname(String taskName){
+		boolean param = false;
+		try{
+		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");
+   		   Object obj = cls.newInstance();
+   		   
+   		  //no paramater
+   		   Class noparams[] = {};
+   		
+   		   Method method = cls.getDeclaredMethod("isDispDetail", noparams);
+		   Object ob =  method.invoke(obj, null);
+		   
+		   param = (Boolean)ob;
 		   logger.debug("return:"+ob);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

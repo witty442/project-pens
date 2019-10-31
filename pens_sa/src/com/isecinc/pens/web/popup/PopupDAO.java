@@ -141,6 +141,7 @@ public class PopupDAO {
 			}
 			return pos;
 		}
+	
 	 public static List<PopupForm> searchItemStockVanList(PopupForm c) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

@@ -25,6 +25,7 @@ import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.web.summary.SummaryForm;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 
@@ -107,7 +108,7 @@ public class ReportOnhandAsOfRobinsonAction {
 				storeList = StoreDAO.getStoreList(conn, Constants.STORE_TYPE_ROBINSON_CODE);
 			}else{
 				//StoreCode more 1> 020047-1,020049-4
-				storeList = StoreDAO.getStoreList(conn, Constants.STORE_TYPE_ROBINSON_CODE,Utils.converToTextSqlIn(storeCodeCheck));
+				storeList = StoreDAO.getStoreList(conn, Constants.STORE_TYPE_ROBINSON_CODE,SQLHelper.converToTextSqlIn(storeCodeCheck));
 			}
 			//Loop By StoreList
 			if(storeList != null && storeList.size() >0){

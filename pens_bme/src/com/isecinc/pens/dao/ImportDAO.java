@@ -17,6 +17,7 @@ import com.isecinc.pens.bean.ProductBean;
 import com.isecinc.pens.dao.constants.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 /**
@@ -1328,7 +1329,7 @@ public class ImportDAO {
 			sql.append(" select pens_value ,pens_desc  from PENSBME_MST_REFERENCE WHERE Reference_code ='Customer' \n");
 			if( !Utils.isNull(notInCustCode).equals("")){
 				if(Utils.isNull(notInCustCode).indexOf(",") != -1){
-					sql.append(" and pens_value not in("+Utils.converToTextSqlIn(notInCustCode)+") \n");
+					sql.append(" and pens_value not in("+SQLHelper.converToTextSqlIn(notInCustCode)+") \n");
 				}else{
 			       sql.append(" and pens_value <> '"+notInCustCode+"' \n");
 				}

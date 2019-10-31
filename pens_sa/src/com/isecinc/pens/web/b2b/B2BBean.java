@@ -17,8 +17,22 @@ public class B2BBean implements Serializable{
 	 */
 	private static final long serialVersionUID = 6601445561355694753L;
 	private String dataType;
+	private String region;
+	private StringBuffer dataStrBuffer;
 	
 	
+	public StringBuffer getDataStrBuffer() {
+		return dataStrBuffer;
+	}
+	public void setDataStrBuffer(StringBuffer dataStrBuffer) {
+		this.dataStrBuffer = dataStrBuffer;
+	}
+	public String getRegion() {
+		return region;
+	}
+	public void setRegion(String region) {
+		this.region = region;
+	}
 	public String getDataType() {
 		return dataType;
 	}

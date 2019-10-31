@@ -37,8 +37,8 @@ import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
 import com.pens.util.meter.MonitorTime;
+import com.pens.util.seq.SequenceProcess;
 
 public class ImportPosProcess extends InterfaceUtils{
 

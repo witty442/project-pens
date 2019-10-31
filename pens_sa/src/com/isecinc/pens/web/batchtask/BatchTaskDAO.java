@@ -31,41 +31,20 @@ public class BatchTaskDAO {
 
 	protected static  Logger logger = Logger.getLogger("PENS");
 	
-	public BatchTaskInfo getBatchTaskInit_BK(String taskName) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-	    BatchTaskInfo taskInfo = new BatchTaskInfo();
-		Connection conn = null;
+	public MonitorBean insertMonitor(MonitorBean model) throws Exception {
+		Connection conn =null;
 		try{
-			conn  = DBConnection.getInstance().getConnection();
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select param ,button_name from PENSBI.BATCHTASK_INIT where program_name='"+taskName+"' \n");
-			
-		    logger.debug("SQL:"+sql.toString());
-		    
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			
-			if(rs.next()){
-			   taskInfo.setParam(Utils.isNull(rs.getString("PARAM")));
-			   taskInfo.setButtonName(Utils.isNull(rs.getString("button_name")));
-			}
+			conn = DBConnection.getInstance().getConnectionApps();
+			model= insertMonitor(conn, model);
 		}catch(Exception e){
-	      throw e;
+			logger.error(e.getMessage(),e);
 		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
 			if(conn != null){
-			  conn.close();conn = null;
+				conn.close();
 			}
 		}
-		return taskInfo;
-	} 
-	
+		return model;
+	}
 	public MonitorBean insertMonitor(Connection conn ,MonitorBean model) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
@@ -409,24 +388,20 @@ public class BatchTaskDAO {
         	}
         }
     }
-    public void updateControlMonitor(Connection conn,BigDecimal transactionId,String type) throws Exception {
+    public void updateControlMonitor(Connection conn,BigDecimal transactionId,String action) throws Exception {
 		PreparedStatement ps = null;
 		try {
-			String sql = "UPDATE c_monitor SET  transaction_id = ? WHERE action = ?";
-			//logger.info("SQL:"+sql);
+			String sql = "UPDATE c_monitor SET  transaction_id = "+transactionId+" WHERE action = '"+action+"'";
+			logger.info("SQL UPDATE:"+sql);
 			int index = 0;
 			ps = conn.prepareStatement(sql);
-			ps.setBigDecimal(++index, transactionId);
-			ps.setString(++index,type);
-			
 			int r = ps.executeUpdate();
 			if(r==0){
 				//insert 
-				sql = "insert into c_monitor(action,transaction_id)values(?,?)";
+				sql = "insert into c_monitor(action,transaction_id)values('"+action+"',"+transactionId+")";
+				logger.info("SQL INS:"+sql);
 				index = 0;
 				ps = conn.prepareStatement(sql);
-				ps.setString(++index,type);
-				ps.setBigDecimal(++index, transactionId);
 				ps.executeUpdate();
 				
 			}
@@ -439,23 +414,54 @@ public class BatchTaskDAO {
 			}
 		}
 	}
-	public  String findControlMonitor(String action) throws Exception{
+    
+    /** check BATCH_TASK_CONTROL 
+     *  TaskName is concurrent or no
+     *  TaskName no set default no concurrent
+     * **/
+	public  boolean canRunBatchTask(String action) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		String status = "";
 		Connection conn = null;
+		StringBuffer sql = new StringBuffer("");
+		boolean isConcurrent = false;
+		boolean canRunBatch =false;
 		try{
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from PENSBI.c_monitor where action ='"+action+"' \n");
-			
-		    logger.debug("SQL:"+sql.toString());
-		    conn = DBConnection.getInstance().getConnection();
+			conn = DBConnection.getInstance().getConnectionApps();
+			 
+			/** Step 1 Check Task is run concurrent or no */
+			sql.append(" select name,IS_CONCURRENT from PENSBI.BATCH_TASK_CONTROL where name ='"+action+"' \n");
+			logger.debug("SQL checkTaskISConcurrent:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
-				status = rs.getString("transaction_id");
+				if(Utils.isNull(rs.getString("IS_CONCURRENT")).equals("Y")){
+					isConcurrent = true;
+				}
 			}
-		
+			logger.info("TaskName:"+action+" isConcurrent:"+isConcurrent);
+			
+			/** Step 2 check control monitor run Task success */
+			/** 1) isConcurrent is true no check control monitor return true*/
+			/** 2) noConcurrent check c_monitor **/
+			if( !isConcurrent){
+				sql = new StringBuffer();
+				sql.append(" select * from PENSBI.c_monitor where action ='"+action+"' \n");
+			    logger.debug("SQL cMonitor:"+sql.toString());
+			  
+				ps = conn.prepareStatement(sql.toString());
+				rs = ps.executeQuery();
+				if(rs.next()){
+					status = rs.getString("transaction_id");
+					if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+					    canRunBatch = true;
+					}
+				}
+			}else{
+				/** Case run concurrent no check c_monitor **/
+				canRunBatch = true;
+			}
 		}catch(Exception e){
 	      throw e;
 		}finally{
@@ -469,7 +475,7 @@ public class BatchTaskDAO {
 			   conn.close();conn = null;
 			}
 		}
-		return status;
+		return canRunBatch;
 	} 
 	
 	/**
@@ -1168,7 +1174,20 @@ public class BatchTaskDAO {
 	} 
 	
 	
-	
+	public MonitorBean updateMonitor(MonitorBean model) throws Exception {
+		Connection conn = null;
+		try{
+			conn =DBConnection.getInstance().getConnectionApps();
+			model = updateMonitor(conn, model);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+		return model;
+	}
 	public MonitorBean updateMonitor(Connection conn,MonitorBean model) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;

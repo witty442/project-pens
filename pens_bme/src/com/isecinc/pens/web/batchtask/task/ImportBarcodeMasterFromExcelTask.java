@@ -33,8 +33,8 @@ import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
 import com.pens.util.meter.MonitorTime;
+import com.pens.util.seq.SequenceProcess;
 
 public class ImportBarcodeMasterFromExcelTask extends BatchTask implements BatchTaskInterface{
 	public static Logger logger = Logger.getLogger("PENS");
@@ -51,6 +51,9 @@ public class ImportBarcodeMasterFromExcelTask extends BatchTask implements Batch
 	}
 	public String getDevInfo(){
 		return "PENSBI.PENSBME_MST_REFERENCE";
+	}
+	public boolean isDispDetail(){
+		return true;
 	}
 	public List<BatchTaskListBean> getParamListBox(){
 		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();

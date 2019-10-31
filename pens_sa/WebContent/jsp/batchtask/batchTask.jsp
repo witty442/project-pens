@@ -403,7 +403,7 @@ body {
 							</tr>
 							<tr>
 								<td align="center" width ="100%">
-								      <input type="button" name ="process" value="<%=buttonName%>" class="newPosBtnLong" onClick="javascript:runBatch('${pageContext.request.contextPath}')">
+								      <input type="button" name ="process" value="<%=buttonName%>" class="newPosBtnLong" onClick="javascript:submitBatch('${pageContext.request.contextPath}')">
 								      <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')">
 								      <input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
 								</td>

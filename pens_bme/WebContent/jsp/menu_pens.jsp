@@ -506,6 +506,10 @@
 	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>');">
 	          <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>" bundle="sysprop"/></span></a>
 	        </li>
+	       <%--  <li>
+	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoOrderAction.do?do=prepareSearch&action=new');">
+	          <span><%no++;out.print(no);%>.<bean:message key="AutoOrder" bundle="sysprop"/></span></a>
+	        </li> --%>
 		</ul>
 	</li>
 <%} %>
@@ -588,8 +592,8 @@
 	       <%} %>
 	         <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 	             <li>
-		          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoSubBigCAction.do?do=prepare2&action=new');">
-		          <span><%no++;out.print(no);%>.<bean:message key="AutoSubTransBigC" bundle="sysprop"/>
+		          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoSubInAction.do?do=prepare2&action=new');">
+		          <span><%no++;out.print(no);%>.<bean:message key="AutoSubIn" bundle="sysprop"/>
 		          </span></a>
 		        </li>
 		    <%} %>
@@ -855,6 +859,12 @@
 				  <a href="#" onclick="javascript:link(false,'<%=contextPathProd%>/jsp/payWhiteAction.do?do=prepare2&action=new');">
 				  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="payWhite"/></span></a>
 				</li>
+			<%} %>
+			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.YELLOWDOC}) ){%>
+				 <li>
+				  <a href="#" onclick="javascript:link(false,'<%=contextPathProd%>/jsp/payYellowAction.do?do=prepare2&action=new');">
+				  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="PayYellow"/></span></a>
+				</li> 
 			<%} %>
 			<%if ( Utils.userInRole(user,new String[]{User.IT,User.ADMIN}) ){%>
 				<li>

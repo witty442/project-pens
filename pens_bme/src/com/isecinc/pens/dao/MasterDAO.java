@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 public class MasterDAO {
 	public static Logger logger = Logger.getLogger("PENS");

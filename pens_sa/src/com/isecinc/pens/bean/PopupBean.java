@@ -108,7 +108,10 @@ public class PopupBean implements Serializable{
 			setStatus(value);
 		}
 	}
-	
+	public PopupBean(String keyName,String value){
+	   setKeyName(keyName);
+	   setValue(value);
+	}
 	
 	public String getStatus() {
 		return status;

@@ -28,51 +28,16 @@ import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
  * @author WITTY
  *
  */
-public class BatchTaskDAO extends InterfaceUtils{
+public class BatchTaskDAO {
 
 	protected static  Logger logger = Logger.getLogger("PENS");
-	
-	public BatchTaskInfo getBatchTaskInit_BK(String taskName) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-	    BatchTaskInfo taskInfo = new BatchTaskInfo();
-		Connection conn = null;
-		try{
-			conn  = DBConnection.getInstance().getConnection();
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select param ,button_name from PENSBI.BATCHTASK_INIT where program_name='"+taskName+"' \n");
-			
-		    logger.debug("SQL:"+sql.toString());
-		    
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			
-			if(rs.next()){
-			   taskInfo.setParam(Utils.isNull(rs.getString("PARAM")));
-			   taskInfo.setButtonName(Utils.isNull(rs.getString("button_name")));
-			}
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-			if(conn != null){
-			  conn.close();conn = null;
-			}
-		}
-		return taskInfo;
-	} 
 	
 	public MonitorBean insertMonitor(Connection conn ,MonitorBean model) throws Exception {
 		boolean result = false;
@@ -420,23 +385,54 @@ public class BatchTaskDAO extends InterfaceUtils{
         }
     }
     
-	public  String findControlMonitor(String action) throws Exception{
+    
+    /** check BATCH_TASK_CONTROL 
+     *  TaskName is concurrent or no
+     *  TaskName no set default no concurrent
+     * **/
+	public  boolean canRunBatchTask(String action) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		String status = "";
 		Connection conn = null;
+		StringBuffer sql = new StringBuffer("");
+		boolean isConcurrent = false;
+		boolean canRunBatch =false;
 		try{
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from PENSBI.c_monitor where action ='"+action+"' \n");
-			
-		    logger.debug("SQL:"+sql.toString());
-		    conn = DBConnection.getInstance().getConnection();
+			conn = DBConnection.getInstance().getConnectionApps();
+			 
+			/** Step 1 Check Task is run concurrent or no */
+			sql.append(" select name,IS_CONCURRENT from PENSBI.BATCH_TASK_CONTROL where name ='"+action+"' \n");
+			logger.debug("SQL checkTaskISConcurrent:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
-				status = rs.getString("transaction_id");
+				if(Utils.isNull(rs.getString("IS_CONCURRENT")).equals("Y")){
+					isConcurrent = true;
+				}
 			}
-		
+			logger.info("TaskName:"+action+" isConcurrent:"+isConcurrent);
+			
+			/** Step 2 check control monitor run Task success */
+			/** 1) isConcurrent is true no check control monitor return true*/
+			/** 2) noConcurrent check c_monitor **/
+			if( !isConcurrent){
+				sql = new StringBuffer();
+				sql.append(" select * from PENSBI.c_monitor where action ='"+action+"' \n");
+			    logger.debug("SQL cMonitor:"+sql.toString());
+			  
+				ps = conn.prepareStatement(sql.toString());
+				rs = ps.executeQuery();
+				if(rs.next()){
+					status = rs.getString("transaction_id");
+					if(Utils.isNull(status).equals("") ||  Utils.isNull(status).equals("0")){
+					    canRunBatch = true;
+					}
+				}
+			}else{
+				/** Case run concurrent no check c_monitor **/
+				canRunBatch = true;
+			}
 		}catch(Exception e){
 	      throw e;
 		}finally{
@@ -450,7 +446,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 			   conn.close();conn = null;
 			}
 		}
-		return status;
+		return canRunBatch;
 	} 
 	
 	/**
@@ -484,75 +480,6 @@ public class BatchTaskDAO extends InterfaceUtils{
 			}
 		}
 	}
-	
-	
-
-	public  String findMonitorStatusBK(Connection conn,String id,String transaction_count) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-		String status = "";
-		try{
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select monitor_id,transaction_type,type ,status,error_code , \n (select count(*) from monitor where transaction_id ="+id+" ) as transaction_count  \n  from monitor where transaction_id ="+id+" order by monitor_id desc  \n");
-			
-			logger.debug("transaction_count:"+transaction_count);
-		    logger.debug("SQL:"+sql.toString());
-		    
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			//1) IMPORT ,1 Trans MANUAL
-			//2) EXPORT ,1 Trans MANUAL
-			//3) IMPORT ,3 Trans,NORMAL   
-			//4) EXPORT ,2 Trans NORMAL
-			if(rs.next()){
-				/** New code  */
-				/** Case Can't Connection FTP Server  Break All Check****/
-				if(Utils.isNull(rs.getString("error_code")).equals("FTPException")){ //Case FtpException Break Task ALL
-					 status = rs.getString("status");
-				}else{
-					if(Utils.isNull(rs.getString("TYPE")).equals("IMPORT")){
-						if(transaction_count.equals(1+"") ){ //IMPORT MANUAL  Transaction_count =1
-						   status = rs.getString("status");
-						}else{ //IMPORT Normal  Transaction_count =3
-							logger.debug("TransaType:"+Utils.isNull(rs.getString("transaction_type")));
-							logger.debug("STATUS:"+Utils.isNull(rs.getString("STATUS")));
-							logger.debug("TransaCount:"+rs.getString("transaction_count"));
-							
-							if(Utils.isNull(rs.getString("transaction_type")).equals(Constants.TRANSACTION_MASTER_TYPE) && 
-									Utils.isNull(rs.getString("STATUS")).equals(Constants.STATUS_FAIL+"")){
-								if(rs.getString("transaction_count").equals(2+"") ){//Update ,Master (FAIL) no run Trans = 2
-									status = rs.getString("status");
-								}
-							}else{
-								if(rs.getString("transaction_count").equals(transaction_count+"") ){//Update ,Master,Trans = 3 (ALL)
-									status = rs.getString("status");
-								}
-							}
-						}
-					}else if(Utils.isNull(rs.getString("TYPE")).equals("EXPORT")){
-						//EXPORT ,1 MANUAL
-						//EXPORT ,2 NORMAL
-						if(rs.getString("transaction_count").equals(transaction_count+"") ){//Case Success Check All Transaction
-						   status = rs.getString("status");
-						}
-					}
-				}
-				
-				/** Olde code **/
-				//status = rs.getString("status");
-			}
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-		}
-		return status;
-	} 
 	
 	public  MonitorBean findMonitorBean(BigDecimal monitorId) throws Exception{
 		PreparedStatement ps =null;
@@ -1215,14 +1142,27 @@ public class BatchTaskDAO extends InterfaceUtils{
 	} 
 	
 	
-	
+	public MonitorBean updateMonitor(MonitorBean model) throws Exception {
+		Connection conn = null;
+		try{
+			conn =DBConnection.getInstance().getConnectionApps();
+			model = updateMonitor(conn, model);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+		return model;
+	}
 	public MonitorBean updateMonitor(Connection conn,MonitorBean model) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
 
 		try {
 			String sql = "UPDATE PENSBI.monitor SET " +
-			" status = ? ,file_count =? ,error_code = ? ,error_msg =?"+
+			" status = ? ,file_count =? ,error_code = ? ,error_msg =? ,transaction_type = ? "+
 			" WHERE MONITOR_ID = ? and transaction_id =?";
 			
 			logger.debug("SQL:"+sql);
@@ -1235,6 +1175,7 @@ public class BatchTaskDAO extends InterfaceUtils{
 			ps.setInt(++index, model.getFileCount());
 			ps.setString(++index, Utils.isNull(model.getErrorCode()).length()> 300?model.getErrorCode().substring(0,299):model.getErrorCode());
 			ps.setString(++index, Utils.isNull(model.getErrorMsg()).length()> 300?model.getErrorMsg().substring(0,299):model.getErrorMsg());
+			ps.setString(++index, Utils.isNull(model.getTransactionType()));
 			ps.setBigDecimal(++index, model.getMonitorId());
 			ps.setBigDecimal(++index, model.getTransactionId());
 			
@@ -1250,7 +1191,6 @@ public class BatchTaskDAO extends InterfaceUtils{
 		}
 		return model;
 	}
-	
 	
 	public MonitorBean updateMonitorCaseError(Connection conn,MonitorBean model) throws Exception {
 		boolean result = false;
@@ -1358,98 +1298,16 @@ public class BatchTaskDAO extends InterfaceUtils{
 		return model;
 	}
 	
- /**
-  * mapFileNameLastImportToTableMap
-  * @param configMap
-  * @return
-  * @throws Exception
-  * 
-  * Store LastFileName import for Check new import 
-  */
- public  LinkedHashMap<String ,TableBean> mapFileNameLastImportToTableMap(Connection conn,LinkedHashMap<String ,TableBean> configMap,User user ,boolean importAll) throws Exception{
-	PreparedStatement ps =null;
-	ResultSet rs = null;
-	try{
-		StringBuffer sql = new StringBuffer("");
-		/** CASE MASTER *****/
-		sql.append(" select monitor_item.id, \n");
-		sql.append(" monitor_item.file_name, \n");
-		sql.append(" monitor_item.table_name  \n");
-		sql.append(" from monitor_item \n");
-		sql.append(" inner join   \n");
-		sql.append("   ( select max(monitor_item.id) as id,monitor_item.table_name from monitor ,monitor_item \n");
-		sql.append("    where monitor.status <> "+Constants.STATUS_FAIL+" \n");
-		sql.append("    and monitor_item.status <> "+Constants.STATUS_FAIL+" \n");
-		sql.append("    and monitor.monitor_id = monitor_item.monitor_id \n");
-		sql.append("    and monitor.type ='"+Constants.TYPE_IMPORT+"' \n");
-		sql.append("    and monitor.create_user Like '%"+user.getUserName()+"%' \n");
-		sql.append("    and monitor.transaction_type ='"+Constants.TRANSACTION_MASTER_TYPE+"' \n");
-		if(importAll){
-		   sql.append("      and monitor_item.file_name Like '%-ALL%' \n");
-		}else{
-		   sql.append("      and monitor_item.file_name not Like '%-ALL%' \n");	
+	public  static String getStatDesc(int status){
+		String statusDesc ="";
+		if(Constants.STATUS_START==status){
+			statusDesc = "Start";
+		}else 	if(Constants.STATUS_SUCCESS==status){
+			statusDesc = "SUCCESS";
+		}else 	if(Constants.STATUS_FAIL==status){
+			statusDesc = "FAIL";
 		}
-		sql.append("        group by monitor_item.table_name \n");
-		sql.append("        ) s  \n");
-		sql.append(" ON s.id = monitor_item.id and s.table_name = monitor_item.table_name \n");
-		
-		sql.append(" union all \n");
-		
-		/** CASE TRANSACTION AND UPDATE-TRANS-SALES   Check Status Only in monitor_item *****/
-		sql.append(" select monitor_item.id, \n");
-		sql.append(" monitor_item.file_name, \n");
-		sql.append(" monitor_item.table_name  \n");
-		sql.append(" from monitor_item \n");
-		sql.append(" inner join   \n");
-		sql.append("  ( select max(monitor_item.id) as id,monitor_item.table_name from monitor ,monitor_item \n");
-		sql.append("    where 1=1 \n"); 
-		sql.append("    and monitor_item.status <> "+Constants.STATUS_FAIL+" \n");
-		sql.append("    and monitor.monitor_id = monitor_item.monitor_id \n");
-		sql.append("    and monitor.type ='"+Constants.TYPE_IMPORT+"' \n");
-		sql.append("    and monitor.create_user Like '%"+user.getUserName()+"%' \n");
-		sql.append("    and monitor.transaction_type in('"+Constants.TRANSACTION_UTS_TRANS_TYPE+"','"+Constants.TRANSACTION_TRANS_TYPE+"','"+Constants.TRANSACTION_WEB_MEMBER_TYPE+"') \n");
-		if(importAll){
-		   sql.append("     and monitor_item.file_name Like '%-ALL%' \n");
-		}else{
-		   sql.append("     and monitor_item.file_name not Like '%-ALL%' \n");	
-		}
-		sql.append("        group by monitor_item.table_name \n");
-		sql.append("  ) s  \n");
-		sql.append(" ON s.id = monitor_item.id and s.table_name = monitor_item.table_name \n");
-		
-	    logger.debug("SQL:"+sql);
-	    
-		ps = conn.prepareStatement(sql.toString());
-		rs = ps.executeQuery();
-		
-		while(rs.next()){
-			String tableName = rs.getString("TABLE_NAME");
-			
-			Set s = configMap.keySet();
-			Iterator it = s.iterator();
-			for (int j = 1; it.hasNext(); j++) {
-				String tableNameMap = (String) it.next();
-				TableBean tableBean = (TableBean) configMap.get(tableNameMap);
-				if(tableName.equalsIgnoreCase(tableNameMap)){
-				   tableBean.setFileNameLastImport(rs.getString("file_name"));	
-				   configMap.put(tableName, tableBean);
-				   break;
-				}
-			}
-		}//end while
-		
-	}catch(Exception e){
-      throw e;
-	}finally{
-		if(ps != null){
-		   ps.close();ps = null;
-		}
-		if(rs != null){
-		   rs.close();rs = null;
-		}
+		return statusDesc;
 	}
-	return configMap;
-} 
 
- 
 }

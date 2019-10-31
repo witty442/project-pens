@@ -24,6 +24,12 @@ public abstract class BatchTaskWorker extends Thread {
 		BatchTaskDAO dao = new BatchTaskDAO();
 		dao.updateControlMonitor(transactionId,taskName);
 	}
+	public void startTaskStatusCaseFail(String taskName,BigDecimal transactionId,BigDecimal monitorId) {
+		logger.info("startTaskStatus transactionId["+transactionId+"]monitorId["+monitorId+"]");
+		//control unique task
+		BatchTaskDAO dao = new BatchTaskDAO();
+		dao.updateControlMonitor(transactionId,taskName);
+	}
 	
 	public void endTaskStatus(String taskName,BigDecimal transactionId,BigDecimal monitorId) {
 		logger.info("endTaskStatus transactionId["+transactionId+"]monitorId["+monitorId+"]");
@@ -35,6 +41,10 @@ public abstract class BatchTaskWorker extends Thread {
 		
 		/** Stamp Monitor Task Sales**/
 		//MonitorSales.monitorSales(transactionId);
+	}
+	public void endTaskStatusCaseFail(String taskName,BigDecimal transactionId,BigDecimal monitorId) {
+		logger.info("endTaskStatus transactionId["+transactionId+"]monitorId["+monitorId+"]");
+		updateTaskStatus(transactionId,monitorId,"1");//finish BatchTask = 1	
 	}
 	
     public void updateTaskStatus(BigDecimal transactionId,BigDecimal monitorId,String status) {

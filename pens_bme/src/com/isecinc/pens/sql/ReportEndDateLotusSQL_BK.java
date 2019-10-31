@@ -14,6 +14,7 @@ import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class ReportEndDateLotusSQL_BK {
@@ -108,7 +109,7 @@ public class ReportEndDateLotusSQL_BK {
 						//sql.append(genWhereCondDateMonthEnd(control,"V.invoice_date"));
 						
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n\t\t AND C.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n\t\t AND C.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n\t\t AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
@@ -136,7 +137,7 @@ public class ReportEndDateLotusSQL_BK {
 						//sql.append(genWhereCondDateMonthEnd(control,"J.close_date"));
 						
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n\t\t AND J.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						    sql.append("\n\t\t AND J.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n\t\t AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
@@ -159,7 +160,7 @@ public class ReportEndDateLotusSQL_BK {
 				  // sql.append(genWhereCondDateMonthEnd(control,"L.sales_date"));
 						
 				   if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					 sql.append("\n\t\t AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					 sql.append("\n\t\t AND L.PENS_CUST_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				   }
 				   if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					 sql.append("\n\t\t AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
@@ -180,7 +181,7 @@ public class ReportEndDateLotusSQL_BK {
 				  //NOT IN pensbme_group_unuse_lotus
 				   sql.append("\n\t\t AND L.group_code NOT IN(select group_code from pensbme_group_unuse_lotus)");
 				   if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					 sql.append("\n\t\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					 sql.append("\n\t\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				   }
 				   if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					 sql.append("\n\t\t AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
@@ -202,7 +203,7 @@ public class ReportEndDateLotusSQL_BK {
 					sql.append("\n\t AND L.ENDING_DATE  = to_date('"+control.getStartDate()+"','dd/mm/yyyy')  ");
 					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n\t AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
@@ -229,7 +230,7 @@ public class ReportEndDateLotusSQL_BK {
 				sql.append(genWhereCondDate(control,"L.sales_date"));
 				  
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					sql.append("\n\t AND L.PENS_CUST_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					sql.append("\n\t AND L.PENS_CUST_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				}
 				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n\t AND L.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
@@ -268,7 +269,7 @@ public class ReportEndDateLotusSQL_BK {
 					sql.append(genWhereCondDate(control,"V.invoice_date"));
 					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					    sql.append("\n\t\t AND C.customer_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					    sql.append("\n\t\t AND C.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n\t\t AND P.inventory_item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
@@ -302,7 +303,7 @@ public class ReportEndDateLotusSQL_BK {
 					sql.append(genWhereCondDate(control,"J.close_date"));
 					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					    sql.append("\n\t AND J.store_code IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					    sql.append("\n\t AND J.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 						sql.append("\n\t AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
@@ -330,7 +331,7 @@ public class ReportEndDateLotusSQL_BK {
 				 	// L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
 				 	sql.append(genWhereCondDate(control,"L.transaction_date"));
 				 	if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-				 		sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+				 		sql.append("\n\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				 	}
 				 	if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 				 		sql.append("\n\t AND L.item_issue >='"+Utils.isNull(c.getPensItemFrom())+"' ");
@@ -360,7 +361,7 @@ public class ReportEndDateLotusSQL_BK {
 				  sql.append(genWhereCondDate(control,"L.transaction_date"));
 				  
 				  if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					sql.append("\n\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				  }
 				  if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n\t AND L.item_receipt >='"+Utils.isNull(c.getPensItemFrom())+"' ");
@@ -388,7 +389,7 @@ public class ReportEndDateLotusSQL_BK {
 				  sql.append(genWhereCondDate(control,"L.transaction_date"));
 				  
 				  if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-					  sql.append("\n\t AND L.STORE_CODE IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					  sql.append("\n\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				  }
 				  if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n\t AND L.item_adjust >='"+Utils.isNull(c.getPensItemFrom())+"' ");

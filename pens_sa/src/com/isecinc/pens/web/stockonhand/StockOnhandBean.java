@@ -63,7 +63,93 @@ public class StockOnhandBean implements Comparable<StockOnhandBean> ,Serializabl
 	private String stockCoverageDay;
 	private String stockCoverageDayByBrand;
 	
+	// PreOrderNissin
+	private String beginQty;
+	private String wipQty;
+	private String totalQty;
+	private String salesAvg;
+	private String foreCastQty;
+	private String salesQty;
+	private String endMonthQty;
+	private String targetQty;
+	private String bufferPercent;
+	private String bufferQty;
+	private String preOrderQty;
+	private String status;
 	
+	
+	public String getSalesQty() {
+		return salesQty;
+	}
+	public void setSalesQty(String salesQty) {
+		this.salesQty = salesQty;
+	}
+	public String getBeginQty() {
+		return beginQty;
+	}
+	public void setBeginQty(String beginQty) {
+		this.beginQty = beginQty;
+	}
+	public String getWipQty() {
+		return wipQty;
+	}
+	public void setWipQty(String wipQty) {
+		this.wipQty = wipQty;
+	}
+	public String getTotalQty() {
+		return totalQty;
+	}
+	public void setTotalQty(String totalQty) {
+		this.totalQty = totalQty;
+	}
+	public String getSalesAvg() {
+		return salesAvg;
+	}
+	public void setSalesAvg(String salesAvg) {
+		this.salesAvg = salesAvg;
+	}
+	public String getForeCastQty() {
+		return foreCastQty;
+	}
+	public void setForeCastQty(String foreCastQty) {
+		this.foreCastQty = foreCastQty;
+	}
+	public String getEndMonthQty() {
+		return endMonthQty;
+	}
+	public void setEndMonthQty(String endMonthQty) {
+		this.endMonthQty = endMonthQty;
+	}
+	public String getTargetQty() {
+		return targetQty;
+	}
+	public void setTargetQty(String targetQty) {
+		this.targetQty = targetQty;
+	}
+	public String getBufferPercent() {
+		return bufferPercent;
+	}
+	public void setBufferPercent(String bufferPercent) {
+		this.bufferPercent = bufferPercent;
+	}
+	public String getBufferQty() {
+		return bufferQty;
+	}
+	public void setBufferQty(String bufferQty) {
+		this.bufferQty = bufferQty;
+	}
+	public String getPreOrderQty() {
+		return preOrderQty;
+	}
+	public void setPreOrderQty(String preOrderQty) {
+		this.preOrderQty = preOrderQty;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	public String getDescription() {
 		return description;
 	}

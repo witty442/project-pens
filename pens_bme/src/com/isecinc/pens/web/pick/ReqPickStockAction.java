@@ -90,6 +90,13 @@ public class ReqPickStockAction extends I_Action {
 				custGroupList.addAll(GeneralDAO.searchCustGroupByWareHouse(new PopupForm(),wareHouse)); 
 				request.getSession().setAttribute("custGroupList",custGroupList);
 				
+				//forwarder
+			    List<PopupForm> forwarderList = new ArrayList<PopupForm>();
+			    PopupForm refP = new PopupForm("",""); 
+			    forwarderList.add(refP);
+			    forwarderList.addAll(GeneralDAO.searchForwarderList( new PopupForm()));
+			    request.getSession().setAttribute("forwarderList",forwarderList);
+			    
 			}else if("back".equals(action)){
 				//Clear Session data
 				request.getSession().setAttribute("results", null);

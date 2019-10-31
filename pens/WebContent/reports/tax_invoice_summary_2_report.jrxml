@@ -49,7 +49,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="SansSerif" size="6" isBold="false"/>
 				</textElement>
-				<text><![CDATA[662/19-20 ถนนพระราม 3 แขวงบางโพงพาง เขตยานนาวา กรุงเทพฯ 10120
+				<text><![CDATA[662/18-20 ถนนพระราม 3 แขวงบางโพงพาง เขตยานนาวา กรุงเทพฯ 10120
  โทร. 0-2294-7300 โทรสาร. 0-2294-7560 สำนักงานใหญ่]]></text>
 			</staticText>
 			<textField pattern="">

@@ -524,7 +524,7 @@ function setProductMainValue(seqNo,types,code,desc,price){
 											    <input type="text" name="groupCode" id="groupCode" value ="${results.groupCode}" size="15" 
 											    onkeypress="getProductKeypress(event,'issue',this,${results.seqNo})"
 											    onchange="getProductModel('issue',this,${results.seqNo})"
-											    />
+											    autocomplete="off" />
 											     <%-- <input  tabindex="-1" type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}',${results.seqNo},'groupCode')"
 											     class="enableNumber"/> --%>
 										   </c:if>
@@ -539,7 +539,7 @@ function setProductMainValue(seqNo,types,code,desc,price){
 										<td class="td_text_center"  width="10%">
 											<c:if test="${results.canEdit == true}">
 											    <input type="text" name="itemAdjustQty" id="itemAdjustQty" value ="${results.itemAdjustQty}" size="8" onblur="isNum(this);sumTotalQty()" 
-											    class="enableNumber" />
+											    class="enableNumber" autocomplete="off"/>
 											</c:if>
 											<c:if test="${results.canEdit == false}">
 											   <input type="text" name="itemAdjustQty" id="itemAdjustQty" value ="${results.itemAdjustQty}" size="8" readonly class="disableNumber"/>

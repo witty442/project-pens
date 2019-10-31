@@ -16,7 +16,23 @@ if(batchTaskForm.getMonitorItem() != null){
 	 List<MonitorItemResultBean> successList = batchTaskForm.getMonitorItem().getSuccessList();
 	 List<MonitorItemResultBean> failList = batchTaskForm.getMonitorItem().getFailList();
 %>
-
+   <%
+   /** case no insert result because data too many show successCount ,failCount from monitor */
+   if( (failList==null ||(failList != null && failList.size()==0) )
+		   && (successList==null || (successList != null && successList.size()==0))){
+   %>
+   <p></p>
+	<table align="center" border="0" cellpadding="3" cellspacing="1" >
+	<tr>
+	  <th ><font color="#921F06">จำนวน Row ที่ไม่สามารถ Import ได้   ${batchTaskForm.monitorItem.failCount} Row </font></th>
+	</tr>
+	<tr>
+	  <th >จำนวน Row ที่สามารถ Import ได้   ${batchTaskForm.monitorItem.successCount} Row </th>
+	</tr>
+	</table>
+   <%} %>
+   <!-------------------------------------------------------------->
+   
 	<%if(failList != null && failList.size() >0){
 		//Gen Column Head Table
 	  if( !Utils.isNull(columnHeadStrArr).equals("")){

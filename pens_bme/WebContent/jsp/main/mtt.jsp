@@ -64,6 +64,9 @@ function printReport(path){
 
 function cancel(path){
 	if(confirm("กรุณายืนยัน การลบข้อมูลขายทั้งเอกสาร")){
+		/**  Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		var form = document.mttForm;
 		form.action = path + "/jsp/mttAction.do?do=cancel";
 		form.submit();
@@ -103,6 +106,8 @@ function save(path){
 		alert("กรุณากรอก รหัสร้านค้า ");
 		return false;
 	}
+	/**  Control Save Lock Screen **/
+	startControlSaveLockScreen();
 	
 	form.action = path + "/jsp/mttAction.do?do=save";
 	form.submit();
@@ -242,8 +247,8 @@ function addRow(){
 	    "<td class='data_barcode'> <input type='text' name='barcode' size='30'  "+
 	    " onkeypress='getProductKeypress(event,this,"+lineId+")' "+
 	  //  " onchange='getProductModel(this,"+lineId+")' "+
-	    " />  </td>"+
-	    "<td class='data_materialMaster'> <input type='text' tabindex ='-1' name='materialMaster' size='25' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
+	    " autocomplete='off'/>  </td>"+
+	    "<td class='data_materialMaster'> <input type='text' tabindex ='-1' autocomplete='off' name='materialMaster' size='25' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
 	    "<td class='data_groupCode'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+
 	    "<td class='data_pensItem'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableText' size='20' /></td>"+
 	    
@@ -567,7 +572,8 @@ function getProductModelByMat(matObj,lineId){
 									<td >รหัสร้านค้า<font color="red">*</font>
 									</td>
 									<td align="left"> 
-									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									  <html:text property="bean.storeCode" styleId="storeCode" size="20"  styleClass="\" autoComplete=\"off" 
+									  onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 									
@@ -578,7 +584,7 @@ function getProductModelByMat(matObj,lineId){
 								<tr>
                                     <td> หมายเหตุ<font color="red"></font></td>
 									<td>		
-										  <html:text property="bean.remark" styleId="remark" size="40"/>
+										  <html:text property="bean.remark" styleId="remark" size="40" styleClass="\" autoComplete=\"off"/>
 									</td>
 								</tr>
 						   </table>
@@ -729,3 +735,6 @@ function getProductModelByMat(matObj,lineId){
 </table>
 </body>
 </html>
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

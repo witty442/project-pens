@@ -18,6 +18,7 @@ import com.isecinc.pens.bean.MCBean;
 import com.isecinc.pens.bean.MCEmpBean;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.DBConnection;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class MCDAO {
@@ -345,7 +346,7 @@ public class MCDAO {
 				   sql.append("\n AND E.status ='A'");
 				   
 				   if( !Utils.isNull(o.getEmpId()).equals("") && !Utils.isNull(o.getEmpId()).equalsIgnoreCase("ALL")){
-						String sqlIn = Utils.converToTextSqlIn(Utils.isNull(o.getEmpId()));
+						String sqlIn = SQLHelper.converToTextSqlIn(Utils.isNull(o.getEmpId()));
 						sql.append("\n and E.employee_id in( "+sqlIn+")");
 					}
 					if( !Utils.isNull(o.getMcArea()).equals("")){
@@ -379,7 +380,7 @@ public class MCDAO {
 				   
 				   sql.append("\n AND E.status ='A'");
 				   if( !Utils.isNull(o.getEmpId()).equals("") && !Utils.isNull(o.getEmpId()).equalsIgnoreCase("ALL")){
-						String sqlIn = Utils.converToTextSqlIn(Utils.isNull(o.getEmpId()));
+						String sqlIn = SQLHelper.converToTextSqlIn(Utils.isNull(o.getEmpId()));
 						sql.append("\n and E.employee_id in( "+sqlIn+")");
 					}
 					if( !Utils.isNull(o.getMcArea()).equals("")){

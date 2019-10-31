@@ -30,36 +30,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
@@ -110,6 +90,8 @@ function save(path){
 		$('#jobName').focus();
 		return false;
 	}
+	/**  Control Save Lock Screen **/
+	startControlSaveLockScreen();
 	
 	form.action = path + "/jsp/genCNAction.do?do=save";
 	form.submit();
@@ -178,7 +160,8 @@ function isNum(obj){
 							   <c:if test="${genCNForm.results == null}">
 							    <tr>
                                     <td align="right"> อ้างอิงเลขที่ CN <font color="red">*</font>
-                                       	<html:text property="bean.cnNo" styleId="cnNo" size="20" onkeypress="searchKeypress('${pageContext.request.contextPath}',event)" />
+                                       	<html:text property="bean.cnNo" styleId="cnNo" size="20" styleClass="\" autoComplete=\"off" 
+                                       	onkeypress="searchKeypress('${pageContext.request.contextPath}',event)" />
                                      </td>
 									<td align="left">
 									     <a href="javascript:search('${pageContext.request.contextPath}')">
@@ -330,3 +313,5 @@ function isNum(obj){
 </table>
 </body>
 </html>
+  <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>

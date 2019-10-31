@@ -86,11 +86,15 @@ PageVisit.processPageVisit(request, pageName);
 						       <jsp:include page="criteria/stockOnhandCriteria.jsp" flush="true"/> 
 					        <%}else if(StockOnhandAction.PAGE_STOCK_CV.equalsIgnoreCase(pageName)) {%>  
 						       <jsp:include page="criteria/stockCVCriteria.jsp" flush="true"/> 
+					        <%}else if(StockOnhandAction.PAGE_PREODER_NISSIN.equalsIgnoreCase(pageName)) {%>  
+						       <jsp:include page="criteria/preOrderNissinCriteria.jsp" flush="true"/> 
 					        <%} %>
 					        
 					 	    <!-- Result -->
 					 	    <%if(StockOnhandAction.PAGE_STOCK_VAN.equalsIgnoreCase(pageName)) {%>
 					 	        <jsp:include page="result/stockVanResult.jsp" flush="true"/>  
+					 	    <%}else if(StockOnhandAction.PAGE_PREODER_NISSIN.equalsIgnoreCase(pageName)) {%>
+					 	         <jsp:include page="result/preOrderNissinResult.jsp" flush="true"/>  
 					 	    <%}else if(StockOnhandAction.PAGE_STOCK_OH.equalsIgnoreCase(pageName)
 					 	    		|| StockOnhandAction.PAGE_STOCK_CV.equalsIgnoreCase(pageName)){   
 					 	          if(request.getAttribute("stockOnhandForm_RESULT") != null){
@@ -102,7 +106,8 @@ PageVisit.processPageVisit(request, pageName);
 					 	
 					 	<!-- INPUT HIDDEN -->
 					 	<input type="hidden" name="pageName" value="<%=pageName %>"/>
-					 	
+					 	<input type="hidden" name="path" id ="path" value="${pageContext.request.contextPath}"/>
+					 
 					</html:form>
 					<!-- BODY -->
 					</td>

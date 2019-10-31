@@ -9,4 +9,5 @@ public interface BatchTaskInterface {
   public String getValidateScript();
   public MonitorBean run(MonitorBean model);
   public String getDevInfo();
+  public boolean isDispDetail();
 }

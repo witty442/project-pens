@@ -448,8 +448,17 @@ public class ReportUtilServlet extends HttpServlet {
 			
 			/** Set property printer and Report **/
 			HashMap fontMap = new HashMap();
-			
-			if("pay_in_report".equalsIgnoreCase(fileName) || "pay_in_white_report".equalsIgnoreCase(fileName)){
+			/*FontKey key = new FontKey("Angsana New", false, false);
+			PdfFont font = new PdfFont("fonts/ANGSAU.TTF", BaseFont.IDENTITY_H, true);
+			fontMap.put(key, font);
+	
+			FontKey key2 = new FontKey("Angsana New", true, false);
+			PdfFont font2 = new  PFont("fonts/ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
+			fontMap.put(key2, font2);*/
+						
+			if("pay_in_report".equalsIgnoreCase(fileName) 
+				|| "pay_in_white_report".equalsIgnoreCase(fileName)
+				|| "pay_in_yellow_report".equalsIgnoreCase(fileName)){
 		
 				String printerPayInName = user.getPrinterName();//"HP LaserJet Professional P1606dn";
 				

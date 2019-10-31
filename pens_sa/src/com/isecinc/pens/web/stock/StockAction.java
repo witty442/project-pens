@@ -39,6 +39,7 @@ import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SalesrepDAO;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
 import com.lowagie.text.pdf.BaseFont;
 import com.pens.util.BeanParameter;
 import com.pens.util.CConstants;
@@ -418,9 +419,13 @@ public class StockAction extends I_Action {
      
 		File rptFile = null;
 		fileName = fileName + ".pdf";
-		String pathFileNameTemp = BeanParameter.getTempPath()+"\\"+ fileNameExport;
+		String pathFileNameTemp = "";//BeanParameter.getTempPath()+"\\"+ fileNameExport;
 		try {
-			logger.debug("temps real temp path :"+pathFileNameTemp);
+			//get RootTempPath
+			String rootPathTemp = FileUtil.getRootPathTemp(EnvProperties.getInstance());
+			pathFileNameTemp = rootPathTemp+fileNameExport;
+			
+			logger.debug("temp path :"+pathFileNameTemp);
 			
 			rptFile = new File(fileJasper + ".jasper");
 			JRDataSource jrDataSource = new JRBeanCollectionDataSource(lstData);
@@ -476,8 +481,10 @@ public class StockAction extends I_Action {
 		String popup = "";
 		String forward = "stockVanReport";
 		String fileNameExport = "";
-		String pathFileNameTemp = BeanParameter.getTempPath()+"\\";
+		String pathFileNameTemp = "";
 		try {
+			//get RootTempPath
+			String rootPathTemp = FileUtil.getRootPathTemp(EnvProperties.getInstance());
 			
 			action = Utils.isNull(request.getParameter("action"));
 			popup = Utils.isNull(request.getParameter("popup"));
@@ -487,7 +494,7 @@ public class StockAction extends I_Action {
 			/** load pdf to screen from temp file **/
 			 if (StockConstants.PAGE_STOCK_CLOSE_VAN.equalsIgnoreCase(pageName)){
 				 fileNameExport = "stock_close_van_"+user.getUserName()+".pdf";
-				 pathFileNameTemp = BeanParameter.getTempPath()+"\\"+"stock_close_van_"+user.getUserName()+".pdf";
+				 pathFileNameTemp = rootPathTemp+"stock_close_van_"+user.getUserName()+".pdf";
 				 logger.debug("pathFileNameTemp:"+pathFileNameTemp);
 				 
 				//read file from temp file
@@ -504,7 +511,7 @@ public class StockAction extends I_Action {
 				/** load pdf to screen from temp file **/
 			 }else  if (StockConstants.PAGE_STOCK_CLOSEPD_VAN.equalsIgnoreCase(pageName)){
 				 fileNameExport = "stock_closepd_van_"+user.getUserName()+".pdf";
-				 pathFileNameTemp = BeanParameter.getTempPath()+"\\"+"stock_closepd_van_"+user.getUserName()+".pdf";
+				 pathFileNameTemp = rootPathTemp+"stock_closepd_van_"+user.getUserName()+".pdf";
 				 logger.debug("pathFileNameTemp:"+pathFileNameTemp);
 				 
 				//read file from temp file

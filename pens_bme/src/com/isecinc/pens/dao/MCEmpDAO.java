@@ -13,7 +13,7 @@ import com.isecinc.pens.bean.MCEmpBean;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 public class MCEmpDAO {
 

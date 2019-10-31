@@ -7,6 +7,7 @@
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
 <%
@@ -67,18 +68,21 @@ function clearForm(path){
 function importExcel(path){
 	var form = document.b2bForm;
 	if(validate()){
-		form.action = path + "/jsp/b2bAction.do?do=importExcel";
-		form.submit();
+		if(confirm("ยืนยันทำรายการ")){
+		  form.action = path + "/jsp/b2bAction.do?do=importExcel";
+		  form.submit();
+		}
 	}
 	return false;
 }
 
 function exportExcel(path){
 	var form = document.b2bForm;
-	
-	form.action = path + "/jsp/b2bAction.do?do=exportExcel";
-	form.submit();
-	return true;
+	if(confirm("ยืนยันทำรายการ")){
+		form.action = path + "/jsp/b2bAction.do?do=exportExcel";
+		form.submit();
+		return true;
+	}
 }
 function searchBatch(path){
 	//unlockScreen
@@ -164,12 +168,15 @@ function validate(){
 	       <td> Import Excel to Oracle Temp and Call Procedure and Export </td>
 	    </tr>
 		 <tr bgcolor="#FFFFFF">
-		     <td> Table Ralate</td>
-		     <td> IMPORT TO (APPS.XXPENS_OM_PUSH_ORDER_ITEM,APPS.XXPENS_OM_PUSH_ORDER_TEMP) 
-		     <br/> Export To Excel
-		     <br/> step1)call apps.xxpens_om_push_order_pkg.b2b();
-		     <br/> step2) Export sheet_data 1:apps.xxpens_om_push_order_vl 
-		     <br/>,apps.sheet_PO_UPLOAD2:xxpens_om_push_order_v1
+		     <td> Action</td>
+		     <td> <b>Import EXCEL</b>
+		     <br/>  1)B2B_ITEM :APPS.XXPENS_OM_PUSH_ORDER_ITEM
+		     <br/>  2)SALES_BY_ITEM: APPS.XXPENS_OM_PUSH_ORDER_TEMP
+		     <br/> <b>Export EXCEL</b>
+		     <br/>  1) call apps.xxpens_om_push_order_pkg.b2b();
+		     <br/>  2) Export sheet_data 
+		     <br/>    2.1)sheet DATA : apps.xxpens_om_push_order_vl 
+		     <br/>    2.2)sheet_PO_UPLOAD2: apps.xxpens_om_push_order_v1
 		     </td>
 		  </tr>
 	  </table>

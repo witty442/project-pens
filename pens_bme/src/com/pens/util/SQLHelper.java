@@ -147,11 +147,28 @@ public class SQLHelper {
 	
 	
 	public static String excUpdate(String sql) {
-	    PreparedStatement ps =null;
-        Connection conn = null;
-        StringBuffer str = new StringBuffer("");
+		Connection conn = null;
+		try{
+		    conn = DBConnection.getInstance().getConnection();
+		    return excUpdate(conn, sql);
+		}catch(Exception e){
+		      e.printStackTrace();
+			}finally{
+				try{
+					if(conn != null){
+						conn.close();
+					}
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		return "";
+	}
+	
+	public static String excUpdate(Connection conn,String sql) {
+	   PreparedStatement ps =null;
+       StringBuffer str = new StringBuffer("");
 		try{  
-			conn = DBConnection.getInstance().getConnection();
 			String[] sqlArr = sql.split("\\;");
 			if(sqlArr != null && sqlArr.length>0){
 			   for(int i=0;i<sqlArr.length;i++){
@@ -172,15 +189,12 @@ public class SQLHelper {
 				if(ps != null){
 				   ps.close();ps = null;
 				}
-				if(conn != null){
-					conn.close();
-				}
 			}catch(Exception e){
-				logger.error(e.getMessage(),e);
+				e.printStackTrace();
 			}
 		}
 		return str.toString();
-  }
+ }
 	
 	public static int excUpdateOneSql(Connection conn,String sqlOne) {
 	    PreparedStatement ps =null;
@@ -213,4 +227,15 @@ public class SQLHelper {
 			return StringUtils.join(valuesText, ","); 
 		}
 	   
+	 public static String converToTextSqlIn(String value){
+			
+			List<String> valuesText = new ArrayList<String>() ;
+			String[] values = value.split("[,]");
+			
+			for(String text : values){
+				valuesText.add("'"+text+"'");
+			}
+			
+			return StringUtils.join(valuesText, ","); 
+		}
 }

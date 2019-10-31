@@ -200,12 +200,29 @@ public class SQLHelper {
 		return str.toString();
  }
 	
-	public static String excUpdate(String sql) {
-	    PreparedStatement ps =null;
-       Connection conn = null;
+  public static String excUpdate(String sql) {
+		Connection conn = null;
+		try{
+		    conn = DBConnection.getInstance().getConnection();
+		    return excUpdate(conn, sql);
+		}catch(Exception e){
+		      e.printStackTrace();
+			}finally{
+				try{
+					if(conn != null){
+						conn.close();
+					}
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+		return "";
+	}
+	
+	public static String excUpdate(Connection conn,String sql) {
+	   PreparedStatement ps =null;
        StringBuffer str = new StringBuffer("");
 		try{  
-			conn = DBConnection.getInstance().getConnection();
 			String[] sqlArr = sql.split("\\;");
 			if(sqlArr != null && sqlArr.length>0){
 			   for(int i=0;i<sqlArr.length;i++){
@@ -226,14 +243,10 @@ public class SQLHelper {
 				if(ps != null){
 				   ps.close();ps = null;
 				}
-				if(conn != null){
-					conn.close();
-				}
 			}catch(Exception e){
 				e.printStackTrace();
 			}
 		}
 		return str.toString();
  }
-	
 }

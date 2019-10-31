@@ -77,8 +77,22 @@ public class OnhandSummary implements  Comparable<OnhandSummary>, Serializable{
     private List<OnhandSummary> subList;
     private double totalQtyByCust = 0;
 	private double totalAmountByCust = 0;
-	
+	private String stockIssueQty;
+	private String stockReceiptQty;
     
+	
+	public String getStockIssueQty() {
+		return stockIssueQty;
+	}
+	public void setStockIssueQty(String stockIssueQty) {
+		this.stockIssueQty = stockIssueQty;
+	}
+	public String getStockReceiptQty() {
+		return stockReceiptQty;
+	}
+	public void setStockReceiptQty(String stockReceiptQty) {
+		this.stockReceiptQty = stockReceiptQty;
+	}
 	public List<OnhandSummary> getErrorList() {
 		return errorList;
 	}

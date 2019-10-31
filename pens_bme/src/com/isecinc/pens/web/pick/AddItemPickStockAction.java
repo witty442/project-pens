@@ -61,6 +61,7 @@ public class AddItemPickStockAction extends I_Action {
             String groupCode = Utils.isNull(request.getParameter("groupCode"));
             String pensItem = Utils.isNull(request.getParameter("pensItem"));
             String wareHouse = Utils.isNull(request.getParameter("wareHouse"));
+            String forwarder = Utils.isNull(request.getParameter("forwarder"));
             
             int index = Utils.convertStrToInt(Utils.isNull(request.getParameter("index")));//Row of Qty
              
@@ -75,6 +76,7 @@ public class AddItemPickStockAction extends I_Action {
             logger.debug("storeNo :"+storeNo);
             logger.debug("remark :"+remark);
             logger.debug("wareHouse :"+wareHouse);
+            logger.debug("forwarder :"+forwarder);
             
 			if( !"".equals(issueReqNo)){
 				logger.debug("prepare edit issueReqNo:"+issueReqNo);
@@ -131,6 +133,7 @@ public class AddItemPickStockAction extends I_Action {
 				p.setModeEdit(true);
 				p.setRowIndex(index+"");
 				p.setWareHouse(wareHouse);
+				p.setForwarder(forwarder);
 				
 				//search by page 
 				ReqPickStock pGroupCodeItems = ReqPickStockDAO.getItemInStockListByGroupCode(conn, p,itemsBarcodeMap);

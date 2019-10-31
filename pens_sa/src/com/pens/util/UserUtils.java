@@ -14,7 +14,8 @@ public class UserUtils {
 		String userRoles[] = null;
 		String userRole = "";
 		/** case Admin All Pass **/
-		if(user.getUserName().equalsIgnoreCase("admin")){
+		if(user.getUserName().equalsIgnoreCase("admin") 
+			|| user.getUserName().equalsIgnoreCase("DEV")	){
 			return true;
 		}
 		for(int i=0;i<roles.length;i++){
@@ -42,6 +43,8 @@ public class UserUtils {
             	userRoleTemp = Utils.isNull(user.getRoleCoverage()).toLowerCase().trim();
             }else if("ROLE_B2B".equalsIgnoreCase(roleType)){
             	userRoleTemp = Utils.isNull(user.getRoleB2B()).toLowerCase().trim();
+            }else if("ROLE_MKT".equalsIgnoreCase(roleType)){
+            	userRoleTemp = Utils.isNull(user.getRoleMkt()).toLowerCase().trim();
             }
             
             userRoles = userRoleTemp.split("\\|");

@@ -27,6 +27,7 @@ import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class GeneralDAO {
@@ -924,7 +925,52 @@ public class GeneralDAO {
 		}
 		return pos;
 	}
-	 
+	 public static List<PopupForm> searchForwarderList(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.delete(0, sql.length());
+				sql.append("\n select pens_value,pens_desc ");
+				sql.append("\n FROM PENSBI.PENSBME_MST_REFERENCE WHERE reference_code = 'Forwarder' ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append(" and pens_value LIKE '%"+c.getCodeSearch()+"%' \n");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append(" and pens_value LIKE '%"+c.getDescSearch()+"%' \n");
+				}
+				sql.append("\n  ORDER BY pens_value asc \n");
+				
+				logger.debug("sql:"+sql);
+				
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("pens_value"));
+					item.setDesc(rst.getString("pens_desc"));
+					
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
 	 public static List<PopupForm> searchCustGroupByWareHouse(PopupForm c,String wareHouse) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
@@ -1462,11 +1508,9 @@ public class GeneralDAO {
 			Connection conn = null;
 			try {
 				conn = DBConnection.getInstance().getConnection();
-				sql.delete(0, sql.length());
-				sql.append("\n select *   ");
-				sql.append("\n FROM PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Customer' ");
+				sql.append("\n select * FROM PENSBI.PENSBME_MST_REFERENCE WHERE reference_code = 'Customer' ");
 				if( !Utils.isNull(custGroup).equals("")){
-				  sql.append("\n AND pens_value ='"+custGroup+"' \n");
+				  sql.append("\n AND pens_value in("+SQLHelper.converToTextSqlIn(custGroup)+") \n");
 				}
 				sql.append("\n \n");
 				
@@ -1494,6 +1538,42 @@ public class GeneralDAO {
 			return dataList;
 		}
 	 
+	 public static List<Master> getCustGroupAutoSubList() throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			List<Master> dataList = new ArrayList<Master>();
+			Master m = null;
+			Connection conn = null;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+				sql.append("\n select * FROM PENSBI.PENSBME_MST_REFERENCE WHERE reference_code = 'Customer' ");
+				sql.append("\n and pens_desc6 ='Auto Sub-transfer'");
+				sql.append("\n \n");
+				
+				logger.debug("sql:"+sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					m = new Master();
+					m.setPensValue(rst.getString("pens_value"));
+					m.setPensDesc(rst.getString("pens_desc"));
+					
+					dataList.add(m);
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return dataList;
+		}
 	 public static List<Master> getCustGroupListCaseAdd(String custGroup) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

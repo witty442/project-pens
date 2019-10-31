@@ -94,7 +94,16 @@ function save(path){
 		alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
 		return false;
 	}
-	
+	if($('#forwarder').val()==""){
+		alert("กรุณาระบุขนส่ง")
+		$('#forwarder').focus();
+		return false;
+	}
+	if($('#forwarderBox').val()==""){
+		alert("กรุณาระบุ จำนวนกล่องที่รับจากขนส่ง")
+		$('#forwarderBox').focus();
+		return false;
+	}
 	if(closeDate != ""){
 		var chkDate  = checkCloseDate(openDate,closeDate);
 		if(chkDate==false){
@@ -261,6 +270,7 @@ function resetStore(){
 		form.subInv.value = "";
 	}
 }
+
 </script>
 
 </head>		
@@ -356,11 +366,12 @@ function resetStore(){
 									</td>
 									<td align="left"> 
 									 <c:if test="${jobForm.job.canEdit == true}">	
-									       <html:text property="job.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')" styleClass="\" autoComplete=\"off"/>-
+									       <html:text property="job.storeCode" styleId="storeCode" size="20" styleClass="\" autoComplete=\"off"
+									       onkeypress="getCustNameKeypress(event,this,'storeCode')" />-
 									       <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  </c:if>
 									   <c:if test="${jobForm.job.canEdit == false}">	
-									   <html:text property="job.storeCode" styleId="storeCode" size="20" styleClass="disableText" disabled="true"/>-
+									   <html:text property="job.storeCode" styleId="storeCode" size="20" styleClass="disableText" disabled="true" />-
 									   </c:if>
 									<html:text property="job.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 									</td>
@@ -404,7 +415,7 @@ function resetStore(){
                                     <td> Close Date</td>
 									<td>				
 									   <c:if test="${jobForm.job.canEdit == true}">
-										  <html:text property="job.closeDate" styleId="closeDate" size="20" />
+										  <html:text property="job.closeDate" styleId="closeDate" size="20" styleClass="\" autoComplete=\"off"/>
 									   </c:if>
 									    <c:if test="${jobForm.job.canEdit == false}">
 									      <html:text property="job.closeDate" styleId="closeDate" size="20" readonly="true" styleClass="disableText"/>
@@ -457,11 +468,36 @@ function resetStore(){
 										</td>
 									</tr>
 							   <%} %>
+							   <tr>
+                                    <td> ขนส่งโดย <font color="red">*</font></td>
+									<td>			
+									   <c:if test="${jobForm.job.canEdit == true}">			
+										 <html:select property="job.forwarder" styleId="forwarder" >
+											<html:options collection="forwarderList" property="code" labelProperty="desc"/>
+									    </html:select>
+									    &nbsp;&nbsp;
+									    จำนวนกล่องที่รับจากขนส่ง  <font color="red">*</font>
+									     <html:text property="job.forwarderBox" styleId="forwarderBox" size="5"
+									     onkeydown="return inputNum(event);" styleClass="enableNumber \" autoComplete=\"off"/>
+									   </c:if>
+									   <c:if test="${jobForm.job.canEdit == false}">			
+										 <html:select property="job.forwarder" disabled="true" styleClass="disableText">
+											<html:options collection="forwarderList" property="code" labelProperty="desc" />
+									    </html:select>
+									     &nbsp;&nbsp;
+									        จำนวนกล่องที่รับจากขนส่ง  <font color="red"></font>
+									     <html:text property="job.forwarderBox" styleId="forwarderBox" size="5" readonly="true"
+									     onkeydown="return inputNum(event);" styleClass="disableNumber \" autoComplete=\"off"/>
+									   </c:if>
+									   (ใส่จำนวนกล่องตามที่รับจริงจากขนส่ง เพราะต้องใช้คิดค่าขนส่ง)
+									</td>
+								</tr>
 						   </table>
 						   
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
+										
 									    <c:if test="${jobForm.job.canEdit == true}">
 											<a href="javascript:save('${pageContext.request.contextPath}')">
 											  <input type="button" value="    บันทึก      " class="newPosBtnLong"> 

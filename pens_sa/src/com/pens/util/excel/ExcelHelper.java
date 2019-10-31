@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -34,6 +35,88 @@ public class ExcelHelper {
 		//File inputFile = new File("D:\\Work_ISEC\\Project-BME\\DEV\\DataImport\\ImportOrderExcel\\temp.xls");
         //File outputFile = new File("D:\\Work_ISEC\\Project-BME\\DEV\\DataImport\\ImportOrderExcel\\temp_gen.csv");
         //convertXlsToCsv(inputFile, outputFilie);
+	}
+	
+	/** Validate Excel number or text (get digit or not by format decimal) **/
+	public static String isCellNumberOrText1(Object cellValue,String format) {
+		if((cellValue instanceof Double || cellValue instanceof Integer || cellValue instanceof Float)){
+			  //logger.debug("is_number : is Number:"+cellValue+">:"+isCellDouble(cellValue,format));
+			  return isCellDouble(cellValue,format);
+		}else{
+			  //logger.debug("no number : No Number:"+cellValue+">:"+Utils.isNull(cellValue));
+			 return Utils.isNull(cellValue);
+		}
+	}
+	//New Version
+	public static String getCellValue(Object cellValue,String cellType,String format) {
+		String ret = "";
+		//INPUT=1,000.24 :OUTPUT = 1000.24
+		if("NUMBER".equalsIgnoreCase(cellType)){
+		    //** is instance of number **/
+			if((cellValue instanceof Double || cellValue instanceof Integer || cellValue instanceof Float)){
+				  //logger.debug("is_number : is Number:"+cellValue+">:"+isCellDouble(cellValue,format));
+				  ret= isCellDouble(cellValue,format);
+			}else{
+				/** is instance of string (cell is string but value is NUMBER )**/
+				if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
+					//logger.debug("account_number : is Number:"+cellValue);
+				   ret= Utils.convertDoubleToStr(Utils.isDoubleNull(cellValue));
+				}
+			}//if
+			
+		//INPUT=1,000.00 :OUTPUT = 1000 (NO DIGIT)
+		}else if("INTEGER".equalsIgnoreCase(cellType)){
+		    //** is instance of number **/
+			if((cellValue instanceof Double || cellValue instanceof Integer || cellValue instanceof Float)){
+				  //logger.debug("is_number : is Number:"+cellValue+">:"+isCellDouble(cellValue,format));
+				ret =  isCellDouble(cellValue,Utils.format_number_no_digit);
+			}else{
+				/** is instance of string (cell is string but value is NUMBER )**/
+				if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
+					ret =  isCellDouble(cellValue,Utils.format_number_no_digit);
+				}
+			}//if
+			
+		//INPUT=XXXX OUTPUT=XXXX
+		}else if("STRING".equalsIgnoreCase(cellType)){
+			if((cellValue instanceof Double || cellValue instanceof Integer || cellValue instanceof Float)){
+				//logger.debug("is_number : is Number:"+cellValue+">:"+isCellDouble(cellValue,format));
+				ret =  isCellDouble(cellValue,Utils.format_number_no_digit);
+			}else{
+				/** is instance of string (cell is string but value is NUMBER )**/
+				if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
+					ret =  isCellDouble(cellValue,Utils.format_number_no_digit);
+				}else{
+					ret=  Utils.isNull(cellValue);
+				}
+			}//if
+			
+		//INPUT=XXXX OUTPUT=XXXX
+		}else{
+			ret= Utils.isNull(cellValue);
+		}
+		return ret;
+	}
+	public static String isCellDouble(Object cellValue,String format) {
+		return Utils.decimalFormat(isCellDoubleNull(cellValue), format);
+	}
+	
+	public static Double isCellDoubleNull(Object str) {
+		if (str ==null){
+			return new Double(0);
+		}
+		//logger.debug("str:"+str);
+		return ((Double)str);
+	}
+	
+	/** Validate Excel Date**/
+	public static Date isCellDate(Object cellValue) {
+		if((cellValue instanceof Date )){
+			  logger.debug("is_date : is Number:"+cellValue+">:");
+			  return (Date)cellValue;
+		}else{
+			return null;
+		}
 	}
 	
 	/** Case Normal **/

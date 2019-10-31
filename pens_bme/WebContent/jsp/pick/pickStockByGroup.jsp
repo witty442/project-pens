@@ -102,6 +102,7 @@ function cancel(path){
 
 function confirmAction(path){
 	var form = document.pickStockGroupForm;
+	
 	if(confirm("ยันยันการ Confirm ข้อมูล")){
 		 /**Control Save Lock Screen **/
 		 startControlSaveLockScreen();
@@ -171,6 +172,11 @@ function save(path){
 	}
 	if(storeNo ==""){
 		alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
+		return false;
+	} 
+	if($('#forwarder').val()==""){
+		alert("กรุณาระบุขนส่ง")
+		$('#forwarder').focus();
 		return false;
 	}
 	/* if( !checkOneSelected()){
@@ -497,6 +503,47 @@ function isNum(obj){
 	   }
 	  return true;
 	}
+
+function autoSubOut(path){
+	var form = document.pickStockGroupForm;
+	var valid = true;
+	if( validAutoSubOut(form.issueReqNo.value)==false){
+		valid =false;
+	}
+	if(form.issueReqStatus.value !='I'){//ISSUE
+		alert("ทำได้เฉพาะ Request ที่ได้ ISSUE แล้วเท่านั้น");
+		valid = false;
+	}
+	if(valid ==true){
+		if( confirm("ยันยันการส่งข้อมูลเพื่อทำ Auto Sub Transfer")){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			
+			form.action = path + "/jsp/pickStockGroupAction.do?do=saveAutoSubOut";
+			form.submit();
+			return true;
+		}
+	}
+	return false;
+}
+function validAutoSubOut(refNo){
+	var returnString = "";
+	var form = document.pickStockGroupForm;
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/validAutoSubOutAjax.jsp",
+			data : "refNo=" + refNo,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	if(returnString =='false'){
+		alert("RefNo นี้ เคยมีการบันทึกการใช้งานไปแล้ว");
+		return false;
+	}	
+	return true;
+}
 </script>
 
 </head>		
@@ -621,6 +668,7 @@ function isNum(obj){
                                     <td> Issue request status</td>
                                       <td colspan="2">
                                         <html:text property="bean.issueReqStatusDesc" styleId="issueReqStatusDesc" size="20" readonly="true" styleClass="disableText"/>
+                                        <html:hidden property="bean.issueReqStatus" styleId="issueReqStatus"/>
                                      	 ผู้เบิก  
 									  <html:text property="bean.pickUser" styleId="pickUser" size="20"  styleClass="\" autoComplete=\"off"/><font color="red">*</font>	  
 									</td>
@@ -665,7 +713,11 @@ function isNum(obj){
                                     <td > หมายเหตุ </td>
                                     <td colspan="2"> 
                                       <html:text property="bean.remark" styleId="remark" size="60" styleClass="\" autoComplete=\"off"/>
-                                       
+                                       &nbsp;&nbsp; 
+                                                                                              ขนส่งโดย  <font color="red">*</font>			
+									    <html:select property="bean.forwarder" styleId="forwarder" >
+									    <html:options collection="forwarderList" property="code" labelProperty="desc"/>
+									</html:select>
                                        <c:if test="${pickStockGroupForm.bean.issueReqStatus == 'I'}">
                                           &nbsp;&nbsp;    จำนวนกล่อง &nbsp;&nbsp; 
                                           <html:text property="bean.totalBox" styleId="totalBox" size="10" 
@@ -796,8 +848,15 @@ function isNum(obj){
 					<div align="center">
 						<table  border="0" cellpadding="3" cellspacing="0" >
 									<tr>
-										<td align="left">
-					 
+									<td align="left">
+									 <%
+									 User user = (User)session.getAttribute("user");
+									 if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
+										<a href="javascript:autoSubOut('${pageContext.request.contextPath}')">
+											<input type="button" value="ส่งข้อมูลเพื่อทำ Auto Sub Transfer" class="newPosBtnLong"> 
+										</a>
+									<%} %>
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					                      <c:if test="${pickStockGroupForm.bean.issueReqStatus == 'I'}">
 											<%--  <a href="javascript:cancelIssueAction('${pageContext.request.contextPath}')"> --%>
 											   <input type="button" value="    Cancel Issue     " class="disablePosBtnLong" disabled> 

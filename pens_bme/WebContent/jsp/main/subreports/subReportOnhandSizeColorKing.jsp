@@ -22,6 +22,7 @@
 		    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false"/>	
 		    <display:column  title="Adjust Qty" property="adjustQty"  sortable="false"/>	
 		    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" />
+		   
 		    <display:column  title="Onhand QTY " property="onhandQty"  sortable="false" />		    				
 		</display:table>
       </c:if>

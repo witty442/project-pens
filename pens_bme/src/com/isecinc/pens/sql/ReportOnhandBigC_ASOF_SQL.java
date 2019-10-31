@@ -11,6 +11,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class ReportOnhandBigC_ASOF_SQL {
@@ -71,14 +72,14 @@ public class ReportOnhandBigC_ASOF_SQL {
 				sql.append("\n  , INTERFACE_DESC as sub_inv from PENSBME_MST_REFERENCE  ");
 				sql.append("\n    WHERE reference_code ='SubInv' ");
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-				    sql.append("\n AND pens_value ="+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+" ");
+				    sql.append("\n AND pens_value ="+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+" ");
 				}
 				sql.append("\n) M ");
 				sql.append("\n ,( SELECT DISTINCT M.PENS_VALUE as pens_item ,PENS_DESC2 as group_type  ");
 				sql.append("\n    from PENSBME_MST_REFERENCE M  ");
 				sql.append("\n    WHERE M.reference_code ='BigCitem' ");
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND M.PENS_DESC2 IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND M.PENS_DESC2 IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				}
 				sql.append("\n  ) MI ");
 				sql.append("\n where M.sub_inv = p.subinventory_code ");
@@ -95,14 +96,14 @@ public class ReportOnhandBigC_ASOF_SQL {
 	                sql.append("\n AND P.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 				}
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-				    sql.append("\n AND M.customer_code ="+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+" ");
+				    sql.append("\n AND M.customer_code ="+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+" ");
 				}
 				if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 					sql.append("\n AND P.item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 					sql.append("\n AND P.item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND MI.group_type IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND MI.group_type IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 				}
 				sql.append("\n GROUP BY M.customer_code,MI.group_type,p.item_code ,M.sub_inv ");
 		   sql.append("\n ) ALL_IN ");
@@ -118,28 +119,28 @@ public class ReportOnhandBigC_ASOF_SQL {
 						sql.append("\n  , INTERFACE_DESC as sub_inv from PENSBME_MST_REFERENCE  ");
 						sql.append("\n   WHERE reference_code ='SubInv' ");
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n AND pens_value ="+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+" ");
+						    sql.append("\n AND pens_value ="+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+" ");
 						}
 						sql.append("\n) M ");
 						sql.append("\n ,( SELECT DISTINCT M.PENS_VALUE as pens_item ,PENS_DESC2 as group_type  ");
 						sql.append("\n    from PENSBME_MST_REFERENCE M  ");
 						sql.append("\n    WHERE M.reference_code ='BigCitem' ");
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND M.PENS_DESC2 IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND M.PENS_DESC2 IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						sql.append("\n  ) MI ");
 						sql.append("\n where M.sub_inv = p.subinventory_code ");
 						sql.append("\n AND P.item_code = MI.pens_item ");
 				
 						if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						    sql.append("\n AND M.customer_code ="+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+" ");
+						    sql.append("\n AND M.customer_code ="+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+" ");
 						}
 						if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
 							sql.append("\n AND P.item_code >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 							sql.append("\n AND P.item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND MI.group_type IN("+Utils.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND MI.group_type IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
 						}
 						sql.append("\n GROUP BY M.customer_code ,MI.group_type,P.item_code ,M.sub_inv");
 				sql.append("\n ) INIT ");

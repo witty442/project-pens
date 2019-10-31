@@ -43,7 +43,6 @@ PageVisit.processPageVisit(request,pageName);
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 
 <script>
@@ -101,14 +100,22 @@ window.onhashchange=function(){window.location.hash="no-back-button";}
 						<div align="center">
 						   <%if(B2BAction.PAGE_B2B_MAKRO.equalsIgnoreCase(pageName)){ %>
 						       <jsp:include page="criteria/b2bMakroCriteria.jsp" flush="true" /> 
+						   <%}else if(B2BAction.PAGE_Q_B2B_MAKRO_SALESBYITEM.equalsIgnoreCase(pageName)){ %>
+						       <jsp:include page="criteria/queryB2BMakroSalesByItemCriteria.jsp" flush="true" /> 
 						   <% } %>
 					    </div>
 					  
-					   <!-- ************************Result ******************************************-->
-					   
+					    <!-- Result -->
+				 	    <%if(B2BAction.PAGE_Q_B2B_MAKRO_SALESBYITEM.equalsIgnoreCase(pageName)){   
+				 	          if(request.getAttribute("b2bForm_RESULT") != null){
+				 	        	 out.println( ((StringBuffer)request.getAttribute("b2bForm_RESULT")).toString());
+				 	          }
+				 	     }
+				 	    %>
 					   
 					   <!-- Hidden field -->
-					   <input type="hidden" name="path"  id="path" value="${pageContext.request.contextPath}"/>
+					   <input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
+					   <input type="hidden" name="pageName" id="pageName" value="<%=pageName%>"/>
 					</html:form>
 					<!-- BODY -->
 					</td>
@@ -138,5 +145,5 @@ window.onhashchange=function(){window.location.hash="no-back-button";}
 </html>
 
  <!-- Control Save Lock Screen -->
-<jsp:include page="../controlSaveLockScreen.jsp"/>
+ <jsp:include page="../controlSaveLockScreen.jsp"/>
 <!-- Control Save Lock Screen -->

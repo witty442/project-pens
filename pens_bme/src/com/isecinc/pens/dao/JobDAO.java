@@ -21,13 +21,12 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 public class JobDAO extends PickConstants{
 
 	protected static Logger logger = Logger.getLogger("PENS");
-	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Utils.local_th);
-	
+
 	public static int searchJobListTotalRec(Connection conn,Job o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -322,6 +321,8 @@ public class JobDAO extends PickConstants{
 				   h.setRtnQty(Utils.decimalFormat(rst.getDouble("rtn_qty"),Utils.format_current_no_disgit,""));
 				   h.setRtnAmt(Utils.decimalFormat(rst.getDouble("rtn_amt"),Utils.format_current_2_disgit,""));
 				   h.setRtnNo(Utils.isNull(rst.getString("rtn_no"))); 
+				   h.setForwarder(Utils.isNull(rst.getString("forwarder"))); 
+				   h.setForwarderBox(Utils.decimalFormat(rst.getDouble("forwarder_Box"), Utils.format_current_no_disgit, "")); 
 				   
 				   if(Utils.isNull(rst.getString("status")).equals(STATUS_CANCEL) 
 					|| Utils.isNull(rst.getString("status")).equals(STATUS_CLOSE) ){
@@ -563,11 +564,11 @@ public class JobDAO extends PickConstants{
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" INSERT INTO PENSBI.PENSBME_PICK_JOB \n");
 				sql.append(" (JOB_ID, NAME, OPEN_DATE,   \n");
-				sql.append("  STATUS, STATUS_MESSAGE, CREATE_DATE, CREATE_USER "
-						+ ",CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,WAREHOUSE"
-						+ ",REF_DOC,RTN_QTY,RTN_AMT)  \n");
+				sql.append("  STATUS, STATUS_MESSAGE, CREATE_DATE, CREATE_USER ");
+				sql.append(",CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,WAREHOUSE");
+				sql.append(",REF_DOC,RTN_QTY,RTN_AMT,Forwarder,Forwarder_box)  \n");
 			
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ,?,?,?,?,?,? ,?,?) \n");
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ? ,?,?,?,?,?,? ,?,?,?,?) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 					
@@ -590,7 +591,9 @@ public class JobDAO extends PickConstants{
 				ps.setString(c++, Utils.isNull(o.getRefDoc()));
 				ps.setDouble(c++, Utils.convertStrToDouble(o.getRtnQty()));
 				ps.setDouble(c++, Utils.convertStrToDouble(o.getRtnAmt()));
-
+				ps.setString(c++, Utils.isNull(o.getForwarder()));
+				ps.setDouble(c++, Utils.convertStrToDouble(o.getForwarderBox()));
+				
 				ps.executeUpdate();
 				
 			}catch(Exception e){
@@ -675,6 +678,8 @@ public class JobDAO extends PickConstants{
 				sql.append(", RTN_QTY = "+Utils.convertStrToDouble(o.getRtnQty())+" \n" );
 				sql.append(", RTN_AMT = "+Utils.convertStrToDouble(o.getRtnAmt())+" \n" );
 				sql.append(", RTN_NO = '"+Utils.isNull(o.getRtnNo())+"' \n" );
+				sql.append(", Forwarder = '"+Utils.isNull(o.getForwarder())+"' \n" );
+				sql.append(", Forwarder_box = "+Utils.convertStrToDouble(o.getForwarderBox())+" \n" );
 				sql.append(" WHERE JOB_ID =? \n" );
                 
 				logger.debug("sql:"+sql.toString());

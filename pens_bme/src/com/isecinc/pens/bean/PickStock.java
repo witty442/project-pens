@@ -90,8 +90,15 @@ public class PickStock implements Serializable{
     private String issueReqDateTo;
 	private String issueReqNoFrom;
 	private String issueReqNoTo;
+	private String forwarder;
 	
 	
+	public String getForwarder() {
+		return forwarder;
+	}
+	public void setForwarder(String forwarder) {
+		this.forwarder = forwarder;
+	}
 	public String getTotalBox() {
 		return totalBox;
 	}

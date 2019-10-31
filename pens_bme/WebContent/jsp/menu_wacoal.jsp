@@ -153,20 +153,29 @@
     <li><a  href="javascript: void(0)" class="parent"><span>SHOP</span></a>
 		<ul> 
 		    <li>
-	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_SALEOUT%>');"><span><%no++;out.print(no);%>.<bean:message key="MayaSaleOut" bundle="sysprop"/></span></a>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_SALEOUT%>');">
+	           <span><%no++;out.print(no);%>.<bean:message key="MayaSaleOut" bundle="sysprop"/></span></a>
 	        </li>
 			 <li>
-	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_STOCK_ONHAND%>');"><span><%no++;out.print(no);%>.<bean:message key="MayaStockOnhand" bundle="sysprop"/></span></a>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_STOCK_ONHAND%>');">
+	           <span><%no++;out.print(no);%>.<bean:message key="MayaStockOnhand" bundle="sysprop"/></span></a>
 	        </li> 
 	         <li>
-	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_PROM%>');"><span><%no++;out.print(no);%>.<bean:message key="ShopPromotion" bundle="sysprop"/></span></a>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_PROM%>');">
+	           <span><%no++;out.print(no);%>.<bean:message key="ShopPromotion" bundle="sysprop"/></span></a>
 	        </li>  
 	        <li>
-	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_BILL_DETAIL%>');"><span><%no++;out.print(no);%>.<bean:message key="ShopBillDetail" bundle="sysprop"/></span></a>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_BILL_DETAIL%>');">
+	           <span><%no++;out.print(no);%>.<bean:message key="ShopBillDetail" bundle="sysprop"/></span></a>
 	        </li>
 	         <li>
-		       <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_TM_SALEOUT%>');"><span><%no++;out.print(no);%><bean:message key="TMSaleOut" bundle="sysprop"/></span></a>
+		       <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_TM_SALEOUT%>');">
+		       <span><%no++;out.print(no);%><bean:message key="TMSaleOut" bundle="sysprop"/></span></a>
 		     </li>
+		     <li>
+		       <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_TM_STOCK_ONHAND%>');">
+		       <span><%out.print(no);%>.<bean:message key="TMStockOnhand" bundle="sysprop"/></span></a>
+		     </li> 
 		</ul>
 	</li>   
 <%} %>
@@ -207,6 +216,22 @@
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/orderAction.do?do=prepareReportOrder&action=new');">
 				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="reportOrderBME"/></span></a>
 			</li>
+			 <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandLotus');">
+				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="SummaryBMEOnhandLotus"/></span></a>
+			</li> 
+			 <li>
+				 <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandAsOfKing');">
+				 <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="SummaryBMEOnhandKing"/></span></a>
+			 </li> 
+			 <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandTops');">
+				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="SummaryBMEOnhandTops"/></span></a>
+			</li> 
+			 <li>
+				 <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=sizeColorKing');">
+				 <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="SummaryBMESizeColorKing"/></span></a>
+			 </li>  
 		</ul>
 	</li>
 <%} %>

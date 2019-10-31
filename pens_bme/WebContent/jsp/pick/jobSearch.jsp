@@ -190,7 +190,7 @@ function gotoPage(path,currPage){
 						       <tr>
                                     <td align="right" nowrap width="5%" class="criteria_style"> Open Date</td>
 									<td  width="5%">						
-										  <html:text property="job.openDate" styleId="openDate" size="15" />
+										  <html:text property="job.openDate" styleId="openDate" size="15" styleClass="\" autoComplete=\"off"/>
 									</td >
 									<td align="right"  width="5%" nowrap  class="criteria_style"> Job On Year</td>
 									<td  width="25%">						
@@ -216,7 +216,8 @@ function gotoPage(path,currPage){
 								<tr>
                                     <td align="right" nowrap width="5%"  class="criteria_style">รหัสร้านค้า</td>
 									<td width="35%" nowrap colspan="3"  class="criteria_style">						
-										 <html:text property="job.storeCode" styleId="storeCode" size="15" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+										 <html:text property="job.storeCode" styleId="storeCode" size="15" onkeypress="getCustNameKeypress(event,this,'storeCode')"
+										  styleClass="\" autoComplete=\"off" />-
 									    <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									<html:text property="job.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 									    &nbsp;&nbsp;&nbsp;&nbsp; Sub Inv&nbsp;

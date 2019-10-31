@@ -783,19 +783,6 @@ public class Utils {
 		}
 		return value;
 	}
-	
-	public static String converToTextSqlIn(String value){
-		
-		List<String> valuesText = new ArrayList<String>() ;
-		String[] values = value.split("[,]");
-		
-		for(String text : values){
-			valuesText.add("'"+text+"'");
-		}
-		
-		return StringUtils.join(valuesText, ","); 
-	}
-	
 
  //Case null retun ""
  	public static String stringValueSpecial2(long dateBigdecimal, String format ,Locale locale) throws Exception {

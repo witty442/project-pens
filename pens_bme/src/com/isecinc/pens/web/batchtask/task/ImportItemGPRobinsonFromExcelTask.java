@@ -1,18 +1,12 @@
 package com.isecinc.pens.web.batchtask.task;
 
 import java.math.BigDecimal;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -24,32 +18,22 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.struts.upload.FormFile;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetDimension;
 
-import com.isecinc.pens.bean.Barcode;
-import com.isecinc.pens.bean.GenCNBean;
-import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.MasterItemBean;
 import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.Order;
-import com.isecinc.pens.bean.TaskStoreBean;
 import com.isecinc.pens.dao.GeneralDAO;
-import com.isecinc.pens.dao.OrderDAO;
-import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.exception.ExceptionHandle;
-import com.isecinc.pens.process.OrderKeyBean;
-import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
-import com.pens.util.EnvProperties;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
-import com.pens.util.excel.ExcelUtils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.excel.ExcelHelper;
 import com.pens.util.meter.MonitorTime;
+import com.pens.util.seq.SequenceProcess;
 
 public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements BatchTaskInterface{
 	public static Logger logger = Logger.getLogger("PENS");
@@ -70,6 +54,9 @@ public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements Batc
 	}
 	public String getDevInfo(){
 		return "PENSBI.PENSBME_ITEMBY_GP";
+	}
+	public boolean isDispDetail(){
+		return true;
 	}
 	public String getValidateScript(){
 		String script ="";
@@ -265,16 +252,16 @@ public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements Batc
 						
 						Object cellValue = xslUtils.getCellValue(colNo, cell);
 						if(colNo==0){
-							pensItem = ExcelUtils.isCellNumberOrText(cellValue);
+							pensItem = ExcelHelper.isCellNumberOrText(cellValue);
 							//logger.debug("pensItem:"+pensItem);
 						}else if(colNo==1){
-							groupCode = ExcelUtils.isCellNumberOrText(cellValue);
+							groupCode = ExcelHelper.isCellNumberOrText(cellValue);
 							//logger.debug("groupCode:"+groupCode);
 						}else if(colNo==2){
-							wholePriceVat = ExcelUtils.isCellNumberOrText(cellValue);
+							wholePriceVat = ExcelHelper.isCellNumberOrText(cellValue);
 							//logger.debug("wholePriceVat:"+wholePriceVat);
 						}else if(colNo==3){
-							gp = ExcelUtils.isCellNumberOrText(cellValue);
+							gp = ExcelHelper.isCellNumberOrText(cellValue);
 							//logger.debug("gp:"+gp);
 						}
 					}//for column

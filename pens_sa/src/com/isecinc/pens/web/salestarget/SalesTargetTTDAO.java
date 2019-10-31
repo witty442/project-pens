@@ -812,8 +812,8 @@ public class SalesTargetTTDAO {
 			
 			sql.append("\n  select D.INVENTORY_ITEM_CODE,D.INVENTORY_ITEM_ID ,D.target_qty,D.TARGET_AMOUNT");
 			sql.append("\n  ,D.PRICE,D.AMT_AVG3,D.AMT_AVG12 ");
-			sql.append("\n  ,(select INVENTORY_ITEM_desc from PENSBI.XXPENS_BI_MST_ITEM B "
-					+ "where B.INVENTORY_ITEM_CODE = D.INVENTORY_ITEM_CODE) as INVENTORY_ITEM_DESC ");
+			sql.append("\n  ,(select INVENTORY_ITEM_desc from PENSBI.XXPENS_BI_MST_ITEM B ");
+			sql.append("\n   where B.INVENTORY_ITEM_CODE = D.INVENTORY_ITEM_CODE) as INVENTORY_ITEM_DESC ");
             sql.append("\n  from PENSBI.XXPENS_BI_SALES_TARGET_TT M ,PENSBI.XXPENS_BI_SALES_TARGET_TT_L D");
 			sql.append("\n  where D.id = M.id ");
 			if( !Utils.isNull(cri.getCustCatNo()).equals(""))

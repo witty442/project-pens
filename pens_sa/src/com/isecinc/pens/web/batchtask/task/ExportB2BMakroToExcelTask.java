@@ -1,83 +1,54 @@
 package com.isecinc.pens.web.batchtask.task;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
-import java.net.InetAddress;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.struts.upload.FormFile;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.exception.ExceptionHandle;
-import com.isecinc.pens.process.SequenceProcessAll;
 import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.FileUtil;
-import com.pens.util.UploadXLSUtil;
-import com.pens.util.Utils;
-import com.pens.util.excel.ExcelUtils;
+import com.pens.util.SQLHelper;
 import com.pens.util.meter.MonitorTime;
 
 public class ExportB2BMakroToExcelTask extends BatchTask implements BatchTaskInterface{
 	public static Logger logger = Logger.getLogger("PENS");
-	public static String PARAM_DATA_TYPE = "dataType";
-   
+	
 	/**
 	 * Return :P Name|P label|P Type|default value|valid,P2...$processName,Button Name|....
 	*/
 	public String getParam(){
 		return "dataType|ระบุประเภทไฟล์|LIST||VALID$Export ข้อมูล";
-	}
+	} 
 	public String getDescription(){
 		return "Import B2B Makro From File Excel";
 	}
 	public String getDevInfo(){
 		return "APPS.XXPENS_OM_PUSH_ORDER_ITEM,APPS.XXPENS_OM_PUSH_ORDER_TEMP  ";
+	}
+	//Show detail BatchTaskResult or no
+	public boolean isDispDetail(){
+		return true;
 	}
 	public List<BatchTaskListBean> getParamListBox(){
 		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();
@@ -131,7 +102,7 @@ public class ExportB2BMakroToExcelTask extends BatchTask implements BatchTaskInt
 			MonitorItemBean modelItem = prepareMonitorItemBean(monitorModel);
 			
 			/** Start process **/ 
-			modelItem = exportProcess(connMonitor,conn,monitorModel,modelItem);
+			modelItem = process(connMonitor,conn,monitorModel,modelItem);
 			 
 			/**debug TimeUse **/
 			monitorTime.debugUsedTime();
@@ -194,21 +165,19 @@ public class ExportB2BMakroToExcelTask extends BatchTask implements BatchTaskInt
 		return monitorModel;
 	}
 
-	
-	
-	public static MonitorItemBean exportProcess(Connection connMonitor ,Connection conn
+	public static MonitorItemBean process(Connection connMonitor ,Connection conn
 			,MonitorBean monitorModel ,MonitorItemBean monitorItemBean) {
 		PreparedStatement ps = null;
 		String errorMsg ="",errorCode ="";
 		XSSFWorkbook workbook = null;
 		EnvProperties env = EnvProperties.getInstance();
-		String rootPath = "";
+		String rootPathTemp = "";
 		String pathFile = "";
 		String fileName = "";
 		int status = Constants.STATUS_SUCCESS;
 		try{
 			//get RootOathTemp
-			rootPath = FileUtil.getRootPathTemp(env);
+			rootPathTemp = FileUtil.getRootPathTemp(env);
 			
 		    //Step 1 Call Procedure
 			try{
@@ -229,13 +198,17 @@ public class ExportB2BMakroToExcelTask extends BatchTask implements BatchTaskInt
 				
 				// gen file to temp server dev_temp
 				fileName = "B2B_MAKRO_"+monitorModel.getCreateUser()+".xls";
-				pathFile = rootPath+fileName;
+				pathFile = rootPathTemp+fileName;
 				
 				logger.debug("Write to :"+pathFile);
 				FileOutputStream fileOut = new FileOutputStream(pathFile);
 			    workbook.write(fileOut);
 			    fileOut.close();
 			}
+			
+			//step 3 delete temp
+			//SQLHelper.excUpdate(conn, "delete from apps.XXPENS_OM_PUSH_ORDER_ITEM ");
+			//SQLHelper.excUpdate(conn, "delete from apps.XXPENS_OM_PUSH_ORDER_TEMP ");
 			
 			monitorItemBean.setStatus(status);
 			monitorItemBean.setFileName(fileName);
@@ -446,9 +419,14 @@ public class ExportB2BMakroToExcelTask extends BatchTask implements BatchTaskInt
 	            		row.createCell(c++).setCellValue(rs.getString(rsmd.getColumnName(i)));
 	            	}else{
 	                    cell = row.createCell(c++);
-	                    cell.setCellValue(rs.getDouble(rsmd.getColumnName(i)));
-	                    cell.setCellStyle(numStyle);
-	                    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+	                    if(rs.getDouble(rsmd.getColumnName(i))!=0){
+	                       cell.setCellValue(rs.getDouble(rsmd.getColumnName(i)));
+	                       cell.setCellStyle(numStyle);
+		                   cell.setCellType(Cell.CELL_TYPE_NUMERIC);
+	                    }else{
+	                       cell.setCellValue("");
+	                    }
+	                   
 	            	}
 	            }
 	            c=0;

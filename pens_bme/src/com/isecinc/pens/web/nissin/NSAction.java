@@ -38,7 +38,7 @@ import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * Summary Action

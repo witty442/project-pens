@@ -50,9 +50,15 @@ public class InvoicePaymentReport implements Serializable{
 	private double totalCashAmt;
 	private double totalAliAmt;
 	private double totalWeAmt;
+	private double totalGovAmt;
 	
 	
-	
+	public double getTotalGovAmt() {
+		return totalGovAmt;
+	}
+	public void setTotalGovAmt(double totalGovAmt) {
+		this.totalGovAmt = totalGovAmt;
+	}
 	public double getTotalAliAmt() {
 		return totalAliAmt;
 	}

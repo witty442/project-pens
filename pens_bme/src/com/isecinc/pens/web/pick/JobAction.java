@@ -21,6 +21,7 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.AdjustStock;
 import com.isecinc.pens.bean.Job;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.AutoSubOutDAO;
 import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
@@ -83,6 +84,13 @@ public class JobAction extends I_Action {
 				yearList.add(ref);
 				yearList.addAll(JobDAO.getYearList());
 				request.getSession().setAttribute("yearList",yearList);
+				
+				//forwarder
+				List<PopupForm> forwarderList = new ArrayList<PopupForm>();
+				refP = new PopupForm("",""); 
+				forwarderList.add(refP);
+				forwarderList.addAll(GeneralDAO.searchForwarderList( new PopupForm()));
+				request.getSession().setAttribute("forwarderList",forwarderList);
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -354,6 +362,7 @@ public class JobAction extends I_Action {
 		}
 		return mapping.findForward("search");
 	}
+	
 	
 	public ActionForward cancel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("cancel Action");

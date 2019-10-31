@@ -74,14 +74,10 @@ function back(path){
 	return true;
 }
 
-var countSave = 0;
 function save(path){
 	//alert(countSave);
 	/** Check Save duplicate */
-    if(countSave > 0){
-    	return false;
-    }
-    countSave++;
+    
 	var form = document.barcodeForm;
 	var jobId =$('#jobId').val();
 	var storeCode =$('#storeName').val();
@@ -252,11 +248,11 @@ function addRow(){
 	
 	var rowData ="<tr class='"+className+"'>"+
 	    "<td class='td_text_center' width='10%'> <input type='checkbox' tabindex ='-1' name='linechk' value='0'/></td>"+
-	    "<td class='td_text_center' width='10%'> <input type='text' name='barcode' size='30'  "+
-	    " onkeypress='getProductKeypress(event,this,"+lineId+")' "+
+	    "<td class='td_text_center' width='10%'><input type='text' name='barcode' size='30'  "+
+	    " onkeypress='getProductKeypress(event,this,"+lineId+")' autoComplete='off' "+
 	
 	    " />  </td>"+
-	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='materialMaster' size='25' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
+	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='materialMaster' autoComplete='off' size='25' onkeypress='getProductKeypressByMat(event,this,"+lineId+")'/></td>"+
 	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='groupCode' readonly class='disableText' size='30' /></td>"+
 	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='pensItem' readonly class='disableText' size='15' /></td>"+
 	    "<td class='td_text_center' width='10%'> <input type='text' tabindex ='-1' name='wholePriceBF' readonly class='disableNumber' size='20' /></td>"+
@@ -646,11 +642,13 @@ function getProductModelByMat(matObj,lineId){
 										    <input type="text" name="barcode" id="barcode" value ="${results.barcode}" size="30" 
 											    onkeypress="getProductKeypress(event,this,${results.lineId})"
 											    readonly="${results.barcodeReadonly}" class="${results.barcodeStyle}" 
+											    autoComplete='off' 
 											   <%--  onchange="getProductModel(this,${results.lineId})" --%>
 											    />
                                         </td>
 										<td class='td_text_center' width='10%'>
-											<input  onkeypress="getProductKeypressByMat(event,this,${results.lineId})" type="text" name="materialMaster" value ="${results.materialMaster}" size="25"/>
+											<input  onkeypress="getProductKeypressByMat(event,this,${results.lineId})" type="text" 
+											name="materialMaster" value ="${results.materialMaster}" size="25" autoComplete='off' />
 										</td>
 										<td class='td_text_center' width='10%'>
 										   <input type="text" name="groupCode" value ="${results.groupCode}" size="30" readonly class="disableText"/>

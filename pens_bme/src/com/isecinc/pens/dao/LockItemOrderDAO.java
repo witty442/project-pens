@@ -18,8 +18,9 @@ import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.web.lockitem.LockItemOrderErrorBean;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcessAll;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class LockItemOrderDAO {
 
@@ -115,7 +116,7 @@ public class LockItemOrderDAO {
 						sql.append("\n and E.group_store ='"+Utils.isNull(o.getGroupStore())+"'");
 				   }
 				   if( !Utils.isNull(o.getStoreCode()).equals("") ){
-						sql.append("\n and E.store_no in("+Utils.converToTextSqlIn(o.getStoreCode())+")");
+						sql.append("\n and E.store_no in("+SQLHelper.converToTextSqlIn(o.getStoreCode())+")");
 				   }
 				   if( !Utils.isNull(o.getLockDate()).equals("") ){
 				      sql.append("\n  and lock_date = to_date('"+lockDateStr+"','dd/mm/yyyy') ");

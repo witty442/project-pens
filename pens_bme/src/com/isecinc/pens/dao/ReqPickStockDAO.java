@@ -20,7 +20,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 public class ReqPickStockDAO extends PickConstants{
 	
@@ -827,6 +827,7 @@ public class ReqPickStockDAO extends PickConstants{
 			   h.setStoreNo(Utils.isNull(rst.getString("store_no"))); 
 			   h.setSubInv(Utils.isNull(rst.getString("sub_inv"))); 
                h.setWareHouse(Utils.isNull(rst.getString("warehouse")));
+               h.setForwarder(Utils.isNull(rst.getString("forwarder")));
                
 			   if(h.isModeEdit()){
 				   //can edit
@@ -1998,8 +1999,8 @@ public class ReqPickStockDAO extends PickConstants{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" INSERT INTO PENSBI.PENSBME_STOCK_ISSUE \n");
 			sql.append(" (ISSUE_REQ_NO, ISSUE_REQ_DATE, STATUS,STATUS_DATE, REQUESTOR,REMARK ," +
-					"CREATE_DATE,CREATE_USER,CUST_GROUP,CUSTOMER_NO,STORE_NO,SUB_INV,NEED_DATE,WAREHOUSE)  \n");
-		    sql.append(" VALUES (?, ?, ?, ?, ?, ? , ? ,?,?,?,?,?,?,?) \n");
+					"CREATE_DATE,CREATE_USER,CUST_GROUP,CUSTOMER_NO,STORE_NO,SUB_INV,NEED_DATE,WAREHOUSE,Forwarder)  \n");
+		    sql.append(" VALUES (?, ?, ?, ?, ?, ? , ? ,?,?,?,?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -2021,6 +2022,7 @@ public class ReqPickStockDAO extends PickConstants{
 			ps.setString(c++, o.getSubInv());
 			ps.setTimestamp(c++, new java.sql.Timestamp(needDate.getTime()));
 			ps.setString(c++, o.getWareHouse());
+			ps.setString(c++, o.getForwarder());
 			
 			ps.executeUpdate();
 			
@@ -2041,7 +2043,7 @@ public class ReqPickStockDAO extends PickConstants{
 			
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBME_STOCK_ISSUE \n");
-			sql.append(" SET  REQUESTOR = ?,REMARK =? ,need_date=?,UPDATE_DATE =?,UPDATE_USER =? \n");
+			sql.append(" SET  REQUESTOR = ?,REMARK =? ,need_date=?,UPDATE_DATE =?,UPDATE_USER =? ,forwarder=? \n");
 		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
 			
 			ps = conn.prepareStatement(sql.toString());
@@ -2053,6 +2055,7 @@ public class ReqPickStockDAO extends PickConstants{
 			ps.setTimestamp(c++, new java.sql.Timestamp(needDate.getTime()));
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getUpdateUser());
+			ps.setString(c++, o.getForwarder());
 			ps.setString(c++, o.getIssueReqNo());
 			
 			ps.executeUpdate();

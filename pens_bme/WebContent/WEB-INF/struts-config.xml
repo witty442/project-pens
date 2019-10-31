@@ -77,6 +77,7 @@
 		<form-bean name="mcTimeForm" type="com.isecinc.pens.web.mc.MCTimeForm" />
 		<form-bean name="payForm" type="com.isecinc.pens.web.pay.PayForm" />
 		<form-bean name="payWhiteForm" type="com.isecinc.pens.web.pay.PayWhiteForm" />
+		<form-bean name="payYellowForm" type="com.isecinc.pens.web.pay.PayYellowForm" />
 		<form-bean name="rtForm" type="com.isecinc.pens.web.rt.RTForm" />
 		<form-bean name="nsForm" type="com.isecinc.pens.web.nissin.NSForm" />
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
@@ -111,13 +112,14 @@
 		<form-bean name="autoCNForm" type="com.isecinc.pens.web.autocn.AutoCNForm" />
 		<form-bean name="genVanScriptForm" type="com.isecinc.pens.web.other.GenVanScriptForm" />
 		<form-bean name="autoCNHISHERForm" type="com.isecinc.pens.web.autocn.hisher.AutoCNHISHERForm" />
-		<form-bean name="autoSubBigCForm" type="com.isecinc.pens.web.autosub.AutoSubBigCForm" />
+		<form-bean name="autoSubInForm" type="com.isecinc.pens.web.autosubin.AutoSubInForm" />
 		<form-bean name="toolManageForm" type="com.isecinc.pens.web.toolmanage.ToolManageForm" />
 		<form-bean name="jojoForm" type="com.isecinc.pens.web.jojo.JojoForm" />
 		<form-bean name="shopForm" type="com.isecinc.pens.web.shop.ShopForm" />
 		<form-bean name="pickReportForm" type="com.isecinc.pens.web.pick.PickReportForm" />
 	    <form-bean name="itManageForm" type="com.isecinc.pens.web.itmanage.ITManageForm" />
 	    <form-bean name="manualStockForm" type="com.isecinc.pens.web.manualstock.ManualStockForm" />
+	    <form-bean name="autoOrderForm" type="com.isecinc.pens.web.autoorder.AutoOrderForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -623,6 +625,11 @@
 			<forward name="detail" path="/jsp/pay/payDetail.jsp" />
 			<forward name="printPayPopup" path="/jsp/popup/printPayPopup.jsp" />
 		</action>
+		<action name="payYellowForm" path="/jsp/payYellowAction" parameter="do" scope="session" type="com.isecinc.pens.web.pay.PayYellowAction">
+			<forward name="search" path="/jsp/pay/payYellowSearch.jsp" />
+			<forward name="detail" path="/jsp/pay/payYellowDetail.jsp" />
+			<forward name="printPayPopup" path="/jsp/popup/printPayYellowPopup.jsp" />
+		</action>
 		<action name="itManageForm" path="/jsp/itManageAction" parameter="do" scope="session" type="com.isecinc.pens.web.itmanage.ITManageAction">
 			<forward name="search" path="/jsp/itmanage/itManageSearch.jsp" />
 			<forward name="detailITStockItem" path="/jsp/itmanage/itStockItemDetail.jsp" />
@@ -710,10 +717,10 @@
 			<forward name="detail" path="/jsp/auto_cn_hisher/autoCN_hisher.jsp" />
 			<forward name="detailView" path="/jsp/auto_cn_hisher/autoCN_hisher_View.jsp" />
 		</action>
-		<action name="autoSubBigCForm" path="/jsp/autoSubBigCAction" parameter="do" scope="session" type="com.isecinc.pens.web.autosub.AutoSubBigCAction">
-			<forward name="search" path="/jsp/autosub_bigc/autosub_bigc_search.jsp" />
-			<forward name="detail" path="/jsp/autosub_bigc/autosub_bigc.jsp" />
-			<forward name="detailView" path="/jsp/autosub_bigc/autosub_bigc_view.jsp" />
+		<action name="autoSubInForm" path="/jsp/autoSubInAction" parameter="do" scope="session" type="com.isecinc.pens.web.autosubin.AutoSubInAction">
+			<forward name="search" path="/jsp/autoSubIn/autoSubInSearch.jsp" />
+			<forward name="detail" path="/jsp/autoSubIn/autoSubIn.jsp" />
+			<forward name="detailView" path="/jsp/autoSubIn/autoSubInView.jsp" />
 		</action>
 		<action name="toolManageForm" path="/jsp/toolManageAction" parameter="do" scope="session" type="com.isecinc.pens.web.toolmanage.ToolManageAction">
 			<forward name="search" path="/jsp/toolmanage/toolManageSearch.jsp" />
@@ -732,6 +739,10 @@
 		<action name="manualStockForm" path="/jsp/manualStockAction" parameter="do" scope="session" type="com.isecinc.pens.web.manualstock.ManualStockAction">
 			<forward name="search" path="/jsp/manualStock/manualStockSearch.jsp" />
 			<forward name="detail" path="/jsp/manualStock/manualStock.jsp" />
+		</action>
+		<action name="autoOrderForm" path="/jsp/autoOrderAction" parameter="do" scope="session" type="com.isecinc.pens.web.autoorder.AutoOrderAction">
+			<forward name="search" path="/jsp/autoOrder/autoOrderSearch.jsp" />
+			<!-- <forward name="detail" path="/jsp/manualStock/manualStock.jsp" /> -->
 		</action>
 	</action-mappings>
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

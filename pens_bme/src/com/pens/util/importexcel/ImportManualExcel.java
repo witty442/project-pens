@@ -20,7 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
-import com.pens.util.excel.ExcelUtils;
+import com.pens.util.excel.ExcelHelper;
 
 public class ImportManualExcel {
 	public static Logger logger = Logger.getLogger("PENS");
@@ -37,7 +37,7 @@ public class ImportManualExcel {
 			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/SALES_ZONE.xlsx",3);
 			
 			
-			importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/XXPENS_BI_MST_CUST_CAT_MAP_TT.xlsx",6);
+			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/XXPENS_BI_MST_CUST_CAT_MAP_TT.xlsx",6);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -153,7 +153,7 @@ public static void importExcel(String dataBaseType,String db,String inputFile,in
 				Object cellValue = xslUtils.getCellValue(colNo, cell);
 				
 				if(columnBean.getColumnType().equalsIgnoreCase("STRING")){
-				   String str = ExcelUtils.isCellNumberOrText((cellValue));
+				   String str = ExcelHelper.isCellNumberOrText((cellValue));
 				   ps.setString((colNo+1),  str.trim());
 				}else  if(columnBean.getColumnType().equalsIgnoreCase("NUMBER")){
 				   double doubleData = Utils.isDoubleNull(cellValue);

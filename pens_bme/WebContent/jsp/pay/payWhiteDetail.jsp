@@ -182,7 +182,7 @@ function switchFlag(obj,name){
 	    	<!-- PROGRAM HEADER -->
 	    
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="pay"/>
+				<jsp:param name="function" value="payWhite"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -269,11 +269,12 @@ function switchFlag(obj,name){
 									<tr class="<%=tabclass%>">
 										<td class="td_text_center" width="25%">
 										  <input type="hidden" name="lineId" id="lineId" >
-										  <input type="text" name="accountName" id="accountName" size="30" maxlength="15" tabindex="<%out.print(tabindex);tabindex++;%>">
+										  <input type="text" name="accountName" id="accountName" autoComplete='off' size="30" maxlength="15" tabindex="<%out.print(tabindex);tabindex++;%>">
 										</td>
-										<td class="td_text" width="30%"><input type="text" name="description" id="description" size="120" maxlength="56" tabindex="<%out.print(tabindex);tabindex++;%>"></td>
+										<td class="td_text" width="30%">
+										<input type="text" name="description" id="description" autoComplete='off'  size="120" maxlength="56" tabindex="<%out.print(tabindex);tabindex++;%>"></td>
 										<td class="td_text" width="20%"> 
-										   <input type="text" name="amount" id="amount" size="30" tabindex="<%out.print(tabindex);tabindex++;%>"
+										   <input type="text" name="amount"  autoComplete='off' id="amount" size="30" tabindex="<%out.print(tabindex);tabindex++;%>"
 										    onblur="isNum2Digit(this);sumTotal();"  class="enableNumber">
 										</td>
 									</tr>

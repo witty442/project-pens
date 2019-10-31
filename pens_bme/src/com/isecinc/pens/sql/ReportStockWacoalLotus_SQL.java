@@ -9,6 +9,7 @@ import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.dao.constants.Constants;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class ReportStockWacoalLotus_SQL {
@@ -41,7 +42,7 @@ public class ReportStockWacoalLotus_SQL {
 					sql.append("\n ,L.item as group_type ");
 					sql.append("\n FROM  PENSBME_INISTK_WACOAL L WHERE 1=1");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.BRANCH_ID IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 				    sql.append("\n UNION ALL");
 				    sql.append("\n SELECT DISTINCT L.branch_id ");
@@ -50,7 +51,7 @@ public class ReportStockWacoalLotus_SQL {
 					sql.append("\n FROM  PENSBME_WACOAL_SALEIN L");
 					sql.append("\n WHERE  1=1 ");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.BRANCH_ID IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					sql.append("\n UNION ALL");
 				    sql.append("\n SELECT DISTINCT L.branch_id ");
@@ -59,7 +60,7 @@ public class ReportStockWacoalLotus_SQL {
 					sql.append("\n FROM  PENSBME_WACOAL_SALEOUT L");
 					sql.append("\n WHERE 1=1 ");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.BRANCH_ID IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					sql.append("\n UNION ALL");
 				    sql.append("\n SELECT DISTINCT L.branch_id");
@@ -68,7 +69,7 @@ public class ReportStockWacoalLotus_SQL {
 					sql.append("\n FROM  PENSBME_WACOAL_RETURN L");
 					sql.append("\n WHERE  1=1 ");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-						sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+						sql.append("\n AND L.BRANCH_ID IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 					}
 					sql.append("\n )AA");
 					
@@ -79,7 +80,7 @@ public class ReportStockWacoalLotus_SQL {
 			    sql.append("\n FROM  PENSBME_INISTK_WACOAL L WHERE 1=1");
 			    sql.append("\n AND L.branch_id in(select branch_id from pensbme_wacoal_store_mapping where BRANCH_NAME LIKE '"+storeCode+"%') ");
 			    if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-				   sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+				   sql.append("\n AND L.BRANCH_ID IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 			    }
 				if( !Utils.isNull(initDateStr).equals("")){
 				   sql.append("\n AND L.CHECK_DATE  = to_date('"+initDateStr+"','dd/mm/yyyy')  ");
@@ -95,7 +96,7 @@ public class ReportStockWacoalLotus_SQL {
 			    sql.append("\n FROM  PENSBME_WACOAL_SALEIN L");
 			    sql.append("\n WHERE  1=1 ");
 			    if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-				   sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+				   sql.append("\n AND L.BRANCH_ID IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 			    }
 			    if(initDate != null){
 					 sql.append("\n AND L.bill_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
@@ -114,7 +115,7 @@ public class ReportStockWacoalLotus_SQL {
 			    sql.append("\n FROM  PENSBME_WACOAL_SALEOUT L");
 			    sql.append("\n WHERE  1=1 ");
 			    if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-				   sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+				   sql.append("\n AND L.BRANCH_ID IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 			    }
 			    if(initDate != null){
 					 sql.append("\n AND L.sales_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
@@ -133,7 +134,7 @@ public class ReportStockWacoalLotus_SQL {
 			    sql.append("\n FROM  PENSBME_WACOAL_RETURN L");
 			    sql.append("\n WHERE  1=1 ");
 			    if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
-				   sql.append("\n AND L.BRANCH_ID IN("+Utils.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+				   sql.append("\n AND L.BRANCH_ID IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 			    }
 			    if(initDate != null){
 					 sql.append("\n AND L.document_date_sdh  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");

@@ -19,10 +19,17 @@ private static final long serialVersionUID = 1L;
     private String validateScript;
     private String description;
     private String devInfo;
+    private boolean dispDetail;
 	private Map<String, BatchTaskInfo> paramMap;
 	private List<BatchTaskInfo> paramList;
 	
 	
+	public boolean isDispDetail() {
+		return dispDetail;
+	}
+	public void setDispDetail(boolean dispDetail) {
+		this.dispDetail = dispDetail;
+	}
 	public String getProcessName() {
 		return processName;
 	}

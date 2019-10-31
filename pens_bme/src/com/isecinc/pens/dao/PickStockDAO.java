@@ -24,7 +24,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 public class PickStockDAO extends PickConstants{
 	
@@ -852,7 +852,7 @@ public class PickStockDAO extends PickConstants{
 			sql.append("\n select  j.*  ");
 			sql.append("\n  ,(SELECT m.pens_desc from PENSBME_MST_REFERENCE m ");
 			sql.append("\n    where 1=1  and j.store_code = m.pens_value and m.reference_code ='Store') as store_name ");
-			sql.append("\n from PENSBME_PICK_STOCK j ");
+			sql.append("\n from PENSBI.PENSBME_PICK_STOCK j ");
 			sql.append("\n where 1=1   ");
 			sql.append("\n and issue_req_no = '"+h.getIssueReqNo()+"'");
 
@@ -871,6 +871,7 @@ public class PickStockDAO extends PickConstants{
 			   h.setRemark(rst.getString("remark"));
 			   h.setPickType(rst.getString("pick_type"));
 			   h.setSubPickType(Utils.isNull(rst.getString("sub_pick_type")));
+			   h.setForwarder(rst.getString("Forwarder"));
 			   
 			   h.setCustGroup(Utils.isNull(rst.getString("cust_group"))); 
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code"))); 
@@ -1797,8 +1798,8 @@ public class PickStockDAO extends PickConstants{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" INSERT INTO PENSBI.PENSBME_PICK_STOCK \n");
 			sql.append(" (ISSUE_REQ_NO, ISSUE_REQ_DATE, ISSUE_REQ_STATUS, PICK_USER,REMARK ," +
-					"CREATE_DATE,CREATE_USER,PICK_TYPE,CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,SUB_PICK_TYPE)  \n");
-		    sql.append(" VALUES (?, ?, ?, ?, ?, ? , ? ,?,?,?,?,?,?) \n");
+					"CREATE_DATE,CREATE_USER,PICK_TYPE,CUST_GROUP,STORE_CODE,STORE_NO,SUB_INV,SUB_PICK_TYPE,Forwarder)  \n");
+		    sql.append(" VALUES (?, ?, ?, ?, ?, ? , ? ,?,?,?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -1818,7 +1819,7 @@ public class PickStockDAO extends PickConstants{
 			ps.setString(c++, o.getStoreNo());
 			ps.setString(c++, o.getSubInv());
 			ps.setString(c++, Utils.isNull(o.getSubPickType()));
-			
+			ps.setString(c++, Utils.isNull(o.getForwarder()));
 			ps.executeUpdate();
 			
 		}catch(Exception e){
@@ -1836,7 +1837,8 @@ public class PickStockDAO extends PickConstants{
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.PENSBME_PICK_STOCK \n");
-			sql.append(" SET ISSUE_REQ_STATUS =?, PICK_USER = ?,REMARK =? ,UPDATE_DATE =?,UPDATE_USER =? \n");
+			sql.append(" SET ISSUE_REQ_STATUS =?, PICK_USER = ?,REMARK =? ,UPDATE_DATE =?,UPDATE_USER =? , Forwarder =? \n");
+			sql.append(" ,total_box =? ,total_issue_qty = ? \n ");
 			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
 				sql.append(" ,confirm_issue_date =? \n ");
 			}
@@ -1850,6 +1852,9 @@ public class PickStockDAO extends PickConstants{
 			ps.setString(c++, o.getRemark());
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, o.getUpdateUser());
+			ps.setString(c++, o.getForwarder());
+			ps.setDouble(c++, Utils.convertStrToDouble(o.getTotalBox()));
+			ps.setDouble(c++, o.getTotalQty());
 			
 			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
 				Date confrimDate = DateUtil.parse( o.getConfirmIssueDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);

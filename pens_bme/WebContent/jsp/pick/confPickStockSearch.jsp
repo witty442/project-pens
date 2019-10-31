@@ -16,10 +16,7 @@
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <jsp:useBean id="confPickStockForm" class="com.isecinc.pens.web.pick.ConfPickStockForm" scope="session" />
-<% 
-%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -270,7 +267,8 @@ function isSelectOne(){
                                      </td>
                                      <td colspan="3">
                                      <html:text property="bean.issueReqDate" styleId="issueReqDate" size="20"  styleClass="\" autoComplete=\"off"/>
-									 Issue request No <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	  
+									 Issue request No 
+									 <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" styleClass="\" autoComplete=\"off"/>	  
 									
                                       Issue request status
                                       <html:select property="bean.status">

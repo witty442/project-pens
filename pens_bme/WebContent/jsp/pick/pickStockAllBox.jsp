@@ -8,7 +8,6 @@
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -145,11 +144,17 @@ function save(path){
 		alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
 		return false;
 	}
+	 if($('#forwarder').val()==""){
+			alert("กรุณาระบุขนส่ง")
+			$('#forwarder').focus();
+			return false;
+		}
+		  
 	if( !checkOneSelected()){
 		alert("กรุณาเลือกรายการอย่างน้อย 1 รายการ");
 		return false;
 	}
-	
+  
 	if(confirm("ยันยันการบันทึกข้อมูล")){
 		/**Control Save Lock Screen **/
 		startControlSaveLockScreen();
@@ -335,6 +340,46 @@ function printStampBoxNoReport(path){
 	form.submit();
 	return true;
 }
+function autoSubOut(path){
+	var form = document.pickStockForm;
+	var valid = true;
+	if( validAutoSubOut(form.issueReqNo.value)==false){
+		valid =false;
+	}
+	if(form.issueReqStatus.value !='I'){//ISSUE
+		alert("ทำได้เฉพาะ Request ที่ได้ ISSUE แล้วเท่านั้น");
+		valid = false;
+	}
+	if(valid ==true){
+		if( confirm("ยันยันการส่งข้อมูลเพื่อทำ Auto Sub Transfer")){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			
+			form.action = path + "/jsp/pickStockAction.do?do=saveAutoSubOut";
+			form.submit();
+			return true;
+		}
+	}
+	return false;
+}
+function validAutoSubOut(refNo){
+	var returnString = "";
+	var form = document.pickStockForm;
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/validAutoSubOutAjax.jsp",
+			data : "refNo=" + refNo,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	if(returnString =='false'){
+		alert("RefNo นี้ เคยมีการบันทึกการใช้งานไปแล้ว");
+		return false;
+	}	
+	return true;
+}
 </script>
 
 </head>		
@@ -395,6 +440,7 @@ function printStampBoxNoReport(path){
                                     <td> Issue request status</td>
                                       <td>
                                         <html:text property="bean.issueReqStatusDesc" styleId="issueReqStatusDesc" size="20" readonly="true" styleClass="disableText"/>
+                                        <html:text property="bean.issueReqStatus" styleId="issueReqStatus"/>
                                      </td>
 									<td align="right">	 ผู้เบิก  </td>
 									<td align="left">
@@ -414,7 +460,8 @@ function printStampBoxNoReport(path){
 									<td >รหัสร้านค้า<font color="red">*</font>
 									</td>
 									<td align="left" colspan="2"> 
-									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									  <html:text property="bean.storeCode" styleId="storeCode" size="20" styleClass="\" autoComplete=\"off"
+									  onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="30"/>
 									</td>
@@ -444,7 +491,13 @@ function printStampBoxNoReport(path){
 								<tr>
                                     <td > หมายเหตุ </td>
                                     <td colspan="2"> 
-                                      <html:text property="bean.remark" styleId="remark" size="60" />
+                                      <html:text property="bean.remark" styleId="remark" size="60" styleClass="\" autoComplete=\"off"/>
+                                           
+						              &nbsp;&nbsp;&nbsp;&nbsp; 
+						                                ขนส่งโดย  <font color="red">*</font>		
+									    <html:select property="bean.forwarder" styleId="forwarder" >
+									      <html:options collection="forwarderList" property="code" labelProperty="desc"/>
+									     </html:select>
                                       </td>
 								</tr>	
 						   </table>
@@ -453,7 +506,7 @@ function printStampBoxNoReport(path){
                      <!-- Table Content -->					
 						<c:if test="${pickStockForm.results != null}">
 				
-								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width=60%>
+								<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width=100%>
 								    <tr>
 									<!-- 	<th >No</th> -->
 										<th ><!-- <input type="checkbox" name="chkAll" onclick="checkAll(this)"/> --></th>
@@ -517,7 +570,13 @@ function printStampBoxNoReport(path){
 						<table  border="0" cellpadding="3" cellspacing="0" >
 									<tr>
 										<td align="left">
-					 
+										<% User user = (User)session.getAttribute("user"); %>
+										<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
+											<a href="javascript:autoSubOut('${pageContext.request.contextPath}')">
+												<input type="button" value="ส่งข้อมูลเพื่อทำ Auto Sub Transfer" class="newPosBtnLong"> 
+											</a>
+										<%} %>
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					                      <c:if test="${pickStockForm.bean.issueReqStatus == 'I'}">
 											<%--  <a href="javascript:cancelIssueAction('${pageContext.request.contextPath}')"> --%>
 											   <input type="button" value="    Cancel Issue     " class="disablePosBtnLong" disabled> 

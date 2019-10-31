@@ -346,12 +346,21 @@ public class GenerateHISHER extends InterfaceUtils{
 			/**8 */line += appendRightByLength(productCode," ",15);//ITEM_ID	รหัสสินค้า	CHAR(15)
 			       line += debug(no,appendRightByLength(productCode," ",15));no++;
 			       
-			       //productCode ME1M03A3BL
-			       sizeCode =productCode.substring(6,8);
+		    	/** new Case Product (AM1001LGY[9], edit:25102019**/
+			    //productCode ME1M03A3BL
+			     if(productCode.length()==10){
+			    	//AM1001XLGY[10]
+			        sizeCode =productCode.substring(6,8);
+			        colorCode =productCode.substring(8,10);
+			     }else{
+			    	//AM1001LGY[9]
+			        sizeCode =productCode.substring(6,7)+" ";
+			        colorCode =productCode.substring(7,9);  
+			     }
+				logger.debug("productCode["+productCode+"]sizeCode["+sizeCode+"]colorCode["+colorCode+"]");
 			/**9 */line += appendRightByLength(sizeCode," ",4);//SIZE_CODE	ขนาดของสินค้า	CHAR(4)
 			       line += debug(no,appendRightByLength(sizeCode," ",4));no++;
 			       
-			       colorCode =productCode.substring(8,10);
 			/**10 */line += appendRightByLength(colorCode," ",3);//COLOR_CODE	สีของสินค้า	CHAR(3)
 			       line += debug(no,appendRightByLength(colorCode," ",3));no++;
 			       

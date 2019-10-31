@@ -5,7 +5,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,6 +28,7 @@ import com.isecinc.pens.sql.ReportSizeColorLotus_SQL;
 import com.isecinc.pens.web.summary.SummaryForm;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class ReportOnhandSizeColorKingAction {
@@ -47,10 +50,13 @@ public class ReportOnhandSizeColorKingAction {
 	double sale_return_qty = 0;
 	double adjust_qty = 0;
 	double onhand_qty = 0;
+	double onhandQtyTemp = 0;
 	List<OnhandSummary> rowAllList = new ArrayList<OnhandSummary>();
 	OnhandSummary item = null;
 	String storeName = "";
 	String custNoOracle = "";
+	String key = "";//custCode+_+pensItem
+	Map<String,String> mapPensItemDupMat = new HashMap<String, String>();
 	try{
 		//set Page Name
 		summaryForm.setPage("onhandAsOfKing");
@@ -110,7 +116,7 @@ public class ReportOnhandSizeColorKingAction {
 				storeList = StoreDAO.getStoreList(conn, "DUTYFREE");
 			}else{
 				//StoreCode more 1> 020047-1,020049-4
-				storeList = StoreDAO.getStoreList(conn, "DUTYFREE",Utils.converToTextSqlIn(storeCodeCheck));
+				storeList = StoreDAO.getStoreList(conn, "DUTYFREE",SQLHelper.converToTextSqlIn(storeCodeCheck));
 			}
 			//Loop By StoreList
 			if(storeList != null && storeList.size() >0){
@@ -137,26 +143,43 @@ public class ReportOnhandSizeColorKingAction {
 						item.setCustNo(custNoOracle);
 						item.setStoreName(storeName);
 						item.setPensItem(rst.getString("pens_item"));
+						item.setGroup(rst.getString("group_type"));
+						
 						item.setMaterialMaster(rst.getString("material_master"));
 						item.setBarcode(rst.getString("barcode"));
-						item.setGroup(rst.getString("group_type"));
+						
 						item.setInitSaleQty(Utils.decimalFormat(rst.getDouble("init_sale_qty"),Utils.format_current_no_disgit));
-						item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
+						
 						item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("sale_return_qty"),Utils.format_current_no_disgit));
 						item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("sale_out_qty"),Utils.format_current_no_disgit));
 						item.setAdjustQty(Utils.decimalFormat(rst.getDouble("adjust_qty"),Utils.format_current_no_disgit));
-						item.setOnhandQty(Utils.decimalFormat(rst.getDouble("onhand_qty"),Utils.format_current_no_disgit));
+
+						/** Case SalesIN 1 pensItem more Mat show sales_in_qty first row only and recalc onhandQty **/
+						key = item.getStoreCode()+"_"+item.getPensItem();
+						if(mapPensItemDupMat.get(key) ==null){
+						   item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
+						  //calc onhandQty
+						   onhandQtyTemp = rst.getDouble("init_sale_qty")+rst.getDouble("sale_in_qty");
+						   onhandQtyTemp = onhandQtyTemp - (rst.getDouble("sale_out_qty")+rst.getDouble("sale_return_qty"));
+						   onhandQtyTemp = onhandQtyTemp + rst.getDouble("ADJUST_QTY");
+						}else{
+						   item.setSaleInQty("0");
+						   //calc onhandQty
+						   onhandQtyTemp = rst.getDouble("init_sale_qty")+0;
+						   onhandQtyTemp = onhandQtyTemp - (rst.getDouble("sale_out_qty")+rst.getDouble("sale_return_qty"));
+						   onhandQtyTemp = onhandQtyTemp + rst.getDouble("ADJUST_QTY");
+						}
+						item.setOnhandQty(Utils.decimalFormat(onhandQtyTemp,Utils.format_current_no_disgit));
 						
-						rowAllList.add(item);
 						
 						//Sum All Row
 						init_QTY += rst.getDouble("init_sale_qty");
-						sale_in_qty += rst.getDouble("sale_in_qty");
 						sale_return_qty += rst.getDouble("sale_return_qty");
 						sale_out_qty += rst.getDouble("sale_out_qty");
 						adjust_qty += rst.getDouble("adjust_qty");
-						onhand_qty += rst.getDouble("onhand_qty");
-
+						onhand_qty += onhandQtyTemp;
+						
+						rowAllList.add(item);
 					}//while
 				}//for
 				
@@ -217,6 +240,9 @@ public class ReportOnhandSizeColorKingAction {
 			StringBuilder sql = new StringBuilder();
 			String storeName = "";
 			String custNoOracle = "";
+			String key = "";//custCode+_+pensItem
+			Map<String,String> mapPensItemDupMat = new HashMap<String, String>();
+			double onhandQtyTemp = 0;
 			try {
 				storeName = GeneralDAO.getStoreNameModel(conn, c.getPensCustCodeFrom());
 		        custNoOracle = GeneralDAO.getCustNoOracleModel(conn, c.getPensCustCodeFrom());
@@ -234,13 +260,32 @@ public class ReportOnhandSizeColorKingAction {
 					item.setBarcode(rst.getString("barcode"));
 					item.setGroup(rst.getString("group_type"));
 					item.setInitSaleQty(Utils.decimalFormat(rst.getDouble("init_sale_qty"),Utils.format_current_no_disgit));
-					item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
+
 					item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("sale_return_qty"),Utils.format_current_no_disgit));
 					item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("sale_out_qty"),Utils.format_current_no_disgit));
 					item.setAdjustQty(Utils.decimalFormat(rst.getDouble("adjust_qty"),Utils.format_current_no_disgit));
-					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("onhand_qty"),Utils.format_current_no_disgit));
+					
+					/** Case SalesIN 1 pensItem more Mat show sales_in_qty first row only and recalc onhandQty **/
+					key = item.getStoreCode()+"_"+item.getPensItem();
+					if(mapPensItemDupMat.get(key) ==null){
+					   item.setSaleInQty(Utils.decimalFormat(rst.getDouble("sale_in_qty"),Utils.format_current_no_disgit));
+					  //calc onhandQty
+					   onhandQtyTemp = rst.getDouble("init_sale_qty")+rst.getDouble("sale_in_qty");
+					   onhandQtyTemp = onhandQtyTemp - (rst.getDouble("sale_out_qty")+rst.getDouble("sale_return_qty"));
+					   onhandQtyTemp = onhandQtyTemp + rst.getDouble("ADJUST_QTY");
+					}else{
+					   item.setSaleInQty("0");
+					   //calc onhandQty
+					   onhandQtyTemp = rst.getDouble("init_sale_qty")+0;
+					   onhandQtyTemp = onhandQtyTemp - (rst.getDouble("sale_out_qty")+rst.getDouble("sale_return_qty"));
+					   onhandQtyTemp = onhandQtyTemp + rst.getDouble("ADJUST_QTY");
+					}
+					item.setOnhandQty(Utils.decimalFormat(onhandQtyTemp,Utils.format_current_no_disgit));
 					
 					pos.add(item);
+					
+					mapPensItemDupMat.put(key, key);
+					onhandQtyTemp =0;
 					
 				}//while
 				

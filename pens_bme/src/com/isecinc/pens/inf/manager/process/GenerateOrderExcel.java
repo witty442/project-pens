@@ -7,11 +7,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -19,26 +16,14 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.isecinc.pens.bean.MCBean;
-import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.StoreBean;
-import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.ImportDAO;
-import com.isecinc.pens.dao.InterfaceDAO;
-import com.isecinc.pens.dao.OrderDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.isecinc.pens.inf.manager.FTPManager;
-import com.isecinc.pens.web.export.ExcelStyle;
-import com.isecinc.pens.web.export.ExportTimeSheetGroup;
 import com.isecinc.pens.web.export.HssfExcelStyle;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
@@ -460,7 +445,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 		HSSFCell headerCell1 = null;
 		row++;
 		int columnAt = 0;
-		String mat = "";
+		String mat = "",sizeCode="",colorCode="";
 		Map<String,String> totalByStoreMap = new HashMap<String, String>();
 		try{
 			 if(orderList != null && orderList.size() >0){
@@ -483,13 +468,28 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			          headerCell1.setCellStyle(style.dataLineCenterStyle);
 			         headerCell1.setCellValue(Utils.convertStrToDouble(o.getRetailPriceBF()));
 			           
+			         /** new Case Product (AM1001LGY[9], edit:25102019**/
+				    //productCode ME1M03A3BL
+				     if(mat.length()==10){
+				    	//AM1001XLGY[10]
+				        sizeCode =mat.substring(6,8);
+				        colorCode =mat.substring(8,10);
+				     }else{
+				    	//AM1001LGY[9]
+				        sizeCode =mat.substring(6,7)+" ";
+				        colorCode =mat.substring(7,9);  
+				     }
+					 logger.debug("mat["+mat+"]sizeCode["+sizeCode+"]colorCode["+colorCode+"]");
+						
 			          headerCell1 = headerRow.createCell(2);
 			          headerCell1.setCellStyle(style.dataLineCenterStyle);
-			          headerCell1.setCellValue(mat.substring(8,10));
+			          headerCell1.setCellValue(colorCode);
 			          
 			          headerCell1 = headerRow.createCell(3);
 			          headerCell1.setCellStyle(style.dataLineCenterStyle);
-			          headerCell1.setCellValue(mat.substring(6,8));
+			          headerCell1.setCellValue(sizeCode);
+			          
+			          /*******************************************************/
 			          
 			          headerCell1 = headerRow.createCell(4);
 			          headerCell1.setCellStyle(style.dataLineCenterStyle);

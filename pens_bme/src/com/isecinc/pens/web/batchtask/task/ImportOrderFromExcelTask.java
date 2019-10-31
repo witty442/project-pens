@@ -43,8 +43,8 @@ import com.pens.util.DateUtil;
 import com.pens.util.EnvProperties;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
 import com.pens.util.meter.MonitorTime;
+import com.pens.util.seq.SequenceProcess;
 
 public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInterface{
 	public static Logger logger = Logger.getLogger("PENS");
@@ -65,6 +65,9 @@ public class ImportOrderFromExcelTask extends BatchTask implements BatchTaskInte
 	}
 	public String getDevInfo(){
 		return "";
+	}
+	public boolean isDispDetail(){
+		return true;
 	}
 	public String getValidateScript(){
 		String script ="";

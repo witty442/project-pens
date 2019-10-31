@@ -32,7 +32,7 @@ import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
  *
  */
 public class FileUtil {
-	public static Logger logger = Logger.getLogger(FileUtil.class);
+	static Logger logger = Logger.getLogger("PENS");
 
 	public static void writeExcel(String path,HSSFWorkbook xssfWorkbook) throws Exception{
 		FileOutputStream outPutStream = null;
@@ -398,13 +398,18 @@ public class FileUtil {
 	/** PROD:/PENS/ERP/apps/inst/saleonline/dev_temp/  **/
 	
 	public static String getRootPathTemp(EnvProperties env) {
-		String rootPathTemp = env.getProperty("path.temp");
+		String rootPathTemp = "";
+		//logger.debug("getRootPathTemp");
 		try{
+			rootPathTemp = env.getProperty("path.temp");
+			
 			//Case rootPath prouctType=production (but deploy for test on 192.168.202.7or8)
 			// use path: d://dev_temp/
-			if(env.getProperty("productType").equalsIgnoreCase("production")){
-				if(InetAddress.getLocalHost().equals("192.168.202.7") //witty
-					|| InetAddress.getLocalHost().equals("192.168.202.8")){
+			logger.debug("product.type["+env.getProperty("product.type")+"]");
+			logger.debug("localAddress["+InetAddress.getLocalHost().getHostAddress()+"]");
+			if(env.getProperty("product.type").equalsIgnoreCase("Production")){
+				if(InetAddress.getLocalHost().getHostAddress().equals("192.168.202.7") //witty
+					|| InetAddress.getLocalHost().getHostAddress().equals("192.168.202.8")){
 					rootPathTemp = "d://dev_temp//";
 				}
 			}

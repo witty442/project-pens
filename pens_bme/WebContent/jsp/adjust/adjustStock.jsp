@@ -688,6 +688,7 @@ function checkSelect(chk1,chk2){
 											    <input type="text" name="itemIssueDesc" id="itemIssueDesc" value ="${results.itemIssueDesc}" size="10" 
 											    onkeypress="getProductKeypress(event,'issue',this,${results.seqNo})"
 											    onchange="getProductModel('issue',this,${results.seqNo})"
+											    autocomplete="off"
 											    />
 											     <input  tabindex="-1" type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}',${results.seqNo},'itemIssue')"
 											     class="enableNumber"/>
@@ -705,7 +706,8 @@ function checkSelect(chk1,chk2){
 										<td class="td_text">
 											<c:if test="${results.canEdit == true}">
 											    <input type="text" name="itemIssueQty" id="itemIssueQty" value ="${results.itemIssueQty}" size="10" onkeypress="isNum(this)" 
-											     class="enableNumber" onblur="sumTotalIssueQty();calcDiffCost(${results.seqNo})"/>
+											     class="enableNumber" onblur="sumTotalIssueQty();calcDiffCost(${results.seqNo})"
+											     autocomplete="off"/>
 											</c:if>
 											<c:if test="${results.canEdit == false}">
 											   <input type="text" name="itemIssueQty" id="itemIssueQty" value ="${results.itemIssueQty}" size="10" readonly class="disableNumber"/>
@@ -717,6 +719,7 @@ function checkSelect(chk1,chk2){
 											    <input type="text" name="itemReceiptDesc" id="itemReceiptDesc" value ="${results.itemReceiptDesc}" size="10"
 											     onkeypress="getProductKeypress(event,'receipt',this,${results.seqNo})"
 											     onchange="getProductModel('receipt',this,${results.seqNo})"
+											      autocomplete="off"
 											     />
 											    <input  tabindex="-1" type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}',${results.seqNo},'itemReceipt')"/>
 								
@@ -733,7 +736,8 @@ function checkSelect(chk1,chk2){
 										<td class="td_text">
 										  <c:if test="${results.canEdit == true}">
 										     <input type="text" name="itemReceiptQty" id="itemReceiptQty" value ="${results.itemReceiptQty}" size="10" onkeypress="isNum(this)" 
-										      class="enableNumber" onblur="sumTotalReceiptQty();calcDiffCost(${results.seqNo});sumTotalDiffCost()"/>
+										      class="enableNumber" onblur="sumTotalReceiptQty();calcDiffCost(${results.seqNo});sumTotalDiffCost()"
+										      autocomplete="off"/>
 										  </c:if>
 										  <c:if test="${results.canEdit == false}">
 										     <input type="text" name="itemReceiptQty" id="itemReceiptQty" value ="${results.itemReceiptQty}" size="10" readonly class="disableNumber"/>

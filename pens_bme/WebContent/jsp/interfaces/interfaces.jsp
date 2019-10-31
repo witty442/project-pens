@@ -58,15 +58,15 @@ if(  Constants.TYPE_GEN_ORDER_EXCEL.equalsIgnoreCase(pageName)
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/interfaces.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/interfaces.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.8.2.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
 
 <!-- Calendar -->
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
@@ -96,7 +96,8 @@ body {
 
 <Script>
     function loadme(){
-    	<%if( Constants.TYPE_IMPORT_BILL_ICC.equalsIgnoreCase(pageName)
+    	<%if( 	Constants.TYPE_GEN_HISHER.equalsIgnoreCase(pageName)
+    		|| Constants.TYPE_IMPORT_BILL_ICC.equalsIgnoreCase(pageName)
     		|| Constants.TYPE_EXPORT_BILL_ICC.equalsIgnoreCase(pageName)
     		|| Constants.TYPE_GEN_ORDER_EXCEL.equalsIgnoreCase(pageName)
     		) {%>
@@ -575,7 +576,7 @@ body {
 						        </tr>
 						       <tr>
 							    <td align="right" width="40%">Transaction Date<font color="red">*</font></td>
-							    <td valign="top" align="left"><html:text property="bean.transactionDate" styleId="transactionDate" size="20"/></td>
+							    <td valign="top" align="left"><html:text property="bean.transactionDate" styleId="transactionDate" size="20" styleClass="\" autoComplete=\"off"/></td>
 						      </tr>
 							</table>
 							
@@ -792,7 +793,7 @@ body {
 								  <b> Time Process Use: <html:text property="monitorBean.timeInUse" readonly="true"  styleClass="disableText"/> Seconds</b>
 								  &nbsp;&nbsp; <a href="javascript:showDivInfo()">Process Info</a>
 								</td>
-								<td align="right"  width="50%">
+								<td align="left"  width="50%">
 								   <b>
 								   <!-- Display Path FTP -->
 									   <%if(Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){ 
@@ -808,6 +809,29 @@ body {
 										    out.print("    Path :"+path);
 										}
 										%>
+										
+										<%if("admin".equalsIgnoreCase(user.getUserName())){ 
+                                           if(Constants.TYPE_GEN_ITEM_MASTER_HISHER.equals(pageName)){ 
+									    		out.println("GEN_ITEM_MASTER_HISHER <br/>");
+									    		out.println("->>GET PENSBME_PRICELIST(INTERFACE_ICC=N) after set INTERFACE_ICC=Y");
+									    	}
+											if(Constants.TYPE_GEN_HISHER.equals(pageName)){ 
+												out.println("GEN_HISHER <br/>");
+									    		out.println("->>GET (PENSBME_ORDER,PENSBME_STOCK_ISSUE) EXPORTED NOT IN(Y,G) after set EXPORTED=Y");
+									    	}
+											if(Constants.TYPE_GEN_ORDER_EXCEL.equals(pageName)){ 
+									    		out.println("GEN_ORDER_EXCEL <br/>");
+									    		out.println("->>GET (PENSBME_ORDER,PENSBME_STOCK_ISSUE) EXPORTED IN(Y) after set EXPORTED=G");
+									    	}
+											/* if(Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){ 
+									    		out.println("IMPORT_BILL_ICC <br/>");
+									    		out.println("");
+									    	}
+											if(Constants.TYPE_EXPORT_BILL_ICC.equals(pageName)){ 
+									    		out.println("EXPORT_BILL_ICC <br/>");
+									    		out.println("");
+									    	} */
+										} %>
 								   </b>
 								 </td>
 							 </tr>

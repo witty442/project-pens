@@ -186,20 +186,20 @@ function stampPrint(){
 		}).responseText;
 	});
 }
+
 function changePaymentMethod(paymentMethod){
-	if("CS" ==paymentMethod.value || "ALI" ==paymentMethod.value || "WE" ==paymentMethod.value){
-		document.getElementById("div_credit_1").style.display = "none";
-		document.getElementById("div_credit_2").style.display = "none";
-		document.getElementById("div_credit_3").style.display = "none";
-		document.getElementById("div_credit_4").style.display = "none";
-	}else{
+	if("CR" ==paymentMethod.value ){
 		document.getElementById("div_credit_1").style.display = "block";
 		document.getElementById("div_credit_2").style.display = "block";
 		document.getElementById("div_credit_3").style.display = "block";
 		document.getElementById("div_credit_4").style.display = "block";
+	}else{
+		document.getElementById("div_credit_1").style.display = "none";
+		document.getElementById("div_credit_2").style.display = "none";
+		document.getElementById("div_credit_3").style.display = "none";
+		document.getElementById("div_credit_4").style.display = "none";
 	}
 }
-
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -418,8 +418,10 @@ function changePaymentMethod(paymentMethod){
 									              <input type="text"  value="AliPay" class="disableBoldText" readonly size="10"/>
 									         <%}else if(orderForm.getOrder().getPaymentMethod().equalsIgnoreCase("WE")) {%>
 									             <input type="text"  value="WeChat" class="disableBoldText" readonly size="10"/>
-									         <%}else{ %>
-									              <input type="text"  value="บัตรเครดิต" class="disableBoldText" readonly size="10"/>
+									         <%}else if(orderForm.getOrder().getPaymentMethod().equalsIgnoreCase("GOV")) {%>
+									             <input type="text"  value="ชิมช็อปใช้" class="disableBoldText" readonly size="10"/>
+									         <%}else if(orderForm.getOrder().getPaymentMethod().equalsIgnoreCase("CR")) {%>
+									             <input type="text"  value="บัตรเครดิต" class="disableBoldText" readonly size="10"/>
 									         <%} %>
 									         </b>
 									      </td>

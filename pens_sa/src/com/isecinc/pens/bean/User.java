@@ -51,7 +51,8 @@ public class User extends I_PO implements Serializable {
 	public static final String PD ="PD";
 	public static final String VANSALES = "VANSALES";
 	public static final String COVERAGE = "COVERAGE";
-	public static final String B2B = "B2B";
+	public static final String B2B_MAKRO = "MAKRO";
+	public static final String PREORDER = "PREORDER";
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -111,6 +112,7 @@ public class User extends I_PO implements Serializable {
 		setRoleOnhand(convertToString(rst.getString("ROLE_ONHAND")));
 		setRoleCoverage(convertToString(rst.getString("ROLE_COVERAGE")));
 		setRoleB2B(convertToString(rst.getString("ROLE_B2B")));
+		setRoleMkt(convertToString(rst.getString("ROLE_MKT")));
 		
 		//System.out.println("setRoleMC:"+getRoleMC()+";"+convertToString(rst.getString("ROLE_MC")));
 		// set display label
@@ -225,8 +227,17 @@ public class User extends I_PO implements Serializable {
     private String roleOnhand;
     private String roleCoverage;
     private String roleB2B;
+    private String roleMkt;
     
     
+	public String getRoleMkt() {
+		return roleMkt;
+	}
+
+	public void setRoleMkt(String roleMkt) {
+		this.roleMkt = roleMkt;
+	}
+
 	public String getRoleB2B() {
 		return roleB2B;
 	}

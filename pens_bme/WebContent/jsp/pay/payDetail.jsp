@@ -275,11 +275,12 @@ function switchFlag(obj,name){
 									<tr class="<%=tabclass%>">
 										<td class="td_text_center" width="25%">
 										  <input type="hidden" name="lineId" id="lineId" >
-										  <input type="text" name="accountName" id="accountName" size="30" maxlength="15" tabindex="<%out.print(tabindex);tabindex++;%>">
+										  <input type="text" name="accountName"  autoComplete='off' id="accountName" size="30" maxlength="15" tabindex="<%out.print(tabindex);tabindex++;%>">
 										</td>
-										<td class="td_text" width="30%"><input type="text" name="description" id="description" size="120" maxlength="56" tabindex="<%out.print(tabindex);tabindex++;%>"></td>
+										<td class="td_text" width="30%">
+										<input type="text" name="description"  autoComplete='off'  id="description" size="120" maxlength="56" tabindex="<%out.print(tabindex);tabindex++;%>"></td>
 										<td class="td_text" width="20%"> 
-										   <input type="text" name="amount" id="amount" size="30" tabindex="<%out.print(tabindex);tabindex++;%>"
+										   <input type="text" name="amount"  autoComplete='off' id="amount" size="30" tabindex="<%out.print(tabindex);tabindex++;%>"
 										    onblur="isNum2Digit(this);sumTotal();"  class="enableNumber">
 										</td>
 									</tr>

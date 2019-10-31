@@ -38,6 +38,14 @@ if(session.getAttribute("custGroupList") == null){
 	
 	session.setAttribute("custGroupList",billTypeList);
 }
+if(session.getAttribute("forwarderList") == null){
+	//forwarder
+	List<PopupForm> forwarderList = new ArrayList<PopupForm>();
+	PopupForm refP = new PopupForm("",""); 
+	forwarderList.add(refP);
+	forwarderList.addAll(GeneralDAO.searchForwarderList( new PopupForm()));
+	request.getSession().setAttribute("forwarderList",forwarderList);
+}
 String pageName = pickStockGroupForm.getBean().getPage();
 %>
 

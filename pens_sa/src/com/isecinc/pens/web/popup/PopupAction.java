@@ -191,6 +191,7 @@ public class PopupAction extends I_Action {
 			}else if("PD".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For SalestargetPD
 				 results = PopupDAO.searchPDList(popupForm,"P");
+				 
 			}
 			
 			 if(results != null && results.size() >0){

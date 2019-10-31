@@ -12,7 +12,7 @@ import com.isecinc.pens.bean.GroupRole;
 import com.isecinc.pens.bean.User;
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;
-import com.pens.util.helper.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 public class ProfileProcess {
 
