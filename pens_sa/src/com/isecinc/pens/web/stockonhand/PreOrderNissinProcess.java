@@ -140,16 +140,17 @@ public class PreOrderNissinProcess  {
 				String[] productCode=request.getParameterValues("productCode");
 				String[] productName=request.getParameterValues("productName");
 				String[] beginQty=request.getParameterValues("beginQty");
-				String[] wipQty=request.getParameterValues("wipQty");
-				String[] totalQty=request.getParameterValues("totalQty");
 				String[] salesAvg=request.getParameterValues("salesAvg");
-				String[] foreCastQty=request.getParameterValues("foreCastQty");
+				String[] currentQty=request.getParameterValues("currentQty");
+				String[] currentPeriod=request.getParameterValues("currentPeriod");
 				String[] endMonthQty=request.getParameterValues("endMonthQty");
-				String[] targetQty=request.getParameterValues("targetQty");
+				String[] nextQty=request.getParameterValues("nextQty");
+				String[] nextPeriod=request.getParameterValues("nextPeriod");
+				String[] suggestedPoQty=request.getParameterValues("suggestedPoQty");
 				String[] bufferPercent=request.getParameterValues("bufferPercent");
 				String[] bufferQty=request.getParameterValues("bufferQty");
-				String[] preOrderQty=request.getParameterValues("preOrderQty");
 				
+		
 				for(int i=0;i<productCode.length;i++){
 					item = new StockOnhandBean();
 					item.setTransDate(aForm.getBean().getTransDate());
@@ -159,15 +160,15 @@ public class PreOrderNissinProcess  {
 					item.setProductCode(productCode[i]);
 					item.setProductName(productName[i]);
 					item.setBeginQty(beginQty[i]);
-					item.setWipQty(wipQty[i]);
-					item.setTotalQty(totalQty[i]);
 					item.setSalesAvg(salesAvg[i]);
-					item.setForeCastQty(foreCastQty[i]);
+					item.setCurrentQty(currentQty[i]);
+					item.setCurrentPeriod(currentPeriod[i]);
 					item.setEndMonthQty(endMonthQty[i]);
-					item.setTargetQty(targetQty[i]);
+					item.setNextQty(nextQty[i]);
+					item.setNextPeriod(nextPeriod[i]);
 					item.setBufferPercent(bufferPercent[i]);
 					item.setBufferQty(bufferQty[i]);
-					item.setPreOrderQty(preOrderQty[i]);
+					item.setSuggestedPoQty(suggestedPoQty[i]);
 					 //update or insert
 					u = updateNissinPreOrder(conn, item);
 					if(u==0){
@@ -231,9 +232,9 @@ public class PreOrderNissinProcess  {
 		try{
 			sql.append(" INSERT INTO PENSBI.NISSIN_PRE_ORDER \n");
 			sql.append(" (TRANS_DATE,INVENTORY_ITEM_CODE,INVENTORY_ITEM_DESC ,Begin_qty ,\n");
-			sql.append(" Wip_qty, Total_qty, Sales_avg,Forecast_qty,  \n");
-			sql.append(" End_month_qty,Target_qty,Buffer_percent,Buffer_qty ,\n");
-			sql.append(" Preorder_qty, STATUS, CREATE_USER, CREATE_DATE)  \n");
+			sql.append(" Sales_avg,current_qty, current_period, \n");
+			sql.append(" End_month_qty,next_qty,next_period,Buffer_percent,Buffer_qty ,\n");
+			sql.append(" suggested_po_qty, STATUS, CREATE_USER, CREATE_DATE)  \n");
 		    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
@@ -242,15 +243,15 @@ public class PreOrderNissinProcess  {
 			ps.setString(c++, o.getProductCode());
 			ps.setString(c++, o.getProductName());
 			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getBeginQty())));
-			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getWipQty())));
-			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getTotalQty())));
 			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getSalesAvg())));
-			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getForeCastQty())));
+			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getCurrentQty())));
+			ps.setString(c++, o.getCurrentPeriod());
 			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getEndMonthQty())));
-			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getTargetQty())));
+			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getNextQty())));
+			ps.setString(c++, o.getNextPeriod());
 			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getBufferPercent())));
 			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getBufferQty())));
-			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getPreOrderQty())));
+			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getSuggestedPoQty())));
 			ps.setString(c++, o.getStatus());
 			ps.setString(c++, o.getCreateUser());
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
@@ -272,24 +273,24 @@ public class PreOrderNissinProcess  {
 		
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.NISSIN_PRE_ORDER \n");
-			sql.append(" SET Begin_qty =?, Wip_qty =?, Total_qty =? ,Sales_avg=? \n");
-			sql.append(" ,Forecast_qty =?, End_month_qty =?, Target_qty =? ,Buffer_percent=? \n");
-			sql.append(" ,Buffer_qty=?,Preorder_qty=?,UPDATE_USER =?, UPDATE_DATE=? ,STATUS =?  \n");
+			sql.append(" SET Begin_qty =?,Sales_avg=?,current_qty =?,current_period =? \n");
+			sql.append(" ,End_month_qty =?, next_qty =? ,next_period =?,Buffer_percent=?,Buffer_qty=?  \n");
+			sql.append(" ,suggested_po_qty=?,UPDATE_USER =?, UPDATE_DATE=? ,STATUS =?  \n");
 			
 		    sql.append(" WHERE TRANS_DATE =? AND INVENTORY_ITEM_CODE = ?\n");
 			
 			ps = conn.prepareStatement(sql.toString());
 			
 			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getBeginQty())));
-			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getWipQty())));
-			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getTotalQty())));
 			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getSalesAvg())));
-			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getForeCastQty())));
+			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getCurrentQty())));
+			ps.setString(c++, o.getCurrentPeriod());
 			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getEndMonthQty())));
-			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getTargetQty())));
+			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getNextQty())));
+			ps.setString(c++, o.getNextPeriod());
 			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getBufferPercent())));
 			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getBufferQty())));
-			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getPreOrderQty())));
+			ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getSuggestedPoQty())));
 			
 			ps.setString(c++, o.getCreateUser());
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
@@ -378,7 +379,6 @@ public class PreOrderNissinProcess  {
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		StringBuffer html = null;
-		//List<StockOnhandBean> itemList = new ArrayList<StockOnhandBean>();
 		int r = 0;
 		String transDate = "";
 		String status = "OPEN";
@@ -402,28 +402,26 @@ public class PreOrderNissinProcess  {
 			  if(r==1){
 				 //gen Head Table
 				 html = new StringBuffer("");
+				 o.setCurrentPeriod(Utils.isNull(rst.getString("current_period")));
+				 o.setNextPeriod(Utils.isNull(rst.getString("next_period")));
 				 html.append(genHeadTable(contextPath,o,excel));
 			  }
 			  status = Utils.isNull(rst.getString("status"));
 			  item.setStatus(status);
 			  item.setProductCode(Utils.isNull(rst.getString("INVENTORY_ITEM_CODE")));
 			  item.setProductName(Utils.isNull(rst.getString("INVENTORY_ITEM_DESC")));
-			  item.setBeginQty(Utils.decimalFormat(rst.getDouble("begin_qty"), Utils.format_current_no_disgit,""));
-			  item.setWipQty(Utils.decimalFormat(rst.getDouble("wip_qty"), Utils.format_current_no_disgit,""));
-			  item.setTotalQty(Utils.decimalFormat(rst.getDouble("total_qty"), Utils.format_current_no_disgit,""));
+			  item.setBeginQty(Utils.decimalFormat(rst.getDouble("begin_qty"), Utils.format_current_2_disgit,""));
 			  item.setSalesAvg(Utils.decimalFormat(rst.getDouble("sales_avg"), Utils.format_current_2_disgit,"")); 
-			  item.setForeCastQty(Utils.decimalFormat(rst.getDouble("Forecast_qty"), Utils.format_current_no_disgit,""));
-			  item.setSalesQty(Utils.decimalFormat(rst.getDouble("sales_qty"), Utils.format_current_no_disgit,""));
-			  item.setEndMonthQty(Utils.decimalFormat(rst.getDouble("End_month_qty"), Utils.format_current_no_disgit,""));
-			  item.setTargetQty(Utils.decimalFormat(rst.getDouble("Target_qty"), Utils.format_current_no_disgit,""));
+			  item.setCurrentQty(Utils.decimalFormat(rst.getDouble("current_qty"), Utils.format_current_2_disgit,""));
+			  item.setEndMonthQty(Utils.decimalFormat(rst.getDouble("End_month_qty"), Utils.format_current_2_disgit,""));
+			  item.setNextQty(Utils.decimalFormat(rst.getDouble("next_qty"), Utils.format_current_2_disgit,""));
 			  item.setBufferPercent(Utils.decimalFormat(rst.getDouble("Buffer_percent"), Utils.format_current_no_disgit,""));
-			  item.setBufferQty(Utils.decimalFormat(rst.getDouble("Buffer_qty"), Utils.format_current_no_disgit,""));
-			  item.setPreOrderQty(Utils.decimalFormat(rst.getDouble("Preorder_qty"), Utils.format_current_no_disgit,""));
+			  item.setBufferQty(Utils.decimalFormat(rst.getDouble("Buffer_qty"), Utils.format_current_2_disgit,""));
+			  item.setSuggestedPoQty(Utils.decimalFormat(rst.getDouble("suggested_po_qty"), Utils.format_current_2_disgit,""));
+			  item.setCurrentPeriod(Utils.isNull(rst.getString("current_period")));
+			  item.setNextPeriod(Utils.isNull(rst.getString("next_period")));
 			  //gen Row
 			  html.append(genRowTable(o,excel,item,(r-1),true));
-			  
-			  //add to List
-			  //itemList.add(item);
 			}
 			
 			//Not found in Data Save Get From Procedure Oracle
@@ -443,21 +441,22 @@ public class PreOrderNissinProcess  {
 				  if(r==1){
 					 //gen Head Table
 					 html = new StringBuffer("");
+					 o.setCurrentPeriod(Utils.isNull(rst.getString("current_name")));
+					 o.setNextPeriod(Utils.isNull(rst.getString("next_name")));
 					 html.append(genHeadTable(contextPath,o,excel));
 				  }
 				  item.setProductCode(Utils.isNull(rst.getString("segment1")));
 				  item.setProductName(Utils.isNull(rst.getString("description")));
-				  item.setBeginQty(Utils.decimalFormat(rst.getDouble("onhand_qty"), Utils.format_current_no_disgit,""));
-				  item.setWipQty(Utils.decimalFormat(rst.getDouble("po_qty"), Utils.format_current_no_disgit,""));
-				  item.setTotalQty(Utils.decimalFormat(rst.getDouble("total_qty"), Utils.format_current_no_disgit,""));
+				  item.setBeginQty(Utils.decimalFormat(rst.getDouble("onhand_qty"), Utils.format_current_2_disgit,""));
 				  item.setSalesAvg(Utils.decimalFormat(rst.getDouble("avg_qty"), Utils.format_current_2_disgit,"")); 
-				  item.setForeCastQty(Utils.decimalFormat(rst.getDouble("Forecast_qty"), Utils.format_current_no_disgit,""));
-				  item.setSalesQty(Utils.decimalFormat(rst.getDouble("sales_qty"), Utils.format_current_no_disgit,""));
-				  item.setEndMonthQty(Utils.decimalFormat(rst.getDouble("End_qty"), Utils.format_current_no_disgit,""));
-				  item.setTargetQty(Utils.decimalFormat(rst.getDouble("Target_qty"), Utils.format_current_no_disgit,""));
+				  item.setCurrentQty(Utils.decimalFormat(rst.getDouble("current_qty"), Utils.format_current_2_disgit,""));
+				  item.setEndMonthQty(Utils.decimalFormat(rst.getDouble("End_qty"), Utils.format_current_2_disgit,""));
+				  item.setNextQty(Utils.decimalFormat(rst.getDouble("next_qty"), Utils.format_current_2_disgit,""));
 				  item.setBufferPercent(Utils.decimalFormat(rst.getDouble("Buffer_percent"), Utils.format_current_no_disgit,""));
 				  item.setBufferQty(Utils.decimalFormat(rst.getDouble("Buffer_qty"), Utils.format_current_2_disgit,""));
-				  item.setPreOrderQty(Utils.decimalFormat(rst.getDouble("Preorder_qty"), Utils.format_current_2_disgit,""));
+				  item.setSuggestedPoQty(Utils.decimalFormat(rst.getDouble("suggested_qty"), Utils.format_current_2_disgit,""));
+				  item.setCurrentPeriod(Utils.isNull(rst.getString("current_name")));
+				  item.setNextPeriod(Utils.isNull(rst.getString("next_name")));
 				  //gen Row
 				  html.append(genRowTable(o,excel,item,(r-1),false));
 				  
@@ -471,7 +470,9 @@ public class PreOrderNissinProcess  {
 			//Check Execute Found data
 			if(r>0){
 			  // gen end Table
-			   html.append("</table>");
+			   html.append("    </tbody>");
+			   html.append("  </table>");
+			   html.append("</div>");
 			}
 			o.setDataStrBuffer(html);
 			o.setStatus(status);
@@ -495,7 +496,7 @@ public class PreOrderNissinProcess  {
 	 */
 	private  StringBuffer genHeadTable(String contextPath,StockOnhandBean head,boolean excel) throws Exception{
 		StringBuffer h = new StringBuffer("");
-		int colspan=12;
+		int colspan=8;
 		if(excel){
 			h.append(ExcelHeader.EXCEL_HEADER);
 			h.append("<table id='tblProduct' align='center' border='1'> \n");
@@ -508,24 +509,24 @@ public class PreOrderNissinProcess  {
 			h.append("</tr> \n");
 			h.append("</table> \n");
 		}
-		String width="100%";
-		h.append("<table id='tblProduct' align='center' border='1' width='"+width+"' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
-		h.append("<tr> \n");
-		h.append(" <th >Item</th> \n");
-		h.append(" <th >Item Description</th>");
-		h.append(" <th >ยอดยกมาจากเดือนก่อน <br/>Beginning Qty</th>");
-		h.append(" <th >ยอดอยู่ระหว่างโรงงานผลิต<br/> Work in Process</th>");
-		h.append(" <th >รวม มีสินค้า <br/>Total</th>");
-		h.append(" <th >AVG Sales <br/>3 M AVG</th>");
-		h.append(" <th >Forecast Sales</th>");
-		/*h.append(" <th >ยอดขายระหว่างเดือน</th>");*/
-		h.append(" <th >End of Month</th>");
-		h.append(" <th >Target Sales</th>");
-		h.append(" <th >%Buffer</th>");
-		h.append(" <th >Buffer</th>");
-		h.append(" <th >Pre Order</th>");
-		h.append("</tr> \n");
-	
+		h.append("<div class='tbl-header'> ");
+		h.append("<table id='tblProduct' class='table_fix' border='1' cellpadding='3' cellspacing='1'> \n");
+		h.append(" <thread><tr> \n");
+		h.append(" <th bgcolor='#03A4B6' height='30px' width='4%'>Item</th> \n");
+		h.append(" <th bgcolor='#03A4B6' height='30px' width='12%'>Item Description</th>");
+		h.append(" <th bgcolor='#03A4B6' height='30px' width='5%'>Stock B&W</th>");
+		h.append(" <th bgcolor='#03A4B6' height='30px' width='5%'>AVG Sales <br/>3 M AVG</th>");
+		h.append(" <th bgcolor='#03A4B6' height='30px' width='5%'>Target <br/> "+head.getCurrentPeriod()+"</th>");
+		h.append(" <th bgcolor='#82E0AA' height='30px' width='5%'><b>Suggested PO</b></th>");
+		h.append(" <th bgcolor='#03A4B6' height='30px' width='5%'>Target <br/> "+head.getNextPeriod()+"</th>");
+		h.append(" <th bgcolor='#03A4B6' height='30px' width='5%'>%Buffer</th>");
+		h.append(" </tr></thread> \n");
+		h.append("</table> \n");
+		h.append("</div> \n");
+		
+		h.append("<div class='tbl-content'> ");
+		h.append(" <table id='tblProductContent' class='table_fix' border='1' cellpadding='3' cellspacing='1'> \n");
+		h.append(" <tbody> \n");
 		return h;
 	}
 	
@@ -541,86 +542,71 @@ public class PreOrderNissinProcess  {
 	private  StringBuffer genRowTable(StockOnhandBean head,boolean excel,StockOnhandBean item,int index,boolean calc) throws Exception{
 		StringBuffer h = new StringBuffer("");
 		String classText = "text";
+		String classTextCenter = "text_center";
 		String classCurrency = "currency";
 		String classNum ="num";
-		h.append("<tr> \n");
-		
-		//calc endMonth
-		
+		h.append("<tr class='lineO'> \n");
 		if( !excel){
 			classText = "td_text";
+			classTextCenter = "td_text_center";
 			classCurrency = "td_number";
-			h.append("<td class='"+classText+"' width='4%'>");
+			h.append("<td class='"+classTextCenter+"' width='4%' height='25px'>");
 			h.append(" <input type='text' readonly name='productCode' tabindex='-1' id='productCode' size='6' class='disableText' value='"+item.getProductCode()+"'/>");
 			h.append("</td> \n");
-			h.append("<td class='"+classText+"' width='12%'>");
-			h.append(" <input type='text' readonly name='productName' tabindex='-1'  id='productName' size='35' class='disableText' value='"+item.getProductName()+"'/>");
+			h.append("<td class='"+classText+"' width='12%' height='25px'>");
+			h.append(" <input type='text' readonly name='productName' tabindex='-1'  id='productName' size='50' class='disableText' value='"+item.getProductName()+"'/>");
 			h.append("</td> \n");
-			h.append("<td class='"+classCurrency+"' width='5%'>");
+			h.append("<td class='"+classCurrency+"' width='5%' height='25px'>");
 			h.append(" <input type='text' readonly name='beginQty' tabindex='-1'  id='beginQty' size='8' class='disableNumber' value='"+item.getBeginQty()+"'/>");
 			h.append("</td> \n");
-			h.append("<td class='"+classCurrency+"' width='5%'>");
-			h.append(" <input type='text' readonly name='wipQty' tabindex='-1'  id='wipQty' size='8' class='disableNumber' value='"+item.getWipQty()+"'/>");
-			h.append("</td> \n");
-			h.append("<td class='"+classCurrency+"' width='5%'>");
-			h.append(" <input type='text' readonly name='totalQty' tabindex='-1'  id='totalQty' size='8' class='disableNumber' value='"+item.getTotalQty()+"'/>");
-			h.append("</td> \n");
-			h.append("<td class='"+classCurrency+"' width='5%'>");
+			h.append("<td class='"+classCurrency+"' width='5%' height='25px'>");
 			h.append(" <input type='text' readonly name='salesAvg' tabindex='-1'  id='salesAvg' size='8' class='disableNumber' value='"+item.getSalesAvg()+"'/>");
 			h.append("</td> \n");
-			h.append("<td class='"+classCurrency+"' width='5%'>");
+			h.append("<td class='"+classCurrency+"' width='5%' height='25px'>");
 			if( !"FINISH".equalsIgnoreCase(item.getStatus())){
-			  h.append(" <input type='text' name='foreCastQty' id='foreCastQty' size='8' class='enableNumber'  value='"+item.getForeCastQty()+"'");
+			  h.append(" <input type='text' name='currentQty' id='currentQty' size='8' class='enableNumber'  value='"+item.getCurrentQty()+"'");
 			  h.append("  onkeydown='return inputNum(event);' onblur='calcEndMonthQty("+index+")' autoComplete='off'/>");
 		    }else{
-		      h.append(" <input type='text' name='foreCastQty' id='foreCastQty' size='8' class='disableNumber'  value='"+item.getForeCastQty()+"'");
+		      h.append(" <input type='text' name='currentQty' id='currentQty' size='8' class='disableNumber'  value='"+item.getCurrentQty()+"'");
 			  h.append(" readonly='true'/>");
 		    }
-		/*	h.append("<td class='"+classCurrency+"' width='5%'>");
-			h.append(" <input type='text' readonly name='salesQty' tabindex='-1'  id='salesQty' size='8' class='disableNumber' value='"+item.getSalesQty()+"'/>");
-			h.append("</td> \n");*/
+			h.append(" <input type='hidden' name='currentPeriod' tabindex='-1'  id='currentPeriod'  value='"+item.getCurrentPeriod()+"'/>");
+			h.append(" <input type='hidden' name='nextPeriod' tabindex='-1'  id='nextPeriod'  value='"+item.getNextPeriod()+"'/>");
+			h.append(" <input type='hidden' name='endMonthQty' tabindex='-1'  id='endMonthQty'  value='"+item.getEndMonthQty()+"'/>");
 			h.append("</td> \n");
 			h.append("<td class='"+classCurrency+"' width='5%'>");
-			h.append(" <input type='text' readonly name='endMonthQty' tabindex='-1'  id='endMonthQty' size='8' class='disableNumber' value='"+item.getEndMonthQty()+"'/>");
+			h.append(" <input type='text' readonly name='suggestedPoQty' tabindex='-1'  id='suggestedPoQty' size='8' class='disableNumberBold' value='"+item.getSuggestedPoQty()+"'/>");
 			h.append("</td> \n");
+			
 			if( !"FINISH".equalsIgnoreCase(item.getStatus())){
-				h.append("<td class='"+classCurrency+"' width='5%'>");
-				h.append(" <input type='text' name='targetQty' id='targetQty' size='8' class='enableNumber' value='"+item.getTargetQty()+"'");
+				h.append("<td class='"+classCurrency+"' width='5%' height='25px'>");
+				h.append(" <input type='text' name='nextQty' id='nextQty' size='8' class='enableNumber' value='"+item.getNextQty()+"'");
 				h.append("  onkeydown='return inputNum(event);' onblur='calcBufferQty("+index+")' autoComplete='off'/>");
 				h.append("</td> \n");
-				h.append("<td class='"+classCurrency+"' width='5%'>");
+				h.append("<td class='"+classCurrency+"' width='5%' height='25px'>");
 				h.append(" <input type='text' name='bufferPercent' id='bufferPercent' size='8' class='enableNumber' value='"+item.getBufferPercent()+"'");
 				h.append("  onkeydown='return inputNum(event);' onblur='calcBufferQty("+index+")' autoComplete='off'/>");
 				h.append("</td> \n");
 			}else{
-				h.append("<td class='"+classCurrency+"' width='5%'>");
-				h.append(" <input type='text' name='targetQty' id='targetQty' size='8' class='disableNumber' value='"+item.getTargetQty()+"'");
+				h.append("<td class='"+classCurrency+"' width='5%' height='25px'>");
+				h.append(" <input type='text' name='nextQty' id='nextQty' size='8' class='disableNumber' value='"+item.getNextQty()+"'");
 				h.append("  readonly='true'/>");
 				h.append("</td> \n");
-				h.append("<td class='"+classCurrency+"' width='5%'>");
+				h.append("<td class='"+classCurrency+"' width='5%' height='25px'>");
 				h.append(" <input type='text' name='bufferPercent' id='bufferPercent' size='8' class='disableNumber' value='"+item.getBufferPercent()+"'");
 				h.append("  readonly='true'/>");
 				h.append("</td> \n");
 			}
-			h.append("<td class='"+classCurrency+"' width='5%'>");
-			h.append(" <input type='text' readonly name='bufferQty' tabindex='-1'  id='bufferQty' size='8' class='disableNumber' value='"+item.getBufferQty()+"'/>");
-			h.append("</td> \n");
-			h.append("<td class='"+classCurrency+"' width='5%'>");
-			h.append(" <input type='text' readonly name='preOrderQty' tabindex='-1'  id='preOrderQty' size='8' class='disableNumber' value='"+item.getPreOrderQty()+"'/>");
-			h.append("</td> \n");
+			h.append(" <input type='hidden' name='bufferQty' tabindex='-1'  id='bufferQty' value='"+item.getBufferQty()+"'/>");
 		}else{
-			h.append("<td class='"+classText+"' width='4%'>"+item.getProductCode()+"</td> \n");
-			h.append("<td class='"+classText+"' width='15%'>"+item.getProductName()+"</td> \n");
-			h.append("<td class='"+classNum+"' width='5%'>"+item.getBeginQty()+"</td> \n");
-			h.append("<td class='"+classNum+"' width='5%'>"+item.getWipQty()+"</td> \n");
-			h.append("<td class='"+classNum+"' width='5%'>"+item.getTotalQty()+"</td> \n");
-			h.append("<td class='"+classCurrency+"' width='5%'>"+item.getSalesAvg()+"</td> \n");
-			h.append("<td class='"+classNum+"' width='5%'>"+item.getForeCastQty()+"</td> \n");
-			h.append("<td class='"+classNum+"' width='5%'>"+item.getEndMonthQty()+"</td> \n");
-			h.append("<td class='"+classNum+"' width='5%'>"+item.getTargetQty()+"</td> \n");
-			h.append("<td class='"+classNum+"' width='5%'>"+item.getBufferPercent()+"</td> \n");
-			h.append("<td class='"+classNum+"' width='5%'>"+item.getBufferQty()+"</td> \n");
-			h.append("<td class='"+classNum+"' width='5%'>"+item.getPreOrderQty()+"</td> \n");
+			h.append("<td class='"+classText+"' width='4%' height='25px'>"+item.getProductCode()+"</td> \n");
+			h.append("<td class='"+classText+"' width='12%' height='25px'>"+item.getProductName()+"</td> \n");
+			h.append("<td class='"+classNum+"' width='5%' height='25px'>"+item.getBeginQty()+"</td> \n");
+			h.append("<td class='"+classCurrency+"' width='5%' height='25px'>"+item.getSalesAvg()+"</td> \n");
+			h.append("<td class='"+classNum+"' width='5%' height='25px'>"+item.getCurrentQty()+"</td> \n");
+			h.append("<td class='"+classNum+"' width='5%' height='25px'>"+item.getSuggestedPoQty()+"</td> \n");
+			h.append("<td class='"+classNum+"' width='5%' height='25px'>"+item.getNextQty()+"</td> \n");
+			h.append("<td class='"+classNum+"' width='5%' height='25px'>"+item.getBufferPercent()+"</td> \n");
 		}
 		h.append("</tr> \n");
 		return h;

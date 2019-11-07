@@ -21,7 +21,7 @@ public class TestALL {
 			
 			output +="DB IP  : "+url+"\n";
 			output +="DB User : "+username+"\n";
-			output +="DB Password : "+password+"\n";
+			//output +="DB Password : "+password+"\n";
 			
 			Class.forName(driver);
 			//DriverManager.setLoginTimeout(600);
@@ -60,7 +60,7 @@ public class TestALL {
 		 }
 		 output +="FTP SERVER(PENS) IP : "+ftpManager.server+"\n";
 		 output +="FTP SERVER(PENS) User : "+user+"\n";
-		 output +="FTP SERVER(PENS) Password : "+pwd.toCharArray()+"\n";
+		 //output +="FTP SERVER(PENS) Password : "+pwd.toCharArray()+"\n";
 		 
 		 if(can==false){
 		    output +="FTP(PENS) SERVER Result Connection:"+errorMsg+"\n"; 
@@ -95,7 +95,7 @@ public class TestALL {
 		 }
 		 output +="FTP(ICC) SERVER IP : "+ftpManager.server+"\n";
 		 output +="FTP(ICC) SERVER User : "+user+"\n";
-		 output +="FTP(ICC) SERVER Password : "+pwd.toCharArray()+"\n";
+		 //output +="FTP(ICC) SERVER Password : "+pwd.toCharArray()+"\n";
 		 
 		 if(can==false){
 		    output +="FTP(ICC) SERVER Result Connection:"+errorMsg+"\n"; 
@@ -130,7 +130,7 @@ public class TestALL {
 		 }
 		 output +="FTP(WACOAL) SERVER IP : "+ftpManager.server+"\n";
 		 output +="FTP(WACOAL) SERVER User : "+user+"\n";
-		 output +="FTP(WACOAL) SERVER Password : "+pwd.toCharArray()+"\n";
+		// output +="FTP(WACOAL) SERVER Password : "+pwd.toCharArray()+"\n";
 		 
 		 if(can==false){
 		    output +="FTP(WACOAL) SERVER Result Connection:"+errorMsg+"\n"; 

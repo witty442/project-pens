@@ -26,12 +26,14 @@ import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.ScanCheckBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.AutoSubOutDAO;
 import com.isecinc.pens.dao.ConfPickStockDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ScanCheckDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.pick.process.OnhandProcess;
+import com.isecinc.pens.web.autosubin.AutoSubInBean;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
@@ -357,6 +359,10 @@ public class ConfPickStockAllAction extends I_Action {
 			if("Y".equalsIgnoreCase(p.getExported())){
 			    p.setCanEditDeliveryDate(false);
 			}
+			
+			/** Can auto SubTrans (by config mst_refrence )  */
+			p.setCanAutoSubTrans(AutoSubOutDAO.canAutoSubTransOut(p.getCustGroup()));
+			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
@@ -638,6 +644,51 @@ public class ConfPickStockAllAction extends I_Action {
 		}finally{
 			if(conn != null){
 			   conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("clear");
+	}
+	
+	public ActionForward saveAutoSubOut(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("saveAutoSubOut Action");
+		ConfPickStockForm aForm = (ConfPickStockForm) form;
+		Connection conn = null;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+			
+		    ReqPickStock confPickStock = aForm.getBean();
+			
+			//prepare bean
+			AutoSubInBean autoSubBean = new AutoSubInBean();
+			autoSubBean.setJobId(confPickStock.getIssueReqNo());
+			autoSubBean.setCustGroup(confPickStock.getCustGroup());
+			autoSubBean.setStoreCode(confPickStock.getStoreCode());
+			autoSubBean.setSubInv(confPickStock.getSubInv());
+		    autoSubBean.setTotalBox(""+confPickStock.getTotalCtn());//old
+			autoSubBean.setTotalQty(""+confPickStock.getTotalQty());//old
+			autoSubBean.setForwarder(confPickStock.getForwarder());
+			autoSubBean.setForwarderBox(""+confPickStock.getTotalCtn());
+			autoSubBean.setUserName(user.getUserName());
+			
+			boolean exist = AutoSubOutDAO.isAutoSubTransOutExist(autoSubBean.getJobId()); 
+			if( !exist){
+			   AutoSubOutDAO.saveSubTransOutStockIssue(conn, autoSubBean);
+			   conn.commit();
+
+			   request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+			}else{
+			   request.setAttribute("Message", "RefNo นี้ เคยมีการบันทึกการใช้งานไปแล้ว");
+			}
+			
+		} catch (Exception e) {
+			conn.rollback();
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
 			}
 		}
 		return mapping.findForward("clear");

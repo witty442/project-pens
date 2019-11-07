@@ -98,11 +98,11 @@
 	  	        newUrl = "<%=hostProd%><%=contextPathProd%>/login.do?do=loginCrossServer&pathRedirect="+pathRedirect;
 		     <%}%>
 	  	     url = newUrl+"&userName=<%=userName%>&password=<%=EncyptUtils.base64encode(password)%>";
-	  	    // alert("isProd:"+isProd+":"+url);
+	  	     //alert("isProd:"+isProd+":"+url);
 		     window.location = encodeURI(url);
 		 
 		  }else{
-			  //alert(url);
+			 //alert(url);
 	         window.location = encodeURI(url);
 		  }
 		<%}else{ %>
@@ -122,15 +122,17 @@
 		  	     
 		  	     url = newUrl+"&userName=<%=userName%>&password=<%=EncyptUtils.base64encode(password)%>";
 		  	     
-		  	    // alert("isProd:"+isProd+":"+url);
+		  	     //alert("isProd:"+isProd+":"+url);
 			     window.location = encodeURI(url);
 		    }else{
+		    	 //alert(url);
 		    	 window.location = encodeURI(url);
 		    }
 		<%}%>
    }
  
   function linkModelTest(isProd,url){
+	//alert(url);
 	window.location = encodeURI(url);	
   }
 </script>
@@ -289,29 +291,42 @@
 		<ul> 
 		    <li><a class="parent"><span><%no++;out.print(no);%>.MAYA</span></a>
 			   <%subNo=0; %>
-			   <ul>
-			    <li>
-		           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_SALEOUT%>');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%><bean:message key="MayaSaleOut" bundle="sysprop"/></span></a>
-		        </li>
-				 <li>
-		           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_STOCK_ONHAND%>');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message key="MayaStockOnhand" bundle="sysprop"/></span></a>
-		        </li> 
-		        <li>
-		           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_BILL_DETAIL%>');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message key="ShopBillDetail" bundle="sysprop"/></span></a>
-		        </li>
-	           </ul>
+			     <ul>
+				    <li>
+			           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_SALEOUT%>');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%><bean:message key="MayaSaleOut" bundle="sysprop"/></span></a>
+			        </li>
+					 <li>
+			           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_MAYA_STOCK_ONHAND%>');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message key="MayaStockOnhand" bundle="sysprop"/></span></a>
+			        </li> 
+			        <li>
+			           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_BILL_DETAIL%>');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message key="ShopBillDetail" bundle="sysprop"/></span></a>
+			        </li>
+	            </ul>
 	         </li>
 	         <li><a class="parent"><span><%no++;out.print(no);%>.TERMINAL</span></a>
-			   <%subNo=0; %>
-			   <ul>
-			    <li>
-		           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_TM_SALEOUT%>');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%><bean:message key="TMSaleOut" bundle="sysprop"/></span></a>
-		        </li>
-				 <li>
-		           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_TM_STOCK_ONHAND%>');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message key="TMStockOnhand" bundle="sysprop"/></span></a>
-		        </li> 
-	           </ul>
+				  <%subNo=0; %>
+				  <ul>
+				    <li>
+			           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_TM_SALEOUT%>');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%><bean:message key="TMSaleOut" bundle="sysprop"/></span></a>
+			        </li>
+					 <li>
+			           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_TM_STOCK_ONHAND%>');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message key="TMStockOnhand" bundle="sysprop"/></span></a>
+			        </li> 
+		          </ul>
 	         </li>
+	         <%--  <li><a class="parent"><span><%no++;out.print(no);%>.I'm CHINA</span></a>
+				  <%subNo=0; %>
+				  <ul>
+				    <li>
+			           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_CH_SALEOUT%>');">
+			           <span><%out.print(no);%>.<%subNo++;out.print(subNo);%><bean:message key="CHINASaleOut" bundle="sysprop"/></span></a>
+			        </li>
+					 <li>
+			           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_CH_STOCK_ONHAND%>');">
+			           <span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message key="CHINAStockOnhand" bundle="sysprop"/></span></a>
+			        </li> 
+		          </ul>
+	         </li> --%>
 	         <li>
 	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_PROM%>');"><span><%no++;out.print(no);%>.<bean:message key="ShopPromotion" bundle="sysprop"/></span></a>
 	        </li> 
@@ -349,6 +364,13 @@
 						<li>
 							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=reportEndDateLotus');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message bundle="sysprop" key="reportEndDateLotus"/></span></a>
 						</li>
+						<!-- NEW -->
+						<%-- <li>
+							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reportsAction.do?do=prepare&action=new&pageName=reportEndDateLotus');">
+							<span><%out.print(no);%>.<%subNo++;out.print(subNo);%> 
+							<bean:message bundle="sysprop" key="reportEndDateLotus"/>(NEW)</span>
+							</a>
+						</li> --%>
 					<%}else{ %>
 						<li>
 							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=reportEndDateLotus');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message bundle="sysprop" key="reportEndDateLotus"/></span></a>
@@ -506,10 +528,10 @@
 	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>');">
 	          <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>" bundle="sysprop"/></span></a>
 	        </li>
-	       <%--  <li>
+	       <%--   <li>
 	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoOrderAction.do?do=prepareSearch&action=new');">
 	          <span><%no++;out.print(no);%>.<bean:message key="AutoOrder" bundle="sysprop"/></span></a>
-	        </li> --%>
+	        </li>  --%>
 		</ul>
 	</li>
 <%} %>
@@ -570,8 +592,8 @@
 	           <span><%no++;out.print(no);%>.<bean:message key="ImportPos" bundle="sysprop"/></span></a>
 	        </li>
 	         <li>
-	            <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_BIGC_FROM_WACOAL%>');">
-	            <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_BIGC_FROM_WACOAL%>" bundle="sysprop"/>
+	            <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_AUTOSUB_FROM_WACOAL%>');">
+	            <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_AUTOSUB_FROM_WACOAL%>" bundle="sysprop"/>
 	            </span></a>
 	        </li>
 	       

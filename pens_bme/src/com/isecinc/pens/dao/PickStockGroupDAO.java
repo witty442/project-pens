@@ -1083,7 +1083,9 @@ public class PickStockGroupDAO extends PickConstants{
 					   h.setCanComplete(false);
 				   }
 			   }
-			}//while
+			   /** Can auto SubTrans (by config mst_refrence )  */
+				h.setCanAutoSubTrans(AutoSubOutDAO.canAutoSubTransOut(h.getCustGroup()));
+			}//if
 			
 			if(h != null){
 				if(getItems){

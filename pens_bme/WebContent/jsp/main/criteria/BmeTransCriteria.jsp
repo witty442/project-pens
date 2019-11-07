@@ -12,37 +12,40 @@ String hideAll = "";
 %>
 <table  border="0" cellpadding="3" cellspacing="0" class="body" width="65%">
         <tr>
-			<td align="right">จาก วันที่ <font color="red">*</font>&nbsp;&nbsp;&nbsp; <html:text property="onhandSummary.asOfDateFrom" styleId="asOfDateFrom" readonly="true"/>
+			<td align="right" width="15%">จาก วันที่ <font color="red">*</font>
 			</td>
-			<td align="left" width="30%">ถึง วันที่&nbsp;&nbsp;&nbsp; <html:text property="onhandSummary.asOfDateTo" styleId="asOfDateTo"/></td>
+			<td align="left" width="50%"><html:text property="onhandSummary.asOfDateFrom" styleId="asOfDateFrom" readonly="true"/>
+			ถึง วันที่&nbsp;&nbsp;&nbsp; <html:text property="onhandSummary.asOfDateTo" styleId="asOfDateTo"/></td>
 		</tr>
        <tr>
-			<td align="right">รหัสร้านค้า<font color="red">*</font>
-			  &nbsp;&nbsp;
-			   <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>-
-			    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>')"/>
+			<td align="right" width="15%">รหัสร้านค้า<font color="red">*</font>
 			</td>
-			<td align="left" width="30%"> <html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/></td>
+			<td align="left" width="50%"> 
+			 <html:text property="onhandSummary.pensCustCodeFrom" styleId="pensCustCodeFrom" styleClass="\" autoComplete=\"off"
+			 size="20" onkeypress="getCustNameKeypress('${pageContext.request.contextPath}',event,this,'pensCustNameFrom')"/>-
+			    <input type="button" name="x1" value="..." onclick="openPopupCustomerAll('${pageContext.request.contextPath}','from','<%=storeType%>')"/>
+			<html:text property="onhandSummary.pensCustNameFrom" styleId="pensCustNameFrom" readonly="true" styleClass="disableText" size="50"/></td>
 		</tr>
 		<tr>
-			<td align="right" width="30%">
-			     Pens Item From &nbsp;&nbsp;<html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom"/>
+			<td align="right" width="15%">
+			     Pens Item From 
+			</td>
+			<td align="left" width="50%">
+			    <html:text property="onhandSummary.pensItemFrom" styleId="pensItemFrom"/>
 			     &nbsp;
 			    <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','from')"/>
-			</td>
-			<td align="left" width="30%">
 			     Pens Item To&nbsp;&nbsp; <html:text property="onhandSummary.pensItemTo" styleId="pensItemTo"/>
 			     <input type="button" name="x1" value="..." onclick="openPopupProduct('${pageContext.request.contextPath}','to')"/>   
 			</td>
 		</tr>
 		<tr>
-			<td align="right" width="30%">Group &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			    <html:text property="onhandSummary.group" styleId="group" />
+			<td align="right" width="15%">Group 
+			  </td>
+			<td align="left" width="50%">   
+			   <html:text property="onhandSummary.group" styleId="group" />
 			    &nbsp;
 			    <input type="button" name="x1" value="..." onclick="openPopupGroup('${pageContext.request.contextPath}')"/>
 			     <html:hidden property="onhandSummary.groupDesc" styleId="groupDesc" />
-			     
-			  </td>
-			<td align="left" width="30%">&nbsp;</td>
+		   </td>
 	   </tr>
 	 </table>

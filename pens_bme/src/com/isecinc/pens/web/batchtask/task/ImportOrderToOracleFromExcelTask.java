@@ -67,7 +67,7 @@ public class ImportOrderToOracleFromExcelTask extends BatchTask implements Batch
 		return "Import File From Excel";
 	}
 	public String getDevInfo(){
-		return "";
+		return "APPS.XXPENS_OM_EXCEL_ORDER_MST | APPS.XXPENS_OM_EXCEL_ORDER_DT";
 	}
 	public boolean isDispDetail(){
 		return true;

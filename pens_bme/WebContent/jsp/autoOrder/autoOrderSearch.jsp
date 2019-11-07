@@ -10,10 +10,6 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <jsp:useBean id="autoOrderForm" class="com.isecinc.pens.web.autoorder.AutoOrderForm" scope="session" />
 
@@ -37,10 +33,9 @@ SessionUtils.clearSessionUnusedForm(request, "autoOrderForm");
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('salesDateFrom'));
 	 new Epoch('epoch_popup', 'th', document.getElementById('salesDateTo'));
@@ -57,6 +52,27 @@ function genAutoOrder(path){
 	form.action = path + "/jsp/autoOrderAction.do?do=genAutoOrder";
 	form.submit();
 	return true;
+}
+
+function gotoStockOnhand(path){
+	var url="";
+	var form = document.autoOrderForm;
+	var storeCode = form.storeCode.value;
+	if(storeCode ==""){
+		alert('กรุณาระบุ รหัสร้านค้า');
+		storeCode.focus();
+		return false;
+	}
+	if(storeCode.indexOf('020047') != -1){
+       url = path+'/jsp/summaryAction.do?do=prepare&action=new&page=reportEndDateLotus';
+	}else if(storeCode.indexOf('020049') != -1){
+       url = path+'/jsp/summaryAction.do?do=prepare&action=new&page=sizeColorBigC';
+	}
+	//alert(url);
+	//window.location = encodeURI(url);
+	
+	link(true,url);
+	
 }
 
 function clearForm(path){
@@ -104,10 +120,9 @@ function getCustNameKeypress(e,custCode,fieldName){
 function getCustName(custCode,fieldName){
 	var returnString = "";
 	var form = document.autoOrderForm;
-	var storeGroup = form.custGroup.value;
 	var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/ajax/getCustNameWithSubInvAjax.jsp",
-			data : "custCode=" + custCode.value+"&storeGroup="+storeGroup,
+			data : "custCode=" + custCode.value,
 			async: false,
 			cache: false,
 			success: function(getData){
@@ -129,6 +144,7 @@ function getCustName(custCode,fieldName){
 		}
 	}
 }
+
 </script>
 </head>
 	
@@ -180,9 +196,10 @@ function getCustName(custCode,fieldName){
 								</td>
 							</tr>
 							<tr>
-								<td  align="right">รหัสร้านค้า </td>
+								<td  align="right">รหัสร้านค้า <font color="red">*</font></td>
 								<td>
-								  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+								  <html:text property="bean.storeCode" styleId="storeCode" size="20" 
+								  onkeypress="getCustNameKeypress(event,this,'storeCode')" styleClass="\" autoComplete=\"off"/>-
 								  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 								  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="40"/>
 								
@@ -204,9 +221,9 @@ function getCustName(custCode,fieldName){
 									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 									  <input type="button" value="   Clear   " class="newPosBtnLong">
 									</a>		
-									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-									  <input type="button" value="ไปหน้าจอ Gen Stock Onhand" class="newPosBtnLong">
-									</a>
+							        <a href="#" onclick="javascript:gotoStockOnhand('${pageContext.request.contextPath}');">
+						                <input type="button" value="ไปหน้าจอ Gen Stock Onhand" class="newPosBtnLong"/>
+						             </a>
 								</td>
 							</tr>
 					  </table>

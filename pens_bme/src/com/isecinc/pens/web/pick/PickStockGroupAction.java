@@ -513,9 +513,8 @@ public class PickStockGroupAction extends I_Action {
 			boolean exist = AutoSubOutDAO.isAutoSubTransOutExist(autoSubBean.getJobId()); 
 			if( !exist){
 			   AutoSubOutDAO.saveSubTransOutPickStockByGroup(conn, autoSubBean);
-			   conn.commit();
-
-			   request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+			 
+			   request.setAttribute("Message", "บันทึกข้อมูล ส่ง Auto Sub Transfer เรียบร้อยแล้ว");
 			   
 			    //new search
 				boolean getItems = true;
@@ -525,12 +524,15 @@ public class PickStockGroupAction extends I_Action {
 				List<PickStock>  allList = new ArrayList<PickStock>();
 				allList.addAll(p.getItems());
 				
-				logger.debug(""+p.isCanCancel());
+				logger.debug("allList Size:"+allList.size());
 				
 				p.setCanConfirm(false);
 				
 				aForm.setBean(p);
 				aForm.setResults(allList);
+				
+				conn.commit();
+
 			}else{
 			   request.setAttribute("Message", "RefNo นี้ เคยมีการบันทึกการใช้งานไปแล้ว");
 			}
@@ -544,7 +546,7 @@ public class PickStockGroupAction extends I_Action {
 				conn.close();conn=null;
 			}
 		}
-		return mapping.findForward("search");
+		return mapping.findForward("prepareByGroup");
 	}
 	
 	public ActionForward confirmAction(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {

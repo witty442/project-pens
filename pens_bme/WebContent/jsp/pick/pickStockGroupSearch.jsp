@@ -250,9 +250,9 @@ function resetStore(){
 						    <table align="center" border="0" cellpadding="3" cellspacing="0" >
 								<tr>
                                     <td align="right">Issue request Date </td>
-                                    <td><html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" /></td>
+                                    <td><html:text property="bean.issueReqDate" styleId="issueReqDate" size="20" styleClass="\" autoComplete=\"off"/></td>
 									<td align="right"> Issue request No </td>
-									<td> <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" />	</td>
+									<td> <html:text property="bean.issueReqNo" styleId="issueReqNo" size="20" styleClass="\" autoComplete=\"off"/>	</td>
 								</tr>
 								 <tr>
                                     <td  align="right">Issue request status</td>
@@ -262,12 +262,12 @@ function resetStore(){
 									    </html:select>
                                      </td>
 									<td  align="right">	 ผู้เบิก </td>
-									<td> <html:text property="bean.pickUser" styleId="pickUser" size="20" /></td>
+									<td> <html:text property="bean.pickUser" styleId="pickUser" size="20" styleClass="\" autoComplete=\"off"/></td>
 								</tr>
 								<tr>
                                     <td align="right"> Confrim Issue Date</td>
 									<td > 
-						               <html:text property="bean.confirmIssueDate" styleId="confirmIssueDate" size="20"/>
+						               <html:text property="bean.confirmIssueDate" styleId="confirmIssueDate" size="20"styleClass="\" autoComplete=\"off"/>
 									</td>
 									<td align="right"> Pick Type </td>
 									 <td> 
@@ -284,12 +284,12 @@ function resetStore(){
 									    </html:select>
 						           </td >
 						           <td align="right">Invoice No </td>
-						           <td > <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" /></td>
+						           <td > <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" styleClass="\" autoComplete=\"off"/></td>
 								</tr>
 								<tr>
 									<td  align="right">รหัสร้านค้า </td>
 									<td colspan="3">
-									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')"/>-
+									  <html:text property="bean.storeCode" styleId="storeCode" size="20" onkeypress="getCustNameKeypress(event,this,'storeCode')" styleClass="\" autoComplete=\"off"/>-
 									  <input type="button" name="x1" value="..." onclick="openPopupCustomer('${pageContext.request.contextPath}','from','')"/>
 									  <html:text property="bean.storeName" styleId="storeName" readonly="true" styleClass="disableText" size="60"/>
 									

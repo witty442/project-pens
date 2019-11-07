@@ -361,6 +361,10 @@ public class ConfPickStockAction extends I_Action {
 			if("Y".equalsIgnoreCase(p.getExported())){
 			    p.setCanEditDeliveryDate(false);
 			}
+			
+			/** Can auto SubTrans (by config mst_refrence )  */
+			p.setCanAutoSubTrans(AutoSubOutDAO.canAutoSubTransOut(p.getCustGroup()));
+			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}

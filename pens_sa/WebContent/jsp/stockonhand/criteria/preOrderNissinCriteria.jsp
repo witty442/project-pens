@@ -2,7 +2,6 @@
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript">
@@ -52,7 +51,6 @@ function save(saveType){
 	}
 	return false;
 }
-
 function exportToExcel(path){
 	var form = document.stockOnhandForm;
 	if(form.transDate.value ==""){
@@ -74,12 +72,10 @@ function setDataPopupValue(code){
 		form.transDate.value = code;
 } 
 function calcEndMonthQty(index){
-	//alert(document.getElementsByName("totalQty")[index].value);
-	var totalQty = convetTxtObjToFloat(document.getElementsByName("totalQty")[index]);
-	var foreCastQty = convetTxtObjToFloat(document.getElementsByName("foreCastQty")[index]);
-	//var salesQty = convetTxtObjToFloat(document.getElementsByName("salesQty")[index]);
+	var beginQty = convetTxtObjToFloat(document.getElementsByName("beginQty")[index]);
+	var currentQty = convetTxtObjToFloat(document.getElementsByName("currentQty")[index]);
 	
-	endMonthQty = totalQty-foreCastQty;
+	endMonthQty = currentQty-beginQty;
 	//var endMonthQty = foreCastQty - (salesQty+totalQty);
 	document.getElementsByName("endMonthQty")[index].value = endMonthQty;
 	toCurrenyNoDigit(document.getElementsByName("endMonthQty")[index]);//convert to 100,000
@@ -88,19 +84,19 @@ function calcEndMonthQty(index){
 }
 function calcBufferQty(index){
 	//alert(document.getElementsByName("totalQty")[index].value);
-	var targetQty = convetTxtObjToFloat(document.getElementsByName("targetQty")[index]);
+	var currentQty = convetTxtObjToFloat(document.getElementsByName("currentQty")[index]);
 	var bufferPercent = convetTxtObjToFloat(document.getElementsByName("bufferPercent")[index]);
 	
 	//cale bufferQty
-	var bufferQty = targetQty + ((bufferPercent/100)*targetQty);
+	var bufferQty = currentQty + ((bufferPercent/100)*currentQty);
 	document.getElementsByName("bufferQty")[index].value = bufferQty;
 	toCurreny(document.getElementsByName("bufferQty")[index]);//convert to 100,000
 	
 	//cale preOrderQty
 	var endMonthQty = convetTxtObjToFloat(document.getElementsByName("endMonthQty")[index]);
-	var preOrderQty = bufferQty-endMonthQty;
-	document.getElementsByName("preOrderQty")[index].value = preOrderQty;
-	toCurreny(document.getElementsByName("preOrderQty")[index]);//convert to 100,000
+	var suggestedPoQty = bufferQty-endMonthQty;
+	document.getElementsByName("suggestedPoQty")[index].value = suggestedPoQty;
+	toCurreny(document.getElementsByName("suggestedPoQty")[index]);//convert to 100,000
 }
 </script>
 <table align="center" border="0" cellpadding="3" cellspacing="0" >
@@ -128,7 +124,3 @@ function calcBufferQty(index){
 			</td>
 		</tr>
 	</table>
-	
-	<!-- Control Save Lock Screen -->
-   <jsp:include page="../../controlSaveLockScreen.jsp"/>
-		

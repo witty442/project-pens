@@ -194,7 +194,7 @@ function clearCach1(){
     </div>
 
 	  <div id="div_config_info"  style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
-	      <input type="button" name="clearCach"  value=" Clear Cach "  onclick="clearCach1()"/>
+	      <input type="button" name="clearCach" class="button2_style" value=" Clear Cach "  onclick="clearCach1()"/>
 	      
 		  <BR><span class="h1_style">Configuration Tab (Config Type:<%= env.getProperty("product.type")%>) </span><br> 
 		       <html:textarea property="configInfo" style=" width :100%;" rows="16"/>

@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +30,8 @@ import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.summary.process.GenerateMonthEndLotus;
 import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
+import com.isecinc.pens.web.batchtask.BatchTaskForm;
+import com.isecinc.pens.web.batchtask.task.GenStockOnhandTempTask;
 import com.isecinc.pens.web.summary.report.OpenBillRobinsonReportAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandAsOfKingAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandAsOfRobinsonAction;
@@ -1118,6 +1122,56 @@ public class SummaryAction extends I_Action {
 		return "view";
 	}
 
+	/** For batch popup **/
+	public ActionForward genStockOnhandTemp(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("genStockOnhandTemp");
+		SummaryForm aForm = (SummaryForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			//Prepare Parameter to BatchTask
+			Map<String, String> batchParaMap = new HashMap<String, String>();
+			batchParaMap.put(GenStockOnhandTempTask.PARAM_ASOF_DATE, aForm.getOnhandSummary().getAsOfDate());
+			batchParaMap.put(GenStockOnhandTempTask.PARAM_STORE_CODE, aForm.getOnhandSummary().getPensCustCodeFrom());
+			
+			logger.debug("storeCode:"+aForm.getOnhandSummary().getPensCustCodeFrom());
+			
+			request.getSession().setAttribute("BATCH_PARAM_MAP",batchParaMap);
+			request.setAttribute("action","submitedGenStockOnhandTemp");//set to popup page to BatchTask
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+		}
+		return mapping.findForward("export");
+	}
+	/** For batch popup after Task success**/
+	public ActionForward searchBatch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchBatch");
+		SummaryForm aForm = (SummaryForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		//String pageName = aForm.getPageName(); 
+		try {
+			//logger.debug("searchBatch :pageName["+pageName+"]");
+	
+			 BatchTaskForm batchTaskForm = (BatchTaskForm)request.getSession().getAttribute("batchTaskForm");
+			 logger.debug("batchTaskForm result size:"+batchTaskForm.getResults().length);
+			 
+			 request.getSession().setAttribute("BATCH_TASK_RESULT",batchTaskForm);
+			 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
+			 
+			 logger.debug("batchName:"+batchTaskForm.getResults()[0].getName());
+			 logger.debug("fileName:"+batchTaskForm.getMonitorItem().getFileName());
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{	
+		}
+		return mapping.findForward("search");
+	}
 	
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");

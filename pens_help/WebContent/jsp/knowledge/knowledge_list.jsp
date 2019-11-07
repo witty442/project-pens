@@ -36,6 +36,9 @@
        <!-- Control Save Lock Screen -->
 		</ jsp:include page="../controlSaveLockScreen.jsp"/>
 		
+		 <!-- Control Save Lock Screen No Jquery-->
+		</ jsp:include page="../controlSaveLockScreenNoJquery.jsp"/>
+		
 		/**  Control Save Lock Screen **/
 		startControlSaveLockScreen();
 		
@@ -100,6 +103,14 @@
     <tr><td>
          <b> Jquery fix head table 
          <a href="http://localhost:8080/pens_help/jsp/knowledge/fixTableHeader.jsp">Show Detail</a></b>
+   </td></tr>
+   <tr><td>
+         <b>  fix head table alternative 2
+         <a href="http://localhost:8080/pens_help/jsp/knowledge/fixTableHeader2.jsp">Show Detail</a></b>
+   </td></tr>
+   <tr><td>
+         <b>  fix head table alternative 3 (work colspan and rowspan) (sample page preNissinOrder)
+         <a href="http://localhost:8080/pens_help/jsp/knowledge/fixTableHeader3.jsp">Show Detail</a></b>
    </td></tr>
     <tr><td>
         <b> Disable Back Button Javascript <a href="javascript:showDiv('div_disable_back');">Show Detail</a></b>

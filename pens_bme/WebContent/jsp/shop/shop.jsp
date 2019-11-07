@@ -25,7 +25,6 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script> --%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -47,7 +46,9 @@
 %>
 
 <script type="text/javascript">
-
+function loadMe(){
+	
+}
 function exportExcel(path){
 	var form = document.shopForm;
 	form.action = path + "/jsp/shopAction.do?do=export&pageName=<%=request.getParameter("pageName")%>";
@@ -115,6 +116,10 @@ function clearForm(path){
 						     <jsp:include page="criteria/mayaSaleOutCriteria.jsp" flush="true" /> 
 						<%}else if(ShopAction.P_TM_STOCK_ONHAND.equalsIgnoreCase(request.getParameter("pageName"))) {%>
 						     <jsp:include page="criteria/mayaStockOnhandCriteria.jsp" /> 
+						<%}if(ShopAction.P_CH_SALEOUT.equalsIgnoreCase(request.getParameter("pageName"))) {%>
+						     <jsp:include page="criteria/mayaSaleOutCriteria.jsp" flush="true" /> 
+						<%}else if(ShopAction.P_CH_STOCK_ONHAND.equalsIgnoreCase(request.getParameter("pageName"))) {%>
+						     <jsp:include page="criteria/mayaStockOnhandCriteria.jsp" /> 
 						<%} %>
 				     <!-- ************* CRITERIA ********************************************************* -->
 					<br>
@@ -148,6 +153,10 @@ function clearForm(path){
 					<%}else if(ShopAction.P_TM_SALEOUT.equalsIgnoreCase(request.getParameter("pageName"))) {%>
 						  <jsp:include page="subreports/subMayaSaleOutTM.jsp" /> 
                     <%}else if(ShopAction.P_TM_STOCK_ONHAND.equalsIgnoreCase(request.getParameter("pageName"))) {%>
+						  <jsp:include page="subreports/subMayaStockOnhand.jsp" /> 
+                    <%}else if(ShopAction.P_CH_SALEOUT.equalsIgnoreCase(request.getParameter("pageName"))) {%>
+						  <jsp:include page="subreports/subMayaSaleOutTM.jsp" /> 
+                    <%}else if(ShopAction.P_CH_STOCK_ONHAND.equalsIgnoreCase(request.getParameter("pageName"))) {%>
 						  <jsp:include page="subreports/subMayaStockOnhand.jsp" /> 
                     <%} %>
                     <!-- ****** RESULT ***************************************************************** -->

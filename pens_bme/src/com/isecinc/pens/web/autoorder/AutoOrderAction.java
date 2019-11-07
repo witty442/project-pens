@@ -43,6 +43,8 @@ public class AutoOrderAction extends I_Action {
 				//prepare parameter
 				AutoOrderBean bean = new AutoOrderBean();
 				bean.setOrderDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+				//for test
+				bean.setStoreCode("020047-1");
 				aForm.setBean(bean);
 			}
 		} catch (Exception e) {

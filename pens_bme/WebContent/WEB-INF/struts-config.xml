@@ -120,6 +120,7 @@
 	    <form-bean name="itManageForm" type="com.isecinc.pens.web.itmanage.ITManageForm" />
 	    <form-bean name="manualStockForm" type="com.isecinc.pens.web.manualstock.ManualStockForm" />
 	    <form-bean name="autoOrderForm" type="com.isecinc.pens.web.autoorder.AutoOrderForm" />
+	    <form-bean name="reportsForm" type="com.isecinc.pens.web.reports.ReportsForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -742,6 +743,10 @@
 		</action>
 		<action name="autoOrderForm" path="/jsp/autoOrderAction" parameter="do" scope="session" type="com.isecinc.pens.web.autoorder.AutoOrderAction">
 			<forward name="search" path="/jsp/autoOrder/autoOrderSearch.jsp" />
+			<!-- <forward name="detail" path="/jsp/manualStock/manualStock.jsp" /> -->
+		</action>
+		<action name="reportsForm" path="/jsp/reportsAction" parameter="do" scope="session" type="com.isecinc.pens.web.reports.ReportsAction">
+			<forward name="reports" path="/jsp/reports/reports.jsp" />
 			<!-- <forward name="detail" path="/jsp/manualStock/manualStock.jsp" /> -->
 		</action>
 	</action-mappings>

@@ -65,24 +65,47 @@ public class StockOnhandBean implements Comparable<StockOnhandBean> ,Serializabl
 	
 	// PreOrderNissin
 	private String beginQty;
-	private String wipQty;
-	private String totalQty;
 	private String salesAvg;
-	private String foreCastQty;
-	private String salesQty;
+	private String currentQty;
+	private String currentPeriod;
 	private String endMonthQty;
-	private String targetQty;
+	private String nextQty;
+	private String nextPeriod;
 	private String bufferPercent;
 	private String bufferQty;
-	private String preOrderQty;
+	private String suggestedPoQty;
 	private String status;
 	
-	
-	public String getSalesQty() {
-		return salesQty;
+
+	public String getCurrentQty() {
+		return currentQty;
 	}
-	public void setSalesQty(String salesQty) {
-		this.salesQty = salesQty;
+	public void setCurrentQty(String currentQty) {
+		this.currentQty = currentQty;
+	}
+	public String getCurrentPeriod() {
+		return currentPeriod;
+	}
+	public void setCurrentPeriod(String currentPeriod) {
+		this.currentPeriod = currentPeriod;
+	}
+	public String getNextQty() {
+		return nextQty;
+	}
+	public void setNextQty(String nextQty) {
+		this.nextQty = nextQty;
+	}
+	public String getNextPeriod() {
+		return nextPeriod;
+	}
+	public void setNextPeriod(String nextPeriod) {
+		this.nextPeriod = nextPeriod;
+	}
+	public String getSuggestedPoQty() {
+		return suggestedPoQty;
+	}
+	public void setSuggestedPoQty(String suggestedPoQty) {
+		this.suggestedPoQty = suggestedPoQty;
 	}
 	public String getBeginQty() {
 		return beginQty;
@@ -90,42 +113,21 @@ public class StockOnhandBean implements Comparable<StockOnhandBean> ,Serializabl
 	public void setBeginQty(String beginQty) {
 		this.beginQty = beginQty;
 	}
-	public String getWipQty() {
-		return wipQty;
-	}
-	public void setWipQty(String wipQty) {
-		this.wipQty = wipQty;
-	}
-	public String getTotalQty() {
-		return totalQty;
-	}
-	public void setTotalQty(String totalQty) {
-		this.totalQty = totalQty;
-	}
+	
 	public String getSalesAvg() {
 		return salesAvg;
 	}
 	public void setSalesAvg(String salesAvg) {
 		this.salesAvg = salesAvg;
 	}
-	public String getForeCastQty() {
-		return foreCastQty;
-	}
-	public void setForeCastQty(String foreCastQty) {
-		this.foreCastQty = foreCastQty;
-	}
+	
 	public String getEndMonthQty() {
 		return endMonthQty;
 	}
 	public void setEndMonthQty(String endMonthQty) {
 		this.endMonthQty = endMonthQty;
 	}
-	public String getTargetQty() {
-		return targetQty;
-	}
-	public void setTargetQty(String targetQty) {
-		this.targetQty = targetQty;
-	}
+	
 	public String getBufferPercent() {
 		return bufferPercent;
 	}
@@ -138,12 +140,7 @@ public class StockOnhandBean implements Comparable<StockOnhandBean> ,Serializabl
 	public void setBufferQty(String bufferQty) {
 		this.bufferQty = bufferQty;
 	}
-	public String getPreOrderQty() {
-		return preOrderQty;
-	}
-	public void setPreOrderQty(String preOrderQty) {
-		this.preOrderQty = preOrderQty;
-	}
+
 	public String getStatus() {
 		return status;
 	}

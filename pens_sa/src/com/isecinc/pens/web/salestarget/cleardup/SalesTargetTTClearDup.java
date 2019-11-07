@@ -48,7 +48,7 @@ public class SalesTargetTTClearDup {
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 			while(rst.next()) {
-				//deleteByIdMKT(conn, rst.getString("id"), rst.getString("line_id"));
+				deleteByIdMKT_TT(conn, rst.getString("id"), rst.getString("line_id"));
 			}//while
 			
 		} catch (Exception e) {

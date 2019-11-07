@@ -22,6 +22,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.autocn.AutoCNBean;
 import com.isecinc.pens.web.autocn.AutoCNForm;
+import com.isecinc.pens.web.shop.sub.CHINAStockOnhandAction;
 import com.isecinc.pens.web.shop.sub.ShopSaleOutAction;
 import com.isecinc.pens.web.shop.sub.ShopStockOnhandAction;
 import com.isecinc.pens.web.shop.sub.ShopBillDetailAction;
@@ -48,19 +49,22 @@ public class ShopAction extends I_Action {
 	
 	final public static String P_TM_SALEOUT = "TMSaleOut";
 	final public static String P_TM_STOCK_ONHAND = "TMStockOnhand";
+	final public static String P_CH_SALEOUT = "CHINASaleOut";
+	final public static String P_CH_STOCK_ONHAND = "CHINAStockOnhand";
 	/**
 	 * Prepare without ID
 	 */
 	protected String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		String forward = "search";
-		ShopForm mayaForm = (ShopForm) form;
+		ShopForm aForm = (ShopForm) form;
 		String pageName =Utils.isNull(request.getParameter("pageName"));
-		String pageAction = Utils.isNull(request.getParameter("pageAction"));
+		String action = Utils.isNull(request.getParameter("pageAction"));
 		ShopBean bean = new ShopBean();
 		try {
-			 logger.debug("prepare pageAction["+pageAction+"] pagaName:"+pageName);
-			 if("new".equalsIgnoreCase(pageAction)){
+			 logger.debug("prepare action["+action+"] pagaName:"+pageName);
+			 if("new".equalsIgnoreCase(action)){
+				 /** MAY **/
 				 if(P_MAYA_SALEOUT.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 bean.setCustGroup(PickConstants.STORE_TYPE_PENSHOP_CODE);
@@ -69,7 +73,7 @@ public class ShopAction extends I_Action {
 				 }else if(P_MAYA_STOCK_ONHAND.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 bean.setCustGroup(PickConstants.STORE_TYPE_PENSHOP_CODE);
-					 
+				 /** TERMINAL **/
 				 }else if(P_TM_SALEOUT.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 bean.setCustGroup(PickConstants.STORE_TYPE_TERMINAL_CODE);
@@ -78,6 +82,16 @@ public class ShopAction extends I_Action {
 				 }else if(P_TM_STOCK_ONHAND.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 bean.setCustGroup(PickConstants.STORE_TYPE_TERMINAL_CODE);
+				 /** CHINA **/
+				 }else if(P_CH_SALEOUT.equalsIgnoreCase(pageName)){
+					 bean = new ShopBean();
+					 bean.setCustGroup(PickConstants.STORE_TYPE_CHINA_CODE);
+					 bean.setStartDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					 bean.setEndDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 }else if(P_CH_STOCK_ONHAND.equalsIgnoreCase(pageName)){
+					 bean = new ShopBean();
+					 bean.setCustGroup(PickConstants.STORE_TYPE_CHINA_CODE);
+				/** ShopBill **/
 				 }else if(P_SHOP_PROM.equalsIgnoreCase(pageName)){
 					 bean = new ShopBean();
 					 forward = "searchPromotion"; 
@@ -85,10 +99,11 @@ public class ShopAction extends I_Action {
 					 bean = new ShopBean();
 					 bean.setCustGroup(PickConstants.STORE_TYPE_PENSHOP_CODE);
 				 }
-				 mayaForm.setBean(bean);
-				 mayaForm.setResults(null);
+				  aForm.setBean(bean);
+				  aForm.setResults(null);
 				 
-				 logger.debug("custGroup:"+mayaForm.getBean().getCustGroup());
+				 logger.debug("custGroup:"+ aForm.getBean().getCustGroup());
+				 logger.debug("startDate:"+ aForm.getBean().getStartDate());
 			 }
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -120,7 +135,7 @@ public class ShopAction extends I_Action {
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ShopForm aForm = (ShopForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		logger.debug("page["+Utils.isNull(request.getParameter("page"))+"]");
+		logger.debug("pageName["+Utils.isNull(request.getParameter("pageName"))+"]");
 		String forward ="search";
 		try {
 			 String queryStr= request.getQueryString();
@@ -140,11 +155,17 @@ public class ShopAction extends I_Action {
 				 }else if(P_TM_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 					aForm = ShopSaleOutAction.search(request, aForm,user);
 					
+				 }else if(P_CH_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+					aForm = ShopSaleOutAction.search(request, aForm,user);
+						
 				 }else if(P_MAYA_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 					 aForm = ShopStockOnhandAction.search(request, aForm,user);
 					 
 				 }else if(P_TM_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 					 aForm = TerminalStockOnhandAction.search(request, aForm,user);
+					 
+				 }else if(P_CH_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+					 aForm = CHINAStockOnhandAction.search(request, aForm,user);
 					 
 				 }else if(P_SHOP_PROM.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){  
 					 String action = Utils.isNull(request.getParameter("action"));

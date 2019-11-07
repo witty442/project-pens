@@ -13,7 +13,7 @@ public class SalesTargetClearDup {
 	
 	public static void main(String[] a){
 		try{
-			processClearDupTEMP("AUG-19","3");
+			processClearDupTEMP("OCT-19","2");
 		}catch(Exception e){
 			e.printStackTrace();
 		}

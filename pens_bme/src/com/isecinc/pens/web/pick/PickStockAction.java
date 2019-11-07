@@ -89,28 +89,6 @@ public class PickStockAction extends I_Action {
 		return mapping.findForward("prepare2");
 	}
 	
-	/*public ActionForward search2_bk(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("search2");
-		PickStockForm aForm = (PickStockForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		String msg = "";
-		try {
-			//aForm.setResultsSearch(PickStockDAO.searchHead(aForm.getBean()));
-			if(aForm.getResultsSearch().size() <=0){
-			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
-			throw e;
-		}finally{
-			
-		}
-		return mapping.findForward("search2");
-	}*/
-	
 	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("search2");
 		PickStockForm aForm = (PickStockForm) form;

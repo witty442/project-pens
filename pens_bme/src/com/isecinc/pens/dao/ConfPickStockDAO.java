@@ -760,8 +760,8 @@ public class ConfPickStockDAO extends PickConstants{
 				}
 			   h.setTotalCtn(rst.getInt("total_ctn"));
 			   h.setExported(Utils.isNull(rst.getString("exported")));
+			   h.setForwarder(Utils.isNull(rst.getString("forwarder")));
 
-			 
 			}//while
 		} catch (Exception e) {
 			throw e;
@@ -775,7 +775,6 @@ public class ConfPickStockDAO extends PickConstants{
 		return h;
 	}
 
-	
 	public static ReqPickStock getStockIssueItemCaseNoEdit(Connection conn,ReqPickStock pickStock,int pageNumber,boolean allRec) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -834,7 +833,6 @@ public class ConfPickStockDAO extends PickConstants{
 			
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
-
 			while(rst.next()) {
 			   ReqPickStock h = new ReqPickStock();
 			   h.setIssueReqNo(pickStock.getIssueReqNo());
@@ -881,7 +879,6 @@ public class ConfPickStockDAO extends PickConstants{
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		List<ReqPickStock> items = new ArrayList<ReqPickStock>();
-
 		int totalQty = 0;
 		logger.debug("***getStockIssueItemCase4ReportMini***");
 		try {

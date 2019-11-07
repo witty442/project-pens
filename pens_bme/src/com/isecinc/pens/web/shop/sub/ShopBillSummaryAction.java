@@ -422,6 +422,8 @@ public class ShopBillSummaryAction {
 			sql.append("\n  )BB");
 			sql.append("\n ) M");
 			/**************************************************************************/
+			logger.debug("sql: \n"+sql.toString());
+			
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 			if(rst.next()) {

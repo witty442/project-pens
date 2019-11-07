@@ -40,6 +40,7 @@ public class Constants {
 	public static final String STORE_TYPE_ROBINSON_CODE ="100002";
 	public static final String STORE_TYPE_PENSHOP_CODE ="000030";
 	public static final String STORE_TYPE_TERMINAL_CODE ="000031";
+	public static final String STORE_TYPE_CHINA_CODE ="000032";
 	
 	public static String STORE_TYPE_LOTUS_ITEM = "LotusItem";
 	public static String STORE_TYPE_BIGC_ITEM = "BigCitem";

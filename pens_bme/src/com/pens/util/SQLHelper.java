@@ -93,7 +93,7 @@ public class SQLHelper {
         StringBuffer str = new StringBuffer("");
 		try{
 			System.out.println("sql:"+sql);   
-			conn = DBConnection.getInstance().getConnection();
+			conn = DBConnection.getInstance().getConnectionApps();
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			rsm = rs.getMetaData();

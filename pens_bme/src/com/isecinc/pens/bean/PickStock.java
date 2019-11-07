@@ -63,6 +63,7 @@ public class PickStock implements Serializable{
 	private boolean canConfirm;
 	private boolean newReq;
 	private boolean canComplete;
+	private boolean canAutoSubTrans;
 	
 	private String barcodeItemStatus;
 	private String lineItemErrorStyle ;
@@ -92,7 +93,12 @@ public class PickStock implements Serializable{
 	private String issueReqNoTo;
 	private String forwarder;
 	
-	
+	public boolean isCanAutoSubTrans() {
+		return canAutoSubTrans;
+	}
+	public void setCanAutoSubTrans(boolean canAutoSubTrans) {
+		this.canAutoSubTrans = canAutoSubTrans;
+	}
 	public String getForwarder() {
 		return forwarder;
 	}

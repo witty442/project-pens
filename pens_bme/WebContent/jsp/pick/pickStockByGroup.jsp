@@ -852,9 +852,11 @@ function validAutoSubOut(refNo){
 									 <%
 									 User user = (User)session.getAttribute("user");
 									 if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
-										<a href="javascript:autoSubOut('${pageContext.request.contextPath}')">
-											<input type="button" value="ส่งข้อมูลเพื่อทำ Auto Sub Transfer" class="newPosBtnLong"> 
-										</a>
+									   <c:if test="${pickStockGroupForm.bean.canAutoSubTrans == true}">
+											<a href="javascript:autoSubOut('${pageContext.request.contextPath}')">
+												<input type="button" value="ส่งข้อมูลเพื่อทำ Auto Sub Transfer" class="newPosBtnLong"> 
+											</a>
+										</c:if>
 									<%} %>
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					                      <c:if test="${pickStockGroupForm.bean.issueReqStatus == 'I'}">

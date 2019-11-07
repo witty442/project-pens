@@ -59,6 +59,7 @@ public class ReqPickStock implements Serializable{
 	private boolean newSearch;
 	private boolean noSearch;
 	private boolean disableCustGroup;
+	private boolean canAutoSubTrans;
 	
 	private String barcodeItemStatus;
 	private String lineItemStyle ;
@@ -79,6 +80,12 @@ public class ReqPickStock implements Serializable{
 	private String forwarder;
 	
 	
+	public boolean isCanAutoSubTrans() {
+		return canAutoSubTrans;
+	}
+	public void setCanAutoSubTrans(boolean canAutoSubTrans) {
+		this.canAutoSubTrans = canAutoSubTrans;
+	}
 	public String getForwarder() {
 		return forwarder;
 	}

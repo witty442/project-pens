@@ -4,13 +4,17 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.Master;
 import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
@@ -23,10 +27,11 @@ import com.pens.util.Utils;
 import com.pens.util.meter.MonitorTime;
 import com.pens.util.seq.SequenceProcess;
 
-public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
+public class ImportOrderAutoSubFromWacoalTask implements BatchTaskInterface{
 	public static Logger logger = Logger.getLogger("PENS");
 	private static String PARAM_AS_OF_DATE = "AS_OF_DATE";
-   
+	private static String PARAM_CUST_GROUP = "custGroup";
+	
 	/*public void run(MonitorBean monitorModel){
 		logger.debug("TaskName:"+monitorModel.getName());
 		logger.debug("transactionId:"+monitorModel.getTransactionId());
@@ -35,16 +40,42 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 	 * Return :Param Name|Param label|Param Type|default value|validate,xxxx|||$Button Name
 	 */
 	public String getParam(){
-		return "AS_OF_DATE|วันที่เปิด Order Big-C จากโรงงาน Wacoal|DATE|SYSDATE|VALID$Import ข้อมูล";
+		//return "AS_OF_DATE|วันที่เปิด Order จากโรงงาน Wacoal|DATE|SYSDATE|VALID$Import ข้อมูล";
+		return "custGroup|กลุ่มร้านค้า|LIST||VALID,AS_OF_DATE|วันที่เปิด Order จากโรงงาน Wacoal|DATE|SYSDATE|VALID$Import ข้อมูล";
 	}
 	public String getDescription(){
-		return " ";
+		return "เฉพาะข้อมูล Order ของกลุ่มร้านค้าที่เป็นลักษณะ การโอนสินค้า ระหว่าง Sub Inventory เช่น BigC,Shop ต่างๆ";
 	}
 	public String getDevInfo(){
-		return "Import Order(PENSBME_ORDER) Bigc To Oracle (apps.XXPENS_PO_ORDER_IMPORT_MST,apps.XXPENS_PO_ORDER_IMPORT_DT) ";
+		return "Import Order(PENSBI.PENSBME_ORDER) Customer in (PENSBI.PENSBME_MST_REFERENCE reference_code = 'Customer' and pens_desc6 = 'Auto Sub-transfer') To Oracle "
+				+ "<br/> (apps.XXPENS_PO_ORDER_IMPORT_MST,apps.XXPENS_PO_ORDER_IMPORT_DT) ";
 	}
 	public boolean isDispDetail(){
 		return true;
+	}
+	public List<BatchTaskListBean> getParamListBox(){
+		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();
+		try{
+			List<Master> custGroupList= GeneralDAO.getCustGroupAutoSubList();
+			if(custGroupList != null && custGroupList.size() >0){
+				//LIST 1
+				BatchTaskListBean listHeadBean = new BatchTaskListBean();
+				List<BatchTaskListBean> listBoxData = new ArrayList<BatchTaskListBean>();
+				//listBoxData.add(new BatchTaskListBean("",""));
+				for(int i=0;i<custGroupList.size();i++){
+				   Master m = custGroupList.get(i);
+				   listBoxData.add(new BatchTaskListBean(m.getPensValue(),m.getPensDesc()));
+				}
+				
+				listHeadBean.setListBoxName("LIST");
+				listHeadBean.setListBoxData(listBoxData);
+				
+				listAll.add(listHeadBean);
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return listAll;
 	}
 	public String getValidateScript(){
 		String script ="";
@@ -83,7 +114,7 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 			monitorTime  = new MonitorTime(monitorModel.getName());   
 			
 			/** insert to monitor_item **/
-			logger.debug("Insert Monitor Item BigC PO ");
+			logger.debug("Insert Monitor Item Store Auto Sub Transfer PO ");
 			MonitorItemBean modelItem = prepareMonitorItemBean(monitorModel);
 			
 			//Validate Duplication
@@ -94,9 +125,10 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 			}else{
 				//Process Generate 
 				modelItem = runProcess(conn,monitorModel,modelItem);
+				
 				/** validate data **/
 	            if(modelItem.getFailCount() ==0 && modelItem.getSuccessCount()==0 ){
-	 			    modelItem.setErrorMsg("ไม่พบข้อมูลการเปิด Order Big-C ในวันที่ระบุ");
+	 			    modelItem.setErrorMsg("ไม่พบข้อมูลการเปิด Order ในวันที่ระบุ");
 	 			    modelItem.setErrorCode("DataNotFoundException");
 	            }else{
 	            	modelItem.setErrorCode("SuccessException"); 
@@ -179,11 +211,13 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 		boolean exist = false;
 		Map<String, String> batchParamMap = monitorModel.getBatchParamMap();
 		try{
+			String custGroup = Utils.isNull(batchParamMap.get(PARAM_CUST_GROUP));
 			String asOfDate =DateUtil.stringValue(DateUtil.parse(batchParamMap.get(PARAM_AS_OF_DATE),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH) ;
 
 			sql.append("\n SELECT count(*) as c");
 			sql.append("\n FROM PENSBME_ORDER O");
 			sql.append("\n WHERE O.ORDER_DATE  = TO_DATE('"+asOfDate+"','dd/mm/yyyy')");
+			sql.append("\n AND O.STORE_TYPE ='"+custGroup+"'");
 			sql.append("\n AND ( O.ORDER_LOT_NO IS  NOT NULL OR ORDER_LOT_NO <> '')");
 			sql.append("\n AND O.ORDER_LOT_NO IN(  ");
 			sql.append("\n   SELECT ORDER_NUMBER FROM XXPENS_PO_ORDER_IMPORT_MST ");
@@ -226,18 +260,26 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 		BigDecimal headId = null;
 		Map<String, String> batchParamMap = monitorModel.getBatchParamMap();
 		try{
+			String custGroup = Utils.isNull(batchParamMap.get(PARAM_CUST_GROUP));
 			String asOfDate = DateUtil.stringValue(DateUtil.parse(batchParamMap.get(PARAM_AS_OF_DATE),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH) ;
 
 			sql.append("\n SELECT DISTINCT ");
 			sql.append("\n  O.STORE_CODE");
 			sql.append("\n ,O.ORDER_DATE");
-			sql.append("\n ,(SELECT INTERFACE_DESC FROM PENSBME_MST_REFERENCE M where reference_code = 'SubInv' and M.pens_value = O.store_code) as SUBINV");
-			sql.append("\n ,(SELECT PENS_DESC FROM PENSBME_MST_REFERENCE M where reference_code = 'Store' and M.pens_value = O.store_code) as STORE_NAME");
+			sql.append("\n ,(SELECT INTERFACE_DESC FROM PENSBI.PENSBME_MST_REFERENCE M where reference_code = 'SubInv' and M.pens_value = O.store_code) as SUBINV");
+			sql.append("\n ,(SELECT PENS_DESC FROM PENSBI.PENSBME_MST_REFERENCE M where reference_code = 'Store' and M.pens_value = O.store_code) as STORE_NAME");
+			sql.append("\n ,(SELECT max(PENS_DESC5) FROM PENSBI.PENSBME_MST_REFERENCE M where reference_code = 'Customer' ");
+			sql.append("\n   and pens_desc6 = 'Auto Sub-transfer'");
+			sql.append("\n   and M.pens_value = O.store_type) as forwarder");
 			sql.append("\n ,O.ORDER_LOT_NO");
-			sql.append("\n FROM PENSBME_ORDER O");
+			sql.append("\n FROM PENSBI.PENSBME_ORDER O");
 			sql.append("\n WHERE O.ORDER_DATE  = TO_DATE('"+asOfDate+"','dd/mm/yyyy')");
+			sql.append("\n AND O.STORE_TYPE ='"+custGroup+"'");
 			sql.append("\n AND ( O.ORDER_LOT_NO IS  NOT NULL OR ORDER_LOT_NO <> '')");
-			sql.append("\n AND O.STORE_TYPE ='"+PickConstants.STORE_TYPE_BIGC_CODE+"'");
+			sql.append("\n AND O.STORE_TYPE IN (");
+			sql.append("\n   select pens_value from PENSBI.PENSBME_MST_REFERENCE");
+			sql.append("\n   where reference_code = 'Customer' and pens_desc6 = 'Auto Sub-transfer'");
+			sql.append("\n )");
 			sql.append("\n AND O.ORDER_LOT_NO NOT IN(  ");
 			sql.append("\n   SELECT ORDER_NUMBER FROM XXPENS_PO_ORDER_IMPORT_MST ");
 			sql.append("\n  ) ");
@@ -248,11 +290,10 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 			String sqlIn = "insert into XXPENS_PO_ORDER_IMPORT_MST \n";
 			sqlIn +=" ( created_by, creation_date,last_updated_by, last_update_date,last_update_login, \n";
 			sqlIn +=" header_id ,account_number,ordered_date , \n ";
-			sqlIn +=" subinventory , int_flag,order_number,comments ) \n";
-			sqlIn +=" values(?,?,?,?, ?,?,?,? ,?,?,?,?) \n";
+			sqlIn +=" subinventory , int_flag,order_number,comments ,transporter_name) \n";
+			sqlIn +=" values(?,?,?,?, ?,?,?,? ,?,?,?,?,?) \n";
 			
 			psIns = conn.prepareStatement(sqlIn);
-			
 			rs = ps.executeQuery();
 			while(rs.next()){
 				foundData = true;
@@ -271,6 +312,7 @@ public class ImportOrderBigCFromWacoalTask implements BatchTaskInterface{
 				psIns.setString(++index,"N");
 				psIns.setString(++index, Utils.isNull(rs.getString("order_lot_no")));
 				psIns.setString(++index, Utils.isNull(rs.getString("STORE_NAME")));
+				psIns.setString(++index, Utils.isNull(rs.getString("forwarder")));
 				
 				psIns.executeUpdate();
 				

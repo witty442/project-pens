@@ -10,14 +10,11 @@
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <jsp:useBean id="confPickStockForm" class="com.isecinc.pens.web.pick.ConfPickStockForm" scope="session" />
 <html>
 <%
@@ -455,6 +452,9 @@ function validAutoSubOut(refNo){
 							              
 										 รวมจำนวนหีบ  <font color="red">*</font>
 										      <html:text property="bean.totalCtn" styleId="totalCtn" size="15" onblur="isNum(this)" onchange="isNum(this)"/>
+										&nbsp;&nbsp;&nbsp;&nbsp;
+										ขนส่งโดย
+										 <html:text property="bean.forwarder" styleId="forwarder" size="10" readonly="true" styleClass="disableText"/>
 										</td>
 									</tr>	
 								</c:if>
@@ -468,10 +468,13 @@ function validAutoSubOut(refNo){
 										      <html:text property="bean.totalCtn" styleId="totalCtn" size="15"  readonly="true" styleClass="disableText"/>
 										&nbsp;&nbsp;
 										Invoice No &nbsp;<html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" readonly="true" styleClass="disableText"/>
-							              
+							              	&nbsp;&nbsp;&nbsp;&nbsp;
+										ขนส่งโดย
+										 <html:text property="bean.forwarder" styleId="forwarder" size="10" readonly="true" styleClass="disableText"/>
 										</td>
 									</tr>	
 								</c:if>
+								 
 						   </table>
 					  </div>
 
@@ -604,9 +607,11 @@ function validAutoSubOut(refNo){
 							<tr>
 								<td align="left">
 								<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
-									<a href="javascript:autoSubOut('${pageContext.request.contextPath}')">
-									   <input type="button" value="ส่งข้อมูลเพื่อทำ Auto Sub Transfer" class="newPosBtnLong"> 
-									</a>
+								    <c:if test="${confPickStockForm.bean.canAutoSubTrans == true}">
+										<a href="javascript:autoSubOut('${pageContext.request.contextPath}')">
+										   <input type="button" value="ส่งข้อมูลเพื่อทำ Auto Sub Transfer" class="newPosBtnLong"> 
+										</a>
+									</c:if>
 								<%} %>
 								 &nbsp; &nbsp; &nbsp; &nbsp;
 								 <c:if test="${confPickStockForm.bean.canCancel == true}">

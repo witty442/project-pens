@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.dao.ImportDAO"%>
@@ -40,6 +41,7 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/page/summary.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+
 <script type="text/javascript">
 
 function loadMe(){
@@ -88,6 +90,7 @@ function loadMe(){
     		 ) {%>
 	     new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	 <%}%>
+	
 }
 
 function search(path){
@@ -393,6 +396,7 @@ function clearForm(path){
 	form.submit();
 	return true;
 }
+
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -754,7 +758,7 @@ function clearForm(path){
 					<!-- BUTTON -->
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 						<tr>
-							<td align="center" width="80%">
+							<td align="center" width="60%">
 								<a href="javascript:search('${pageContext.request.contextPath}')">
 								  <input type="button" value="ค้นหา" class="newPosBtn"> 
 								</a>&nbsp;
@@ -765,7 +769,7 @@ function clearForm(path){
 								  <input type="button" value="Export" class="newPosBtn">
 								</a>
 							</td>
-							 <td align="right" width="20%">
+							 <td align="right" width="40%" nowrap>
 								<%if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))){%>
 								   <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
 								 
@@ -779,6 +783,9 @@ function clearForm(path){
 									<a href="javascript:genReportEndDate('${pageContext.request.contextPath}')">
 									  <input type="button" value="Gen Data เปรียบเทียบนับสต็อก" class="newPosBtn">
 									</a>
+									<%-- <a href="javascript:genStockOnhandTemp('${pageContext.request.contextPath}')">
+									  <input type="button" value="Gen Stock Onhand" class="newPosBtn">
+									</a> --%>
 								<%}} %>
 								<%if("onhandLotus".equalsIgnoreCase(request.getParameter("page")) && User.ADMIN.equals(user.getRole().getKey())) {%>
 									<%-- <a href="javascript:genMonthEnd('${pageContext.request.contextPath}','Lotus')">
@@ -871,6 +878,7 @@ function clearForm(path){
 					<!-- hidden field -->
 					<input type="hidden" name="page" value="<%=request.getParameter("page") %>"/>
 					<input type="hidden" name="storeType" id="storeType" value="<%=storeType%>"/>
+					<input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

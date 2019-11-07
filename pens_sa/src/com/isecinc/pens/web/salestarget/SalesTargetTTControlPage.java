@@ -364,6 +364,10 @@ public class SalesTargetTTControlPage {
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			logger.debug("prepareDetailTTSUPER_TT");
+			//clear for new set
+			request.getSession().removeAttribute("productMKTList");
+			request.getSession().removeAttribute("salesrepList");
+			request.getSession().removeAttribute("dataMap");
 			
 			//Create Connection
 			conn = DBConnection.getInstance().getConnection();
@@ -412,7 +416,7 @@ public class SalesTargetTTControlPage {
 			   rowMap = dataList.get(0);
 			   dataMap = dataList.get(1);
 			}
-			//Get SalesList
+			//Get SalesList 
 			List<SalesTargetBean> salesrepList = SalesTargetTTDAO.searchSalesrepListByTTSUPER(conn, sales, user,rowMap);
 				
 			request.getSession().setAttribute("productMKTList", productMKTList);

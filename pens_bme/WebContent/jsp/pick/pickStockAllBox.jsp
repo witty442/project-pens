@@ -440,7 +440,7 @@ function validAutoSubOut(refNo){
                                     <td> Issue request status</td>
                                       <td>
                                         <html:text property="bean.issueReqStatusDesc" styleId="issueReqStatusDesc" size="20" readonly="true" styleClass="disableText"/>
-                                        <html:text property="bean.issueReqStatus" styleId="issueReqStatus"/>
+                                        <html:hidden property="bean.issueReqStatus" styleId="issueReqStatus"/>
                                      </td>
 									<td align="right">	 ผู้เบิก  </td>
 									<td align="left">
@@ -572,9 +572,11 @@ function validAutoSubOut(refNo){
 										<td align="left">
 										<% User user = (User)session.getAttribute("user"); %>
 										<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
+											 <c:if test="${pickStockForm.bean.canAutoSubTrans == true}">
 											<a href="javascript:autoSubOut('${pageContext.request.contextPath}')">
 												<input type="button" value="ส่งข้อมูลเพื่อทำ Auto Sub Transfer" class="newPosBtnLong"> 
 											</a>
+											</c:if>
 										<%} %>
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					                      <c:if test="${pickStockForm.bean.issueReqStatus == 'I'}">

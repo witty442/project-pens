@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.ReqPickStock"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
@@ -7,8 +8,6 @@
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -306,6 +305,46 @@ function sumQty(){
 	});
 }
 
+function autoSubOut(path){
+	var form = document.confPickStockAllForm;
+	var valid = true;
+	if( validAutoSubOut(form.issueReqNo.value)==false){
+		valid =false;
+	}
+	if(form.status.value !='I'){//ISSUE
+		alert("ทำได้เฉพาะ Request ที่ได้ ISSUE แล้วเท่านั้น");
+		valid = false;
+	}
+	if(valid ==true){
+		if( confirm("ยันยันการส่งข้อมูลเพื่อทำ Auto Sub Transfer")){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			
+			form.action = path + "/jsp/confPickStockAllAction.do?do=saveAutoSubOut";
+			form.submit();
+			return true;
+		}
+	}
+	return false;
+}
+function validAutoSubOut(refNo){
+	var returnString = "";
+	var form = document.confPickStockAllForm;
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/validAutoSubOutAjax.jsp",
+			data : "refNo=" + refNo,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	if(returnString =='false'){
+		alert("RefNo นี้ เคยมีการบันทึกการใช้งานไปแล้ว");
+		return false;
+	}	
+	return true;
+}
 </script>
 
 </head>		
@@ -366,6 +405,7 @@ function sumQty(){
                                     <td> Issue request status</td>
                                       <td>
                                         <html:text property="bean.statusDesc" styleId="statusDesc" size="20" readonly="true" styleClass="disableText"/>
+                                        <html:hidden property="bean.status" styleId="status" />
                                      </td>
 									<td align="right"> ผู้เบิก</td>
 									<td align="left">
@@ -432,6 +472,9 @@ function sumQty(){
                                     <td>Invoice No</td>
 									<td colspan="3">
 									  <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" readonly="true" styleClass="disableText"/>
+									  	&nbsp;&nbsp;&nbsp;&nbsp;
+										ขนส่งโดย
+										 <html:text property="bean.forwarder" styleId="forwarder" size="10" readonly="true" styleClass="disableText"/>
 									</td>
 								</tr>	
 						   </table>
@@ -563,12 +606,22 @@ function sumQty(){
 						<table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
 								<td align="left">
+								<%
+								User user = (User)session.getAttribute("user");
+								if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
+								  <c:if test="${confPickStockAllForm.bean.canAutoSubTrans == true}">
+									<a href="javascript:autoSubOut('${pageContext.request.contextPath}')">
+										<input type="button" value="ส่งข้อมูลเพื่อทำ Auto Sub Transfer" class="newPosBtnLong"> 
+									</a>
+									</c:if>
+							   <%} %>
+							&nbsp;&nbsp;&nbsp;
 								 <c:if test="${confPickStockAllForm.bean.canCancel == true}">
 									<a href="javascript:cancelAction('${pageContext.request.contextPath}')">
 									  <input type="button" value=" ยกเลิก Request นี้" class="newPosBtnLong"> 
 									</a>
 								 </c:if> 
-								 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+								 &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
 								 <c:if test="${confPickStockAllForm.bean.canPrint == true}">
 								    <a href="javascript:printMini('${pageContext.request.contextPath}')">
 									  <input type="button" value=" พิมพ์ ใบเบิกสินค้าแบบย่อ " class="newPosBtnLong"> 

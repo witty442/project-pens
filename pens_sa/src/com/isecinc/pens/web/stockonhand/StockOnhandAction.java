@@ -106,7 +106,9 @@ public class StockOnhandAction extends I_Action {
 		StockOnhandForm aForm = (StockOnhandForm) form;
 		try {
 			String pageName = Utils.isNull(request.getParameter("pageName"));
-			
+			if(true){
+				Thread.sleep(10000);
+			}
 		    if(PAGE_PREODER_NISSIN.equalsIgnoreCase(pageName)){
 			   return new PreOrderNissinProcess().save(aForm, request, response);
 			} 

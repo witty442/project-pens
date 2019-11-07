@@ -1,4 +1,4 @@
-<%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
+z<%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
 <%@page import="com.pens.util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.stock.StockConstants"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
@@ -351,7 +351,7 @@
 <%if ( UserUtils.userInRole("ROLE_MKT",user,new String[]{User.ADMIN, User.PREORDER}) ){ 
 	  no=0;
 %>
-    <li><a href="javascript: void(0)" class="parent" ><span>Maketing</span></a>
+    <li><a href="javascript: void(0)" class="parent" ><span>Marketing</span></a>
 	  <ul>
 	 <%if ( UserUtils.userInRole("ROLE_MKT",user,new String[]{User.ADMIN,User.PREORDER})) {%>
 	      <li>
