@@ -3,7 +3,6 @@
 	<name>pens_sa</name>
 	<comment></comment>
 	<projects>
-		<project>pens_utils</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
