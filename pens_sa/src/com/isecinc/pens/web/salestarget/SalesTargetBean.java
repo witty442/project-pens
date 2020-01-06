@@ -96,8 +96,15 @@ public class SalesTargetBean implements Serializable{
 	
 	private List<SalesTargetBean> itemsList;
 	StringBuffer dataStrBuffer;
+	String sessionId;
 	
 	
+	public String getSessionId() {
+		return sessionId;
+	}
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+	}
 	public StringBuffer getDataStrBuffer() {
 		return dataStrBuffer;
 	}

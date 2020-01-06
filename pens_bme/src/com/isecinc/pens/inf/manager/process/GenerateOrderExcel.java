@@ -691,6 +691,17 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n 	and H.delivery_date = ?  ");
 			sql.append("\n 	and H.exported = 'Y' ");
 			
+			sql.append("\n 	UNION ALL ");
+			/** PICK_Stock 14/11/2019 **/
+			sql.append("\n 	SELECT H.store_code ,h.store_no ");
+			sql.append("\n 	,(select Max(M.pens_desc) from PENSBME_MST_REFERENCE M where M.reference_code = 'Store' and M.pens_value = H.store_code) as store_name ");
+			sql.append("\n 	from PENSBME_PICK_STOCK H ,PENSBME_PICK_STOCK_I I  ");
+			sql.append("\n 	WHERE 1=1 ");
+			sql.append("\n 	and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
+			sql.append("\n 	and H.ISSUE_REQ_STATUS = '"+PickConstants.STATUS_ISSUED+"'");
+			sql.append("\n 	and H.cust_group = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n 	and H.delivery_date = ?  ");
+			sql.append("\n 	and H.exported = 'Y' ");
 			sql.append("\n)A ");
 			
 			logger.debug("sql:"+sql.toString());
@@ -698,7 +709,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			ps = conn.prepareStatement(sql.toString());
 			ps.setDate(1, new java.sql.Date(orderDate.getTime()));
 			ps.setDate(2, new java.sql.Date(orderDate.getTime()));
-			
+			ps.setDate(3, new java.sql.Date(orderDate.getTime()));
 			rs = ps.executeQuery();
 			while(rs.next()){
 				StoreBean m = new StoreBean();
@@ -773,6 +784,23 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n 		and H.delivery_date = ?  ");
 			sql.append("\n 		and H.exported = 'Y' ");
 
+			/** Pick Stock edit :14/11/2019 **/
+			sql.append("\n 	    UNION ALL ");
+			sql.append("\n 		SELECT DISTINCT" );
+			sql.append("\n       I.material_master as mat ");
+			sql.append("\n      ,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n 		from PENSBME_PICK_STOCK H ,PENSBME_PICK_STOCK_I I  ");
+			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
+			sql.append("\n 		    ON P.group_code = I.group_code  ");
+			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n   		AND P.product ='"+batchParamMap.get(PARAM_PRODUCT_TYPE)+"'");
+			sql.append("\n 		WHERE 1=1 ");
+			sql.append("\n 		and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
+			sql.append("\n 		and H.ISSUE_REQ_STATUS = '"+PickConstants.STATUS_ISSUED+"'");
+			sql.append("\n 		and H.cust_group = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n 		and H.delivery_date = ?  ");
+			sql.append("\n 		and H.exported = 'Y' ");
+			
 			sql.append("\n )A ");
 			sql.append("\n order by A.mat ");
 			
@@ -784,9 +812,8 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			ps = conn.prepareStatement(sql.toString());
 			ps.setDate(1, new java.sql.Date(orderDate.getTime()));
 			ps.setDate(2, new java.sql.Date(orderDate.getTime()));
-			
+			ps.setDate(3, new java.sql.Date(orderDate.getTime()));
 			rst = ps.executeQuery();
-
 			while (rst.next()) {
 				Order item = new Order();
                 item.setMaterialMaster(Utils.isNull(rst.getString("mat")));

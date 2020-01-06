@@ -41,6 +41,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
+import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.pens.util.Constants;
@@ -195,12 +196,15 @@ public class GenStockOnhandTempTask extends BatchTask implements BatchTaskInterf
 		boolean foundError = false;boolean passValid = false;String lineMsg = "";String errorMsg = "";
 		PreparedStatement ps =null,psIns=null;
 		ResultSet rst = null;
-		int index = 1;
+		int index = 0;
 		StringBuffer sql = new StringBuffer("");
 		try{
 		    //get parameter
 			String asOfDate = monitorModel.getBatchParamMap().get(PARAM_ASOF_DATE);
 			String storeCode = monitorModel.getBatchParamMap().get(PARAM_STORE_CODE);
+			
+			logger.debug("asOfDate:"+asOfDate);
+			logger.debug("storeCode:"+storeCode);
 			
 			//gen sql
 			OnhandSummary c = new OnhandSummary();
@@ -209,9 +213,9 @@ public class GenStockOnhandTempTask extends BatchTask implements BatchTaskInterf
 			
 			sql = genSQLStockOnhandLotus(conn,c);
 			//sql insert 
-			String sqlIns = "INSERT INTO PENSBME_TEMP_ONHAND_REP" +
-					"( STORE_CODE, GROUP_CODE, PENS_ITEM, ONHAND_QTY, CREATE_USER, CREATE_DATE) "+
-					"VALUES(?, ?, ?, ?, ?, ?)";
+			String sqlIns  = "INSERT INTO PENSBME_TEMP_ONHAND_REP";
+			       sqlIns +="(STORE_CODE, GROUP_CODE, PENS_ITEM, ONHAND_QTY, CREATE_USER, CREATE_DATE) ";
+			       sqlIns +=" VALUES(?, ?, ?, ?, ?, ?)";
 			psIns = conn.prepareStatement(sqlIns.toString());
 					
 			ps = conn.prepareStatement(sql.toString());
@@ -221,10 +225,11 @@ public class GenStockOnhandTempTask extends BatchTask implements BatchTaskInterf
 				psIns.setString(++index, rst.getString("group_type"));
 				psIns.setString(++index, rst.getString("pens_item"));
 				psIns.setDouble(++index, rst.getDouble("onhand_qty"));
-				psIns.setString(++index, monitorModel.getUserName());
+				psIns.setString(++index, monitorModel.getCreateUser());
 				psIns.setDate(++index, new java.sql.Date(new Date().getTime()));
 				
 				psIns.execute();
+				index = 0;
 			}
 			
 			conn.commit();
@@ -294,10 +299,14 @@ public class GenStockOnhandTempTask extends BatchTask implements BatchTaskInterf
 				
 				//prepare parameter
 				String christSalesDateStr ="";
-				if( !Utils.isNull(c.getSalesDate()).equals("")){
-					asofDate = DateUtil.parse(c.getSalesDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				if( !Utils.isNull(c.getAsOfDate()).equals("")){
+					asofDate = DateUtil.parse(c.getAsOfDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 					christSalesDateStr = DateUtil.stringValue(asofDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				}
+				//debug
+				logger.debug("onhandDateAsOfConfig:"+onhandDateAsOfConfig);
+				logger.debug("christSalesDateStr:"+christSalesDateStr);
+				
 				sql.append("\n SELECT A.* FROM(");
 				sql.append("\n SELECT M.*");
 				sql.append("\n , NVL(SALE_IN.SALE_IN_QTY,0) AS SALE_IN_QTY");

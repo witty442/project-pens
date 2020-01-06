@@ -89,7 +89,7 @@ PageVisit.processPageVisit(request,pageNameTemp);
 	overflow:auto;
 	white-space:nowrap;
 	box-shadow:0 0 25px #000;
-	}
+  }
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -165,13 +165,13 @@ PageVisit.processPageVisit(request,pageNameTemp);
 						        <jsp:include page="criteria/TTSUPER_Criteria.jsp" flush="true" />   
 						    <%}else if(SalesTargetConstants.PAGE_TTMGR.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/TTMGR_Criteria.jsp" flush="true" />   
-						     <%}else if(SalesTargetConstants.PAGE_TTADMIN.equalsIgnoreCase(pageName)){ %>
+						    <%}else if(SalesTargetConstants.PAGE_TTADMIN.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/TTADMIN_Criteria.jsp" flush="true" />   
-						     <%}else if(SalesTargetConstants.PAGE_MTADMIN.equalsIgnoreCase(pageName)){ %>
+						    <%}else if(SalesTargetConstants.PAGE_MTADMIN.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/MTADMIN_Criteria.jsp" flush="true" />   
-						     <%}else if(SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){ %>
+						    <%}else if(SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/SalesTargetPDCriteria.jsp" flush="true"/> 
-						     <%} %>
+						    <%} %>
 					    </div>
 					  
 					   <!-- ************************Result ***************************************************-->

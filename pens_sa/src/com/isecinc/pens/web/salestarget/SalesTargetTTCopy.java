@@ -136,7 +136,7 @@ public class SalesTargetTTCopy {
 		StringBuilder sql = new StringBuilder();
 		BigDecimal idNew = null;
 		try {
-			idNew =new BigDecimal(SequenceProcessAll.getNextValue("XXPENS_BI_SALES_TARGET_TT"));
+			idNew =new BigDecimal(SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TT"));
 			if(idNew.compareTo(new BigDecimal("0")) ==0){
 				idNew = new BigDecimal("1");
 			}

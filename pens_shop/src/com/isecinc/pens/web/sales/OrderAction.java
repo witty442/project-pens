@@ -757,6 +757,7 @@ public class OrderAction extends I_Action {
 					logger.debug("lineAmount:"+line.getLineAmount()+","+line.getLineAmount1());
 					logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1());
 					logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1());
+					logger.debug("uom:"+line.getUom()+","+line.getUom1()+","+line.getUom2());
 				}*/
 			}//for
 
@@ -783,11 +784,13 @@ public class OrderAction extends I_Action {
 			}else{
 				order.setCreditCardExpireDate(order.getCreditcardMonthExpire()+"/"+order.getCreditcardYearExpire());
 			}
+			
 			//Case CustomerBillName is null use default customerName(Maya)
 			
 			if(Utils.isNull(order.getCustomerBillName()).equals("")){
 				order.setCustomerBillName(customer!=null?customer.getName():"");
 			}
+			
 			// Save Order
 			if (!new MOrder().save(order, userActive.getId(), conn)) {
 				// return with duplicate Document no
@@ -821,7 +824,7 @@ public class OrderAction extends I_Action {
 				line.setSubInv(subInv);
 				
 				logger.debug("modifier_line_id["+line.getModifierLineId()+"]");
-				
+			
 				//Save Line to DB
 				new MOrderLine().save(line, userActive.getId(), conn);
 			}

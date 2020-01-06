@@ -23,7 +23,6 @@ import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.web.batchtask.task.BatchTaskListBean;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 

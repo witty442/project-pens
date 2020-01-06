@@ -96,6 +96,8 @@ function selectMultiple(){
 		//alert(pageName+":"+retCode+":"+retDesc+":"+retDesc2);
 		if(pageName=="SalesrepSales"){
 			window.opener.setDataPopupValue(retCode,retDesc,retDesc2,retDesc3,pageName);
+		}else if(pageName=="CustomerAutoSub"){
+		    window.opener.setDataPopupValue(retCode,retDesc,retDesc2,retDesc3,pageName);
 		}else{
 			window.opener.setDataPopupValue(retCode,retDesc,pageName);
 		}

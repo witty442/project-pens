@@ -729,7 +729,7 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  FROM t_receipt rc ");
 			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
-			sql.append("\n  WHERE rc.PD_PAYMENTMETHOD IN ('CR') ");
+			sql.append("\n  WHERE rc.PAYMENT_METHOD IN ('CR') ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 			sql.append("\n  AND rc.RECEIPT_DATE >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
 			sql.append("\n  AND rc.RECEIPT_DATE < DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");

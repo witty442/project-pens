@@ -1,5 +1,7 @@
 package com.pens.util;
 
+import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
+
 
 public class GoogleMapJavaScriptAPI {
     private static GoogleMapJavaScriptAPI _instance;
@@ -7,7 +9,7 @@ public class GoogleMapJavaScriptAPI {
 	
     public GoogleMapJavaScriptAPI(){
     	try{
-    		API_KEY = "AIzaSyAJUWErumNlehQ6rT4rP52yThSNsYd7bsI";
+    		API_KEY = EnvProperties.getInstance().getProperty("GoogleMapAPIKey");
 		}catch(Exception e){
 		}
     }

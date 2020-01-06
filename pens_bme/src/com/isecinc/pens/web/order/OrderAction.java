@@ -39,6 +39,8 @@ import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.managepath.ManagePath;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
+import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
@@ -532,6 +534,7 @@ public class OrderAction extends I_Action {
 		StringBuffer data = new StringBuffer("");
 		Connection conn = null;
 		OrderDAO orderDAO = new OrderDAO();
+		EnvProperties env = EnvProperties.getInstance();
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -546,7 +549,10 @@ public class OrderAction extends I_Action {
 
 			data = orderDAO.genOrderToTextAll(conn, user, orderForm.getOrder().getOrderDate());
 
-			java.io.OutputStream out = response.getOutputStream();
+			FileUtil.writeFile( env.getProperty("path.temp")+fileName, data, "TIS-620");
+			request.setAttribute("DOWNLOAD_FILE", fileName);//Mark flag for onload download File
+			
+			/*java.io.OutputStream out = response.getOutputStream();
 			response.setHeader("Content-Disposition", "attachment; filename="+fileName+".txt");
 			response.setContentType("text/html");
 			
@@ -556,10 +562,17 @@ public class OrderAction extends I_Action {
 		    w.close();
 
 		    out.flush();
-		    out.close();
+		    out.close();*/
 		    
 		    conn.commit();
 		    logger.debug("Conn Commit");
+		    
+		    /** insert History exportToTextAll **/
+		    Order orderHis = new Order();
+		    orderHis.setOrderDate(orderForm.getOrder().getOrderDate());
+		    orderHis.setCreateUser(user.getUserName());
+		    
+		    orderDAO.insertGenOrderTextHis(orderHis);
 		} catch(LogisticException e){
 			conn.rollback();
 			logger.debug("Conn Rollback");
@@ -576,6 +589,34 @@ public class OrderAction extends I_Action {
 			if(conn != null){
 				conn.close();conn=null;
 			}
+		}
+		return mapping.findForward("export");
+	}
+	public ActionForward downloadFileOrderToTextAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("downloadFileOrderToTextAll");
+		EnvProperties env = EnvProperties.getInstance();
+		try {
+			String fileName = Utils.isNull(request.getParameter("fileName"));
+			logger.debug("fileName:"+fileName);
+			String dataFile =FileUtil.readFile(env.getProperty("path.temp")+fileName, "TIS-620");
+			
+			java.io.OutputStream out = response.getOutputStream();
+			response.setHeader("Content-Disposition", "attachment; filename="+fileName+"");
+			response.setContentType("text/html");
+			
+			Writer w = new BufferedWriter(new OutputStreamWriter(out,"TIS-620")); 
+			w.write(dataFile);
+		    w.flush();
+		    w.close();
+
+		    out.flush();
+		    out.close();
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", e.toString());
+			return mapping.findForward("export");
+		}finally{
+			
 		}
 		return mapping.findForward("export");
 	}

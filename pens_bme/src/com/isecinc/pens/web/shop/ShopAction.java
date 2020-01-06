@@ -233,7 +233,7 @@ public class ShopAction extends I_Action {
 			 if(P_MAYA_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				fileName="Report Sale MAYA Shop.xls";
 				if(aForm.getResults() != null && aForm.getResults().size() > 0){
-					htmlTable = ShopSaleOutAction.exportToExcel(request,aForm,user,aForm.getResults());	
+					htmlTable = ShopSaleOutAction.exportSaleOutToExcel(request,aForm,user,aForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -261,7 +261,7 @@ public class ShopAction extends I_Action {
 			}else if(P_TM_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				fileName="Report Sale TERMINAL Shop.xls";
 				if(aForm.getResults() != null && aForm.getResults().size() > 0){
-					htmlTable = ShopSaleOutAction.exportToExcelTM(request,aForm,user,aForm.getResults());	
+					htmlTable = ShopSaleOutAction.exportSaleOutToExcelTM(request,aForm,user,aForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -270,6 +270,23 @@ public class ShopAction extends I_Action {
 				fileName="Report Sale TERMINAL StockOnhand.xls";
 				if(aForm.getResults() != null && aForm.getResults().size() > 0){
 					htmlTable = TerminalStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+				
+			}else if(P_CH_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				fileName="Report Sale Im Chaina Shop.xls";
+				if(aForm.getResults() != null && aForm.getResults().size() > 0){
+					htmlTable = ShopSaleOutAction.exportSaleOutToExcel(request,aForm,user,aForm.getResults());	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if(P_CH_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				fileName="Report Sale Im Chaina StockOnhand.xls";
+				if(aForm.getResults() != null && aForm.getResults().size() > 0){
+					htmlTable = CHINAStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");

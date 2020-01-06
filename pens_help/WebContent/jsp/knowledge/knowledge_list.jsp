@@ -17,8 +17,48 @@
    <tr><td>
    <font size="3"> <b>Knowledge List Sample </b></font>
    </td></tr>
+    <tr><td>
+        <b> Pass Value Thai Javascript <a href="javascript:showDiv('div_passvalue_thai');">Show Detail</a></b>
+         <div style="display:;" id="div_passvalue_thai">
+              <textarea rows="6" cols="160">
+              //Call ajax pass ProvinceName
+				data : "provinceName=" + encodeURI(document.getElementsByName('bean.projectCBean.province')[0].value),
+			//Jsp 
+			  provinceName =new String(provinceName.getBytes("ISO8859_1"), "UTF-8");
+		    </textarea>
+		</div>	 
+   </td></tr>
   <tr><td>
-     <a href="pens_bme/jsp/mttAction.do?do=prepare2&action=new">การแบ่ง Page Sample(บันทึกและค้นหาข้อมูลขาย Sale-Out)</a>
+     <b> การแบ่ง Paging
+     <a href="javascript:showDiv('div_paging');">Show Detail</a></b>
+         <div style="display:;" id="div_paging">
+            <textarea rows="15" cols="200">
+	    function search(path){
+			var form = document.nsForm;
+			form.action = path + "/jsp/nsAction.do?do=search&action=newsearch";
+			form.submit();
+			return true;
+		}
+		function gotoPage(path,currPage){
+			var form = document.nsForm;
+			form.action = path + "/jsp/nsAction.do?do=search&currPage="+currPage;
+		    form.submit();
+		    return true;
+		}
+		// Jsp
+		View  Source
+        replcae $
+		   $ jsp:include page="../pageing_new.jsp" $
+	         $ jsp:param name="totalPage" value="$%=//nsForm.getTotalPage() %$" /$
+	         $ jsp:param name="totalRecord" value="$%=//nsForm.getTotalRecord() %$" /$
+	         $ jsp:param name="currPage" value="$%=//nsForm.getCurrPage() %$" /$
+	         $ jsp:param name="startRec" value="$%=//nsForm.getStartRec() %$" /$
+	         $ jsp:param name="endRec" value="$%=//nsForm.getEndRec() %$"/$ 
+           $ / jsp:include $  
+         
+		   </textarea>
+		 
+		</div>	 
   </td></tr>
   <tr><td>
      <a href="pens_bme/jsp/autoCNAction.do?do=prepare2&action=new">add row,delete row table Sample(Request Job เพื่อทำ Auto-CN(LOTUS)</a>
@@ -136,9 +176,9 @@
     <tr><td>
         <b> Open Popup Javascript <a href="javascript:showDiv('div_popup_all');">Show Detail</a></b>
          <div style="display: none;" id="div_popup_all">
-              <textarea rows="5" cols="160">
+              <textarea rows="20" cols="160">
             <XX input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','CustomerStockMC')"/>   
-			
+	
 			function openPopup(path,pageName){
 				var form = document.stockMCForm;
 				var param = "&pageName="+pageName;
@@ -159,6 +199,8 @@
 					form.customerName.value = desc;
 				}
 			} 
+			
+			
 		    </textarea>
 		</div>	 
    </td></tr>

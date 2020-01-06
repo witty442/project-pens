@@ -148,7 +148,8 @@ public class PopupAction extends I_Action {
 		}
 		return forward;
 	}
-
+ 
+	/** NEW Code **/
 	public ActionForward prepareAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepareAll");
 		PopupForm popupForm = (PopupForm) form;
@@ -207,7 +208,7 @@ public class PopupAction extends I_Action {
 		}
 		return mapping.findForward(forward);
 	}
-	
+	/** NEW CODE **/
 	public ActionForward searchAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("searchAll");
 		PopupForm popupForm = (PopupForm) form;
@@ -217,6 +218,13 @@ public class PopupAction extends I_Action {
 			 
 			if("SalesrepSales".equalsIgnoreCase(popupForm.getPageName()) ){
 				 List<PopupForm> results = PopupDAO.searchSalesrepSalesList(popupForm);
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+			}else if("CustomerAutoSub".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupForm> results = PopupDAO.searchCustomerAutoSubList(popupForm);
 				 if(results != null && results.size() >0){
 					 request.getSession().setAttribute("DATA_LIST", results);
 				 }else{

@@ -43,7 +43,7 @@ public class JobDAO extends PickConstants{
 			sql.append("\n     where v.job_id = J.job_id and v.intflag='S' ) as auto_cn_hh ");
 			sql.append("\n   ,( select (case when v.intflag='S' then 'Y' ELSE '' END)");
 			sql.append("\n     from PENSBI.PENSBME_AUTO_SUBTRANSFER v ");
-			sql.append("\n     where v.job_id = J.job_id) as autosub_bigc ");
+			sql.append("\n     where v.job_id = J.job_id) as autosub_all ");
 			sql.append("\n    from PENSBI.PENSBME_PICK_JOB J  ");
 			sql.append("\n )A where 1=1 ");
 			//genWHereCondSql
@@ -92,7 +92,7 @@ public class JobDAO extends PickConstants{
 			sql.append("\n     where v.job_id = J.job_id and v.intflag='S' ) as auto_cn_hh ");
 			sql.append("\n   ,( select (case when v.intflag='S' then 'Y' ELSE '' END)");
 			sql.append("\n     from PENSBI.PENSBME_AUTO_SUBTRANSFER v ");
-			sql.append("\n     where v.job_id = J.job_id) as autosub_bigc ");
+			sql.append("\n     where v.job_id = J.job_id) as autosub_all ");
 			sql.append("\n   from PENSBI.PENSBME_PICK_JOB J ");
 			sql.append("\n  )B where 1=1   ");
 			//genWHereCondSql
@@ -133,12 +133,10 @@ public class JobDAO extends PickConstants{
 				   
 				   if( Utils.isNull(h.getCustGroup()).equals(PickConstants.STORE_TYPE_LOTUS_CODE)){
 					  h.setAutoCN(Utils.isNull(rst.getString("auto_cn_lotus")));
-				   }
-				   if( Utils.isNull(h.getCustGroup()).equals(PickConstants.STORE_TYPE_HISHER_CODE)){
+				   }else if( Utils.isNull(h.getCustGroup()).equals(PickConstants.STORE_TYPE_HISHER_CODE)){
 					  h.setAutoCN(Utils.isNull(rst.getString("auto_cn_hh")));
-				   }
-				   if( Utils.isNull(h.getCustGroup()).equals(PickConstants.STORE_TYPE_BIGC_CODE)){
-					  h.setAutoCN(Utils.isNull(rst.getString("autosub_bigc")));
+				   }else{
+					  h.setAutoCN(Utils.isNull(rst.getString("autosub_all")));
 				   }
 					
 				   h.setRtnQty(Utils.decimalFormat(rst.getDouble("rtn_qty"),Utils.format_current_no_disgit,""));
@@ -216,16 +214,14 @@ public class JobDAO extends PickConstants{
 		}
 		if( !Utils.isNull(o.getDispAutoCN()).equals("")){
 			if( Utils.isNull(o.getCustGroup()).equals("")){
-			 // sql.append("\n and ( auto_cn_lotus = 'Y' OR auto_cn_hh = 'Y' or autosub_bigc ='Y')");
+			 // sql.append("\n and ( auto_cn_lotus = 'Y' OR auto_cn_hh = 'Y' or autosub_all ='Y')");
 			}else{
 				if( Utils.isNull(o.getCustGroup()).equals(PickConstants.STORE_TYPE_LOTUS_CODE)){
 					sql.append("\n and auto_cn_lotus = 'Y' ");
-				}
-				if( Utils.isNull(o.getCustGroup()).equals(PickConstants.STORE_TYPE_HISHER_CODE)){
+				}else if( Utils.isNull(o.getCustGroup()).equals(PickConstants.STORE_TYPE_HISHER_CODE)){
 					sql.append("\n and auto_cn_hh = 'Y' ");
-				}
-				if( Utils.isNull(o.getCustGroup()).equals(PickConstants.STORE_TYPE_BIGC_CODE)){
-					sql.append("\n and autosub_bigc = 'Y' ");
+				}else{
+					sql.append("\n and autosub_all = 'Y' ");
 				}
 			}
 		}

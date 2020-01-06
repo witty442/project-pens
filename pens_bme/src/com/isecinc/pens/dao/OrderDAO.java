@@ -2758,5 +2758,72 @@ public class OrderDAO {
 		}
 		return "";
 	}
+	
+	public  void insertGenOrderTextHis(Order o) throws Exception{
+		PreparedStatement ps = null;
+		Connection conn = null;
+		logger.debug("Update");
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" INSERT INTO PENSBI.PENSBME_ORDER_GENTEXT_HIS \n");
+			sql.append(" (ORDER_DATE,CREATE_USER,CREATE_DATE)  \n" );
+			sql.append(" VALUES(?,?,?) \n" );
 
+			conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+				
+			//int index =1;
+			Date orderDate = DateUtil.parse( o.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			
+			ps.setDate(1, new java.sql.Date(orderDate.getTime()));
+			ps.setString(2, o.getCreateUser());
+			ps.setTimestamp(3, new java.sql.Timestamp(new java.util.Date().getTime()));
+			ps.executeUpdate();
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+			if(conn != null){
+				conn.close();
+			}
+		}
+	}
+	public static int getCountGenOrderTextHis(String orderDateS) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection conn = null;
+		int count = 0;
+		logger.debug("getCountGenOrderTextHis");
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" SELECT count(*) as c FROM PENSBI.PENSBME_ORDER_GENTEXT_HIS \n");
+			sql.append(" WHERE ORDER_DATE = ?  \n" );
+
+			conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+				
+			//int index =1;
+			Date orderDate = DateUtil.parse(orderDateS, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			
+			ps.setDate(1, new java.sql.Date(orderDate.getTime()));
+			rs = ps.executeQuery();
+			if(rs.next()){
+				count = rs.getInt("c");
+			}
+			
+			return count;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+			if(conn != null){
+				conn.close();
+			}
+		}
+	}
 }

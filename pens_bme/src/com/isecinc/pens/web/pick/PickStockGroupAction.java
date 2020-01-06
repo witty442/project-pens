@@ -410,7 +410,6 @@ public class PickStockGroupAction extends I_Action {
 			String[] orgQty = request.getParameterValues("orgQty");
 			String[] onhandQty = request.getParameterValues("onhandQty");
 			
-
 			//add value to Results
 			if(boxNo != null && boxNo.length > 0){
 				for(int i=0;i<boxNo.length;i++){

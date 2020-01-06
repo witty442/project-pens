@@ -295,8 +295,14 @@ public class AutoCNHISHERDAO extends PickConstants{
 		
 			sql.append("\n  , (SELECT max(P.price) from xxpens_bi_mst_price_list P " );
 			sql.append("\n     where P.product_id =M.INVENTORY_ITEM_ID " );
-			sql.append("\n     and P.primary_uom_code ='Y' " );
+			//sql.append("\n     and P.primary_uom_code ='Y' " );
+			sql.append("\n     and P.uom_code = 'EA' ");
 			sql.append("\n     and P.pricelist_id ="+priceListId+") as unit_price");
+			
+		/*	sql.append("\n  ,(select unit_price from pensbme_unit_price_v ");
+			sql.append("\n    where customer_code = '"+o.getStoreCode()+"' ");
+			sql.append("\n    and inventory_item_id = M.INVENTORY_ITEM_ID  ");
+			sql.append("\n    and rownum = 1 ) as unit_price");*/
 			
 			sql.append("\n  , nvl(count(*),0) as qty");
 		    sql.append("\n   from pensbme_pick_barcode_item j ,xxpens_om_item_mst_v M ");
@@ -745,11 +751,18 @@ public class AutoCNHISHERDAO extends PickConstants{
 				}
 				sql.append("\n select MS.pens_value as pens_item ");
 				sql.append("\n ,M.description as item_name,M.INVENTORY_ITEM_ID ");
-				
+
 				sql.append("\n  , (SELECT max(P.price) from xxpens_bi_mst_price_list P " );
 				sql.append("\n     where P.product_id =M.INVENTORY_ITEM_ID " );
-				sql.append("\n     and P.primary_uom_code ='Y' " );
+				//sql.append("\n     and P.primary_uom_code ='Y' " );
+				sql.append("\n     and P.uom_code = 'EA' ");
 				sql.append("\n     and P.pricelist_id ="+priceListId+") as unit_price");
+				
+				
+			/*	sql.append("\n  ,(select unit_price from pensbme_unit_price_v ");
+				sql.append("\n    where customer_code = '"+storeCode+"' ");
+				sql.append("\n    and inventory_item_id = M.INVENTORY_ITEM_ID  ");
+				sql.append("\n    and rownum = 1 ) as unit_price");*/
 				
 				/*sql.append("\n  ,(SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
 				sql.append("\n   where P.INVENTORY_ITEM_ID =M.INVENTORY_ITEM_ID " );

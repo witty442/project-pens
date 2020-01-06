@@ -216,6 +216,7 @@ public class SalesTargetMTAction  {
 			SalesTargetBean bean = aForm.getBean();
 			bean.setCreateUser(user.getUserName());
 			bean.setUpdateUser(user.getUserName());
+			bean.setSessionId(request.getSession().getId());
 			
 			String errorCode = SalesTargetCopy.copyFromLastMonthMT(user, bean,aForm.getPageName());
 			if(errorCode.equalsIgnoreCase("DATA_CUR_EXIST_EXCEPTION")){
@@ -539,7 +540,7 @@ public class SalesTargetMTAction  {
 			SalesTargetBean salesReuslt = SalesTargetDAO.searchTargetHeadByMTADMIN(aForm.getBean(),user,aForm.getPageName());
 			aForm.setBean(salesReuslt);
 			if(salesReuslt.getItems() != null && salesReuslt.getItems().size() >0){
-				 request.getSession().setAttribute("RESULTS", SalesTargetExport.genResultSearchTargetHeadByMTADMIN(request,aForm.getBean(),user));
+				request.getSession().setAttribute("salesTargetForm_RESULTS", SalesTargetExport.genResultSearchTargetHeadByMTADMIN(request,aForm.getBean(),user));
 			}
 		
 		} catch (Exception e) {

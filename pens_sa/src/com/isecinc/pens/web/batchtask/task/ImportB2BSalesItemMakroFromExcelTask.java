@@ -289,25 +289,25 @@ public class ImportB2BSalesItemMakroFromExcelTask extends BatchTask implements B
 			
 				    
 				cellObjValue = xslUtils.getCellValue(colNo, row.getCell((short) 0));
-				supplierNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+				supplierNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 1));
-				locationNumber =ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+				locationNumber =ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 2));
 				locationName = ExcelHelper.getCellValue(cellObjValue,"STRING","");
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 3));
-				classNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+				classNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 4));
-				subClassNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+				subClassNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 5));
-				itemNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+				itemNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 6));
-				barcode = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+				barcode = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 7));
 				itemDesc = ExcelHelper.getCellValue(cellObjValue,"STRING","");

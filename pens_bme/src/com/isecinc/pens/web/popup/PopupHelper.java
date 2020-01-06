@@ -48,6 +48,10 @@ public class PopupHelper {
 		 	headName = "พนักงานขาย";
 		 	codeSearchTxtName = "รหัสพนักงานขาย";
 		 	descSearchTxtName = "ชื่อพนักงานขาย";
+	    }else  if("CustomerAutoSub".equalsIgnoreCase(pageName)){
+		 	headName = "ร้านค้า (Auto Sub Transfer)";
+		 	codeSearchTxtName = "Customer Code";
+		 	descSearchTxtName = "Customer Name";
 	    }
 	    headTextArr[0] = headName;
 	    headTextArr[1] = codeSearchTxtName;

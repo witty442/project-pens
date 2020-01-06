@@ -13,7 +13,6 @@
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <jsp:useBean id="pickStockForm" class="com.isecinc.pens.web.pick.PickStockForm" scope="session" />
 <%
 /*clear session form other page */
@@ -36,7 +35,7 @@ SessionUtils.clearSessionUnusedForm(request, "pickStockForm");
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 function loadMe(){
-	// new Epoch('epoch_popup', 'th', document.getElementById('transactionDate'));
+	 new Epoch('epoch_popup', 'th', document.getElementById('deliveryDate'));
 	sumTotal();
 }
 function clearForm(path){
@@ -127,7 +126,6 @@ function save(path){
 		alert("กรุณากรอก กลุ่มร้านค้า");
 		return false;
 	}
-	
 	if(pickUser ==""){
 		alert("กรุณากรอก ผู้เบิก");
 		return false;
@@ -144,12 +142,22 @@ function save(path){
 		alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
 		return false;
 	}
-	 if($('#forwarder').val()==""){
-			alert("กรุณาระบุขนส่ง")
-			$('#forwarder').focus();
-			return false;
-		}
-		  
+	if($('#deliveryDate').val() ==''){
+		$('#deliveryDate').focus();
+		alert("กรุณาระบุวันที่พร้อมจัดส่ง");
+		return false;
+	}
+	if($('#forwarder').val() ==''){
+		$('#forwarder').focus();
+		alert("กรุณาระบุขนส่ง");
+		return false;
+	}
+/* 	if($('#totalBox').val() ==''){
+		$('#totalBox').focus();
+		alert("กรุณาระบุจำนวนกล่อง");
+		return false;
+	} */
+	
 	if( !checkOneSelected()){
 		alert("กรุณาเลือกรายการอย่างน้อย 1 รายการ");
 		return false;
@@ -380,6 +388,42 @@ function validAutoSubOut(refNo){
 	}	
 	return true;
 }
+function saveTotalBox(path){
+	var form = document.pickStockForm;
+	var issueReqNo =$('#issueReqNo').val();
+	
+	if($('#deliveryDate').val() ==''){
+		$('#deliveryDate').focus();
+		alert("กรุณาระบุวันที่พร้อมจัดส่ง");
+		return false;
+	}
+	if($('#forwarder').val() ==''){
+		$('#forwarder').focus();
+		alert("กรุณาระบุขนส่ง");
+		return false;
+	}
+	/* if($('#totalBox').val() ==''){
+		$('#totalBox').focus();
+		alert("กรุณาระบุจำนวนกล่อง");
+		return false;
+	} */
+	var param  = "issueReqNo=" + issueReqNo;
+	    param +="&totalBox="+$('#totalBox').val();
+	    param +="&forwarder="+$('#forwarder').val();
+	    param +="&deliveryDate="+$('#deliveryDate').val();
+	    
+	var getData = $.ajax({
+		url: "${pageContext.request.contextPath}/jsp/pick/ajax/saveTotalBoxPickStockGroupAjax.jsp",
+		data : encodeURI(param),
+		async: false,
+		cache: false,
+		success: function(getData){
+		  returnString = jQuery.trim(getData);
+		}
+	}).responseText;
+	
+	setTimeout("alert(returnString)",1500);
+}
 </script>
 
 </head>		
@@ -402,10 +446,10 @@ function validAutoSubOut(refNo){
 	    	</table>
 	    	</div>
 	    	<!-- PROGRAM HEADER -->
-	    
 	      	<jsp:include page="../program.jsp">
 				<jsp:param name="function" value="pickStock"/>
 			</jsp:include>
+			
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -486,18 +530,31 @@ function validAutoSubOut(refNo){
                                     <td>
 						               <html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" readonly="true" styleClass="disableText"/>
 									</td>
-									<td></td><td></td>
+									<td></td>
+									<td rowspan="2">
+                                         <table border='0' cellpadding="3" cellspacing="1" bgcolor="black">
+                                             <tr bgcolor="white"><td>
+                                                                                                                      วันที่พร้อมจัดส่ง<font color="red">*</font>	
+                                                <html:text property="bean.deliveryDate" styleId="deliveryDate" size="9" readonly='true'/>
+                                             </td></tr>
+	                                         <tr bgcolor="white"><td>
+		                                      &nbsp;
+		                                                                                              ขนส่งโดย  <font color="red">*</font>			
+											    <html:select property="bean.forwarder" styleId="forwarder" >
+											    <html:options collection="forwarderList" property="code" labelProperty="desc"/>
+											</html:select>
+	                                         
+												<a href="javascript:saveTotalBox('${pageContext.request.contextPath}')">
+													<input type="button" value="บันทึกข้อมูลส่วนในกรอบนี้" class="newPosBtnLong"> 
+												</a>
+											</td></tr>
+											</table>
+									</td>
 								</tr>
 								<tr>
                                     <td > หมายเหตุ </td>
-                                    <td colspan="2"> 
+                                    <td> 
                                       <html:text property="bean.remark" styleId="remark" size="60" styleClass="\" autoComplete=\"off"/>
-                                           
-						              &nbsp;&nbsp;&nbsp;&nbsp; 
-						                                ขนส่งโดย  <font color="red">*</font>		
-									    <html:select property="bean.forwarder" styleId="forwarder" >
-									      <html:options collection="forwarderList" property="code" labelProperty="desc"/>
-									     </html:select>
                                       </td>
 								</tr>	
 						   </table>

@@ -72,7 +72,18 @@
 	   <servlet-name>BatchTaskDownloadServlet</servlet-name>
 	   <servlet-class>com.isecinc.pens.web.batchtask.BatchTaskDownloadServlet</servlet-class>
   </servlet>
+  <!-- ProjectC Servlet -->
+	<servlet>
+		<display-name>ProjectC Servlet</display-name>
+		<servlet-name>ProjectCServlet</servlet-name>
+		<servlet-class>com.isecinc.pens.web.projectc.ProjectCServlet</servlet-class>
+	</servlet>
+	
   <servlet-mapping>
+	   <servlet-name>ProjectCServlet</servlet-name>
+	   <url-pattern>/jsp/projectCServlet</url-pattern>
+  </servlet-mapping>
+   <servlet-mapping>
 	   <servlet-name>BatchTaskDownloadServlet</servlet-name>
 	   <url-pattern>/batchTaskDownloadServlet</url-pattern>
   </servlet-mapping>

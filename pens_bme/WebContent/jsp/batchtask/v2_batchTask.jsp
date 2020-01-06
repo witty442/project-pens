@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@page import="com.isecinc.pens.web.batchtask.task.BatchTaskListBean"%>
+<%@page import="com.isecinc.pens.web.batchtask.BatchTaskListBean"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Map"%>

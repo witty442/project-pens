@@ -812,25 +812,26 @@ body {
 										
 										<%if("admin".equalsIgnoreCase(user.getUserName())){ 
                                            if(Constants.TYPE_GEN_ITEM_MASTER_HISHER.equals(pageName)){ 
-									    		out.println("GEN_ITEM_MASTER_HISHER <br/>");
-									    		out.println("->>GET PENSBME_PRICELIST(INTERFACE_ICC=N) after set INTERFACE_ICC=Y");
+									    		out.println("*** GEN_ITEM_MASTER_HISHER *** <br/>");
+									    		out.println("-GET PENSBME_PRICELIST(INTERFACE_ICC=N) <br/> -set INTERFACE_ICC=Y");
 									    	}
 											if(Constants.TYPE_GEN_HISHER.equals(pageName)){ 
-												out.println("GEN_HISHER <br/>");
-									    		out.println("->>GET (PENSBME_ORDER,PENSBME_STOCK_ISSUE) EXPORTED NOT IN(Y,G) after set EXPORTED=Y");
+												out.println("*** GEN_HISHER (text) *** <br/>");
+									    		out.println("-GET (PENSBME_ORDER,PENSBME_STOCK_ISSUE,PENSBME_PICK_STOCK) EXPORTED NOT IN(Y,G) <br/> -set EXPORTED=Y <br/>");
+									    		out.println("-text icc path : twstock <br/>-backup path : D:/DATA_ICC_INTERFACE/PENS_STOCK(twstock) ON DD-SERVER");
 									    	}
 											if(Constants.TYPE_GEN_ORDER_EXCEL.equals(pageName)){ 
-									    		out.println("GEN_ORDER_EXCEL <br/>");
-									    		out.println("->>GET (PENSBME_ORDER,PENSBME_STOCK_ISSUE) EXPORTED IN(Y) after set EXPORTED=G");
+									    		out.println("*** GEN_ORDER_EXCEL *** <br/>");
+									    		out.println("-GET (PENSBME_ORDER,PENSBME_STOCK_ISSUE,PENSBME_PICK_STOCK) EXPORTED IN(Y) <br/>-set EXPORTED=G");
 									    	}
-											/* if(Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){ 
+										   if(Constants.TYPE_IMPORT_BILL_ICC.equals(pageName)){ 
 									    		out.println("IMPORT_BILL_ICC <br/>");
-									    		out.println("");
+									    		out.println("TABLE: PENSBI.PENSBME_ICC_HEAD , PENSBI.PENSBME_ICC_DLYR");
 									    	}
 											if(Constants.TYPE_EXPORT_BILL_ICC.equals(pageName)){ 
 									    		out.println("EXPORT_BILL_ICC <br/>");
 									    		out.println("");
-									    	} */
+									    	} 
 										} %>
 								   </b>
 								 </td>

@@ -12,7 +12,7 @@ import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.web.reports.ReportsBean;
+import com.isecinc.pens.web.reportall.ReportAllBean;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
@@ -21,7 +21,7 @@ import com.pens.util.Utils;
 public class ReportEndDateLotusSQL {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	 public static StringBuilder genSQL(Connection conn,ReportsBean c,User user,String summaryType,String typeGen) throws Exception{
+	 public static StringBuilder genSQL(Connection conn,ReportAllBean c,User user,String summaryType,String typeGen) throws Exception{
 			StringBuilder sql = new StringBuilder();
 			//Date asofDate = null;
 			BMEControlBean control = null;

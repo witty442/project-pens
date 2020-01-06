@@ -298,7 +298,7 @@ public class LockItemOrderDAO {
 				//logger.debug("sql:"+sql.toString());
 				
 				ps = conn.prepareStatement(sql.toString());
-				ps.setInt(c++, SequenceProcessAll.getNextValue(conn,"PENSBME_LOCK_ITEM"));
+				ps.setInt(c++, SequenceProcessAll.getIns().getNextValue(conn,"PENSBME_LOCK_ITEM").intValue());
 				
 				ps.setString(c++, Utils.isNull(o.getGroupCode()));//1
 				if( !Utils.isNull(o.getLockDate()).equals("")){//4

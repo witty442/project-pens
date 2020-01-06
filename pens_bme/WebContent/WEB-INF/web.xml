@@ -81,6 +81,14 @@
     <servlet-name>PrintPayInReport</servlet-name>
     <url-pattern>/printPayInReport</url-pattern>
   </servlet-mapping>
+   <servlet>
+	   <servlet-name>DownloadFileServlet</servlet-name>
+	   <servlet-class>com.isecinc.pens.web.servlet.DownloadFileServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	   <servlet-name>DownloadFileServlet</servlet-name>
+	   <url-pattern>/downloadFileServlet</url-pattern>
+  </servlet-mapping>
   <servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>

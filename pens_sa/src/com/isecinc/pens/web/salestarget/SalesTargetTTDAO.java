@@ -882,14 +882,17 @@ public class SalesTargetTTDAO {
 			sql.append("\n  ,D.INVENTORY_ITEM_CODE ,D.target_qty,D.TARGET_AMOUNT");
 			sql.append("\n  ,(select INVENTORY_ITEM_desc from PENSBI.XXPENS_BI_MST_ITEM B ");
 			sql.append("\n    where B.INVENTORY_ITEM_CODE = D.INVENTORY_ITEM_CODE) as INVENTORY_ITEM_DESC ");
-			sql.append("\n  from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ,PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L D");
+			sql.append("\n  from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
+			sql.append("\n  ,PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L D");
+			sql.append("\n  ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
 			sql.append("\n  where D.id = M.id ");
-			
+			sql.append("\n  and M.salesrep_code = Z.salesrep_code ");
+			sql.append("\n  and M.DIVISION ='B' ");//Van and Credit only
 			if( !Utils.isNull(cri.getCustCatNo()).equals(""))
 				sql.append("\n  and M.CUSTOMER_CATEGORY = '"+cri.getCustCatNo()+"'");
 			
-			/*if( !Utils.isNull(cri.getSalesZone()).equals(""))
-				sql.append("\n  and M.ZONE = '"+cri.getSalesZone()+"'");*/
+			if( !Utils.isNull(cri.getSalesZone()).equals(""))
+				sql.append("\n  and Z.ZONE = '"+cri.getSalesZone()+"'");
 			
 			if( !Utils.isNull(cri.getBrand()).equals(""))
 			   sql.append("\n  and M.brand = '"+cri.getBrand()+"'");
@@ -917,7 +920,7 @@ public class SalesTargetTTDAO {
 			   h.setItemCode(rst.getString("INVENTORY_ITEM_CODE"));
 			   h.setItemName(rst.getString("INVENTORY_ITEM_DESC"));
 			   if(rst.getDouble("TARGET_QTY") != 0){
-			       h.setTargetQty(Utils.decimalFormat(rst.getDouble("TARGET_QTY"), Utils.format_number_no_digit));
+			       h.setTargetQty(Utils.decimalFormat(rst.getDouble("TARGET_QTY"), Utils.format_number_no_disgit));
 			       h.setTargetAmount(Utils.decimalFormat(rst.getDouble("TARGET_AMOUNT"), Utils.format_current_2_disgit));
 			   }else{
 				   h.setTargetQty("");
@@ -1199,25 +1202,63 @@ public class SalesTargetTTDAO {
 	 * @return
 	 * @throws Exception
 	 */
-	public static SalesTargetBean save(SalesTargetBean h,User user) throws Exception{
-		Connection conn = null;
+	public static SalesTargetBean save(Connection conn,SalesTargetBean h,User user) throws Exception{
 		try{
-			conn = DBConnection.getInstance().getConnection();
-			conn.setAutoCommit(false);
 			if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.MKT,User.ADMIN}) ){
 				h = saveModelByMKT_TT(conn,h);
 			}
-			conn.commit();
-			
 			return h;
 		}catch(Exception e){
-			conn.rollback();
 			throw e;
 		}finally{
-			if(conn !=null){
-				conn.close();conn=null;
-			}
 		}
+	}
+	
+	/** delete product in XXPENS_BI_SALES_TARGET_TEMP_L where product_id not in(XXPENS_BI_SALES_TARGET_TT_L) */
+	public static int deleteProductByMKTDel(Connection conn,SalesTargetBean cri,User user){
+		int maxLineId = 0;
+		Statement stmt = null;
+		StringBuilder sql = new StringBuilder();
+		try{
+			sql.append("\n delete from PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L D");
+			sql.append("\n where D.id in(");
+			sql.append("\n  select M.id from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
+			sql.append("\n  ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
+			sql.append("\n  where M.salesrep_id = Z.salesrep_id");
+			sql.append("\n  and M.division ='B'");//van and credit
+			sql.append("\n  and M.target_month = '"+Utils.isNull(cri.getTargetMonth())+"'");
+			sql.append("\n  and M.target_quarter = '"+Utils.isNull(cri.getTargetQuarter())+"'");
+			sql.append("\n  and M.target_year = '"+Utils.isNull(cri.getTargetYear())+"'");
+            sql.append("\n  and M.brand = '"+cri.getBrand()+"'");
+			sql.append("\n  and M.CUSTOMER_CATEGORY = '"+Utils.isNull(cri.getCustCatNo())+"'");
+			sql.append("\n  and Z.zone = '"+Utils.isNull(cri.getSalesZone())+"'");
+			sql.append("\n ) ");
+			// item_code not in TT_L 
+			sql.append("\n and D.inventory_item_code not in (");
+			sql.append("\n   select DD.inventory_item_code from PENSBI.XXPENS_BI_SALES_TARGET_TT_L DD");
+			sql.append("\n   where DD.id in(");
+			sql.append("\n     select M.id from PENSBI.XXPENS_BI_SALES_TARGET_TT M ");
+			sql.append("\n     where M.target_month = '"+Utils.isNull(cri.getTargetMonth())+"'");
+			sql.append("\n     and M.target_quarter = '"+Utils.isNull(cri.getTargetQuarter())+"'");
+			sql.append("\n     and M.target_year = '"+Utils.isNull(cri.getTargetYear())+"'");
+            sql.append("\n     and M.brand = '"+cri.getBrand()+"'");
+			sql.append("\n     and M.CUSTOMER_CATEGORY = '"+Utils.isNull(cri.getCustCatNo())+"'");
+			sql.append("\n     and M.zone = '"+Utils.isNull(cri.getSalesZone())+"'");
+			sql.append("\n    ) ");
+			sql.append("\n ) ");
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			
+			int r = stmt.executeUpdate(sql.toString());
+			logger.debug("total rec del:"+r);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				stmt.close();
+			} catch (Exception e) {}
+		}
+	 return maxLineId;
 	}
 	
 	public static SalesTargetBean saveModelByMKT_TT(Connection conn,SalesTargetBean h) throws Exception{
@@ -1227,7 +1268,7 @@ public class SalesTargetTTDAO {
 			//check documentNo
 			if(h.getId()==0){
 				//Gen Next ID Sequence
-				Integer id =SequenceProcessAll.getNextValue("XXPENS_BI_SALES_TARGET_TT");
+				Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TT");
 				if(id==0){
 					id = 1;
 				}
@@ -1287,6 +1328,7 @@ public class SalesTargetTTDAO {
 	}
 	
 	//XXPENS_BI_SALES_TARGET_TEMP
+	/** Save By TTSUPER (OLD) **/
 	public static boolean saveModelByTTSUPER_TT(Connection conn,List<SalesTargetBean> salesrepDataSaveList) throws Exception{
         logger.debug("saveModelByTTSUPER_TT ");
         SalesTargetBean h = null;
@@ -1297,7 +1339,7 @@ public class SalesTargetTTDAO {
 				//check documentNo
 				if(h.getId()==0){
 					//Gen Next ID Sequence
-					Integer id =SequenceProcessAll.getNextValue("XXPENS_BI_SALES_TARGET_TEMP");
+					Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP");
 					if(id==0){
 						id = 1;
 					}
@@ -1308,7 +1350,7 @@ public class SalesTargetTTDAO {
 					h = convertCriteria(h);
 					
 					//save Head
-					insertXXPENS_BI_SALES_TARGET_TEMPByTTSUPER(conn, h);
+					insertXXPENS_BI_SALES_TARGET_TEMP_ByTTSUPER(conn, h);
 					//save line
 					if(h.getItems() != null && h.getItems().size()>0){
 					   for(int i=0;i<h.getItems().size();i++){
@@ -1318,7 +1360,7 @@ public class SalesTargetTTDAO {
 							   l.setId(h.getId());
 							   lineId++;
 							   l.setLineId(lineId);
-							   insertXXPENS_BI_SALES_TARGET_TEMP_LByTTSUPER(conn, l);
+							   insertXXPENS_BI_SALES_TARGET_TEMP_L_ByTTSUPER(conn, l);
 						   }
 					   }
 					}
@@ -1338,11 +1380,11 @@ public class SalesTargetTTDAO {
 							    maxLineId++;
 							    l.setLineId(maxLineId);
 							    logger.debug("Insert new LineID:"+l.getLineId());
-							    insertXXPENS_BI_SALES_TARGET_TEMP_LByTTSUPER(conn, l);
+							    insertXXPENS_BI_SALES_TARGET_TEMP_L_ByTTSUPER(conn, l);
 						   }else{
 								logger.debug("UPDATE LineID:"+l.getLineId());
 							    //update Item by LineId
-							    updateXXPENS_BI_SALES_TARGET_TEMP_LByTTSUPER(conn,l);
+							    updateXXPENS_BI_SALES_TARGET_TEMP_L_ByTTSUPER(conn,l);
 						   }//if
 					   }//for
 					}//if
@@ -1355,6 +1397,72 @@ public class SalesTargetTTDAO {
 		}
 	}
 	
+	/** Save By TTSUPER (NEW) :21/11/2019**/
+	public static boolean saveModelByTTSUPER_TT_BK(Connection conn,List<SalesTargetBean> salesrepDataSaveList) throws Exception{
+        logger.debug("saveModelByTTSUPER_TT ");
+        SalesTargetBean h = null;
+        int lineId = 0;
+		try{
+			for(int r=0;r<salesrepDataSaveList.size();r++){
+				h = salesrepDataSaveList.get(r);
+				//check documentNo
+				if(h.getId()==0){
+					//Gen Next ID Sequence
+					Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP");
+					if(id==0){
+						id = 1;
+					}
+					h.setId(id);
+					
+					logger.debug("**** Start Insert New ID:"+h.getId()+"****");
+					//convert to target month year quarter
+					h = convertCriteria(h);
+					
+					//save Head
+					insertXXPENS_BI_SALES_TARGET_TEMP_ByTTSUPER(conn, h);
+					//save line
+					if(h.getItems() != null && h.getItems().size()>0){
+					   for(int i=0;i<h.getItems().size();i++){
+						   SalesTargetBean l = (SalesTargetBean)h.getItems().get(i);
+						 //  logger.debug("itemCode["+l.getItemCode()+"]status["+l.getStatus()+"]");
+						   if( !Utils.isNull(l.getStatus()).equals("DELETE")){
+							   l.setId(h.getId());
+							   lineId++;
+							   l.setLineId(lineId);
+							   insertXXPENS_BI_SALES_TARGET_TEMP_L_ByTTSUPER(conn, l);
+						   }
+					   }
+					}
+				}else{
+					logger.debug("****Start Update ID:"+h.getId()+"****");
+					
+					//update Head (update_date,update_user)
+					updateXXPENS_BI_SALES_TARGET_TEMP_ByTTSUPER(conn, h);
+					
+					//delete all line by head_id
+					deleteXXPENS_BI_SALES_TARGET_TEMP_L_ByTTSUPER(conn, h.getId());
+					
+					//save line new all
+					if(h.getItems() != null && h.getItems().size()>0){
+					   for(int i=0;i<h.getItems().size();i++){
+						   SalesTargetBean l = (SalesTargetBean)h.getItems().get(i);
+						   //logger.debug("itemCode["+l.getItemCode()+"]status["+l.getStatus()+"]");
+						   if( !Utils.isNull(l.getStatus()).equals("DELETE")){
+							   l.setId(h.getId());
+							   lineId++;
+							   l.setLineId(lineId);
+							   insertXXPENS_BI_SALES_TARGET_TEMP_L_ByTTSUPER(conn, l);
+						   }//if
+					   }//for
+					}//if
+				}//if
+			}
+			return true;
+		}catch(Exception e){
+		  throw e;
+		}finally{
+		}
+	}
 	/**
 	 * getMaxLineID
 	 * @param conn
@@ -1491,6 +1599,7 @@ public class SalesTargetTTDAO {
 			sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z"); 
 			sql.append("\n where 1=1  ");
 			sql.append("\n and M.salesrep_id = Z.salesrep_id  ");
+			sql.append("\n and M.division ='B' ");// Van And Credit
 			sql.append("\n and M.period = '"+Utils.isNull(o.getPeriod())+"'");
 			sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
 			sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
@@ -1978,7 +2087,7 @@ public class SalesTargetTTDAO {
 		 * @param o
 		 * @throws Exception
 		 */
-		 public static void insertXXPENS_BI_SALES_TARGET_TEMPByTTSUPER(Connection conn,SalesTargetBean o) throws Exception{
+		 public static void insertXXPENS_BI_SALES_TARGET_TEMP_ByTTSUPER(Connection conn,SalesTargetBean o) throws Exception{
 				PreparedStatement ps = null;
 				int c =1;
 				logger.debug("insertXXPENS_BI_SALES_TARGET_TEMPByTTSUPER ID["+o.getId()+"]");
@@ -1990,8 +2099,8 @@ public class SalesTargetTTDAO {
 					sql.append("  SALESREP_ID, SALESREP_CODE, TARGET_MONTH,  \n");
 					sql.append("  TARGET_QUARTER, TARGET_YEAR, CUSTOMER_CATEGORY,  \n");
 					sql.append("  DIVISION, SALES_CHANNEL, BRAND, \n");
-					sql.append("  BRAND_GROUP, STATUS, CREATE_USER, CREATE_DATE,PERIOD,CUSTOMER_GROUP)  \n");
-				    sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
+					sql.append("  BRAND_GROUP, STATUS, CREATE_USER, CREATE_DATE,PERIOD,CUSTOMER_GROUP,SESSION_ID)  \n");
+				    sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
 					
 					ps = conn.prepareStatement(sql.toString());
 					
@@ -2013,6 +2122,7 @@ public class SalesTargetTTDAO {
 					ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 					ps.setString(c++, o.getPeriod());
 					ps.setString(c++, o.getCustomerGroup());
+					ps.setString(c++, o.getSessionId());
 					
 					ps.executeUpdate();
 					
@@ -2025,7 +2135,36 @@ public class SalesTargetTTDAO {
 				}
 			}
 		 
-		 public static void insertXXPENS_BI_SALES_TARGET_TEMP_LByTTSUPER(Connection conn,SalesTargetBean o) throws Exception{
+		 public static void updateXXPENS_BI_SALES_TARGET_TEMP_ByTTSUPER(Connection conn,SalesTargetBean o) throws Exception{
+				PreparedStatement ps = null;
+				int c =1;
+				logger.debug("insertXXPENS_BI_SALES_TARGET_TEMPByTTSUPER ID["+o.getId()+"]");
+				logger.debug("customerId:"+o.getCustomerId());
+				try{
+					StringBuffer sql = new StringBuffer("");
+					sql.append(" UPDATE PENSBI.XXPENS_BI_SALES_TARGET_TEMP \n");
+					sql.append(" SET UPDATE_DATE =? ,UPDATE_USER =? ,SESSION_ID =?  \n");
+				    sql.append(" WHERE ID = ? \n");
+					
+					ps = conn.prepareStatement(sql.toString());
+					
+				
+					ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+					ps.setString(c++, o.getCreateUser());
+					ps.setString(c++, o.getSessionId());
+					ps.setLong(c++, o.getId());
+					ps.executeUpdate();
+					
+				}catch(Exception e){
+					throw e;
+				}finally{
+					if(ps != null){
+						ps.close();ps=null;
+					}
+				}
+			}
+		 
+		 public static void insertXXPENS_BI_SALES_TARGET_TEMP_L_ByTTSUPER(Connection conn,SalesTargetBean o) throws Exception{
 				PreparedStatement ps = null;
 				int c =1;
 				logger.debug("insertXXPENS_BI_SALES_TARGET_TEMP_LByTTSUPER ID["+o.getId()+"] LINE_ID["+o.getLineId()+"]itemId["+o.getItemId()+"]");
@@ -2035,8 +2174,8 @@ public class SalesTargetTTDAO {
 					sql.append(" INSERT INTO XXPENS_BI_SALES_TARGET_TEMP_L \n");
 					sql.append(" (ID,LINE_ID, INVENTORY_ITEM_ID, INVENTORY_ITEM_CODE,\n");
 					sql.append(" TARGET_QTY, TARGET_AMOUNT, STATUS,  \n");
-					sql.append(" REMARK, REJECT_REASON, CREATE_USER, CREATE_DATE,AMT_AVG12,AMT_AVG3,PRICE)  \n");
-				    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?) \n");
+					sql.append(" REMARK, REJECT_REASON, CREATE_USER, CREATE_DATE,AMT_AVG12,AMT_AVG3,PRICE,SESSION_ID)  \n");
+				    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?) \n");
 					
 					ps = conn.prepareStatement(sql.toString());
 					
@@ -2054,7 +2193,7 @@ public class SalesTargetTTDAO {
 					ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getOrderAmt12Month())));
 					ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getOrderAmt3Month())));
 					ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getPrice())));
-
+					ps.setString(c++, o.getSessionId());
 					ps.executeUpdate();
 				}catch(Exception e){
 					throw e;
@@ -2064,7 +2203,7 @@ public class SalesTargetTTDAO {
 					}
 				}
 			}
-		 public static void updateXXPENS_BI_SALES_TARGET_TEMP_LByTTSUPER(Connection conn,SalesTargetBean o) throws Exception{
+		 public static void updateXXPENS_BI_SALES_TARGET_TEMP_L_ByTTSUPER(Connection conn,SalesTargetBean o) throws Exception{
 				PreparedStatement ps = null;
 				int c =1;
 				//logger.debug("updateItemByMKT ID["+o.getId()+"] LINE_ID["+o.getLineId()+"]");
@@ -2073,7 +2212,7 @@ public class SalesTargetTTDAO {
 					StringBuffer sql = new StringBuffer("");
 					sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TEMP_L \n");
 					sql.append(" SET TARGET_QTY =?, TARGET_AMOUNT =?, REMARK =?  \n");
-					sql.append(" ,UPDATE_USER =?, UPDATE_DATE=?  \n");
+					sql.append(" ,UPDATE_USER =?, UPDATE_DATE=? ,SESSION_ID =?  \n");
 				    sql.append(" WHERE ID =? AND LINE_ID = ?\n");
 					
 					ps = conn.prepareStatement(sql.toString());
@@ -2083,6 +2222,7 @@ public class SalesTargetTTDAO {
 					ps.setString(c++, o.getRemark());
 					ps.setString(c++, o.getCreateUser());
 					ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+					ps.setString(c++, o.getSessionId());
 					
 					ps.setLong(c++, o.getId());
 					ps.setLong(c++, o.getLineId());
@@ -2098,6 +2238,27 @@ public class SalesTargetTTDAO {
 				}
 			}
 		 
+		 public static void deleteXXPENS_BI_SALES_TARGET_TEMP_L_ByTTSUPER(Connection conn,long id) throws Exception{
+				PreparedStatement ps = null;
+				int c =1;
+				//logger.debug("updateItemByMKT ID["+o.getId()+"] LINE_ID["+o.getLineId()+"]");
+				try{
+					StringBuffer sql = new StringBuffer("");
+					sql.append(" DELETE FROM PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L \n");
+				    sql.append(" WHERE ID =? \n");
+					ps = conn.prepareStatement(sql.toString());
+					ps.setLong(c++, id);
+
+					ps.executeUpdate();
+					
+				}catch(Exception e){
+					throw e;
+				}finally{
+					if(ps != null){
+						ps.close();ps=null;
+					}
+				}
+			}
 		public static void updateStatusRejectByTTSUPER_TT(Connection conn,SalesTargetBean o) throws Exception{
 			PreparedStatement ps = null;
 			logger.debug("updateStatusRejectItemByTTSUPER_TT PERIOD["+o.getPeriod()+"] status["+o.getStatus()+"]rejectReason["+o.getRejectReason()+"]");

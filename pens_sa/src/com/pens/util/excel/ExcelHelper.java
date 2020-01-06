@@ -69,11 +69,11 @@ public class ExcelHelper {
 		    //** is instance of number **/
 			if((cellValue instanceof Double || cellValue instanceof Integer || cellValue instanceof Float)){
 				  //logger.debug("is_number : is Number:"+cellValue+">:"+isCellDouble(cellValue,format));
-				ret =  isCellDouble(cellValue,Utils.format_number_no_digit);
+				ret =  isCellDouble(cellValue,Utils.format_number_no_disgit);
 			}else{
 				/** is instance of string (cell is string but value is NUMBER )**/
 				if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
-					ret =  isCellDouble(cellValue,Utils.format_number_no_digit);
+					ret =  isCellDouble(cellValue,Utils.format_number_no_disgit);
 				}
 			}//if
 			
@@ -81,11 +81,11 @@ public class ExcelHelper {
 		}else if("STRING".equalsIgnoreCase(cellType)){
 			if((cellValue instanceof Double || cellValue instanceof Integer || cellValue instanceof Float)){
 				//logger.debug("is_number : is Number:"+cellValue+">:"+isCellDouble(cellValue,format));
-				ret =  isCellDouble(cellValue,Utils.format_number_no_digit);
+				ret =  isCellDouble(cellValue,Utils.format_number_no_disgit);
 			}else{
 				/** is instance of string (cell is string but value is NUMBER )**/
 				if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
-					ret =  isCellDouble(cellValue,Utils.format_number_no_digit);
+					ret =  isCellDouble(cellValue,Utils.format_number_no_disgit);
 				}else{
 					ret=  Utils.isNull(cellValue);
 				}

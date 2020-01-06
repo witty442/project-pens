@@ -645,7 +645,7 @@ public class SalesTargetExport {
 				h.append("<option value='Post'>Post</option> \n");
 				h.append("</select> \n");
 				/** hidden field **/
-				h.append("  <input type='hidden' name='customer_code_change' value='"+item.getBrand()+"'/> \n");
+				h.append("  <input type='hidden' name='customer_code_change' value='"+item.getCustomerCode()+"'/> \n");
 				h.append("  <input type='hidden' name='brand_change' value='"+item.getBrand()+"'/> \n");
 				h.append("</td> \n");
 				h.append("</tr> \n");

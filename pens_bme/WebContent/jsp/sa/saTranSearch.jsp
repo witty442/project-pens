@@ -33,7 +33,7 @@ User user = (User) request.getSession().getAttribute("user");
 	List<PopupForm> billTypeList2 = new ArrayList();
 	PopupForm ref2 = new PopupForm("",""); 
 	billTypeList2.add(ref2);
-	billTypeList2.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Region"));
+	billTypeList2.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","Region"));
 	
 	session.setAttribute("empRegionList",billTypeList2);
 //}
@@ -42,7 +42,7 @@ User user = (User) request.getSession().getAttribute("user");
 	List<PopupForm> billTypeList1 = new ArrayList();
 	PopupForm ref1 = new PopupForm("",""); 
 	billTypeList1.add(ref1);
-	billTypeList1.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","EMPtype"));
+	billTypeList1.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","EMPtype"));
 	
 	session.setAttribute("empTypeList",billTypeList1);
 //}
@@ -51,7 +51,7 @@ User user = (User) request.getSession().getAttribute("user");
 	List<PopupForm> billTypeList3 = new ArrayList();
 	PopupForm ref3 = new PopupForm("",""); 
 	billTypeList3.add(ref3);
-	billTypeList3.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
+	billTypeList3.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
 	
 	session.setAttribute("groupStoreList",billTypeList3);
 //}

@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.Utils"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskForm"%>
 <%@page import="com.isecinc.pens.bean.MonitorBean"%>
 <%@page import="java.util.List"%>
@@ -47,7 +48,7 @@ if(session.getAttribute("BATCH_TASK_RESULT") != null){
 				   <%} %>
 				</td>
 				<td> <%=item.getSubmitDateDisp()%></td>
-				<td align="left"><%=item.getErrorMsg()%> </td>
+				<td align="left"><%=Utils.isNull(item.getErrorMsg())%> </td>
 			    <td></td>
 		</tr>
 		<%} %>	

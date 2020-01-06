@@ -259,7 +259,7 @@ function openPensEdit(path,orderId){
 					  </div>
 
             <c:if test="${nsForm.results != null}">
-					   <jsp:include page="../pageing.jsp">
+					   <jsp:include page="../pageing_new.jsp">
 				       <jsp:param name="totalPage" value="<%=nsForm.getTotalPage() %>"/>
 				       <jsp:param name="totalRecord" value="<%=nsForm.getTotalRecord() %>"/>
 				       <jsp:param name="currPage" value="<%=nsForm.getCurrPage() %>"/>

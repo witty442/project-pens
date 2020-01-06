@@ -1039,11 +1039,15 @@ public class PickStockGroupDAO extends PickConstants{
 			   
 			   h.setTotalBox(Utils.isNull(rst.getString("total_box"))); 
 			   h.setForwarder(Utils.isNull(rst.getString("Forwarder"))); 
-			   
+			   if(rst.getDate("delivery_date") != null){
+					String dateStr = DateUtil.stringValue(rst.getDate("delivery_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				    h.setDeliveryDate(dateStr);
+				 }
 			   if(rst.getDate("confirm_issue_date") != null){
 				   String dateStr = DateUtil.stringValue(rst.getDate("confirm_issue_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				   h.setConfirmIssueDate(dateStr);
 			   }
+			   h.setDeliveryDate(DateUtil.stringValueNull(rst.getDate("delivery_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   
 			   if(h.isModeEdit()){
 				   //can edit
@@ -2078,8 +2082,8 @@ public class PickStockGroupDAO extends PickConstants{
 			sql.append(" INSERT INTO PENSBI.PENSBME_PICK_STOCK \n");
 			sql.append(" (ISSUE_REQ_NO, ISSUE_REQ_DATE, ISSUE_REQ_STATUS, PICK_USER,REMARK ," );
 			sql.append(" CREATE_DATE,CREATE_USER,PICK_TYPE,CUST_GROUP,STORE_CODE,STORE_NO,");
-			sql.append(" SUB_INV,SUB_PICK_TYPE,TOTAL_BOX ,forwarder)  \n");
-		    sql.append(" VALUES (?, ?, ?, ?, ?, ? , ? ,?,?,?,?,?,?,?,?) \n");
+			sql.append(" SUB_INV,SUB_PICK_TYPE,TOTAL_BOX ,forwarder,delivery_date)  \n");
+		    sql.append(" VALUES (?, ?, ?, ?, ?, ? , ? ,?,?,?,?,?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 				
@@ -2101,6 +2105,7 @@ public class PickStockGroupDAO extends PickConstants{
 			ps.setString(c++, Utils.isNull(o.getSubPickType()));
 			ps.setInt(c++, Utils.convertToInt(o.getTotalBox()));
 			ps.setString(c++, Utils.isNull(o.getForwarder()));
+			ps.setDate(c++, new java.sql.Date(DateUtil.parse( o.getDeliveryDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
 			
 			ps.executeUpdate();
 			
@@ -2193,7 +2198,7 @@ public class PickStockGroupDAO extends PickConstants{
 			}
 		}
 	}
-	public static void updateTotalBox(String issueReqNo,String totalBox,User user) throws Exception{
+	public static void updateTotalBox(User user,String issueReqNo,String totalBox,String forwarder,String deliveryDate) throws Exception{
 		Connection conn = null;
 		PreparedStatement ps = null;
 		logger.debug("updateHeadModel");
@@ -2201,7 +2206,7 @@ public class PickStockGroupDAO extends PickConstants{
 			conn = DBConnection.getInstance().getConnectionApps();
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.PENSBME_PICK_STOCK \n");
-			sql.append(" SET UPDATE_DATE =?,UPDATE_USER =? ,TOTAL_BOX =? \n");
+			sql.append(" SET UPDATE_DATE =?,UPDATE_USER =? ,TOTAL_BOX =?,FORWARDER =? ,DELIVERY_DATE =?  \n");
 		    sql.append(" WHERE ISSUE_REQ_NO = ? \n");
 			
 			ps = conn.prepareStatement(sql.toString());
@@ -2210,6 +2215,8 @@ public class PickStockGroupDAO extends PickConstants{
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, user.getUserName());
 			ps.setInt(c++, Utils.convertToInt(totalBox));
+			ps.setString(c++, forwarder);
+			ps.setDate(c++, new java.sql.Date(DateUtil.parse(deliveryDate, DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			ps.setString(c++, issueReqNo);
 			
 			ps.executeUpdate();
@@ -2233,7 +2240,7 @@ public class PickStockGroupDAO extends PickConstants{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE PENSBI.PENSBME_PICK_STOCK \n");
 			sql.append(" SET ISSUE_REQ_STATUS =?, PICK_USER = ?,REMARK =? ,UPDATE_DATE =?,UPDATE_USER =? \n");
-			sql.append(" ,TOTAL_REQ_QTY = ? ,TOTAL_BOX =? ,forwarder =? ");
+			sql.append(" ,TOTAL_REQ_QTY = ? ,TOTAL_BOX =? ,forwarder =? ,delivery_date =?");
 			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
 				sql.append(" ,confirm_issue_date =? \n ");
 			}
@@ -2250,6 +2257,7 @@ public class PickStockGroupDAO extends PickConstants{
 			ps.setInt(c++, o.getTotalQty());
 			ps.setInt(c++, Utils.convertToInt(o.getTotalBox()));
 			ps.setString(c++, Utils.isNull(o.getForwarder()));
+			ps.setDate(c++, new java.sql.Date(DateUtil.parse( o.getDeliveryDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
 			
 			if( !Utils.isNull(o.getConfirmIssueDate()).equals("")){
 				Date confrimDate = DateUtil.parse( o.getConfirmIssueDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);

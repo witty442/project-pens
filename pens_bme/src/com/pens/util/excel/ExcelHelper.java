@@ -64,7 +64,57 @@ public class ExcelHelper {
 		//logger.debug("str:"+str);
 		return ((Double)str);
 	}
-	
+	//New Version
+		public static String getCellValue(Object cellValue,String cellType,String format) {
+			String ret = "";
+			//INPUT=1,000.24 :OUTPUT = 1000.24
+			if("NUMBER".equalsIgnoreCase(cellType)){
+			    //** is instance of number **/
+				if((cellValue instanceof Double || cellValue instanceof Integer || cellValue instanceof Float)){
+					  //logger.debug("is_number : is Number:"+cellValue+">:"+isCellDouble(cellValue,format));
+					  ret= isCellDouble(cellValue,format);
+				}else{
+					/** is instance of string (cell is string but value is NUMBER )**/
+					if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
+						//logger.debug("account_number : is Number:"+cellValue);
+					   ret= Utils.convertDoubleToStr(Utils.isDoubleNull(cellValue));
+					}
+				}//if
+				
+			//INPUT=1,000.00 :OUTPUT = 1000 (NO DIGIT)
+			}else if("INTEGER".equalsIgnoreCase(cellType)){
+			    //** is instance of number **/
+				if((cellValue instanceof Double || cellValue instanceof Integer || cellValue instanceof Float)){
+					  //logger.debug("is_number : is Number:"+cellValue+">:"+isCellDouble(cellValue,format));
+					ret =  isCellDouble(cellValue,Utils.format_number_no_disgit);
+				}else{
+					/** is instance of string (cell is string but value is NUMBER )**/
+					if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
+						ret =  isCellDouble(cellValue,Utils.format_number_no_disgit);
+					}
+				}//if
+				
+			//INPUT=XXXX OUTPUT=XXXX
+			}else if("STRING".equalsIgnoreCase(cellType)){
+				if((cellValue instanceof Double || cellValue instanceof Integer || cellValue instanceof Float)){
+					//logger.debug("is_number : is Number:"+cellValue+">:"+isCellDouble(cellValue,format));
+					ret =  isCellDouble(cellValue,Utils.format_number_no_disgit);
+				}else{
+					/** is instance of string (cell is string but value is NUMBER )**/
+					if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
+						ret =  isCellDouble(cellValue,Utils.format_number_no_disgit);
+					}else{
+						ret=  Utils.isNull(cellValue);
+					}
+				}//if
+				
+			//INPUT=XXXX OUTPUT=XXXX
+			}else{
+				ret= Utils.isNull(cellValue);
+			}
+			return ret;
+	}
+		
 	/** Case Normal **/
 	public static void readExcel(){
 		Row row = null;

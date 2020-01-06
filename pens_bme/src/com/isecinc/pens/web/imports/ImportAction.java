@@ -80,6 +80,8 @@ public class ImportAction extends I_Action {
 				importForm.setSummary(new OnhandSummary());
 				importForm.setSummarySuccessList(null);
 				importForm.setSummaryErrorList(null);
+				importForm.setSummaryBoxSuccessList(null);
+				importForm.setSummaryBoxErrorList(null);
 				
 				importForm.setImported(false);
 				importForm.setTotalSize(0);
@@ -94,6 +96,9 @@ public class ImportAction extends I_Action {
 				
 				importForm.setSummaryWacoalListErrorSize(0);
 				importForm.setSummaryWacoalListSuccessSize(0);
+				
+				importForm.setSummaryWacoalBoxListErrorSize(0);
+				importForm.setSummaryWacoalBoxListSuccessSize(0);
 				
 				importForm.setBoxNo("");
 				importForm.setSummaryReturnWacoalListErrorSize(0);
@@ -179,7 +184,7 @@ public class ImportAction extends I_Action {
             return process.importReturnWacoal(mapping, importForm, request, response);    
             
         }else if("onhandLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
-        	return process.importOhhandLotusFromWacoal(mapping, importForm, request, response);
+        	return new ImportOnhandFromWacoalAction().importOhhandLotusFromWacoal(mapping, importForm, request, response);
         	
         }else if("onhandFriday".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	return process.importOnhandFridayFromWacoal(mapping, importForm, request, response);

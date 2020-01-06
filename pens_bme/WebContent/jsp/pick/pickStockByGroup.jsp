@@ -39,7 +39,8 @@ String pageName = pickStockGroupForm.getBean().getPage();
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 function loadMe(){
-	// new Epoch('epoch_popup', 'th', document.getElementById('transactionDate'));
+	 new Epoch('epoch_popup', 'th', document.getElementById('deliveryDate'));
+	 
 	sumTotal();
 	 <%if(pickStockGroupForm.getBean().isCanConfirm() ){%>
 	  sumTotalIssue();
@@ -174,15 +175,21 @@ function save(path){
 		alert("ไม่พบข้อมูล Store no  ไม่สามารถทำงานต่อได้");
 		return false;
 	} 
-	if($('#forwarder').val()==""){
-		alert("กรุณาระบุขนส่ง")
-		$('#forwarder').focus();
+	if($('#deliveryDate').val() ==''){
+		$('#deliveryDate').focus();
+		alert("กรุณาระบุวันที่พร้อมจัดส่ง");
 		return false;
 	}
-	/* if( !checkOneSelected()){
-		alert("กรุณาเลือกรายการอย่างน้อย 1 รายการ");
+	if($('#forwarder').val() ==''){
+		$('#forwarder').focus();
+		alert("กรุณาระบุขนส่ง");
 		return false;
-	}  */
+	}
+	/* if($('#totalBox').val() ==''){
+		$('#totalBox').focus();
+		alert("กรุณาระบุจำนวนกล่อง");
+		return false;
+	} */
 	
 	if(confirm("ยันยันการบันทึกข้อมูล")){
 	  /**Control Save Lock Screen **/
@@ -198,15 +205,30 @@ function save(path){
 function saveTotalBox(path){
 	var form = document.pickStockGroupForm;
 	var issueReqNo =$('#issueReqNo').val();
-	var totalBox =$('#totalBox').val();
-	if(totalBox ==''){
+	
+	if($('#deliveryDate').val() ==''){
+		$('#deliveryDate').focus();
+		alert("กรุณาระบุวันที่พร้อมจัดส่ง");
+		return false;
+	}
+	if($('#forwarder').val() ==''){
+		$('#forwarder').focus();
+		alert("กรุณาระบุขนส่ง");
+		return false;
+	}
+	if($('#totalBox').val() ==''){
 		$('#totalBox').focus();
 		alert("กรุณาระบุจำนวนกล่อง");
 		return false;
 	}
+	var param  = "issueReqNo=" + issueReqNo;
+	    param +="&totalBox="+$('#totalBox').val();
+	    param +="&forwarder="+$('#forwarder').val();
+	    param +="&deliveryDate="+$('#deliveryDate').val();
+	    
 	var getData = $.ajax({
 		url: "${pageContext.request.contextPath}/jsp/pick/ajax/saveTotalBoxPickStockGroupAjax.jsp",
-		data : "issueReqNo=" + issueReqNo+"&totalBox="+totalBox,
+		data : encodeURI(param),
 		async: false,
 		cache: false,
 		success: function(getData){
@@ -669,8 +691,8 @@ function validAutoSubOut(refNo){
                                       <td colspan="2">
                                         <html:text property="bean.issueReqStatusDesc" styleId="issueReqStatusDesc" size="20" readonly="true" styleClass="disableText"/>
                                         <html:hidden property="bean.issueReqStatus" styleId="issueReqStatus"/>
-                                     	 ผู้เบิก  
-									  <html:text property="bean.pickUser" styleId="pickUser" size="20"  styleClass="\" autoComplete=\"off"/><font color="red">*</font>	  
+                                     	 ผู้เบิก  <font color="red">*</font>
+									  <html:text property="bean.pickUser" styleId="pickUser" size="20"  styleClass="\" autoComplete=\"off"/>  
 									</td>
 								</tr>
 								<tr>
@@ -702,31 +724,46 @@ function validAutoSubOut(refNo){
 								
 								<tr>
                                     <td > Confirm Issue Date</td>
-                                    <td colspan="2">
+                                    <td>
 						               <html:text property="bean.confirmIssueDate" styleId="confirmIssueDate" size="20" readonly="true" styleClass="disableText"/>
 									&nbsp;&nbsp; Invoice No&nbsp;&nbsp; 
 									<html:text property="bean.invoiceNo" styleId="invoiceNo" size="20" readonly="true" styleClass="disableText"/>
 									</td>
+									<td rowspan="2">
+									
+                                         <table border='0' cellpadding="3" cellspacing="1" bgcolor="black">
+                                             <tr bgcolor="white"><td>
+                                                                                                                      วันที่พร้อมจัดส่ง<font color="red">*</font>	
+                                                <html:text property="bean.deliveryDate" styleId="deliveryDate" size="9" readonly='true'/>
+                                             </td></tr>
+	                                         <tr bgcolor="white"><td>
+		                                      &nbsp;
+		                                                                                              ขนส่งโดย  <font color="red">*</font>			
+											    <html:select property="bean.forwarder" styleId="forwarder" >
+											    <html:options collection="forwarderList" property="code" labelProperty="desc"/>
+											</html:select>
+	                                          &nbsp;   จำนวนกล่อง &nbsp;
+	                                          <html:text property="bean.totalBox" styleId="totalBox" size="5" 
+	                                           styleClass="enableNumber\" autoComplete=\"off"  onkeypress="isNum(this)"/>
+	                                     
+												<a href="javascript:saveTotalBox('${pageContext.request.contextPath}')">
+													<input type="button" value="บันทึกข้อมูลส่วนในกรอบนี้" class="newPosBtnLong"> 
+												</a>
+											</td></tr>
+											</table>
+									
+									</td>
 									
 								</tr>
 								<tr>
-                                    <td > หมายเหตุ </td>
-                                    <td colspan="2"> 
+                                    <td> หมายเหตุ </td>
+                                    <td> 
                                       <html:text property="bean.remark" styleId="remark" size="60" styleClass="\" autoComplete=\"off"/>
-                                       &nbsp;&nbsp; 
-                                                                                              ขนส่งโดย  <font color="red">*</font>			
-									    <html:select property="bean.forwarder" styleId="forwarder" >
-									    <html:options collection="forwarderList" property="code" labelProperty="desc"/>
-									</html:select>
-                                       <c:if test="${pickStockGroupForm.bean.issueReqStatus == 'I'}">
-                                          &nbsp;&nbsp;    จำนวนกล่อง &nbsp;&nbsp; 
-                                          <html:text property="bean.totalBox" styleId="totalBox" size="10" 
-                                           styleClass="enableNumber\" autoComplete=\"off"  onkeypress="isNum(this)"/>
-                                     
-											<a href="javascript:saveTotalBox('${pageContext.request.contextPath}')">
-												<input type="button" value="บันทึกจำนวนกล่อง" class="newPosBtnLong"> 
-											</a>
-										</c:if>
+                                    </td>
+                                </tr>
+								<tr>
+                                    <td> 
+                                      
                                     </td>
 								</tr>	
 						   </table>
@@ -789,7 +826,8 @@ function validAutoSubOut(refNo){
 										                     
 														    <input type="text" name="qty" value ="<%=o.getQty()%>" size="20" 
 														     onkeypress="chkQtyKeypress(this,event,<%=i%>)"
-									                         onchange="validateQty(this,<%=i%>)" class="enableNumber" tabindex="<%=tabindex%>"/> 
+									                         onchange="validateQty(this,<%=i%>)" class="enableNumber" tabindex="<%=tabindex%>"
+									                         autoComplete='off'/> 
 								                        <% }else{ %>
 								                          
 								                             <input type="text" name="qty" value ="<%=o.getQty()%>" size="20" class="disableNumber" tabindex="-1" readonly/> 

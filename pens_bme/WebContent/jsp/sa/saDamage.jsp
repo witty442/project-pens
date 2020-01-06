@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.dao.SAEmpDAO"%>
 <%@page import="com.isecinc.pens.bean.SADamageBean"%>
@@ -33,7 +34,7 @@ SADamageBean bean = saDamageForm.getBean();
 List<PopupForm> payTypeList = new ArrayList();
 PopupForm ref2 = new PopupForm("",""); 
 payTypeList.add(ref2);
-payTypeList.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","SApaytype"));
+payTypeList.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","SApaytype"));
 //session.setAttribute("payTypeList",billTypeList2);
 
 %>
@@ -48,28 +49,6 @@ payTypeList.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","SApaytype
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
-
 .day {
   width: 14%;
 }

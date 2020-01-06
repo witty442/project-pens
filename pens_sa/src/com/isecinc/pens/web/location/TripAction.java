@@ -159,9 +159,9 @@ public class TripAction {
 		LocationBean c = new LocationBean();
 		StringBuffer sql = new StringBuffer("");
 		try{
-			sql.append("\n   SELECT distinct cs.trip1,trip2,trip3");
-			sql.append("\n   from apps.xxpens_ar_cust_sales_vl cs  ");
-			sql.append("\n   where 1=1 ");
+			sql.append("\n   SELECT distinct cs.trip1,trip2,trip3 ,cs.customer_class_code");
+			sql.append("\n   from apps.xxpens_ar_cust_sales_vl cs ");
+			sql.append("\n   where 1=1");
 			sql.append("   "+genWhereCondSql(conn, "", o));
 			if( !Utils.isNull(o.getTripDay()).equals("")){
 				sql.append("\n   and (cs.trip1 ="+o.getTripDay()+"  ");
@@ -243,8 +243,9 @@ public class TripAction {
 			sql.append("\n   SELECT ");
 			sql.append("\n    cs.account_number ,cs.party_name ");
 			sql.append("\n   ,cs.address,cs.primary_salesrep_id ,cs.trip1,cs.trip2,cs.trip3");
-			sql.append("\n   from apps.xxpens_ar_cust_sales_vl cs  ");
-			sql.append("\n   where 1=1 ");
+			sql.append("\n   ,cs.customer_class_code ");
+			sql.append("\n   from apps.xxpens_ar_cust_sales_vl cs");
+			sql.append("\n   where 1=1");
 			if( !"".equals(tripBySearchSqlIn)){
 				sql.append("\n   and (   cs.trip1 ="+tripBySearchSqlIn+" ");
 				sql.append("\n        or cs.trip2 ="+tripBySearchSqlIn+" ");
@@ -265,6 +266,7 @@ public class TripAction {
 			   h = new LocationBean();
 			   h.setCustomerCode(Utils.isNull(rst.getString("ACCOUNT_NUMBER")));
 			   h.setCustomerName(Utils.isNull(rst.getString("party_name")));
+			   h.setCustomerType(Utils.isNull(rst.getString("customer_class_code")));
 			   h.setAddress(Utils.isNull(rst.getString("address")));
 			   h.setSalesrepCode(Utils.isNull(rst.getString("primary_salesrep_id")));
 			   h.setTripDay(Utils.isNull(rst.getString("trip1")));
@@ -399,8 +401,8 @@ public class TripAction {
 		try {
 			sql.append("\n   SELECT ");
 			sql.append("\n   cs.account_number ,cs.party_name ,cs.address,cs.primary_salesrep_id,cs.trip1,cs.trip2,cs.trip3");
-			sql.append("\n   ,cs.party_site_id,cs.cust_account_id ,cs.code");
-			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs ");
+			sql.append("\n   ,cs.party_site_id,cs.cust_account_id ,cs.code ,cs.customer_class_code");
+			sql.append("\n   FROM apps.xxpens_ar_cust_sales_vl cs  ");
 			sql.append("\n   WHERE 1=1");
 			sql.append("\n   and cs.account_number ='"+o.getCustomerCode()+"'");	
 			logger.debug("sql:\n"+sql.toString());
@@ -421,12 +423,16 @@ public class TripAction {
 			   h.setTripDay(Utils.isNull(rst.getString("trip1")));
 			   h.setTripDay2(Utils.isNull(rst.getString("trip2")));
 			   h.setTripDay3(Utils.isNull(rst.getString("trip3")));
-			   h.setCustAccountId(rst.getLong("party_site_id"));
+			   //h.setCustAccountId(rst.getLong("party_site_id"));
+			   h.setCustAccountId(rst.getLong("cust_account_id"));
 			   h.setPartySiteId(rst.getLong("party_site_id"));
 			   
 			   h.setTripDayDB(Utils.isNull(rst.getString("trip1")));
 			   h.setTripDayDB2(Utils.isNull(rst.getString("trip2")));
 			   h.setTripDayDB3(Utils.isNull(rst.getString("trip3")));
+			   
+			   h.setCustomerType(Utils.isNull(rst.getString("customer_class_code")));
+			   h.setCustomerTypeDB(Utils.isNull(rst.getString("customer_class_code")));
 			}//
 		} catch (Exception e) {
 			throw e;
@@ -613,6 +619,9 @@ public class TripAction {
 		 //update trip master
 		 updateCustTripMasterProc(conn, o);
 		 
+		 //update customerType
+		 updateCustTypeMasterProc(conn, o);
+		 
 		 //insertCustTripChangeHis 
 		 insertCustTripChangeHis(conn, o);
 		  
@@ -639,12 +648,14 @@ public class TripAction {
 	logger.debug("insertCustTripChangeHis customerCode["+o.getCustomerCode()+"]");
 	long id = 0;
 	try{
-		id = SequenceProcessAll.getNextValue("XXPENS_BI_CUST_TRIP_CHANGE_HIS");
+		id = SequenceProcessAll.getIns().getNextValue("XXPENS_BI_CUST_TRIP_CHANGE_HIS");
 		
 		StringBuffer sql = new StringBuffer("");
 		sql.append(" INSERT INTO PENSBI.XXPENS_BI_CUST_TRIP_CHANGE_HIS \n");
-		sql.append(" (ID,ACCOUNT_NUMBER,TRIP1_TO,TRIP2_TO,TRIP3_TO, CREATE_USER, CREATE_DATE,TRIP1_FROM, TRIP2_FROM, TRIP3_FROM)  \n");
-	    sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?) \n");
+		sql.append(" (ID,ACCOUNT_NUMBER,TRIP1_TO,TRIP2_TO,TRIP3_TO"
+				+ ", CREATE_USER, CREATE_DATE,TRIP1_FROM"
+				+ ", TRIP2_FROM, TRIP3_FROM,cust_class_code_from,cust_class_code_to)  \n");
+	    sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?) \n");
 		
 		ps = conn.prepareStatement(sql.toString());
 		ps.setLong(c++, id);
@@ -657,7 +668,8 @@ public class TripAction {
 		ps.setString(c++,Utils.isNull(o.getTripDayDB()));
 		ps.setString(c++,Utils.isNull(o.getTripDayDB2()));
 		ps.setString(c++,Utils.isNull(o.getTripDayDB3()));
-
+		ps.setString(c++,Utils.isNull(o.getCustomerTypeDB()));
+		ps.setString(c++,Utils.isNull(o.getCustomerType()));
 		ps.executeUpdate();
 	}catch(Exception e){
 		throw e;
@@ -704,6 +716,35 @@ public static void updateCustTripMasterProc(Connection conn,LocationBean o) thro
 		}
 		ps.executeUpdate();
 		
+	}catch(Exception e){
+		throw e;
+	}finally{
+		if(ps != null){
+			ps.close();ps=null;
+		}
+	}
+}
+
+public static void updateCustTypeMasterProc(Connection conn,LocationBean o) throws Exception{
+	PreparedStatement ps = null;
+	logger.debug("updateCustTypeMasterProc cust_account_id["+o.getCustAccountId()+"]");
+	logger.debug("customerType:"+o.getCustomerType());
+	int  c = 1;
+	try{
+		StringBuffer sql = new StringBuffer("");
+		sql.append("{ call xxpens_om_trip_pkg.update_cust_class(?,?) } \n");
+		
+		//xxpens_om_trip_pkg.update_cust_class(p_cust_id    in number, p_cust_class in varchar2)
+		
+		ps = conn.prepareCall(sql.toString());
+		
+		ps.setLong(c++,o.getCustAccountId());
+		if( !Utils.isNull(o.getCustomerType()).equals("")){
+		   ps.setString(c++,Utils.isNull(o.getCustomerType()));
+		}else{
+		   ps.setNull(c++, java.sql.Types.NULL);
+		}
+		ps.executeUpdate();
 	}catch(Exception e){
 		throw e;
 	}finally{

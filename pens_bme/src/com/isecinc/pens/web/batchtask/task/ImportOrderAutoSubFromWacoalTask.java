@@ -19,6 +19,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
@@ -272,6 +273,8 @@ public class ImportOrderAutoSubFromWacoalTask implements BatchTaskInterface{
 			sql.append("\n   and pens_desc6 = 'Auto Sub-transfer'");
 			sql.append("\n   and M.pens_value = O.store_type) as forwarder");
 			sql.append("\n ,O.ORDER_LOT_NO");
+			//Get transporter_qty from 
+			sql.append("\n ,(SELECT TOTAL_BOX FROM PENSBI.PENSBME_BOX_BYWACOAL M where M.LOT_NO = O.ORDER_LOT_NO) as transporter_qty ");
 			sql.append("\n FROM PENSBI.PENSBME_ORDER O");
 			sql.append("\n WHERE O.ORDER_DATE  = TO_DATE('"+asOfDate+"','dd/mm/yyyy')");
 			sql.append("\n AND O.STORE_TYPE ='"+custGroup+"'");
@@ -287,11 +290,11 @@ public class ImportOrderAutoSubFromWacoalTask implements BatchTaskInterface{
 			logger.debug("sql:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			
-			String sqlIn = "insert into XXPENS_PO_ORDER_IMPORT_MST \n";
+			String sqlIn = "insert into PENSBI.XXPENS_PO_ORDER_IMPORT_MST \n";
 			sqlIn +=" ( created_by, creation_date,last_updated_by, last_update_date,last_update_login, \n";
 			sqlIn +=" header_id ,account_number,ordered_date , \n ";
-			sqlIn +=" subinventory , int_flag,order_number,comments ,transporter_name) \n";
-			sqlIn +=" values(?,?,?,?, ?,?,?,? ,?,?,?,?,?) \n";
+			sqlIn +=" subinventory , int_flag,order_number,comments ,transporter_name,transporter_qty) \n";
+			sqlIn +=" values(?,?,?,?, ?,?,?,? ,?,?,?,?,?,?) \n";
 			
 			psIns = conn.prepareStatement(sqlIn);
 			rs = ps.executeQuery();
@@ -313,6 +316,7 @@ public class ImportOrderAutoSubFromWacoalTask implements BatchTaskInterface{
 				psIns.setString(++index, Utils.isNull(rs.getString("order_lot_no")));
 				psIns.setString(++index, Utils.isNull(rs.getString("STORE_NAME")));
 				psIns.setString(++index, Utils.isNull(rs.getString("forwarder")));
+				psIns.setInt(++index, rs.getInt("transporter_qty"));
 				
 				psIns.executeUpdate();
 				

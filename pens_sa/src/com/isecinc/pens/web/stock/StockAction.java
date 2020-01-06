@@ -111,6 +111,7 @@ public class StockAction extends I_Action {
 					}
 				}else if (StockConstants.PAGE_STOCK_CR_EXPIRE.equalsIgnoreCase(pageName)){
 					StockControlPage.prepareSearchCreditExpireReport(request, conn, user,pageName);
+					
 				}
 				aForm.setBean(sales);
 			}else if("back".equals(action)){

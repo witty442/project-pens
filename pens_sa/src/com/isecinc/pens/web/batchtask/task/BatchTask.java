@@ -66,7 +66,7 @@ public class BatchTask {
 		modelItem.setDestination("ORACLE");
 		modelItem.setStatus(Constants.STATUS_START);
 		modelItem.setSubmitDate(new Date());
-		modelItem.setId(new BigDecimal(SequenceProcessAll.getNextValue("monitor_item")));
+		modelItem.setId(new BigDecimal(SequenceProcessAll.getIns().getNextValue("monitor_item")));
 		
 		return modelItem;
 	}

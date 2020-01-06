@@ -11,7 +11,7 @@ window.onload = function(){
 function loadMe(){
 	MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png');
 	var form = document.stockOnhandForm;
-	new Epoch('epoch_popup','th',document.getElementById('transDate'));
+	//new Epoch('epoch_popup','th',document.getElementById('transDate'));
 }
 function clearForm(path){
 	var form = document.stockOnhandForm;
@@ -104,8 +104,14 @@ function calcBufferQty(index){
 		<td align="right"> Transaction Date<font color="red">*</font>
 		</td>
 		  <td> 
-		    <html:text property="bean.transDate" styleId="transDate" readonly="true"/>
+		    <html:text property="bean.transDate" styleId="transDate" readonly="true" styleClass="disableText"/>
 		    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','TransDateNissinPreOrder')"/>   
+		    &nbsp;&nbsp;&nbsp;
+		    À’∫æ‘‡»…
+		     <html:select property="bean.reportType" styleId="reportType">
+		       <html:option value="N">À’∫ª°µ‘</html:option>
+		       <html:option value="S">À’∫æ‘‡»…</html:option>
+		     </html:select>
 		</td>
 	</tr>	
   </table>

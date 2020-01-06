@@ -56,6 +56,7 @@ public class PickStock implements Serializable{
 	private List<PickStock> items;
 	private String createUser;
 	private String updateUser;
+	private String deliveryDate;
 
 	//optional
 	private boolean canEdit;
@@ -93,6 +94,13 @@ public class PickStock implements Serializable{
 	private String issueReqNoTo;
 	private String forwarder;
 	
+	
+	public String getDeliveryDate() {
+		return deliveryDate;
+	}
+	public void setDeliveryDate(String deliveryDate) {
+		this.deliveryDate = deliveryDate;
+	}
 	public boolean isCanAutoSubTrans() {
 		return canAutoSubTrans;
 	}

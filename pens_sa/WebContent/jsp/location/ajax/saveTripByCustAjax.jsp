@@ -6,10 +6,7 @@
 <%@page import="com.isecinc.pens.web.location.LocationBean"%>
 <%@page import="com.isecinc.pens.web.location.TripAction"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<%@page import="java.util.List"%>
-<%@page import="java.util.ArrayList"%>
 <%
 Connection conn = null;
 User user = (User) request.getSession().getAttribute("user");
@@ -19,6 +16,7 @@ try{
 	conn.setAutoCommit(false);
 	
 	String customerCode = Utils.isNull(request.getParameter("customerCode"));
+	String customerType = Utils.isNull(request.getParameter("customerType"));
 	String tripDay = Utils.isNull(request.getParameter("tripDay"));
 	String tripDay2 = Utils.isNull(request.getParameter("tripDay2"));
 	String tripDay3 = Utils.isNull(request.getParameter("tripDay3"));
@@ -34,6 +32,7 @@ try{
 	bean.setTripDay(tripDay);
 	bean.setTripDay2(tripDay2);
 	bean.setTripDay3(tripDay3);
+	bean.setCustomerType(customerType);
 	
 	//check db data to input screen fro update 
 	/* if( Utils.isNull(bean.getTripDay()).equals("")){
@@ -50,9 +49,9 @@ try{
 	bean.setCustAccountId(beanCheck.getCustAccountId());
 	bean.setPartySiteId(beanCheck.getPartySiteId());
 	
-	//Update Trip Customer
+	//Update Trip Customer ,CustomerType
 	String msg = TripAction.updateCustTrip(bean);
-	
+
 	//search refresh to display
 	if( !"".equals(customerCode)){
 	   bean = TripAction.searchCustomerTripDetail(conn, bean);

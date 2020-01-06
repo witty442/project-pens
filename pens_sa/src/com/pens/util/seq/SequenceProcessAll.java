@@ -3,9 +3,6 @@ package com.pens.util.seq;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
@@ -21,9 +18,15 @@ import com.pens.util.DBConnection;
 public class SequenceProcessAll {
 
 	private static Logger logger = Logger.getLogger("PENS");
-	protected static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", Locale.US);
-
-	public static Integer getNextValue(String sequenceType) throws Exception {
+    private  static SequenceProcessAll _sequenceProcessAll;
+    
+	public static  SequenceProcessAll getIns(){
+		  if(_sequenceProcessAll ==null)
+			  _sequenceProcessAll = new SequenceProcessAll();
+		  return _sequenceProcessAll;
+		}
+	
+	public  Integer getNextValue(String sequenceType) throws Exception {
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
@@ -37,7 +40,7 @@ public class SequenceProcessAll {
 		}
 		
 	}
-	public static Integer getNextValue(Connection conn,String sequenceType) throws Exception {
+	public Integer getNextValue(Connection conn,String sequenceType) throws Exception {
 		return getNextValueModel(conn, sequenceType);
 	}
 	
@@ -49,7 +52,7 @@ public class SequenceProcessAll {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Integer getNextValueModel(Connection conn,String sequenceType) throws Exception {
+	public  Integer getNextValueModel(Connection conn,String sequenceType) throws Exception {
 		Integer nextValue = 0;
 		Statement stmt = null;
 		ResultSet rst = null;

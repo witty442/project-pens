@@ -233,37 +233,7 @@ public class SalesTargetTTControlPage {
 		}
 	}
 
-	public static void prepareSearchMTADMIN(HttpServletRequest request,Connection conn,User user,String pageName){
-		try{
-			//init monthYearList
-			request.getSession().setAttribute("PERIOD_LIST", SalesTargetTTUtils.initPeriod(conn));
-			//init salesChannelList
-
-			//SALES_CHANNEL_LIST
-			//add Blank Row
-			List<PopupBean> salesChannelList = new ArrayList<PopupBean>();
-			PopupBean item = new PopupBean();
-			item.setSalesChannelNo("");
-			item.setSalesChannelDesc("");
-			salesChannelList.add(item);
-			
-			List<PopupBean> salesChannelList_s = SalesTargetTTUtils.searchSalesChannelTTListModel(conn, user);
-			salesChannelList.addAll(salesChannelList_s);
-			request.getSession().setAttribute("SALES_CHANNEL_LIST",salesChannelList);
-			
-			//Cust Cat No List
-			//add Blank Row
-			List<PopupBean> custCatNoList = new ArrayList<PopupBean>();
-			item = new PopupBean();
-			item.setCustCatNo("");
-			item.setCustCatDesc("");
-			custCatNoList.add(item);
-			custCatNoList.addAll(SalesTargetTTUtils.searchCustCatNoMTListModel(conn, ""));
-			request.getSession().setAttribute("CUSTOMER_CATEGORY_LIST",custCatNoList);
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}
-	}
+	
 	/**
 	 * prepareDetailMKT_TT
 	 * @param form

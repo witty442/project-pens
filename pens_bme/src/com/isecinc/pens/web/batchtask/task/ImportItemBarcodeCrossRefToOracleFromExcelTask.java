@@ -23,6 +23,7 @@ import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.exception.ExceptionHandle;
+import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.pens.util.Constants;

@@ -58,6 +58,22 @@ function selectAll(){
 	document.getElementsByName("codes")[0].value = 'ALL,';
 	document.getElementsByName("descs")[0].value = 'ALL,';
 }
+function selectOneRadio(){
+	var pageName ='<%=pageName%>';
+	var chRadio = document.getElementsByName("chCheck");
+	var retCode = document.getElementsByName("code_temp");
+	var retDesc = document.getElementsByName("desc");
+
+	for(var i=0;i<chRadio.length;i++){
+        if(chRadio[i].checked){
+        	//alert(i+":"+code[i+1].value);
+            window.opener.setDataPopupValue(retCode[i].value,retDesc[i].value,pageName);
+        	window.close();
+            break;
+        }
+	}
+}
+
 function selectMultiple(){
 	var chk = document.getElementsByName("chCheck");
 	var pageName ='<%=pageName%>';
@@ -256,7 +272,11 @@ window.onload = function(){
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
 	<tr>
 		<td align="center">
-			<input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:80px;"  class="newPosBtnLong" />
+		    <%if(selectone.equalsIgnoreCase("false")){ %>
+			  <input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:80px;"  class="newPosBtnLong" />
+			<%}else{ %>
+			  <input type="button" name="ok" value="OK" onclick="selectOneRadio()" style="width:80px;"  class="newPosBtnLong" />
+			<%} %>
 			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:80px;"  class="newPosBtnLong" />
 			&nbsp;
 			<%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  /> เลือกทั้งหมด <%} %>
@@ -282,7 +302,7 @@ window.onload = function(){
 	<%}else if("PDStockVan".equalsIgnoreCase(pageName) ){ %>
 	     <jsp:include page="popup_sub/pdStockVanResult.jsp" /> 
 	<%}else{ %>  
-	  <!-- Result all PageName -->
+	   <!-- Result all PageName -->
 	   <jsp:include page="popup_sub/popupResult.jsp" /> 
 	<%} %> 
 <%}else if(session.getAttribute("search_submit") != null){ %>

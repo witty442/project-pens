@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForm;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.dao.BMEProductDAO;
+import com.isecinc.pens.dao.PopupDAO;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.Utils;
@@ -36,6 +37,20 @@ public class AutoKeypressAction {
 				criteriaForm.setCodeSearch(Utils.isNull(request.getParameter("salesrepCode")));
 				
 				PopupForm popupForm = AutoKeypressDAO.searchSalesrepSalesDetail(criteriaForm);
+				if(popupForm != null){
+					resultAjax = "4|"+popupForm.getCode()+"|"+popupForm.getDesc()+"|"+popupForm.getDesc2()+"|"+popupForm.getDesc3();
+				}else{
+					resultAjax = "-1|||";
+				}
+			}else if("CustomerAutoSub".equalsIgnoreCase(pageName) ){
+				//set criteria
+				criteriaForm.setCodeSearch(Utils.isNull(request.getParameter("toStoreCode")));
+				
+				List<PopupForm> popupList=   PopupDAO.searchCustomerAutoSubList(criteriaForm);
+				PopupForm popupForm = null;
+				if(popupList != null && popupList.size() >0){
+					popupForm = popupList.get(0);
+				}
 				if(popupForm != null){
 					resultAjax = "4|"+popupForm.getCode()+"|"+popupForm.getDesc()+"|"+popupForm.getDesc2()+"|"+popupForm.getDesc3();
 				}else{

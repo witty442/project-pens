@@ -313,10 +313,10 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 						description =ExcelHelper.getCellValue(cellObjValue,"STRING","");
 					}
 					if(colNo ==2){
-						barcode = ExcelHelper.getCellValue(cellObjValue,"STRING",Utils.format_number_no_digit);
+						barcode = ExcelHelper.getCellValue(cellObjValue,"STRING",Utils.format_number_no_disgit);
 					}
 					if(colNo ==3){
-						coverday = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+						coverday = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 					}
 					
 				}//for colNo
@@ -511,19 +511,19 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 				//cell = row.getCell((short) colNo);
 				
 				cellObjValue = xslUtils.getCellValue(colNo, row.getCell((short) 0));
-				supplierNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+				supplierNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 1));
-				locationNumber =ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+				locationNumber =ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 2));
 				locationName = ExcelHelper.getCellValue(cellObjValue,"STRING","");
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 5));
-				itemNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+				itemNumber = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 6));
-				barcode = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_digit);
+				barcode = ExcelHelper.getCellValue(cellObjValue,"INTEGER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 8));
 				eohQty = ExcelHelper.getCellValue(cellObjValue,"NUMBER",Utils.format_current_2_disgit);
@@ -532,7 +532,7 @@ public class ImportB2BMakroFromExcelTask extends BatchTask implements BatchTaskI
 				onOrderInTransitQty = ExcelHelper.getCellValue(cellObjValue,"NUMBER",Utils.format_current_2_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 11));
-				makroUnit = ExcelHelper.getCellValue(cellObjValue,"STRING",Utils.format_number_no_digit);
+				makroUnit = ExcelHelper.getCellValue(cellObjValue,"STRING",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 12));
 				avgNetSalesQty = ExcelHelper.getCellValue(cellObjValue,"NUMBER",Utils.format_current_2_disgit);

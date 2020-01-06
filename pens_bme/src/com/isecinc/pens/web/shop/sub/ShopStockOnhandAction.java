@@ -263,6 +263,7 @@ public class ShopStockOnhandAction {
 					sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
 					sql.append("\n   WHERE reference_code ='"+Constants.STORE_TYPE_7CATALOG_ITEM+"'");
+					sql.append("\n   AND MP.pens_desc6 in ('MAYA') ");
 					sql.append("\n   AND MP.pens_value =I.segment1 ");
 					sql.append("\n ) MP ");
 					sql.append("\n WHERE L.ORDER_NUMBER = D.ORDER_NUMBER ");

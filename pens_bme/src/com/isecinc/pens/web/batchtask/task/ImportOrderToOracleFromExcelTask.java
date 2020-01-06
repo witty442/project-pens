@@ -38,6 +38,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
+import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.pens.util.Constants;

@@ -48,6 +48,10 @@ int pageNumber = 1;
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 
+<!-- Control Save Lock Screen -->
+ <jsp:include page="../controlSaveLockScreen.jsp"/> 
+<!-- Control Save Lock Screen -->
+
 <script type="text/javascript">
 
 function loadMe(){
@@ -67,7 +71,13 @@ function loadMe(){
         //alert("ร้านค้า  Over Credit Limit ");
         deleteOrderInPage();
      <%} %>
+     
+     /** Sumit Load File Export Order TO Text All " **/
+     <%if( !Utils.isNull(request.getAttribute("DOWNLOAD_FILE")).equals("")){ %>
+         downloadFileOrderToTextAll('<%=Utils.isNull(request.getAttribute("DOWNLOAD_FILE"))%>');
+     <%}%>
 }
+
 function unblockUI(){
 	$.unblockUI();
 }
@@ -145,8 +155,41 @@ function exportToText(path){
 
 function exportToTextAll(path){
 	var form = document.orderForm;
+	var returnString = "";
+	/** warining Gen Text more than 1 time **/
+	var getData = $.ajax({
+		url: "${pageContext.request.contextPath}/jsp/ajax/getCountOrderGenTextAjax.jsp",
+		data : "orderDate="+form.orderDate.value,
+		async: false,
+		cache: false,
+		success: function(getData){
+		  returnString = jQuery.trim(getData);
+		}
+	}).responseText;
 	
-	form.action = path + "/jsp/orderAction.do?do=exportToTextAll";
+	//alert(returnString);
+	if(returnString != ''){
+	    if(confirm("มีการ Export To Text ทุกห้าง มาแล้วจำนวน "+returnString +"ครั้ง   ยืนยันทำการ Export")){
+			/**Control Save Lock Screen **/
+			startControlSaveLockScreen();
+			
+			form.action = path + "/jsp/orderAction.do?do=exportToTextAll";
+			form.submit();
+			return true;
+	    }
+	}else{
+		/**Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
+		form.action = path + "/jsp/orderAction.do?do=exportToTextAll";
+		form.submit();
+		return true;
+	}
+}
+function downloadFileOrderToTextAll(fileName){
+	var form = document.orderForm;
+	var path = document.getElementById("path").value;
+	form.action = path + "/jsp/orderAction.do?do=downloadFileOrderToTextAll&fileName="+fileName;
 	form.submit();
 	return true;
 }
@@ -654,7 +697,7 @@ function sumQtyInRow(row){
 					<!-- hidden field -->
 					<input type="hidden" name="maxColumns" id="maxColumns" value="<%=storeList!=null?storeList.size():0%>"/>
 				    <input type="hidden" name="pageNumber" id="pageNumber" value="<%=pageNumber%>"/>
-					
+					 <input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					
@@ -683,6 +726,3 @@ function sumQtyInRow(row){
 </table>
 </body>
 </html>
-<!-- Control Save Lock Screen -->
- <jsp:include page="../controlSaveLockScreen.jsp"/> 
-<!-- Control Save Lock Screen -->

@@ -29,15 +29,18 @@ public class ImportForm extends I_Form {
 	private String[] chkIndex;
    
 	private FormFile dataFile;
-	
+	private FormFile dataFile2;
 	private OnhandSummary summary;
 	
 	private String page;
 	
 	private List<ImportSummary> summarySuccessList;
 	private List<ImportSummary> summaryErrorList;
+	private List<ImportSummary> summaryBoxSuccessList;
+	private List<ImportSummary> summaryBoxErrorList;
 	
 	private int totalSize;
+	private int totalBoxSize;
 	private int summaryLotusSuccessSize;
 	private int summaryLotusErrorSize;
 	
@@ -65,6 +68,9 @@ public class ImportForm extends I_Form {
 	private int loadOnhandTVDirectListErrorSize;
 	private int loadOnhandTVDirectListSuccessSize;
 	
+	private int summaryWacoalBoxListErrorSize;
+	private int summaryWacoalBoxListSuccessSize;
+	
 	private String countDate;
 	private String custCode;
 	
@@ -79,6 +85,55 @@ public class ImportForm extends I_Form {
 	
 	private List<OnhandSummary> reconcileList;
 	
+    
+	public int getTotalBoxSize() {
+		return totalBoxSize;
+	}
+
+	public void setTotalBoxSize(int totalBoxSize) {
+		this.totalBoxSize = totalBoxSize;
+	}
+
+	public List<ImportSummary> getSummaryBoxSuccessList() {
+		return summaryBoxSuccessList;
+	}
+
+	public void setSummaryBoxSuccessList(List<ImportSummary> summaryBoxSuccessList) {
+		this.summaryBoxSuccessList = summaryBoxSuccessList;
+	}
+
+	public List<ImportSummary> getSummaryBoxErrorList() {
+		return summaryBoxErrorList;
+	}
+
+	public void setSummaryBoxErrorList(List<ImportSummary> summaryBoxErrorList) {
+		this.summaryBoxErrorList = summaryBoxErrorList;
+	}
+
+	public int getSummaryWacoalBoxListErrorSize() {
+		return summaryWacoalBoxListErrorSize;
+	}
+
+	public void setSummaryWacoalBoxListErrorSize(int summaryWacoalBoxListErrorSize) {
+		this.summaryWacoalBoxListErrorSize = summaryWacoalBoxListErrorSize;
+	}
+
+	public int getSummaryWacoalBoxListSuccessSize() {
+		return summaryWacoalBoxListSuccessSize;
+	}
+
+	public void setSummaryWacoalBoxListSuccessSize(
+			int summaryWacoalBoxListSuccessSize) {
+		this.summaryWacoalBoxListSuccessSize = summaryWacoalBoxListSuccessSize;
+	}
+
+	public FormFile getDataFile2() {
+		return dataFile2;
+	}
+
+	public void setDataFile2(FormFile dataFile2) {
+		this.dataFile2 = dataFile2;
+	}
 
 	public List<OnhandSummary> getReconcileList() {
 		return reconcileList;

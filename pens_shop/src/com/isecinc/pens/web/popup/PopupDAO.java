@@ -8,13 +8,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 
 public class PopupDAO {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	 public static List<PopupForm> searchItemBarcodeList(PopupForm c) throws Exception {
+	 public static List<PopupForm> searchItemBarcodeList(PopupForm c,User user) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			List<PopupForm> pos = new ArrayList<PopupForm>();
@@ -26,7 +27,11 @@ public class PopupDAO {
 				sql.append("\n SELECT * from m_barcode M ");
 				sql.append("\n where product_code in ");
 				sql.append("\n ( select code from m_product p,m_product_price pr ");
-				sql.append("\n  where p.product_id =pr.product_id and p.isactive ='Y' ) ");
+				sql.append("\n  where p.product_id =pr.product_id and p.isactive ='Y'  ");
+				//EDIT :17/12/2562 :Case filter only priceList id by shop(fix)
+				sql.append("\n  and pr.PRICELIST_ID ="+user.getConfig().getPricelistId());
+				sql.append("\n  )");
+				
 				if( !Utils.isNull(c.getCodeSearch()).equals("")){
 					sql.append("\n and M.product_code like'"+c.getCodeSearch()+"%' ");
 				}
@@ -36,7 +41,7 @@ public class PopupDAO {
 				if( !Utils.isNull(c.getBarcodeSearch()).equals("")){
 					sql.append("\n and M.barcode ='"+c.getBarcodeSearch()+"' ");
 				}
-				
+			
 				sql.append("\n  ORDER BY M.product_code asc ");
 				
 				logger.debug("sql:"+sql);

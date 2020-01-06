@@ -31,9 +31,16 @@ public class PopupSearchForm extends ActionForm implements Serializable{
     private String groupCode;
     private String styleNo;
     private String pensItem;
+    private String notIn;/** sql no in(""); **/
     private Map<String, String> criteriaMap;
     
     
+	public String getNotIn() {
+		return notIn;
+	}
+	public void setNotIn(String notIn) {
+		this.notIn = notIn;
+	}
 	public String getGroupStore() {
 		return groupStore;
 	}

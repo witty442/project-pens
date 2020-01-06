@@ -732,7 +732,7 @@ public class SalesTargetDAO {
 			//check documentNo
 			if(h.getId()==0){
 				//Gen Next ID Sequence
-				Integer id =SequenceProcessAll.getNextValue("XXPENS_BI_SALES_TARGET_TEMP");
+				Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP");
 				if(id==0){
 					id = 1;
 				}
@@ -1157,6 +1157,7 @@ public class SalesTargetDAO {
 			try {
 				//convert Criteria
 				o = convertCriteria(o);
+				
 				sql.append("\n SELECT A.customer_code ,A.customer_id,A.customer_name, A.BRAND ,A.brand_name  ");
 				sql.append("\n ,SUM(total_target_qty) as total_target_qty  ");
 				sql.append("\n ,SUM(total_target_amount) as total_target_amount  ");
@@ -1259,6 +1260,9 @@ public class SalesTargetDAO {
 				if(!"".equals(Utils.isNull(o.getBrand()))){
 				  sql.append("\n and M.brand = '"+Utils.isNull(o.getBrand())+"'");
 				}
+				if(!"".equals(Utils.isNull(o.getCustomerCode()))){
+					  sql.append("\n and M.customer_code = '"+Utils.isNull(o.getCustomerCode())+"'");
+				}
 				logger.debug("sql:"+sql);
 				
 				stmt = conn.createStatement();
@@ -1295,9 +1299,9 @@ public class SalesTargetDAO {
                 
 				//XXPENS_BI_SALES_TARGET_TEMP
 				sql = new StringBuffer("");
-				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TEMP M SET  \n");
-				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
-				sql.append(" WHERE 1=1  \n" );
+				sql.append("\n UPDATE XXPENS_BI_SALES_TARGET_TEMP M SET ");
+				sql.append("\n STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?  ");
+				sql.append("\n WHERE 1=1 " );
 				sql.append("\n and M.division <>'B' ");// Not equals Van And Credit
 				sql.append("\n and M.customer_id <> 0 ");
 				sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
@@ -1343,9 +1347,9 @@ public class SalesTargetDAO {
                 
 				//XXPENS_BI_SALES_TARGET_TEMP_L
 				sql = new StringBuffer("");
-				sql.append("\n UPDATE XXPENS_BI_SALES_TARGET_TEMP_L  SET  \n");
-				sql.append("\n STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
-				sql.append("\n WHERE ID IN( \n" );
+				sql.append("\n UPDATE XXPENS_BI_SALES_TARGET_TEMP_L  SET  ");
+				sql.append("\n STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   ");
+				sql.append("\n WHERE ID IN( " );
 				sql.append("\n   SELECT ID FROM  XXPENS_BI_SALES_TARGET_TEMP M ");
 				sql.append("\n   WHERE 1=1  " );
 				sql.append("\n   and M.division <> 'B' ");// <> Van And Credit

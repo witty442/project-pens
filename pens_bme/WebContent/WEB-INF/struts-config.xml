@@ -113,6 +113,7 @@
 		<form-bean name="genVanScriptForm" type="com.isecinc.pens.web.other.GenVanScriptForm" />
 		<form-bean name="autoCNHISHERForm" type="com.isecinc.pens.web.autocn.hisher.AutoCNHISHERForm" />
 		<form-bean name="autoSubInForm" type="com.isecinc.pens.web.autosubin.AutoSubInForm" />
+		<form-bean name="autoSubB2BForm" type="com.isecinc.pens.web.autosubb2b.AutoSubB2BForm" />
 		<form-bean name="toolManageForm" type="com.isecinc.pens.web.toolmanage.ToolManageForm" />
 		<form-bean name="jojoForm" type="com.isecinc.pens.web.jojo.JojoForm" />
 		<form-bean name="shopForm" type="com.isecinc.pens.web.shop.ShopForm" />
@@ -120,7 +121,9 @@
 	    <form-bean name="itManageForm" type="com.isecinc.pens.web.itmanage.ITManageForm" />
 	    <form-bean name="manualStockForm" type="com.isecinc.pens.web.manualstock.ManualStockForm" />
 	    <form-bean name="autoOrderForm" type="com.isecinc.pens.web.autoorder.AutoOrderForm" />
-	    <form-bean name="reportsForm" type="com.isecinc.pens.web.reports.ReportsForm" />
+	    <form-bean name="reportAllForm" type="com.isecinc.pens.web.reportall.ReportAllForm" />
+	    <form-bean name="importAllForm" type="com.isecinc.pens.web.importall.ImportAllForm" />
+	    <form-bean name="autoCNHHTempForm" type="com.isecinc.pens.web.autocnhhtemp.AutoCNHHTempForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -723,6 +726,10 @@
 			<forward name="detail" path="/jsp/autoSubIn/autoSubIn.jsp" />
 			<forward name="detailView" path="/jsp/autoSubIn/autoSubInView.jsp" />
 		</action>
+		<action name="autoSubB2BForm" path="/jsp/autoSubB2BAction" parameter="do" scope="session" type="com.isecinc.pens.web.autosubb2b.AutoSubB2BAction">
+			<forward name="search" path="/jsp/autoSubB2B/autoSubB2BSearch.jsp" />
+			<forward name="detail" path="/jsp/autoSubB2B/autoSubB2B.jsp" />
+		</action>
 		<action name="toolManageForm" path="/jsp/toolManageAction" parameter="do" scope="session" type="com.isecinc.pens.web.toolmanage.ToolManageAction">
 			<forward name="search" path="/jsp/toolmanage/toolManageSearch.jsp" />
 			<forward name="detail" path="/jsp/toolmanage/toolManage.jsp" />
@@ -745,9 +752,16 @@
 			<forward name="search" path="/jsp/autoOrder/autoOrderSearch.jsp" />
 			<!-- <forward name="detail" path="/jsp/manualStock/manualStock.jsp" /> -->
 		</action>
-		<action name="reportsForm" path="/jsp/reportsAction" parameter="do" scope="session" type="com.isecinc.pens.web.reports.ReportsAction">
-			<forward name="reports" path="/jsp/reports/reports.jsp" />
+		<action name="reportAllForm" path="/jsp/reportAllAction" parameter="do" scope="session" type="com.isecinc.pens.web.reportall.ReportAllAction">
+			<forward name="reportAll" path="/jsp/reportAll/reportAll.jsp" />
 			<!-- <forward name="detail" path="/jsp/manualStock/manualStock.jsp" /> -->
+		</action>
+		<action name="importAllForm" path="/jsp/importAllAction" parameter="do" scope="session" type="com.isecinc.pens.web.importall.ImportAllAction">
+			<forward name="importAll" path="/jsp/importAll/importAll.jsp" />
+			<!-- <forward name="detail" path="/jsp/manualStock/manualStock.jsp" /> -->
+		</action>
+		<action name="autoCNHHTempForm" path="/jsp/autoCNHHTempAction" parameter="do" scope="session" type="com.isecinc.pens.web.autocnhhtemp.AutoCNHHTempAction">
+			<forward name="import" path="/jsp/autoCNHHTemp/importAutoCNHHTemp.jsp" />
 		</action>
 	</action-mappings>
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

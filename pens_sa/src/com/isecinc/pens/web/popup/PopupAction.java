@@ -192,6 +192,11 @@ public class PopupAction extends I_Action {
 				//For SalestargetPD
 				 results = PopupDAO.searchPDList(popupForm,"P");
 				 
+			}else if("CustomerProjectC".equalsIgnoreCase(popupForm.getPageName()) ){
+				 results = PopupDAO.searchCustomerCreditSalesProjectCList(request,popupForm);
+				 
+			}else if("BranchProjectC".equalsIgnoreCase(popupForm.getPageName()) ){
+				 results = PopupDAO.searchCustomerBranchCreditSalesProjectCList(request,popupForm);
 			}
 			
 			 if(results != null && results.size() >0){

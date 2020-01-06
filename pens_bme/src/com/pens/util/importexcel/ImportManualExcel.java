@@ -2,10 +2,13 @@ package com.pens.util.importexcel;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -21,6 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHelper;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class ImportManualExcel {
 	public static Logger logger = Logger.getLogger("PENS");
@@ -43,8 +47,71 @@ public class ImportManualExcel {
 		}
 	}
 	
+//Form page input
+public static void importExcel(String dataBaseType,String db,InputStream is,String inputFile,int maxColumn,String userName) throws Exception{
+	 Connection conn = null;
+	 try{
+		if("ORACLE".equalsIgnoreCase(dataBaseType)){
+			if("PRODUCTION".equalsIgnoreCase(db)){
+			   logger.debug("IMPORT TO DB "+db);
+			   conn = getConnectionProdApps();
+			}else{
+			   conn = getConnectionUATApps();
+			   logger.debug("IMPORT TO DB "+db);
+			}
+		}else{
+			  conn = getConnectionMysqlLocal();
+		}
+		conn.setAutoCommit(false);
+		importExcelModel(conn,is, inputFile, maxColumn,userName);
+		conn.commit();
+	 }catch(Exception e){
+		 conn.rollback();
+	 }finally{
+		 if(conn != null){
+				conn.close();
+			}
+	 }
+}
+//Form page input
+public static void importExcel(Connection conn,InputStream is,String inputFile,int maxColumn,String userName) throws Exception{
+	 try{
+		importExcelModel(conn,is, inputFile, maxColumn,userName);
+	 }catch(Exception e){
+		throw e;
+	 }finally{
+		
+	 }
+}
+//form manual code
 public static void importExcel(String dataBaseType,String db,String inputFile,int maxColumn) throws Exception{
 	 Connection conn = null;
+	 try{
+		if("ORACLE".equalsIgnoreCase(dataBaseType)){
+			if("PRODUCTION".equalsIgnoreCase(db)){
+			   logger.debug("IMPORT TO DB "+db);
+			   conn = getConnectionProdApps();
+			}else{
+			   conn = getConnectionUATApps();
+			   logger.debug("IMPORT TO DB "+db);
+			}
+		}else{
+			  conn = getConnectionMysqlLocal();
+		}
+		conn.setAutoCommit(false);
+		importExcelModel(conn,null, inputFile, maxColumn,"");
+		conn.commit();
+	 }catch(Exception e){
+		 conn.rollback();
+	 }finally{
+		 if(conn != null){
+				conn.close();
+			}
+	 }
+}
+
+public static void importExcelModel(Connection conn,InputStream is,String inputFile,int maxColumn,String userName) throws Exception{
+
 	 StringBuffer sql = new StringBuffer();
 	 UploadXLSUtil xslUtils = new UploadXLSUtil();
 	 PreparedStatement ps = null;
@@ -55,25 +122,39 @@ public static void importExcel(String dataBaseType,String db,String inputFile,in
 	 Row row = null;
 	 Cell cell = null;
 	 int maxColumnNo = maxColumn;//get MaxColumn wait for next step
+	 FileInputStream fis = null;
 	 try{
+		 logger.debug("is:"+is);
 		 logger.debug("inputFile:"+inputFile);
 		 
 		//get fielType
 		fileType = inputFile.substring(inputFile.indexOf(".")+1,inputFile.length());
-		 
-		FileInputStream dataFile = new FileInputStream(new File(inputFile));
-		
-		if("xls".equalsIgnoreCase(fileType)){
-		   wb1 = new HSSFWorkbook(dataFile);//97-2003
-		   sheet = wb1.getSheetAt(0);
-		   logger.debug("number of sheet: " + wb1.getNumberOfSheets());
+		if(is ==null){
+			//Get from local file
+			fis = new FileInputStream(new File(inputFile));
+			if("xls".equalsIgnoreCase(fileType)){
+			   wb1 = new HSSFWorkbook(fis);//97-2003
+			   sheet = wb1.getSheetAt(0);
+			   logger.debug("number of sheet: " + wb1.getNumberOfSheets());
+			}else{
+			   OPCPackage pkg = OPCPackage.open(fis);
+			   wb2 = new XSSFWorkbook(pkg);
+			   sheet = wb2.getSheetAt(0);
+			   logger.debug("number of sheet: " + wb2.getNumberOfSheets());
+			}
 		}else{
-		   OPCPackage pkg = OPCPackage.open(dataFile);
-		   wb2 = new XSSFWorkbook(pkg);
-		   sheet = wb2.getSheetAt(0);
-		   logger.debug("number of sheet: " + wb2.getNumberOfSheets());
+			// Get InputStream from Screen
+			if("xls".equalsIgnoreCase(fileType)){
+			   wb1 = new HSSFWorkbook(is);//97-2003
+			   sheet = wb1.getSheetAt(0);
+			   logger.debug("number of sheet: " + wb1.getNumberOfSheets());
+			}else{
+			   OPCPackage pkg = OPCPackage.open(is);
+			   wb2 = new XSSFWorkbook(pkg);
+			   sheet = wb2.getSheetAt(0);
+			   logger.debug("number of sheet: " + wb2.getNumberOfSheets());
+			}
 		}
-		
 		//init table_name row =0
 		row = sheet.getRow(0);
 		Cell cellTableName = row.getCell((short) 0);
@@ -118,21 +199,11 @@ public static void importExcel(String dataBaseType,String db,String inputFile,in
 			sql.append(") \n");
 		}
 		logger.debug("sql:"+sql.toString());
-		if("ORACLE".equalsIgnoreCase(dataBaseType)){
-			if("PRODUCTION".equalsIgnoreCase(db)){
-			   logger.debug("IMPORT TO DB "+db);
-			   conn = getConnectionProdApps();
-			}else{
-			   conn = getConnectionUATApps();
-			   logger.debug("IMPORT TO DB "+db);
-			}
-		}else{
-			  conn = getConnectionMysqlLocal();
-		}
+		
 		ps = conn.prepareStatement(sql.toString());
 		
 		//Loop data row
-		int rowNo = 3;
+		int rowNo = 2;
 		for (int i = rowNo; i < sheet.getLastRowNum()+1; i++) {
 			row = sheet.getRow(i);
 			
@@ -148,7 +219,7 @@ public static void importExcel(String dataBaseType,String db,String inputFile,in
 			for (int colNo = 0; colNo < maxColumnNo; colNo++) {
 				ColumnBean columnBean = columnList.get(colNo);
 				cell = row.getCell((short) colNo);
-				logger.debug("row["+i+"]col[("+colNo+"]type["+columnBean.getColumnType()+"]value["+xslUtils.getCellValue(colNo, cell)+"]");
+				//logger.debug("row["+i+"]col[("+colNo+"]type["+columnBean.getColumnType()+"]value["+xslUtils.getCellValue(colNo, cell)+"]");
 				
 				Object cellValue = xslUtils.getCellValue(colNo, cell);
 				
@@ -158,6 +229,12 @@ public static void importExcel(String dataBaseType,String db,String inputFile,in
 				}else  if(columnBean.getColumnType().equalsIgnoreCase("NUMBER")){
 				   double doubleData = Utils.isDoubleNull(cellValue);
 				   ps.setDouble((colNo+1),  doubleData);
+				}else  if(columnBean.getColumnType().equalsIgnoreCase("SEQ")){
+				   ps.setBigDecimal((colNo+1), getSeq(conn, tableName));	
+				}else  if(columnBean.getColumnType().equalsIgnoreCase("SYSDATE")){
+				   ps.setTimestamp((colNo+1), new java.sql.Timestamp(new Date().getTime()));	
+				}else  if(columnBean.getColumnType().equalsIgnoreCase("CURRENT_USER")){
+				   ps.setString((colNo+1),  userName);
 				}
 			}//for
 			ps.executeUpdate();
@@ -168,11 +245,23 @@ public static void importExcel(String dataBaseType,String db,String inputFile,in
 		if(ps !=null){
 			ps.close();
 		}
-		if(conn != null){
-			conn.close();
-		}
+		
+		if(fis != null)fis.close();
+		if(is != null)is.close();
+		
 	}
  }
+
+   public static BigDecimal getSeq(Connection conn,String tableName) throws Exception{
+	   BigDecimal seq = new BigDecimal("0");
+	   try{
+		   seq = SequenceProcessAll.getIns().getNextValue(conn, tableName.toLowerCase());
+	   }catch(Exception e){
+		   throw e;
+	   }
+	   return seq;
+   }
+   
 	public  static Connection getConnectionProdApps(){		
 		Connection _instanceInf =null;
 		try {	

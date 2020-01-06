@@ -25,6 +25,7 @@ import com.isecinc.pens.bean.ReqPickStock;
 import com.isecinc.pens.bean.SAEmpBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ConfPickStockDAO;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.SAEmpDAO;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.pick.ConfPickStockForm;
@@ -61,6 +62,24 @@ public class SAEmpAction extends I_Action {
 				if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
 					ad.setCanEdit(true);
 				}
+			
+				List<PopupForm> billTypeList2 = new ArrayList<PopupForm>();
+				PopupForm ref2 = new PopupForm("",""); 
+				billTypeList2.add(ref2);
+				billTypeList2.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","Region"));
+				request.getSession().setAttribute("empRegionList",billTypeList2);
+
+				List<PopupForm> billTypeList1 = new ArrayList<PopupForm>();
+				PopupForm ref1 = new PopupForm("",""); 
+				billTypeList1.add(ref1);
+				billTypeList1.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","EMPtype"));
+				request.getSession().setAttribute("empTypeList",billTypeList1);
+			
+				List<PopupForm> billTypeList3 = new ArrayList<PopupForm>();
+				PopupForm ref3 = new PopupForm("",""); 
+				billTypeList3.add(ref3);
+				billTypeList3.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
+				request.getSession().setAttribute("groupStoreList",billTypeList3);
 				
 				aForm.setBean(ad);
 			}else if("back".equals(action)){
@@ -123,9 +142,9 @@ public class SAEmpAction extends I_Action {
 			logger.debug("prepare edit empRefId:"+empRefId+",action:"+action);
 			if("add".equalsIgnoreCase(action)){
 				//init default value
-				bean.setRewardBme(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","RewardBME").get(0).getCode());
-				bean.setRewardWacoal(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","RewardWACOAL").get(0).getCode());
-				bean.setSuretyBond(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","SuretyBond").get(0).getCode());
+				bean.setRewardBme(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","RewardBME").get(0).getCode());
+				bean.setRewardWacoal(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","RewardWACOAL").get(0).getCode());
+				bean.setSuretyBond(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","SuretyBond").get(0).getCode());
 			}else{
 				SAEmpBean c = new SAEmpBean();
 				c.setEmpRefId(empRefId);
@@ -508,9 +527,9 @@ public class SAEmpAction extends I_Action {
 			
 			SAEmpBean bean = new SAEmpBean();
 			//init default value
-			bean.setRewardBme(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","RewardBME").get(0).getCode());
-			bean.setRewardWacoal(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","RewardWACOAL").get(0).getCode());
-			bean.setSuretyBond(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","SuretyBond").get(0).getCode());
+			bean.setRewardBme(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","RewardBME").get(0).getCode());
+			bean.setRewardWacoal(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","RewardWACOAL").get(0).getCode());
+			bean.setSuretyBond(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","SuretyBond").get(0).getCode());
 			
 			if ( Utils.userInRole(user,new String[]{User.ADMIN,User.HRM}) ){
 				bean.setCanEdit(true);

@@ -7,9 +7,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.PopupBean;
+import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.web.location.LocationControlPage;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
@@ -1309,4 +1313,148 @@ public class PopupDAO {
 			}
 		 return pos;
 	}
+	 
+	 public static List<PopupForm> searchCustomerCreditSalesProjectCList(HttpServletRequest request,PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			User user = (User)request.getSession().getAttribute("user");
+			try {
+				
+				if(c.getCriteriaMap() != null){
+				   //salesrepCode = Utils.isNull(c.getCriteriaMap().get("salesrepCode"));
+				}
+				sql.append("\n SELECT distinct C.account_number as customer_code ,C.party_name as customer_desc " );
+				sql.append("\n from apps.xxpens_ar_cust_sales_all M,apps.xxpens_ar_customer_all_v C");
+				sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+				sql.append("\n where M.cust_account_id = C.cust_account_id ");
+				sql.append("\n and M.primary_salesrep_id = Z.salesrep_id ");
+				sql.append("\n and M.code like 'S%' ");//Credit Sales Only
+				sql.append("\n and Z.zone in('0','1','2','3','4') ");
+				sql.append("\n and C.account_number in ( ");
+				sql.append("\n  select oracle_cust_no from PENSBI.PENSBME_TT_BRANCH"); //display only set
+				sql.append("\n ) ");
+		
+				/** filter sales by user login **/
+				/** check user is mapping customer tt (manager,TTSupper)**/
+				if(GeneralDAO.isUserMapCustSalesTT(user)){
+					if( !Utils.isNull(user.getUserName()).equals("")){
+						sql.append("\n and Z.zone in( ");
+						sql.append("\n   select zone from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT ");
+						sql.append("\n   where user_name ='"+(user.getUserName())+"'");
+						sql.append("\n ) ");
+					}
+				}else if( !user.getUserName().equalsIgnoreCase("admin")){
+					//is CreditSales Key
+					sql.append("\n and Z.salesrep_code ='"+user.getUserName().toUpperCase()+"'");
+				}
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and C.account_number ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and C.party_name LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				sql.append("\n  ORDER BY C.account_number asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("customer_code"));
+					item.setDesc(rst.getString("customer_desc"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 public static List<PopupForm> searchCustomerBranchCreditSalesProjectCList(HttpServletRequest request,PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			User user = (User)request.getSession().getAttribute("user");
+			String storeCode="";
+			try {
+				if(c.getCriteriaMap() != null){
+					storeCode = Utils.isNull(c.getCriteriaMap().get("storeCode"));
+				}
+				sql.append("\n SELECT distinct B.branch_id,B.branch_name ");
+				sql.append("\n from apps.xxpens_ar_cust_sales_all M,apps.xxpens_ar_customer_all_v C");
+				sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ,PENSBI.PENSBME_TT_BRANCH B ");
+				sql.append("\n where M.cust_account_id = C.cust_account_id ");
+				sql.append("\n and M.primary_salesrep_id = Z.salesrep_id ");
+				sql.append("\n and B.oracle_cust_no = C.account_number ");
+				sql.append("\n and M.code like 'S%' ");//Credit Sales Only
+				sql.append("\n and Z.zone in('0','1','2','3','4') ");
+				
+				if( !Utils.isNull(storeCode).equals("")){
+					sql.append("\n and C.account_number ='"+storeCode+"'");
+				}
+				
+				/** filter sales by user login **/
+				/** check user is mapping customer tt **/
+				if(GeneralDAO.isUserMapCustSalesTT(user)){
+					if( !Utils.isNull(user.getUserName()).equals("")){
+						sql.append("\n and Z.zone in( ");
+						sql.append("\n   select zone from PENSBI.XXPENS_BI_MST_CUST_CAT_MAP_TT ");
+						sql.append("\n   where user_name ='"+(user.getUserName())+"'");
+						sql.append("\n ) ");
+					}
+				}else if( !user.getUserName().equalsIgnoreCase("admin")){
+					//is CreditSales Key
+					sql.append("\n and Z.salesrep_code ='"+user.getUserName().toUpperCase()+"'");
+				}
+				
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and B.branch_id ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and B.branch_name LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				sql.append("\n  ORDER BY B.branch_id asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("branch_id"));
+					item.setDesc(rst.getString("branch_name"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
 }

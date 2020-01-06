@@ -180,7 +180,7 @@ public class SearchValuePopupAction extends I_Action {
 		List<DisplayBean> valueList = null;
 		int pageSize =20;
 		try {
-			String action = Utils.isNull(request.getParameter("action"));
+			 String action = Utils.isNull(request.getParameter("action"));
 			 String currCondType = Utils.isNull(request.getParameter("currCondType"));
 			 String currCondNo = Utils.isNull(request.getParameter("currCondNo"));			 
 			

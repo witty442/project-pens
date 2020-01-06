@@ -10,5 +10,11 @@
 	${Message}
 </logic:present>
 </span>
+<br/>
+<span id="msg2" class="errormsg">
+<logic:present name="Message2" scope="request">
+	${Message2}
+</logic:present>
+</span>
 </center>
 

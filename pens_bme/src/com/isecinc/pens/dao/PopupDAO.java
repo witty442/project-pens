@@ -214,5 +214,73 @@ public class PopupDAO {
 			}
 			return pos;
 		}
-	  
+	 public static List<PopupForm> searchCustomerAutoSubList(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			String storeType = "";
+			try {
+				logger.debug("criteriaMap:"+c.getCriteriaMap());
+				if(c.getCriteriaMap() != null){          
+					storeType = c.getCriteriaMap().get("storeType");
+				}
+				
+				sql.append("SELECT A.* FROM (\n");
+				sql.append("  SELECT M.* , \n");
+				sql.append("  (select max(M1.interface_desc) from pensbi.PENSBME_MST_REFERENCE M1 \n");
+				sql.append("   where M1.reference_code = 'SubInv' and M1.pens_value =M.pens_value) as sub_inv \n");
+				sql.append("  ,substr(M.pens_value,0,6) as cust_group \n");
+				sql.append("  from PENSBI.PENSBME_MST_REFERENCE M \n");
+				sql.append("  where reference_code ='Store' \n");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append(" and M.pens_value ='"+c.getCodeSearch()+"' \n");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append(" and M.pens_desc = '"+c.getDescSearch()+"' \n");
+				}
+				if( !Utils.isNull(storeType).equals("")){
+					sql.append(" and M.pens_value LIKE '"+storeType+"%' \n");
+				}
+				sql.append(") A \n");
+				
+				//Filter storeCode can AutoSub 
+				sql.append(" WHERE A.CUST_GROUP IN(  \n");
+				sql.append("    SELECT pens_value  \n");
+				sql.append("    FROM  PENSBI.PENSBME_MST_REFERENCE  \n");
+				sql.append("    where reference_code = 'Customer'  \n");
+				sql.append("    and  pens_desc6 = 'Auto Sub-transfer' \n");
+				sql.append(" ) \n");
+				
+				sql.append("  ORDER BY A.pens_value asc \n");
+				
+				logger.debug("sql:\n"+sql);
+				
+				conn = DBConnection.getInstance().getConnectionApps();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("pens_value"));
+					item.setDesc(rst.getString("pens_value"));
+					item.setDesc2(rst.getString("interface_value"));//storeNo
+					item.setDesc3(rst.getString("sub_inv"));//autoSub
+					pos.add(item);
+					
+				}//while
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
 }

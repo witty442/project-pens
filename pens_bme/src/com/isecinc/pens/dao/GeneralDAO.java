@@ -293,13 +293,21 @@ public class GeneralDAO {
     	}
 	 }
 	 
+	 
     public static Barcode searchProductByBarcode(PopupForm c,String storeCode) throws Exception {
     	Connection conn = null;
     	try{
     		conn = DBConnection.getInstance().getConnection();
 		    if(storeCode.startsWith(Constants.STORE_TYPE_FRIDAY_CODE)){
 			   return searchProductByBarcodeModelFridayModel(conn,c);
+		    }else if(storeCode.startsWith(Constants.STORE_TYPE_PENSHOP_CODE)){
+		       return searchProductByBarcodeModelMSTRefByPENSHOP(conn,c);
+		    }else if(storeCode.startsWith(Constants.STORE_TYPE_TERMINAL_CODE)){
+		       return searchProductByBarcodeModelMSTRefByTerminal(conn,c);
+		    }else if(storeCode.startsWith(Constants.STORE_TYPE_CHINA_CODE)){
+		       return searchProductByBarcodeModelMSTRefByChina(conn,c);
 		    }
+		    //all customer
 		    return searchProductByBarcodeModelBMELockedModel(conn,c);
     	}catch(Exception e){
     		throw e;
@@ -757,6 +765,163 @@ public class GeneralDAO {
 			return b;
 	}
 	 
+	 public static Barcode searchProductByBarcodeModelMSTRefByPENSHOP(Connection conn,PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Barcode b = null;
+			try {
+				sql.append("\n select interface_desc as BARCODE ");
+				sql.append("\n ,interface_value as MATERIAL_MASTER");
+				sql.append("\n ,pens_desc2 as GROUP_ITEM ");
+				sql.append("\n ,pens_value as PENS_ITEM");
+				sql.append("\n ,(select WHOLE_PRICE_BF from PENSBI.PENSBME_ONHAND_BME_LOCKED B where B.barcode =M.interface_desc) as WHOLE_PRICE_BF");
+				sql.append("\n ,(select RETAIL_PRICE_BF from PENSBI.PENSBME_ONHAND_BME_LOCKED B where B.barcode =M.interface_desc) as RETAIL_PRICE_BF");
+				sql.append("\n from PENSBI.PENSBME_MST_REFERENCE M  ");
+				sql.append("\n where 1=1 ");
+				sql.append("\n and reference_code ='"+Constants.STORE_TYPE_7CATALOG_ITEM+"'");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					   sql.append("\n and M.interface_desc ='"+c.getCodeSearch()+"'");
+				}
+				if( !Utils.isNull(c.getMatCodeSearch()).equals("")){
+					   sql.append("\n and M.interface_value ='"+c.getMatCodeSearch()+"'");
+				}
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				if (rst.next()) {
+					b = new Barcode();
+					
+					if( !Utils.isNull(rst.getString("group_item")).equals("") 
+						&& !Utils.isNull(rst.getString("PENS_ITEM")).equals("") 
+						&& !Utils.isNull(rst.getString("MATERIAL_MASTER")).equals("") ){
+						
+						b.setBarcode(rst.getString("barcode"));
+						b.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
+						b.setGroupCode(rst.getString("group_item"));
+						b.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
+						b.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+						b.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
+					}
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return b;
+	}
+	 
+	 public static Barcode searchProductByBarcodeModelMSTRefByTerminal(Connection conn,PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Barcode b = null;
+			try {
+				sql.append("\n select interface_desc as BARCODE ");
+				sql.append("\n ,interface_value as MATERIAL_MASTER");
+				sql.append("\n ,pens_desc2 as GROUP_ITEM ");
+				sql.append("\n ,pens_value as PENS_ITEM");
+				sql.append("\n ,(select WHOLE_PRICE_BF from PENSBI.PENSBME_ONHAND_BME_LOCKED B where B.barcode =M.interface_desc) as WHOLE_PRICE_BF");
+				sql.append("\n ,(select RETAIL_PRICE_BF from PENSBI.PENSBME_ONHAND_BME_LOCKED B where B.barcode =M.interface_desc) as RETAIL_PRICE_BF");
+				sql.append("\n from PENSBI.PENSBME_MST_REFERENCE M  ");
+				sql.append("\n where 1=1 ");
+				sql.append("\n and M.reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
+				sql.append("\n and M.pens_desc6 in ('MAYA' , 'TM21') ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					   sql.append("\n and M.interface_desc ='"+c.getCodeSearch()+"'");
+				}
+				if( !Utils.isNull(c.getMatCodeSearch()).equals("")){
+					   sql.append("\n and M.interface_value ='"+c.getMatCodeSearch()+"'");
+				}
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				if (rst.next()) {
+					b = new Barcode();
+					
+					if( !Utils.isNull(rst.getString("group_item")).equals("") 
+						&& !Utils.isNull(rst.getString("PENS_ITEM")).equals("") 
+						&& !Utils.isNull(rst.getString("MATERIAL_MASTER")).equals("") ){
+						
+						b.setBarcode(rst.getString("barcode"));
+						b.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
+						b.setGroupCode(rst.getString("group_item"));
+						b.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
+						b.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+						b.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
+					}
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return b;
+	}
+	 public static Barcode searchProductByBarcodeModelMSTRefByChina(Connection conn,PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			Barcode b = null;
+			try {
+				sql.append("\n select interface_desc as BARCODE ");
+				sql.append("\n ,interface_value as MATERIAL_MASTER");
+				sql.append("\n ,pens_desc2 as GROUP_ITEM ");
+				sql.append("\n ,pens_value as PENS_ITEM");
+				sql.append("\n ,(select WHOLE_PRICE_BF from PENSBI.PENSBME_ONHAND_BME_LOCKED B where B.barcode =M.interface_desc) as WHOLE_PRICE_BF");
+				sql.append("\n ,(select RETAIL_PRICE_BF from PENSBI.PENSBME_ONHAND_BME_LOCKED B where B.barcode =M.interface_desc) as RETAIL_PRICE_BF");
+				sql.append("\n from PENSBI.PENSBME_MST_REFERENCE M  ");
+				sql.append("\n where 1=1 ");
+				sql.append("\n and M.reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
+				sql.append("\n and M.pens_desc6 in ('MAYA' , 'TM21','IMCHINA') ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					   sql.append("\n and M.interface_desc ='"+c.getCodeSearch()+"'");
+				}
+				if( !Utils.isNull(c.getMatCodeSearch()).equals("")){
+					   sql.append("\n and M.interface_value ='"+c.getMatCodeSearch()+"'");
+				}
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				
+				if (rst.next()) {
+					b = new Barcode();
+					
+					if( !Utils.isNull(rst.getString("group_item")).equals("") 
+						&& !Utils.isNull(rst.getString("PENS_ITEM")).equals("") 
+						&& !Utils.isNull(rst.getString("MATERIAL_MASTER")).equals("") ){
+						
+						b.setBarcode(rst.getString("barcode"));
+						b.setMaterialMaster(rst.getString("MATERIAL_MASTER"));
+						b.setGroupCode(rst.getString("group_item"));
+						b.setPensItem(Utils.isNull(rst.getString("PENS_ITEM")));
+						b.setWholePriceBF(Utils.decimalFormat(rst.getDouble("WHOLE_PRICE_BF"), Utils.format_current_2_disgit));
+						b.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit));
+					}
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return b;
+	}
+	 
 	 public static Barcode searchProductByPensItemModelBMELocked(Connection conn,String pensItem) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
@@ -831,9 +996,6 @@ public class GeneralDAO {
 			}
 		return b;
 	}
-	 
-	
-	 
 	 public static Barcode searchProductByBarcodeMTT(PopupForm c) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -1132,7 +1294,6 @@ public class GeneralDAO {
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
 			try {
-				sql.delete(0, sql.length());
 				sql.append("\n select pens_value , pens_desc  FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1 ");
 				sql.append("\n and reference_code ='Customer' ");
@@ -1294,7 +1455,6 @@ public class GeneralDAO {
 			StringBuilder sql = new StringBuilder();
 			String storeName ="";
 			try {
-				sql.delete(0, sql.length());
 				sql.append("\n select pens_value , pens_desc  ");
 				sql.append("\n FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Store' ");
@@ -1372,7 +1532,6 @@ public class GeneralDAO {
 			StringBuilder sql = new StringBuilder();
 			String storeName ="";
 			try {
-				sql.delete(0, sql.length());
 				sql.append("\n select interface_value  ");
 				sql.append("\n FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Store' ");
@@ -1403,7 +1562,6 @@ public class GeneralDAO {
 			StringBuilder sql = new StringBuilder();
 			String storeName ="";
 			try {
-				sql.delete(0, sql.length());
 				sql.append("\n select interface_desc  FROM ");
 				sql.append("\n PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'SubInv' ");
 				sql.append("\n AND pens_value ='"+storeCode+"' \n");
@@ -1427,13 +1585,12 @@ public class GeneralDAO {
 			}
 			return storeName;
 		}
-	 public static StoreBean getStoreBeanModel(Connection conn,String storeCode) throws Exception {
+	 public static StoreBean getStoreInfo(Connection conn,String storeCode) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
 			StoreBean s = null;
 			try {
-				sql.delete(0, sql.length());
 				sql.append("\n select *  ");
 				sql.append("\n FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Store' ");
@@ -1472,7 +1629,6 @@ public class GeneralDAO {
 			StringBuilder sql = new StringBuilder();
 			String custNo ="";
 			try {
-				sql.delete(0, sql.length());
 				sql.append("\n select interface_value   ");
 				sql.append("\n FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Store' ");
@@ -1840,5 +1996,44 @@ public class GeneralDAO {
 			return items;
 		}
 	 
-	
+	 public static List<PopupForm> getMasterListByRefCode(PopupForm c,String equals,String refCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.append("\n  SELECT M.* from PENSBME_MST_REFERENCE M");
+				sql.append("\n  where 1=1 and reference_code ='"+refCode+"' ");
+				if("equals".equals(equals)){
+					sql.append("\n  and M.pens_value ='"+c.getCodeSearch()+"'");
+				}
+				sql.append("\n  ORDER BY pens_value asc \n");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no=0;
+				while (rst.next()) {
+					no++;
+					PopupForm item = new PopupForm();
+					item.setNo(no);
+					item.setCode(Utils.isNull(rst.getString("pens_value")));
+					item.setDesc(Utils.isNull(rst.getString("pens_desc")));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
 }

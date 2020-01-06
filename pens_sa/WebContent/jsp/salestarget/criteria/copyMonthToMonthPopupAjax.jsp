@@ -17,7 +17,7 @@ String toPeriod = Utils.isNull(request.getParameter("toPeriod"));
 String toStartDate = Utils.isNull(request.getParameter("toStartDate"));
 String returnStr = "";
 try{
-	returnStr = SalesTargetCopyNMonth.copy(fromPeriod, fromStartDate, toPeriod, toStartDate);
+	returnStr = SalesTargetCopyNMonth.copy(request,fromPeriod, fromStartDate, toPeriod, toStartDate);
 }catch(Exception e){
 	e.printStackTrace();
 }

@@ -66,7 +66,7 @@ public class PreOrderNissinProcess  {
 				aForm.setResultsSearch(null);
 				//prepare bean
 				StockOnhandBean bean = new StockOnhandBean();
-				//bean.setTransDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+			    bean.setTransDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				aForm.setBean(bean);
 			
 			}else if("back".equals(action)){
@@ -390,6 +390,7 @@ public class PreOrderNissinProcess  {
 			transDate = DateUtil.stringValue(DateUtil.parse(o.getTransDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th),DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			sql.append("\n select * from PENSBI.NISSIN_PRE_ORDER M where trans_date = to_date('"+transDate+"','dd/mm/yyyy') ");
+			sql.append("\n and r_type ='"+o.getReportType()+"'");
 			sql.append("\n ORDER BY M.INVENTORY_ITEM_CODE asc");
 			
 			logger.debug("sql:"+sql);
@@ -429,9 +430,15 @@ public class PreOrderNissinProcess  {
 				//input:2019/10/05
 				transDate = DateUtil.stringValue(DateUtil.parse(o.getTransDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th),DateUtil.YYYY_MM_DD_WITH_SLASH);
 				
-                sql = new StringBuilder("");
-				sql.append("\n select * from table(apps.xxpens_po_reports_xml_pkg.po_preorder('"+transDate+"')) M");
-				sql.append("\n ORDER BY M.segment1 asc");
+				if("N".equalsIgnoreCase(o.getReportType())){
+	                sql = new StringBuilder("");
+					sql.append("\n select * from table(apps.xxpens_po_reports_xml_pkg.po_preorder('"+transDate+"')) M");
+					sql.append("\n ORDER BY M.segment1 asc");
+				}else{
+					sql = new StringBuilder("");
+					sql.append("\n select * from table(apps.xxpens_po_reports_xml_pkg.po_preorder_sp('"+transDate+"')) M");
+					sql.append("\n ORDER BY M.segment1 asc");
+				}
 				logger.debug("sql:"+sql);
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());

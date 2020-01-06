@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.dao.SAEmpDAO"%>
 <%@page import="com.isecinc.pens.bean.SADamageBean"%>
 <%@page import="com.isecinc.pens.bean.SAEmpBean"%>
@@ -34,7 +35,7 @@ SADamageBean bean = saDamageForm.getBean();
 List<PopupForm> payTypeList = new ArrayList();
 PopupForm ref2 = new PopupForm("",""); 
 payTypeList.add(ref2);
-payTypeList.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","SApaytype"));
+payTypeList.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","SApaytype"));
 //session.setAttribute("payTypeList",billTypeList2);
 
 %>

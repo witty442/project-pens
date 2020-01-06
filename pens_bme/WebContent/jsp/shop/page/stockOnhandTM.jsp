@@ -81,17 +81,15 @@ function setDataPopupValue(code,desc,pageName,fieldName){
 } 
 function search(path){
 	var form = document.shopForm;
-   var startDate = form.startDate;
-   var endDate = form.endDate;
-   
-   if(startDate.value =="" && endDate.value =="" ){
-	   startDate.focus();
-	   alert("กรุณากรอกข้อมูลในการค้นหาอย่างน้อยหนึ่งรายการ");
-	   return false;
-   }
-   form.action = path + "/jsp/shopAction.do?do=search&pageName=<%=request.getParameter("pageName")%>";
-   form.submit();
-   return true;
+	var asOfDate = form.asOfDate; 
+	if(asOfDate.value ==""){
+		 asOfDate.focus();
+		 alert("กรุณากรอก วันที่ขาย (As Of Date)");
+		 return false;
+	}
+	form.action = path + "/jsp/shopAction.do?do=search&pageName=<%=request.getParameter("pageName")%>";
+	form.submit();
+	return true;
 }
 
 function exportExcel(path){
@@ -293,8 +291,5 @@ function clearForm(path){
     	<td colspan="3"><jsp:include page="../../footer.jsp"/></td>
   	</tr>
 </table>
-<script>
-   loadCalendar();
-</script>
 </body>
 </html>

@@ -117,7 +117,7 @@ public class SalesTargetAction extends I_Action {
 					
 				}else if (SalesTargetConstants.PAGE_MTADMIN.equalsIgnoreCase(pageName)){
 					sales = new SalesTargetBean();
-					SalesTargetTTControlPage.prepareSearchMTADMIN(request, conn, user,pageName);
+					SalesTargetControlPage.prepareSearchMTADMIN(request, conn, user,pageName);
 					
 				}else if (SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){
 					sales = new SalesTargetBean();
@@ -378,7 +378,6 @@ public class SalesTargetAction extends I_Action {
 				
 				request.setAttribute("save_by_ttsuper", "save_by_ttsuper");
 				return new SalesTargetTTAction().saveTTSUPER(aForm, request, response);
-			
 			}
 		} catch (Exception e) {
             //e.printStackTrace();

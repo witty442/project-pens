@@ -121,7 +121,7 @@ public class ExceptionHandle {
 				//System.out.println("Insert Error Msg");
 				if( !Utils.isNull(errorMsg).equals("")){
 				   stInsert = conn.createStatement();
-				   int errorId = SequenceProcessAll.getNextValue(conn, "m_error_mapping");
+				   int errorId = SequenceProcessAll.getIns().getNextValue(conn, "m_error_mapping");
 				   stInsert.execute(" INSERT INTO monitor_error_mapping(error_id,error_code,error_msg)values("+errorId+",'"+errorCode+"','"+errorMsg+"')");
 				}
 			}

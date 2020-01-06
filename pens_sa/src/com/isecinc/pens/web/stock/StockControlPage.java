@@ -199,6 +199,7 @@ public class StockControlPage {
 			logger.error(e.getMessage(),e);
 		}
 	}
+	
 	public static void prepareSearchStockCloseVanReport(HttpServletRequest request,Connection conn,User user,String pageName){
 
 		try{

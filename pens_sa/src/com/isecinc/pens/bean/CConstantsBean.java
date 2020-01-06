@@ -11,9 +11,18 @@ public class CConstantsBean implements Serializable{
 	private String refCode;
 	private String refDesc;
 	private String code;
+	private String codeDesc;
 	private String value;
 	private String value2;
 	private String isactive;
+	
+	
+	public String getCodeDesc() {
+		return codeDesc;
+	}
+	public void setCodeDesc(String codeDesc) {
+		this.codeDesc = codeDesc;
+	}
 	public String getRefCode() {
 		return refCode;
 	}

@@ -23,6 +23,7 @@ import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
@@ -53,10 +54,10 @@ public class AutoCNAction extends I_Action {
 				ad.setCustGroup(PickConstants.STORE_TYPE_LOTUS_CODE);
 				aForm.setBean(ad);
 				
-				List<Master> custGroupList = new ArrayList<Master>();
-				Master refP = new Master(); 
+				List<PopupForm> custGroupList = new ArrayList<PopupForm>();
+				PopupForm refP = new PopupForm(); 
 				custGroupList.add(refP);
-				custGroupList.addAll(GeneralDAO.getCustGroupList(PickConstants.STORE_TYPE_LOTUS_CODE));
+				custGroupList.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","Store_AutoCN"));
 				request.getSession().setAttribute("custGroupList",custGroupList);
 				
 			}

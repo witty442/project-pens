@@ -85,7 +85,9 @@ function openPopup(path,pageName,multipleCheck){
 	var param = "&pageName="+pageName;
 	if("StoreCodeBME" == pageName){
         param +="&groupStore="+form.custGroup.value;
-        param +="&multipleCheck="+multipleCheck;
+        param +="&multipleCheck=false";
+        param +="&hideAll=true";
+        param +="&notIn=020999-2,020999-1,020999-13,020999-99";
 	}
 	url = path + "/jsp/popupSearchAction.do?do=prepare&action=new"+param;
 	PopupCenterFullHeight(url,"",600);

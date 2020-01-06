@@ -54,19 +54,20 @@ function genAutoOrder(path){
 	return true;
 }
 
-function gotoStockOnhand(path){
+function gotoStockOnhandPage(path){
 	var url="";
 	var form = document.autoOrderForm;
 	var storeCode = form.storeCode.value;
+	var param = "&storeCode="+storeCode+"&orderDate="+form.orderDate.value;
 	if(storeCode ==""){
 		alert('กรุณาระบุ รหัสร้านค้า');
 		storeCode.focus();
 		return false;
 	}
 	if(storeCode.indexOf('020047') != -1){
-       url = path+'/jsp/summaryAction.do?do=prepare&action=new&page=reportEndDateLotus';
+       url = path+'/jsp/reportsAction.do?do=prepare&action=new&pageName=reportEndDateLotus'+param;
 	}else if(storeCode.indexOf('020049') != -1){
-       url = path+'/jsp/summaryAction.do?do=prepare&action=new&page=sizeColorBigC';
+       url = path+'/jsp/reportsAction.do?do=prepare&action=new&pageName=sizeColorBigC'+param;
 	}
 	//alert(url);
 	//window.location = encodeURI(url);
@@ -221,7 +222,7 @@ function getCustName(custCode,fieldName){
 									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 									  <input type="button" value="   Clear   " class="newPosBtnLong">
 									</a>		
-							        <a href="#" onclick="javascript:gotoStockOnhand('${pageContext.request.contextPath}');">
+							        <a href="#" onclick="javascript:gotoStockOnhandPage('${pageContext.request.contextPath}');">
 						                <input type="button" value="ไปหน้าจอ Gen Stock Onhand" class="newPosBtnLong"/>
 						             </a>
 								</td>

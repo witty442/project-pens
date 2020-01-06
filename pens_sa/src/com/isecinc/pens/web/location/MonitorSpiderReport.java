@@ -362,7 +362,7 @@ public class MonitorSpiderReport {
 					 sql.append("\n and nvl(cs.trip3,0) = "+startTrip);
 				}//if
 				sql.append("\n UNION ");
-				//Case No set Trip
+				//Case No set Trip (??)What 
 				sql.append("\n  select distinct cs.code,s.salesrep_name,cs.primary_salesrep_id ,'"+startTrip+"' as trip_day  ");
 				sql.append("\n ,(case when length('"+startTrip+"')=1 then '0'||'"+startTrip+"' else '"+startTrip+"' end) as tripday_str ");
 				sql.append("\n  from apps.xxpens_ar_cust_sales_vs cs ,   ");

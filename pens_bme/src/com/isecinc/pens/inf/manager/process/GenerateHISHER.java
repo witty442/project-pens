@@ -113,6 +113,31 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n 		and H.delivery_date = ?  ");
 			sql.append("\n 		and  ( (H.exported <> 'Y' and H.exported <> 'G') or H.exported is null)	 ");
 			sql.append("\n 		group by I.barcode, I.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
+			
+			/** Pick Stock edit :14/11/2019 **/
+			sql.append("\n 		UNION ALL ");
+			
+			sql.append("\n 		SELECT " );
+			sql.append("\n      ( select M.interface_desc from PENSBME_MST_REFERENCE M");
+			sql.append("\n        WHERE  I.pens_item = M.pens_value ");
+			sql.append("\n        AND  I.material_master = M.interface_value ");
+			sql.append("\n        AND M.reference_code = 'LotusItem')  as barcode ");
+			sql.append("\n 		, I.group_code,I.material_master as product_code" );
+			sql.append("\n      , count(*) as qty ");
+			sql.append("\n 		, NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n 		from PENSBME_PICK_STOCK H ,PENSBME_PICK_STOCK_I I  ");
+			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
+			sql.append("\n 		ON P.group_code = I.group_code ");
+			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n   		AND P.product ='"+productType+"'");
+			sql.append("\n 		WHERE 1=1 ");
+			sql.append("\n 		and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
+			sql.append("\n 		and H.ISSUE_REQ_STATUS = '"+PickConstants.STATUS_ISSUED+"'");
+			sql.append("\n 		and H.cust_group = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n 		and H.delivery_date = ?  ");
+			sql.append("\n 		and  ( (H.exported <> 'Y' and H.exported <> 'G') or H.exported is null)	 ");
+			sql.append("\n 		group by I.pens_item,I.material_master, I.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
+			
 			sql.append("\n )A ");
 			sql.append("\n group by A.barcode, A.group_code, A.product_code,A.WHOLE_PRICE_BF,A.RETAIL_PRICE_BF ");
 			sql.append("\n order by A.group_code ,A.product_code ");
@@ -123,7 +148,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			
 			ps.setDate(1, new java.sql.Date(date.getTime()));
 			ps.setDate(2, new java.sql.Date(date.getTime()));
-			
+			ps.setDate(3, new java.sql.Date(date.getTime()));
 			rs = ps.executeQuery();
 			while(rs.next()){
 				foundData = true;
@@ -184,13 +209,17 @@ public class GenerateHISHER extends InterfaceUtils{
 			    FileUtil.writeFile(ddServerPath, outputFile, "TIS-620");
 				
 			     //Update Exported ='Y' in BME_ORDER
-			     logger.debug("Update Exported ='Y' in BME_ORDER");
+			     logger.debug("**Update Exported ='Y' in BME_ORDER**");
 			     int updateCount = updateOrderExportFlag(conn, user.getUserName(), date, batchParamMap.get(PARAM_CUST_GROUP));
-			     logger.debug("updateCount:"+updateCount);
+			     logger.debug("-updateCount:"+updateCount);
 			     
-			     logger.debug("Update Exported ='Y' in STOCK_ISSUE");
+			     logger.debug("**Update Exported ='Y' in STOCK_ISSUE**");
 			     updateCount = updateStockIssueExportFlag(conn, user.getUserName(), date, batchParamMap.get(PARAM_CUST_GROUP));
-			     logger.debug("updateCount:"+updateCount);
+			     logger.debug("-updateCount:"+updateCount);
+			     
+			     logger.debug("**Update Exported ='Y' in PICK_STOCK**");
+			     updateCount = updatePickStockExportFlag(conn, user.getUserName(), date, batchParamMap.get(PARAM_CUST_GROUP));
+			     logger.debug("-updateCount:"+updateCount);
 			     
 			}else if(!foundData){
 				
@@ -277,7 +306,32 @@ public class GenerateHISHER extends InterfaceUtils{
 			}
 		}
 	}
-	
+	//W3
+	private static int  updatePickStockExportFlag(Connection conn,String userName,Date orderDate,String storeType) throws Exception {
+		PreparedStatement ps = null;
+		StringBuffer sql = new StringBuffer("");
+		int updateCount = 0;
+		try{
+			sql.append("\n UPDATE PENSBME_PICK_STOCK O  ");
+			sql.append("\n SET EXPORTED ='Y' ,update_user ='"+userName+"' ,update_date = sysdate");
+			sql.append("\n where O.cust_group = '"+storeType+"'");
+			sql.append("\n and O.delivery_date = ?  ");
+			sql.append("\n and (O.exported = 'N' or O.exported is null)	 ");
+			
+			ps = conn.prepareStatement(sql.toString());
+			ps.setDate(1, new java.sql.Date(orderDate.getTime()));
+			
+			updateCount = ps.executeUpdate();
+			
+			return updateCount;
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			if(ps != null){
+				ps.close();ps = null;
+			}
+		}
+	}
 	private static void insertMonitorItemResult(Connection conn,BigDecimal monitorItemId,String status,String msg) throws Exception {
 		PreparedStatement ps = null;
 		try {
@@ -357,7 +411,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			        sizeCode =productCode.substring(6,7)+" ";
 			        colorCode =productCode.substring(7,9);  
 			     }
-				logger.debug("productCode["+productCode+"]sizeCode["+sizeCode+"]colorCode["+colorCode+"]");
+				//logger.debug("productCode["+productCode+"]sizeCode["+sizeCode+"]colorCode["+colorCode+"]");
 			/**9 */line += appendRightByLength(sizeCode," ",4);//SIZE_CODE	ขนาดของสินค้า	CHAR(4)
 			       line += debug(no,appendRightByLength(sizeCode," ",4));no++;
 			       
@@ -384,12 +438,18 @@ public class GenerateHISHER extends InterfaceUtils{
 			/**16 */line += appendRightByLength(Utils.isNull(configMap.get("STOCK_METHOD"))," ",1);//STOCK_METHOD	วิธีการเก็บ Stock ของสินค้า	CHAR(1)
 			       line += debug(no,appendRightByLength(Utils.isNull(configMap.get("STOCK_METHOD"))," ",1));no++;
 			       
+			       //debug
+			       //logger.debug("qty:"+qty);
 			/**17 */line += appendNumLeft(String.valueOf(qty),"0",12)+appendDecRightByLength("0","0",4);//TOTAL_QTY	จำนวนสินค้าที่ Online มา ต่อหน่วย ข้อ 12.	CHAR(16)
 			        line += debug(no,appendNumLeft(String.valueOf(qty),"0",12)+appendDecRightByLength("0","0",4));no++;
-			        
+			       
 			        wholePriceBF1 = String.valueOf(wholePriceBF).substring(0,String.valueOf(wholePriceBF).indexOf("."));
 			        wholePriceBF2 = String.valueOf(wholePriceBF).substring(String.valueOf(wholePriceBF).indexOf(".")+1,String.valueOf(wholePriceBF).length());
 			       
+			        //debug
+			        //logger.debug("wholePriceBF["+wholePriceBF+"]wholePriceBF1["+wholePriceBF1+"]wholePriceBF2["+wholePriceBF2+"]");
+			       // logger.debug("appendDecRightByLength(wholePriceBF2,0,2):"+appendDecRightByLength(wholePriceBF2,"0",2));
+			        
 			/**18 */line += appendNumLeft(wholePriceBF1,"0",9)+appendDecRightByLength(wholePriceBF2,"0",2);//TW_PRICE	ราคาที่โรงงานขายให้ Icc.  ต่อหน่วย ข้อ 11.	CHAR(11)
 			        line += debug(no,appendNumLeft(wholePriceBF1,"0",9)+appendDecRightByLength(wholePriceBF2,"0",2));no++;
 			        

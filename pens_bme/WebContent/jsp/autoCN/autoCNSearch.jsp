@@ -186,7 +186,7 @@ function getCustName(path,storeCode,fieldName,storeType){
 	    	<!-- PROGRAM HEADER -->
 	    
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="AutoCNLotus"/>
+				<jsp:param name="function" value="AutoCN"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -209,7 +209,7 @@ function getCustName(path,storeCode,fieldName,storeType){
                                     <td align="right">  กลุ่มร้านค้า	</td>
 									<td>	
 									    <html:select property="bean.custGroup" styleId="custGroup">
-											<html:options collection="custGroupList" property="pensValue" labelProperty="pensDesc"/>
+											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
 									    </html:select>	
 									</td>
 									<td>		

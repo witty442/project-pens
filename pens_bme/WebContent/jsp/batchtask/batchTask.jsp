@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@page import="com.isecinc.pens.web.batchtask.BatchTaskListBean"%>
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<%@page import="com.isecinc.pens.web.batchtask.task.BatchTaskListBean"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Map"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskInfo"%>

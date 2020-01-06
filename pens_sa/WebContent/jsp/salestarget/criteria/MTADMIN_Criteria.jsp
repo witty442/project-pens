@@ -27,7 +27,7 @@ function loadMe(){
 	<%if( !"".equals(Utils.isNull(bean.getSalesChannelNo())) ) { %>
          document.getElementsByName('bean.salesChannelNo')[0].value = "<%=bean.getSalesChannelNo()%>";
          loadCustCatNoList();
-	      document.getElementsByName('bean.custCatNo')[0].value = '<%=bean.getCustCatNo()%>';
+	     document.getElementsByName('bean.custCatNo')[0].value = '<%=bean.getCustCatNo()%>';
 	<% } %>
 }
 

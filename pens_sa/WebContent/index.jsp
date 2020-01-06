@@ -23,6 +23,7 @@ body {
 -->
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript">
 

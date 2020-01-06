@@ -134,7 +134,9 @@ function linePrice(rowNo,price1,price2){
 		if(parseFloat(qty2) > parseFloat(pacQty2)){
 			//alert("qty2:"+qty2+",pacQty2:"+pacQty2);
 			alert("บันทึกจำนวนเศษไม่ถูกต้อง กรุณาตรวจสอบและบันทึกใหม่ ");
+			document.getElementsByName("qty2")[rowNo].value ='';
 			document.getElementsByName("qty2")[rowNo].focus();
+			
 			return false;
 		}
 	}

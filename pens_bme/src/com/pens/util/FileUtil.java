@@ -558,7 +558,7 @@ public class FileUtil {
 	    }
 	 
 
-		/** Get Root Temp fro write file temp */
+		/** Get Root Temp for write file temp */
 		/** UAT:d://dev_temp/ **/
 		/** PROD:/PENS/ERP/apps/inst/saleonline/dev_temp/  **/
 		

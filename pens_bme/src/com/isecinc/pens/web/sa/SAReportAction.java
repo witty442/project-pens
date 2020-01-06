@@ -20,6 +20,7 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.SAEmpBean;
 import com.isecinc.pens.bean.SAReportBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.SAEmpDAO;
 import com.isecinc.pens.dao.SAReportDAO;
 import com.isecinc.pens.init.InitialMessages;
@@ -60,13 +61,13 @@ public class SAReportAction extends I_Action {
 					List<PopupForm> billTypeList2 = new ArrayList<PopupForm>();
 					PopupForm ref2 = new PopupForm("",""); 
 					billTypeList2.add(ref2);
-					billTypeList2.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Region"));
+					billTypeList2.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","Region"));
 					request.getSession().setAttribute("empRegionList",billTypeList2);
 			
 					List<PopupForm> billTypeList3 = new ArrayList<PopupForm>();
 					PopupForm ref3 = new PopupForm("",""); 
 					billTypeList3.add(ref3);
-					billTypeList3.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
+					billTypeList3.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
 					request.getSession().setAttribute("groupStoreList",billTypeList3);
 				
 					SAReportBean ad = new SAReportBean();
@@ -132,13 +133,13 @@ public class SAReportAction extends I_Action {
 					List<PopupForm> billTypeList1 = new ArrayList();
 					PopupForm ref1 = new PopupForm("",""); 
 					billTypeList1.add(ref1);
-					billTypeList1.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","EMPtype"));
+					billTypeList1.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","EMPtype"));
 					request.getSession().setAttribute("empTypeList",billTypeList1);
 					
 					List<PopupForm> billTypeList3 = new ArrayList<PopupForm>();
 					PopupForm ref3 = new PopupForm("",""); 
 					billTypeList3.add(ref3);
-					billTypeList3.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
+					billTypeList3.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
 					request.getSession().setAttribute("groupStoreList",billTypeList3);
 					
 					aForm.setBean(new SAReportBean());
@@ -151,7 +152,7 @@ public class SAReportAction extends I_Action {
 					List<PopupForm> billTypeList3 = new ArrayList<PopupForm>();
 					PopupForm ref3 = new PopupForm("",""); 
 					billTypeList3.add(ref3);
-					billTypeList3.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
+					billTypeList3.addAll(GeneralDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
 					request.getSession().setAttribute("groupStoreList",billTypeList3);
 					
 					List<PopupForm> billTypeList1 = new ArrayList();

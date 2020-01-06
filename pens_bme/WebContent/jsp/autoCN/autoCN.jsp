@@ -11,7 +11,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="autoCNForm" class="com.isecinc.pens.web.autocn.AutoCNForm" scope="session" /> 
 
@@ -286,7 +285,7 @@ function sumTotal(){
 	    	<!-- PROGRAM HEADER -->
 	    
 	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="AutoCNLotus"/>
+				<jsp:param name="function" value="AutoCN"/>
 			</jsp:include>
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
@@ -309,7 +308,7 @@ function sumTotal(){
                                     <td align="right">  กลุ่มร้านค้า	</td>
 									<td>	
 									    <html:select property="bean.custGroup" styleId="custGroup" disabled="true" styleClass="disableText">
-											<html:options collection="custGroupList" property="pensValue" labelProperty="pensDesc"/>
+											<html:options collection="custGroupList" property="code" labelProperty="desc"/>
 									    </html:select>	
 									</td>
 									<td>		

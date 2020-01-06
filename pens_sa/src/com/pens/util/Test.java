@@ -1,13 +1,17 @@
 package com.pens.util;
 
-import antlr.StringUtils;
 
 public class Test {
+
+	public static void main(String[] args) {
+		 String ddmmyyyy ="10/12/2562";
+         System.out.println("result:"+ddmmyyyy.replaceAll("\\/", ""));
+	}
 
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main_1(String[] args) {
 		// TODO Auto-generated method stub
 		 //convert yyyy thai to end date
 		String mmyyyy ="20190601";

@@ -314,7 +314,7 @@
 			        </li> 
 		          </ul>
 	         </li>
-	         <%--  <li><a class="parent"><span><%no++;out.print(no);%>.I'm CHINA</span></a>
+	           <li><a class="parent"><span><%no++;out.print(no);%>.I'm CHINA</span></a>
 				  <%subNo=0; %>
 				  <ul>
 				    <li>
@@ -326,7 +326,7 @@
 			           <span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message key="CHINAStockOnhand" bundle="sysprop"/></span></a>
 			        </li> 
 		          </ul>
-	         </li> --%>
+	         </li> 
 	         <li>
 	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_PROM%>');"><span><%no++;out.print(no);%>.<bean:message key="ShopPromotion" bundle="sysprop"/></span></a>
 	        </li> 
@@ -366,7 +366,7 @@
 						</li>
 						<!-- NEW -->
 						<%-- <li>
-							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reportsAction.do?do=prepare&action=new&pageName=reportEndDateLotus');">
+							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reportAllAction.do?do=prepare&action=new&pageName=reportEndDateLotus');">
 							<span><%out.print(no);%>.<%subNo++;out.print(subNo);%> 
 							<bean:message bundle="sysprop" key="reportEndDateLotus"/>(NEW)</span>
 							</a>
@@ -528,10 +528,10 @@
 	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>');">
 	          <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_ORDER_FROM_EXCEL%>" bundle="sysprop"/></span></a>
 	        </li>
-	       <%--   <li>
+	        <%--  <li>
 	          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoOrderAction.do?do=prepareSearch&action=new');">
 	          <span><%no++;out.print(no);%>.<bean:message key="AutoOrder" bundle="sysprop"/></span></a>
-	        </li>  --%>
+	        </li>   --%>
 		</ul>
 	</li>
 <%} %>
@@ -601,7 +601,7 @@
 	        <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
 		       <li>
 		          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoCNAction.do?do=prepare2&action=new');">
-		          <span><%no++;out.print(no);%>.<bean:message key="AutoCNLotus" bundle="sysprop"/>
+		          <span><%no++;out.print(no);%>.<bean:message key="AutoCN" bundle="sysprop"/>
 		          </span></a>
 		        </li>
 		    <%} %>
@@ -626,12 +626,26 @@
 	                </a>
 	             </li> 
 		    <%} %>
+		     <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN,User.SALE}) ){%>
+	             <li>
+		          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoSubB2BAction.do?do=prepare2&action=new');">
+		          <span><%no++;out.print(no);%>.<bean:message key="AutoSubB2B" bundle="sysprop"/>
+		          </span></a>
+		        </li> 
+		    <%} %>
 		    <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){ %>
 	           <%--   <li>
 		           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/manualStockAction.do?do=prepareSearch&action=new');">
 		           <span><%no++;out.print(no);%>.<bean:message key="ManualStock" bundle="sysprop"/>
 		           </span></a>
 		        </li>  --%>
+		    <%} %>
+		     <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN,User.SALE}) ){%>
+	             <li>
+		          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoCNHHTempAction.do?do=prepare2&action=new');">
+		          <span><%no++;out.print(no);%>.<bean:message key="AutoCNHHTemp" bundle="sysprop"/>
+		          </span></a>
+		        </li> 
 		    <%} %>
 		</ul>
 	</li>
@@ -995,6 +1009,12 @@
 	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_ITEM_GP_ROBIN_FROM_EXCEL%>');">
 	           <span><%no++;out.print(no);%>.<bean:message key="<%=BatchTaskConstants.IMPORT_ITEM_GP_ROBIN_FROM_EXCEL%>" bundle="sysprop"/></span></a>
 	        </li>
+	      <%} %>
+	      <%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
+	        <%--   <li>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/importAllAction.do?do=prepare&action=new&pageName=ImportMasterOrderREP');">
+	           <span><%no++;out.print(no);%>.<bean:message key="ImportMasterOrderREP" bundle="sysprop"/></span></a>
+	        </li>  --%>
 	      <%} %>
 		</ul>
 	</li> 

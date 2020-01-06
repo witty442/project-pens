@@ -81,12 +81,11 @@ function setDataPopupValue(code,desc,pageName,fieldName){
 } 
 function search(path){
 	var form = document.shopForm;
-   var startDate = form.startDate;
-   var endDate = form.endDate;
+   var startDate = form.asOfDate;
    
-   if(startDate.value =="" && endDate.value =="" ){
-	   startDate.focus();
-	   alert("กรุณากรอกข้อมูลในการค้นหาอย่างน้อยหนึ่งรายการ");
+   if(asOfDate.value =="" ){
+	   asOfDate.focus();
+	   alert("กรุณากรอกข้อมูล วันที่ขาย (As Of Date)");
 	   return false;
    }
    form.action = path + "/jsp/shopAction.do?do=search&pageName=<%=request.getParameter("pageName")%>";

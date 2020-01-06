@@ -508,7 +508,7 @@ public class StockMCDAO {
 			  
 			//logger.debug("SQL:"+sql);
 			//Gen ID running
-			model.setId(SequenceProcessAll.getNextValue("MC_COUNTSTK_HEADER"));
+			model.setId(SequenceProcessAll.getIns().getNextValue("MC_COUNTSTK_HEADER"));
 
 			ps = conn.prepareStatement(sql.toString());
 			

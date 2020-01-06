@@ -57,15 +57,46 @@ public class ProductBarcodeDAO {
 			    	   productCatalog.setPrice1(calePriceIncludeVat(itemProd.getPrice1()));
 			    	}
 			    	
+			    	logger.debug("productCode["+productCatalog.getProductCode()+"]price1["+productCatalog.getPrice1()+"]price2["+productCatalog.getPrice2()+"]");
+			    	logger.debug("uom1["+productCatalog.getUom1()+"]uom2["+productCatalog.getUom2()+"]");
+			    	
 			    	/** Case witty:03/09/2562 :Case Product Premium default inputQty = uom2 allway */
 			    	if(productCatalog.getPrice1() == 0){//Product premium price==0     
-			    		productCatalog.setPrice2(0);
+			    		//OLD CODE
+			    		/*productCatalog.setPrice2(0);
 				    	productCatalog.setTaxable(itemProd.getTaxable());
 				    	productCatalog.setQty1(0);
 				    	productCatalog.setQty2(Integer.parseInt(inputQty));//get from screen input
 				    	//calc from qty1*price1
 				    	Double lineAmt = itemProd.getQty2()*itemProd.getPrice1();
-				    	productCatalog.setLineNetAmt(lineAmt);
+				    	productCatalog.setLineNetAmt(lineAmt);*/
+				    	
+				    	//edit 16/12/2562
+				    	if( !Utils.isNull(productCatalog.getUom1()).equals("")
+				    		&& !Utils.isNull(productCatalog.getUom2()).equals("") ){
+				    		logger.debug("Case1: CTN/BAG");
+				    		//Case CTN/BAG
+				    		productCatalog.setPrice2(0);
+					    	productCatalog.setTaxable(itemProd.getTaxable());
+					    	productCatalog.setQty1(0);
+					    	productCatalog.setQty2(Integer.parseInt(inputQty));//get from screen input
+					    	//calc from qty1*price1
+					    	Double lineAmt = itemProd.getQty2()*itemProd.getPrice1();
+					    	productCatalog.setLineNetAmt(lineAmt);
+					    	
+				    	}else{
+				    		//case EA/
+				    		logger.debug("Case2: EA/");
+				    		productCatalog.setPrice2(0);
+					    	productCatalog.setTaxable(itemProd.getTaxable());
+					    	productCatalog.setQty1(Integer.parseInt(inputQty));
+					    	productCatalog.setQty2(0);//get from screen input
+					    	//calc from qty1*price1
+					    	Double lineAmt = itemProd.getQty1()*itemProd.getPrice1();
+					    	productCatalog.setLineNetAmt(lineAmt);
+				    	}
+				    	
+			    	
 			    	}else{
 				    	productCatalog.setPrice2(0);
 				    	productCatalog.setTaxable(itemProd.getTaxable());
@@ -129,7 +160,7 @@ public class ProductBarcodeDAO {
 			}
 			return p;
 		}
-	 
+	
 		public static ProductCatalog getProductCatalogByProductCode(Connection conn,String productCode,String pricelistId ,User u) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
@@ -188,8 +219,6 @@ public class ProductBarcodeDAO {
 			}
 			return catalog;
 		}
-		
-		
 		
 		private static double calePriceIncludeVat(double price1) throws Exception{
 			try{

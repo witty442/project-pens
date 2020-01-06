@@ -247,6 +247,7 @@ function calPrice(){
 		if(parseFloat(qty2) > parseFloat(pacQty2)){
 			//alert("qty2:"+qty2+",pacQty2:"+pacQty2);
 			alert("บันทึกจำนวนเศษไม่ถูกต้อง กรุณาตรวจสอบและบันทึกใหม่ ");
+			$('#qty2').val('');
 			$('#qty2').focus();
 			return false;
 		}

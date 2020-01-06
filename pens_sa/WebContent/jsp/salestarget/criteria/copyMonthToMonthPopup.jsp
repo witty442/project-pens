@@ -202,10 +202,10 @@ function setPeriodDate(periodDesc,type){
 		String msg = "Copy Success From Month["+fromPeriod+"] To Month["+toPeriod+"]";
 		String returnStr = "";
 		try{
-			returnStr = SalesTargetCopyNMonth.copy(fromPeriod, fromStartDate, toPeriod, toStartDate);
+			returnStr = SalesTargetCopyNMonth.copy(request,fromPeriod, fromStartDate, toPeriod, toStartDate);
 			
       	  if("DATA_CUR_EXIST_EXCEPTION" ==returnStr){
-      		  msg = "ข้อมูลเดือน "+toPeriod +" มีการ key ข้อมูลบางส่วนไปแล้ว";
+      		  msg = "ข้อมูลเดือน "+toPeriod +" มีการ key ข้อมูลบางส่วนไปแล้ว"; 
       	  }else if("DATA_CUR_EXIST_EXCEPTION" ==returnStr){
       		  msg = "ไม่พบข้อมูลเดือน "+fromPeriod +"";
       	  }

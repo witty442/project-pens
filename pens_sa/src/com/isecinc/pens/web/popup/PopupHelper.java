@@ -58,6 +58,14 @@ public class PopupHelper {
 		 	headName = "พนักงานขาย(Credit Sales)";
 		 	codeSearchTxtName = "Salesrep Code";
 		 	descSearchTxtName = "Salesrep Name";
+	    }else  if("CustomerProjectC".equalsIgnoreCase(pageName)){
+		 	headName = "ร้านค้า (Credit Sales-Project C)";
+		 	codeSearchTxtName = "Customer Code";
+		 	descSearchTxtName = "Customer Name";
+	    }else  if("BranchProjectC".equalsIgnoreCase(pageName)){
+		 	headName = "สาขาร้านค้า (Credit Sales-Project C)";
+		 	codeSearchTxtName = "Branch Id";
+		 	descSearchTxtName = "Branch Name";
 	    }
 	    headTextArr[0] = headName;
 	    headTextArr[1] = codeSearchTxtName;

@@ -147,15 +147,20 @@ function importExcel(path,noCheckError){
 	    
 	
 	<%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
-		if(form.dataFile.value == '' || extension != "txt"){
-			alert("กรุณาเลือกไฟล์นามสกุล .txt");
-			return true;
+		//1 onhand wacoal
+	    if(form.dataFile.value == '' || extension != "txt"){
+	    	//new code
+	    	 if(form.dataFile2.value == '' ){
+			  alert("กรุณาเลือกไฟล์นามสกุล .txt");
+			  return true;
+	    	} 
 		}else{
 			if( startFileName !='lotus'){
 				alert("ชื่อไฟล์ที่จะ Import ต้องขึ้นต้นด้วย LOTUS เท่านั้น");
 				return false;
 			}
 		}
+		
 	<%}else if("onhandFriday".equalsIgnoreCase(request.getParameter("page"))) {%>
 		if(form.dataFile.value == '' || extension != "txt"){
 			alert("กรุณาเลือกไฟล์นามสกุล .txt");
@@ -259,6 +264,9 @@ function importExcel(path,noCheckError){
 		}
      
      <% } %>
+     
+    /**  Control Save Lock Screen **/
+	startControlSaveLockScreen();
      
 	form.action = path + "/jsp/importAction.do?do=importExcel&page=<%=request.getParameter("page")%>&NO_CHECK_ERROR="+noCheckError;
 	form.submit();
@@ -475,6 +483,7 @@ function getCustName(custCode,fieldName,storeType){
 						<!-- BODY -->
 						<html:form action="/jsp/importAction" enctype="multipart/form-data">
 						<jsp:include page="../error.jsp"/>
+						
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 						<% if("physical".equalsIgnoreCase(request.getParameter("page"))) {%>
 							<tr>
@@ -489,14 +498,14 @@ function getCustName(custCode,fieldName,storeType){
 								     </html:select>
 								</td>
 							</tr>
-						<% }else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%>
-						    <input type="hidden" name ="storeCodeTemp" >
+						<% }else if("return_wacoal".equalsIgnoreCase(request.getParameter("page"))) {%> 
 							<tr>
 								<td align="right" width="40%">ห้าง<font color="red">*</font></td>
 								<td valign="top" align="left">
 								    <html:select property="storeType" onchange="loadStoreList();">
 										<html:options collection="storeTypeList" property="key" labelProperty="name"/>
 								     </html:select>
+								     <input type="hidden" name ="storeCodeTemp" />
 								</td>
 							</tr>
 							<tr>
@@ -533,7 +542,7 @@ function getCustName(custCode,fieldName,storeType){
 								</tr>
 						<%} %>
 						
-						<%  if("reconcile".equalsIgnoreCase(request.getParameter("page"))) {%>
+						<% if("reconcile".equalsIgnoreCase(request.getParameter("page"))) {%>
 							<tr>
 								<td align="right" width="40%">รหัสร้านค้า<font color="red">*</font></td>
 								<td align="left"> 
@@ -555,7 +564,20 @@ function getCustName(custCode,fieldName,storeType){
 									<html:file property="dataFile" styleClass="" style="width:300px;height:21px"/>
 								</td>
 							</tr>
-							
+					    <%}else if("onhandLotus".equalsIgnoreCase(request.getParameter("page"))) {%>
+							<tr>
+								<td align="right" width="40%">เลือกไฟล์(on-hand B'me from wacoal)&nbsp;&nbsp;</td>
+								<td valign="top" align="left">
+									<html:file property="dataFile" styleClass="" style="width:300px;height:21px"/>
+								</td>
+							</tr>
+							 <tr>
+								<td align="right" width="40%">เลือกไฟล์ สรุปจำนวนกล่อง&nbsp;&nbsp;</td>
+								<td valign="top" align="left">
+									<html:file property="dataFile2" styleClass="" style="width:300px;height:21px"/>
+									[เลือกไฟล์ที่มีสกุล .911]
+								</td>
+							</tr> 
 						<%}else{ %>
 							<tr>
 								<td align="right" width="40%">เลือกไฟล์&nbsp;&nbsp;</td>
@@ -604,29 +626,29 @@ function getCustName(custCode,fieldName,storeType){
 
 						<!-- RESULT -->
 						<br/>
-						
 						<!-- Page Display Result -->
-						 <c:if test="${importForm.page == 'LoadStockInitLotus'}">
-						  <jsp:include page="subimports/importStockInitSub.jsp" /> 
-						</c:if>
-						 <c:if test="${importForm.page == 'LoadStockInitBigC'}">
-						  <jsp:include page="subimports/importStockInitSub.jsp" /> 
-						</c:if>
-						 <c:if test="${importForm.page == 'LoadStockInitMTT'}">
-						  <jsp:include page="subimports/importStockInitSub.jsp" /> 
-						</c:if>
-						<c:if test="${importForm.page == 'onhandTVDirect'}">
-						   <jsp:include page="subimports/importOnhandTVDirectSub.jsp" /> 
-						</c:if>
-						 <c:if test="${importForm.page == 'reconcile'}">
-						   <jsp:include page="subimports/reconcileSub.jsp" />  
-						 </c:if> 
-						
-						
 						<c:choose>
 					    <c:when test="${importForm.page == 'king'}">
 					       <jsp:include page="subimports/importKingTranSub.jsp" /> 
 					    </c:when>
+					     <c:when test="${importForm.page == 'LoadStockInitLotus'}">
+						  <jsp:include page="subimports/importStockInitSub.jsp" /> 
+						</c:when>
+						 <c:when test="${importForm.page == 'LoadStockInitBigC'}">
+						  <jsp:include page="subimports/importStockInitSub.jsp" /> 
+						</c:when>
+						 <c:when test="${importForm.page == 'LoadStockInitMTT'}">
+						  <jsp:include page="subimports/importStockInitSub.jsp" /> 
+						</c:when>
+						<c:when test="${importForm.page == 'onhandTVDirect'}">
+						   <jsp:include page="subimports/importOnhandTVDirectSub.jsp" /> 
+						</c:when>
+						<c:when test="${importForm.page == 'reconcile'}">
+						   <jsp:include page="subimports/reconcileSub.jsp" />  
+						</c:when> 
+						<c:when test="${importForm.page == 'onhandLotus'}">
+						   <jsp:include page="subimports/importOnhandFromWacoal.jsp" />  
+						</c:when> 
 					    <c:when test="${importForm.page == 'wait'}"> 
 					    </c:when>
 					    <c:otherwise>
@@ -683,3 +705,5 @@ function getCustName(custCode,fieldName,storeType){
 </table>
 </body>
 </html>
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>

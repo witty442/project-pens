@@ -30,7 +30,8 @@ public class Utils {
 
 	
 	public static final Locale local_th= new Locale("th","TH");
-
+	
+	public static final String format_number_no_disgit = "###0";
 	public static final String format_current_no_disgit = "#,##0";
 	public static final String format_current_2_disgit = "#,##0.00";
     public static final String format_current_5_digit = "#,##0.00000";

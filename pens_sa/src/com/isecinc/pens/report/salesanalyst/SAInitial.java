@@ -80,7 +80,7 @@ public class SAInitial {
 	}
 
 	static {
-		logger.debug("Initail Param Sales Analisis");
+		logger.debug("Initail Param Sales Analysis");
 		
 		MULTI_SELECTION_LIST.add("inventory_item_id");
 		MULTI_SELECTION_LIST.add("Brand");
@@ -93,6 +93,7 @@ public class SAInitial {
 		MULTI_SELECTION_LIST.add("SUBBRAND");
 		MULTI_SELECTION_LIST.add("Division");
 		MULTI_SELECTION_LIST.add("SALES_ZONE");
+		MULTI_SELECTION_LIST.add("CUSTOMER_CLASS_CODE");
 		
 		/** Column Of ORDER **/
 		COLUMN_ORDER_MAP.put("ORDERED","ORDERED");
@@ -122,14 +123,14 @@ public class SAInitial {
 		DISP_COL_MAP.put("IR","ยอดขาย-คืน");/** INVOICED_AMT-RETURNED_AMT as IR_AMT **/
 		DISP_COL_MAP.put("NETAMT","ยอดขาย-คืน-ส่วนลด");/** INVOICED_AMT-RETURNED_AMT-DISCOUNT_AMT as NETAMT **/
 		DISP_COL_MAP.put("CALL_NEW", "CALL NEW");/**Sum Customer no dup in prev criteria **/
-		DISP_COL_MAP.put("CALL", "CALL");/**Sum Customer no dup in creteria**/
+		DISP_COL_MAP.put("CALL", "CALL");/**Sum Customer no dup in criteria**/
 		
 		/** Unit Column  **/
 		UNIT_MAP.put("AMT","บาท");
 		UNIT_MAP.put("QTY","หีบ");
 		UNIT_MAP.put("QTY_S","หีบพิเศษ");
 		
-		/** Copmare Column  **/
+		/** Compare Column  **/
 		COMPARE_MAP.put("PERCENT","%");
 		
 		/** Summary Type*/

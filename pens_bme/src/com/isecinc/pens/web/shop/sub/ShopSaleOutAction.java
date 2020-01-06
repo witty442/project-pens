@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
+import com.isecinc.pens.web.shop.ShopAction;
 import com.isecinc.pens.web.shop.ShopBean;
 import com.isecinc.pens.web.shop.ShopForm;
 import com.pens.util.DBConnection;
@@ -103,9 +104,10 @@ public class ShopSaleOutAction {
 		return f;
     }
  
- public static StringBuffer exportToExcel(HttpServletRequest request, ShopForm form,User user,List<ShopBean> list){
+ public static StringBuffer exportSaleOutToExcel(HttpServletRequest request, ShopForm form,User user,List<ShopBean> list){
 		StringBuffer h = new StringBuffer("");
 		String colspan ="13";
+		String pageName = Utils.isNull(request.getParameter("pageName"));
 		try{
 			h.append(ExcelHeader.EXCEL_HEADER);
 			if("GroupCode".equalsIgnoreCase(form.getSummaryType())){
@@ -114,11 +116,15 @@ public class ShopSaleOutAction {
 			//Header
 			h.append("<table border='1'> \n");
 			h.append(" <tr> \n");
+		
 			if (Utils.isNull(form.getBean().getCustGroup()).equals(PickConstants.STORE_TYPE_PENSHOP_CODE)){
-			  h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ MAYA Shop</td> \n");
+			   h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ MAYA Shop</td> \n");
 			}else if (Utils.isNull(form.getBean().getCustGroup()).equals(PickConstants.STORE_TYPE_TERMINAL_CODE)){
-			  h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ Terminal Shop</td> \n");
+			   h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ Terminal Shop</td> \n");
+			}else if (Utils.isNull(form.getBean().getCustGroup()).equals(PickConstants.STORE_TYPE_CHINA_CODE)){
+			   h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ Im Chaina Shop</td> \n");
 			}
+			
 			h.append(" </tr> \n");
 			h.append(" <tr> \n");
 			h.append("  <td align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+form.getBean().getStartDate()+"-"+form.getBean().getEndDate()+"</td> \n");
@@ -186,7 +192,7 @@ public class ShopSaleOutAction {
 		}
 		return h;
 	}
- public static StringBuffer exportToExcelTM(HttpServletRequest request, ShopForm form,User user,List<ShopBean> list){
+ public static StringBuffer exportSaleOutToExcelTM(HttpServletRequest request, ShopForm form,User user,List<ShopBean> list){
 		StringBuffer h = new StringBuffer("");
 		String colspan ="13";
 		try{

@@ -481,6 +481,7 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 	int i = 0;
 	int prvIndex = 0;
 	boolean firstAdd = true;
+	logger.debug("*********** fillLinesShowPromotion ******************************");
 	try {
 		while (i < lines.size()) {
 			chkLine = lines.get(i);
@@ -706,6 +707,7 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 			
 			i++;
 		}
+		logger.debug("*********** /fillLinesShowPromotion ******************************");
 	} catch (Exception e) {
 		throw e;
 	}

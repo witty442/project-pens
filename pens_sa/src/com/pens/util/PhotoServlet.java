@@ -32,15 +32,16 @@ public class PhotoServlet extends HttpServlet {
 	    	 String pageName = Utils.isNull(request.getParameter("pageName"));
 	    	 if( !Utils.isNull(fileName).equals("")){
 		    	 if("prodShow".equalsIgnoreCase(pageName)){
-		    		 if(env.getProperty("product.type").equalsIgnoreCase("Production")){
-			    	    imageFileLocalPath= "/PENS/ERP/apps/inst/saleonline/Transaction/Sales-Out-Photo/";
-			    	    //for localhost test
-			    	    // imageFileLocalPath= "d:/SalesApp/Images-prodshow/";
-		    		 }else if(env.getProperty("product.type").equalsIgnoreCase("UAT")){
-					    imageFileLocalPath= "/PENS/TEST/apps/inst/saleonline/Transaction/Sales-Out-Photo/";
-		    		 }
+		    		//UAT  "d:/dev_temp/Sales-Out-Photo/";
+		    		//PROD "/PENS/ERP/apps/inst/saleonline/Transaction/Sales-Out-Photo/";
+		    		 
+			    	 imageFileLocalPath= env.getProperty("path.prodshow.photo");
+		    	 }else if("ProjectC".equalsIgnoreCase(pageName)){
+		    		//UAT  "d:/dev_temp/StockCR-ProjectC-Photo/";
+		    		//PROD "/PENS/ERP/apps/inst/saleonline/Transaction/StockCR-ProjectC-Photo/";
+		    		 
+			    	imageFileLocalPath= env.getProperty("path.projectc.photo");   
 		    	 }
-	    	
 		    	  imageFileLocalPath +=fileName; 
 		    	  System.out.println("imageFileLocalPath:"+imageFileLocalPath);
 		    	  
@@ -58,7 +59,6 @@ public class PhotoServlet extends HttpServlet {
 	    	  }
 	       
 	    } catch (Exception e) {
-	        e.printStackTrace();
 	        logger.error(e.getMessage(),e);
 	    }finally{
 	    	if(fis != null){

@@ -8,14 +8,16 @@ String system="";
 String function="";
 String code="";
 String moredesc  ="";
+String programKey = "";
 
 system=(request.getParameter("system")==null?"":request.getParameter("system"));
 function=(request.getParameter("function")==null?"":request.getParameter("function"));
 code=(request.getParameter("code")==null?"":request.getParameter("code"));
 
-//System.out.println(system);
-//System.out.println(function);
-//System.out.println(code);
+programKey = function;
+/* System.out.println("system:"+system);
+System.out.println("function:"+function);
+System.out.println("code:"+code); */
 
 if(system.length()>0) system = SystemProperties.getCaption(system,Locale.getDefault());
 if(function.length()>0) function = SystemProperties.getCaption(function,Locale.getDefault());
@@ -29,13 +31,16 @@ if(code.equals("null")){
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
-<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?"></script>
+
+<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
 	<tr>
  		<td width="41" align="left"><img src="${pageContext.request.contextPath}/images2/bullet.gif" width="37" height="19" /></td>
-   		<td style="background:#FFFFFF url('${pageContext.request.contextPath}/images2/bulletLine.gif') no-repeat right;">
-   			<strong><%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %></strong>
+   		<td  class="nav_txt" style="background:#FFFFFF url('${pageContext.request.contextPath}/images2/bulletLine.gif') no-repeat right;">
+   			<a href="javascript:popupFull('/pens_help/jsp/doc/pens_bme/<%=programKey %>_DOC.jsp')">
+   		      <%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %>
+   			</a>
    		</td>
-   		
 	</tr>
  	<tr>
  		<td colspan="3"><img src="${pageContext.request.contextPath}/images2/blank.gif" width="1" height="15" /></td>

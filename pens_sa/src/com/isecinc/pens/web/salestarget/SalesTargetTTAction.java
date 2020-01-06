@@ -87,8 +87,14 @@ public class SalesTargetTTAction  {
 			}//if
 			//set items list
 			h.setItems(itemList);
+			
 			//save
-			SalesTargetTTDAO.save(h,user);
+			SalesTargetTTDAO.save(conn,h,user);
+			
+			/** after save case: MKT(reject from ttsupper) delete some product but TTSUPER is save product 
+			 *  check is product not in(TT) and delete 
+			 */
+			SalesTargetTTDAO.deleteProductByMKTDel(conn, h, user);
 			
 			//commit
 			conn.commit();
@@ -127,7 +133,8 @@ public class SalesTargetTTAction  {
 		List<SalesTargetBean> productDataSaveListBySalesrep = new ArrayList<SalesTargetBean>();
 		boolean checkFoundInsertQty = false;
 		SalesTargetBean h = null;
-		boolean validProduct =true;
+		String sessionId = request.getSession().getId();
+		boolean dataValid = true;
 		try {
 			conn = DBConnection.getInstance().getConnection();
 			conn.setAutoCommit(false);
@@ -154,73 +161,71 @@ public class SalesTargetTTAction  {
 	                    String targetAmount = Utils.isNull(request.getParameter(keyTargetAmount));
 	                   // logger.debug("keyTargetQty["+keyTargetQty+"],targetQty["+targetQty+"]");
 	                    
-	                    //if( !Utils.isNull(targetQty).equals("")){
-	                    	logger.debug("keyTargetQty["+keyTargetQty+"],targetQty["+targetQty+"]");
-	                    	
-	                    	checkFoundInsertQty = true;
-		                    String id = Utils.isNull(request.getParameter("id_"+productBean.getItemCode()+"_"+salesrepBean.getSalesrepCode()));
-		                    String lineId = Utils.isNull(request.getParameter("line_id_"+productBean.getItemCode()+"_"+salesrepBean.getSalesrepCode()));
-		                    
-		                    l = new SalesTargetBean();
-		                    
-		                    logger.debug("itemId:"+productBean.getItemId());
-		                    l.setId(Utils.convertStrToLong(id,0));
-							l.setLineId(Utils.convertStrToLong(lineId,0));
-							l.setItemCode(productBean.getItemCode());
-							l.setItemId(productBean.getItemId());
-							l.setTargetQty(targetQty);
-							l.setTargetAmount(targetAmount);
-							l.setPrice(productBean.getPrice());
-							l.setOrderAmt12Month(productBean.getOrderAmt12Month());
-							l.setOrderAmt3Month(productBean.getOrderAmt3Month());
-							l.setRemark("");
-							l.setRejectReason("");
-							l.setCreateUser(user.getUserName());
-							l.setUpdateUser(user.getUserName());
-							
-		                    //add product
-							productDataSaveListBySalesrep.add(l);
-							
-							//valid brand head vs product line is equals
-							/*if( !productBean.getItemCode().startsWith(bean.getBrand())){
-								validProduct = false;
-							}*/
-	                    //}
+                    	logger.debug("keyTargetQty["+keyTargetQty+"],targetQty["+targetQty+"]");
+                    	
+                    	checkFoundInsertQty = true;
+	                    String id = Utils.isNull(request.getParameter("id_"+productBean.getItemCode()+"_"+salesrepBean.getSalesrepCode()));
+	                    String lineId = Utils.isNull(request.getParameter("line_id_"+productBean.getItemCode()+"_"+salesrepBean.getSalesrepCode()));
+	                    
+	                    l = new SalesTargetBean();
+	  
+	                    logger.debug("itemId:"+productBean.getItemId());
+	                    l.setId(Utils.convertStrToLong(id,0));
+						l.setLineId(Utils.convertStrToLong(lineId,0));
+						l.setItemCode(productBean.getItemCode());
+						l.setItemId(productBean.getItemId());
+						l.setTargetQty(targetQty);
+						l.setTargetAmount(targetAmount);
+						l.setPrice(productBean.getPrice());
+						l.setOrderAmt12Month(productBean.getOrderAmt12Month());
+						l.setOrderAmt3Month(productBean.getOrderAmt3Month());
+						l.setRemark("");
+						l.setRejectReason("");
+						l.setCreateUser(user.getUserName());
+						l.setUpdateUser(user.getUserName());
+						l.setSessionId(sessionId);
+	                    //add product
+						productDataSaveListBySalesrep.add(l);
+			
+						//validate head id vs input(screen) id
+	                    if(salesrepBean.getId() != l.getId()){
+	                    	dataValid = false;
+	                    	break;
+	                    }//if
 	        		}//for 2
 	        	    
-	        	    //header
-	        	    if(checkFoundInsertQty){
-	        	    	h = new SalesTargetBean();
-	        	    	//set header property
-	        	    	h.setStartDate(bean.getStartDate());
-		        	    h.setPeriod(bean.getPeriod());
-		        	    h.setCustCatNo(bean.getCustCatNo());
-		        	    h.setBrand(bean.getBrand());
-		        	    h.setBrandGroup(bean.getBrandGroup());
-	        	    	h.setId(salesrepBean.getId());
-		        	    h.setSalesrepCode(salesrepBean.getSalesrepCode());
-		        	    h.setSalesrepId(salesrepBean.getSalesrepId());
-		        	    h.setSalesChannelNo(salesrepBean.getSalesChannelNo());
-		        	    h.setDivision(SalesTargetTTUtils.getDivision(conn,h.getSalesChannelNo()));
-		    			//set productList to salesrepCode
-		        	    h.setItems(productDataSaveListBySalesrep);
-		        		h.setStatus(SalesTargetConstants.STATUS_POST);
-		    			h.setCreateUser(user.getUserName());
-		    			h.setUpdateUser(user.getUserName());
-		    			
-		        	    logger.debug("** Prepare head *****");
-		        	    logger.debug("salesrepCode:"+h.getSalesrepCode()+",id:"+h.getId());
-		        	    
-		        	    salesrepDataSaveList.add(h);
-	        	    }//if
+	        	   //set header property
+        	    	h = new SalesTargetBean();
+        	    	h.setStartDate(bean.getStartDate());
+	        	    h.setPeriod(bean.getPeriod());
+	        	    h.setCustCatNo(bean.getCustCatNo());
+	        	    h.setBrand(bean.getBrand());
+	        	    h.setBrandGroup(bean.getBrandGroup());
+        	    	h.setId(salesrepBean.getId());
+	        	    h.setSalesrepCode(salesrepBean.getSalesrepCode());
+	        	    h.setSalesrepId(salesrepBean.getSalesrepId());
+	        	    h.setSalesChannelNo(salesrepBean.getSalesChannelNo());
+	        	    h.setDivision(SalesTargetTTUtils.getDivision(conn,h.getSalesChannelNo()));
+	    			//set productList to salesrepCode
+	        	    h.setItems(productDataSaveListBySalesrep);
+	        		h.setStatus(SalesTargetConstants.STATUS_POST);
+	    			h.setCreateUser(user.getUserName());
+	    			h.setUpdateUser(user.getUserName());
+	    			h.setSessionId(sessionId);
+	    			
+	        	    logger.debug("** Prepare head *****");
+	        	    logger.debug("salesrepCode:"+h.getSalesrepCode()+",id:"+h.getId());
 	        	    
+	        	    salesrepDataSaveList.add(h);
 	        	}//for 1
-			}
+			}//if
 			
-			if(validProduct==false){
-				request.setAttribute("Message", "ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบว่าไม้ได้ทำการบันทึก สองหน้าจอพร้อมกัน");
+			//validate duplicate
+			if(dataValid==false){
+				request.setAttribute("Message", "!!!ไม่สามารถบันทึกข้อมูลได้ พบข้อมูลไม่ถูกต้อง  กลับไปที่หน้าค้นหาหลัก แล้วทำการบันทึกข้อมูลใหม่  หากไม่ได้ กรุณาติดต่อ ฝ่ายไอที");
 				return "detailTTSUPER";
 			}
+		
 			//save Head target_temp
 			SalesTargetTTDAO.saveModelByTTSUPER_TT(conn, salesrepDataSaveList);
 
@@ -312,6 +317,7 @@ public class SalesTargetTTAction  {
 			SalesTargetBean bean = aForm.getBean();
 			bean.setCreateUser(user.getUserName());
 			bean.setUpdateUser(user.getUserName());
+			bean.setSessionId(request.getSession().getId());
 			
 			String errorCode = SalesTargetTTSUPERCopy.copyFromLastMonthByTTSUPER(user, bean,aForm.getPageName());
 			
@@ -355,6 +361,7 @@ public class SalesTargetTTAction  {
 			paramBean.setSalesZone(Utils.isNull(request.getParameter("salesZone")));
 			paramBean.setCreateUser(user.getUserName());
 			paramBean.setUpdateUser(user.getUserName());
+			paramBean.setSessionId(request.getSession().getId());
 			
 			String errorCode = SalesTargetTTSUPERCopyByBrand.copyBrandFromLastMonthByTTSUPER(user, paramBean,aForm.getPageName());
 			if(errorCode.equalsIgnoreCase("DATA_CUR_EXIST_EXCEPTION")){

@@ -202,7 +202,7 @@ function setPeriodDate(periodDesc,type){
 		String returnStr = "";
 		User user = (User) request.getSession().getAttribute("user");
 		try{
-			returnStr = SalesTargetTTCopyNMonth.copy(fromPeriod, fromStartDate, toPeriod, toStartDate,user);
+			returnStr = SalesTargetTTCopyNMonth.copy(request,fromPeriod, fromStartDate, toPeriod, toStartDate,user);
 			
       	  if("DATA_CUR_EXIST_EXCEPTION" ==returnStr){
       		  msg = "ข้อมูลเดือน "+toPeriod +" มีการ key ข้อมูลบางส่วนไปแล้ว";

@@ -80,7 +80,57 @@ public class OnhandSummary implements  Comparable<OnhandSummary>, Serializable{
 	private String stockIssueQty;
 	private String stockReceiptQty;
     
+	private String lotNo;
+	private String lotDate;
+	private String totalBox;
+	private String forwarder;
+	private String province;
+	private String refId;
+	private String sendDate;
 	
+	
+	public String getLotNo() {
+		return lotNo;
+	}
+	public void setLotNo(String lotNo) {
+		this.lotNo = lotNo;
+	}
+	public String getLotDate() {
+		return lotDate;
+	}
+	public void setLotDate(String lotDate) {
+		this.lotDate = lotDate;
+	}
+	public String getTotalBox() {
+		return totalBox;
+	}
+	public void setTotalBox(String totalBox) {
+		this.totalBox = totalBox;
+	}
+	public String getForwarder() {
+		return forwarder;
+	}
+	public void setForwarder(String forwarder) {
+		this.forwarder = forwarder;
+	}
+	public String getProvince() {
+		return province;
+	}
+	public void setProvince(String province) {
+		this.province = province;
+	}
+	public String getRefId() {
+		return refId;
+	}
+	public void setRefId(String refId) {
+		this.refId = refId;
+	}
+	public String getSendDate() {
+		return sendDate;
+	}
+	public void setSendDate(String sendDate) {
+		this.sendDate = sendDate;
+	}
 	public String getStockIssueQty() {
 		return stockIssueQty;
 	}

@@ -277,7 +277,7 @@ public class SecurityHelper {
 			
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();	
-			whereSql +="/** Filter Data BY User **/ \n";
+			whereSql +="\n /** Filter Data BY User **/ \n";
 			//String roleColumnAccess= "";
 			while(rs.next()){
 				 roleColumnAccess = rs.getString("role_column_access");

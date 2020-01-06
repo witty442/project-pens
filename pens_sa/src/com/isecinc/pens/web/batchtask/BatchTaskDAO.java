@@ -66,10 +66,10 @@ public class BatchTaskDAO {
 			  
 			logger.debug("SQL:"+sql);
 			if(model.getTransactionId() ==null){
-				 model.setTransactionId(new BigDecimal(SequenceProcessAll.getNextValue("monitor")));
+				 model.setTransactionId(new BigDecimal(SequenceProcessAll.getIns().getNextValue("monitor")));
 			}
 			if(model.getMonitorId() ==null){
-				 model.setMonitorId(new BigDecimal(SequenceProcessAll.getNextValue("monitor_2")));
+				 model.setMonitorId(new BigDecimal(SequenceProcessAll.getIns().getNextValue("monitor_2")));
 			}
 			logger.debug("Transaction id:"+model.getTransactionId());
 
@@ -128,7 +128,7 @@ public class BatchTaskDAO {
 			logger.debug("SQL:"+sql);
 			logger.debug("SucessCound:"+model.getSuccessCount());
 			if(model.getId() ==null){
-				model.setId(new BigDecimal(SequenceProcessAll.getNextValue("monitor_item")));
+				model.setId(new BigDecimal(SequenceProcessAll.getIns().getNextValue("monitor_item")));
 			}
 			
 			int index = 0;

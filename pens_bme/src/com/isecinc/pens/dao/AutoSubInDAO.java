@@ -303,7 +303,6 @@ public class AutoSubInDAO extends PickConstants{
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		AutoSubInBean h = null;
 	    int totalRec = 0;
 		try {
             sql.append("\n select count(*) as c from(");
@@ -348,6 +347,8 @@ public class AutoSubInDAO extends PickConstants{
 	public static StringBuffer genWhereSearchJobList(AutoSubInBean o) throws Exception{
 		StringBuffer sql = new StringBuffer("");
 		sql.append("\n and j.store_code is not null ");
+		sql.append("\n and j.store_code not in('020999-2','020999-1','020999-13','020999-99') ");//V007,V901
+		
 	    if( !Utils.isNull(o.getCustGroup()).equals("")){
 	       sql.append("\n and j.cust_group = '"+Utils.isNull(o.getCustGroup())+"' ");
 	    }

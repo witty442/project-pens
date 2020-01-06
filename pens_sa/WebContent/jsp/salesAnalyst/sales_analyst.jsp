@@ -232,10 +232,6 @@ function chkSearch(){
 					                <table width="80%" border="0" align="left" cellpadding="1" cellspacing="1">
 					                  <tr>
 					                      <td width="15%" align="left" nowrap>
-					                        <%--    <a href="javascript:editProfile('${pageContext.request.contextPath}','admin')">
-					                              <b>แก้ไข/เพิ่ม Profile</b>
-					                          </a>  
-					                          &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; --%>
 		                                       <html:select property="salesBean.profileId" styleId="profileId" onchange="changeProfile('${pageContext.request.contextPath}','')" styleClass="txt_style" >
 											         <html:options collection="profileList" property="key" labelProperty="name"/>
 									            </html:select>

@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.zip.ZipEntry;
@@ -418,6 +419,41 @@ public class FileUtil {
 			logger.error(e.getMessage(),e);
 		}
 		return rootPathTemp;
+	}
+	public static void deleteFile(String fileName) throws Exception {
+		File f = null;
+		try{
+		   f = new File(fileName);
+		   boolean success = f.delete();
+		   if(!success){
+			   logger.info("deleteFile "+fileName+" fail");
+		   }
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+			throw e;
+		}finally{
+			if( f != null){
+				f = null;
+			}
+		}
+	}
+	
+	public static String writeImageFile(String path,InputStream in) throws Exception{
+		try{
+			OutputStream out = new FileOutputStream(path);
+			byte[] buff = new byte[4096];  // how much of the blob to read/write at a time
+			int len = 0;
+
+			while ((len = in.read(buff)) != -1) {
+			    out.write(buff, 0, len);
+			}
+			in.close();
+			out.close();
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		    throw e;
+		}
+		return "";
 	}
 	
 }

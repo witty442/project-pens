@@ -606,7 +606,11 @@ public class SAGenCondition {
 			
 			}else if("Order_type_id".equalsIgnoreCase(condType)){
 				sql = "(SELECT M.order_type_name|| ' (' || M.order_type_cat || ')' as DESC_ from XXPENS_BI_MST_ORDER_TYPE M WHERE M.Order_type_id = S.Order_type_id )";
+			
+			}else if("CUSTOMER_CLASS_CODE".equalsIgnoreCase(condType)){
+				sql = "(SELECT DESCRIPTION FROM apps.xxpens_ar_cust_class_v M WHERE M.code = S.CUSTOMER_CLASS_CODE)";
 			}
+			
 			
 			sql +=" AS "+condType+"_DESC , \n";
 			
@@ -695,6 +699,9 @@ public class SAGenCondition {
 			
 			}else if("Order_type_id".equalsIgnoreCase(condType)){
 				sql = "(SELECT M.order_type_id as DESC_ from XXPENS_BI_MST_ORDER_TYPE M WHERE M.Order_type_id = S.Order_type_id )";
+			
+			}else if("CUSTOMER_CLASS_CODE".equalsIgnoreCase(condType)){
+				sql = "CUSTOMER_CLASS_CODE";
 			}
 			
 			sql +=" AS "+condType+"_CODE , \n";

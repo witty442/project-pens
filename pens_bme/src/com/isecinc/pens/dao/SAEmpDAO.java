@@ -556,46 +556,6 @@ public class SAEmpDAO {
 			return detail;
 		}
 	 
-	 public static List<PopupForm> getMasterListByRefCode(PopupForm c,String equals,String refCode) throws Exception {
-			Statement stmt = null;
-			ResultSet rst = null;
-			List<PopupForm> pos = new ArrayList<PopupForm>();
-			StringBuilder sql = new StringBuilder();
-			Connection conn = null;
-			try {
-				sql.delete(0, sql.length());
-				sql.append("\n  SELECT M.* from PENSBME_MST_REFERENCE M");
-				sql.append("\n  where 1=1 and reference_code ='"+refCode+"' ");
-				if("equals".equals(equals)){
-					sql.append("\n  and M.pens_value ='"+c.getCodeSearch()+"'");
-				}
-				sql.append("\n  ORDER BY pens_value asc \n");
-				
-				logger.debug("sql:"+sql);
-				conn = DBConnection.getInstance().getConnection();
-				stmt = conn.createStatement();
-				rst = stmt.executeQuery(sql.toString());
-				int no=0;
-				while (rst.next()) {
-					no++;
-					PopupForm item = new PopupForm();
-					item.setNo(no);
-					item.setCode(Utils.isNull(rst.getString("pens_value")));
-					item.setDesc(Utils.isNull(rst.getString("pens_desc")));
-					pos.add(item);
-					
-				}//while
-
-			} catch (Exception e) {
-				throw e;
-			} finally {
-				try {
-					rst.close();
-					stmt.close();
-					conn.close();
-				} catch (Exception e) {}
-			}
-			return pos;
-		}
+	
 	
 }

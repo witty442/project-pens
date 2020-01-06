@@ -66,7 +66,7 @@ public class OrderNoGenerate {
 	   String orderNo = "";
 	   try{
 		   //get Seq
-		   int seq = SequenceProcessAll.getNextValue("BAR_ON_BOX");
+		   int seq = SequenceProcessAll.getIns().getNextValue("BAR_ON_BOX").intValue();
 		   String barcodeInput12Digit = "911"+new DecimalFormat("000000000").format(seq);
 		   int chkDigitEAN13 = BarcodeGenerate.genBarcode(barcodeInput12Digit);
 		  

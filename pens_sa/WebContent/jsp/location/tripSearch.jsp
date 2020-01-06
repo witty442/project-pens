@@ -1,4 +1,6 @@
 
+<%@page import="com.isecinc.pens.bean.CConstantsBean"%>
+<%@page import="com.pens.util.CConstants"%>
 <%@page import="com.pens.util.PageVisit"%>
 <%@page import="com.pens.util.SessionUtils"%>
 <%@page import="com.isecinc.pens.web.location.LocationBean"%>
@@ -27,6 +29,11 @@ SessionUtils.clearSessionUnusedForm(request, "locationForm");
 /** Count Visit Page */
 PageVisit.processPageVisit(request,"Trip");
 
+/** Get CustTypeLsit **/
+ List<CConstantsBean> custTypeList = CConstants.getConstantsDataList(CConstants.CUST_TYPE);
+ String selected ="";
+ CConstantsBean custTypeItemBean = null;
+ int i=0;
 %>
 <html>
 <head>
@@ -154,14 +161,24 @@ function validateTripDay(tripDayObj){
 	return true;
 }
 function saveTripByCustAjax(index,customerCode){
+	var form = document.locationForm;
 	var returnString = "";
 	var tripDay = document.getElementsByName("tripDay")[index];
 	var tripDay2 = document.getElementsByName("tripDay2")[index];
 	var tripDay3 = document.getElementsByName("tripDay3")[index];
+	var customerType = document.getElementsByName("customerType")[index];
 	
+	if(form.custCatNo.value =='C'){//check VanSales only
+		if(customerType.value ==""){
+			alert("กรุณาระบุประเภทร้านค้า");
+			customerType.focus();
+			return false;
+		}
+	}
 	var param  ="&tripDay="+tripDay.value;
 	    param +="&tripDay2="+tripDay2.value;
 	    param +="&tripDay3="+tripDay3.value;
+	    param +="&customerType="+customerType.value;
 	    
 	var getData = $.ajax({
 			url: "${pageContext.request.contextPath}/jsp/location/ajax/saveTripByCustAjax.jsp",
@@ -312,7 +329,7 @@ function saveTripByCustAjax(index,customerCode){
 						<%
 						int curPage = locationForm.getCurrPage();
 						List<LocationBean> its= ((List)session.getAttribute("tripPageList"));
-					    for(int i=0;i<its.size();i++){
+					    for(i=0;i<its.size();i++){
 					    	int trip = Integer.parseInt(its.get(i).getTripDay()); 
 					    	if( curPage != trip){
 						 %>
@@ -330,6 +347,7 @@ function saveTripByCustAjax(index,customerCode){
 						<th>ชื่อ</th>
 						<th>ที่อยู่</th>
 						<!-- <th>Action</th> -->
+					    <th>ประเภทร้านค้า</th>
 						<th>จุด 1</th>
 						<th>จุด 2</th>
 						<th>จุด 3</th>
@@ -352,6 +370,24 @@ function saveTripByCustAjax(index,customerCode){
 								<%-- <td class="td_text_center" width="10%">
 							     <a  href="javascript:viewTripDetail('${pageContext.request.contextPath}','<%=mc.getCustomerCode()%>','','<%=mc.getSalesrepCode()%>')">แก้ไข/ดู</a>
 								</td> --%>
+								
+								 <td class="td_text_center" width="5%">
+								   <select name="customerType" id="customerType">
+								    <option></option>
+								   <%
+									   selected ="";
+									   for(i=0;i<custTypeList.size();i++){
+										   custTypeItemBean = custTypeList.get(i);
+										   selected = "";
+										   if(custTypeItemBean.getValue().equalsIgnoreCase(mc.getCustomerType())){
+											   selected ="selected";
+										   }
+									   %>
+								       <option value="<%=custTypeItemBean.getValue() %>" <%=selected%>><%=custTypeItemBean.getCodeDesc() %></option>
+								   <% } %>
+								   </select>
+								   <font color="red">*</font>
+								</td> 
 								<td class="td_text_center" width="5%">
 								   <input type="text" name="tripDay" value="<%=mc.getTripDay()%>" 
 								    onblur="validateTripDay(this)" size ="3" class="enableNumber" autocomplete="off"/>

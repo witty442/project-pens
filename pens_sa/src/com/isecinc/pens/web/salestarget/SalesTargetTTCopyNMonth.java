@@ -38,7 +38,7 @@ public class SalesTargetTTCopyNMonth {
 		}
 	}
 	
-	public static String copy(String fromPeriod,String fromStartDate,String toPeriod,String toStartDate,User user){
+	public static String copy(HttpServletRequest request, String fromPeriod,String fromStartDate,String toPeriod,String toStartDate,User user){
 		String returnStr = "";
 		try{
 			logger.debug("** Start Copy From["+fromPeriod+"]TO["+toPeriod+"]**");
@@ -50,6 +50,7 @@ public class SalesTargetTTCopyNMonth {
 			destBean.setCreateUser("SYSTEM");
 			destBean.setStartDate(Utils.isNull(toStartDate)); 
 			destBean.setPeriod(Utils.isNull(toPeriod));
+			destBean.setSessionId(request.getSession().getId());
 			
 			returnStr = copyFromNMonth(dateSource,destBean,user);
 			
@@ -184,7 +185,7 @@ public class SalesTargetTTCopyNMonth {
 		StringBuilder sql = new StringBuilder();
 		BigDecimal idNew = null;
 		try {
-			idNew =new BigDecimal(SequenceProcessAll.getNextValue("XXPENS_BI_SALES_TARGET_TEMP"));
+			idNew =new BigDecimal(SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP"));
 			if(idNew.compareTo(new BigDecimal("0")) ==0){
 				idNew = new BigDecimal("1");
 			}

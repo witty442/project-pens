@@ -153,7 +153,7 @@ public class GenCNAction extends I_Action {
 			job.setWareHouse(PickConstants.WAREHOUSE_W3);
 			job.setSubInv("G071");
 			job.setCreateUser(user.getUserName());
-			StoreBean storeBean = GeneralDAO.getStoreBeanModel(conn, job.getStoreCode());
+			StoreBean storeBean = GeneralDAO.getStoreInfo(conn, job.getStoreCode());
 			if(storeBean !=null){
 				job.setCustGroup(storeBean.getCustGroup());
 				job.setStoreNo(storeBean.getStoreNo());

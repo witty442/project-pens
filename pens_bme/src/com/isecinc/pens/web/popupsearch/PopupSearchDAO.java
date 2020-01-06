@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.pens.util.DBConnection;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class PopupSearchDAO {
@@ -35,6 +36,9 @@ public class PopupSearchDAO {
 				}
 				if( !Utils.isNull(c.getDescSearch()).equals("")){
 					sql.append("\n and M.pens_desc LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				if( !Utils.isNull(c.getNotIn()).equals("")){
+					sql.append("\n and M.pens_value not in("+SQLHelper.converToTextSqlIn(c.getNotIn())+") ");
 				}
 				sql.append("\n  ORDER BY M.pens_value asc ");
 				

@@ -37,6 +37,7 @@ import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHelper;
 import com.pens.util.meter.MonitorTime;
 import com.pens.util.seq.SequenceProcess;
 
@@ -304,7 +305,7 @@ public class ImportPosProcess extends InterfaceUtils{
 						   ps.setString(1,  order_number);
 						}else if(colNo==1){
 						   //account_number
-						   account_number = Utils.isNull(cellValue);
+						   account_number = ExcelHelper.isCellNumberOrText(cellValue);//Utils.isNull(cellValue);
 						   ps.setString(2, account_number);
 						}else if(colNo==2){
 						   //ordered_date

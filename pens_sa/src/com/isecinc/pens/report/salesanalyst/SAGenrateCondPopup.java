@@ -544,6 +544,23 @@ public class SAGenrateCondPopup {
 					returnList.add(new DisplayBean(no,rs.getString("Order_type_id"),rs.getString("Order_type_id"),rs.getString("Order_type_name")+"-"+rs.getString("Order_type_cat")));
 				}
 			}
+			//Customer_class_code (customerType)
+			else if("CUSTOMER_CLASS_CODE".equalsIgnoreCase(condType)){
+				sql = "select  * from apps.xxpens_ar_cust_class_v WHERE ENABLED_FLAG ='Y' \n";
+				if(!Utils.isNull(code).equals("")){
+					sql += " and code like '"+code+"%' \n";
+				}
+				if(!Utils.isNull(desc).equals("")){
+					sql += " and description LIKE '%"+desc+"%' \n";
+				}
+				sql += "order by code \n";
+				ps = conn.prepareStatement(sql);
+				rs = ps.executeQuery();
+				while(rs.next()){
+					no++;
+					returnList.add(new DisplayBean(no,rs.getString("code"),rs.getString("code"),rs.getString("description")));
+				}
+			}
 			
 			logger.debug("SQL:"+sql);
 		}catch(Exception e){
@@ -1313,6 +1330,24 @@ public class SAGenrateCondPopup {
 					while(rs.next()){
 						no++;
 						returnList.add(new DisplayBean(no,rs.getString("Order_type_id"),rs.getString("Order_type_id"),rs.getString("Order_type_name")+"-"+rs.getString("Order_type_cat")));
+					}
+				}
+				
+				//Customer_class_code (customerType)
+				else if("CUSTOMER_CLASS_CODE".equalsIgnoreCase(currCondType)){
+					sql = "select  * from apps.xxpens_ar_cust_class_v WHERE ENABLED_FLAG ='Y' \n";
+					if(!Utils.isNull(code).equals("")){
+						sql += " and code like '"+code+"%' \n";
+					}
+					if(!Utils.isNull(desc).equals("")){
+						sql += " and description LIKE '%"+desc+"%' \n";
+					}
+					sql += "order by code \n";
+					ps = conn.prepareStatement(sql);
+					rs = ps.executeQuery();
+					while(rs.next()){
+						no++;
+						returnList.add(new DisplayBean(no,rs.getString("code"),rs.getString("code"),rs.getString("description")));
 					}
 				}
 	

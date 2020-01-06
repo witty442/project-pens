@@ -3,7 +3,9 @@ package com.pens.util;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -27,6 +29,7 @@ public class CConstants {
 	
 	public static final String MOVEORDER_MAX_MOVEDAY ="MoveOrderMaxMoveDay"; 
 	public static final String STOCK_CALLC_CREDIT_START_DATE ="StockCallCCreditStartDate"; 
+	public static final String CUST_TYPE ="CUST_TYPE"; 
 	
 	 public static CConstantsBean getConstants(Connection conn,String refCode,String code) throws Exception {
 		 return getConstantsModel(conn,refCode, code);
@@ -50,6 +53,7 @@ public class CConstants {
 				sql.append("\n select * from PENSBI.C_CONSTANTS ");
 				sql.append("\n where ref_code ='"+refCode+"'");
 				sql.append("\n and code ='"+code+"'");
+				sql.append("\n and isactive <> 'N'");
 				
 				logger.debug("sql:"+sql);
 				stmt = conn.createStatement();
@@ -96,6 +100,7 @@ public class CConstants {
 			try {
 				sql.append("\n select * from PENSBI.C_CONSTANTS ");
 				sql.append("\n where ref_code ='"+refCode+"'");
+				sql.append("\n and isactive <> 'N'");
 				
 				logger.debug("sql:"+sql);
 				stmt = conn.createStatement();
@@ -120,5 +125,50 @@ public class CConstants {
 				} catch (Exception e) {}
 			}
 			return constantsMap;
+		}
+	 
+	 public static List<CConstantsBean> getConstantsDataList(String refCode) throws Exception {
+		 Connection conn = null;
+		 try{
+			 conn = DBConnection.getInstance().getConnectionApps();
+			 return getConstantsDataListModel(conn,refCode);
+		 } finally {
+			conn.close();	
+		}
+	 }
+	 public static List<CConstantsBean> getConstantsDataListModel(Connection conn,String refCode) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			CConstantsBean value = null;
+			List<CConstantsBean> constantsList = new ArrayList<CConstantsBean>();
+			try {
+				sql.append("\n select * from PENSBI.C_CONSTANTS ");
+				sql.append("\n where ref_code ='"+refCode+"'");
+				sql.append("\n and isactive <> 'N'");
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					value = new CConstantsBean();
+					value.setRefCode(Utils.isNull(rst.getString("ref_code")));
+					value.setRefDesc(Utils.isNull(rst.getString("ref_desc")));
+					value.setCode(Utils.isNull(rst.getString("code")));
+					value.setCodeDesc(Utils.isNull(rst.getString("code_desc")));
+					value.setValue(Utils.isNull(rst.getString("value")));
+					value.setValue2(Utils.isNull(rst.getString("value_2")));
+				    value.setIsactive(Utils.isNull(rst.getString("isactive")));
+				    
+				    constantsList.add(value);
+				}//while
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return constantsList;
 		}
 }

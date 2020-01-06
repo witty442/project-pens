@@ -118,7 +118,7 @@ public class PopupAction extends I_Action {
 		try {
 		    if("ItemBarcode".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For Stock
-				 results = PopupDAO.searchItemBarcodeList(popupForm);
+				 results = PopupDAO.searchItemBarcodeList(popupForm,user);
 			}
 		    logger.debug("results.size():"+results.size());
 		    

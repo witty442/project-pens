@@ -45,7 +45,12 @@ TABLE.result2 TD.summary {
 	font-weight: normal;
 	text-decoration: none;
 }
-
+.nav_txt {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	font-weight: bold;
+	text-decoration: none;
+}
 /* BUTTONS */
 .buttons a,.buttons button {
 	display: block;
@@ -602,4 +607,34 @@ TABLE.result2 TD {
 	position:relative;
 	top:1px;
 }
+/** for Paging css ************************/
+.pagination {
+  display: inline-block;
+  font-size:16px;
+}
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 12px;
+  text-decoration: none;
+  transition: background-color .3s;
+  border: 1px solid #ddd;
+  margin: 0 4px;
+}
+.pagination span {
+  font-size:16px;
+  color: black;
+  float: left;
+  padding: 8px 10px;
+  text-decoration: none;
+  transition: background-color .3s;
+  border: 1px solid #ddd;
+  margin: 0 4px;
+}
+.pagination a.active {
+  background-color: #4CAF50;
+  color: white;
+  border: 1px solid #4CAF50;
+}
+.pagination a:hover:not(.active) {background-color: #ddd;}
 /******************************************/

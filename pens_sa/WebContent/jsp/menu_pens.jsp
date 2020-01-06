@@ -1,4 +1,4 @@
-z<%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
+<%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
 <%@page import="com.pens.util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.stock.StockConstants"%>
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
@@ -137,11 +137,11 @@ z<%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
 				            </a> 
 			           </li>  
 			            <%if ( UserUtils.userInRoleSalesTarget(user,new String[]{User.ADMIN}) ){ %>
-			               <%--   <li>
+			                 <li>
 			                    <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetAction.do?do=prepareSearch&pageName=<%=SalesTargetConstants.PAGE_MTADMIN%>&action=new';">
 			                      <span><%subNo++;out.print(no+"."+subNo+" "); %><bean:message key="MTADMIN_SalesTarget" bundle="sysprop"/></span>
 			                    </a>
-			                 </li>   --%>
+			                 </li>  
 	                    <%} %>
 			       </ul>
 	             </li>
@@ -206,7 +206,7 @@ z<%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
 		 </ul>
 	</li>
 <%} %>
-<%if (   UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN, User.STOCKCR,User.STOCKCRSALE}) 
+<%if (   UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN, User.STOCKCR,User.STOCKCRSALE,User.PROJECTC}) 
 	  || UserUtils.userInRole("ROLE_PRODSHOW",user,new String[]{User.ADMIN, User.PRODSHOW})) { 
 	no=0;
 %>
@@ -247,6 +247,20 @@ z<%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
 	               <a href="#" class="parent" 
 	               onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareSearch&pageName=<%=StockConstants.PAGE_STOCK_CR_EXPIRE%>&action=new';">
 	               <span><%no++;out.print(no);%>.<bean:message key="<%=StockConstants.PAGE_STOCK_CR_EXPIRE%>" bundle="sysprop"/></span>
+	               </a>
+	             </li>  
+             <%} %>
+             <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN,User.PROJECTC})){ %>
+                  <li>
+	               <a href="#" class="parent" 
+	               onclick="window.location='${pageContext.request.contextPath}/jsp/projectCAction.do?do=prepareSearch&action=new';">
+	               <span><%no++;out.print(no);%>.<bean:message key="ProjectC" bundle="sysprop"/></span>
+	               </a>
+	             </li>  
+	             <li>
+	               <a href="#" class="parent" 
+	               onclick="window.location='${pageContext.request.contextPath}/jsp/reportAllAction.do?do=prepare&action=new&pageName=ProjectCReport';">
+	               <span><%no++;out.print(no);%>.<bean:message key="ProjectCReport" bundle="sysprop"/></span>
 	               </a>
 	             </li>  
              <%} %>

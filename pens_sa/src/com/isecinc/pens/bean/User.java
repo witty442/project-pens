@@ -53,6 +53,7 @@ public class User extends I_PO implements Serializable {
 	public static final String COVERAGE = "COVERAGE";
 	public static final String B2B_MAKRO = "MAKRO";
 	public static final String PREORDER = "PREORDER";
+	public static final String PROJECTC = "PROJECTC";
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**

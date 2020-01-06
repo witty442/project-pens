@@ -28,7 +28,7 @@ public class CopyDB {
 			//String where =" where id =1";
 
 			/*****************copy  product to test********************/
-			processProductionToUAT("pensbi","PENSBME_MST_REFERENCE","");
+			//processProductionToUAT("pensbi","PENSBME_MST_REFERENCE"," WHERE reference_code ='Store_AutoCN' ");
 			
 		   // processProductionToUAT("pensbi","PENSBME_ONHAND_BME_LOCKED","");
 		   // processProductionToUAT("pensbi","PENSBME_STYLE_MAPPING","");
@@ -69,6 +69,9 @@ public class CopyDB {
 		
 			//processUATToProduction("PENSBI","XXPENS_BI_SALES_TARGET_TEMP","where id in (539,540,541,546,589,591,593 )");
 			//processUATToProduction("PENSBI","XXPENS_BI_SALES_TARGET_TEMP_L","where id in (539,540,541,546,589,591,593 )");
+			
+			//processUATToProduction("PENSBI","PENSBME_TT_BRANCH","where oracle_cust_no ='25105003'");
+			
 		}catch(Exception e){
 			e.printStackTrace();
 		}

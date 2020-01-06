@@ -65,6 +65,7 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		parameterMap.put("curWeAmt", dataReport.getTotalWeAmt());
 		parameterMap.put("curGovAmt", dataReport.getTotalGovAmt());
 		
+		
 		parameterMap.put("curCashCnt", process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 1));//currentCashCnt
 		parameterMap.put("curCreditCardCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 2));//curCreditcasrCnt
 		parameterMap.put("curAliCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 6));//curAliCnt
@@ -105,7 +106,7 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		setFileType(reportForm.getCriteria().getFileType());
 		setFileName("invoice_payment_new_report");  
 
-		logger.debug("curCashCnt:"+parameterMap.get("curCashCnt"));
+	/*	logger.debug("curCashCnt:"+parameterMap.get("curCashCnt"));
 		logger.debug("curCreditCardCnt:"+parameterMap.get("curCreditCardCnt"));
 		logger.debug("curAliCnt:"+parameterMap.get("curAliCnt"));
 		logger.debug("curWeCnt:"+parameterMap.get("curWeCnt"));
@@ -115,7 +116,7 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		logger.debug("creditCardCntBefore:"+parameterMap.get("creditCardCntBefore"));
 		logger.debug("aliCntBefore:"+parameterMap.get("aliCntBefore"));
 		logger.debug("weCntBefore:"+parameterMap.get("weCntBefore"));
-		logger.debug("govCntBefore:"+parameterMap.get("govCntBefore"));
+		logger.debug("govCntBefore:"+parameterMap.get("govCntBefore"));*/
 		
 		double p_sum_all_cnt = (Integer)parameterMap.get("curCashCnt");
 		      p_sum_all_cnt += (Integer)parameterMap.get("curCreditCardCnt");
@@ -143,6 +144,16 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		      
 		parameterMap.put("p_sum_all_cnt",p_sum_all_cnt);
 		parameterMap.put("p_sum_all_amt",p_sum_all_amt);
+		
+		//debug
+		double   p_sum_all_amt_b = (Double)parameterMap.get("cashAmtBefore");
+		p_sum_all_amt_b += (Double)parameterMap.get("creditCardAmtBefore");
+		p_sum_all_amt_b += (Double)parameterMap.get("aliAmtBefore");
+		p_sum_all_amt_b += (Double)parameterMap.get("weAmtBefore");
+		p_sum_all_amt_b += (Double)parameterMap.get("govAmtBefore");
+		      
+		logger.debug("p_sum_all_amt_b:"+p_sum_all_amt_b);
+		
 		return lstReport;
 	}
 

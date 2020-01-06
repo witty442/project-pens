@@ -12,7 +12,6 @@
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -21,41 +20,10 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="saEmpForm" class="com.isecinc.pens.web.sa.SAEmpForm" scope="session" />
-
 <%
 User user = (User) request.getSession().getAttribute("user");
-
-//if(session.getAttribute("empRegionList") == null){
-	List<PopupForm> billTypeList2 = new ArrayList();
-	PopupForm ref2 = new PopupForm("",""); 
-	billTypeList2.add(ref2);
-	billTypeList2.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Region"));
-	
-	session.setAttribute("empRegionList",billTypeList2);
-//}
-
-//if(session.getAttribute("empTypeList") == null){
-	List<PopupForm> billTypeList1 = new ArrayList();
-	PopupForm ref1 = new PopupForm("",""); 
-	billTypeList1.add(ref1);
-	billTypeList1.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","EMPtype"));
-	
-	session.setAttribute("empTypeList",billTypeList1);
-//}
-
-//if(session.getAttribute("groupStoreList") == null){
-	List<PopupForm> billTypeList3 = new ArrayList();
-	PopupForm ref3 = new PopupForm("",""); 
-	billTypeList3.add(ref3);
-	billTypeList3.addAll(SAEmpDAO.getMasterListByRefCode(new PopupForm(),"","Group_store"));
-	
-	session.setAttribute("groupStoreList",billTypeList3);
-//}
 %>
 <html>
 <head>
@@ -67,26 +35,6 @@ User user = (User) request.getSession().getAttribute("user");
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 .day {
   width: 14%;
 }
@@ -106,7 +54,6 @@ span.pagelinks {
 function loadMe(){
 	sumTotal();
 }
-
 function sumTotal(){
 	var totalRewardBmeTemp = document.getElementsByName("totalRewardBmeTemp");
 	var totalRewardWacoalTemp = document.getElementsByName("totalRewardWacoalTemp");
@@ -160,7 +107,6 @@ function newEmp(path){
 	form.submit();
 	return true; 
 }
-
 function openEdit(path,empRefId){
 	 var form = document.saEmpForm;
 	var param ="&empRefId="+empRefId;
@@ -168,7 +114,6 @@ function openEdit(path,empRefId){
 	form.submit();
 	return true; 
 }
-
 function openPopupCustomer(path){
 	var form = document.saEmpForm;
 	var mcArea = document.getElementsByName('bean.mcArea')[0].value;
@@ -183,7 +128,6 @@ function openPopupCustomer(path){
 	window.open(encodeURI(url),"",
 			   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
 }
-
 function setStoreMainValue(code,desc){
 	var form = document.saEmpForm;
 	//alert(form);
@@ -196,7 +140,6 @@ function setStoreMainValue(code,desc){
 	  form.name.value = "";
 	}
 } 
-
 function getStaffNameKeypress(e,custCode){
 	var form = document.saEmpForm;
 	if(e != null && e.keyCode == 13){
@@ -241,9 +184,7 @@ function getStaffName(custCode){
 		form.name.value = "";
 	}
 }
-
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">

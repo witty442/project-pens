@@ -143,7 +143,7 @@ public class SalesTargetCopy {
 		StringBuilder sql = new StringBuilder();
 		BigDecimal idNew = null;
 		try {
-			idNew =new BigDecimal(SequenceProcessAll.getNextValue("XXPENS_BI_SALES_TARGET_TEMP"));
+			idNew =new BigDecimal(SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP"));
 			if(idNew.compareTo(new BigDecimal("0")) ==0){
 				idNew = new BigDecimal("1");
 			}
@@ -164,7 +164,7 @@ public class SalesTargetCopy {
 			sql.append("\n  BRAND, ");
 			sql.append("\n  BRAND_GROUP, ");
 			sql.append("\n  'Open' as STATUS, "); 
-			sql.append("\n  '"+curBean.getCreateUser()+"' as CREATE_USER, ");
+			sql.append("\n  '"+curBean.getCreateUser()+"_copy' as CREATE_USER, ");
 			sql.append("\n  sysdate as CREATE_DATE, ");
 			sql.append("\n  '' as UPDATE_USER, ");
 			sql.append("\n  null as UPDATE_DATE, ");
@@ -173,8 +173,8 @@ public class SalesTargetCopy {
 			sql.append("\n  null as invoiced_amt ,");
 			sql.append("\n  null as estimate_qty ,");
 			sql.append("\n  null as estimate_amt ,");
-			sql.append("\n  null as price");
-			
+			sql.append("\n  null as price,");
+			sql.append("\n  '"+curBean.getSessionId()+"' as session_id");
 			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP WHERE ID="+idCopy);
 		   // logger.debug("sql:"+sql);
 			
@@ -207,12 +207,32 @@ public class SalesTargetCopy {
 			sql.append("\n  'Open' as status, ");
 			sql.append("\n  '' as remark, ");
 			sql.append("\n  '' as REJECT_REASON, ");
-			sql.append("\n  '"+curBean.getCreateUser()+"' as CREATE_USER, ");
+			sql.append("\n  '"+curBean.getCreateUser()+"_copy' as CREATE_USER, ");
 			sql.append("\n  sysdate as CREATE_DATE, ");
 			sql.append("\n  '' as UPDATE_USER, ");
 			sql.append("\n  null as UPDATE_DATE, ");
-			sql.append("\n  p.SUM12, ");//AMT_AVG12
-			sql.append("\n  p.SUM3, ");//AMT_AVG3
+			//OLD
+			//sql.append("\n  p.SUM12, ");//AMT_AVG12
+			//sql.append("\n  p.SUM3, ");//AMT_AVG3
+			
+			//NEW 21/11/2019
+			sql.append("\n  ( SELECT MAX(V.SUM12) ");
+			sql.append("\n    FROM APPS.XXPENS_BI_MST_SALES_AVG_V V,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n    WHERE V.PERIOD ='"+curBean.getPeriod()+"'");
+			sql.append("\n    AND V.CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
+			sql.append("\n    AND Z.ZONE ='"+curBean.getSalesZone()+"'");
+			sql.append("\n    AND V.salesrep_id ="+curBean.getSalesrepId());
+			sql.append("\n    AND V.salesrep_id = Z.salesrep_id");
+			sql.append("\n  ) as SUM12, ");
+
+			sql.append("\n  ( SELECT MAX(V.SUM3) ");
+			sql.append("\n    FROM APPS.XXPENS_BI_MST_SALES_AVG_V V,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
+			sql.append("\n    WHERE V.PERIOD ='"+curBean.getPeriod()+"'");
+			sql.append("\n    AND V.CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
+			sql.append("\n    AND Z.ZONE ='"+curBean.getSalesZone()+"'");
+			sql.append("\n    AND V.salesrep_id ="+curBean.getSalesrepId());
+			sql.append("\n    AND V.salesrep_id = Z.salesrep_id");
+			sql.append("\n  ) as SUM3, ");
 			
 			//old version
 			/*sql.append("\n  ( SELECT max(P.price) from xxpens_bi_mst_price_list P " );
@@ -223,16 +243,17 @@ public class SalesTargetCopy {
 			//new version 06/2019
 			sql.append("\n  (SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
 			sql.append("\n   where P.INVENTORY_ITEM_ID = L.INVENTORY_ITEM_ID " );
-			sql.append("\n   and P.list_header_id in("+ SQLHelper.converToTextSqlIn(priceListId)+")) as price");
-			
+			sql.append("\n   and P.list_header_id in("+ SQLHelper.converToTextSqlIn(priceListId)+")) as price ,");
+			sql.append("\n  '"+curBean.getSessionId()+"' as session_id");
 			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP_L L ");
-			sql.append("\n  LEFT OUTER JOIN ( ");
+			//OLD
+			/*sql.append("\n  LEFT OUTER JOIN ( ");
 			sql.append("\n    SELECT INVENTORY_ITEM_ID ,SUM3,SUM12 FROM XXPENS_BI_MST_SALES_AVG_V ");
 			sql.append("\n    WHERE PERIOD ='"+curBean.getPeriod()+"'");
 			sql.append("\n    AND CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
 			sql.append("\n    AND SALESREP_ID ='"+curBean.getSalesrepId()+"'");
 			sql.append("\n    AND CUSTOMER_ID ='"+curBean.getCustomerId()+"'");
-			sql.append("\n  ) P ON L.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");
+			sql.append("\n  ) P ON L.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");*/
 			sql.append("\n  WHERE L.ID="+idCopy);
 		    logger.debug("sql:"+sql);
 		    

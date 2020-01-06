@@ -42,6 +42,11 @@ public class ImportManualExcel {
 			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/รายชื่อสาขาและที่อยู่ Makro 31-05-19.xlsx",7);
 			
 			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/nissin_buffer.xlsx",2,0);
+			
+			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/ข้อมูลสาขาของร้านค้า.xlsx",9,0);
+			///importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/ข้อมูลสาขาของร้านค้า.xlsx",9,0);
+			
+			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/ORDER_REP/MasterBmeOrderRep.xlsx",2,0);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

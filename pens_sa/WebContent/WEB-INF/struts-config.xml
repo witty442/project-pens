@@ -46,6 +46,8 @@
 		<form-bean name="batchTaskForm" type="com.isecinc.pens.web.batchtask.BatchTaskForm"/>
 		<form-bean name="b2bForm" type="com.isecinc.pens.web.b2b.B2BForm"/>
 		<form-bean name="vanForm" type="com.isecinc.pens.web.van.VanForm"/>
+		<form-bean name="projectCForm" type="com.isecinc.pens.web.projectc.ProjectCForm"/>
+		<form-bean name="reportAllForm" type="com.isecinc.pens.web.reportall.ReportAllForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -187,7 +189,15 @@
 		     scope="session" type="com.isecinc.pens.web.b2b.B2BAction" >
            <forward name="search" path="/jsp/b2b/b2bSearch.jsp"></forward>
         </action>
-        
+        <action name="projectCForm" path="/jsp/projectCAction" parameter="do" scope="session" type="com.isecinc.pens.web.projectc.ProjectCAction">
+			<forward name="search" path="/jsp/projectC/projectCSearch.jsp" />
+			<forward name="checkStockSearch" path="/jsp/projectC/checkStockSearch.jsp" />
+			<forward name="checkStockDetail" path="/jsp/projectC/checkStockDetail.jsp" />
+		</action>
+		<action name="reportAllForm" path="/jsp/reportAllAction" parameter="do" scope="session" type="com.isecinc.pens.web.reportall.ReportAllAction">
+			<forward name="reportAll" path="/jsp/reportAll/reportAll.jsp" />
+			<!-- <forward name="detail" path="/jsp/manualStock/manualStock.jsp" /> -->
+		</action>
 	</action-mappings>
  
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

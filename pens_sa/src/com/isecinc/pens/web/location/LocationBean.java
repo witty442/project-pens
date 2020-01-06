@@ -52,20 +52,28 @@ public class LocationBean implements  Serializable,Comparable<LocationBean>{
 	private String tripDayDB;
 	private String tripDayDB2;
 	private String tripDayDB3;
-	
+	private String customerTypeDB;
 	private int totalRec;
 	private String createUser;
 	private String status;
 	
 	private long custAccountId;
 	private long partySiteId;
-	
 	//option
 	private String startDate;
 	private String endDate;
 	private String salesZone;
 
 	
+   
+	public String getCustomerTypeDB() {
+		return customerTypeDB;
+	}
+
+	public void setCustomerTypeDB(String customerTypeDB) {
+		this.customerTypeDB = customerTypeDB;
+	}
+
 	public String getSalesCode() {
 		return salesCode;
 	}
