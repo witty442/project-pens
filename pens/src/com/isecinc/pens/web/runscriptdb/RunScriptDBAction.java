@@ -1,5 +1,6 @@
 package com.isecinc.pens.web.runscriptdb;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +12,7 @@ import java.util.Locale;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import util.ControlCode;
@@ -54,6 +56,7 @@ public class RunScriptDBAction {
 				runScriptDBUpdate(sc, conn);
 				
 				/** Drop table no use or update or clear  wrong data**/
+				//despricate
 				dropTableOrClearWrongData(conn);
 			}
 			
@@ -76,6 +79,11 @@ public class RunScriptDBAction {
 				purgDataTempImportTransErr(conn);
 			}
 			
+			//Delete file in DB_backup back 1 month
+			if(day==27){
+				deleteFileDBBackUp();
+			}
+			
 			//clear Task running for next run
 			InterfaceDAO dao = new InterfaceDAO();
 			dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT);
@@ -94,6 +102,44 @@ public class RunScriptDBAction {
 					conn.close();conn= null;
 				}
 			}catch(Exception e){}
+		}
+	}
+	
+	//Delete file in DB_backup back 1 month
+	public static void deleteFileDBBackUp(){
+		String dbBackUpPath ="d:\\DB_Backup\\";
+		String cur_YYYYMM ="";
+		String fileName ="";
+		String fileNameYYYYMM = "";
+		File file = null;
+		try{
+			//get CurrentYYYYMM  
+			cur_YYYYMM = Utils.stringValue(new Date(), "yyyyMM");
+			logger.debug("cur_YYYYMM:"+cur_YYYYMM);
+			
+			//delete all file in Folder Method 1
+			//FileUtils.cleanDirectory(new File(dbBackUpPath)); 
+			
+			File folder = new File(dbBackUpPath);
+			File[] listOfFiles = folder.listFiles();
+
+			for (int i = 0; i < listOfFiles.length; i++) {
+			  if (listOfFiles[i].isFile()) {
+				  fileName = listOfFiles[i].getName();
+				  logger.debug("FileName " + listOfFiles[i].getName());
+				  fileNameYYYYMM = listOfFiles[i].getName().substring(0,6);
+				  logger.debug("fileNameYYYYMM:"+fileNameYYYYMM);
+				  if( !cur_YYYYMM.equals(fileNameYYYYMM)){
+					  file = new File(dbBackUpPath+fileName);
+					  logger.debug("del ["+fileName+"]"+file.delete());
+				  }
+			  } else if (listOfFiles[i].isDirectory()) {
+				  logger.debug("Directory " + listOfFiles[i].getName());
+			  }//if
+			}//for
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
 		}
 	}
 	

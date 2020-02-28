@@ -47,6 +47,7 @@ public class ImportAllBean implements  Comparable<ImportAllBean>, Serializable{
     private String pensItem;
     private String onhandAmt;
     
+    private String custGroup;
     private String storeCode;
     private String storeName;
     private String custNo;//oracle
@@ -83,6 +84,13 @@ public class ImportAllBean implements  Comparable<ImportAllBean>, Serializable{
     private String summaryType;
     private String endSaleDate;
     
+    
+	public String getCustGroup() {
+		return custGroup;
+	}
+	public void setCustGroup(String custGroup) {
+		this.custGroup = custGroup;
+	}
 	public String getSummaryType() {
 		return summaryType;
 	}

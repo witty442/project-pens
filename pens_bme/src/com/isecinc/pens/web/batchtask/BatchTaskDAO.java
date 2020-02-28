@@ -39,6 +39,35 @@ public class BatchTaskDAO {
 
 	protected static  Logger logger = Logger.getLogger("PENS");
 	
+	public  BatchTaskForm searchBatchLastRun(User user,String pageName){
+		BatchTaskForm batchTaskForm = new BatchTaskForm();
+		try{
+			/** Set Condition Search **/
+			MonitorBean[] monitors = findMonitorListNew(user,pageName);
+			
+			logger.debug("monitors Size:"+monitors.length);
+			if (monitors != null && monitors.length > 0) {
+				
+				//Search interfaceResult (monitorItem)
+				MonitorItemBean monitorItemBean = findMonitorItemBean(user,monitors[0]);
+				batchTaskForm.setMonitorItem(monitorItemBean);
+	
+				// Head Monitor 
+				batchTaskForm.setResults(monitors);
+				
+				//Get BatschTask Info
+				BatchTaskInfo taskInfo = new BatchTaskInfo();
+				taskInfo.setTaskName(pageName);
+				taskInfo.setDispDetail(new BatchTaskAction().getDispDetailByTaskname(pageName));
+				batchTaskForm.setTaskInfo(taskInfo);
+			} else {
+				batchTaskForm.setResults(null);
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return batchTaskForm;
+	}
 	public MonitorBean insertMonitor(Connection conn ,MonitorBean model) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
@@ -562,6 +591,7 @@ public class BatchTaskDAO {
 				m.setTransactionType(rs.getString("TRANSACTION_TYPE"));
 				m.setMonitorId(rs.getBigDecimal("monitor_id"));
 				m.setName(rs.getString("name"));
+				m.setThName(rs.getString("th_name"));
 				m.setType(rs.getString("type"));
 				m.setStatus(rs.getInt("status"));
 				m.setStatusDesc(getStatDesc(rs.getInt("status")));
@@ -570,6 +600,7 @@ public class BatchTaskDAO {
 				m.setSubmitDate(rs.getTimestamp("submit_date"));
 				m.setSubmitDateDisp(DateUtil.stringValue(rs.getTimestamp("submit_date"),DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,Utils.local_th));
 	            m.setFileCount(rs.getInt("file_count"));
+	            m.setFileName(rs.getString("file_name"));
 	            m.setSuccessCount(rs.getInt("success_count"));
 	            if( !Utils.isNull(rs.getString("error_msg")).equals("")){
 	               m.setErrorMsg(rs.getString("error_msg"));
@@ -1163,6 +1194,7 @@ public class BatchTaskDAO {
 		try {
 			String sql = "UPDATE PENSBI.monitor SET " +
 			" status = ? ,file_count =? ,error_code = ? ,error_msg =? ,transaction_type = ? "+
+			" ,file_name = ? ,type =? ,th_name = ?"+
 			" WHERE MONITOR_ID = ? and transaction_id =?";
 			
 			logger.debug("SQL:"+sql);
@@ -1176,6 +1208,9 @@ public class BatchTaskDAO {
 			ps.setString(++index, Utils.isNull(model.getErrorCode()).length()> 300?model.getErrorCode().substring(0,299):model.getErrorCode());
 			ps.setString(++index, Utils.isNull(model.getErrorMsg()).length()> 300?model.getErrorMsg().substring(0,299):model.getErrorMsg());
 			ps.setString(++index, Utils.isNull(model.getTransactionType()));
+			ps.setString(++index, Utils.isNull(model.getFileName()));
+			ps.setString(++index, Utils.isNull(model.getType()));
+			ps.setString(++index, Utils.isNull(model.getThName()));
 			ps.setBigDecimal(++index, model.getMonitorId());
 			ps.setBigDecimal(++index, model.getTransactionId());
 			

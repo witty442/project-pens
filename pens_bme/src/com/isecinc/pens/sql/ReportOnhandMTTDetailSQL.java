@@ -97,14 +97,14 @@ public class ReportOnhandMTTDetailSQL {
 					sql.append("\n UNION ALL");
 					
 					sql.append("\n SELECT DISTINCT ");
-					sql.append("\n  P.inventory_item_code as pens_item, substr(P.inventory_item_desc,0,6) as group_type ");
+					sql.append("\n  P.inventory_item_code as pens_item, MI.group_type ");
 					sql.append("\n ,MI.material_master,MI.barcode ");
 					sql.append("\n  FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
 					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
 					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
 					sql.append("\n ,( ");
-					sql.append("\n   select pens_value as pens_item,");
-					sql.append("\n   interface_value as material_master,interface_desc as barcode ");
+					sql.append("\n   select pens_value as pens_item,PENS_DESC2 as group_type");
+					sql.append("\n   ,interface_value as material_master,interface_desc as barcode ");
 					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
 					sql.append("\n  )MI ");
@@ -122,7 +122,7 @@ public class ReportOnhandMTTDetailSQL {
 					sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 					sql.append("\n AND V.customer_id = C.customer_id ");
 					sql.append("\n AND M.cust_no = C.customer_code  ");
-					sql.append("\n AND P.inventory_item_code = MI.pens_item  ");
+					sql.append("\n AND P.inventory_item_code = MI.pens_item ");
 					sql.append("\n AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
 					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
@@ -142,7 +142,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND MI.group_type LIKE '"+c.getGroup()+"%' ");
 					}
 						
 					sql.append("\n )AA");
@@ -153,7 +153,7 @@ public class ReportOnhandMTTDetailSQL {
       		    sql.append("\n SELECT ");
 				sql.append("\n L.PENS_ITEM, L.GROUP_CODE as group_type, L.material_master,L.barcode,");
 				sql.append("\n SUM(QTY) AS INIT_SALE_QTY ");
-				sql.append("\n FROM PENSBME_MTT_INIT_STK H,PENSBME_MTT_ONHAND_INIT_STK L");
+				sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBI.PENSBME_MTT_ONHAND_INIT_STK L");
 				sql.append("\n WHERE 1=1 ");
 				sql.append("\n and H.cust_no = L.cust_no  ");
 				sql.append("\n and H.COUNT_STK_DATE = L.COUNT_STK_DATE  ");
@@ -169,7 +169,7 @@ public class ReportOnhandMTTDetailSQL {
 					sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND L.GROUP_CODE  LIKE '"+c.getGroup()+"%' ");
 				}
 				sql.append("\n  GROUP BY L.PENS_ITEM,L.GROUP_CODE, L.material_master,L.barcode ");
 				sql.append("\n )INIT_MTT ");
@@ -182,7 +182,7 @@ public class ReportOnhandMTTDetailSQL {
 				sql.append("\n L.PENS_ITEM, ");
 			    sql.append("\n L.GROUP_CODE as group_type, L.material_master,L.barcode , ");
 				sql.append("\n NVL(COUNT(*),0) AS SALE_OUT_QTY ");
-				sql.append("\n FROM PENSBME_SALES_OUT L");
+				sql.append("\n FROM PENSBI.PENSBME_SALES_OUT L");
 				sql.append("\n WHERE 1=1 ");
 				sql.append("\n AND L.status <> '"+PickConstants.STATUS_CANCEL+"'");
 					
@@ -201,7 +201,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.GROUP_CODE  LIKE '"+c.getGroup()+"%' ");
 					}
 					sql.append("\n  GROUP BY L.PENS_ITEM, L.GROUP_CODE , L.material_master,L.barcode ");
 					
@@ -218,7 +218,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n SELECT  ");
 						sql.append("\n MI.pens_item, M.group_code as group_type,MI.material_master,MI.barcode,");
 						sql.append("\n NVL(SUM(QTY),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBME_ORDER M ");
+						sql.append("\n FROM PENSBI.PENSBME_ORDER M ");
 						sql.append("\n ,( ");
 						sql.append("\n   select pens_value as pens_item,");
 						sql.append("\n   interface_value as material_master,interface_desc as barcode ");
@@ -240,7 +240,7 @@ public class ReportOnhandMTTDetailSQL {
 							sql.append("\n AND MI.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND M.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND M.group_code  LIKE '"+c.getGroup()+"%' ");
 						}
 						sql.append("\n GROUP BY MI.pens_item,M.group_code,MI.material_master,MI.barcode ");
 						
@@ -249,7 +249,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n SELECT  ");
 						sql.append("\n I.pens_item, I.group_code as group_type,I.material_master,MI.barcode, ");
 						sql.append("\n NVL(COUNT(*),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBME_PICK_STOCK M ,PENSBI.PENSBME_PICK_STOCK_I I ");
+						sql.append("\n FROM PENSBI.PENSBME_PICK_STOCK M ,PENSBI.PENSBME_PICK_STOCK_I I ");
 						sql.append("\n ,( ");
 						sql.append("\n   select pens_value as pens_item,");
 						sql.append("\n   interface_value as material_master,interface_desc as barcode ");
@@ -276,7 +276,7 @@ public class ReportOnhandMTTDetailSQL {
 							sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND I.group_code  LIKE '"+c.getGroup()+"%' ");
 						}
 						sql.append("\n GROUP BY I.pens_item,I.group_code,I.material_master,MI.barcode ");
 						
@@ -285,7 +285,7 @@ public class ReportOnhandMTTDetailSQL {
 						sql.append("\n SELECT  ");
 						sql.append("\n I.pens_item, I.group_code as group_type,I.material_master,I.barcode, ");
 						sql.append("\n NVL(SUM(I.ISSUE_QTY),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBME_STOCK_ISSUE M ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I ");
+						sql.append("\n FROM PENSBI.PENSBME_STOCK_ISSUE M ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I ");
 						sql.append("\n WHERE 1=1   ");
 						sql.append("\n AND M.issue_req_no = I.issue_req_no  ");
 						sql.append("\n AND M.status ='"+PickConstants.STATUS_ISSUED+"'");
@@ -304,7 +304,7 @@ public class ReportOnhandMTTDetailSQL {
 							sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
 						}
 						if( !Utils.isNull(c.getGroup()).equals("")){
-							sql.append("\n AND I.group_code IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+							sql.append("\n AND I.group_code  LIKE '"+c.getGroup()+"%' ");
 						}
 						sql.append("\n GROUP BY I.pens_item,I.group_code,I.material_master,I.barcode ");
 						
@@ -320,8 +320,8 @@ public class ReportOnhandMTTDetailSQL {
 					sql.append("\n SELECT I.pens_item, ");
 					sql.append("\n I.group_code as group_type,I.material_master,I.barcode ,");
 					sql.append("\n NVL(COUNT(*),0) as SALE_RETURN_QTY ");
-					sql.append("\n  FROM PENSBME_PICK_JOB J   ");
-					sql.append("\n ,PENSBME_PICK_BARCODE B ,PENSBME_PICK_BARCODE_ITEM I  ");
+					sql.append("\n  FROM PENSBI.PENSBME_PICK_JOB J   ");
+					sql.append("\n ,PENSBI.PENSBME_PICK_BARCODE B ,PENSBI.PENSBME_PICK_BARCODE_ITEM I  ");
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND J.job_id = B.job_id  ");
 					sql.append("\n AND B.job_id = I.job_id ");

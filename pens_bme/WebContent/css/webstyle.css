@@ -332,7 +332,8 @@ TABLE.result_success TD {
 }
 
 .lineE:hover {
-	background-color: #FFBBFF;
+	/* background-color: #FFBBFF; */
+	 background-color: #E8F6F3 ; 
 }
 
 .lineO {
@@ -340,7 +341,8 @@ TABLE.result_success TD {
 }
 
 .lineO:hover {
-	background-color: #FFBBFF;
+	/* background-color: #FFBBFF; */
+	 background-color: #E8F6F3; 
 }
 .lineError {
 	background-color: #FF0000;

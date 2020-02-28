@@ -31,7 +31,7 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.summary.process.GenerateMonthEndLotus;
 import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
 import com.isecinc.pens.web.batchtask.BatchTaskForm;
-import com.isecinc.pens.web.batchtask.task.GenStockOnhandTempTask;
+import com.isecinc.pens.web.batchtask.task.GenStockOnhandRepTempTask;
 import com.isecinc.pens.web.summary.report.OpenBillRobinsonReportAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandAsOfKingAction;
 import com.isecinc.pens.web.summary.report.ReportOnhandAsOfRobinsonAction;
@@ -1130,8 +1130,8 @@ public class SummaryAction extends I_Action {
 		try {
 			//Prepare Parameter to BatchTask
 			Map<String, String> batchParaMap = new HashMap<String, String>();
-			batchParaMap.put(GenStockOnhandTempTask.PARAM_ASOF_DATE, aForm.getOnhandSummary().getAsOfDate());
-			batchParaMap.put(GenStockOnhandTempTask.PARAM_STORE_CODE, aForm.getOnhandSummary().getPensCustCodeFrom());
+			batchParaMap.put(GenStockOnhandRepTempTask.PARAM_ASOF_DATE, aForm.getOnhandSummary().getAsOfDate());
+			batchParaMap.put(GenStockOnhandRepTempTask.PARAM_STORE_CODE, aForm.getOnhandSummary().getPensCustCodeFrom());
 			
 			logger.debug("storeCode:"+aForm.getOnhandSummary().getPensCustCodeFrom());
 			

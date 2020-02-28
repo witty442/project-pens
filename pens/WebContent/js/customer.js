@@ -107,6 +107,12 @@ function save(path) {
 		document.getElementsByName('customer.tripDay')[0].focus();
 		return false;
 	}
+	if(document.getElementsByName('customer.businessType')[0].value == '')
+	{
+		alert('กรุณาระบุ ประเภท');
+		document.getElementsByName('customer.businessType')[0].focus();
+		return false;
+	}
 	
 	if(!createAddressList()){return false;}
 	if(!createContactList()){return false;}

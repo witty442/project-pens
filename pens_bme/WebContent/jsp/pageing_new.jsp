@@ -14,7 +14,7 @@
 			       title="Go to page <%=(1)%>"> หน้าแรก</a>
 		
 		 <!-- Prev Page (currPage-1) < 1 No Action -->
-		  <%if(currPage-1 <= 1){ %>
+		  <%if(currPage > 1){ %>
 	         <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(currPage==1?1:currPage-1)%>')"  
 			       title="Go to page <%=(currPage==1?1:currPage-1)%>"> &laquo;</a>
 		  <%}else{ %>

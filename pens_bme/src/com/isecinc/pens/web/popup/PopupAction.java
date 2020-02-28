@@ -230,6 +230,20 @@ public class PopupAction extends I_Action {
 				 }else{
 					 request.setAttribute("Message", "ไม่พบข่อมูล");
 				 }
+			}else if("StoreOrderRep".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupForm> results = PopupDAO.searchStoreOrderRepList(popupForm);
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+			}else if("Store".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupForm> results = PopupDAO.searchStoreList(popupForm);
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
 			}
 			
 		} catch (Exception e) {

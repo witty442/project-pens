@@ -1726,6 +1726,8 @@ public class OrderAction extends I_Action {
 					}
 				}
 			}
+			//default cancel_msg
+			//parameterMap.put("p_cancel_msg", "");
 			
 			//original or copy report
 			//Cash
@@ -1742,6 +1744,11 @@ public class OrderAction extends I_Action {
 				parameterMap.put("p_sign_name_1", "พนักงานขาย");
 				parameterMap.put("p_sign_name_2", "ผู้รับสินค้า/ผู้ชำระเงิน");
 				parameterMap.put("p_sign_name_3", "ผู้ช่วยพนักงานขาย");
+				
+				//case Print cancel Order
+				if(Utils.isNull(request.getParameter("statusOrder")).equalsIgnoreCase("VO")){
+					pReportTitle = "ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว (ยกเลิก)";
+				}
 			
 			//Credit
 			}else if("tax".equalsIgnoreCase(reportType)){ 

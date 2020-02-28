@@ -401,6 +401,7 @@ function getCustName(custCode,fieldName){
 									<th >Issue Req Status</th>
 									<th >Confirm Issue Date</th>
 									<th >Pick Type</th>
+									<th >ทำ Auto-Trans แล้ว</th>
 									<th >หมายเหตุ</th>
 									<th >แก้ไข</th>	
 									<th >ยืนยัน</th>						
@@ -420,15 +421,20 @@ function getCustName(custCode,fieldName){
 										   ${results.issueReqDate}
 										</td>
 										<td class="td_text_center" width="10%">${results.issueReqNo}</td>
-										<td class="td_text_center" width="10%">
+										<td class="td_text_center" width="5%">
 											${results.issueReqStatusDesc}
 										</td>
 										<td class="td_text_center" width="10%">
 										    ${results.confirmIssueDate}
 										</td>
 										
-										<td class="td_text_center" width="10%">
+										<td class="td_text_center" width="5%">
 										  ${results.pickTypeDesc}
+										</td>
+										<td class="td_text_center" width="10%">
+											<c:if test="${results.autoTrans == true}">
+											  <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+											</c:if>
 										</td>
 									    <td class="td_text" width="20%">
 										  ${results.remark}

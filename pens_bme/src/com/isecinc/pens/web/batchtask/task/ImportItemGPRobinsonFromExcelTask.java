@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -28,6 +29,7 @@ import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.UploadXLSUtil;
@@ -37,7 +39,7 @@ import com.pens.util.meter.MonitorTime;
 import com.pens.util.seq.SequenceProcess;
 
 public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements BatchTaskInterface{
-	public static Logger logger = Logger.getLogger("PENS");
+	
    
 	/*public void run(MonitorBean monitorModel){
 		logger.debug("TaskName:"+monitorModel.getName());
@@ -47,8 +49,20 @@ public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements Batc
 	/**
 	 * Return :Param Name|Param label|Param Type|default value|validate$Button Name
 	 */
-	public String getParam(){
+	/*public String getParam(){
 		return "dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
+	}*/
+	
+	public String[] getParam(){
+		String[] param = new String[1];
+		param[0] = "dataFormFile|เลือกไฟล์|FROMFILE||VALID";
+		return param;
+	}
+	public List<BatchTaskListBean> getParamListBox(){
+		return null;
+	}
+	public String getButtonName(){
+		return "Import ข้อมูล";
 	}
 	public String getDescription(){
 		return "Import File From Excel";

@@ -16,10 +16,14 @@
 "use strict";
 
 	function setup($) {
-		if (/^1\.(0|1|2)/.test($.fn.jquery)) {
-			/*global alert:true */
+		/*if (/^1\.(0|1|2)/.test($.fn.jquery)) {
+			global alert:true 
 			alert('blockUI requires jQuery v1.3 or later!  You are using v' + $.fn.jquery);
 			return;
+		}*/
+		if ((/1\.(2\.([3-9]|[1-9][0-9])|[3-9]\.[0-9]*|[1-9][0-9]*\.[0-9]*)/.test($.fn.jquery)) === false ) {
+		    alert('blockUI requires jQuery v1.2.3 or later!  You are using v' + $.fn.jquery);
+		    return;
 		}
 
 		$.fn._fadeIn = $.fn.fadeIn;

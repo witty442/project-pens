@@ -1,7 +1,12 @@
 package com.isecinc.pens.web.batchtask;
 
 public class BatchTaskConstants {
-	
+
+/** Gobal Parameter Map Name **/
+public static String BATCH_PARAM_MAP  ="BATCH_PARAM_MAP";
+public static String DATA_FILE  ="DATA_FILE";
+
+/** Task Name **/
  public static String IMPORT_ORDER_AUTOSUB_FROM_WACOAL = "ImportOrderAutoSubFromWacoal";
  public static String IMPORT_ORDER_FROM_EXCEL = "ImportOrderFromExcel";
  public static String IMPORT_BARCODE_MASTER_FROM_EXCEL = "ImportBarcodeMasterFromExcel";
@@ -12,5 +17,9 @@ public class BatchTaskConstants {
  public static String IMPORT_ITEM_GP_ROBIN_FROM_EXCEL = "ImportItemGPRobinsonFromExcel";
  public static String IMPORT_AUTOCNHHTEMP_FROM_EXCEL = "ImportAutoCNHHTempFromExcel";
  
- public static String GEN_STOCK_ONHAND_TEMP = "GenStockOnhandTemp";
+ public static String GEN_STOCK_ONHAND_REP_TEMP = "GenStockOnhandRepTemp";
+ public static String GEN_AUTO_ORDER_REP = "GenAutoOrderRep";
+ public static String IMPORT_EXCEL_PIC_G899_TO_G07 = "ImportExcelPICG899ToG07";
+ public static String EXPORT_REPORT_ONHAND_LOTUS = "ExportReportOnhandLotus";
+ public static String EXPORT_REPORT_ONHAND_ROBINSON = "ExportReportOnhandRobinson";
 }

@@ -21,7 +21,7 @@ public class ReportAllBean implements  Comparable<ReportAllBean>, Serializable{
 	private String pensItemTo;
 	private String dispZeroStock;
 	private String endDate;
-	
+	private String currentDate;
 	private String salesDate;
 	private String pensCustCodeFrom;
 	private String pensCustNameFrom;
@@ -83,6 +83,13 @@ public class ReportAllBean implements  Comparable<ReportAllBean>, Serializable{
     private String summaryType;
     private String endSaleDate;
     
+    
+	public String getCurrentDate() {
+		return currentDate;
+	}
+	public void setCurrentDate(String currentDate) {
+		this.currentDate = currentDate;
+	}
 	public String getSummaryType() {
 		return summaryType;
 	}

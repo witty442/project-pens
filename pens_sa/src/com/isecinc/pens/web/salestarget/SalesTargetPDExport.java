@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.dao.GeneralDAO;
+import com.isecinc.pens.dao.SalesrepZoneDAO;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -41,7 +42,7 @@ public class SalesTargetPDExport {
 				h.append(" <td  colspan='5'><b>เดือน : "+o.getPeriod()+"</b></td> \n");
 				h.append("</tr>");
 				h.append("<tr> \n");
-				h.append("  <td  colspan='5'><b>ภาคตามสายดูแล : "+ GeneralDAO.getSalesZoneDesc(o.getSalesZone())+" &nbsp;&nbsp;PD:"+o.getPdCode()+"</b></td> \n");
+				h.append("  <td  colspan='5'><b>ภาคตามสายดูแล : "+ SalesrepZoneDAO.getSalesZoneDesc(o.getSalesZone())+" &nbsp;&nbsp;PD:"+o.getPdCode()+"</b></td> \n");
 				h.append("</tr>");
 				h.append("<tr> \n");
 				h.append("  <td  colspan='5'><b> แบรนด์ : "+o.getBrand()+"  &nbsp;&nbsp;รหัสสินค้า : "+o.getItemCode()+"</b></td> \n");

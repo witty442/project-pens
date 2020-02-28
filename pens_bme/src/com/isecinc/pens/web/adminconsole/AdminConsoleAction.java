@@ -1,5 +1,9 @@
 package com.isecinc.pens.web.adminconsole;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,6 +17,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.EnvProperties;
 import com.pens.util.EnvQuartzProperties;
+import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
@@ -54,8 +59,9 @@ public class AdminConsoleAction extends I_Action {
 				currentTab = Utils.isNull(request.getAttribute("currentTab"));
 			}
 			String action = Utils.isNull(request.getParameter("action"));
+			String export = Utils.isNull(request.getParameter("export"));
 			
-			//System.out.println("Servlet:currentTab:"+request.getParameter("currentTab") +"action:"+action);
+			System.out.println("Servlet:currentTab:"+request.getParameter("currentTab") +"action:"+action+",export="+export);
 
 			if(currentTab.equals("tab_config_info") || "".equals(currentTab)){
 				String configInfo  ="";
@@ -161,34 +167,53 @@ public class AdminConsoleAction extends I_Action {
 				String q2 = Utils.isNull(adForm.getQ2());
 				System.out.println("textQSql1:"+q1);
 				System.out.println("textQSql2:"+q2);
-				
-				 if( !q1.equals("")){
-				    System.out.println("Query");
-				    resultQ1 =  SQLHelper.excQuery(q1);
-				 } 
-				 if( !q2.equals("")){
-					 resultQ2 =  SQLHelper.excQuery(q2);
-				 }
-				
-				 adForm.setResultQ1(resultQ1);
-				 adForm.setResultQ2(resultQ2);
-				 
+				if( !"true".equalsIgnoreCase(export)){
+					 if( !q1.equals("")){
+					    System.out.println("Query");
+					    resultQ1 =  SQLHelper.excQuery(q1);
+					    //FileUtil.writeFile("C:\\Users\\WITTY-LENOVO\\Desktop\\jojo\\temp.xls", resultQ1.toString(),"TIS-620");
+					 } 
+					 if( !q2.equals("")){
+						 resultQ2 =  SQLHelper.excQuery(q2);
+					 }
+					
+					 adForm.setResultQ1(resultQ1);
+					 adForm.setResultQ2(resultQ2);
+				}else{
+					logger.debug("Submit Export To Excel");
+					q1 = Utils.isNull(adForm.getQ1());
+					try{
+						 String eOutput =  SQLHelper.excQuery(q1);
+						 
+					     java.io.OutputStream out = response.getOutputStream();
+						 response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+						 response.setContentType("application/vnd.ms-excel");
+						 Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+						 w.write(eOutput);
+					     w.flush();
+					     w.close();
+					
+					     out.flush();
+					     out.close();
+					 }catch(Exception e){
+					    e.printStackTrace();
+					 }
+				}
 			}else if(currentTab.equals("tab_execute") && "tab_execute".equalsIgnoreCase(action)){
 				String eSQL = "";
 				String eOutput = "";
-				
+				logger.debug("Submit Query");
 				eSQL = Utils.isNull(adForm.geteSQL());
 	            
 				System.out.println("eSQL:"+eSQL);
 				
 			    if( !eSQL.equals("")){
 			    	eOutput =  SQLHelper.excUpdate(eSQL);
-			    	
 			    	System.out.println("eOutput:"+eOutput);
 			    }	
 			    
 			    adForm.seteOutput(eOutput);
-			    
+				
 			}else if(currentTab.equals("tab_backupdb") && "tab_backupdb".equalsIgnoreCase(action)){
 				String resultBKDB = "";
 				  try {   

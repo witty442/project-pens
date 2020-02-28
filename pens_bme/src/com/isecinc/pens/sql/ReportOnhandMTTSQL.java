@@ -53,13 +53,13 @@ public class ReportOnhandMTTSQL {
 			   sql.append("\n SELECT DISTINCT AA.* FROM(");
 					sql.append("\n SELECT DISTINCT ");
 					sql.append("\n M.customer_code,M.customer_desc,M.cust_no,P.inventory_item_code as pens_item,   ");
-					sql.append("\n substr(P.inventory_item_desc,0,6) as group_type ");
-					sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+					sql.append("\n MI.group_type ");
+					sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
-					sql.append("\n   PENSBME_MST_REFERENCE M ");
+					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE  ( pens_value like  '"+Constants.STORE_TYPE_MTT_CODE_1+"%' " );
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER+"%'");
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_HISHER_CODE+"%'");
@@ -69,7 +69,12 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_5+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
+			        sql.append("\n,( SELECT DISTINCT M.PENS_VALUE as pens_item ,PENS_DESC2 as group_type ");
+			        sql.append("\n   from PENSBI.PENSBME_MST_REFERENCE M  ");
+			        sql.append("\n   WHERE M.reference_code ='LotusItem' ");
+			        sql.append("\n ) MI ");
 					sql.append("\n WHERE 1=1   ");
+					sql.append("\n AND P.inventory_item_code = MI.pens_item ");
 					sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 					sql.append("\n AND V.customer_id = C.customer_id ");
 					sql.append("\n AND M.cust_no = C.customer_code  ");
@@ -92,7 +97,7 @@ public class ReportOnhandMTTSQL {
 						sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND MI.GROUP_TYPE LIKE '"+c.getGroup()+"%' ");
 					}
 					sql.append("\n UNION ALL");
 					
@@ -124,7 +129,7 @@ public class ReportOnhandMTTSQL {
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.GROUP_CODE LIKE '"+c.getGroup()+"%'");
 					}
 					
 					sql.append("\n UNION ALL");
@@ -172,7 +177,7 @@ public class ReportOnhandMTTSQL {
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.GROUP_CODE LIKE '"+c.getGroup()+"%' ");
 					}
 					
 					sql.append("\n )AA");
@@ -212,7 +217,7 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 				}
 				if( !Utils.isNull(c.getGroup()).equals("")){
-					sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+					sql.append("\n AND L.GROUP_CODE LIKE '"+c.getGroup()+"%' ");
 				}
 				sql.append("\n  GROUP BY L.CUST_NO,L.PENS_ITEM,L.GROUP_CODE ");
 				sql.append("\n )INIT_MTT ");
@@ -256,7 +261,7 @@ public class ReportOnhandMTTSQL {
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND L.GROUP_CODE IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND L.GROUP_CODE LIKE '"+c.getGroup()+"%' ");
 					}
 					sql.append("\n  GROUP BY L.CUST_NO,L.PENS_ITEM, L.GROUP_CODE ");
 					sql.append("\n )SALE_OUT ");
@@ -266,8 +271,8 @@ public class ReportOnhandMTTSQL {
 			sql.append("\n LEFT OUTER JOIN( ");
 					sql.append("\n SELECT  ");
 					sql.append("\n M.customer_code ,P.inventory_item_code as pens_item,  ");
-					sql.append("\n substr(P.inventory_item_desc,0,6) as group_type, ");
-					sql.append("\n NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
+					sql.append("\n MI.group_type ");
+					sql.append("\n ,NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
 					sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
 					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
 					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
@@ -283,7 +288,11 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_5+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
-					sql.append("\n WHERE 1=1   ");
+			        sql.append("\n,( SELECT DISTINCT M.PENS_VALUE as pens_item ,PENS_DESC2 as group_type ");
+			        sql.append("\n   from PENSBI.PENSBME_MST_REFERENCE M  ");
+			        sql.append("\n   WHERE M.reference_code ='LotusItem' ");
+			        sql.append("\n ) MI ");
+					sql.append("\n WHERE P.inventory_item_code = MI.pens_item  ");
 					sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 					sql.append("\n AND V.customer_id = C.customer_id  ");
 					sql.append("\n AND M.cust_no = C.customer_code  ");
@@ -306,18 +315,18 @@ public class ReportOnhandMTTSQL {
 						sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND MI.group_type LIKE '"+c.getGroup()+"%' ");
 					}
 						
-					sql.append("\n GROUP BY M.customer_code,P.inventory_item_code, substr(P.inventory_item_desc,0,6) ");
+					sql.append("\n GROUP BY M.customer_code,P.inventory_item_code, MI.group_type ");
 			sql.append("\n )SALE_IN ");
 			sql.append("\n ON  M.customer_code = SALE_IN.customer_code and M.pens_item = SALE_IN.pens_item ");
 			sql.append("\n AND M.group_type  = SALE_IN.group_type ");
 			sql.append("\n LEFT OUTER JOIN ( ");
 					sql.append("\n SELECT  ");
-					sql.append("\n M.customer_code,P.inventory_item_code as pens_item,  ");
-					sql.append("\n substr(P.inventory_item_desc,0,6) as group_type, ");
-					sql.append("\n NVL(SUM(RETURNED_QTY),0)  as SALE_RETURN_QTY ");
+					sql.append("\n  M.customer_code,P.inventory_item_code as pens_item ");
+					sql.append("\n ,MI.group_type ");
+					sql.append("\n ,NVL(SUM(RETURNED_QTY),0)  as SALE_RETURN_QTY ");
 					sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
 					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
 					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
@@ -333,7 +342,11 @@ public class ReportOnhandMTTSQL {
 					sql.append("\n           OR pens_value like '"+Constants.STORE_TYPE_KING_POWER_5+"%')");
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
-					sql.append("\n WHERE 1=1   ");
+			        sql.append("\n,( SELECT DISTINCT M.PENS_VALUE as pens_item ,PENS_DESC2 as group_type ");
+			        sql.append("\n   from PENSBI.PENSBME_MST_REFERENCE M  ");
+			        sql.append("\n   WHERE M.reference_code ='LotusItem' ");
+			        sql.append("\n ) MI ");
+					sql.append("\n WHERE P.inventory_item_code = MI.pens_item  ");
 					sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 					sql.append("\n AND V.customer_id = C.customer_id  ");
 					sql.append("\n AND M.cust_no = C.customer_code  ");
@@ -356,9 +369,9 @@ public class ReportOnhandMTTSQL {
 						sql.append("\n AND P.inventory_item_code <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					if( !Utils.isNull(c.getGroup()).equals("")){
-						sql.append("\n AND substr(P.inventory_item_desc,0,6) IN("+SQLHelper.converToTextSqlIn(c.getGroup())+") ");
+						sql.append("\n AND MI.group_type LIKE '"+c.getGroup()+"%' ");
 					}
-					sql.append("\n GROUP BY M.customer_code ,P.inventory_item_code,  substr(P.inventory_item_desc,0,6)" );
+					sql.append("\n GROUP BY M.customer_code ,P.inventory_item_code, MI.group_type" );
 			sql.append("\n )SALE_RETURN ");
 			sql.append("\n  ON  M.customer_code = SALE_RETURN.customer_code and M.pens_item = SALE_RETURN.pens_item ");
 			sql.append("\n  AND M.group_type   = SALE_RETURN.group_type");
@@ -369,8 +382,6 @@ public class ReportOnhandMTTSQL {
 			}
 			
 			sql.append("\n ORDER BY A.customer_code,A.group_type asc ");
-			
-			//logger.debug("sql:"+sql);
 			
 			//debug write sql to file
 			if(logger.isDebugEnabled()){

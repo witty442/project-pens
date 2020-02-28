@@ -99,7 +99,7 @@
      </textarea>
     </td></tr>	
     <tr><td>
-      <b>Validate Data Table (Javascript)</b>
+      <b>Validate Data ,ex Number ,Date,Currency (Javascript)</b>
       <a href="http://localhost:8080/pens_help/jsp/knowledge/validateDataTable.html">Show Detail</a></b>
    </td></tr>
     <tr><td>
@@ -149,7 +149,7 @@
          <a href="http://localhost:8080/pens_help/jsp/knowledge/fixTableHeader2.jsp">Show Detail</a></b>
    </td></tr>
    <tr><td>
-         <b>  fix head table alternative 3 (work colspan and rowspan) (sample page preNissinOrder)
+         <b>  fix head table alternative 3 (work colspan and rowspan) (sample page preNissinOrder(pens_sa) ,Page AutoOrder(pens_bme))
          <a href="http://localhost:8080/pens_help/jsp/knowledge/fixTableHeader3.jsp">Show Detail</a></b>
    </td></tr>
     <tr><td>
@@ -159,14 +159,6 @@
 				  window.location.hash="no-back-button";
 				  window.location.hash="Again-No-back-button";//again because google chrome don't insert first hash into history
 				  window.onhashchange=function(){window.location.hash="no-back-button";}
-		    </textarea>
-		</div>	 
-   </td></tr>
-    <tr><td>
-        <b> Number Input Javascript <a href="javascript:showDiv('div_number');">Show Detail</a></b>
-         <div style="display: none;" id="div_number">
-              <textarea rows="5" cols="160">
-				onkeydown="return inputNum(event);"
 		    </textarea>
 		</div>	 
    </td></tr>

@@ -43,7 +43,7 @@ function openPopupProduct(path,types,storeType){
 }
 
 function setStoreMainValue(code,desc,types){
-	var form = document.reportsForm;
+	var form = document.reportAllForm;
 	//alert(form);
 	if("from" == types){
 		form.pensCustCodeFrom.value = code;
@@ -55,13 +55,13 @@ function setStoreMainValue(code,desc,types){
 } 
 
 function setGroupMainValue(code,desc,types){
-	var form = document.reportsForm;
+	var form = document.reportAllForm;
 	form.group.value = code;
 	form.groupDesc.value = desc;
 }
 
 function setProductMainValue(code,desc,types){
-	var form = document.reportsForm;
+	var form = document.reportAllForm;
 	//alert(form);
 	if("from" == types){
 		form.pensItemFrom.value = code;
@@ -71,7 +71,7 @@ function setProductMainValue(code,desc,types){
 } 
 
 function getCustNameKeypress(path,e,custCode,fieldName){
-	var form = document.reportsForm;
+	var form = document.reportAllForm;
 	var storeType = form.storeType.value;
 	
 	if(e != null && e.keyCode == 13){
@@ -90,7 +90,7 @@ function getCustNameKeypress(path,e,custCode,fieldName){
 
 function getCustName(path,custCode,fieldName,storeType){
 	var returnString = "";
-	var form = document.reportsForm;
+	var form = document.reportAllForm;
 	var getData = $.ajax({
 			url: path+"/jsp/ajax/getCustNameAjax.jsp",
 			data : "custCode=" + custCode.value+"&storeType="+storeType,
@@ -121,7 +121,7 @@ function getCustName(path,custCode,fieldName,storeType){
 	}
 }
 function getCustNameWithSubInvKeypress(path,e,custCode,storeType,fieldName){
-	var form = document.reportsForm;
+	var form = document.reportAllForm;
 	if(e != null && e.keyCode == 13){
 		if(custCode.value ==''){
 			if("pensCustNameFrom" == fieldName){
@@ -137,7 +137,7 @@ function getCustNameWithSubInvKeypress(path,e,custCode,storeType,fieldName){
 }
 function getCustNameWithSubInv(path,custCode,fieldName,storeType){
 	var returnString = "";
-	var form = document.reportsForm;
+	var form = document.reportAllForm;
 	var getData = $.ajax({
 			url: path+"/jsp/ajax/getCustNameWithSubInvAjax.jsp",
 			data : "custCode=" + custCode.value+"&storeType="+storeType,
@@ -176,7 +176,7 @@ function getCustNameWithSubInv(path,custCode,fieldName,storeType){
 	}
 }
 function getBranchNameKeypress(path,e,custCode,fieldName,storeType){
-	var form = document.reportsForm;
+	var form = document.reportAllForm;
 	if(e != null && e.keyCode == 13){
 		if(custCode.value ==''){
 			if("pensCustNameFrom" == fieldName){
@@ -192,7 +192,7 @@ function getBranchNameKeypress(path,e,custCode,fieldName,storeType){
 }
 function getBranchName(path,custCode,fieldName,storeType){
 	var returnString = "";
-	var form = document.reportsForm;
+	var form = document.reportAllForm;
 	var getData = $.ajax({
 			url: path+"/jsp/ajax/getBranchNameAjax.jsp",
 			data : "custCode=" + custCode.value+"&storeType="+storeType,

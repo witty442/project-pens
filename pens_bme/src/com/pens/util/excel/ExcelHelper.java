@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -18,6 +19,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.pens.util.DateUtil;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 
@@ -65,7 +67,7 @@ public class ExcelHelper {
 		return ((Double)str);
 	}
 	//New Version
-		public static String getCellValue(Object cellValue,String cellType,String format) {
+		public static String getCellValue(Object cellValue,String cellType,String format) throws Exception{
 			String ret = "";
 			//INPUT=1,000.24 :OUTPUT = 1000.24
 			if("NUMBER".equalsIgnoreCase(cellType)){
@@ -107,7 +109,23 @@ public class ExcelHelper {
 						ret=  Utils.isNull(cellValue);
 					}
 				}//if
-				
+			
+		    //INPUT DATE EXCEL : OUTPUT dd/mm/yyyy (10/10/2020)
+			}else if("DATE".equalsIgnoreCase(cellType)){
+				if((cellValue instanceof Date )){
+					logger.debug("is_date ::"+cellValue+">:"+cellValue);
+					ret = DateUtil.stringValue((Date)cellValue, DateUtil.DD_MM_YYYY_WITH_SLASH);
+				}else{
+					//No idea
+					logger.debug("is_no_date :"+cellValue+">:"+cellValue);
+					
+					/** is instance of string (cell is string but value is NUMBER )**//*
+					if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
+						ret =  isCellDouble(cellValue,Utils.format_number_no_disgit);
+					}else{
+						ret=  Utils.isNull(cellValue);
+					}*/
+				}//if
 			//INPUT=XXXX OUTPUT=XXXX
 			}else{
 				ret= Utils.isNull(cellValue);

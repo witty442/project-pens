@@ -18,6 +18,7 @@ import org.apache.struts.action.ActionForm;
 
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.web.salestarget.SalesTargetBean;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
@@ -422,7 +423,6 @@ public class StockControlPage {
 			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
 				sql.append("\n  and sales_channel_no ='"+user.getUserName().substring(1,2)+"'");
 			}
-			
 			sql.append("\n  ORDER BY S.sales_channel_no asc \n");
 			logger.debug("sql:"+sql);
 			

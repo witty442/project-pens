@@ -2,8 +2,6 @@
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
@@ -344,7 +342,8 @@ function isSelectOne(){
 									<th >Request Qty</th>
 									<th >Issued Qty</th>
 									<th >วันที่รับของ</th>
-									<th >หมายเหตุ</th>
+									<th >ทำ Auto-Trans แล้ว</th>
+									<th >หมายเหตุ </th>
 									<th >วันที่พร้อมจัดส่ง</th>
 									<th >รวมจำนวนหีบ</th>
 								    <th >Action</th>	
@@ -387,6 +386,11 @@ function isSelectOne(){
 										<td class="td_text_center" width="8%">
 										  ${results.needDate}
 										</td>
+										<td class="td_text_center" width="5%">
+									        <c:if test="${results.autoTrans == true}">
+									            <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+									        </c:if>
+									    </td>
 									    <td class="td_text_center" width="15%">
 										  ${results.remark}
 										</td>

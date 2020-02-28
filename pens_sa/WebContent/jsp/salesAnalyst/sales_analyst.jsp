@@ -239,12 +239,11 @@ function chkSearch(){
 		                                  <td width="65%" align="left" nowrap>     
 		                                    <input type="button" value="บันทึกรูปแบบการค้นหา" class="btnSmallLong" style="width: 185px;" 
 											onClick="javascript:saveProfile('${pageContext.request.contextPath}','admin')" /> 
-										 	<%if(user.getUserName().equalsIgnoreCase("pornsawas")
-										 		|| user.getUserName().equalsIgnoreCase("sansern")) {%>
+										 	<%//if(user.getUserName().equalsIgnoreCase("pornsawas") {%>
 											 	&nbsp;&nbsp;
-												<input type="button" value="แก้ไขชื่อ/เพิ่ม" class="btnSmallLong" style="width: 120px;" 
+												<input type="button" value="เพิ่ม/แก้ไข" class="btnSmallLong" style="width: 150px;" 
 												onClick="javascript:editProfile('${pageContext.request.contextPath}','admin')" /> 
-										    <%} %>
+										    <%//} %>
 										 </td>
 		                              </tr>
 		                            </table>
@@ -369,12 +368,12 @@ function chkSearch(){
 	                            <fieldset id="condition-frame">
 	                            <legend>เงื่อนไขในการเลือกข้อมูล</legend>
 		                            <table width="100%"  border="0" cellpadding="1" cellspacing="1" >
-		                              <tr nowarp="nowarp" class="txt_style" >
+		                              <tr  class="txt_style" >
 		                                <td align="left" width="20%"><b>ขอบเขตข้อมูล</b> </td>
 		                                <td align="center" width="5%">=</td>
 		                                <td align="left" width="75%"><b>ข้อมูลเงื่อนไข</b></td>
 		                              </tr>
-		                              <tr nowarp="nowarp" class="txt_style" >
+		                              <tr  class="txt_style" >
 		                                <td align="left">
 		                                    <html:select property="salesBean.condName1" onchange="clearText(1);" styleId="condName1">
 										        <html:options collection="conditionList" property="key" labelProperty="name"/>
@@ -397,7 +396,7 @@ function chkSearch(){
 									         <html:hidden property="salesBean.condValue1" styleId="condValue1"></html:hidden>
 								        </td>
 		                              </tr>
-		                             <tr nowarp="nowarp class="txt_style" >
+		                             <tr  class="txt_style" >
 		                                <td align="left">
 		                                    <html:select property="salesBean.condName2" onchange="clearText(2);" styleId="condName2" >
 										        <html:options collection="conditionList" property="key" labelProperty="name"/>
@@ -421,7 +420,7 @@ function chkSearch(){
 									        
 								       </td>
 		                              </tr>
-		                             <tr nowarp="nowarp" class="txt_style" >
+		                             <tr class="txt_style" >
 		                                <td align="left">
 		                                    <html:select property="salesBean.condName3" onchange="clearText(3);" styleId="condName3">
 										        <html:options collection="conditionList" property="key" labelProperty="name"/>
@@ -445,7 +444,7 @@ function chkSearch(){
 									       
 								       </td>
 		                              </tr>
-		                              <tr nowarp="nowarp" class="txt_style" >
+		                              <tr  class="txt_style" >
 		                                <td align="left">
 		                                    <html:select property="salesBean.condName4" onchange="clearText(4);" styleId="condName4">
 										        <html:options collection="conditionList" property="key" labelProperty="name"/>

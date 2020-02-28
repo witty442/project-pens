@@ -10,7 +10,7 @@
 
 package com.isecinc.pens.dao.constants;
 
-public class Constants {
+public class Constants extends com.pens.util.Constants{
 
 	// system default
 	public static final int LINE_PER_PAGE = 20; //10

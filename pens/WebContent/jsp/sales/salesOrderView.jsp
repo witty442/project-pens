@@ -127,10 +127,11 @@ function setNextVisitSummary(path, visitDate, fileType){
 	return true;
 }
 
-function gotoSummaryReport(path, reportType,orderNo){
+function gotoSummaryReport(path, reportType,orderNo,statusOrder){
  var param ="report_name=tax_invoice_summary&orderId="+document.getElementsByName('order.id')[0].value
      param += "&reportType="+reportType;
      param +="&orderNo="+orderNo;
+     param +="&statusOrder="+statusOrder;
      
      var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
      var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
@@ -539,17 +540,19 @@ function stampPrint(){
 									<%if(role.equals(User.VAN)){ %>
 										<c:if test="${orderForm.order.docStatus=='SV'}">
 										     <c:if test="${orderForm.order.isCash=='Y'}">
-											    <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy');">
-					                            <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original');">
+											    <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy','','');">
+					                            <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original','','');">
 	                                          </c:if>
 	                                          
 	                                          <c:if test="${orderForm.order.isCash=='N'}">
-											    <input type="button" id ="reportBtn" value="พิมพ์ใบส่งของ/ใบกำกับภาษี" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','tax','${orderForm.order.orderNo}');">
-					                           
-					                             <input type="button" id ="reportBtn" value="พิมพ์ใบเสร็จรับเงิน" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','bill','${orderForm.order.orderNo}');">
-	                                           
+											     <input type="button" id ="reportBtn" value="พิมพ์ใบส่งของ/ใบกำกับภาษี" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','tax','${orderForm.order.orderNo}','');">
+					                             <input type="button" id ="reportBtn" value="พิมพ์ใบเสร็จรับเงิน" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','bill','${orderForm.order.orderNo}','');">
 	                                          </c:if>
 											  <input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
+										</c:if>
+										
+										<c:if test="${orderForm.order.docStatus=='VO'}">
+											   <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy','','VO');">
 										</c:if>
 									<%} %>
 									

@@ -29,6 +29,10 @@ if(session.getAttribute("storeList") != null){
 int start = 0;
 int end = 0;
 int pageNumber = 1;
+
+/** Check Can Access Page **/
+boolean canAccess = ControlLockPage.canAccessPage("Order");
+System.out.println("CanAccess PageName[Order]:"+canAccess);
 %>
 <html>
 <head>
@@ -386,13 +390,18 @@ function sumQtyInRow(row){
 						   <table  align="left" border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
-									   
-										<a href="javascript:search('${pageContext.request.contextPath}')">
-										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
-										</a>						
-										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-										  <input type="button" value="   Clear   " class="newPosBtnLong">
-										</a>						
+									   <%if(canAccess){ %>
+											<a href="javascript:search('${pageContext.request.contextPath}')">
+											  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
+											</a>						
+											<a href="javascript:clearForm('${pageContext.request.contextPath}')">
+											  <input type="button" value="   Clear   " class="newPosBtnLong">
+											</a>		
+										<%}else{ %>	
+										    <font color="red" size="3">
+										             ยังไม่สามารถทำรายการหน้านี้ได้ เนื่องจากกำลัง  Gen Order-Auto-Replenishment กรุณาตรวจสอบจากฝ่ายที่เกี่ยวข้องเพื่อทำการปลดล็อค
+										    </font>
+										<%} %>			
 									</td>
 								</tr>
 						  </table>
@@ -442,14 +451,19 @@ function sumQtyInRow(row){
 						   <table  border="0" cellpadding="3" cellspacing="0" >
 								<tr>
 									<td align="left">
-									   
-										<a href="javascript:search('${pageContext.request.contextPath}')">
-										  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
-										</a>
-										
-										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-										  <input type="button" value="   Clear   " class="newPosBtnLong">
-										</a>						
+									   <%if(canAccess) {%>
+											<a href="javascript:search('${pageContext.request.contextPath}')">
+											  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
+											</a>
+											
+											<a href="javascript:clearForm('${pageContext.request.contextPath}')">
+											  <input type="button" value="   Clear   " class="newPosBtnLong">
+											</a>	
+										<%}else{ %>	
+										    <font color="red" size="3">
+										        ยังไม่สามารถทำรายการหน้านี้ได้ เนื่องจากกำลัง 	Gen Order - Auto-Replenishment กรุณาตรวจสอบจากฝ่ายที่เกี่ยวข้องเพื่อทำการปลดล็อค
+										     </font>
+										<%} %>							
 									</td>
 								</tr>
 							</table>
@@ -464,7 +478,9 @@ function sumQtyInRow(row){
 							<td align="left" width="8%">
 							    &nbsp;
 							</td>
+							
 							<td align="left" width="92%">
+							<%if(canAccess) {%>
 								<a href="javascript:save('${pageContext.request.contextPath}')">
 								  <input type="button" value="บันทึกข้อมูล" class="newPosBtnLong"> 
 								</a>
@@ -482,7 +498,8 @@ function sumQtyInRow(row){
 								</a>
 								<%-- <a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
 								  <input type="button" value="Export To Excel" class="newPosBtnLong">
-								</a> --%>						
+								</a> --%>	
+								<%} %>					
 							</td>
 						</tr>
 					</table>
@@ -660,7 +677,7 @@ function sumQtyInRow(row){
 						                        value="<%=Utils.isNull(storeItem.getQty())%>" tabindex="<%=tabindex%>" size="3" 
 						                        onkeypress="chkQtyKeypress(this,event,'<%=c%>','<%=i%>')"
 						                        onchange="validateQty(this,'<%=c%>','<%=i%>')"
-						                        title="<%=titleDisp %>"
+						                        title="<%=titleDisp %>" autoComplete="off"
 						                        <%=readOnly%> class="<%=className%>"
 						                        />
 						                        

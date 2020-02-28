@@ -27,8 +27,17 @@ public class ReportAllForm extends I_Form {
 	private List<ReportAllBean> results;
 	private ReportAllBean bean;
 	private String pageName;
-   
+	private ReportAllBean summary;
     
+	
+	public ReportAllBean getSummary() {
+		return summary;
+	}
+
+	public void setSummary(ReportAllBean summary) {
+		this.summary = summary;
+	}
+
 	public ReportAllBean getCriteria() {
 		return criteria;
 	}

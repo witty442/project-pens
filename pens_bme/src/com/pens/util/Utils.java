@@ -407,7 +407,7 @@ public class Utils {
 	}
 	
 	public static int convertToInt(String str) throws Exception{
-		logger.debug("xx:"+str);
+		//logger.debug("xx:"+str);
 		if(str == null || Utils.isNull(str).equals("")){
 			return 0;
 		}

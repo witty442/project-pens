@@ -36,9 +36,18 @@ public class ExcelHelper {
         //File outputFile = new File("D:\\Work_ISEC\\Project-BME\\DEV\\DataImport\\ImportOrderExcel\\temp_gen.csv");
         //convertXlsToCsv(inputFile, outputFilie);
 	}
-	
+	//old version
+	public static String isCellNumberOrText(Object cellValue) {
+		if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){
+			  //logger.debug("account_number : is Number:"+cellValue);
+			 return Utils.convertDoubleToStr(Utils.isDoubleNull(cellValue));
+		}else{
+			   //logger.debug("account_number : No Number:"+cellValue);
+			 return Utils.isNull(cellValue);
+		}
+	}
 	/** Validate Excel number or text (get digit or not by format decimal) **/
-	public static String isCellNumberOrText1(Object cellValue,String format) {
+	public static String isCellNumberOrText(Object cellValue,String format) {
 		if((cellValue instanceof Double || cellValue instanceof Integer || cellValue instanceof Float)){
 			  //logger.debug("is_number : is Number:"+cellValue+">:"+isCellDouble(cellValue,format));
 			  return isCellDouble(cellValue,format);

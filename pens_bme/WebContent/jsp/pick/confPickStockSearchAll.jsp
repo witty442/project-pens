@@ -1,7 +1,4 @@
 <%@page import="com.pens.util.SIdUtils"%>
-<%@page import="com.isecinc.pens.dao.GeneralDAO"%>
-<%@page import="com.isecinc.pens.web.popup.PopupForm"%>
-<%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -13,7 +10,6 @@
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <jsp:useBean id="confPickStockAllForm" class="com.isecinc.pens.web.pick.ConfPickStockForm" scope="session" />
 <% 
 %>
@@ -339,6 +335,7 @@ function isSelectOne(){
 									<th >Request Qty</th>
 									<th >Issued Qty</th>
 									<th >วันที่รับของ</th>
+									<th >ทำ Auto-Trans แล้ว</th>
 									<th >หมายเหตุ</th>
 									<th >วันที่พร้อมจัดส่ง</th>
 									<th >รวมจำนวนหีบ</th>
@@ -382,6 +379,11 @@ function isSelectOne(){
 										<td class="td_text_center" width="8%">
 										  ${results.needDate}
 										</td>
+										<td class="td_text_center" width="5%">
+									        <c:if test="${results.autoTrans == true}">
+									            <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+									        </c:if>
+									    </td>
 									    <td class="td_text_center" width="15%">
 										  ${results.remark}
 										</td>

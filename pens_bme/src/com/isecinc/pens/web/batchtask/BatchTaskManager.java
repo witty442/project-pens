@@ -109,13 +109,13 @@ public ActionForward runBatchFromPageByPopup(ActionMapping mapping, ActionForm f
 		
 		/** Set Param Batch Map **/
 		//Case popup from Get from session (by page set parameter)
-		Map<String,String> batchParamMap = (HashMap<String, String>)request.getSession().getAttribute("BATCH_PARAM_MAP");
+		Map<String,String> batchParamMap = (HashMap<String, String>)request.getSession().getAttribute(BatchTaskConstants.BATCH_PARAM_MAP);
 		monitorModel.setBatchParamMap(batchParamMap);
 		
 		/** Case Form File **/
 		//Case popup from Get from session 
-		logger.debug("dataFromFile:"+request.getSession().getAttribute("DATA_FILE"));
-		monitorModel.setDataFile((FormFile)request.getSession().getAttribute("DATA_FILE"));
+		logger.debug("dataFromFile:"+request.getSession().getAttribute(BatchTaskConstants.DATA_FILE));
+		monitorModel.setDataFile((FormFile)request.getSession().getAttribute(BatchTaskConstants.DATA_FILE));
 		
 		//clear session from (by page prepare)
 		request.getSession().removeAttribute("DATA_FILE");
@@ -136,8 +136,9 @@ public ActionForward runBatchFromPageByPopup(ActionMapping mapping, ActionForm f
 		logger.error(e.getMessage(),e);
 		request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 	}
-	return mapping.findForward("search");
+	return mapping.findForward("batchFromPopup");
 }
+
 	public MonitorBean createBatchTask(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
 		Connection connMonitor = null;
 		BatchTaskDAO dao = new BatchTaskDAO();

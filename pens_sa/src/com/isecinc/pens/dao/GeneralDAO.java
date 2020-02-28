@@ -18,49 +18,7 @@ public class GeneralDAO {
 	private static Logger logger = Logger.getLogger("PENS");
 	
 	
-	 public static String getSalesZoneDesc(String salesZone) throws Exception {
-		 Connection conn = null;
-		 try{
-			 conn = DBConnection.getInstance().getConnectionApps();
-			 return getSalesZoneDesc(conn, salesZone);
-		 }catch(Exception e){
-			 throw e;
-		 }finally{
-			 if(conn != null){
-				 conn.close();
-			 }
-		 }
-	 }
-	 public static String getSalesZoneDesc(Connection conn ,String salesZone) throws Exception {
-			Statement stmt = null;
-			ResultSet rst = null;
-			StringBuilder sql = new StringBuilder();
-			String salesZoneDesc = "";
-			try {
-				if(Utils.isNull(salesZone).equals("")){
-					return "";
-				}
-				sql.append("\n select ZONE_NAME ");
-				sql.append("\n FROM PENSBI.XXPENS_BI_MST_SALES_ZONE  ");
-				sql.append("\n WHERE zone = '"+salesZone+"' \n");
-				
-				logger.debug("sql:"+sql);
-				stmt = conn.createStatement();
-				rst = stmt.executeQuery(sql.toString());
-			    if (rst.next()) {
-			    	salesZoneDesc =Utils.isNull(rst.getString("ZONE_NAME"));
-				}//if
-			} catch (Exception e) {
-				throw e;
-			} finally {
-				try {
-					rst.close();
-					stmt.close();
-				} catch (Exception e) {}
-			}
-			return salesZoneDesc;
-		}
-	 
+	
 	//Return is set map :true
 		public static boolean isUserMapCustSalesTT(User user){
 			Statement stmt = null;
@@ -155,54 +113,7 @@ public class GeneralDAO {
 		  return salesChannelDesc;
 		}
 		
-		
-		/**
-		 * getSalesChannelName
-		 * @param salesChannelNo
-		 * @return
-		 * @throws Exception
-		 */
-		public static String getSalesChannelName(String salesChannelNo) throws Exception{
-			 Connection conn = null;
-			 try{
-				 conn = DBConnection.getInstance().getConnection();
-				 return getSalesChannelName(conn,salesChannelNo);
-			 }catch(Exception e){
-				 throw e;
-			 }finally{
-				conn.close();
-			 }
-		}
-		public static String getSalesChannelName(Connection conn,String salesChannelNo){
-			String salesChannelDesc = "";
-			Statement stmt = null;
-			ResultSet rst = null;
-			StringBuilder sql = new StringBuilder();
-			try{
-				if(Utils.isNull(salesChannelNo).equals("")){
-					return "";
-				}
-				sql.append("\n  SELECT sales_channel_desc from PENSBI.XXPENS_BI_MST_SALES_CHANNEL  ");
-				sql.append("\n  where  sales_channel_no ='"+salesChannelNo+"' \n");
-
-				logger.debug("sql:"+sql);
-				stmt = conn.createStatement();
-				rst = stmt.executeQuery(sql.toString());
-				if (rst.next()) {
-					salesChannelDesc =Utils.isNull(rst.getString("sales_channel_desc"));
-				}//while
-				
-			}catch(Exception e){
-				logger.error(e.getMessage(),e);
-			} finally {
-				try {
-					rst.close();
-					stmt.close();
-				} catch (Exception e) {}
-			}
-		  return salesChannelDesc;
-		}
-		
+	
 		
 		public static String getCustName(String custCode) throws Exception{
 			 Connection conn = null;
@@ -285,35 +196,5 @@ public class GeneralDAO {
 			}
 		  return salesChannelDesc;
 		}
-		
-		public static String getSalesrepName(Connection conn,String salesrepCode){
-			String name ="";
-			Statement stmt = null;
-			ResultSet rst = null;
-			StringBuilder sql = new StringBuilder();
-			try{
-				if(Utils.isNull(salesrepCode).equals("")){
-					return "";
-				}
-				sql.append("\n  SELECT S.* from PENSBI.XXPENS_BI_MST_SALESREP S ");
-				sql.append("\n  where salesrep_code ='"+salesrepCode+"'");
-				
-				logger.debug("sql:"+sql);
-				stmt = conn.createStatement();
-				rst = stmt.executeQuery(sql.toString());
-				if (rst.next()) {
-					 name = Utils.isNull(rst.getString("salesrep_desc"));
-				}//while
-				
-			}catch(Exception e){
-				logger.error(e.getMessage(),e);
-			} finally {
-				try {
-					rst.close();
-					stmt.close();
-				} catch (Exception e) {}
-			}
-		 return name;
-		}
-		
+	
 }

@@ -97,6 +97,9 @@ function save(path){
 		return false;
 	}
 	
+	/**Control Save Lock Screen **/
+	startControlSaveLockScreen();
+	
 	document.requestPromotionForm.action = path + "/jsp/requestPromotionAction.do?do=save";
 	document.requestPromotionForm.submit();
 	return true;

@@ -64,9 +64,22 @@ private static final long serialVersionUID = -990650039740579753L;
 	private Map<String, Object> batchParamMapObj;
     private FormFile dataFile;
 	private User user;
+	private String thName;
     
 	
-   public String getSubmitDateDisp() {
+   public String getThName() {
+		return thName;
+	}
+	public void setThName(String thName) {
+		this.thName = thName;
+	}
+public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+public String getSubmitDateDisp() {
 		return submitDateDisp;
 	}
 	public void setSubmitDateDisp(String submitDateDisp) {

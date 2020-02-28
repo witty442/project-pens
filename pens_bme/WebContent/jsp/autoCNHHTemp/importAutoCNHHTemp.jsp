@@ -32,7 +32,7 @@ User user = (User) request.getSession().getAttribute("user");
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript">
 function loadMe(){
 	 /** for popup BatchTask in page **/
@@ -97,6 +97,20 @@ function searchBatch(path){
 	form.submit();
 	return true;
 }
+function searchBatchForm(){
+	var path = document.getElementById("path").value;
+	var form = document.autoCNHHTempForm;
+	form.action = path + "/jsp/autoCNHHTempAction.do?do=searchBatchForm";
+	form.submit();
+	return true;
+}
+function clearBatchForm(){
+	var path = document.getElementById("path").value;
+	var form = document.autoCNHHTempForm;
+	form.action = path + "/jsp/autoCNHHTempAction.do?do=clearBatchForm";
+	form.submit();
+	return true;
+}
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -151,16 +165,30 @@ function searchBatch(path){
 								<tr>
 									<td align="left">
 										<a href="javascript:importExcel()">
-										  <input type="button" value=" Import " class="newPosBtnLong"> 
+										  <input type="button" value="      Import ข้อมูล        " class="newPosBtnLong"> 
 										</a>
 										<a href="javascript:clearForm()">
+										  <input type="button" value="ปิดหน้าจอ" class="newPosBtnLong">
+										</a>						
+									</td>
+								</tr>
+							</table>
+							<br/>
+							 <table  border="0" cellpadding="3" cellspacing="0" >
+								<tr>
+									<td align="left">
+										<a href="javascript:searchBatchForm()">
+										  <input type="button" value="ตรวจสอบสถานะล่าสุด" class="newPosBtnLong"> 
+										</a>
+										<a href="javascript:clearBatchForm()">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>						
 									</td>
 								</tr>
 							</table>
 					  </div>
-					  
+					 
+					 <!-- Disp BatchTask Lastest Run -->
 		             <jsp:include page="/jsp/batchtask/batchTaskPopupResult.jsp"></jsp:include>
 					<!-- hidden field -->
 

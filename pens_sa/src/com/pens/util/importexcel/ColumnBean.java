@@ -4,6 +4,14 @@ public class ColumnBean {
   private String columnName;
   private String columnValue;
   private String columnType;
+  private String columnFunction;
+  
+public String getColumnFunction() {
+	return columnFunction;
+}
+public void setColumnFunction(String columnFunction) {
+	this.columnFunction = columnFunction;
+}
 public String getColumnName() {
 	return columnName;
 }

@@ -37,6 +37,7 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.managepath.ManagePath;
+import com.pens.util.ControlLockPage;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.EnvProperties;
@@ -191,6 +192,22 @@ public class OrderAction extends I_Action {
 			}
 			
 			if("save".equalsIgnoreCase(action)){
+				//validate Lock Order Page
+				boolean accessOrderPage = ControlLockPage.canAccessPage("Order");
+		        logger.info("accessOrderPage:"+accessOrderPage);
+		        if(!accessOrderPage){
+		        	//clear all session
+		        	 request.getSession().setAttribute("results", null);
+					 request.getSession().setAttribute("storeList",null);
+					 request.getSession().setAttribute("itemErrorMap", null);
+					 
+					 request.getSession().removeAttribute("totalPage");
+					 request.getSession().removeAttribute("totalPage"); 
+					 request.getSession().removeAttribute("ORDER_ERROR");
+					 request.getSession().removeAttribute("canOrderMap");
+		        	return "search";
+		        }
+		        
 				storeList = (List<StoreBean>)request.getSession().getAttribute("storeList");
 				saveOrderDB(request,response, conn, orderForm,"search");
 			}else{
@@ -283,6 +300,21 @@ public class OrderAction extends I_Action {
 		OrderForm orderForm = (OrderForm) form;
 		try {
 			conn = DBConnection.getInstance().getConnection();
+			boolean accessOrderPage = ControlLockPage.canAccessPage("Order");
+	        logger.info("accessOrderPage:"+accessOrderPage);
+	        if(!accessOrderPage){
+	        	//clear all session
+	        	 request.getSession().setAttribute("results", null);
+				 request.getSession().setAttribute("storeList",null);
+				 request.getSession().setAttribute("itemErrorMap", null);
+				 
+				 request.getSession().removeAttribute("totalPage");
+				 request.getSession().removeAttribute("totalPage"); 
+				 request.getSession().removeAttribute("ORDER_ERROR");
+				 request.getSession().removeAttribute("canOrderMap");
+	        	return "prepare";
+	        }
+	        
 			saveOrderDB(request,response, conn, orderForm,"save");
 		} catch (Exception e) {
             e.printStackTrace();

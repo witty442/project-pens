@@ -9,5 +9,11 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 %>
 <%if("reportEndDateLotus".equalsIgnoreCase(pageName)){%>
   <jsp:include page="page/reportEndDateLotus.jsp" flush="true"/> 
+<%}else if("reportSizeColorBigC".equalsIgnoreCase(pageName)){%>
+  <jsp:include page="page/reportSizeColorBigC.jsp" flush="true"/> 
+<%}else if("reportOnhandLotus".equalsIgnoreCase(pageName)){%>
+  <jsp:include page="page/reportOnhandLotus.jsp" flush="true"/> 
+<%}else if("reportOnhandAsOfRobinson".equalsIgnoreCase(pageName)){%>
+  <jsp:include page="page/reportOnhandAsOfRobinson.jsp" flush="true"/> 
 <%} %>
 						

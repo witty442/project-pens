@@ -9,8 +9,14 @@ import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.importall.ImportAllForm;
+import com.isecinc.pens.web.importall.page.ImportExcelPICG899ToG07Action;
 import com.isecinc.pens.web.reportall.page.ReportEndDateLotusAction;
+import com.isecinc.pens.web.reportall.page.ReportOnhandAsOfRobinsonAction;
+import com.isecinc.pens.web.reportall.page.ReportOnhandLotusAction;
+import com.isecinc.pens.web.reportall.page.ReportSizeColorBigCAction;
 import com.pens.util.Utils;
 
 /**
@@ -40,6 +46,12 @@ public class ReportAllAction extends I_Action {
 				 //Default display have qty
 				 if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 					 return new ReportEndDateLotusAction().prepare(form, request, response);
+				 }else if("reportSizeColorBigC".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+					 return new ReportSizeColorBigCAction().prepare(form, request, response);
+				 }else if("reportOnhandLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+					 return new ReportOnhandLotusAction().prepare(form, request, response);
+				 }else if("reportOnhandAsOfRobinson".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+					 return new ReportOnhandAsOfRobinsonAction().prepare(form, request, response);
 				 }
 			 }
 		} catch (Exception e) {
@@ -72,7 +84,13 @@ public class ReportAllAction extends I_Action {
 		logger.debug("page["+reportAllForm.getPageName()+"]");
 		try {
 			 if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(reportAllForm.getPageName())) ){
-				 return new ReportEndDateLotusAction().search(reportAllForm, request, response);
+				 return new ReportEndDateLotusAction().search(form, request, response);
+			 }else if("reportSizeColorBigC".equalsIgnoreCase(Utils.isNull(reportAllForm.getPageName())) ){
+				 return new ReportSizeColorBigCAction().search(form, request, response);
+			 }else if("reportOnhandLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new ReportOnhandLotusAction().search(form, request, response);
+			 }else if("reportOnhandAsOfRobinson".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new ReportOnhandAsOfRobinsonAction().search(form, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -95,7 +113,7 @@ public class ReportAllAction extends I_Action {
 	}
 	
 	public ActionForward genEndDate(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("genMonthEnd");
+		logger.debug("genEndDate");
 		ReportAllForm aForm = (ReportAllForm) form;
 		try{
 			 if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
@@ -111,9 +129,15 @@ public class ReportAllAction extends I_Action {
 	public ActionForward export(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		ReportAllForm aForm = (ReportAllForm) form;
 		try {
-			logger.debug("PageAction:"+request.getParameter("page"));
+			logger.debug("PageName:"+Utils.isNull(aForm.getPageName()));
 			 if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
-				 return new ReportEndDateLotusAction().export(mapping, aForm, request, response);
+				 return new ReportEndDateLotusAction().export(mapping, form, request, response);
+			 }else if("reportSizeColorBigC".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 return new ReportSizeColorBigCAction().export(mapping, form, request, response);
+			 }else if("reportOnhandLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 return new ReportOnhandLotusAction().export(mapping, form, request, response);
+			 }else if("reportOnhandAsOfRobinson".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new ReportOnhandAsOfRobinsonAction().export(mapping,form, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -145,12 +169,15 @@ public class ReportAllAction extends I_Action {
 	}
 
 	/** For batch popup **/
-	public ActionForward genStockOnhandTemp(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	public ActionForward genStockOnhandRepTemp(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		ReportAllForm aForm = (ReportAllForm) form;
 		try {
 			 if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
-				 return new ReportEndDateLotusAction().genStockOnhandTemp(mapping, aForm, request, response);
+				 return new ReportEndDateLotusAction().genStockOnhandRepTemp(mapping, form, request, response);
+			 }else  if("reportSizeColorBigC".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 return new ReportSizeColorBigCAction().genStockOnhandRepTemp(mapping, form, request, response);
 			 }
+			 
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -166,7 +193,13 @@ public class ReportAllAction extends I_Action {
 		ReportAllForm aForm = (ReportAllForm) form;
 		try {
 			 if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
-				 return new ReportEndDateLotusAction().searchBatch(mapping, aForm, request, response);
+				 return new ReportEndDateLotusAction().searchBatch(mapping, form, request, response);
+			 }else if("reportSizeColorBigC".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				return new ReportSizeColorBigCAction().searchBatch(mapping, form, request, response);
+			 }else if("reportOnhandLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				return new ReportOnhandLotusAction().searchBatch(mapping, form, request, response);
+			 }else if("reportOnhandAsOfRobinson".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new ReportOnhandAsOfRobinsonAction().searchBatch(mapping,form, request, response);
 			 }
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -175,7 +208,28 @@ public class ReportAllAction extends I_Action {
 			throw e;
 		}finally{	
 		}
-		return mapping.findForward("reports");
+		return mapping.findForward("reportAll");
+	}
+	public ActionForward downloadFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		ReportAllForm aForm = (ReportAllForm) form;
+		try {
+			 if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				
+			 }else if("reportSizeColorBigC".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				
+			 }else if("reportOnhandLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 return new ReportOnhandLotusAction().downloadFile(mapping, form, request, response);
+			 }else if("reportOnhandAsOfRobinson".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new ReportOnhandAsOfRobinsonAction().downloadFile(mapping,form, request, response);
+			 }
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{	
+		}
+		return mapping.findForward("reportAll");
 	}
 	
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -183,7 +237,7 @@ public class ReportAllAction extends I_Action {
 		ReportAllForm aForm = (ReportAllForm) form;
 		try {
 			 if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
-				 return new ReportEndDateLotusAction().clear(mapping, aForm, request, response);
+				 return new ReportEndDateLotusAction().clear(mapping, form, request, response);
 			 }
 			 	
 		} catch (Exception e) {
@@ -193,6 +247,50 @@ public class ReportAllAction extends I_Action {
 		return mapping.findForward("clear");
 	}
 	
+	/** Search BatchTask Lastest Run **/
+	public ActionForward searchBatchForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchBatchForm");
+		ReportAllForm aForm = (ReportAllForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			 if("".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 
+			 }else if("reportOnhandLotus".equalsIgnoreCase(aForm.getPageName())){
+		         return new ReportOnhandLotusAction().searchBatchForm(mapping, aForm, request, response);
+			 }else if("reportOnhandAsOfRobinson".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new ReportOnhandAsOfRobinsonAction().searchBatchForm(mapping,form, request, response);
+			 }
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{	
+		}
+		return mapping.findForward("reportAll");
+	}
+	
+	/** Clear Search BatchTask Lastest Run **/
+	public ActionForward clearBatchForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clearBatchForm");
+		ReportAllForm aForm = (ReportAllForm) form;
+		try {
+			 if("".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 
+			 }else if("reportOnhandLotus".equalsIgnoreCase(aForm.getPageName())){
+		        return new ReportOnhandLotusAction().clearBatchForm(mapping, aForm, request, response);
+			 }else if("reportOnhandAsOfRobinson".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new ReportOnhandAsOfRobinsonAction().clearBatchForm(mapping,form, request, response);
+			 }
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{	
+		}
+		return mapping.findForward("reportAll");
+	}
 	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)

@@ -15,6 +15,8 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.batchtask.BatchTaskConstants;
+import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskForm;
 import com.isecinc.pens.web.reportall.ReportAllForm;
 import com.pens.util.Utils;
@@ -106,7 +108,48 @@ public class AutoCNHHTempAction extends I_Action {
 		}
 		return mapping.findForward("import");
 	}
-	
+	public ActionForward searchBatchForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchBatchForm");
+		AutoCNHHTempForm aForm = (AutoCNHHTempForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+	         aForm.setResults(null);
+	         
+			 BatchTaskForm batchTaskForm = new BatchTaskDAO().searchBatchLastRun(user, BatchTaskConstants.IMPORT_AUTOCNHHTEMP_FROM_EXCEL);
+			 if(batchTaskForm.getResults() != null && batchTaskForm.getResults().length >0){
+				 logger.debug("batchTaskForm result size:"+batchTaskForm.getResults().length);
+				 
+				 request.getSession().setAttribute("BATCH_TASK_RESULT",batchTaskForm);
+				 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
+				 
+				 logger.debug("batchName:"+batchTaskForm.getResults()[0].getName());
+			 }else{
+				 request.setAttribute("Message", "ไม่พบข้อมูล");
+			 }
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{	
+		}
+		return mapping.findForward("import");
+	}
+	public ActionForward clearBatchForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clearBatchForm");
+		AutoCNHHTempForm aForm = (AutoCNHHTempForm) form;
+		try {
+			 request.getSession().removeAttribute("BATCH_TASK_RESULT");
+			 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{	
+		}
+		return mapping.findForward("import");
+	}
 	/**
 	 * Prepare without ID
 	 */

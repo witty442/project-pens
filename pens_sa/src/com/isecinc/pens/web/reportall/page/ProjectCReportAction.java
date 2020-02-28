@@ -255,6 +255,7 @@ public class ProjectCReportAction extends I_Action {
 			sql.append("\n    ,PENSBI.PENSBME_TT_PROJECTC_I D ,apps.xxpens_ar_cust_sales_all CS");
 			sql.append("\n    ,apps.xxpens_ar_customer_all_v C ");
 			sql.append("\n    WHERE M.ORACLE_CUST_NO = B.ORACLE_CUST_NO ");
+			sql.append("\n    AND M.BRANCH_ID = B.BRANCH_ID ");
 			sql.append("\n    AND M.ID = D.ID ");
 			sql.append("\n    AND C.CUST_ACCOUNT_ID = CS.CUST_ACCOUNT_ID ");
 			sql.append("\n    AND C.ACCOUNT_NUMBER = M.ORACLE_CUST_NO ");

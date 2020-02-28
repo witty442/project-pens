@@ -64,6 +64,7 @@ function loadMe(_path){
 	   String orderId = request.getParameter("orderId");
 	   String reportType = request.getParameter("reportType");
 	   String orderNo = Utils.isNull(request.getParameter("orderNo"));
+	   String statusOrder = Utils.isNull(request.getParameter("statusOrder"));
 	   
 	   /* Case Van Order credit Check is Receipt Before print bill  */
 	   boolean vanCanPrintBill = OrderUtils.canPrintBillCreditCaseVan(user,orderNo);
@@ -71,8 +72,10 @@ function loadMe(_path){
        if("bill".equalsIgnoreCase(reportType) ){
     	  if(vanCanPrintBill){
     		  msg = "";
-  %>
-             document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printReportSummary&orderId=<%=orderId%>&fileType=PRINTER&reportType=<%=reportType%>";
+  %> 
+             var param ="&orderId=<%=orderId%>&fileType=PRINTER&reportType=<%=reportType%>";
+                 param +="&statusOrder=<%=statusOrder%>";
+             document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printReportSummary"+param;
 	         document.orderForm.submit();
 
 	     <%}else{
@@ -83,7 +86,9 @@ function loadMe(_path){
 	       
 	  <%}}else{%>
 	      //Other Report No check
-	      document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printReportSummary&orderId=<%=orderId%>&fileType=PRINTER&reportType=<%=reportType%>";
+	      var param ="&orderId=<%=orderId%>&fileType=PRINTER&reportType=<%=reportType%>";
+	          param +="&statusOrder=<%=statusOrder%>";
+	      document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printReportSummary"+param;
           document.orderForm.submit();
 	  <%}%>
 	  

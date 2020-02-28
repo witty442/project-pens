@@ -187,15 +187,15 @@ function changePV(pvid){
 	</tr>
 	<tr>
 		<td align="right"><bean:message key="Address" bundle="sysele"/><font color="red">*</font></td>
-		<td align="left"><input type="text" id="line1" name="line1" size="40"/></td>
+		<td align="left"><input type="text" id="line1" name="line1" size="40" autoComplete="off"/></td>
 	</tr>
 	<tr>
 		<td align="right"></td>
-		<td align="left"><input type="text" id="line2" name="line2" size="40"/></td>
+		<td align="left"><input type="text" id="line2" name="line2" size="40" autoComplete="off"/></td>
 	</tr>
 	<tr>
 		<td align="right"><bean:message key="Address.Line3" bundle="sysele"/><font color="red">*</font></td>
-		<td align="left"><input type="text" id="line3" name="line3" size="15"/></td>
+		<td align="left"><input type="text" id="line3" name="line3" size="15" autoComplete="off"/></td>
 	</tr>
 	<tr>
 		<td align="right"><bean:message key="Address.Province" bundle="sysele"/><font color="red">*</font></td>
@@ -216,7 +216,9 @@ function changePV(pvid){
 	</tr>
 	<tr>
 		<td align="right"><bean:message key="Address.PostalCode" bundle="sysele"/><font color="red">*</font></td>
-		<td align="left"><input type="text" id="postalCode" name="postalCode" maxlength="5" size="10" onkeydown="return inputNum(event);"/></td>
+		<td align="left">
+		<input type="text" id="postalCode" name="postalCode" maxlength="5" size="10" 
+		onkeydown="return inputNum(event);"  autoComplete="off"/></td>
 	
 	</tr>
 	<tr>

@@ -198,7 +198,8 @@ function switchPrintType(){
 								&nbsp;&nbsp;&nbsp;
 								กำหนดจุด #1
 								<font color="red">*</font>
-								 <html:text property="customer.tripDay" size="10" styleId="tripDay"  readonly="true" styleClass="disableText" />
+								 <html:text property="customer.tripDay" size="10" styleId="tripDay"  readonly="false" styleClass="normalText" 
+								 onkeydown="return inputNum(event);"/>
 								 <%-- <html:select property="customer.tripDay" >
 										<html:options collection="tripDayList" property="key" labelProperty="name"/>
 									</html:select>
@@ -223,6 +224,7 @@ function switchPrintType(){
 									    <!-- OLD Code -->
 										<%-- <html:option value="P"><bean:message key="PartyType.Personal" bundle="sysele"/></html:option>
 										<html:option value="O"><bean:message key="PartyType.Org" bundle="sysele"/></html:option> --%>
+									     <html:option value=""></html:option>
 									    <html:options collection="partyTypeList" property="key" labelProperty="name"/>
 									</html:select>
 								</td>
@@ -230,24 +232,24 @@ function switchPrintType(){
 							<tr>
 								<td align="right" colspan="2"><bean:message key="Customer.Name" bundle="sysele"/><font color="red">*</font></td>
 								<td align="left">
-									<html:text property="customer.name" size="25" styleId="customerName"/>
+									<html:text property="customer.name" size="25" styleId="customerName"  styleClass="\" autoComplete=\"off"/>
 								</td>
 								<td align="right"><bean:message key="Customer.SubName" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.name2" size="25" />
+									<html:text property="customer.name2" size="25"  styleClass="\" autoComplete=\"off"/>
 								</td>
 							</tr>
 							<tr>
 								<td align="right" colspan="2"><bean:message key="TaxNo" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left" nowrap>
-									<html:text property="customer.taxNo" size="25" maxlength="20"  onkeydown="return inputNum2(event,this)"/>
+									<html:text property="customer.taxNo" size="25" maxlength="20"  onkeydown="return inputNum2(event,this)"  styleClass="\" autoComplete=\"off"/>
 									 <html:checkbox property="customer.printTax" value="Y">พิมพ์เลขประจำตัวผู้เสียภาษี</html:checkbox>
 									 &nbsp;&nbsp;
 									 <html:checkbox property="customer.printHeadBranchDesc" value="Y">พิมพ์สนญ./สาขาที่</html:checkbox>
 								</td>
 								<td align="right"><bean:message key="Customer.Website" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="customer.website" size="25" />
+									<html:text property="customer.website" size="25"  styleClass="\" autoComplete=\"off"/>
 								</td>
 							</tr>
 							<tr>

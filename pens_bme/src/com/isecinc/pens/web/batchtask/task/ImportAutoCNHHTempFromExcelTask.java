@@ -39,14 +39,21 @@ import com.pens.util.meter.MonitorTime;
 import com.pens.util.seq.SequenceProcessAll;
 
 public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchTaskInterface{
-	public static Logger logger = Logger.getLogger("PENS");
    
 	/**
 	 * Return :P Name|P label|P Type|default value|valid,P2...$processName,Button Name|....
 	*/
-	public String getParam(){
-		return "dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
+	public String[] getParam(){
+		//return "dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
+		
+		String[] param = new String[1];
+		param[0] = "dataFormFile|เลือกไฟล์|FROMFILE||VALID";
+		return param;
 	}
+	public String getButtonName(){
+		return "Import ข้อมูล";
+	}
+	
 	public String getDescription(){
 		return "Import AutoCnHHTemp From File Excel";
 	}
@@ -54,8 +61,7 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 		return "PENSBI.BME_AUTOCN_HH_IMPORT_TEMP,PENSBI.BME_AUTOCN_HH_TEMP ,PENSBI.BME_AUTOCN_HH_TEMP_I,PENSBI.BME_AUTOCN_HH_TEMP_INV";
 	}
 	public List<BatchTaskListBean> getParamListBox(){
-		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();
-		return listAll;
+		return null;
 	}
 	//Show detail BatchTaskResult or no
 	public boolean isDispDetail(){
@@ -198,6 +204,7 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 	    
 	    String storeCode  = "",materialMaster = "",groupCode = "";
 	    String pensItem="",qty="",org="",subInv="",location="",unitPrice="";
+	    String orderedDate = "",orderType="",custPONumber="";
 	    BigDecimal id = new BigDecimal("0");
 		try{
 			//Get Parameter Value
@@ -261,12 +268,12 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 			}
 			
 			//validate InvoiceNo is Exist
-			if(isImportExist(conn,invoiceNoAll)){
+			/*if(isImportExist(conn,invoiceNoAll)){
 				monitorItemBean.setStatus(Constants.STATUS_FAIL);
 				monitorItemBean.setErrorMsg("ข้อมูล InvoiceNo นี้เคยถูก Import ไปแล้ว ");
 				monitorItemBean.setErrorCode("ImportException");
 				return monitorItemBean;
-			}
+			}*/
 
             //delete prev all data
 			SQLHelper.excUpdate(conn, "delete from PENSBI.BME_AUTOCN_HH_IMPORT_TEMP ");
@@ -274,10 +281,10 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 			//prepare insert temp import
 			sql = new StringBuffer();
 			sql.append("INSERT INTO PENSBI.BME_AUTOCN_HH_IMPORT_TEMP( \n");
-			sql.append("ID,STORE_CODE, MATERIAL_MASTER, GROUP_CODE,PENS_ITEM, \n"); 
+			sql.append("ID,STORE_CODE,ORDERED_DATE,ORDER_TYPE, MATERIAL_MASTER, GROUP_CODE,PENS_ITEM, \n"); 
 			sql.append("QTY, ORG,SUB_INV, LOCATION ,\n");
-			sql.append("UNIT_PRICE ,CREATE_DATE, CREATE_USER, FILE_NAME) \n");//13
-			sql.append(" VALUES(?,?,?,? ,?,?,?,? ,?,?,?,? ,? )");
+			sql.append("UNIT_PRICE ,CREATE_DATE, CREATE_USER, FILE_NAME,CUST_PO_NUMBER) \n");//13
+			sql.append(" VALUES(?,?,?,? ,?,?,?,? ,?,?,?,? ,? ,?,?,? )");
 			ps = conn.prepareStatement(sql.toString());
 			
 		    /** Loop Row **/
@@ -310,28 +317,37 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 				storeCode = ExcelHelper.getCellValue(cellObjValue,"STRING","");
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 1));
-				materialMaster =ExcelHelper.getCellValue(cellObjValue,"STRING","");
+				orderedDate =ExcelHelper.getCellValue(cellObjValue,"DATE","");
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 2));
-				groupCode = ExcelHelper.getCellValue(cellObjValue,"STRING","");
+				materialMaster =ExcelHelper.getCellValue(cellObjValue,"STRING","");
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 3));
-				pensItem = ExcelHelper.getCellValue(cellObjValue,"STRING","");
+				groupCode = ExcelHelper.getCellValue(cellObjValue,"STRING","");
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 4));
-				qty = ExcelHelper.getCellValue(cellObjValue,"NUMBER",Utils.format_number_no_disgit);
+				pensItem = ExcelHelper.getCellValue(cellObjValue,"STRING","");
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 5));
-				org = ExcelHelper.getCellValue(cellObjValue,"STRING","");
+				qty = ExcelHelper.getCellValue(cellObjValue,"NUMBER",Utils.format_number_no_disgit);
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 6));
-				subInv = ExcelHelper.getCellValue(cellObjValue,"STRING","");
+				orderType = ExcelHelper.getCellValue(cellObjValue,"STRING","");
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 7));
-				location = ExcelHelper.getCellValue(cellObjValue,"STRING","");
+				org = ExcelHelper.getCellValue(cellObjValue,"STRING","");
 				
 				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 8));
+				subInv = ExcelHelper.getCellValue(cellObjValue,"STRING","");
+				
+				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 9));
+				location = ExcelHelper.getCellValue(cellObjValue,"STRING","");
+				
+				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 10));
 				unitPrice = ExcelHelper.getCellValue(cellObjValue,"NUMBER",Utils.format_current_2_disgit);
+				
+				cellObjValue = xslUtils.getCellValue(colNo,  row.getCell((short) 11));
+				custPONumber = ExcelHelper.getCellValue(cellObjValue,"STRING","");
 				
 				//Reset Value By Line Loop
 				lineMsg = "";
@@ -364,7 +380,9 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 				//add statement
 				ps.setBigDecimal(index++, id);
 				ps.setString(index++, Utils.isNull(storeCode));
-			    ps.setString(index++, Utils.isNull(materialMaster));
+				ps.setDate(index++, new java.sql.Date(DateUtil.parse(orderedDate,DateUtil.DD_MM_YYYY_WITH_SLASH).getTime()));
+				ps.setString(index++, Utils.isNull(orderType));
+				ps.setString(index++, Utils.isNull(materialMaster));
 			    ps.setString(index++, Utils.isNull(groupCode));
 			    ps.setString(index++, Utils.isNull(pensItem));
 			    ps.setDouble(index++, Utils.convertStrToDouble(qty));
@@ -375,14 +393,15 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 			    ps.setDate(index++, new java.sql.Date(new Date().getTime()));
 			    ps.setString(index++, monitorModel.getCreateUser());
 			    ps.setString(index++, fileName);
+			    ps.setString(index++, custPONumber);
 			    ps.addBatch();
 			    
 	    	}//for row
 		
 			//Insert Column For Display Result (1:no, last column ->status,Message )default column
 			lineMsg ="";
-			lineMsg  = "No|Line Excel|CustomerNo|ProdCode|GroupCode|pensItem|QTY|";
-			lineMsg += "org|subInv|location|ราคาออกCN ก่อนVat|";
+			lineMsg  = "No|Line Excel|CustomerNo|วันที่ทำเอกสาร|ProdCode|GroupCode|pensItem|QTY|RMA Order Type|";
+			lineMsg += "org|subInv|location|ราคาออกCN ก่อนVat|custPONumber";
 			 
 			//insertMonitorItemColumnHeadTableResult(connMonitor,monitorItemBean.getId(),lineMsg);
 			 
@@ -428,8 +447,8 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 		int index = 1;
 		String custGroup = "";
 		try {
-			sql.append("\n SELECT STORE_CODE ,SUM(QTY) as TOTAL_QTY FROM PENSBI.BME_AUTOCN_HH_IMPORT_TEMP ");
-			sql.append("\n WHERE ID ='"+id+"' GROUP BY ID,STORE_CODE ");
+			sql.append("\n SELECT STORE_CODE,ORDERED_DATE,ORDER_TYPE,ORG,SUB_INV ,SUM(QTY) as TOTAL_QTY FROM PENSBI.BME_AUTOCN_HH_IMPORT_TEMP ");
+			sql.append("\n WHERE ID ='"+id+"' GROUP BY ID,STORE_CODE,ORDERED_DATE,ORDER_TYPE,ORG,SUB_INV");
 			
 			logger.debug("sql:"+sql);
 			ps = conn.prepareStatement(sql.toString());
@@ -437,9 +456,9 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 			if (rst.next()) {
 				sql = new StringBuilder();
 				sql.append("\n INSERT INTO PENSBI.BME_AUTOCN_HH_TEMP ");
-				sql.append("\n (ID,CUST_GROUP,STORE_CODE,STATUS ,");
+				sql.append("\n (ID,CUST_GROUP,STORE_CODE,ORDERED_DATE,ORDER_TYPE,ORG,SUB_INV,STATUS ,");
 				sql.append("\n TOTAL_QTY,CREATE_DATE,CREATE_USER) ");
-				sql.append("\n VALUES(?,?,?,?,?,?,?) ");
+				sql.append("\n VALUES(?,?,?,?,?,?,?,?,?,?,?) ");
 				
 				//GET CustGroup
 				custGroup = rst.getString("store_code");
@@ -449,6 +468,10 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 				ps.setBigDecimal(index++, id);
 				ps.setString(index++, custGroup);
 				ps.setString(index++, rst.getString("STORE_CODE"));
+				ps.setDate(index++, rst.getDate("ORDERED_DATE"));
+				ps.setString(index++, rst.getString("ORDER_TYPE"));
+				ps.setString(index++, rst.getString("ORG"));
+				ps.setString(index++, rst.getString("SUB_INV"));
 				ps.setString(index++, "APPROVED");
 				ps.setDouble(index++, rst.getDouble("TOTAL_QTY"));
 				ps.setDate(index++, new java.sql.Date(new Date().getTime()));
@@ -474,20 +497,20 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 			sql.append("\n "+id+" as ID");
 			sql.append("\n ,(select P.inventory_item_id from apps.xxpens_om_item_mst_v P ");
 			sql.append("\n  where P.segment1 = S.pens_item) as INVENTORY_ITEM_ID");
+			sql.append("\n ,S.MATERIAL_MASTER ");
+			sql.append("\n ,S.GROUP_CODE ");
 			sql.append("\n ,S.PENS_ITEM");
 			sql.append("\n ,S.UNIT_PRICE ");
 			sql.append("\n ,'APPROVED' as STATUS ");
-			sql.append("\n ,S.ORG ");
-			sql.append("\n ,S.SUB_INV ");
 			sql.append("\n ,S.LOCATION ");
+			sql.append("\n ,S.CUST_PO_NUMBER ");
 			sql.append("\n ,SUM(S.QTY) as QTY");
 			sql.append("\n ,sysdate");
 			sql.append("\n ,'"+userName+"' as create_user");
 			sql.append("\n FROM PENSBI.BME_AUTOCN_HH_IMPORT_TEMP S");
 			sql.append("\n WHERE ID ="+id+"");
 			sql.append("\n GROUP BY");
-			sql.append("\n  S.PENS_ITEM,S.UNIT_PRICE,S.ORG ");
-			sql.append("\n ,S.SUB_INV ,S.LOCATION ");
+			sql.append("\n  S.PENS_ITEM,S.MATERIAL_MASTER,S.GROUP_CODE,S.UNIT_PRICE,S.LOCATION,S.CUST_PO_NUMBER ");
 			
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();

@@ -12,12 +12,13 @@ import com.isecinc.pens.bean.DiffStockSummary;
 import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.PhysicalSummary;
 import com.isecinc.pens.bean.TransactionSummary;
+import com.isecinc.pens.web.importall.bean.PageBean;
 
 /**
- * Receipt Form
+ * ImportAllForm
  * 
- * @author atiz.b
- * @version $Id: ReceiptForm.java,v 1.0 26/10/2010 00:00:00 atiz.b Exp $
+ * @author witty.b
+ * @version $Id:01/01/2020 
  * 
  */
 public class ImportAllForm extends I_Form {
@@ -26,59 +27,47 @@ public class ImportAllForm extends I_Form {
 
 	private ImportAllBean criteria = new ImportAllBean();
 	private List<ImportAllBean> results;
-	private ImportAllBean bean;
+	private ImportAllBean bean;//for Page is simple
+	private PageBean pageBean = new PageBean();//for page is complicate and separate bean by PageName
 	private String pageName;
     private FormFile dataFile;
     private FormFile dataFile2;
     private FormFile dataFile3;
     
     
-    
+	public PageBean getPageBean() {
+		return pageBean;
+	}
+	public void setPageBean(PageBean pageBean) {
+		this.pageBean = pageBean;
+	}
 	public FormFile getDataFile3() {
 		return dataFile3;
 	}
-
-
 	public void setDataFile3(FormFile dataFile3) {
 		this.dataFile3 = dataFile3;
 	}
-
-
 	public FormFile getDataFile() {
 		return dataFile;
 	}
-
-
 	public void setDataFile(FormFile dataFile) {
 		this.dataFile = dataFile;
 	}
-
-
 	public FormFile getDataFile2() {
 		return dataFile2;
 	}
-
-
 	public void setDataFile2(FormFile dataFile2) {
 		this.dataFile2 = dataFile2;
 	}
-
-
 	public ImportAllBean getCriteria() {
 		return criteria;
 	}
-
-
 	public void setCriteria(ImportAllBean criteria) {
 		this.criteria = criteria;
 	}
-
-
 	public List<ImportAllBean> getResults() {
 		return results;
 	}
-
-
 	public void setResults(List<ImportAllBean> results) {
 		this.results = results;
 	}

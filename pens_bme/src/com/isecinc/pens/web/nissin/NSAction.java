@@ -570,7 +570,8 @@ public class NSAction extends I_Action {
 			  h.append("<tr> \n");
 				    h.append("<th>ID</th>\n");
 					h.append("<th>Status</th>\n");
-					h.append("<th>Date</th>\n");
+					h.append("<th>Nissin Ordered Date</th>\n");
+					h.append("<th>Pens Open Date</th>\n");
 					h.append("<th>Type</th>\n");
 					h.append("<th>Customer Code</th>\n");
 					h.append("<th>Customer Name</th>\n");
@@ -581,6 +582,7 @@ public class NSAction extends I_Action {
 					h.append("<th>Phone Number</th>\n");
 					h.append("<th>Invoice No</th>\n");
 					h.append("<th>Invoice Date</th>\n");
+					h.append("<th>Complete Date</th>\n");
 					h.append("<th>Sale Code</th>\n");
 					
 					h.append("<th>Cup72 (CTN)</th>\n");
@@ -604,7 +606,8 @@ public class NSAction extends I_Action {
 					h.append("<tr> \n");
 					h.append("<td>"+mc.getOrderId() +"</td>");
 					h.append("<td class='text'>"+mc.getStatusDesc()+"</td>"); 
-					h.append("<td>"+mc.getOrderDate() +"</td>");
+					h.append("<td class='text'>"+mc.getNissinOrderDate() +"</td>");
+					h.append("<td class='text'>"+mc.getOrderDate() +"</td>");
 					h.append("<td class='text'>"+mc.getCustomerType()+"</td>");
 					h.append("<td class='text'>"+mc.getCustomerCode()+"</td>");
 				    h.append("<td class='text'>"+mc.getCustomerName()+"</td>");
@@ -614,7 +617,8 @@ public class NSAction extends I_Action {
 				    h.append("<td class='text'>"+mc.getAddressLine2()+"</td>");
 					h.append("<td class='text'>"+mc.getPhone()+"</td>");
 					h.append("<td class='text'>"+mc.getInvoiceNo()+"</td>");
-					h.append("<td>"+mc.getInvoiceDate()+"</td>");
+					h.append("<td class='text'>"+mc.getInvoiceDate()+"</td>");
+					h.append("<td class='text'>"+mc.getCompleteDate()+"</td>");
 					h.append("<td>"+mc.getSaleCode()+"</td>");
 					h.append("<td>"+mc.getCupQty()+"</td>");
 					h.append("<td>"+mc.getCupNQty()+"</td>");

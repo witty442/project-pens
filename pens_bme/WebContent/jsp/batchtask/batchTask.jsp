@@ -1,8 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskListBean"%>
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<%@page import="java.util.Iterator"%>
-<%@page import="java.util.Map"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskInfo"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
@@ -55,8 +53,9 @@ if(taskInfo != null){
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.8.2.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
+ <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script>
+
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 
 <!-- Calendar -->
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
@@ -185,6 +184,7 @@ body {
 	   var stepMinUp = 1;
 	   var stepHaftMinUp = 0.5;
 	   var stepDotOne = 0.1;
+	   var stepDotDotOne = 0.00001;
 	   var progressCount = 0;
 	   var useTimeMillisecs = 0;
 	   var startTime = new Date();
@@ -203,7 +203,9 @@ body {
 	   
 	   function updateProgress(status){
 	    	 if(status != '1' && status != "-1"){ //Running
-	    		 if(progressCount > 95){
+	    		 if(progressCount > 96){
+			       progressCount += stepDotDotOne; 
+	    		 }else if(progressCount > 95){
 		    	   progressCount += stepDotOne; 
 	    		 }else if(progressCount > 90){
 	    		   progressCount += stepHaftMinUp; 

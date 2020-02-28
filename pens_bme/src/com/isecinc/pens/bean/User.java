@@ -41,7 +41,7 @@ public class User extends I_PO implements Serializable {
 	public static final String IT = "IT";
 	public static final String WACOAL = "WACOAL";
 	public static final String NISSINVIEW ="NISSINVIEW";
-	
+	public static final String MERC ="MERS";
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**

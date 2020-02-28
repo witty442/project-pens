@@ -245,11 +245,12 @@ public class SAReportAction extends I_Action {
 			SAReportForm formBean = (SAReportForm) form;
 			User user = (User) request.getSession().getAttribute("user");
 			boolean status = ProfileProcess.saveProfile(user, formBean.getSalesBean());
+			SABean profileBean =  ProfileProcess.getProfile(user.getId()+"", formBean.getSalesBean().getProfileId());
 			
 			if(status){
-			   request.setAttribute("Message", "บันทึกข้อมูลรูปแแบบการค้นหา  Profile "+formBean.getSalesBean().getProfileId() +"เรียบร้อยแล้ว");
+			   request.setAttribute("Message", "บันทึกข้อมูลรูปแแบบการค้นหา   "+profileBean.getProfileId()+"-"+profileBean.getProfileName() +" เรียบร้อยแล้ว");
 			}else{
-			   request.setAttribute("Message", "ไม่สามารถ บันทึกข้อมูลรูปแแบบการค้นหา  Profile "+formBean.getSalesBean().getProfileId() +"โปรดตรวจสอบข้อมูล");
+			   request.setAttribute("Message", "ไม่สามารถ บันทึกข้อมูลรูปแแบบการค้นหา   "+profileBean.getProfileId()+"-"+profileBean.getProfileName() +" โปรดตรวจสอบข้อมูล");
 			}
 			
 			request.getSession().setAttribute("RESULT", null);	

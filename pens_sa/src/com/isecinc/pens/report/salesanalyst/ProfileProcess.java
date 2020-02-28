@@ -88,8 +88,8 @@ public class ProfileProcess {
 	    	
 	    	b.setUserId(userId);
     		b.setProfileId(profileId);
-    		
 	    	if(rs.next()){
+	    		b.setProfileName(Utils.isNull(rs.getString("profile_name")));
 	    		b.setTypeSearch(Utils.isNull(rs.getString("TYPE_SEARCH")));
 	    		b.setGroupBy(Utils.isNull(rs.getString("GROUP_BY")));
 	    		b.setDay(Utils.isNull(rs.getString("DATE_FROM")));

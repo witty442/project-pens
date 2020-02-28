@@ -83,17 +83,17 @@ PageVisit.processPageVisit(request,"ProdShow");
 						<!-- BODY -->
 						<html:form action="/jsp/prodShowAction">
 						<jsp:include page="../error.jsp"/>
-						<div align="center">
+						
 						   	<!--  Criteria -->
 						    <jsp:include page="criteria/prodShowCriteria.jsp" />  
 					    
 					 	    <!-- ************************Result *************-->
-					 	    <jsp:include page="result/prodShowResult.jsp" />  
-					 	</div>
 					 	
+					 	    <jsp:include page="result/prodShowResult.jsp" />  
+					 
 					 	<!-- INPUT HIDDEN -->
 					 	<input type="hidden" name="pageName" value="<%=pageName %>"/>
-					 	
+					 	<input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

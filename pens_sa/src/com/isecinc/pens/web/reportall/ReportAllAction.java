@@ -11,6 +11,7 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.reportall.page.ProjectCReportAction;
+import com.isecinc.pens.web.reportall.page.StockReturnAction;
 import com.pens.util.Utils;
 
 /**
@@ -40,6 +41,8 @@ public class ReportAllAction extends I_Action {
 				 //Default display have qty
 				 if("ProjectCReport".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 					 return new ProjectCReportAction().prepare(form, request, response);
+				 }else if("StockReturn".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+					 return new StockReturnAction().prepare(form, request, response);
 				 }
 			 }
 		} catch (Exception e) {
@@ -68,10 +71,13 @@ public class ReportAllAction extends I_Action {
 	 * Search
 	 */
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		logger.debug("page["+Utils.isNull(request.getParameter("pageName"))+"]");
+		ReportAllForm aForm = (ReportAllForm) form;
+		logger.debug("page["+aForm.getPageName()+"]");
 		try {
 			 if("ProjectCReport".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				 return new ProjectCReportAction().search(form, request, response);
+			 }else if("StockReturn".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 return new StockReturnAction().search(form, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -93,7 +99,20 @@ public class ReportAllAction extends I_Action {
 		}
 		return mapping.findForward("reportAll");
 	}
-
+	
+	public ActionForward printReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		ReportAllForm aForm = (ReportAllForm) form;
+		try {
+			logger.debug("PageName:"+aForm.getPageName());
+		    if("StockReturn".equalsIgnoreCase(aForm.getPageName()) ){
+			   return new StockReturnAction().printReport(mapping, form, request, response);
+		    }
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("reportAll");
+	}
 	/**
 	 * Save
 	 */

@@ -215,6 +215,8 @@ public class SalesTargetTTCopy {
 			
 			sql.append("\n  ( SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
 			sql.append("\n    where P.INVENTORY_ITEM_ID =L.INVENTORY_ITEM_ID " );
+			//witty edit:04/02/2020 (get only active )
+			sql.append("\n    and P.end_date_active is null ");
 			sql.append("\n    and P.list_header_id ="+priceListId+") as price ");//Price
 			
 			sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_TARGET_TT_L L ");

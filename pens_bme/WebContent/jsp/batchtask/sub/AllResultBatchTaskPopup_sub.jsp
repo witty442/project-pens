@@ -18,10 +18,13 @@ if(batchTaskForm.getMonitorItem() != null){
 	 String columnHeadStrArr = batchTaskForm.getMonitorItem().getColumnHeadStrArr();
 	 List<MonitorItemResultBean> successList = batchTaskForm.getMonitorItem().getSuccessList();
 	 List<MonitorItemResultBean> failList = batchTaskForm.getMonitorItem().getFailList();
+	 
+	 System.out.println("successList size:"+successList!=null?successList.size():0);
+	 System.out.println("failList size:"+failList!=null?failList.size():0);
 %>
 
-	<%if(failList != null && failList.size() >0){
-		//Gen Column Head Table
+<% if(failList != null && failList.size() >0){
+	  //Gen Column Head Table
 	  if( !Utils.isNull(columnHeadStrArr).equals("")){
 		String[] columnHeadArr = columnHeadStrArr.split("\\|");
 	%>
@@ -30,6 +33,7 @@ if(batchTaskForm.getMonitorItem() != null){
 	<tr>
 	  <th colspan="<%=columnHeadArr.length%>"><font color="#921F06">จำนวน Row ที่ไม่สามารถ Import ได้   <%=batchTaskForm.getMonitorItem().getFailCount() %> Row </font></th>
 	</tr>
+	<% if(columnHeadArr != null && columnHeadArr.length >0){ %> 
 	<tr>
 		<% 
 			for(int c=0;c<columnHeadArr.length;c++){
@@ -66,10 +70,12 @@ if(batchTaskForm.getMonitorItem() != null){
 			<% }%>
 		</tr>
 		<%} %>
+	  <%} %>
 	</table>
   <%} %>
 
-<% 
+<%  
+  if(successList != null && successList.size() >0){ 
 	//Gen Column Head Table
 	String[] columnHeadArr = null;
     if( !Utils.isNull(columnHeadStrArr).equals("")){
@@ -81,8 +87,8 @@ if(batchTaskForm.getMonitorItem() != null){
 		  <th colspan="<%=columnHeadArr.length%>">จำนวน Row ที่สามารถ Import ได้   <%=batchTaskForm.getMonitorItem().getSuccessCount() %> Row </th>
 		</tr>
 	<%} %>
-	
-	<% if(successList != null && successList.size() >0){ %> 
+
+	<% if(columnHeadArr != null && columnHeadArr.length >0){ %> 
 	<tr>
 		<% for(int c=0;c<columnHeadArr.length;c++){%>
 		  <th width="5%"><%=columnHeadArr[c]%></th>
@@ -117,9 +123,9 @@ if(batchTaskForm.getMonitorItem() != null){
 			<%}%>
 		</tr>
 		<%} %>
+	  <%} %>
 	</table>
-   <%} %>
-	 
+  <% }%> 
 <% }%>
 					
 								

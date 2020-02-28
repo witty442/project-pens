@@ -38,16 +38,17 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/page/reports.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/DateUtils.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/page/reportAll.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript">
 
 function loadMe(){
 	 new Epoch('epoch_popup', 'th', document.getElementById('salesDate'));
 	
 	 /** for popup BatchTask in page **/
-	 <%if( "submitedGenStockOnhandTemp".equals(request.getAttribute("action"))){%>
+	 <%if( !"".equals(Utils.isNull(request.getAttribute("BATCH_TASK_NAME")))){%>
 	    //lockscreen
 	    var path = document.getElementById("path").value;
 	    /** Init progressbar **/
@@ -57,13 +58,15 @@ function loadMe(){
 		}); 
 		    
 		//submitedGenStockOnhandTemp
-		var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopup&pageName=<%=BatchTaskConstants.GEN_STOCK_ONHAND_TEMP%>';
-		popupFull(url,'submitedGenStockOnhandTemp');
+		var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopup&pageName=<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>';
+		popupFull(url,'<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>');
    <%}%>
 }
 
-function search(path){
+function search(){
 	var form = document.reportAllForm;
+	var path = form.path.value;
+	
 	   var asOfDateFrom = form.salesDate.value;
 	   var pensCustCodeFrom = form.pensCustCodeFrom.value;
 	   
@@ -81,49 +84,87 @@ function search(path){
 	return true;
 }
 
-function exportExcel(path){
+function exportExcel(){
 	var form = document.reportAllForm;
+	var path = form.path.value;
 	form.action = path + "/jsp/reportAllAction.do?do=export";
 	form.submit();
 	return true;
 }
-function genStockOnhandTemp(path){
+function genStockOnhandRepTemp(){
+	//alert("genStockOnhandRepTemp");
    var form = document.reportAllForm;
-   var asOfDateFrom = form.salesDate.value;
-   var pensCustCodeFrom = form.pensCustCodeFrom.value;
+   var path = form.path.value;
+   var asOfDateFrom = form.salesDate;
+   var pensCustCodeFrom = form.pensCustCodeFrom;
+   var currentDate = form.currentDate;
    var storeType = form.storeType.value;
-   if(asOfDateFrom ==""){ 
+   if(asOfDateFrom.value ==""){ 
 	   alert("กรุณากรอกข้อมูลวันที่ As Of");
 	   asOfDateFrom.focus();
 	   return false;
+   }else{
+	   //check isToday
+	   if(compareDate(asOfDateFrom.value,currentDate.value) != 0){
+		   alert("กรุณากรอกข้อมูลวันที่ As Of เป็นวันที่ปัจจุบันเท่านั้น");
+		   asOfDateFrom.focus();
+		   return false;
+	   }
    }
-    if(pensCustCodeFrom ==""){ 
+    if(pensCustCodeFrom.value ==""){ 
 	   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
 	   pensCustCodeFrom.focus();
 	   return false;
    } 
     
+  //Check StoreCode Can Gen Stock Onhand Temp Rep
+	var returnString= "";
+	var param = "storeCode="+form.pensCustCodeFrom.value;
+	var getData = $.ajax({
+		url: "${pageContext.request.contextPath}/jsp/autoOrder/ajax/canGenStockOnhandTempRepAjax.jsp",
+		data : param,
+		async: false,
+		cache: false,
+		success: function(getData){
+		  returnString = jQuery.trim(getData);
+		}
+	}).responseText;
+	
+   if(returnString=='0'){
+	  alert("ร้านค้านี้ ไม่ได้ถูกกำหนดให้ทำการเติมเต็มสินค้า");
+      return false
+    }
    if(confirm("กรุณายืนยันการ Gen Stock Onhand Temp")){
-		form.action = path + "/jsp/reportAllAction.do?do=genStockOnhandTemp&storeType="+storeType;
+		form.action = path + "/jsp/reportAllAction.do?do=genStockOnhandRepTemp";
 		form.submit();
 		return true;
    }
 }
 
-function clearForm(path){
+function clearForm(){
 	var form = document.reportAllForm;
+	var path = form.path.value;
 	form.action = path + "/jsp/reportAllAction.do?do=prepare&action=new";
 	form.submit();
 	return true;
 }
-function searchBatch(path){
+function searchBatch(){
 	//unlockScreen
 	setTimeout($.unblockUI, 100); 
 	 
 	var form = document.reportAllForm;
+	var path = form.path.value;
 	form.action = path + "/jsp/reportAllAction.do?do=searchBatch";
 	form.submit();
 	return true;
+}
+function gotoAutoOrderPage(path){
+	var url="";
+	var form = document.reportAllForm;
+	var storeCode = form.pensCustCodeFrom.value;
+	var param = "&storeCode="+storeCode+"&orderDate="+form.salesDate.value;
+	url = path+'/jsp/autoOrderAction.do?do=prepareSearch&action=new'+param;
+	link(true,url);
 }
 </script>
 </head>
@@ -174,10 +215,11 @@ function searchBatch(path){
 							<td align="right"  nowrap>จาก วันที่ขาย (As Of)<font color="red">*</font> 
 							&nbsp;&nbsp;
 							<html:text property="bean.salesDate" styleId="salesDate" readonly="true"/>
+							<html:hidden property="bean.currentDate" styleId="currentDate"/>
 							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 							</td>
 							<td align="left" width="50%" nowrap>
-							   <% if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("page"))){ %>
+							   <% if("reportEndDateLotus".equalsIgnoreCase(request.getParameter("pageName"))){ %>
 							      ปิดรอบสต็อกล่าสุดวันที่:
 							   	  <html:text property="bean.endDate" styleId="endDate" size="20" styleClass="disableText" readonly="true"/> 
 							   	  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -237,25 +279,43 @@ function searchBatch(path){
 					<!-- BUTTON -->
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 						<tr>
-							<td align="center" width="60%">
-								<a href="javascript:search('${pageContext.request.contextPath}')">
+						    <td align="center" width="30%">
+						     <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.MERC}) ){ %>
+						           <a href="#" onclick="javascript:gotoAutoOrderPage('${pageContext.request.contextPath}');">     
+						                  <button type="button" class="newPosBtnLong" onclick="">
+											ไปหน้าจอ Gen Order
+											  <br />
+											  Auto-Replenishment
+										</button>
+						             </a>
+						             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						          <a href="javascript:genStockOnhandRepTemp()">
+									   <button type="button" class="newPosBtnLong" onclick="">
+										  บันทึกยอด Onhand
+										  <br />
+										  สำหรับทำ Order Replenisment
+										</button>
+									</a>
+									
+							 <%} %>
+							</td>
+							<td align="center" width="40%">
+								<a href="javascript:search()">
 								  <input type="button" value="ค้นหา" class="newPosBtn"> 
 								</a>&nbsp;
-								<a href="javascript:clearForm('${pageContext.request.contextPath}')">
+								<a href="javascript:clearForm()">
 								  <input type="button" value="Clear" class="newPosBtn">
 								</a>&nbsp;
-								<a href="javascript:exportExcel('${pageContext.request.contextPath}')">
+								<a href="javascript:exportExcel()">
 								  <input type="button" value="Export" class="newPosBtn">
 								</a>
 							</td>
-							 <td align="right" width="40%" nowrap>
+							 <td align="right" width="25%" nowrap>
 								<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
 									<a href="javascript:genReportEndDate('${pageContext.request.contextPath}')">
 									  <input type="button" value="Gen Data เปรียบเทียบนับสต็อก" class="newPosBtn">
 									</a>
-									<a href="javascript:genStockOnhandTemp('${pageContext.request.contextPath}')">
-									  <input type="button" value="Gen Stock Onhand" class="newPosBtn">
-									</a>
+									
 								<%} %>
 							</td>
 						</tr>
@@ -288,7 +348,7 @@ function searchBatch(path){
 				
 						<c:if test="${reportAllForm.bean.summaryType == 'PensItem'}">
 						<br/>
-							<display:table style="width:100%;" id="item" name="sessionScope.reportsForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
+							<display:table style="width:100%;" id="item" name="sessionScope.reportAllForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
 							    requestURI="#" sort="list" pagesize="50">	
 							    
 							    <display:column  title="รหัสสาขา" property="storeCode"  sortable="false" class="td_text" style="width:5%"/>
@@ -328,7 +388,7 @@ function searchBatch(path){
 							
 							<c:if test="${reportAllForm.bean.summaryType == 'GroupCode'}">
 						    <br/>
-							<display:table style="width:100%;" id="item" name="sessionScope.reportsForm.results" defaultsort="0" defaultorder="descending" class="resultDisp"
+							<display:table style="width:100%;" id="item" name="sessionScope.reportAllForm.results" defaultsort="0" defaultorder="descending" class="resultDisp"
 							    requestURI="#" sort="list" pagesize="50">	
 							    
 							    <display:column  title="รหัสสาขา" property="storeCode"  sortable="false" class="td_text"  style="width:8%"/> 

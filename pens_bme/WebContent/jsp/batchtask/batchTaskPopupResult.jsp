@@ -1,3 +1,6 @@
+<%@page import="com.isecinc.pens.bean.MonitorItemBean"%>
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.pens.util.Utils"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskForm"%>
 <%@page import="com.isecinc.pens.bean.MonitorBean"%>
@@ -14,6 +17,7 @@
 if(session.getAttribute("BATCH_TASK_RESULT") != null){
  BatchTaskForm batchTaskForm = (BatchTaskForm)session.getAttribute("BATCH_TASK_RESULT");
  System.out.println("Page BatchResults: batchTaskForm["+batchTaskForm+"]results lenth["+batchTaskForm.getResults().length+"]");
+ MonitorItemBean monitorItemBean = batchTaskForm.getMonitorItem();
 %>
 
 <%if(batchTaskForm.getResults() != null && batchTaskForm.getResults().length >0){ %>
@@ -22,6 +26,7 @@ if(session.getAttribute("BATCH_TASK_RESULT") != null){
         <th> No.</th>
         <th> เลขที่รายการ</th>
 		<th> ชื่อ Process</th>
+		<th> ชื่อ Process(TH)</th>
 		<th> ประเภทข้อมูล</th>
 		<th> ผู้สร้าง</th>
 		<th> สถานะ</th>
@@ -38,6 +43,7 @@ if(session.getAttribute("BATCH_TASK_RESULT") != null){
                 <td> <%=(i+1)%></td>
                 <td> <%=item.getTransactionId() %></td>
 				<td> <%=item.getName() %></td>
+				<td> <%=item.getThName() %></td>
 				<td> <%=item.getTransactionType() %></td>
 				<td> <%=item.getCreateUser() %></td>
 				<td> 
@@ -49,13 +55,20 @@ if(session.getAttribute("BATCH_TASK_RESULT") != null){
 				</td>
 				<td> <%=item.getSubmitDateDisp()%></td>
 				<td align="left"><%=Utils.isNull(item.getErrorMsg())%> </td>
-			    <td></td>
+			    <td>
+			    <!-- Case Export save all path for download after run Batch Success -->
+			      <%if(Utils.isNull(item.getType()).equalsIgnoreCase("export")){ %>
+			      <a href="javascript:downloadFile('<%=item.getFileName()%>')">DownloadFile</a>
+			      <%} %>
+			    </td>
 		</tr>
 		<%} %>	
 	</table>
 <%} %>	
 
   <!-- Result Batch Task Result Import-->
+  <%System.out.println("batchTaskName:"+batchTaskForm.getTaskInfo().getDescription()+":"+batchTaskForm.getTaskInfo().isDispDetail()) ;%>
+  
   <%if(batchTaskForm.getTaskInfo().isDispDetail()){ %>
      <jsp:include page="sub/AllResultBatchTaskPopup_sub.jsp"></jsp:include>
   <%} %>

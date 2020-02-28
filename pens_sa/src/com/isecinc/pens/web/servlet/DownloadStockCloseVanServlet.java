@@ -86,8 +86,11 @@ public class DownloadStockCloseVanServlet extends HttpServlet {
 		
 			//Get SalesRepName
 			SalesrepBean salesrepBean =  SalesrepDAO.getSalesrepBeanByCode(conn, user.getUserName());
-			parameterMap.put("salesFullName",user.getUserName()+"-"+salesrepBean.getSalesrepFullName());
-			
+			if(salesrepBean != null){
+			   parameterMap.put("salesFullName",user.getUserName()+"-"+salesrepBean.getSalesrepFullName());
+			}else{
+			   parameterMap.put("salesFullName","");
+			}
 			String fileNameExport = "stock_close_van.pdf";
 			if(lstData != null && lstData.size() >0){
 			    reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName, lstData,fileNameExport);

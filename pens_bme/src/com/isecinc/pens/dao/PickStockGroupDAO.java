@@ -550,7 +550,10 @@ public class PickStockGroupDAO extends PickConstants{
 		PickStock h = null;
 		List<PickStock> items = new ArrayList<PickStock>();
 		try {
-			sql.append("\n select M.* from (");
+			sql.append("\n select M.*");
+			sql.append("\n ,(select count(*) as c FROM PENSBI.PENSBME_AUTO_SUBTRANS_OUT S ");
+			sql.append("\n   where S.REF_NO = M.issue_req_no ) as auto_trans_count");
+			sql.append("\n from (");
 			sql.append("\n select A.* ,rownum as r__ from (");
 				sql.append(" SELECT S.* " );
 				sql.append(" ,(select max(M.pens_desc) from PENSBME_MST_REFERENCE M ");
@@ -611,7 +614,9 @@ public class PickStockGroupDAO extends PickConstants{
 				   }else{
 					   h.setCanComplete(false);
 				   }
- 
+				   if(rst.getInt("auto_trans_count") >0){
+				       h.setAutoTrans(true);
+				   }
 			   items.add(h);
 			   
 			}//while

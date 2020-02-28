@@ -4,7 +4,6 @@
 <%@page import="com.isecinc.pens.web.salestarget.SalesTargetConstants"%>
 <%@page import="com.pens.util.Utils"%>
 <%@page import="com.pens.util.SIdUtils"%>
-<%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -16,7 +15,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="salesTargetForm" class="com.isecinc.pens.web.salestarget.SalesTargetForm" scope="session" />
 <%
-//for test clear session
+//for test clear session 
 //SIdUtils.getInstance().clearInstance();
 		 
 /*clear session form other page */

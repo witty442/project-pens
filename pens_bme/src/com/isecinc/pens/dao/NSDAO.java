@@ -94,6 +94,7 @@ public class NSDAO {
 				   h = new NSBean();
 				   h.setOrderId(Utils.isNull(rst.getString("order_id")));
 				   h.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setNissinOrderDate(DateUtil.stringValueNull(rst.getDate("nissin_order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 				   h.setCustomerType(Utils.isNull(rst.getString("customer_type")));
 				   h.setCustomerSubType(Utils.isNull(rst.getString("customer_sub_type")));
@@ -109,11 +110,10 @@ public class NSDAO {
 				   h.setChannelId(Utils.isNull(rst.getString("channel_id")));
 				   h.setProvinceId(Utils.isNull(rst.getString("province_id")));
 				    
-				   if( rst.getDate("invoice_date") !=null){
-				     h.setInvoiceDate(DateUtil.stringValue(rst.getDate("invoice_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   }else{
-					   h.setInvoiceDate("");
-				   }
+				  
+				   h.setInvoiceDate(DateUtil.stringValueNull(rst.getDate("invoice_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setCompleteDate(DateUtil.stringValueNull(rst.getDate("update_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   
 				   h.setCupQty(Utils.isNull(rst.getInt("CUP_QTY")));
 				   h.setPac6CTNQty(Utils.isNull(rst.getInt("PAC_QTY")));
 				   h.setPoohQty(Utils.isNull(rst.getInt("POOH_QTY")));
@@ -200,6 +200,7 @@ public class NSDAO {
 				   h = new NSBean();
 				   h.setOrderId(Utils.isNull(rst.getString("order_id")));
 				   h.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setNissinOrderDate(DateUtil.stringValueNull(rst.getDate("nissin_order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 				   h.setCustomerType(Utils.isNull(rst.getString("customer_type")));
 				   h.setCustomerSubType(Utils.isNull(rst.getString("customer_sub_type")));
@@ -216,10 +217,13 @@ public class NSDAO {
 				   h.setProvinceId(Utils.isNull(rst.getString("province_id")));
 				    
 				   if( rst.getDate("invoice_date") !=null){
-				     h.setInvoiceDate(DateUtil.stringValue(rst.getDate("invoice_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				       h.setInvoiceDate(DateUtil.stringValue(rst.getDate("invoice_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   }else{
 					   h.setInvoiceDate("");
 				   }
+				  
+				   h.setCompleteDate(DateUtil.stringValueNull(rst.getDate("update_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  
 				   h.setCupQty(Utils.isNull(rst.getInt("CUP_QTY")));
 				   h.setPac6CTNQty(Utils.isNull(rst.getInt("PAC_QTY")));
 				   h.setPoohQty(Utils.isNull(rst.getInt("POOH_QTY")));
@@ -382,9 +386,9 @@ public class NSDAO {
 			sql.append(" INSERT INTO PENSBI.NISSIN_ORDER \n");
 			sql.append(" (order_id, order_date, customer_type, customer_name, \n");
 			sql.append(" address_line1, address_line2, phone, remark,  \n");
-			sql.append(" STATUS, CREATE_DATE, CREATE_USER,channel_id,province_id ,customer_sub_type) ");
+			sql.append(" STATUS, CREATE_DATE, CREATE_USER,channel_id,province_id ,customer_sub_type,nissin_order_date) ");
 			sql.append(" VALUES \n"); 
-			sql.append(" (?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?,?,?,?) \n");
+			sql.append(" (?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 			
@@ -404,6 +408,11 @@ public class NSDAO {
 			ps.setString(c++, Utils.isNull(o.getChannelId()));
 			ps.setString(c++, Utils.isNull(o.getProvinceId()));
 			ps.setString(c++, Utils.isNull(o.getCustomerSubType()));
+			
+			//nissinOrderDate
+		    d = DateUtil.parse(Utils.isNull(o.getNissinOrderDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			ps.setDate(c++, new java.sql.Date(d.getTime()));
+			
 			ps.executeUpdate();
 			
 		}catch(Exception e){
@@ -423,6 +432,7 @@ public class NSDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" UPDATE NISSIN_ORDER SET order_date =? ,customer_type = ? ,customer_name=?,address_line1 =?,address_line2 =?,  \n");
 			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ? ,REMARK =? ,phone=? ,channel_id =?,province_id = ? ,customer_sub_type = ? \n");
+			sql.append(" ,nissin_order_date =? \n"); 
 			sql.append(" WHERE order_id = ?  \n" );
 
 			ps = conn.prepareStatement(sql.toString());
@@ -442,6 +452,9 @@ public class NSDAO {
 			ps.setString(c++, Utils.isNull(o.getChannelId()));
 			ps.setString(c++, Utils.isNull(o.getProvinceId()));
 			ps.setString(c++, Utils.isNull(o.getCustomerSubType()));
+			//nissinOrderDate
+		    d = DateUtil.parse(Utils.isNull(o.getNissinOrderDate()), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			ps.setDate(c++, new java.sql.Date(d.getTime()));
 			
 			ps.setString(c++, Utils.isNull(o.getOrderId()));
 

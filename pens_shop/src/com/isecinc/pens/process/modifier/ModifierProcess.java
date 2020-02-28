@@ -109,7 +109,7 @@ public class ModifierProcess {
 			stmt = conn.createStatement();
             
 			if(isDebug){
-			  logger.info("************** Start  LINE Modifier ************************************");  //What ? no used
+			  logger.info("************** Start LINE(Item) Modifier ********************************");  //What ? no used
 			}
 			
 			for (OrderLine oline : orderLines) {
@@ -164,13 +164,13 @@ public class ModifierProcess {
 			}// line
 
 			if(isDebug){
-			  logger.info("************** END  LINE Modifier ************************************"); 
+			  logger.info("************** END  LINE(Item) Modifier ******************************"); 
 			}
 			
 			// Check Line Group Modifier
 	
 			if(isDebug){
-			   logger.info("************** START LINER GROUP ************************************"); 
+			   logger.info("************** START LINER GROUP AND ALLITEM *************************"); 
 			   logger.info("************ Find Product Category From OrderLine product and distinct productCategory*******"); 
 			}
 			List<ProductCategory> itemCats = new ArrayList<ProductCategory>();
@@ -201,7 +201,7 @@ public class ModifierProcess {
 						itemCats.add(cat);
 					}
 				}
-			}
+			}//for
 			
 			if(isDebug){
 				logger.info("************ END Product Category From OrderLine product and distinct productCategory*******"); 
@@ -218,7 +218,7 @@ public class ModifierProcess {
 				sql = createSQL(BeanParameter.getModifierItemCategory(), String.valueOf(item.getId()), 0, "",LEVEL_LINEGROUP, user);
 				
 				if(isDebug){
-				 // logger.info("CateId["+item.getId()+"Loop Cate LINEGROUP>> SQL[\n "+sql+"\n]");
+				  logger.info("PCateId["+item.getId()+"]Loop Cate LINEGROUP>> SQL[\n "+sql+"\n]");
 				}
 				
 				rst = stmt.executeQuery(sql);
@@ -688,10 +688,13 @@ public class ModifierProcess {
 							// find on ISEXCLUDE
 							bExclude = false;
 							if (excludeAttrs != null) {
+								logger.debug("FOUND EXCLUDE :"+excludeAttrs);
 								for (ModifierAttr excAttr : excludeAttrs) {
+									
+									//Exclude ItemNumber
 									if (excAttr.getProductAttribute().equalsIgnoreCase(BeanParameter.getModifierItemNumber())) {
 										if(isDebug){
-										  logger.info("EXCLUDE..IN ITEM_NUMBER");
+										  logger.info("FOUND EXCLUDE..IN ITEM_NUMBER :"+excAttr.getProductAttributeValue());
 										}
 										if (excAttr.getProductAttributeValue().equalsIgnoreCase(String.valueOf(oline.getProduct().getId()))) {
 											if(isDebug){
@@ -701,7 +704,23 @@ public class ModifierProcess {
 											bExclude = true;
 											break;
 										}
-									}
+									}//if
+									
+									//Exclude Item Category
+									if (excAttr.getProductAttribute().equalsIgnoreCase(BeanParameter.getModifierItemCategory())) {
+										if(isDebug){
+										  logger.info("FOUND EXCLUDE..IN ITEM_CATEGORY :"+excAttr.getProductAttributeValue());
+										}
+										String productCategoryId = String.valueOf(oline.getProduct().getProductCategory().getId());
+										if (excAttr.getProductAttributeValue().equalsIgnoreCase(productCategoryId)) {
+											if(isDebug){
+											  logger.info(oline.getProduct()+":pCategoryId["+productCategoryId+"]" + "...IS EXCLUDED");
+											}
+											
+											bExclude = true;
+											break;
+										}
+									}//if
 								}
 							} else {
 								if(isDebug){
@@ -1478,8 +1497,8 @@ public class ModifierProcess {
 
 		// join customer qualifier
 		
-		//logger.debug("terriory:"+terriory+",territoryName:"+territoryName);
-		//FileUtil.writeFile(FileUtil.dev_temp_path+"test.txt", territoryName,"TIS-620");
+		logger.debug("terriory:"+terriory+",territoryName:"+territoryName);
+		FileUtil.writeFile(FileUtil.dev_temp_path+"test.txt", territoryName,"TIS-620");
 		
 		if (terriory.length() > 0) {
 
@@ -1509,14 +1528,13 @@ public class ModifierProcess {
 			sql += " ) \r\n";
 		}
 
+		logger.debug("productId:"+productId);
 		// exclude
 		if (productId != 0) {
 			sql += "  and a.MODIFIER_LINE_ID not in( \r\n";
-			sql += "	select MODIFIER_LINE_ID from m_modifier_attr \r\n";
-			sql += "  where 1=1 \r\n";
-			
+			sql += "	  select MODIFIER_LINE_ID from m_modifier_attr \r\n";
+			sql += "      where 1=1 \r\n";
 			sql += "	  and product_attribute = '" + BeanParameter.getModifierItemCategory() + "' \r\n";
-			
 			sql += "	  and product_attribute_value = '" + productId + "' \r\n";
 			sql += "	  and isexclude = 'Y' \r\n";
 			sql += "	) \r\n";

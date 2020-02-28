@@ -24,6 +24,9 @@ function confirmInputReason(){
 
 function save(path,moveOrderType){
 	if(checkTableCanSave()){
+		/**  Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
 		document.stockForm.action = path + "/jsp/stockAction.do?do=save";
 		document.stockForm.submit();
 		return true;
@@ -275,7 +278,7 @@ function addRow(setFocus){
 	    "   onkeypress='getProductKeypress(event,this,"+rowId+")' "+
 	    "   onchange='checkProductOnblur(event,this,"+rowId+")' " +
 	    "   tabindex ="+tabIndex+
-	    " />  </td>"+
+	    "   autoComplete='off'/>  </td>"+
 	    "<td class='td_text'  width='15%'> "+
 	    " <input type='text' tabindex ='-1' name='productName' size='40' readonly class='disableText' />" +
 	    " <input type='hidden' tabindex ='-1' name='inventoryItemId' id='inventoryItemId'/>"+
@@ -293,13 +296,13 @@ function addRow(setFocus){
 	    tabIndex++;
 	    rowData +="<td class='td_number' width='3%'> "+
 	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='qty' size='5' "+
+	    "  value='' name='qty' size='5' autoComplete='off'"+
 	    "  onkeydown='return isNum0to9andpoint(this,event);'class='numberText' /> "+
 	    "  </td>"+
 	    tabIndex++;
 	    rowData +="<td class='td_number' width='3%'> "+
 	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='sub' size='5' "+
+	    "  value='' name='sub' size='5' autoComplete='off'"+
 	    "  onkeydown='return isNum0to9andpoint(this,event);'class='numberText' /> "+
 	    "  </td>"+
 	    tabIndex++;
@@ -310,13 +313,13 @@ function addRow(setFocus){
 	    tabIndex++;
 	    rowData +="<td class='td_number' width='3%'> "+
 	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='qty2' size='5' "+
+	    "  value='' name='qty2' size='5' autoComplete='off'"+
 	    "  onkeydown='return isNum0to9andpoint(this,event);'class='numberText' /> "+
 	    "  </td>"+
 	    tabIndex++;
 	    rowData +="<td class='td_number' width='3%'> "+
 	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='sub2' size='5' "+
+	    "  value='' name='sub2' size='5' autoComplete='off'"+
 	    "  onkeydown='return isNum0to9andpoint(this,event);'class='numberText' /> "+
 	    "  </td>"+
 	    tabIndex++;
@@ -326,13 +329,13 @@ function addRow(setFocus){
 	    tabIndex++;
 	    rowData +="<td class='td_number' width='3%'> "+
 	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='qty3' size='5' "+
+	    "  value='' name='qty3' size='5' autoComplete='off'"+
 	    "  onkeydown='return isNum0to9andpoint(this,event);'class='numberText' /> "+
 	    "  </td>"+
 	    tabIndex++;
 	    rowData +="<td class='td_number' width='3%'> "+
 	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='sub3' size='5' "+
+	    "  value='' name='sub3' size='5' autoComplete='off'"+
 	    "  onkeydown='return isNum0to9andpoint(this,event);'class='numberText' /> "+
 	    "  </td>"+
 	    tabIndex++;

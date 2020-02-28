@@ -93,8 +93,15 @@ public class PickStock implements Serializable{
 	private String issueReqNoFrom;
 	private String issueReqNoTo;
 	private String forwarder;
+	private boolean autoTrans;
 	
 	
+	public boolean isAutoTrans() {
+		return autoTrans;
+	}
+	public void setAutoTrans(boolean autoTrans) {
+		this.autoTrans = autoTrans;
+	}
 	public String getDeliveryDate() {
 		return deliveryDate;
 	}

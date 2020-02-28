@@ -5,14 +5,14 @@ TABLE.tableHead TH {
 }
 TABLE.tableHead TD {
 	height: 25px;
-	font-size: 13px;
+	font-size: 14px;
 }
 .headTitle{
 	background-color:#02a7b9;
 	color:#FFFFFF;
 }
 .headTitle1{
-	background-color:#A2D9CE;
+	background-color:#E5E7E9;
 	color:#000000;
 }
 /** Style Button **/

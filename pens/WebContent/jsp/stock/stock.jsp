@@ -224,7 +224,7 @@ function backsearch(path) {
 									<tr>
 										<td align="right">Remark</td>
 										<td align="left" colspan="3">
-											<html:text property="bean.description" size="60" styleClass="normalText"/>
+											<html:text property="bean.description" size="60" styleClass="\" autoComplete=\"off"/>
 											&nbsp;&nbsp;&nbsp;
 											ใช้ข้อมูลการสั่งซื้อย้อนหลัง <html:text property="bean.backAvgMonth" size="5"  readonly="true" styleClass="disableTextCenter"/>&nbsp;เดือน
 										</td>
@@ -305,6 +305,7 @@ function backsearch(path) {
 											    onkeydown="getProductKeydown(event,this,${results.no})"
 											    onchange="checkProductOnblur(event,this,${results.no})" 
 											     readonly class="disableText"  tabindex="${tabIndex}"
+											     autoComplete="off"
 											  /> 
 										</td>
 										
@@ -327,7 +328,7 @@ function backsearch(path) {
 											tabindex="${tabIndex}"
 											value="${results.qty}" name="qty" size="5"
 											onkeydown="return isNum0to9andpoint(this,event);"
-											class="numberText" />
+											class="numberText" autoComplete="off"/>
 										</td>
 										<td class="td_number" width="3%">
 										    <c:set var="tabIndex" value="${tabIndex + 1}" />
@@ -335,7 +336,7 @@ function backsearch(path) {
 											tabindex="${tabIndex}"
 											value="${results.sub}" name="sub" size="5"
 											onkeydown="return isNum0to9andpoint(this,event);"
-											class="numberText" />
+											class="numberText" autoComplete="off"/>
 										</td>
 										<td class="td_text_center" width="5%">
 										  <input type='text' name='expireDate'  size='8' value='${results.expireDate}' id="expireDate" onmouseover="popCalendar(this,this)" readonly>
@@ -348,7 +349,7 @@ function backsearch(path) {
 											tabindex="${tabIndex}"
 											value="${results.qty2}" name="qty2" size="5"
 											onkeydown="return isNum0to9andpoint(this,event);"
-											class="numberText" />
+											class="numberText" autoComplete="off"/>
 										</td>
 										<td class="td_number" width="3%">
 										    <c:set var="tabIndex" value="${tabIndex + 1}" />
@@ -356,7 +357,7 @@ function backsearch(path) {
 											tabindex="${tabIndex}"
 											value="${results.sub2}" name="sub2" size="5"
 											onkeydown="return isNum0to9andpoint(this,event);"
-											class="numberText" />
+											class="numberText" autoComplete="off"/>
 										</td>
 										<td class="td_text_center" width="5%">
 										  <input type='text' name='expireDate2'  size='8' value='${results.expireDate2}' id="expireDate" onmouseover="popCalendar(this,this)" readonly>
@@ -369,7 +370,7 @@ function backsearch(path) {
 											tabindex="${tabIndex}"
 											value="${results.qty3}" name="qty3" size="5"
 											onkeydown="return isNum0to9andpoint(this,event);"
-											class="numberText" />
+											class="numberText" autoComplete="off"/>
 										</td>
 										<td class="td_number" width="3%">
 										    <c:set var="tabIndex" value="${tabIndex + 1}" />
@@ -377,7 +378,7 @@ function backsearch(path) {
 											tabindex="${tabIndex}"
 											value="${results.sub3}" name="sub3" size="5"
 											onkeydown="return isNum0to9andpoint(this,event);"
-											class="numberText" />
+											class="numberText" autoComplete="off"/>
 										</td>
 										<td class="td_text_center" width="5%">
 										  <input type='text' name='expireDate3'  size='8' value='${results.expireDate3}' id="expireDate" onmouseover="popCalendar(this,this)" readonly>
@@ -477,4 +478,6 @@ function backsearch(path) {
 </body>
 </html>
 
-
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

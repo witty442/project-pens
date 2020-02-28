@@ -668,5 +668,14 @@ public class DateUtil {
 			return new SimpleDateFormat(pattern, Locale.US).format(date);
 		}
 
-	    
+		//BackDay negative (-1)
+		public static Date getBackDate(Date date, int backDay) {
+			if (date == null) {
+				return null;
+			}
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.DAY_OF_MONTH, backDay);
+			
+			return c.getTime();
+		}
 }

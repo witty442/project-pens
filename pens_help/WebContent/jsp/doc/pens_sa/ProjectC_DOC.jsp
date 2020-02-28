@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<a href="/pens_help/jsp/doc/pens_bme/sa_index_doc.jsp">PENSBME Main Document Index</a>
+<a href="/pens_help/jsp/doc/pens_sa/sa_index_doc.jsp">PENSSA Main Document Index</a>
 <table border="1">
 <tr>
  <th>Document</th>

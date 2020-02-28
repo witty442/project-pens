@@ -45,9 +45,8 @@ public class DateUtil {
 	public static void main(String[] args) {
 		//System.out.println(isFromToDateCorrect("15/11/2553", "15/11/2553"));
 		try{
-			Date date1 = parse("01/11/2017", DD_MM_YYYY_WITH_SLASH);
-			Date date2 = parse("01/01/2018", DD_MM_YYYY_WITH_SLASH);
-			logger.debug("date1:"+date1);
+		    Date backDate = getBackDate(new Date(), -30);
+			logger.debug("backDate:"+backDate);
 			//calcDiffMonthYear(date1,date2);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -666,4 +665,14 @@ public class DateUtil {
 		return new SimpleDateFormat(pattern, Locale.US).format(date);
 	}
 	
+	//BackDay negative (-1)
+	public static Date getBackDate(Date date, int backDay) {
+		if (date == null) {
+			return null;
+		}
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.DAY_OF_MONTH, backDay);
+		
+		return c.getTime();
+	}
 }

@@ -7,11 +7,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,21 +19,17 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
-import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.PopupBean;
+import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
+import com.isecinc.pens.dao.SalesrepChannelDAO;
+import com.isecinc.pens.dao.SalesrepDAO;
+import com.isecinc.pens.dao.SalesrepZoneDAO;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.web.prodshow.ProdShowBean;
-import com.isecinc.pens.web.prodshow.ProdShowDAO;
-import com.isecinc.pens.web.prodshow.ProdShowForm;
-import com.isecinc.pens.web.prodshow.ProdShowUtils;
-import com.isecinc.pens.web.stock.StockBean;
-import com.isecinc.pens.web.stock.StockReport;
-import com.isecinc.pens.web.stockonhand.StockOnhandBean;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
-import com.pens.util.SQLHelper;
+import com.pens.util.PageingGenerate;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -677,6 +670,11 @@ public class OrderVanVOProcess  {
 	private  StringBuffer genHeadTableBySummary(Connection conn,VanForm vanForm,VanBean head,boolean excel) throws Exception{
 		StringBuffer h = new StringBuffer("");
 		if(excel){
+			
+			//Get Info
+			SalesrepBean salesrepBean = SalesrepDAO.getSalesrepBeanByCode(conn,head.getSalesrepCode());
+			String salesrepName = salesrepBean != null?salesrepBean.getSalesrepFullName():"";
+			
 			int colspan=7;
 			h.append(ExcelHeader.EXCEL_HEADER);
 			
@@ -685,9 +683,9 @@ public class OrderVanVOProcess  {
 			h.append("<td colspan="+colspan+"><b> รายการบิลยกเลิก ที่ Sales appl.(แบบสรุป)</b> </td>\n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
-			h.append("<td colspan="+colspan+">ประเภทขาย:Van Sales  | ภาคการขาย :"+GeneralDAO.getSalesChannelName(conn,head.getSalesChannelNo())+" </td>\n");
+			h.append("<td colspan="+colspan+">ประเภทขาย:Van Sales  | ภาคการขาย :"+SalesrepChannelDAO.getSalesChannelName(conn,head.getSalesChannelNo())+" </td>\n");
 			h.append("</tr> \n");
-			h.append("<td colspan="+colspan+">ภาคตามการดูแล:"+GeneralDAO.getSalesZoneDesc(conn,head.getSalesZone())+"   | พนักงานขาย :"+head.getSalesrepCode()+"-"+GeneralDAO.getSalesrepName(conn,head.getSalesrepCode())+" </td>\n");
+			h.append("<td colspan="+colspan+">ภาคตามการดูแล:"+SalesrepZoneDAO.getSalesZoneDesc(conn,head.getSalesZone())+"   | พนักงานขาย :"+head.getSalesrepCode()+"-"+salesrepName+" </td>\n");
 			h.append("</tr> \n");
 			h.append("</tr> \n");
 			h.append("<td colspan="+colspan+">รหัสร้านค้า:"+head.getCustomerCode()+"-"+GeneralDAO.getCustName(conn,head.getCustomerCode())+" </td>\n");
@@ -706,21 +704,8 @@ public class OrderVanVOProcess  {
 		   int endRec = vanForm.getEndRec();
 		   int no = startRec;
 			
-		   h.append("<div align='left'> \n");
-		   h.append("<span class='pagebanner'>รายการทั้งหมด  "+totalRecord+" รายการ, แสดงรายการที่  "+startRec+" ถึง  "+endRec+".</span>\n");
-		   h.append("<span class='pagelinks'>\n");
-		   h.append("หน้าที่ \n");
-		   for(int r=0;r<totalPage;r++){
-			 if(currPage ==(r+1)){
-			    h.append("<strong>"+(r+1) +"</strong>\n");
-			 }else{ 
-				h.append("<a href='javascript:gotoPage("+(r+1)+")'" );
-				h.append(" title='Go to page "+(r+1)+"'> "+(r+1)+"</a>\n");
-		     }
-		  }//for 
-		   
-		  h.append("</span>\n");
-		  h.append("</div>\n");
+		   //pageing Generate
+		   h.append(PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no));
 		}
 		String width="100%";
 		h.append("<table id='tblProduct' align='center' border='1' width='"+width+"' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
@@ -744,15 +729,18 @@ public class OrderVanVOProcess  {
 		int colspan=7;
 		if(excel){
 			h.append(ExcelHeader.EXCEL_HEADER);
+			//Get Info
+			SalesrepBean salesrepBean = SalesrepDAO.getSalesrepBeanByCode(conn,head.getSalesrepCode());
+			String salesrepName = salesrepBean != null?salesrepBean.getSalesrepFullName():"";
 			
 			h.append("<table id='tblProduct' align='center' border='1'> \n");
 			h.append("<tr> \n");
 			h.append("<td colspan="+colspan+"><b> รายการบิลยกเลิก ที่ Sales appl.(แบบแสดงรายละเอียด)</b> </td>\n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
-			h.append("<td colspan="+colspan+">ประเภทขาย:Van Sales   | ภาคการขาย :"+GeneralDAO.getSalesChannelName(conn,head.getSalesChannelNo())+" </td>\n");
+			h.append("<td colspan="+colspan+">ประเภทขาย:Van Sales   | ภาคการขาย :"+SalesrepChannelDAO.getSalesChannelName(conn,head.getSalesChannelNo())+" </td>\n");
 			h.append("</tr> \n");
-			h.append("<td colspan="+colspan+">ภาคตามการดูแล:"+GeneralDAO.getSalesZoneDesc(conn,head.getSalesZone())+"   | พนักงานขาย :"+head.getSalesrepCode()+"-"+GeneralDAO.getSalesrepName(conn,head.getSalesrepCode())+" </td>\n");
+			h.append("<td colspan="+colspan+">ภาคตามการดูแล:"+SalesrepZoneDAO.getSalesZoneDesc(conn,head.getSalesZone())+"   | พนักงานขาย :"+head.getSalesrepCode()+"-"+salesrepName+" </td>\n");
 			h.append("</tr> \n");
 			h.append("</tr> \n");
 			h.append("<td colspan="+colspan+">รหัสร้านค้า:"+head.getCustomerCode()+"-"+GeneralDAO.getCustName(conn,head.getCustomerCode())+" </td>\n");

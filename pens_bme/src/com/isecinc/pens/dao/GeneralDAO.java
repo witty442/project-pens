@@ -1730,6 +1730,41 @@ public class GeneralDAO {
 			}
 			return dataList;
 		}
+	 public static List<Master> getCustGroupAutoPOToOracleList() throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			List<Master> dataList = new ArrayList<Master>();
+			Master m = null;
+			Connection conn = null;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+				sql.append("\n select * FROM PENSBI.PENSBME_MST_REFERENCE WHERE reference_code = 'AutoPOtoORACLE' ");
+				sql.append("\n \n");
+				
+				logger.debug("sql:"+sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					m = new Master();
+					m.setPensValue(rst.getString("pens_value"));
+					m.setPensDesc(rst.getString("pens_desc"));
+					
+					dataList.add(m);
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return dataList;
+		}
 	 public static List<Master> getCustGroupListCaseAdd(String custGroup) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

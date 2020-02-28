@@ -424,6 +424,7 @@ function resetStore(){
 								 	<th >Work Step</th>
 									<th >Qty ที่จะเบิก</th>
 									<th >Qty ที่เบิกได้จริง</th>
+									<th >ทำ Auto-Trans แล้ว</th>
 									<th >หมายเหตุ</th>
 									<th >แก้ไข</th>	
 									 <th >ยืนยัน</th>				
@@ -459,6 +460,11 @@ function resetStore(){
 										<td class="td_text_center">
 										  ${results.totalIssueQty}
 										</td>
+										<td class="td_text_center" width="5%">
+								         <c:if test="${results.autoTrans == true}">
+								            <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+								         </c:if>
+                                        </td>
 									    <td class="td_text">
 										  ${results.remark}
 										</td>

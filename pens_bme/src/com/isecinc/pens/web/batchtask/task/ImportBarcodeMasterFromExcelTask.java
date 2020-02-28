@@ -39,23 +39,21 @@ import com.pens.util.meter.MonitorTime;
 import com.pens.util.seq.SequenceProcess;
 
 public class ImportBarcodeMasterFromExcelTask extends BatchTask implements BatchTaskInterface{
-	public static Logger logger = Logger.getLogger("PENS");
+
 	private static String PARAM_DATA_TYPE = "dataType";
    
 	/**
 	 * Return :P Name|P label|P Type|default value|valid,P2...$Button Name
 	*/
-	public String getParam(){
+	/*public String getParam(){
 		return "dataType|ระบุประเภทกลุ่ม Barcode|LIST||VALID,dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
-	}
-	public String getDescription(){
-		return "Import File Excel";
-	}
-	public String getDevInfo(){
-		return "PENSBI.PENSBME_MST_REFERENCE";
-	}
-	public boolean isDispDetail(){
-		return true;
+	}*/
+	
+	public String[] getParam(){
+		String[] param = new String[2];
+		param[0] = "dataType|ระบุประเภทกลุ่ม Barcode|LIST||VALID";
+		param[1] = "dataFormFile|เลือกไฟล์|FROMFILE||VALID";
+		return param;
 	}
 	public List<BatchTaskListBean> getParamListBox(){
 		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();
@@ -84,7 +82,20 @@ public class ImportBarcodeMasterFromExcelTask extends BatchTask implements Batch
 		
 		return listAll;
 	}
+	public String getButtonName(){
+		return "Import ข้อมูล";
+	}
 	
+	public String getDescription(){
+		return "Import File Excel";
+	}
+	public String getDevInfo(){
+		return "PENSBI.PENSBME_MST_REFERENCE";
+	}
+	public boolean isDispDetail(){
+		return true;
+	}
+
 	public String getValidateScript(){
 		String script ="";
 		script +="<script>";

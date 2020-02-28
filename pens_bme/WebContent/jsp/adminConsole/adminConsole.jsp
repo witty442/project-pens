@@ -155,6 +155,21 @@ function submitBT(path){
 	document.adminConsoleForm.action = path + "/jsp/adminConsole.do?do=process"+queryStr;
     document.adminConsoleForm.submit();
 }
+function submitExportBT(path){
+	var currentTab  = document.getElementsByName("currentTab")[0].value;
+	var queryStr ="&curentTab="+currentTab;
+	
+	if(currentTab =='tab_query'){
+		queryStr +="&action=tab_query&export=true";
+		//queryStr +="&q1="+document.getElementsByName("q1")[0].value;
+		//queryStr +="&q2="+document.getElementsByName("q2")[0].value;
+	
+	    //alert("quertStr:"+queryStr);
+	
+	   document.adminConsoleForm.action = path + "/jsp/adminConsole.do?do=process"+queryStr;
+       document.adminConsoleForm.submit();
+	}
+}
 
 function clearCach1(){
 	var returnString = "";
@@ -209,6 +224,7 @@ function clearCach1(){
 	      <BR>
 		   <span class="h1_style"> Query Tab (Config Type:<%= env.getProperty("product.type")%>)  </span> :
 	       <INPUT TYPE="button" class="button2_style" name ="B_QUERY" VALUE="Submit Query DB" onclick="submitBT('<%=request.getContextPath()%>');">
+	       <INPUT TYPE="button" class="button2_style" name ="B_EXPORT"  VALUE="Submit Export DB" onclick="submitExportBT('<%=request.getContextPath()%>');">
 	        <BR><br>
 		    Please enter your text SQL 1:<BR>
 		 
@@ -230,6 +246,7 @@ function clearCach1(){
 	      <BR>
 		     <span class="h1_style">Execute Tab (Config Type:<%= env.getProperty("product.type")%>) </span> :
 	         <INPUT TYPE="button" class="button2_style" name ="B_EXECUTE"  VALUE="Submit Execute DB" onclick="submitBT('<%=request.getContextPath()%>');">
+	       
 		  <BR>
 		    Please enter your text SQL To Execute:
 		  <BR>

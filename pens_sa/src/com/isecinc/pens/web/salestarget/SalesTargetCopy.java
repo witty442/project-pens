@@ -243,17 +243,12 @@ public class SalesTargetCopy {
 			//new version 06/2019
 			sql.append("\n  (SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
 			sql.append("\n   where P.INVENTORY_ITEM_ID = L.INVENTORY_ITEM_ID " );
+			//witty edit:04/02/2020 (get only active )
+			sql.append("\n   and P.end_date_active is null ");
 			sql.append("\n   and P.list_header_id in("+ SQLHelper.converToTextSqlIn(priceListId)+")) as price ,");
 			sql.append("\n  '"+curBean.getSessionId()+"' as session_id");
 			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP_L L ");
-			//OLD
-			/*sql.append("\n  LEFT OUTER JOIN ( ");
-			sql.append("\n    SELECT INVENTORY_ITEM_ID ,SUM3,SUM12 FROM XXPENS_BI_MST_SALES_AVG_V ");
-			sql.append("\n    WHERE PERIOD ='"+curBean.getPeriod()+"'");
-			sql.append("\n    AND CUSTOMER_CATEGORY ='"+curBean.getCustCatNo()+"'");
-			sql.append("\n    AND SALESREP_ID ='"+curBean.getSalesrepId()+"'");
-			sql.append("\n    AND CUSTOMER_ID ='"+curBean.getCustomerId()+"'");
-			sql.append("\n  ) P ON L.INVENTORY_ITEM_ID = P.INVENTORY_ITEM_ID  ");*/
+
 			sql.append("\n  WHERE L.ID="+idCopy);
 		    logger.debug("sql:"+sql);
 		    

@@ -1,4 +1,4 @@
-package com.isecinc.pens.web.reports.sql;
+package com.isecinc.pens.web.reportall.sql;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

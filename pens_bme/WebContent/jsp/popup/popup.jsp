@@ -162,10 +162,18 @@ function saveSelectedInPage(no){
 	    var found = chekCodeDupInCodesAll(retCode);
 
 	    if(found == false){
-	  	   codesAllNew += retCode +",";
-	  	   descsAllNew += retDesc +",";
-	  	   descsAllNew2 += retDesc2 +",";
-	  	   descsAllNew3 += retDesc3 +",";
+	    	<%if(selectone=="false"){%>
+		  	   codesAllNew += retCode +",";
+		  	   descsAllNew += retDesc +",";
+		  	   descsAllNew2 += retDesc2 +",";
+		  	   descsAllNew3 += retDesc3 +",";
+		  	<%}else{%>
+		  	   // select One record
+		  	   codesAllNew = retCode +",";
+		  	   descsAllNew = retDesc +",";
+		  	   descsAllNew2 = retDesc2 +",";
+		  	   descsAllNew3 = retDesc3 +",";
+		  	<%}%>
 	    }
 	    document.getElementsByName("codes")[0].value =  codesAllNew;
 	    document.getElementsByName("descs")[0].value =  descsAllNew;
@@ -293,7 +301,6 @@ window.onload = function(){
 <input type="hidden" name="descs" value ="<%=descs%>" />
 <input type="hidden" name="descs2" value ="<%=descs2%>" />
 <input type="hidden" name="descs3" value ="<%=descs3%>" />
-
 <input type="hidden" name="hideAll" value ="<%=hideAll%>" />
 <input type="hidden" name="selectone" value ="<%=selectone%>" />
 
@@ -303,10 +310,11 @@ window.onload = function(){
 		<th width="90%" ><b>ค้นหาข้อมูล <%=headName%></b></th>
 	</tr>
 	<tr height="21px" class="headTitle1">
-		<td width="15%" ><b><%=codeSearchTxtName %></b>  </td>
+		<td width="15%" ><b><%=codeSearchTxtName %></b> </td>
 		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px" styleClass="\" autoComplete=\"off"/>
-		<input type="button" name="search"  class="newPosBtnLong"  value="Search" onclick="searchPopup('<%=request.getContextPath()%>')" />
-		</td>
+		<input type="button" name="search"  class="newPosBtnLong"  value="   ค้นหา     " 
+		onclick="searchPopup('<%=request.getContextPath()%>')" />
+		</td> 
 	</tr>
 	<tr height="21px" class="headTitle1">
 		<td nowrap><b><%=descSearchTxtName %></b></td>

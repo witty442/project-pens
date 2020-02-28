@@ -567,7 +567,8 @@ public class FileUtil {
 			try{
 				//Case rootPath prouctType=production (but deploy for test on 192.168.202.7or8)
 				// use path: d://dev_temp/
-				if(env.getProperty("productType").equalsIgnoreCase("production")){
+				logger.debug("env productType:"+env.getProperty("product.type"));
+				if(env.getProperty("product.type").equalsIgnoreCase("production")){
 					if(InetAddress.getLocalHost().equals("192.168.202.7") //witty
 						|| InetAddress.getLocalHost().equals("192.168.202.8")){
 						rootPathTemp = "d://dev_temp//";

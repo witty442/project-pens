@@ -273,9 +273,7 @@ function getCustName(custCode){
 			$("#customerCode").val('');
 			$("#customerName").val('');
 		}
-		
 }
-
 function calPrice(fieldName){
 	
 	    var total = 0;
@@ -312,8 +310,6 @@ function calPrice(fieldName){
 			}
 		}
 }
-
-
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -704,3 +700,7 @@ function calPrice(fieldName){
 </table>
 </body>
 </html>
+
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

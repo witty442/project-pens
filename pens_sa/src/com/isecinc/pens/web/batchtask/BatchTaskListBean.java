@@ -1,4 +1,4 @@
-package com.isecinc.pens.web.batchtask.task;
+package com.isecinc.pens.web.batchtask;
 
 import java.io.Serializable;
 import java.util.List;

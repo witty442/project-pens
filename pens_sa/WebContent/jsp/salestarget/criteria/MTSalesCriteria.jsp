@@ -116,23 +116,23 @@ function calcEstimateAmt(objNoUse,rowId){
 	}
 }
 </script>
-
-
 <table align="center" border="0" cellpadding="3" cellspacing="0" >
        <tr>
-               <td> เดือน <font color="red">*</font></td>
-			<td>					
+            <td valign="bottom"> เดือน <font color="red">*</font></td>
+			<td valign="bottom">					
 				 <html:select property="bean.periodDesc" styleId="periodDesc" onchange="setPeriodDate(this)">
 					<html:options collection="PERIOD_LIST" property="value" labelProperty="keyName"/>
 			    </html:select>
 			     <html:hidden property="bean.period" styleId="period"/>
 			</td>
-			<td colspan="2"> 
+			<td colspan="2" valign="bottom"> 
 			     <html:text property="bean.startDate" styleId="startDate" size="20" readonly="true" styleClass="disableText"/>
 			        -
 				<html:text property="bean.endDate" styleId="endDate" size="20" readonly="true" styleClass="disableText"/>
 				
-				รหัสพนักงานขาย  <html:text property="bean.salesrepCode" styleId="salesrepCode" size="50" readonly="true" styleClass="disableText"/>	
+				รหัสพนักงานขาย  
+				<%-- <html:text property="bean.salesrepCode" styleId="salesrepCode" size="50" readonly="false" styleClass="normalText"/>	 --%>
+			    <html:textarea property="bean.salesrepCode" styleId="salesrepCode" cols="45" rows="2"></html:textarea>
 			     <html:hidden property="bean.salesrepId" styleId="salesrepId"/>
 			</td>
 		</tr>

@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.StoreBean;
+import com.pens.util.excel.ExcelHeader;
 
 public class SQLHelper {
 	private static Logger logger = Logger.getLogger("PENS");
@@ -100,29 +101,28 @@ public class SQLHelper {
 			columnCount = rsm.getColumnCount();
 			
 			//getColumnHeader 
-			 str.append("<table align='center' border='1' cellpadding='3' cellspacing='1' class='result'> \n");
-			 str.append("<tr>");  
-			 for(int i=1;i<=columnCount;i++){
+			str.append(ExcelHeader.EXCEL_HEADER);
+			str.append("<table align='center' border='1' cellpadding='3' cellspacing='1' class='result'> \n");
+			str.append("<tr>");  
+			for(int i=1;i<=columnCount;i++){
 				    //System.out.println("["+i+"]"+rsm.getColumnName(i));
 				    str.append("<th> \n");
 	            	str.append(rsm.getColumnName(i));
 	            	str.append("</th>");
-			   }
-			 str.append("</tr> \n"); 
+			}
+			str.append("</tr> \n"); 
 			 
-			 //Gen Detail
-			 while(rs.next()){
-				 str.append("<tr> \n");  
-				 for(int i=1;i<=columnCount;i++){
-					    str.append("<td class='lineE'>");
-		            	str.append(Utils.isNull(rs.getString(rsm.getColumnName(i))));
-		            	str.append("</td>");
-				   }
-				 str.append("</tr> ");  
-			 }
-			
-			str.append("</table> \n");
-			
+			//Gen Detail
+			while(rs.next()){
+				str.append("<tr> \n");  
+				for(int i=1;i<=columnCount;i++){
+					  str.append("<td class='text'>");
+		              str.append(Utils.isNull(rs.getString(rsm.getColumnName(i))));
+		              str.append("</td>");
+				}
+			    str.append("</tr> ");  
+			}
+		   str.append("</table> \n");
 		}catch(Exception e){
 	      e.printStackTrace();
 	      str.append("ERROR: \n"+e.getMessage());

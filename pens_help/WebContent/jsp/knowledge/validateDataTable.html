@@ -6,56 +6,81 @@
 </head>
 <body>
 <p>
-<b>Validate Data Table By Javascript</b> <br/>
+<b>Validate Data All By Javascript</b> <br/>
  <b><a href="http://localhost:8080/pens_help/jsp/knowledge/knowledge_list.jsp">Back to Knowledge</a></b>
  </p>
  <textarea rows="40" cols="160">
-				 function validateData(){
-				var pass = true;
-				var table = document.getElementById('tblProduct');
-				var rows = table.getElementsByTagName("tr"); 
-				
-				if(rows.length ==1){
-					return false;
+ /** Import js **/
+ /js/number.js
+ /js/DateUtils.js
+ 
+ /** validate input number only **/
+onkeydown="return inputNum(event);"
+			
+/** validate Data Table By Row and set Style Row Error **/
+function validateData(){
+		var pass = true;
+		var table = document.getElementById('tblProduct');
+		var rows = table.getElementsByTagName("tr"); 
+		
+		if(rows.length ==1){
+			return false;
+		}
+		
+		var itemIssueDesc = document.getElementsByName("itemIssueDesc");
+		var itemIssue = document.getElementsByName("itemIssue");
+		
+		var itemReceiptDesc = document.getElementsByName("itemReceiptDesc");
+		var itemReceipt = document.getElementsByName("itemReceipt");
+		
+		//alert(itemIssue.length);
+		
+		var errorList = new Object();
+		<!-- for(var i= 0;i<itemIssueDesc.length;i++){
+			var rowObj = new Object();
+			var lineClass ="lineE";
+			if(i%2==0){
+				lineClass = "lineO";
+			}
+			//alert(itemIssue[i].value );
+			
+			if(itemIssueDesc[i].value != ""){
+				if( itemIssue[i].value =="" ){
+				  rows[i+1].className ='lineError';
+				  pass = false;
 				}
-				
-				var itemIssueDesc = document.getElementsByName("itemIssueDesc");
-				var itemIssue = document.getElementsByName("itemIssue");
-				
-				var itemReceiptDesc = document.getElementsByName("itemReceiptDesc");
-				var itemReceipt = document.getElementsByName("itemReceipt");
-				
-				//alert(itemIssue.length);
-				
-				var errorList = new Object();
-				<!-- for(var i= 0;i<itemIssueDesc.length;i++){
-					var rowObj = new Object();
-					var lineClass ="lineE";
-					if(i%2==0){
-						lineClass = "lineO";
-					}
-					//alert(itemIssue[i].value );
-					
-					if(itemIssueDesc[i].value != ""){
-						if( itemIssue[i].value =="" ){
-						  rows[i+1].className ='lineError';
-						  pass = false;
-						}
-					}
-					if(itemReceiptDesc[i].value != "" ){
-						if(itemReceipt[i].value ==""){
-						  rows[i+1].className ='lineError';
-						  pass = false;
-						}
-					}
-					//no error
-					if(pass){
-						rows[i+1].className =lineClass;
-					}
-					//alert("rows["+i+"]:"+rows[i].className);
-				}// for
-				return pass ;
-			} -->
-		    </textarea>
+			}
+			if(itemReceiptDesc[i].value != "" ){
+				if(itemReceipt[i].value ==""){
+				  rows[i+1].className ='lineError';
+				  pass = false;
+				}
+			}
+			//no error
+			if(pass){
+				rows[i+1].className =lineClass;
+			}
+			//alert("rows["+i+"]:"+rows[i].className);
+		}// for
+		return pass ;
+	} -->
+	
+	/** Sum Qty **/
+	<!--   
+	function sumTotal(){
+		var totalOrderQty = 0;
+		var orderQtyObj = document.getElementsByName("orderQty");
+		
+		for(var i=0;i<orderQtyObj.length;i++){
+			totalOrderQty += convetTxtObjToFloat(orderQtyObj[i]);
+		}
+		var totalOrderQtyObj = document.getElementsByName("totalOrderQty")[0];
+		totalOrderQtyObj.value =totalOrderQty;
+		//convertTo Currency No Digit
+		toCurrenyNoDigit(totalOrderQtyObj);
+		
+   }-->
+
+</textarea>
 </body>
 </html>

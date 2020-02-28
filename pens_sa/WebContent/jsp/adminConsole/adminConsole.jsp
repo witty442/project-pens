@@ -193,6 +193,21 @@ function submitBT(path){
 	document.adminConsoleForm.action = path + "/jsp/adminConsole.do?do=process"+queryStr;
     document.adminConsoleForm.submit();
 }
+function submitExportBT(path){
+	var currentTab  = document.getElementsByName("currentTab")[0].value;
+	var queryStr ="&curentTab="+currentTab;
+	
+	if(currentTab =='tab_query'){
+		queryStr +="&action=tab_query&export=true";
+		//queryStr +="&q1="+document.getElementsByName("q1")[0].value;
+		//queryStr +="&q2="+document.getElementsByName("q2")[0].value;
+	
+	    //alert("quertStr:"+queryStr);
+	
+	   document.adminConsoleForm.action = path + "/jsp/adminConsole.do?do=process"+queryStr;
+       document.adminConsoleForm.submit();
+	}
+}
 function addSlqToeSQL(sqlUtils){
 	document.getElementById("eSQL").value = sqlUtils.value;
 }
@@ -238,8 +253,9 @@ function addSlqToeSQL(sqlUtils){
 	      <BR>
 		   <span class="h1_style"> Query Tab </span> :
 	       <INPUT TYPE="button" class="button2_style" name ="B_QUERY" VALUE="Submit Query DB" onclick="submitBT('<%=request.getContextPath()%>');">
-	        <BR><br>
-		    Please enter your text SQL 1:<BR>
+	       <INPUT TYPE="button" class="button2_style" name ="B_EXPORT"  VALUE="Submit Export DB" onclick="submitExportBT('<%=request.getContextPath()%>');">
+	       <BR><br>
+		   Please enter your text SQL 1:<BR>
 		 
 		   <html:textarea property="q1" style=" width :100%;" rows="8"/>
 		  <BR><BR>

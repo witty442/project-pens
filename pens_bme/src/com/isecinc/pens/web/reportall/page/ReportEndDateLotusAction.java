@@ -1,10 +1,14 @@
 package com.isecinc.pens.web.reportall.page;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +34,17 @@ import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
+import com.isecinc.pens.web.batchtask.BatchTaskConstants;
 import com.isecinc.pens.web.batchtask.BatchTaskForm;
-import com.isecinc.pens.web.batchtask.task.GenStockOnhandTempTask;
+import com.isecinc.pens.web.batchtask.task.GenStockOnhandRepTempTask;
 import com.isecinc.pens.web.reportall.ReportAllBean;
 import com.isecinc.pens.web.reportall.ReportAllForm;
-import com.isecinc.pens.web.reports.sql.ReportEndDateLotusSQL;
+import com.isecinc.pens.web.reportall.sql.ReportEndDateLotusSQL;
 import com.isecinc.pens.web.summary.SummaryForm;
 import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 /**
  * Summary Action
@@ -53,7 +60,7 @@ public class ReportEndDateLotusAction extends I_Action {
 	 */
 	public String prepare(ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		String forward = "reports";
+		String forward = "reportAll";
 		ReportAllForm reportAllForm = (ReportAllForm) form;
 		ReportAllBean bean = new ReportAllBean();
 		try {
@@ -76,6 +83,7 @@ public class ReportEndDateLotusAction extends I_Action {
 				 if( !Utils.isNull(request.getParameter("orderDate")).equals("")){
 					 bean.setSalesDate(Utils.isNull(request.getParameter("orderDate")));
 				 }
+				 bean.setCurrentDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				 
 				 reportAllForm.setBean(bean);
 				 reportAllForm.setPageName(Utils.isNull(request.getParameter("pageName")));
@@ -107,51 +115,68 @@ public class ReportEndDateLotusAction extends I_Action {
 	 * Search
 	 */
 	public String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		ReportAllForm reportAllForm = (ReportAllForm) form;
+		ReportAllForm aForm = (ReportAllForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		logger.debug("page["+Utils.isNull(request.getParameter("page"))+"]");
 		try {
-			//set for display by page
-			request.getSession().setAttribute("summary" ,null);
-			
-			//Validate asOfdate Must over than max End Date
-			String[] resultsValidate = ControlConstantsDB.canGenEndDateLotus(reportAllForm.getBean().getPensCustCodeFrom(),reportAllForm.getBean().getSalesDate());
-			if(resultsValidate[0].equals("false")){
-				reportAllForm.setResults(null);
-				request.setAttribute("Message", "กรุณากรอก วันที่ขาย (As Of) มากกว่า วันที่ปิดสต๊อกล่าสุด ");
+			 String queryStr= request.getQueryString();
+			 if(queryStr.indexOf("d-") != -1){
+			 	queryStr = queryStr.substring(queryStr.indexOf("d-"),queryStr.indexOf("-p")+2 );
+			 	System.out.println("queryStr:"+queryStr);
+			 }
+			 
+			//Case link page in display no search again
+			logger.debug("currentPage:"+request.getParameter(queryStr));
+			if(request.getParameter(queryStr) != null){
+				//logger.debug("results:"+summaryForm.getResults());
+				ImportDAO importDAO = new ImportDAO();
+				Master m = importDAO.getStoreName("Store", aForm.getBean().getPensCustCodeFrom());
+				if(m != null)
+				   aForm.getBean().setPensCustNameFrom(m.getPensDesc());
 			}else{
-				List<ReportAllBean> results = null;
-				ReportAllBean sumBean = searchReportEndDateLotusAllStore(reportAllForm.getBean(),user);
-				
-				results = sumBean.getItemsList();
-				if (results != null  && results.size() >0) {
-					reportAllForm.setResults(results);
-					request.getSession().setAttribute("summary", sumBean.getSummary());
+				//set for display by page
+				request.getSession().setAttribute("summary" ,null);
+				request.getSession().setAttribute("BATCH_TASK_RESULT",null);//Clear BatchTask Result
+				 
+				//Validate asOfdate Must over than max End Date
+				String[] resultsValidate = ControlConstantsDB.canGenEndDateLotus(aForm.getBean().getPensCustCodeFrom(),aForm.getBean().getSalesDate());
+				if(resultsValidate[0].equals("false")){
+					aForm.setResults(null);
+					request.setAttribute("Message", "กรุณากรอก วันที่ขาย (As Of) มากกว่า วันที่ปิดสต๊อกล่าสุด ");
+				}else{
+					List<ReportAllBean> results = null;
+					ReportAllBean sumBean = searchReportEndDateLotusAllStore(aForm.getBean(),user);
 					
-					//logger.debug("results:"+summaryForm.getResults());
-					ImportDAO importDAO = new ImportDAO();
-					Master m = importDAO.getStoreName("Store", reportAllForm.getBean().getPensCustCodeFrom());
-					if(m != null)
-						reportAllForm.getBean().setPensCustNameFrom(m.getPensDesc());
+					results = sumBean.getItemsList();
+					if (results != null  && results.size() >0) {
+						aForm.setResults(results);
+						request.getSession().setAttribute("summary", sumBean.getSummary());
+						
+						//logger.debug("results:"+summaryForm.getResults());
+						ImportDAO importDAO = new ImportDAO();
+						Master m = importDAO.getStoreName("Store", aForm.getBean().getPensCustCodeFrom());
+						if(m != null)
+							aForm.getBean().setPensCustNameFrom(m.getPensDesc());
+						
+					} else {
+						aForm.setResults(null);
+						request.getSession().setAttribute("summary", null);
+						request.setAttribute("Message", "ไม่พบข่อมูล");
+					}
 					
-				} else {
-					reportAllForm.setResults(null);
-					request.getSession().setAttribute("summary", null);
-					request.setAttribute("Message", "ไม่พบข่อมูล");
-				}
-				
-				//By StoreCode ONLY ,All Store Not Set
-				if( !Utils.isNull(reportAllForm.getBean().getPensCustCodeFrom()).equals("ALL")
-					&& Utils.isNull(reportAllForm.getBean().getPensCustCodeFrom()).indexOf(",") == -1){
-					reportAllForm.getBean().setEndDate(GenerateStockEndDateLotus.getEndDateStock(reportAllForm.getBean().getPensCustCodeFrom()));
-					reportAllForm.getBean().setEndSaleDate(GenerateStockEndDateLotus.getEndSaleDateLotus(reportAllForm.getBean().getPensCustCodeFrom(),reportAllForm.getBean().getSalesDate()) );
+					//By StoreCode ONLY ,All Store Not Set
+					if( !Utils.isNull(aForm.getBean().getPensCustCodeFrom()).equals("ALL")
+						&& Utils.isNull(aForm.getBean().getPensCustCodeFrom()).indexOf(",") == -1){
+						aForm.getBean().setEndDate(GenerateStockEndDateLotus.getEndDateStock(aForm.getBean().getPensCustCodeFrom()));
+						aForm.getBean().setEndSaleDate(GenerateStockEndDateLotus.getEndSaleDateLotus(aForm.getBean().getPensCustCodeFrom(),aForm.getBean().getSalesDate()) );
+					}
 				}
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			throw e;
 		}
-		return "reports";
+		return "reportAll";
 	}
 	 public ReportAllBean searchReportEndDateLotusAllStore(ReportAllBean c,User user) throws Exception{
 	   Statement stmt = null;
@@ -323,7 +348,7 @@ public class ReportEndDateLotusAction extends I_Action {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("reports");
+		return mapping.findForward("reportAll");
 	}
 	
 	public ActionForward genEndDate(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -349,7 +374,7 @@ public class ReportEndDateLotusAction extends I_Action {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("reports");
+		return mapping.findForward("reportAll");
 	}
 	
 	public ActionForward export(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -359,17 +384,33 @@ public class ReportEndDateLotusAction extends I_Action {
 		StringBuffer htmlTable = new StringBuffer("");
 		String fileName ="data.xls";
 		try {
-			logger.debug("PageAction:"+request.getParameter("page"));
-			
+			logger.debug("PageAction:"+reportAllForm.getPageName());
+			fileName ="Report BME EndDate Stock Lotus.xls";
+		    
+		    if(reportAllForm.getResults() != null && reportAllForm.getResults().size() > 0){
+				htmlTable = genReportEndDateLotusHTML(request,reportAllForm,user);	
+				
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename="+fileName);
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(htmlTable.toString());
+			    w.flush();
+			    w.close();
+	
+			    out.flush();
+			    out.close();
+		     }else{
+				request.setAttribute("Message", "ไม่พบข้อมูล");
+			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("reports");
+		return mapping.findForward("reportAll");
 	}
 	
-	
-		
 	/**
 	 * Save
 	 */
@@ -396,21 +437,21 @@ public class ReportEndDateLotusAction extends I_Action {
 
 	/** For batch popup TaskName: GenStockOnhandTempTask **/
 	/** Prepare parameter **/
-	public ActionForward genStockOnhandTemp(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("submit genStockOnhandTemp");
+	public ActionForward genStockOnhandRepTemp(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("submit genStockOnhandRepTemp");
 		ReportAllForm aForm = (ReportAllForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			//Prepare Parameter to BatchTask
 			Map<String, String> batchParaMap = new HashMap<String, String>();
-			batchParaMap.put(GenStockOnhandTempTask.PARAM_ASOF_DATE, aForm.getBean().getSalesDate());
-			batchParaMap.put(GenStockOnhandTempTask.PARAM_STORE_CODE, aForm.getBean().getPensCustCodeFrom());
+			batchParaMap.put(GenStockOnhandRepTempTask.PARAM_ASOF_DATE, aForm.getBean().getSalesDate());
+			batchParaMap.put(GenStockOnhandRepTempTask.PARAM_STORE_CODE, aForm.getBean().getPensCustCodeFrom());
 			
 			logger.debug("storeCode:"+aForm.getBean().getPensCustCodeFrom());
 			logger.debug("asOfDate:"+aForm.getBean().getSalesDate());
 			
 			request.getSession().setAttribute("BATCH_PARAM_MAP",batchParaMap);
-			request.setAttribute("action","submitedGenStockOnhandTemp");//set to popup page to BatchTask
+			request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.GEN_STOCK_ONHAND_REP_TEMP);//set to popup page to BatchTask
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -418,7 +459,7 @@ public class ReportEndDateLotusAction extends I_Action {
 			throw e;
 		}finally{
 		}
-		return mapping.findForward("reports");
+		return mapping.findForward("reportAll");
 	}
 	
 	/** For batch popup after Task success**/
@@ -447,7 +488,7 @@ public class ReportEndDateLotusAction extends I_Action {
 			throw e;
 		}finally{	
 		}
-		return mapping.findForward("reports");
+		return mapping.findForward("reportAll");
 	}
 	
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -455,14 +496,12 @@ public class ReportEndDateLotusAction extends I_Action {
 		ReportAllForm reportAllForm = (ReportAllForm) form;
 		try {
 			
-			 	
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("clear");
+		return mapping.findForward("reportAll");
 	}
-	
 	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)
@@ -477,5 +516,113 @@ public class ReportEndDateLotusAction extends I_Action {
 
 	}
 	
-	
+	public StringBuffer genReportEndDateLotusHTML(HttpServletRequest request,ReportAllForm aForm,User user){
+		StringBuffer h = new StringBuffer("");
+		int colspan = 13;
+		String page = aForm.getPageName();
+		List<ReportAllBean> list = aForm.getResults();
+		try{
+			logger.debug("SummaryType:"+aForm.getBean().getSummaryType());
+			
+			if("GroupCode".equalsIgnoreCase(aForm.getBean().getSummaryType())){
+				colspan = 12;
+			}
+			//Head Style
+			h.append(ExcelHeader.EXCEL_HEADER);
+			
+			//Header
+			h.append("<table border='1'> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"'>รายงานปิดรอบ LOTUS(EndDate)</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >จากวันที่ขาย:"+aForm.getBean().getSalesDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >รหัสร้านค้า:"+aForm.getBean().getPensCustCodeFrom()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >Pens Item From:"+aForm.getBean().getPensItemFrom()+"  Pens Item To:"+aForm.getBean().getPensItemTo()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >Group:"+aForm.getBean().getGroup()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("<tr> \n");
+			h.append("<td align='left' colspan='"+colspan+"' >ปิดสต๊อกล่าสุดวันที่:"+aForm.getBean().getEndDate()+"</td> \n");
+			h.append("</tr> \n");
+			
+			h.append("</table> \n");
+
+			if(list != null){
+				h.append("<table border='1'> \n");
+				h.append("<tr> \n");
+				  h.append("<th>รหัสสาขา</th> \n");
+				  h.append("<th>ชื่อสาขา</th> \n");
+				  if("PensItem".equalsIgnoreCase(aForm.getBean().getSummaryType())){
+				     h.append("<th>PensItem</th> \n");
+				  }
+				  h.append("<th>Group</th> \n");
+				  h.append("<th>Begining Qty</th> \n");
+				  h.append("<th>Sale In Qty</th> \n");
+				  h.append("<th>Sale Return Qty </th> \n");
+				  h.append("<th>Sales Out Qty </th> \n");
+				  h.append("<th>Adjust Qty</th> \n");
+				  h.append("<th>Stock short </th> \n");
+				  h.append("<th>Onhand Qty </th> \n");
+				  h.append("<th>Price List </th> \n");
+				  h.append("<th>Amount </th> \n");
+				h.append("</tr> \n");
+				
+				for(int i=0;i<list.size();i++){
+					ReportAllBean s = (ReportAllBean)list.get(i);
+					h.append("<tr> \n");
+					  h.append("<td>"+s.getStoreCode()+"</td> \n");
+					  h.append("<td>"+s.getStoreName()+"</td> \n");
+					  if("PensItem".equalsIgnoreCase(aForm.getBean().getSummaryType())){
+					     h.append("<td>"+s.getPensItem()+"</td> \n");
+					  }
+					  h.append("<td>"+s.getGroup()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getBeginingQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getSaleInQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getSaleReturnQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getSaleOutQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getAdjustQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getStockShortQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getOnhandQty()+"</td> \n");
+					  h.append("<td class='num_currency'>"+s.getRetailPriceBF()+"</td> \n");
+					  h.append("<td class='currency'>"+s.getOnhandAmt()+"</td> \n");
+					h.append("</tr>");
+				}
+				
+				ReportAllBean s = (ReportAllBean)request.getSession().getAttribute("summary");
+				h.append("<tr> \n");
+				  h.append("<td></td> \n");
+				  h.append("<td></td> \n");
+				  if("PensItem".equalsIgnoreCase(aForm.getBean().getSummaryType())){
+				     h.append("<td></td> \n");
+				  }
+				  h.append("<td class='colum_head'>Total</td> \n");
+				  h.append("<td class='num_currency_bold'>"+s.getBeginingQty()+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+s.getSaleInQty()+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+s.getSaleReturnQty()+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+s.getSaleOutQty()+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+s.getAdjustQty()+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+s.getStockShortQty()+"</td> \n");
+				  h.append("<td class='num_currency_bold'>"+s.getOnhandQty()+"</td> \n");
+				  h.append("<td class='currency_bold'></td> \n");
+				  h.append("<td class='currency_bold'>"+s.getOnhandAmt()+"</td> \n");
+				h.append("</tr>");
+				h.append("</table> \n");
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return h;
+	}
 }

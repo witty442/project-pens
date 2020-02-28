@@ -616,11 +616,13 @@ public class SAGenerate {
 						/** Case Column CALL Summary CALL= NP_CALL+key(Get distinct customer) DUP  and Type Summary **/
 						if(resultKey.startsWith("CALL") && !resultKey.startsWith("CALL_NEW") && isSummry && SAInitial.SUMMARY_TYPE_SUM.equals(summaryType)){
 							debug.debug("CALL:"+resultKey);
+							/** Sum No Dup **/
 							//value = Utils.isNullToZero(rs.getBigDecimal(SAInitial.NO_DUP_PREFIX+resultKey));//ND_Normal
-							//valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(SAInitial.NO_DUP_PREFIX+resultKey));//ND_ Value
+							valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(SAInitial.NO_DUP_PREFIX+resultKey));//ND_ Value
 							
+							/** Sum Dup **/
 							value = Utils.isNullToZero(rs.getBigDecimal(resultKey));//ND_Normal
-							valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//ND_ Value
+							//valueRowSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//ND_ Value
 							
 							valueColSummary = Utils.isNullToZero(rs.getBigDecimal(resultKey));//Normal
 						}else{

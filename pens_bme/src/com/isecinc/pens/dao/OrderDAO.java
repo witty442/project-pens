@@ -2112,6 +2112,31 @@ public class OrderDAO {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void saveOrderFromGenAuto(Connection conn,Order o) throws Exception{
+		try{
+			if(idOrderLineExist(conn, o)){
+				updateOrderModel(conn,o);
+			}else{
+			    insertOrderModel(conn, o);
+			}
+		
+		  //For Test insert dup
+		  /* Date orderDate = Utils.parse(o.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+		   String orderNo = OrderNoGenerate.genOrderNoKEY(orderDate, Utils.isNull(o.getStoreCode()));
+		   o.setOrderNo(orderNo);
+		   insertOrderModel(conn, o);*/
+		}catch(java.sql.SQLIntegrityConstraintViolationException e){
+			logger.debug("Exception Uniq Constraint Update Order ");
+			logger.debug("OrderNo["+o.getOrderNo()+"]");
+			logger.debug("BarOnBox["+o.getBarOnBox()+"]");
+			logger.debug("StoreCode["+o.getStoreCode()+"]");
+			logger.debug("barcode["+o.getBarcode()+"]");
+			logger.debug("BillType["+o.getBillType()+"]");
+			e.printStackTrace();
+		}
+	}
+	
 	public static boolean idOrderLineExist(Connection conn,Order o) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -2121,7 +2146,7 @@ public class OrderDAO {
 			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
 			StringBuffer sql = new StringBuffer("");
-			sql.append("select count(*) as c from pensbi.pensbme_order where 1=1 \n");
+			sql.append(" select count(*) as c from pensbi.pensbme_order where 1=1 \n");
 			sql.append(" and trunc(order_date) = to_date('"+orderDateStr+"','dd/mm/yyyy') \n");
 			sql.append(" and order_no ='"+o.getOrderNo()+"'\n");
 			sql.append(" and store_code ='"+o.getStoreCode()+"'\n");
@@ -2145,7 +2170,6 @@ public class OrderDAO {
 			if(rs != null){
 			   rs.close();rs = null;
 			}
-			
 		}
 		return exist;
 	} 
@@ -2154,7 +2178,7 @@ public class OrderDAO {
 		logger.debug("Insert");
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" INSERT INTO PENSBME_ORDER \n");
+			sql.append(" INSERT INTO PENSBI.PENSBME_ORDER \n");
 			sql.append(" (ORDER_NO,ORDER_DATE, STORE_TYPE, \n" );
 			sql.append(" STORE_CODE, GROUP_CODE, ITEM, \n" );
 			sql.append(" BARCODE, EXPORTED, CREATE_DATE, \n");
@@ -2199,7 +2223,7 @@ public class OrderDAO {
 	//	logger.debug("Update");
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" UPDATE PENSBME_ORDER \n");
+			sql.append(" UPDATE PENSBI.PENSBME_ORDER \n");
 			sql.append(" SET QTY =? ,UPDATE_USER =? ,UPDATE_DATE =?  \n" );
 			sql.append(" WHERE ORDER_NO =? AND STORE_CODE =? AND BARCODE =? AND BILL_TYPE =? \n" );
 

@@ -118,7 +118,7 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("search");
+		return mapping.findForward("batchFromPopup");
 	}
 	
 	public MonitorBean createBatchTask(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{

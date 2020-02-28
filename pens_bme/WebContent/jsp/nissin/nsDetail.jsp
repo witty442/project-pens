@@ -1,13 +1,9 @@
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.NSBean"%>
 <%@page import="com.isecinc.pens.dao.NSDAO"%>
-<%@page import="com.isecinc.pens.dao.RTDAO"%>
-<%@page import="com.isecinc.pens.bean.RTBean"%>
 <%@page import="com.isecinc.pens.web.nissin.NSForm"%>
 <%@page import="java.util.Calendar"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
@@ -21,11 +17,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="nsForm" class="com.isecinc.pens.web.nissin.NSForm" scope="session" />
 
@@ -59,6 +50,7 @@ System.out.println("Bean:"+bean.getChannelId());
 
 function loadMe(){
 	//new Epoch('epoch_popup', 'th', document.getElementById('orderDate'));
+	new Epoch('epoch_popup', 'th', document.getElementById('nissinOrderDate'));
 	
 	<%if( !"".equals(bean.getChannelId())) { %>
        document.getElementsByName('bean.channelId')[0].value = <%=bean.getChannelId()%>;
@@ -82,12 +74,20 @@ function back(path){
 
 function save(path){
 	var form = document.nsForm;
-	if( $('#customerType').val()==""){
-		alert("กรุณาระบุ ประเภทร้านค้า");
+	if( $('#nissinOrderDate').val()==""){
+		alert("กรุณาระบุ วันที่ Nissin ส่ง Line แจ้ง");
+		$('#nissinOrderDate').focus();
 		return false;
 	}
+	if( $('#customerType').val()==""){
+		alert("กรุณาระบุ ประเภทร้านค้า");
+		$('#customerType').focus();
+		return false;
+	}
+	//alert($('#channelId').val());
 	if( $('#channelId').val()==""){
 		alert("กรุณาระบุ ภาค");
+		$('#channelId').focus();
 		return false;
 	}
 	if( $('#provinceId').val()==""){
@@ -96,14 +96,17 @@ function save(path){
 	}
 	if( $('#customerName').val()==""){
 		alert("กรุณาระบุ ร้านค้า");
+		$('#customerName').focus();
 		return false;
 	}
 	if( $('#orderDate').val()==""){
 		alert("กรุณาระบุ วันทีบันทึก");
+		$('#orderDate').focus();
 		return false;
 	}
 	if( $('#phone').val()==""){
 		alert("กรุณาระบุ หมายเลขโทรศัพท์");
+		$('#phone').focus();
 		return false;
 	}
 	
@@ -191,10 +194,10 @@ function loadProvince(){
                                     <td  align="center" colspan="2">
                                        <%if( !Utils.userInRole(user,new String[]{User.NISSINVIEW}) ){%>
 		                                    <c:if test="${nsForm.bean.mode == 'add'}">
-		                                        <b>Add New</b>
+		                                        <font size="2"><b>เพิ่มข้อมูลใหม่</b></font>
 		                                     </c:if>
 		                                     <c:if test="${nsForm.bean.mode == 'edit'}">
-		                                         <b>Edit </b>
+		                                         <font size="2"><b>แก้ไขข้อมูล </b></font>
 		                                     </c:if>
 		                               <%}else{ %>
 		                                                                                                                            
@@ -205,6 +208,9 @@ function loadProvince(){
                                 <td align="right">ID</td>
 								<td align="left">
 								   <html:text property="bean.orderId" styleClass="disableText" styleId="orderId"/>
+								    &nbsp;&nbsp;
+								   วันที่ Nissin ส่ง Line แจ้ง(Nissin Ordered date)<font color="red">*</font>&nbsp;
+								   <html:text property="bean.nissinOrderDate" styleClass="" size='10' styleId="nissinOrderDate" readonly="true"/>
 								</td>
 								</tr>
 						     <tr>

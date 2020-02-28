@@ -12,6 +12,8 @@ public class NSBean implements Serializable{
 
 	private String orderId;
 	private String orderDate;
+	private String nissinOrderDate;
+	private String completeDate;
 	
 	private String orderDateFrom;
 	private String orderDateTo;
@@ -65,6 +67,22 @@ public class NSBean implements Serializable{
     private NSBean summary;
 	
     
+	public String getCompleteDate() {
+		return completeDate;
+	}
+
+	public void setCompleteDate(String completeDate) {
+		this.completeDate = completeDate;
+	}
+
+	public String getNissinOrderDate() {
+		return nissinOrderDate;
+	}
+
+	public void setNissinOrderDate(String nissinOrderDate) {
+		this.nissinOrderDate = nissinOrderDate;
+	}
+
 	public String getSalesZoneDesc() {
 		return salesZoneDesc;
 	}

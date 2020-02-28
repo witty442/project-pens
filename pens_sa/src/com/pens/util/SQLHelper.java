@@ -11,6 +11,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.pens.util.excel.ExcelHeader;
+
 public class SQLHelper {
 	protected static Logger logger = Logger.getLogger("PENS");
 	
@@ -95,14 +97,15 @@ public class SQLHelper {
 			columnCount = rsm.getColumnCount();
 			
 			//getColumnHeader 
-			 str.append("<table align='center' border='1' cellpadding='3' cellspacing='1' class='result'>");
-			 str.append("<tr>");  
-			 for(int i=1;i<=columnCount;i++){
-				    //System.out.println("["+i+"]"+rsm.getColumnName(i));
-				    str.append("<th>");
-	            	str.append(rsm.getColumnName(i));
-	            	str.append("</th>");
-			   }
+			str.append(ExcelHeader.EXCEL_HEADER);
+			str.append("<table align='center' border='1' cellpadding='3' cellspacing='1' class='result'>");
+			str.append("<tr>");  
+			for(int i=1;i<=columnCount;i++){
+			    //System.out.println("["+i+"]"+rsm.getColumnName(i));
+			    str.append("<th>");
+            	str.append(rsm.getColumnName(i));
+            	str.append("</th>");
+			 }
 			 str.append("</tr>"); 
 			 
 			 //Gen Detail

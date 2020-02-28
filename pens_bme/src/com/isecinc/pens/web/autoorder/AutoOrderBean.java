@@ -11,20 +11,126 @@ public class AutoOrderBean implements Serializable{
 	private String orderDate;
 	private String storeCode;
 	private String storeName;
+	private String storeType;
 	private String subInv;
 	private String storeNo;
 	private String pensItem;
 	private String groupCode;
+	private String sizeColor;
 	private String materialMaster;
-    private String onhandQty;
+    private String shopOnhandQty;
+    private String wacoalOnhandQty;
+    private String orderQty;
     private String priority;
     private String minQty;
     private String maxQty;
     
     private String createDate;
 	private String createUser;
+	private String backSalesDay;
+	private String dayCover;
+	private String salesQty;
+	private String salesQtyPerDay;
+	private String stockByCoverDay;
+	private String recommendCalcQty;
+	private String recommendQty;
+	private String retailPriceBF;
+	
+	private boolean canSave;
+	private String status;
+	private String userName;
 	
 	
+	public String getRecommendCalcQty() {
+		return recommendCalcQty;
+	}
+	public void setRecommendCalcQty(String recommendCalcQty) {
+		this.recommendCalcQty = recommendCalcQty;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public boolean isCanSave() {
+		return canSave;
+	}
+	public void setCanSave(boolean canSave) {
+		this.canSave = canSave;
+	}
+	public String getSizeColor() {
+		return sizeColor;
+	}
+	public void setSizeColor(String sizeColor) {
+		this.sizeColor = sizeColor;
+	}
+	public String getSalesQty() {
+		return salesQty;
+	}
+	public void setSalesQty(String salesQty) {
+		this.salesQty = salesQty;
+	}
+	public String getRetailPriceBF() {
+		return retailPriceBF;
+	}
+	public void setRetailPriceBF(String retailPriceBF) {
+		this.retailPriceBF = retailPriceBF;
+	}
+	public String getStoreType() {
+		return storeType;
+	}
+	public void setStoreType(String storeType) {
+		this.storeType = storeType;
+	}
+	public String getWacoalOnhandQty() {
+		return wacoalOnhandQty;
+	}
+	public void setWacoalOnhandQty(String wacoalOnhandQty) {
+		this.wacoalOnhandQty = wacoalOnhandQty;
+	}
+	public String getOrderQty() {
+		return orderQty;
+	}
+	public void setOrderQty(String orderQty) {
+		this.orderQty = orderQty;
+	}
+	public String getBackSalesDay() {
+		return backSalesDay;
+	}
+	public void setBackSalesDay(String backSalesDay) {
+		this.backSalesDay = backSalesDay;
+	}
+	public String getDayCover() {
+		return dayCover;
+	}
+	public void setDayCover(String dayCover) {
+		this.dayCover = dayCover;
+	}
+	public String getSalesQtyPerDay() {
+		return salesQtyPerDay;
+	}
+	public void setSalesQtyPerDay(String salesQtyPerDay) {
+		this.salesQtyPerDay = salesQtyPerDay;
+	}
+	public String getStockByCoverDay() {
+		return stockByCoverDay;
+	}
+	public void setStockByCoverDay(String stockByCoverDay) {
+		this.stockByCoverDay = stockByCoverDay;
+	}
+	public String getRecommendQty() {
+		return recommendQty;
+	}
+	public void setRecommendQty(String recommendQty) {
+		this.recommendQty = recommendQty;
+	}
 	public String getSubInv() {
 		return subInv;
 	}
@@ -73,11 +179,12 @@ public class AutoOrderBean implements Serializable{
 	public void setMaterialMaster(String materialMaster) {
 		this.materialMaster = materialMaster;
 	}
-	public String getOnhandQty() {
-		return onhandQty;
+	
+	public String getShopOnhandQty() {
+		return shopOnhandQty;
 	}
-	public void setOnhandQty(String onhandQty) {
-		this.onhandQty = onhandQty;
+	public void setShopOnhandQty(String shopOnhandQty) {
+		this.shopOnhandQty = shopOnhandQty;
 	}
 	public String getPriority() {
 		return priority;

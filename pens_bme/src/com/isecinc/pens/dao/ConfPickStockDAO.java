@@ -74,6 +74,8 @@ public class ConfPickStockDAO extends PickConstants{
 			sql.append("\n   where M.reference_code = 'Store' and M.pens_value = j.customer_no) as STORE_NAME ");
 			sql.append("\n  ,(select sum(s.req_qty) from PENSBME_STOCK_ISSUE_ITEM s Where s.issue_req_no=j.issue_req_no )as total_req_qty");
 			sql.append("\n  ,(select sum(s.issue_qty) from PENSBME_STOCK_ISSUE_ITEM s Where s.issue_req_no=j.issue_req_no )as total_issue_qty");
+			sql.append("\n ,(select count(*) as c FROM PENSBI.PENSBME_AUTO_SUBTRANS_OUT S ");
+			sql.append("\n   where S.REF_NO = j.issue_req_no ) as auto_trans_count");
 			sql.append("\n from PENSBME_STOCK_ISSUE j ");
 			sql.append("\n where 1=1   ");
 			sql.append("\n and status in('"+PickConstants.STATUS_POST+"','"+PickConstants.STATUS_ISSUED+"','"+PickConstants.STATUS_BEF+"')");
@@ -137,12 +139,9 @@ public class ConfPickStockDAO extends PickConstants{
 				}
 			   h.setTotalCtn(rst.getInt("total_ctn"));
 			   h.setExported(Utils.isNull(rst.getString("exported")));
-			  
 			   h.setTotalReqQty(rst.getInt("total_req_qty"));
 			   h.setTotalIssueQty(rst.getInt("total_issue_qty"));
-			   
-		
-			   
+
 			   if(Utils.isNull(rst.getString("status")).equals(STATUS_BEF)){
 				   h.setCanConfirm(true);
 			   }else{
@@ -155,6 +154,9 @@ public class ConfPickStockDAO extends PickConstants{
 			   }else{
 				   h.setCanEdit(false); 
 			   }
+			   if(rst.getInt("auto_trans_count") >0){
+			        h.setAutoTrans(true);
+			    }
 
 			   items.add(h);
 			   r++;

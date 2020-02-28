@@ -74,8 +74,18 @@ public class StockBean implements Comparable<StockBean>,Serializable{
     private String recordType;
     private String brandSaveZoneDay;
     private String productExpireDay;
+    private String requestNo;
+
     
     
+	public String getRequestNo() {
+		return requestNo;
+	}
+
+	public void setRequestNo(String requestNo) {
+		this.requestNo = requestNo;
+	}
+
 	public String getProductExpireDay() {
 		return productExpireDay;
 	}

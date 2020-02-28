@@ -167,7 +167,8 @@
 			<forward name="search" path="/jsp/billPlan/billPlanSearch.jsp" />
 		</action>
 		<action name="stockForm" path="/jsp/stockAction" parameter="do" scope="session" type="com.isecinc.pens.web.stock.StockAction">
-			<forward name="search" path="/jsp/stock/stockSearch.jsp" />
+			<!-- <forward name="search" path="/jsp/stock/stockSearch.jsp" /> -->
+			<forward name="search" path="/jsp/stock/stockAll.jsp" />
 			<forward name="stockVanReport" path="/jsp/stock/stockVanPDPopupReport.jsp" />
 		</action>
 		<action name="locationForm" path="/jsp/locationAction" parameter="do" scope="session" type="com.isecinc.pens.web.location.LocationAction">
@@ -184,6 +185,7 @@
 		<action  name="batchTaskForm" path="/jsp/batchTaskAction" parameter="do" 
 		     scope="session" type="com.isecinc.pens.web.batchtask.BatchTaskAction" >
            <forward name="search" path="/jsp/batchtask/batchTask.jsp"></forward>
+           <forward name="batchFromPopup" path="/jsp/batchtask/batchTaskPopup.jsp"></forward>
         </action>
         <action  name="b2bForm" path="/jsp/b2bAction" parameter="do" 
 		     scope="session" type="com.isecinc.pens.web.b2b.B2BAction" >

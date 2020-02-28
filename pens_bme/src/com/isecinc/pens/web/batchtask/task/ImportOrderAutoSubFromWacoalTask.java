@@ -17,6 +17,7 @@ import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.exception.ExceptionHandle;
+import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.isecinc.pens.web.batchtask.BatchTaskListBean;
@@ -28,8 +29,8 @@ import com.pens.util.Utils;
 import com.pens.util.meter.MonitorTime;
 import com.pens.util.seq.SequenceProcess;
 
-public class ImportOrderAutoSubFromWacoalTask implements BatchTaskInterface{
-	public static Logger logger = Logger.getLogger("PENS");
+public class ImportOrderAutoSubFromWacoalTask extends BatchTask implements BatchTaskInterface{
+
 	private static String PARAM_AS_OF_DATE = "AS_OF_DATE";
 	private static String PARAM_CUST_GROUP = "custGroup";
 	
@@ -40,15 +41,25 @@ public class ImportOrderAutoSubFromWacoalTask implements BatchTaskInterface{
 	/**
 	 * Return :Param Name|Param label|Param Type|default value|validate,xxxx|||$Button Name
 	 */
-	public String getParam(){
+	/*public String getParam(){
 		//return "AS_OF_DATE|วันที่เปิด Order จากโรงงาน Wacoal|DATE|SYSDATE|VALID$Import ข้อมูล";
 		return "custGroup|กลุ่มร้านค้า|LIST||VALID,AS_OF_DATE|วันที่เปิด Order จากโรงงาน Wacoal|DATE|SYSDATE|VALID$Import ข้อมูล";
+	}*/
+	public String[] getParam(){
+		String[] param = new String[2];
+		param[0] = "custGroup|กลุ่มร้านค้า|LIST||VALID";
+		param[1] = "AS_OF_DATE|วันที่เปิด Order จากโรงงาน Wacoal|DATE|SYSDATE|VALID";
+		return param;
 	}
+	public String getButtonName(){
+		return "Import ข้อมูล";
+	}
+	
 	public String getDescription(){
 		return "เฉพาะข้อมูล Order ของกลุ่มร้านค้าที่เป็นลักษณะ การโอนสินค้า ระหว่าง Sub Inventory เช่น BigC,Shop ต่างๆ";
 	}
 	public String getDevInfo(){
-		return "Import Order(PENSBI.PENSBME_ORDER) Customer in (PENSBI.PENSBME_MST_REFERENCE reference_code = 'Customer' and pens_desc6 = 'Auto Sub-transfer') To Oracle "
+		return "Import Order(PENSBI.PENSBME_ORDER) Customer in (PENSBI.PENSBME_MST_REFERENCE reference_code = 'AutoPOtoORACLE') To Oracle "
 				+ "<br/> (apps.XXPENS_PO_ORDER_IMPORT_MST,apps.XXPENS_PO_ORDER_IMPORT_DT) ";
 	}
 	public boolean isDispDetail(){
@@ -57,7 +68,7 @@ public class ImportOrderAutoSubFromWacoalTask implements BatchTaskInterface{
 	public List<BatchTaskListBean> getParamListBox(){
 		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();
 		try{
-			List<Master> custGroupList= GeneralDAO.getCustGroupAutoSubList();
+			List<Master> custGroupList= GeneralDAO.getCustGroupAutoPOToOracleList();
 			if(custGroupList != null && custGroupList.size() >0){
 				//LIST 1
 				BatchTaskListBean listHeadBean = new BatchTaskListBean();
@@ -269,8 +280,7 @@ public class ImportOrderAutoSubFromWacoalTask implements BatchTaskInterface{
 			sql.append("\n ,O.ORDER_DATE");
 			sql.append("\n ,(SELECT INTERFACE_DESC FROM PENSBI.PENSBME_MST_REFERENCE M where reference_code = 'SubInv' and M.pens_value = O.store_code) as SUBINV");
 			sql.append("\n ,(SELECT PENS_DESC FROM PENSBI.PENSBME_MST_REFERENCE M where reference_code = 'Store' and M.pens_value = O.store_code) as STORE_NAME");
-			sql.append("\n ,(SELECT max(PENS_DESC5) FROM PENSBI.PENSBME_MST_REFERENCE M where reference_code = 'Customer' ");
-			sql.append("\n   and pens_desc6 = 'Auto Sub-transfer'");
+			sql.append("\n ,(SELECT max(PENS_DESC5) FROM PENSBI.PENSBME_MST_REFERENCE M where reference_code = 'AutoPOtoORACLE' ");
 			sql.append("\n   and M.pens_value = O.store_type) as forwarder");
 			sql.append("\n ,O.ORDER_LOT_NO");
 			//Get transporter_qty from 
@@ -281,7 +291,7 @@ public class ImportOrderAutoSubFromWacoalTask implements BatchTaskInterface{
 			sql.append("\n AND ( O.ORDER_LOT_NO IS  NOT NULL OR ORDER_LOT_NO <> '')");
 			sql.append("\n AND O.STORE_TYPE IN (");
 			sql.append("\n   select pens_value from PENSBI.PENSBME_MST_REFERENCE");
-			sql.append("\n   where reference_code = 'Customer' and pens_desc6 = 'Auto Sub-transfer'");
+			sql.append("\n   where reference_code = 'AutoPOtoORACLE'");
 			sql.append("\n )");
 			sql.append("\n AND O.ORDER_LOT_NO NOT IN(  ");
 			sql.append("\n   SELECT ORDER_NUMBER FROM XXPENS_PO_ORDER_IMPORT_MST ");

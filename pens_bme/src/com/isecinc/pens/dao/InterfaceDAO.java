@@ -320,7 +320,7 @@ public class InterfaceDAO extends InterfaceUtils{
 			sql.append(" select channel as batch_task_status from monitor \n");
 			sql.append("where MONITOR_ID = (select min(monitor_id) from monitor where transaction_id ="+id+") \n");
 			
-		    logger.info("SQL:"+sql.toString());
+		    //logger.info("SQL:"+sql.toString());
 		    
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();

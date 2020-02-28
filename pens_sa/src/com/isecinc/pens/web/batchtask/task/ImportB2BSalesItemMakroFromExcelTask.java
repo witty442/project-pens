@@ -24,8 +24,10 @@ import org.apache.struts.upload.FormFile;
 import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.exception.ExceptionHandle;
+import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
@@ -41,8 +43,16 @@ public class ImportB2BSalesItemMakroFromExcelTask extends BatchTask implements B
 	/**
 	 * Return :P Name|P label|P Type|default value|valid,P2...$processName,Button Name|....
 	*/
-	public String getParam(){
+	/*public String getParam(){
 		return "dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
+	}*/
+	public String[] getParam(){
+		String[] param = new String[1];
+		param[0] = "dataFormFile|เลือกไฟล์|FROMFILE||VALID";
+		return param;
+	}
+	public String getButtonName(){
+		return "Import ข้อมูล";
 	}
 	public String getDescription(){
 		return "Import B2B Sales By Item Makro From File Excel";

@@ -19,13 +19,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <jsp:useBean id="nsForm" class="com.isecinc.pens.web.nissin.NSForm" scope="session" />
-
 <%
 User user = (User) request.getSession().getAttribute("user");
 String role = user.getRole().getKey();
@@ -97,7 +92,6 @@ function back(path){
 function savePens(path){
 	var form = document.nsForm;
 
-	
 	if( $('#status').val()=="P"){
 		if( $('#customerCode').val() !="" || $('#saleCode').val() !="" || $('#invoiceDate').val() !=""){
 			alert("มีการระบุข้อมูล รหัสร้านค้า รหัส Sale วันที่ Invoice Date ไม่สามารถ เปลี่ยนสถานะเป็น PENDING ได้");
@@ -213,6 +207,9 @@ function cancelAction(path){
                                  </td>
 								<td align="left">
 								   <html:text property="bean.orderId" styleClass="disableText" styleId="orderId"/>
+								   &nbsp;&nbsp;
+								   วันที่ Nissin ส่ง Line แจ้ง(Nissin Ordered date)<font color="red">*</font>&nbsp;
+								   <html:text property="bean.nissinOrderDate" styleClass="disableText" size="10" styleId="nissinOrderDate" readonly="true"/>
 								</td>
 							</tr>
 						     <tr>

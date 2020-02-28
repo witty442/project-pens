@@ -264,6 +264,14 @@
 	               </a>
 	             </li>  
              <%} %>
+              <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN,User.STOCKCR,User.STOCKCRSALE})){ %>
+                  <li>
+	               <a href="#" class="parent" 
+	               onclick="window.location='${pageContext.request.contextPath}/jsp/reportAllAction.do?do=prepare&pageName=StockReturn&action=new';">
+	               <span><%no++;out.print(no);%>.<bean:message key="StockReturn" bundle="sysprop"/></span>
+	               </a>
+	             </li>  
+             <%} %>
 		</ul>
 	</li>  
 <%}%>

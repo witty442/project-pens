@@ -23,7 +23,6 @@ import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.web.batchtask.task.BatchTaskListBean;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
@@ -71,8 +70,15 @@ public class BatchTaskAction extends I_Action {
 		logger.debug("BatchTask Prepare Form No ID");
 		try {
 			logger.debug("pageName:"+Utils.isNull(request.getParameter("pageName")) +",pageAction:"+Utils.isNull(request.getParameter("pageAction")));
+			logger.debug("initBatchAction:"+Utils.isNull(request.getParameter("initBatchAction")) );
+			//forward to BatchTask Popup
+			if(Utils.isNull(request.getParameter("initBatchAction")).equalsIgnoreCase("initBatchFromPageByPopup")){
+				returnText = "batchFromPopup";
+			}
 			
 			if("new".equalsIgnoreCase(Utils.isNull(request.getParameter("pageAction")))){
+				//clear Task running for next run
+				dao.updateControlMonitor(new BigDecimal(0),pageName);
 				
 				//Clear Form
 				batchTaskForm.setMonitorBean(new MonitorBean());
@@ -84,18 +90,14 @@ public class BatchTaskAction extends I_Action {
 				//getDevInfo
 				taskInfo.setDevInfo(getDevInfoByTaskname(pageName));
 				
-				//get Parameter by TaskName
-				String[] paramAll = getParamByTaskname(pageName).split("\\$");
+				//Get Parameter All By TaskName
+				paramArr = getParamByTaskname(pageName);
 				
-				//Button List
-				//Button Name
-				String param = paramAll[0];
-				taskInfo.setButtonName(paramAll[1]);
+				//Get Button Name By TaskName
+				taskInfo.setButtonName(getButtonNameByTaskname(pageName));
 				
 				//Parameter All
-				param = paramAll[0];
-				if( !Utils.isNull(param).equals("")){
-					paramArr = param.split("\\,");
+				if( paramArr != null){
 					for(int i=0;i<paramArr.length;i++){
 					     String[] criArr = paramArr[i].split("\\|");
 					     logger.debug("paramName:"+paramArr[i]);
@@ -106,24 +108,20 @@ public class BatchTaskAction extends I_Action {
 					     paramItem.setParamType(criArr[2]);
 					     paramItem.setParamValue(getDefaultValue(criArr[3]));
 					     paramItem.setParamValid(criArr[4]);
-					     
-					     //paramMap.put(paramItem.getParamName(),paramItem); //old code
 					     paramList.add(paramItem);
 					 }//for
 					
 					/** INIT LISTBOX DATA TO SESSION FRO DISPLAY **/
-				     if(param.indexOf("LIST") !=-1){
-				    	 List<BatchTaskListBean> listBoxBean = getParamListBoxByTaskname(pageName);
-				    	 if(listBoxBean != null && listBoxBean.size() >0){
-				    		 for(int i=0;i<listBoxBean.size();i++){
-				    			 BatchTaskListBean listBoxItem = listBoxBean.get(i);
-				    			 logger.debug("keySessionName:"+listBoxItem.getListBoxName());
-				    	         request.getSession().setAttribute(listBoxItem.getListBoxName(), listBoxItem.getListBoxData());
-				    		 }
-				    	 }
-				     }
-				     
+			    	 List<BatchTaskListBean> listBoxBean = getParamListBoxByTaskname(pageName);
+			    	 if(listBoxBean != null && listBoxBean.size() >0){
+			    		 for(int i=0;i<listBoxBean.size();i++){
+			    			 BatchTaskListBean listBoxItem = listBoxBean.get(i);
+			    			 logger.debug("keySessionName:"+listBoxItem.getListBoxName());
+			    	         request.getSession().setAttribute(listBoxItem.getListBoxName(), listBoxItem.getListBoxData());
+			    		 }
+			    	 }
 				}//if
+				
 				//set to TaskInfo
 				//taskInfo.setParamMap(paramMap);//old code
 				taskInfo.setParamList(paramList);
@@ -131,7 +129,6 @@ public class BatchTaskAction extends I_Action {
 				//get Script validate
 				String validateScript = getValidateScriptByTaskname(pageName);
 				taskInfo.setValidateScript(validateScript);
-				
 				//get Show BatchTask Detail
 				taskInfo.setDispDetail(getDispDetailByTaskname(pageName));
 				
@@ -178,6 +175,10 @@ public class BatchTaskAction extends I_Action {
 			logger.info("TimeInUse:"+timeInUse);
 			logger.debug("pageName:"+pageName);
 			
+			//forward to BatchTask Popup
+			if(Utils.isNull(request.getParameter("batchAction")).equalsIgnoreCase("initBatchFromPageByPopup")){
+				returnText = "batchFromPopup";
+			}
 			/** Set Condition Search **/
 			MonitorBean[] monitors = dao.findMonitorListNew(user,pageName);
 			
@@ -210,6 +211,7 @@ public class BatchTaskAction extends I_Action {
 		return returnText;
 	}
 	
+	
 	/**
 	 * Save
 	 */
@@ -233,8 +235,8 @@ public class BatchTaskAction extends I_Action {
 		return "re-search";
 	}
 	
-	private String getParamByTaskname(String taskName){
-		String param = "";
+	private String[] getParamByTaskname(String taskName){
+		String[] param = null;
 		try{
 		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");
    		   Object obj = cls.newInstance();
@@ -243,6 +245,26 @@ public class BatchTaskAction extends I_Action {
    		   Class noparams[] = {};
    		
    		   Method method = cls.getDeclaredMethod("getParam", noparams);
+		   Object ob =  method.invoke(obj, null);
+		   
+		   param = (String[])ob;
+		   logger.debug("return:"+ob);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return param;
+	}
+	
+	private String getButtonNameByTaskname(String taskName){
+		String param = "";
+		try{
+		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");
+   		   Object obj = cls.newInstance();
+   		   
+   		  //no paramater
+   		   Class noparams[] = {};
+   		
+   		   Method method = cls.getDeclaredMethod("getButtonName", noparams);
 		   Object ob =  method.invoke(obj, null);
 		   
 		   param = (String)ob;
@@ -312,6 +334,25 @@ public class BatchTaskAction extends I_Action {
 		}
 		return listBoxBean;
 	}
+	private boolean getDispDetailByTaskname(String taskName){
+		boolean param = false;
+		try{
+		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");
+   		   Object obj = cls.newInstance();
+   		   
+   		  //no paramater
+   		   Class noparams[] = {};
+   		
+   		   Method method = cls.getDeclaredMethod("isDispDetail", noparams);
+		   Object ob =  method.invoke(obj, null);
+		   
+		   param = (Boolean)ob;
+		   logger.debug("return:"+ob);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return param;
+	}
 	
 	private String getValidateScriptByTaskname(String taskName){
 		String param = "";
@@ -326,25 +367,6 @@ public class BatchTaskAction extends I_Action {
 		   Object ob =  method.invoke(obj, null);
 		   
 		   param = (String)ob;
-		   logger.debug("return:"+ob);
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}
-		return param;
-	}
-	private boolean getDispDetailByTaskname(String taskName){
-		boolean param = false;
-		try{
-		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");
-   		   Object obj = cls.newInstance();
-   		   
-   		  //no paramater
-   		   Class noparams[] = {};
-   		
-   		   Method method = cls.getDeclaredMethod("isDispDetail", noparams);
-		   Object ob =  method.invoke(obj, null);
-		   
-		   param = (Boolean)ob;
 		   logger.debug("return:"+ob);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

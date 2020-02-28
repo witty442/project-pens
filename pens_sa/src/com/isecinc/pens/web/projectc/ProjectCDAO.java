@@ -475,7 +475,7 @@ public class ProjectCDAO {
 			logger.debug("sql:"+sql);
 			ps = conn.prepareStatement(sql.toString());
 			
-			long id = SequenceProcessAll.getIns().getNextValue("PENSBME_TT_PROJECTC");
+			long id = SequenceProcessAll.getIns().getNextValue("PENSBME_TT_PROJECTC").longValue();
 			bean.setId(id+"");
 			
 			ps.setLong(++index, id);

@@ -66,8 +66,9 @@ function exportToExcel(path){
 	form.submit();
 	return true;
 }
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.prodShowForm;
+	var path = document.getElementById("path").value;
 	form.action = path + "/jsp/prodShowAction.do?do=searchHead&currPage="+currPage;
     form.submit();
     return true;
@@ -180,6 +181,7 @@ function openImage(path,fileName){
 </script>
 
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<div align="center">
 <table align="center" border="0" cellpadding="3" cellspacing="0" >
 	       <tr>
                 <td> รอบเวลา<font color="red">*</font></td>
@@ -257,3 +259,4 @@ function openImage(path,fileName){
 				</td>
 			</tr>
 		</table>
+</div>

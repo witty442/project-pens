@@ -456,7 +456,10 @@ public class PickStockDAO extends PickConstants{
 		int r = 1;
 		int c = 1;
 		try {
-			sql.append("\n select M.* from (");
+			sql.append("\n select M.* ");
+			sql.append("\n ,(select count(*) as c FROM PENSBI.PENSBME_AUTO_SUBTRANS_OUT S ");
+			sql.append("\n   where S.REF_NO = M.issue_req_no ) as auto_trans_count");
+			sql.append("\n  from (");
 			sql.append("\n select A.* ,rownum as r__ from (");
 				sql.append("\n SELECT * from PENSBME_PICK_STOCK  ");
 				sql.append("\n where 1=1   ");
@@ -498,7 +501,9 @@ public class PickStockDAO extends PickConstants{
 			   if(Utils.isNull(rst.getString("issue_req_status")).equals(STATUS_OPEN) ){
 				   h.setCanConfirm(true);
 			   }
-
+			   if(rst.getInt("auto_trans_count") >0){
+				   h.setAutoTrans(true);
+			   }
 			   items.add(h);
 			   r++;
 			   

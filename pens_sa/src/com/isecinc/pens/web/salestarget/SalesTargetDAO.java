@@ -19,6 +19,7 @@ import com.isecinc.pens.process.SequenceProcessAll;
 import com.isecinc.pens.web.stock.StockBean;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.UserUtils;
 import com.pens.util.Utils;
 
@@ -306,6 +307,9 @@ public class SalesTargetDAO {
 				if( !"admin".equalsIgnoreCase(user.getUserName()))
 				    sql.append("\n    and A.user_name = '"+Utils.isNull(user.getUserName())+"'");
 				sql.append("\n  ) ");
+				//Edit:04/02/2020 add salesRepCode
+				sql.append("\n  and M.salesrep_code in("+SQLHelper.converToTextSqlIn(o.getSalesrepCode())+")");
+				
 			}else{
 				if( !Utils.isNull(o.getSalesChannelNo()).equals("")){
 					sql.append("\n and M.sales_channel = '"+Utils.isNull(o.getSalesChannelNo())+"'");

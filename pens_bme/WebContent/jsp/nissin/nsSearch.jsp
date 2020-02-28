@@ -21,7 +21,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="nsForm" class="com.isecinc.pens.web.nissin.NSForm" scope="session" />
 <%
@@ -49,7 +48,6 @@ String role = user.getRole().getKey();
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-<%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css" /> --%>
 
 <style type="text/css">
 
@@ -68,7 +66,6 @@ String role = user.getRole().getKey();
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>" ></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-<%-- <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script> --%>
 
 <script type="text/javascript">
 
@@ -136,7 +133,6 @@ function openPensEdit(path,orderId){
 	return true; 
 }
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -271,7 +267,8 @@ function openPensEdit(path,orderId){
 				            <th >Action</th>
 				            <th >Status</th>
 				            <th >ID</th>
-							<th >Date</th>
+				            <th >Nissin Ordered Date</th>
+							<th >Pens Open Date</th>
 							<th >Type</th>
 							<th >Customer Code</th>
 							<th >Customer Name</th>
@@ -282,6 +279,7 @@ function openPensEdit(path,orderId){
 							<th >Phone Number</th>
 							<th >Invoice No</th>
 							<th >Invoice Date</th>
+							<th >Complete Date</th>
 							<th >Sale Code</th>
 							<th >Cup72 (CTN)</th>
 							<th >Cup72 (CUP)</th>
@@ -352,6 +350,7 @@ function openPensEdit(path,orderId){
 								</td>
 								<td class="td_text_center" width="3%" nowrap><%=mc.getStatusDesc()%></td>
 								<td class="td_text_center" width="4%" nowrap><%=mc.getOrderId()%></td>
+								<td class="td_text_center" width="4%" nowrap ><%=mc.getNissinOrderDate()%></td>
 								<td class="td_text_center" width="4%" nowrap ><%=mc.getOrderDate()%></td>
 								<td class="td_text_center" width="4%" nowrap><%=mc.getCustomerType()%></td>
 								<td class="td_text" width="5%" ><%=mc.getCustomerCode()%></td>
@@ -363,6 +362,7 @@ function openPensEdit(path,orderId){
 								<td class="td_text" width="5%" nowrap><%=mc.getPhone()%></td>
 								<td class="td_text" width="5%" nowrap><%=mc.getInvoiceNo()%></td>
 								<td class="td_text" width="5%" nowrap><%=mc.getInvoiceDate()%></td>
+								<td class="td_text" width="5%" nowrap><%=mc.getCompleteDate()%></td> 
 								<td class="td_text" width="5%" nowrap><%=mc.getSaleCode()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getCupQty()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getCupNQty()%></td>

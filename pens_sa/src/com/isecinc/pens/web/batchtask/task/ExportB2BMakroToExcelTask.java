@@ -23,8 +23,10 @@ import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
+import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.FileUtil;
@@ -37,18 +39,13 @@ public class ExportB2BMakroToExcelTask extends BatchTask implements BatchTaskInt
 	/**
 	 * Return :P Name|P label|P Type|default value|valid,P2...$processName,Button Name|....
 	*/
-	public String getParam(){
+	/*public String getParam(){
 		return "dataType|ระบุประเภทไฟล์|LIST||VALID$Export ข้อมูล";
-	} 
-	public String getDescription(){
-		return "Import B2B Makro From File Excel";
-	}
-	public String getDevInfo(){
-		return "APPS.XXPENS_OM_PUSH_ORDER_ITEM,APPS.XXPENS_OM_PUSH_ORDER_TEMP  ";
-	}
-	//Show detail BatchTaskResult or no
-	public boolean isDispDetail(){
-		return true;
+	} */
+	public String[] getParam(){
+		String[] param = new String[1];
+		param[0] = "dataType|ระบุประเภทไฟล์|LIST||VALID";
+		return param;
 	}
 	public List<BatchTaskListBean> getParamListBox(){
 		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();
@@ -66,6 +63,20 @@ public class ExportB2BMakroToExcelTask extends BatchTask implements BatchTaskInt
 	
 		return listAll;
 	}
+	public String getButtonName(){
+		return "Export ข้อมูล";
+	}
+	public String getDescription(){
+		return "Import B2B Makro From File Excel";
+	}
+	public String getDevInfo(){
+		return "APPS.XXPENS_OM_PUSH_ORDER_ITEM,APPS.XXPENS_OM_PUSH_ORDER_TEMP  ";
+	}
+	//Show detail BatchTaskResult or no
+	public boolean isDispDetail(){
+		return true;
+	}
+	
 	
 	public String getValidateScript(){
 		String script ="";

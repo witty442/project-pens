@@ -41,6 +41,7 @@ import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
+import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
@@ -51,7 +52,6 @@ import com.pens.util.meter.MonitorTime;
 import com.pens.util.seq.SequenceProcess;
 
 public class ImportSalesOutBigCFromTextTask extends BatchTask implements BatchTaskInterface{
-	public static Logger logger = Logger.getLogger("PENS");
    
 	/*public void run(MonitorBean monitorModel){
 		logger.debug("TaskName:"+monitorModel.getName());
@@ -61,8 +61,19 @@ public class ImportSalesOutBigCFromTextTask extends BatchTask implements BatchTa
 	/**
 	 * Return :Param Name|Param label|Param Type|default value|validate$Button Name
 	 */
-	public String getParam(){
+	/*public String getParam(){
 		return "dataFormFile|เลือกไฟล์|FROMFILE||VALID$Import ข้อมูล";
+	}*/
+	public String[] getParam(){
+		String[] param = new String[1];
+		param[0] = "dataFormFile|เลือกไฟล์|FROMFILE||VALID";
+		return param;
+	}
+	public List<BatchTaskListBean> getParamListBox(){
+		return null;
+	}
+	public String getButtonName(){
+		return "Import ข้อมูล";
 	}
 	public String getDescription(){
 		String desc = "ใช้ File นามสกุล .txt ที่ Load มาจาก EDI Web ใหม่ มาทำการ Upload <br/>";

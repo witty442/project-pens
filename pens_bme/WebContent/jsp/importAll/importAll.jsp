@@ -9,5 +9,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 %>
 <%if("importMasterOrderREP".equalsIgnoreCase(pageName)){%>
   <jsp:include page="page/importMasterOrderREP.jsp" flush="true"/> 
+<%}else if("ImportExcelPICG899ToG07".equalsIgnoreCase(pageName)){%>
+  <jsp:include page="page/importExcelPICG899ToG07.jsp" flush="true"/> 
 <%} %>
 						

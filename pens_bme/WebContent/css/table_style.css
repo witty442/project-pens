@@ -74,7 +74,7 @@ TABLE.tableSearchNoWidth TD {
 
 }
 .td_text_center{
-	align:center;
+	text-align:center;
 }
 
 table.tableSearchNoWidth td.td_text_right {
