@@ -392,6 +392,7 @@ public class SalesTargetTTControlPage {
 			request.getSession().setAttribute("productMKTList", productMKTList);
 			request.getSession().setAttribute("salesrepList", salesrepList);
 			request.getSession().setAttribute("dataMap", dataMap);
+			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", "err:"+ e.getMessage());

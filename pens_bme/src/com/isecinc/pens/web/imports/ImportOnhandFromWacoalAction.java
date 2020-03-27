@@ -17,6 +17,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.upload.FormFile;
 
+import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.ImportSummary;
 import com.isecinc.pens.bean.MasterBean;
 import com.isecinc.pens.bean.Message;
@@ -25,6 +26,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.constants.Constants;
+import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
@@ -60,7 +62,7 @@ public class ImportOnhandFromWacoalAction {
 			//2 import txt total box from wacoal
 			importForm = importTotalBoxFromWacoalModel(importForm, user, request);
 	   }catch(Exception e){
-		   e.printStackTrace();
+		   request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		   logger.error(e.getMessage(),e);
 	   }
 	   return mapping.findForward("success");

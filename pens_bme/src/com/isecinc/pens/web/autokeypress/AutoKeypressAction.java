@@ -87,7 +87,8 @@ public class AutoKeypressAction {
             }else if("Store".equalsIgnoreCase(pageName) ){
 				
                 criteriaForm.setCodeSearch(Utils.isNull(request.getParameter("storeCode")));
-				
+                criteriaForm.setStoreType(Utils.isNull(request.getParameter("storeType")));
+                
 				List<PopupForm> popupList=   PopupDAO.searchStoreList(criteriaForm);
 				PopupForm popupForm = null;
 				if(popupList != null && popupList.size() >0){
@@ -101,9 +102,8 @@ public class AutoKeypressAction {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}
 		return resultAjax;

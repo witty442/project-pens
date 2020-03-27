@@ -120,9 +120,8 @@ public class ConfPickStockAllAction extends I_Action {
 			   aForm.setResultsSearch(null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -414,9 +413,8 @@ public class ConfPickStockAllAction extends I_Action {
 			
 			request.setAttribute("Message", msg);
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			if(conn != null){
@@ -900,8 +898,8 @@ public class ConfPickStockAllAction extends I_Action {
 				return  mapping.findForward("prepare");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				 conn.close();
@@ -960,8 +958,8 @@ public class ConfPickStockAllAction extends I_Action {
 				return  mapping.findForward("prepare");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				 conn.close();
@@ -1020,8 +1018,8 @@ public class ConfPickStockAllAction extends I_Action {
 				return  mapping.findForward("prepare");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				 conn.close();
@@ -1083,8 +1081,8 @@ public ActionForward printBillMiniAll(ActionMapping mapping, ActionForm form, Ht
 				return  mapping.findForward("prepare");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				 conn.close();
@@ -1139,8 +1137,8 @@ public ActionForward printBillMiniAll(ActionMapping mapping, ActionForm form, Ht
 				return  mapping.findForward("prepare");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				 conn.close();
@@ -1240,8 +1238,8 @@ public ActionForward printBillMiniAll(ActionMapping mapping, ActionForm form, Ht
 				return  mapping.findForward("prepare");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				 conn.close();
@@ -1306,8 +1304,8 @@ public ActionForward printBillMiniAll(ActionMapping mapping, ActionForm form, Ht
 				return  mapping.findForward("prepare");
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				 conn.close();

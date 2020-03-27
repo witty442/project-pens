@@ -51,9 +51,8 @@ public class SAReportAction extends I_Action {
 			formBean.setSalesBean(saBean);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
-					+ e.toString());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}
 		return returnText;
@@ -76,9 +75,8 @@ public class SAReportAction extends I_Action {
 			formBean.setSalesBean(saBean);
 
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
-					+ e.toString());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}
 		

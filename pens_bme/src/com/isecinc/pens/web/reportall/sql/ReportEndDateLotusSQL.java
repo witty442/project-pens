@@ -31,12 +31,12 @@ public class ReportEndDateLotusSQL {
 				}else{
 					control = calcDueDate(conn,c.getPensCustCodeFrom(),c.getSalesDate());
 				}
-			sql.append("\n SELECT A.* " );
+			sql.append("\n SELECT A.* ");
 			sql.append("\n,(SELECT NVL(MAX(RETAIL_PRICE_BF),0) FROM PENSBME_ONHAND_BME_LOCKED T "
 					 + "\n WHERE A.group_type = T.group_item"
 					 + "\n OR A.group_type = T.material_master) as retail_price_bf \n");
 			sql.append("\n,(A.ONHAND_QTY *(SELECT NVL(MAX(RETAIL_PRICE_BF),0) "
-				 	 + "\n FROM PENSBME_ONHAND_BME_LOCKED T "
+				 	 + "\n FROM PENSBI.PENSBME_ONHAND_BME_LOCKED T "
 					 + "\n WHERE A.group_type = T.group_item"
 					 + "\n OR A.group_type = T.material_master)) as onhand_amt \n");
 			sql.append("\n FROM( ");
@@ -74,13 +74,13 @@ public class ReportEndDateLotusSQL {
 				sql.append("\n FROM(  ");
 						sql.append("\n\t\t SELECT DISTINCT ");
 						sql.append("\n\t\t C.customer_code,P.inventory_item_code as pens_item,   ");
-						sql.append("\n\t\t (select M.pens_desc from PENSBME_MST_REFERENCE M WHERE " );
+						sql.append("\n\t\t (select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE " );
 						sql.append("\n\t\t M.pens_value = C.customer_code AND M.reference_code ='Store') as customer_desc, ");
 						sql.append("\n\t\t MP.MATERIAL_MASTER as group_type ");
-						sql.append("\n\t\t FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-						sql.append("\n\t\t ,XXPENS_BI_MST_CUSTOMER C ");
-						sql.append("\n\t\t ,XXPENS_BI_MST_ITEM P ");
-						sql.append("\n\t\t ,PENSBME_STYLE_MAPPING MP ");
+						sql.append("\n\t\t FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+						sql.append("\n\t\t ,PENSBI.XXPENS_BI_MST_CUSTOMER C ");
+						sql.append("\n\t\t ,PENSBI.XXPENS_BI_MST_ITEM P ");
+						sql.append("\n\t\t ,PENSBI.PENSBME_STYLE_MAPPING MP ");
 						sql.append("\n\t\t WHERE 1=1 ");
 						sql.append("\n\t\t AND V.inventory_item_id = P.inventory_item_id  ");
 						sql.append("\n\t\t AND V.customer_id = C.customer_id  ");
@@ -89,7 +89,7 @@ public class ReportEndDateLotusSQL {
 						sql.append("\n\t\t AND V.inventory_item_id IS NOT NULL  ");
 						sql.append("\n\t\t AND P.inventory_item_desc LIKE 'ME%' ");
 						//NOT IN pensbme_group_unuse_lotus
-						sql.append("\n\t\t AND MP.MATERIAL_MASTER NOT IN(select group_code from pensbme_group_unuse_lotus)");
+						sql.append("\n\t\t AND MP.MATERIAL_MASTER NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 						//Lotus Only 020047
 						sql.append("\n\t\t AND C.customer_code LIKE '020047-%'");
 						
@@ -109,16 +109,16 @@ public class ReportEndDateLotusSQL {
 						
 						sql.append("\n\t\t SELECT distinct ");
 						sql.append("\n\t\t J.store_code as customer_code,I.pens_item,  ");
-						sql.append("\n\t\t (select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
+						sql.append("\n\t\t (select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE ");
 						sql.append("\n\t\t  M.pens_value = J.store_code AND M.reference_code ='Store') as customer_desc,");
 						sql.append("\n\t\t I.group_code as group_type ");
-						sql.append("\n\t\t FROM PENSBME_PICK_JOB J ,PENSBME_PICK_BARCODE B ,PENSBME_PICK_BARCODE_ITEM I ");
+						sql.append("\n\t\t FROM PENSBI.PENSBME_PICK_JOB J ,PENSBI.PENSBME_PICK_BARCODE B ,PENSBI.PENSBME_PICK_BARCODE_ITEM I ");
 						sql.append("\n\t\t WHERE 1=1   ");
 						sql.append("\n\t\t AND J.job_id = B.job_id  ");
 						sql.append("\n\t\t AND B.job_id = I.job_id ");
 						sql.append("\n\t\t AND B.box_no = I.box_no ");
 						//NOT IN pensbme_group_unuse_lotus
-						sql.append("\n\t\t AND I.group_code NOT IN(select group_code from pensbme_group_unuse_lotus)");
+						sql.append("\n\t\t AND I.group_code NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 						//Lotus Only 020047
 						sql.append("\n\t\t AND J.cust_group = '020047'");
 						//sql.append(genWhereCondDateMonthEnd(control,"J.close_date"));
@@ -137,13 +137,13 @@ public class ReportEndDateLotusSQL {
 						
                  sql.append("\n\t\t SELECT distinct ");
  				   sql.append("\n\t\t  L.PENS_CUST_CODE as customer_code,L.PENS_ITEM ");
- 				   sql.append("\n\t\t ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
+ 				   sql.append("\n\t\t ,(select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE ");
  				   sql.append("\n\t\t   M.pens_value = L.PENS_CUST_CODE AND M.reference_code ='Store') as customer_desc ");
 				   sql.append("\n\t\t ,L.pens_group_type as group_type ");
-				   sql.append("\n\t\t  FROM PENSBME_SALES_FROM_LOTUS L ");
+				   sql.append("\n\t\t  FROM PENSBI.PENSBME_SALES_FROM_LOTUS L ");
 				   sql.append("\n\t\t  WHERE 1=1 ");
 				 //NOT IN pensbme_group_unuse_lotus
-					sql.append("\n\t\t AND L.pens_group_type NOT IN(select group_code from pensbme_group_unuse_lotus)");
+					sql.append("\n\t\t AND L.pens_group_type NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 				  // sql.append(genWhereCondDateMonthEnd(control,"L.sales_date"));
 						
 				   if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
@@ -163,10 +163,10 @@ public class ReportEndDateLotusSQL {
  				   sql.append("\n\t\t ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
  				   sql.append("\n\t\t   M.pens_value = L.STORE_CODE AND M.reference_code ='Store') as customer_desc ");
 				   sql.append("\n\t\t , L.group_code as group_type ");
-				   sql.append("\n\t\t FROM PENSBME_ENDDATE_STOCK L");
+				   sql.append("\n\t\t FROM PENSBI.PENSBME_ENDDATE_STOCK L");
 				   sql.append("\n\t\t WHERE 1=1 ");
 				  //NOT IN pensbme_group_unuse_lotus
-				   sql.append("\n\t\t AND L.group_code NOT IN(select group_code from pensbme_group_unuse_lotus)");
+				   sql.append("\n\t\t AND L.group_code NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 				   if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 					 sql.append("\n\t\t AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
 				   }
@@ -183,10 +183,10 @@ public class ReportEndDateLotusSQL {
          sql.append("\n /******************* BEGINING ****************************************/ ");
 				    sql.append("\n\t SELECT L.STORE_CODE as customer_code,L.PENS_ITEM, ");
 					sql.append("\n\t L.group_code as group_type, NVL(SUM(Ending_qty),0) AS BEGINING_QTY ");
-					sql.append("\n\t FROM PENSBME_ENDDATE_STOCK L");
+					sql.append("\n\t FROM PENSBI.PENSBME_ENDDATE_STOCK L");
 					sql.append("\n\t WHERE 1=1 ");
 					//NOT IN pensbme_group_unuse_lotus
-					sql.append("\n\t AND L.group_code NOT IN(select group_code from pensbme_group_unuse_lotus)");
+					sql.append("\n\t AND L.group_code NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 					sql.append("\n\t AND L.ENDING_DATE  = to_date('"+control.getStartDate()+"','dd/mm/yyyy')  ");
 					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
@@ -210,10 +210,10 @@ public class ReportEndDateLotusSQL {
  				sql.append("\n\t SELECT L.PENS_CUST_CODE as customer_code,L.PENS_ITEM, ");
 				sql.append("\n\t L.pens_group_type as group_type, ");
 				sql.append("\n\t NVL(SUM(QTY),0) AS SALE_OUT_QTY ");
-				sql.append("\n\t FROM PENSBME_SALES_FROM_LOTUS L ");
+				sql.append("\n\t FROM PENSBI.PENSBME_SALES_FROM_LOTUS L ");
 				sql.append("\n\t WHERE 1=1 ");
 				//NOT IN pensbme_group_unuse_lotus
-				sql.append("\n\t AND L.pens_group_type NOT IN(select group_code from pensbme_group_unuse_lotus)");
+				sql.append("\n\t AND L.pens_group_type NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 				sql.append(genWhereCondDate(control,"L.sales_date"));
 				  
 				if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
@@ -238,10 +238,10 @@ public class ReportEndDateLotusSQL {
 					sql.append("\n\t\t  C.customer_code ,P.inventory_item_code as pens_item");
 					sql.append("\n\t\t ,MP.MATERIAL_MASTER as group_type  ");
 					sql.append("\n\t\t ,NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
-					sql.append("\n\t\t FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-					sql.append("\n\t\t ,XXPENS_BI_MST_CUSTOMER C  ");
-					sql.append("\n\t\t ,XXPENS_BI_MST_ITEM P  ");
-					sql.append("\n\t\t ,PENSBME_STYLE_MAPPING MP ");
+					sql.append("\n\t\t FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+					sql.append("\n\t\t ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+					sql.append("\n\t\t ,PENSBI.XXPENS_BI_MST_ITEM P  ");
+					sql.append("\n\t\t ,PENSBI.PENSBME_STYLE_MAPPING MP ");
 					sql.append("\n\t\t WHERE 1=1   ");
 					sql.append("\n\t\t AND V.inventory_item_id = P.inventory_item_id  ");
 					sql.append("\n\t\t AND V.customer_id = C.customer_id  ");
@@ -250,7 +250,7 @@ public class ReportEndDateLotusSQL {
 					sql.append("\n\t\t AND V.inventory_item_id IS NOT NULL  ");
 					sql.append("\n\t\t AND P.inventory_item_desc LIKE 'ME%' ");
 					//NOT IN pensbme_group_unuse_lotus
-					sql.append("\n\t\t AND MP.MATERIAL_MASTER NOT IN(select group_code from pensbme_group_unuse_lotus)");
+					sql.append("\n\t\t AND MP.MATERIAL_MASTER NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 					//Lotus Only 020047
 					sql.append("\n\t\t AND C.customer_code LIKE '020047-%'");
 					sql.append(genWhereCondDate(control,"V.invoice_date"));
@@ -276,15 +276,15 @@ public class ReportEndDateLotusSQL {
 					sql.append("\n\t SELECT J.store_code as customer_code,I.pens_item,  ");
 					sql.append("\n\t I.group_code as group_type, ");
 					sql.append("\n\t COUNT(*) as SALE_RETURN_QTY ");
-					sql.append("\n\t FROM PENSBME_PICK_JOB J,PENSBME_PICK_BARCODE B ");
-					sql.append("\n\t ,PENSBME_PICK_BARCODE_ITEM I ");
+					sql.append("\n\t FROM PENSBI.PENSBME_PICK_JOB J,PENSBI.PENSBME_PICK_BARCODE B ");
+					sql.append("\n\t ,PENSBI.PENSBME_PICK_BARCODE_ITEM I ");
 					sql.append("\n\t WHERE 1=1   ");
 					sql.append("\n\t AND J.job_id = B.job_id  ");
 					sql.append("\n\t AND B.job_id = I.job_id ");
 					sql.append("\n\t AND B.box_no = I.box_no ");
 					sql.append("\n\t AND I.STATUS <> '"+PickConstants.STATUS_CANCEL+"' ");
 					//NOT IN pensbme_group_unuse_lotus
-					sql.append("\n\t AND I.group_code NOT IN(select group_code from pensbme_group_unuse_lotus)");
+					sql.append("\n\t AND I.group_code NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 					//Lotus Only 020047
 					sql.append("\n\t AND J.cust_group = '020047'");
 					sql.append(genWhereCondDate(control,"J.close_date"));
@@ -310,10 +310,10 @@ public class ReportEndDateLotusSQL {
 				 	sql.append("\n\t SELECT ");
 				 	sql.append("\n\t L.store_code as customer_code,L.item_issue as pens_item,L.item_issue_desc as group_type, ");
 				 	sql.append("\n\t (NVL(SUM(ITEM_ISSUE_QTY),0)*-1) AS ISSUE_QTY ");
-				 	sql.append("\n\t FROM PENSBME_ADJUST_INVENTORY L ");
+				 	sql.append("\n\t FROM PENSBI.PENSBME_ADJUST_INVENTORY L ");
 				 	sql.append("\n\t WHERE 1=1 " );
 				 	//NOT IN pensbme_group_unuse_lotus
-					sql.append("\n\t AND L.item_issue_desc NOT IN(select group_code from pensbme_group_unuse_lotus)");
+					sql.append("\n\t AND L.item_issue_desc NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 					sql.append("\n\t AND L.STORE_CODE LIKE '020047-%'");
 				 	// L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
 				 	sql.append(genWhereCondDate(control,"L.transaction_date"));
@@ -339,10 +339,10 @@ public class ReportEndDateLotusSQL {
 				  sql.append("\n\t SELECT ");
 				  sql.append("\n\t L.STORE_CODE as customer_code,L.item_receipt as pens_item,L.item_receipt_desc as group_type, ");
 				  sql.append("\n\t NVL(SUM(ITEM_RECEIPT_QTY),0) AS RECEIPT_QTY ");
-				  sql.append("\n\t FROM PENSBME_ADJUST_INVENTORY L");
+				  sql.append("\n\t FROM PENSBI.PENSBME_ADJUST_INVENTORY L");
 				  sql.append("\n\t WHERE 1=1 ");
 				 //NOT IN pensbme_group_unuse_lotus
-				  sql.append("\n\t AND L.item_receipt_desc NOT IN(select group_code from pensbme_group_unuse_lotus)");
+				  sql.append("\n\t AND L.item_receipt_desc NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 				  sql.append("\n\t AND L.STORE_CODE LIKE '020047-%'");
 				  //L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
 				  sql.append(genWhereCondDate(control,"L.transaction_date"));
@@ -368,10 +368,10 @@ public class ReportEndDateLotusSQL {
 				  sql.append("\n\t SELECT ");
 				  sql.append("\n\t L.STORE_CODE as customer_code,L.item_adjust as pens_item,L.item_adjust_desc as group_type, ");
 				  sql.append("\n\t NVL(SUM(ITEM_ADJUST_QTY),0) AS STOCK_SHORT_QTY ");
-				  sql.append("\n\t FROM PENSBME_ADJUST_SALES L ");
+				  sql.append("\n\t FROM PENSBI.PENSBME_ADJUST_SALES L ");
 				  sql.append("\n\t WHERE 1=1 ");	 
 				 //NOT IN pensbme_group_unuse_lotus
-				  sql.append("\n\t AND L.item_adjust_desc NOT IN(select group_code from pensbme_group_unuse_lotus)");
+				  sql.append("\n\t AND L.item_adjust_desc NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 				  sql.append("\n\t AND L.STORE_CODE LIKE '020047-%'");
 				  sql.append(genWhereCondDate(control,"L.transaction_date"));
 				  

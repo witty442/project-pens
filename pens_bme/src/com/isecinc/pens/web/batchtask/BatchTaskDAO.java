@@ -563,13 +563,13 @@ public class BatchTaskDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select monitor.*  \n");
-			sql.append(" , (select count(*) from monitor_item where monitor_item.monitor_id = monitor.monitor_id and status = "+Constants.STATUS_SUCCESS+" )  as success_count  \n");
-			sql.append(" , (select max(id) from monitor_item where monitor_item.monitor_id = monitor.monitor_id)  as monitor_item_id  \n");
-			sql.append(" , (select error_msg from monitor_error_mapping where monitor_error_mapping.error_code = monitor.error_code) as error_disp \n");
-			sql.append(" from monitor  \n");
+			sql.append(" , (select count(*) from pensbi.monitor_item where monitor_item.monitor_id = monitor.monitor_id and status = "+Constants.STATUS_SUCCESS+" )  as success_count  \n");
+			sql.append(" , (select max(id) from pensbi.monitor_item where monitor_item.monitor_id = monitor.monitor_id)  as monitor_item_id  \n");
+			sql.append(" , (select error_msg from pensbi.monitor_error_mapping where monitor_error_mapping.error_code = monitor.error_code) as error_disp \n");
+			sql.append(" from pensbi.monitor  \n");
 			sql.append(" inner join  \n");
 			sql.append(" ( select max(transaction_id) as transaction_id  \n");
-			sql.append("   from monitor  \n");
+			sql.append("   from pensbi.monitor  \n");
 			sql.append("   where create_user like '%"+user.getUserName()+"%' \n");
 			sql.append("   and name ='"+name+"'\n");
 			sql.append("  ) s  \n");
@@ -607,7 +607,7 @@ public class BatchTaskDAO {
 	            }else{
 	               m.setErrorMsg(rs.getString("error_disp"));
 	            }
-	            
+	        	m.setUpdateDateDisp(DateUtil.stringValue(rs.getTimestamp("update_date"),DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,Utils.local_th));
 	            if(Utils.isNull(m.getErrorMsg()).equals("")){
 	            	logger.debug("errorCode:"+rs.getString("error_code"));
 	            	String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_code")));
@@ -1194,7 +1194,7 @@ public class BatchTaskDAO {
 		try {
 			String sql = "UPDATE PENSBI.monitor SET " +
 			" status = ? ,file_count =? ,error_code = ? ,error_msg =? ,transaction_type = ? "+
-			" ,file_name = ? ,type =? ,th_name = ?"+
+			" ,file_name = ? ,type =? ,th_name = ? ,update_date =? "+
 			" WHERE MONITOR_ID = ? and transaction_id =?";
 			
 			logger.debug("SQL:"+sql);
@@ -1211,6 +1211,11 @@ public class BatchTaskDAO {
 			ps.setString(++index, Utils.isNull(model.getFileName()));
 			ps.setString(++index, Utils.isNull(model.getType()));
 			ps.setString(++index, Utils.isNull(model.getThName()));
+			if(model.getStatus()==-1 || model.getStatus()==1){
+				ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));
+			}else{
+				ps.setTimestamp(++index,null);
+			}
 			ps.setBigDecimal(++index, model.getMonitorId());
 			ps.setBigDecimal(++index, model.getTransactionId());
 			

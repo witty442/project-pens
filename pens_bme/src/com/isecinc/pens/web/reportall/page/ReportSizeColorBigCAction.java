@@ -128,8 +128,9 @@ public class ReportSizeColorBigCAction  extends I_Action{
 			if(request.getParameter(queryStr) != null){
 				
 				Master m = new ImportDAO().getStoreName("Store", reportAllForm.getBean().getPensCustCodeFrom());
-				if(m != null)
+				if(m != null){
 					reportAllForm.getBean().setPensCustNameFrom(m.getPensDesc());
+				}
 			}else{
 				reportAllForm = searchReport(request,user, reportAllForm);
 			}
@@ -197,9 +198,8 @@ public class ReportSizeColorBigCAction  extends I_Action{
 			request.getSession().setAttribute("BATCH_PARAM_MAP",batchParaMap);
 			request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.GEN_STOCK_ONHAND_REP_TEMP);//set to popup page to BatchTask
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 		}
@@ -226,9 +226,8 @@ public class ReportSizeColorBigCAction  extends I_Action{
 			 logger.debug("batchName:"+batchTaskForm.getResults()[0].getName());
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -352,19 +351,13 @@ public class ReportSizeColorBigCAction  extends I_Action{
 	Statement stmt = null;
 	ResultSet rst = null;
 	StringBuilder sql = new StringBuilder();
-	double BEGINING_QTY = 0;
-	double trans_in_qty = 0;
-	double sale_return_qty = 0;
-	double sale_out_qty = 0;
-	double ADJUST_QTY = 0;
-	double onhand_qty = 0;
+	double BEGINING_QTY = 0,trans_in_qty = 0;
+	double sale_return_qty = 0,sale_out_qty = 0;
+	double ADJUST_QTY = 0,onhand_qty = 0;
 	String key = "";
 	List<ReportAllBean> rowAllList = new ArrayList<ReportAllBean>();
 	ReportAllBean item = null;
-	ReportAllBean prevItem = null;
-	List<ReportAllBean> pos = new ArrayList<ReportAllBean>();
 	try{
-	
 		//Init Connection
 		conn = DBConnection.getInstance().getConnection();
 		
@@ -380,7 +373,7 @@ public class ReportSizeColorBigCAction  extends I_Action{
 			storeBean.setStoreCode(c.getPensCustCodeFrom());
 			storeList.add(storeBean);
 			
-			//Validate Initial Date
+			//Validate Initial Date vs asOfDate(user input)
 			Date asOfDate = DateUtil.parse(c.getSalesDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			Date initDate = new SummaryDAO().searchInitDateBigC(conn,c.getPensCustCodeFrom());
 			

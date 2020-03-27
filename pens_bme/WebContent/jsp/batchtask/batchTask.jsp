@@ -53,7 +53,7 @@ if(taskInfo != null){
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script>
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 
@@ -104,7 +104,12 @@ body {
 	         window.opener.searchBatch('<%=request.getContextPath()%>');
 	         window.close();
 	     <%}%>
-	        
+	     
+	     /** Case onload from popup Page summited Batch**/
+      	 <%if( "initBatchFromPageByPopupNoWait".equalsIgnoreCase(initBatchAction)){%>
+      	     submitBatchFromPageByPopupNoWait(document.getElementById("path").value);
+      	 <%}%>
+      	 
       	 /** start check batchTask by Ajax **/
        	<%if( "submited".equals(request.getAttribute("action"))){%>
        	   startCheckBatch();
@@ -141,6 +146,14 @@ body {
 		document.batchTaskForm.submit();
 		return true;
 	}
+	/** Start Batch from Page By Popup Page No Wait**/
+	function submitBatchFromPageByPopupNoWait(path) {
+		//alert("path:"+path+",runBatchFromPopup");
+		document.batchTaskForm.action = path + "/jsp/batchTaskAction.do?do=runBatchFromPageByPopupNoWait&action=submited";
+		document.batchTaskForm.submit();
+		return true;
+	}
+	
 	function disableF5(e) {
 		if (e.which == 116) e.preventDefault(); 
 	}
@@ -155,6 +168,9 @@ body {
 		var param = "";
 		 <%if( "initBatchFromPageByPopup".equalsIgnoreCase(batchAction)){%>
 		    param +="&batchAction=initBatchFromPageByPopup";
+		 <%}%>
+		 <%if( "initBatchFromPageByPopupNoWait".equalsIgnoreCase(batchAction)){%>
+		    param +="&batchAction=initBatchFromPageByPopupNoWait";
 		 <%}%>
 		 //alert(param);
 		document.batchTaskForm.action = path + "/jsp/batchTaskAction.do?do=search"+param;
@@ -310,7 +326,10 @@ body {
 	    	<!-- PROGRAM HEADER -->
 	    	<!-- Case submit from page by popu no display Name Batch-->
 	    	 <%if( !"initBatchFromPageByPopup".equalsIgnoreCase(initBatchAction)
-	    		&& !"initBatchFromPageByPopup".equalsIgnoreCase(batchAction) ){%>
+	    		&& !"initBatchFromPageByPopup".equalsIgnoreCase(batchAction)
+	    		&& !"initBatchFromPageByPopupNoWait".equalsIgnoreCase(initBatchAction)
+	    		&& !"initBatchFromPageByPopupNoWait".equalsIgnoreCase(batchAction)
+	    	   ){%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="<%=pageName%>"/>
 				</jsp:include>
@@ -483,6 +502,10 @@ body {
 						<input type="hidden" name="pageName"  id="pageName" value="<%=pageName%>"/>
 					    <input type="hidden" name="path"  id="path" value="${pageContext.request.contextPath}"/>
 					    <input type="hidden" name="batchAction"  id="batchAction" value="<%=initBatchAction%>"/>
+					    
+					     <!-- Execute delete db(sales-out) by fileName -->
+                          <jsp:include page="../all/deleteBmeSalesOut.jsp" />
+                          
 					</html:form>
 					<!-- BODY -->   
 					</td>

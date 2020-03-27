@@ -27,7 +27,7 @@ public class InitialMessages extends I_Initial {
 	public void init(Connection conn) {
 		try {
 			StringBuilder sql = new StringBuilder();
-			sql.append("SELECT * FROM c_message ");
+			sql.append("SELECT * FROM pensbi.c_message ");
 			List<Messages> refList = Database.query(sql.toString(), null, Messages.class, conn);
 			// logger.debug(refList);
 			for (Messages r : refList) {

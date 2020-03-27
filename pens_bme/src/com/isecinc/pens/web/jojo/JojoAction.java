@@ -52,21 +52,13 @@ public class JojoAction extends I_Action {
     	JojoForm jojoForm = (JojoForm) form;
     	try {
 			logger.debug("search");
-			String reportType = Utils.isNull(request.getParameter("reportType"));
-			String startDate = Utils.isNull(request.getParameter("startDate"));
-			String endDate = Utils.isNull(request.getParameter("endDate"));
 			
-			logger.debug("reportType:"+reportType);
-			logger.debug("startDate:"+startDate);
-			logger.debug("endDate:"+endDate);
-		    String result = JojoDAO.searchReport(reportType, startDate, endDate);
+		    String result = JojoDAO.searchReport(request);
 			
 			request.setAttribute("DATA_JOJO", result);
 			
 		} catch (Exception e) {
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
-			throw e;
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
 		return "search";
 	}
@@ -78,14 +70,8 @@ public class JojoAction extends I_Action {
 		try {
 			/** Export before search **/
 			if(request.getAttribute("DATA_JOJO") ==null){
-				String reportType = Utils.isNull(request.getParameter("reportType"));
-				String startDate = Utils.isNull(request.getParameter("startDate"));
-				String endDate = Utils.isNull(request.getParameter("endDate"));
-				
-				logger.debug("reportType:"+reportType);
-				logger.debug("startDate:"+startDate);
-				logger.debug("endDate:"+endDate);
-			    String result = JojoDAO.searchReport(reportType, startDate, endDate);
+			
+			    String result = JojoDAO.searchReport(request);
 				
 				request.setAttribute("DATA_JOJO", result);
 			}
@@ -103,7 +89,6 @@ public class JojoAction extends I_Action {
 		    out.close();
 		
 		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
 	return mapping.findForward("export");

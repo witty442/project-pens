@@ -406,7 +406,6 @@ public class ControlConstantsDB {
 				
 				return results;
 			} catch (Exception e) {
-				e.printStackTrace();
 				throw e;
 			} finally {
 				try {
@@ -520,7 +519,7 @@ public class ControlConstantsDB {
 		StringBuilder sql = new StringBuilder();
 		String date ="";
 		try {
-			sql.append("\n select con_value FROM PENSBME_C_CONTROL WHERE 1=1 ");
+			sql.append("\n select con_value FROM PENSBI.PENSBME_C_CONTROL WHERE 1=1 ");
 			sql.append("\n and con_type ='"+conCode+"'");
 			logger.debug("sql:"+sql);
 			

@@ -24,13 +24,15 @@ import com.pens.util.excel.ExcelHeader;
 
 public class ShopSaleOutAction {
  private static Logger logger = Logger.getLogger("PENS");
-	
+ private static int pageSize =50;
+ 
  public static ShopForm search(HttpServletRequest request, ShopForm f,User user) throws Exception{
 	   Statement stmt = null;
 		ResultSet rst = null;
 		List<ShopBean> pos = new ArrayList<ShopBean>();
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
+		int currPage = 1;
 		double totalQty = 0;
 		double totalLineAmount = 0;
 		double totalDiscount = 0;
@@ -38,59 +40,90 @@ public class ShopSaleOutAction {
 		double totalAmountInVat = 0;
 		double totalAmountExVat = 0;
 		try {
-			conn = DBConnection.getInstance().getConnectionApps();
-			sql = genSQL(conn,f);
-			stmt = conn.createStatement();
-			rst = stmt.executeQuery(sql.toString());
-			while (rst.next()) {
-				ShopBean item = new ShopBean();
-				item.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				item.setOrderNo(Utils.isNull(rst.getString("ORDER_NUMBER")));
-				item.setPensItem(Utils.isNull(rst.getString("pens_item")));
-				item.setBarcode(rst.getString("barcode"));
-				item.setStyle(rst.getString("material_master"));
-				item.setQty(Utils.decimalFormat(rst.getDouble("qty"),Utils.format_current_no_disgit));
-				item.setUnitPrice(Utils.decimalFormat(rst.getDouble("price"),Utils.format_current_2_disgit));
-				item.setLineAmount(Utils.decimalFormat(rst.getDouble("line_amount"),Utils.format_current_2_disgit));
-				item.setDiscount(Utils.decimalFormat(rst.getDouble("discount"),Utils.format_current_2_disgit));
-				item.setVatAmount(Utils.decimalFormat(rst.getDouble("vat_amount"),Utils.format_current_2_disgit));
-				//TotalAmount (incVat)
-				item.setTotalAmount(Utils.decimalFormat(rst.getDouble("total_amount"),Utils.format_current_2_disgit));
-				item.setTotalAmountExVat(Utils.decimalFormat(rst.getDouble("total_amount_ex_vat"),Utils.format_current_2_disgit));
-				
-				if("S".equalsIgnoreCase(Utils.isNull(rst.getString("promotion")))){
-				  item.setFreeItem("YES");
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
+			
+			if("newsearch".equalsIgnoreCase(action)){
+				conn = DBConnection.getInstance().getConnectionApps();
+				sql = genSQL(conn,f);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					ShopBean item = new ShopBean();
+					item.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					item.setOrderNo(Utils.isNull(rst.getString("ORDER_NUMBER")));
+					item.setPensItem(Utils.isNull(rst.getString("pens_item")));
+					item.setBarcode(rst.getString("barcode"));
+					item.setStyle(rst.getString("material_master"));
+					item.setQty(Utils.decimalFormat(rst.getDouble("qty"),Utils.format_current_no_disgit));
+					item.setUnitPrice(Utils.decimalFormat(rst.getDouble("price"),Utils.format_current_2_disgit));
+					item.setLineAmount(Utils.decimalFormat(rst.getDouble("line_amount"),Utils.format_current_2_disgit));
+					item.setDiscount(Utils.decimalFormat(rst.getDouble("discount"),Utils.format_current_2_disgit));
+					item.setVatAmount(Utils.decimalFormat(rst.getDouble("vat_amount"),Utils.format_current_2_disgit));
+					//TotalAmount (incVat)
+					item.setTotalAmount(Utils.decimalFormat(rst.getDouble("total_amount"),Utils.format_current_2_disgit));
+					item.setTotalAmountExVat(Utils.decimalFormat(rst.getDouble("total_amount_ex_vat"),Utils.format_current_2_disgit));
+					
+					if("S".equalsIgnoreCase(Utils.isNull(rst.getString("promotion")))){
+					  item.setFreeItem("YES");
+					}else{
+					  item.setFreeItem("");
+					}
+					pos.add(item);
+					
+					//summary
+					totalQty +=rst.getDouble("qty");
+					totalLineAmount += rst.getDouble("line_amount");
+					totalDiscount += rst.getDouble("discount");
+					totalVatAmount += rst.getDouble("vat_amount");
+					totalAmountInVat += rst.getDouble("total_amount");
+					totalAmountExVat += rst.getDouble("total_amount_ex_vat");
+				}//while
+			
+				if(pos != null && pos.size() >0){
+					f.setResults(pos);
+					
+					//add summary
+					ShopBean summary = new ShopBean();
+					summary.setQty(Utils.decimalFormat(totalQty,Utils.format_current_no_disgit));
+					summary.setLineAmount(Utils.decimalFormat(totalLineAmount,Utils.format_current_2_disgit));
+					summary.setDiscount(Utils.decimalFormat(totalDiscount,Utils.format_current_2_disgit));
+					summary.setVatAmount(Utils.decimalFormat(totalVatAmount,Utils.format_current_2_disgit));
+					summary.setTotalAmount(Utils.decimalFormat(totalAmountInVat,Utils.format_current_2_disgit));
+					summary.setTotalAmountExVat(Utils.decimalFormat(totalAmountExVat,Utils.format_current_2_disgit));
+					
+					request.getSession().setAttribute("summary" ,summary);
+					
+					//calc Paging
+					f.setTotalRecord(f.getResults().size());
+					f.setTotalPage(Utils.calcTotalPage(f.getTotalRecord(), pageSize));
+					f.setPageSize(pageSize);
+					f.setCurrPage(1);
+					//calc startRec endRec
+					int startRec = ((currPage-1)*pageSize);
+					int endRec = (currPage * pageSize);
+				    if(endRec > f.getTotalRecord()){
+					   endRec = f.getTotalRecord();
+				    }
+				    f.setStartRec(startRec);
+				    f.setEndRec(endRec);
 				}else{
-				  item.setFreeItem("");
+					f.setResults(null);
+					request.getSession().setAttribute("summary" ,null);
+					request.setAttribute("Message", "äÁè¾º¢èÍÁÙÅ");
 				}
-				pos.add(item);
-				
-				//summary
-				totalQty +=rst.getDouble("qty");
-				totalLineAmount += rst.getDouble("line_amount");
-				totalDiscount += rst.getDouble("discount");
-				totalVatAmount += rst.getDouble("vat_amount");
-				totalAmountInVat += rst.getDouble("total_amount");
-				totalAmountExVat += rst.getDouble("total_amount_ex_vat");
-			}//while
-		
-			if(pos != null && pos.size() >0){
-				f.setResults(pos);
-				
-				//add summary
-				ShopBean summary = new ShopBean();
-				summary.setQty(Utils.decimalFormat(totalQty,Utils.format_current_no_disgit));
-				summary.setLineAmount(Utils.decimalFormat(totalLineAmount,Utils.format_current_2_disgit));
-				summary.setDiscount(Utils.decimalFormat(totalDiscount,Utils.format_current_2_disgit));
-				summary.setVatAmount(Utils.decimalFormat(totalVatAmount,Utils.format_current_2_disgit));
-				summary.setTotalAmount(Utils.decimalFormat(totalAmountInVat,Utils.format_current_2_disgit));
-				summary.setTotalAmountExVat(Utils.decimalFormat(totalAmountExVat,Utils.format_current_2_disgit));
-				
-				request.getSession().setAttribute("summary" ,summary);
 			}else{
-				f.setResults(null);
-				request.getSession().setAttribute("summary" ,null);
-				request.setAttribute("Message", "äÁè¾º¢èÍÁÙÅ");
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				f.setCurrPage(currPage);
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize);
+				int endRec = (currPage * pageSize);
+			    if(endRec > f.getTotalRecord()){
+				   endRec = f.getTotalRecord();
+			    }
+			    f.setStartRec(startRec);
+			    f.setEndRec(endRec);
 			}
 		} catch (Exception e) {
 			throw e;

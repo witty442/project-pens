@@ -83,8 +83,22 @@ public class ImportAllBean implements  Comparable<ImportAllBean>, Serializable{
    
     private String summaryType;
     private String endSaleDate;
+    private String importDate;
+    private boolean imported;
     
     
+	public boolean isImported() {
+		return imported;
+	}
+	public void setImported(boolean imported) {
+		this.imported = imported;
+	}
+	public String getImportDate() {
+		return importDate;
+	}
+	public void setImportDate(String importDate) {
+		this.importDate = importDate;
+	}
 	public String getCustGroup() {
 		return custGroup;
 	}

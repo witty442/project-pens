@@ -45,8 +45,8 @@ public class Utils {
 	      
 	public static void main(String[] args){
 	    try{	
-	    	String input ="020068";
-	    	System.out.println(new Double(input));
+	    	String input ="BME ME1D33B2NN เสื้อชั้นในบีมี590";
+	    	System.out.println(input.substring(input.indexOf(" ")+1,input.lastIndexOf(" ")));
 	        
 	    }catch(Exception e){
 	        e.printStackTrace();
@@ -100,8 +100,9 @@ public class Utils {
 		return totalPage.intValue();
 	}
 	
-	public static int calcStartNoInPage(int currentPage,int maxPerPage){
-		return (((currentPage-1)*maxPerPage))+1;
+	public static int calcStartNoInPage(int currentPage,int pageSize){
+		logger.debug("currentPage:"+currentPage+",pageSize:"+pageSize+",startNo:"+((((currentPage-1)*pageSize))+1));
+		return (((currentPage-1)*pageSize))+1;
 	}
 	
 	public static String genFileName(String prefix){
@@ -425,7 +426,7 @@ public class Utils {
 	}
 	
 	public static double convertToDouble(String str) throws Exception{
-		if(str == null){
+		if(str == null || isNull(str).equals("")){
 			return 0;
 		}
 		return Double.parseDouble(str);

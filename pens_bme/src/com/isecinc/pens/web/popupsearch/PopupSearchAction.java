@@ -80,9 +80,8 @@ public class PopupSearchAction extends I_Action {
 				 
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}
 		return forward;
@@ -136,9 +135,8 @@ public class PopupSearchAction extends I_Action {
 			 //mark flag search
 			 request.getSession().setAttribute("search_submit", "search");
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}
 		return forward;

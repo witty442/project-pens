@@ -16,7 +16,7 @@
 <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=TaskName');">
 
 /** 2.Popup BatchTask from Page  **/	
-      //intit 
+      //init
       request.getSession().setAttribute("BATCH_TASK_RESULT"
     2.1 submit to FormAction
         2.1.1)form.action = path + "/jsp/b2bAction.do?do=importExcel";
@@ -28,14 +28,27 @@
 			
 		 request.getSession().setAttribute("BATCH_PARAM_MAP",paraMap);
 		 request.getSession().setAttribute("DATA_FILE", aForm.getDataFormFile());
-		 request.setAttribute("action","submited");//set to popup page to BatchTask
-		
+		 request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.EXPORT_REPORT_ONHAND_ROBINSON);//set to popup page to BatchTask
+	  
 	   2.1.3 onload() popup to BatchTask
-		 if( "submited".equals(request.getAttribute("action"))){
-		     var path = document.getElementById("path").value;
-			 var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopup&pageName=TaskName';
-			 PopupCenterFull(url,'Import Excel');
-	      }
+		  /** for popup BatchTask in page **/
+		  //initBatchFromPageByPopup
+		  //initBatchFromPageByPopupNoWait (run and close popup)
+			 <%-- <%if(!"".equals(Utils.isNull(request.getAttribute("BATCH_TASK_NAME")))){%> --%>
+			    //lockscreen
+			    var path = document.getElementById("path").value;
+			    /** Init progressbar **/
+				$(function() {
+					// update the block message 
+			        $.blockUI({ message: "<h2>กำลังทำรายการ     กรุณารอสักครู่......</h2>" }); 
+				}); 
+				    
+				//submitedGenStockOnhandTemp
+				var url  = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new';
+					<%-- url +='&initBatchAction=initBatchFromPageByPopupNoWait&pageName=<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>'; --%>
+			<%-- 	popupFull(url,'<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>'); --%>
+		  <%--  <%}%> --%>
+		   
 	   2.1.4 After success process  set search in mainpage for display result batch
 	    function searchBatch(path){
 			var form = document.b2bForm;
@@ -76,7 +89,22 @@
 		}
 		return mapping.findForward("search");
 	}
-	
+	/** clearBatchForm **/
+	public ActionForward clearBatchForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clearBatchForm");
+		ReportAllForm reportAllForm = (ReportAllForm) form;
+		try {
+			 request.getSession().removeAttribute("BATCH_TASK_RESULT");
+			 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{	
+		}
+		return mapping.findForward("reportAll");
+	}
 	public ActionForward loadExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("loadExcel");
 		B2BForm aForm = (B2BForm) form;

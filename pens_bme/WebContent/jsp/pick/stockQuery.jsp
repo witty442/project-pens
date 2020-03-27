@@ -1,8 +1,8 @@
-<%@page import="com.pens.util.SIdUtils"%>
-<%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
-<%@page import="com.isecinc.pens.dao.JobDAO"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
+<%@page import="com.isecinc.pens.bean.StockQuery"%>
+<%@page import="com.pens.util.SIdUtils"%>
+<%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
@@ -15,10 +15,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <jsp:useBean id="stockQueryForm" class="com.isecinc.pens.web.pick.StockQueryForm" scope="session" />
 
 <html>
@@ -134,26 +131,6 @@ function swithWareHouse(){
 	//alert(document.getElementsByName('bean.wareHouse')[0].checked);
 	//alert(document.getElementsByName('bean.wareHouse')[0].value);
 	
-	/* if(document.getElementsByName('bean.wareHouse')[0].checked){//W1
-		loadStatusList('W1');
-		loadSummaryTypeList('W1');
-	}else if(document.getElementsByName('bean.wareHouse')[1].checked){//W2{
-		loadStatusList('W2');
-		loadSummaryTypeList('W2');
-	}else if(document.getElementsByName('bean.wareHouse')[2].checked){//W3{
-		loadStatusList('W3');
-		loadSummaryTypeList('W3');
-	}else if(document.getElementsByName('bean.wareHouse')[3].checked){//W4{
-		loadStatusList('W4');
-		loadSummaryTypeList('W4');
-	}else if(document.getElementsByName('bean.wareHouse')[4].checked){//W5{
-		loadStatusList('W5');
-		loadSummaryTypeList('W5');
-	}else if(document.getElementsByName('bean.wareHouse')[5].checked){//W5{
-		loadStatusList('W6');
-		loadSummaryTypeList('W6');
-	} */
-	
 	//Load Criteria by WareHouse
 	loadStatusList(document.getElementsByName('bean.wareHouse')[0].value);
 	loadSummaryTypeList(document.getElementsByName('bean.wareHouse')[0].value);
@@ -208,9 +185,7 @@ function loadSummaryTypeListW2(status){
 		});
 	}
 }
-
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -308,7 +283,7 @@ function loadSummaryTypeListW2(status){
 									</td>
 								</tr>
 								<tr>
-                                    <td> แสดงตาม  </td>
+                                    <td> แสดงตาม </td>
 									<td colspan="3">			
 										 <html:select property="bean.summaryType" styleId="summaryTypeListW1">	
 									    </html:select>
@@ -476,6 +451,43 @@ function loadSummaryTypeListW2(status){
 											</td>
 										</tr>
 								</c:forEach>
+								 <tr>
+										<td ></td>
+										<td ></td>
+										<td class="td_text_right" width="10%"><b>Total QTY</b></td>	
+										<td class="td_text_right" width="10%"><b>${stockQueryForm.bean.totalQty}</b></td>					
+								   </tr>
+						</table>
+					</c:if>
+					<c:if test="${stockQueryForm.bean.summaryType =='SummaryByBoxMat'}">
+							<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
+							       <tr>
+							            <th >เลขที่กล่อง</th>
+										<th >รับคืนจาก</th>
+										<th >รุ่น</th>	
+										<th >จำนวน</th>					
+								   </tr>
+								 
+									<% String tabclass="lineO";
+									Map<String,String> lineChkMap= new HashMap<String,String>();
+									for(int i=0;i<stockQueryForm.getResults().size();i++){ 
+										StockQuery item = stockQueryForm.getResults().get(i);
+										tabclass = i%2==0?"lineE":"lineO";
+									%>
+										<tr class="<%=tabclass %>">
+										<%if(lineChkMap.get(item.getBoxNo()+"-"+item.getName()) ==null) {%>
+										    <td class="td_text_center" width="10%"><%=item.getBoxNo() %></td>
+											<td class="td_text" width="15%"><%=item.getName() %></td>
+										<%
+										   lineChkMap.put(item.getBoxNo()+"-"+item.getName(),item.getBoxNo()+"-"+item.getName());
+										}else{ %>
+										    <td class="td_text" width="10%"></td>
+											<td class="td_text_center" width="15%"></td>
+										<%} %>
+											<td class="td_text_center" width="10%"><%=item.getGroupCode() %></td>
+											<td class="td_text_right" width="10%"> <%=item.getOnhandQty()%></td>
+										</tr>
+								   <%} %>
 								 <tr>
 										<td ></td>
 										<td ></td>

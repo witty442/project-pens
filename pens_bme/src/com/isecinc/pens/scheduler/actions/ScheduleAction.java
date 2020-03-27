@@ -55,9 +55,8 @@ public class ScheduleAction extends  I_Action
 				 request.getSession().setAttribute("dataList",null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
-					+ e.toString());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}
 		return returnText;
@@ -101,9 +100,8 @@ public class ScheduleAction extends  I_Action
         	}
        
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
-					+ e.toString());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			if(conn != null)conn.close();
 		}
@@ -158,7 +156,8 @@ public class ScheduleAction extends  I_Action
 	         request.getSession().setAttribute("dataList",dataList);
 		
 		}catch(Exception e){
-			 e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			if(conn != null){
 				conn.close();
@@ -214,7 +213,8 @@ public class ScheduleAction extends  I_Action
 			 request.setAttribute("regenSuccess", "Success");
 			 
 		}catch(Exception e){
-			 e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			if(conn != null){
 				conn.close();
@@ -246,7 +246,8 @@ public class ScheduleAction extends  I_Action
 	         request.getSession().setAttribute("dataList",dataList);
 		
 		}catch(Exception e){
-			 e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			if(conn != null){
 				conn.close();

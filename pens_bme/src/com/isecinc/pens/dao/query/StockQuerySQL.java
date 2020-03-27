@@ -29,7 +29,7 @@ public class StockQuerySQL extends PickConstants{
 		
 		StringBuffer sql = new StringBuffer();
 		sql.append("\n select S.*, ");
-		sql.append("\n (select max(p.issue_req_no)|| ' '|| max(p.remark) from pensbme_pick_stock p,pensbme_pick_stock_i pi " +
+		sql.append("\n (select max(p.issue_req_no)|| ' '|| max(p.remark) from pensbi.pensbme_pick_stock p,pensbi.pensbme_pick_stock_i pi " +
 				   "\n       where p.issue_req_no = pi.issue_req_no and pi.job_id = S.job_id and pi.box_no = S.box_no and pi.group_code  = S.group_code)as remark ");
 		sql.append("\n from( ");
 		sql.append(genFromStockPick(o,statusAll));
@@ -42,7 +42,7 @@ public class StockQuerySQL extends PickConstants{
 		
 		sql.append("\n select h.warehouse,j.job_id,j.name as job_name ,l.box_no, l.material_master ,l.group_code," );
 		sql.append("\n l.pens_item,l.barcode,l.status ,count(*) as qty,'' as remark ");
-		sql.append("\n from PENSBI.PENSBME_PICK_BARCODE h,PENSBI.PENSBME_PICK_BARCODE_ITEM l ,PENSBME_PICK_JOB j ");
+		sql.append("\n from PENSBI.PENSBME_PICK_BARCODE h,PENSBI.PENSBME_PICK_BARCODE_ITEM l ,PENSBI.PENSBME_PICK_JOB j ");
 		sql.append("\n where h.job_id = l.job_id and h.box_no = l.box_no ");
 		sql.append("\n and  h.job_id = j.job_id");
 		
@@ -95,7 +95,7 @@ public class StockQuerySQL extends PickConstants{
     	
     	sql.append("\n select 'W2' as warehouse,0 as job_id ,''as job_name,'' as box_no, l.material_master ,");
     	sql.append("\n l.group_code,l.pens_item,l.barcode,'RE' as status ,sum(nvl(issue_qty,0)) as qty ");
-		sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
+		sql.append("\n from PENSBI.PENSBME_STOCK_ISSUE h,PENSBI.PENSBME_STOCK_ISSUE_ITEM l ");
 		sql.append("\n where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 		if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
 			sql.append("\n and l.pens_item >= '"+Utils.isNull(o.getPensItemFrom())+"'");
@@ -139,7 +139,7 @@ public class StockQuerySQL extends PickConstants{
 		//** Stock ISSUE **/
 		sql.append("\n 		select 'W2' as warehouse,0 as job_id ,''as job_name,'' as box_no, l.material_master ,l.group_code," );
 		sql.append("\n 		l.pens_item,l.barcode,'A' as status ,(-1* sum(nvl(req_qty,0))) as qty ");
-		sql.append("\n 		from PENSBI.PENSBME_STOCK_ISSUE h,PENSBME_STOCK_ISSUE_ITEM l ");
+		sql.append("\n 		from PENSBI.PENSBME_STOCK_ISSUE h,PENSBI.PENSBME_STOCK_ISSUE_ITEM l ");
 		sql.append("\n 		where h.ISSUE_REQ_NO = l.ISSUE_REQ_NO ");
 		sql.append("\n 		and l.status in('"+STATUS_OPEN+"','"+STATUS_POST+"')");
 		if( !Utils.isNull(o.getPensItemFrom()).equals("") && !Utils.isNull(o.getPensItemTo()).equals("")){
@@ -165,7 +165,7 @@ public class StockQuerySQL extends PickConstants{
 		
 		sql.append("\n select h.warehouse,j.job_id,j.name as job_name ,l.box_no, l.material_master ,l.group_code," );
 		sql.append("\n l.pens_item,l.barcode,l.status ,count(*) as qty ");
-		sql.append("\n from PENSBI.PENSBME_PICK_BARCODE h,PENSBI.PENSBME_PICK_BARCODE_ITEM l ,PENSBME_PICK_JOB j ");
+		sql.append("\n from PENSBI.PENSBME_PICK_BARCODE h,PENSBI.PENSBME_PICK_BARCODE_ITEM l ,PENSBI.PENSBME_PICK_JOB j ");
 		sql.append("\n where h.job_id = l.job_id and h.box_no = l.box_no ");
 		sql.append("\n and  h.job_id = j.job_id");
 		

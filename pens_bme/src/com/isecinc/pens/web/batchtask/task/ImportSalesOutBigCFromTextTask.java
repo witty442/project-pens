@@ -81,7 +81,7 @@ public class ImportSalesOutBigCFromTextTask extends BatchTask implements BatchTa
 		return desc;
 	}
 	public String getDevInfo(){
-		return "";
+		return "PENSBI.PENSBME_SALES_FROM_BIGC_TEMP";
 	}
 	public boolean isDispDetail(){
 		return true;
@@ -166,7 +166,7 @@ public class ImportSalesOutBigCFromTextTask extends BatchTask implements BatchTa
             monitorModel.setErrorCode(modelItem.getErrorCode());
 			monitorModel.setStatus(modelItem.getStatus());
 			monitorModel.setFileCount(modelItem.getSuccessCount()>0?1:0);
-			
+			monitorModel.setType("IMPORT");
 			/** Update Status Monitor **/
 			dao.updateMonitor(connMonitor,monitorModel);
 		}catch(Exception e){

@@ -1,9 +1,5 @@
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.dao.ConfirmReturnWacoalDAO"%>
-<%@page import="com.isecinc.pens.dao.ReqReturnWacoalDAO"%>
-<%@page import="com.isecinc.pens.dao.JobDAO"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
@@ -16,9 +12,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%> 
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <jsp:useBean id="confirmReturnWacoalForm" class="com.isecinc.pens.web.pick.ConfirmReturnWacoalForm" scope="session" />
 <%
 if(session.getAttribute("statusConfReturnList") == null){
@@ -66,8 +60,9 @@ function search(path){
 	form.submit();
 	return true;
 }
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.confirmReturnWacoalForm;
+	var path = document.getElementById("path").value;
 	form.action = path + "/jsp/confirmReturnAction.do?do=search2&currPage="+currPage;
     form.submit();
     return true;
@@ -78,9 +73,7 @@ function openEdit(path,requestNo,returnNo,mode){
 	form.submit();
 	return true;
 }
-
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -174,23 +167,10 @@ function openEdit(path,requestNo,returnNo,mode){
 					   int currPage =  confirmReturnWacoalForm.getCurrPage();
 					   int startRec = confirmReturnWacoalForm.getStartRec();
 					   int endRec = confirmReturnWacoalForm.getEndRec();
+					   int no = confirmReturnWacoalForm.getStartRec();
 					%>
-					   
-					<div align="left">
-					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
-					   <span class="pagelinks">
-						หน้าที่ 
-						 <% 
-							 for(int r=0;r<totalPage;r++){
-								 if(currPage ==(r+1)){
-							 %>
-			 				   <strong><%=(r+1) %></strong>
-							 <%}else{ %>
-							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-						 <% }} %>				
-						</span>
-					</div>
+					<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
+					  
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -252,6 +232,7 @@ function openEdit(path,requestNo,returnNo,mode){
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					
 					<!-- hidden field -->
+					<input type="hidden" id="path" name="path" value ="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

@@ -102,9 +102,8 @@ public class PickStockGroupAction extends I_Action {
 			   aForm.setResultsSearch(null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -174,9 +173,8 @@ public class PickStockGroupAction extends I_Action {
 				aForm.setResultsSearch(items);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			if(conn != null){
@@ -343,9 +341,8 @@ public class PickStockGroupAction extends I_Action {
 			aForm.setResults(p.getItems());
 
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			if(conn != null){
@@ -862,8 +859,8 @@ public class PickStockGroupAction extends I_Action {
 		    out.close();
 		    
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 			

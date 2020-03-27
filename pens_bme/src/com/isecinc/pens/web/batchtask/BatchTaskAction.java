@@ -46,9 +46,8 @@ public class BatchTaskAction extends I_Action {
 		try {
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
-					+ e.toString());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}
 		return returnText;
@@ -146,9 +145,8 @@ public class BatchTaskAction extends I_Action {
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
-					+ e.toString());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			//conn.close();
 		}
@@ -160,6 +158,9 @@ public class BatchTaskAction extends I_Action {
 	}
 	public ActionForward runBatchFromPageByPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		return new BatchTaskManager().runBatchFromPageByPopup(mapping,form,request,response);
+	}
+	public ActionForward runBatchFromPageByPopupNoWait(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		return new BatchTaskManager().runBatchFromPageByPopupNoWait(mapping,form,request,response);
 	}
 	
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -178,6 +179,9 @@ public class BatchTaskAction extends I_Action {
 			//forward to BatchTask Popup
 			if(Utils.isNull(request.getParameter("batchAction")).equalsIgnoreCase("initBatchFromPageByPopup")){
 				returnText = "batchFromPopup";
+			}
+			if(Utils.isNull(request.getParameter("batchAction")).equalsIgnoreCase("initBatchFromPageByPopupNoWait")){
+				returnText = "batchFromPopupNoWait";
 			}
 			/** Set Condition Search **/
 			MonitorBean[] monitors = dao.findMonitorListNew(user,pageName);
@@ -203,6 +207,10 @@ public class BatchTaskAction extends I_Action {
 			if( "initBatchFromPageByPopup".equalsIgnoreCase(Utils.isNull(request.getParameter("batchAction")))){
 				logger.debug("set action=searchTaskFinishFromPopupPage");
 				request.setAttribute("action", "searchTaskFinishFromPopupPage");
+			}
+			if( "initBatchFromPageByPopupNoWait".equalsIgnoreCase(Utils.isNull(request.getParameter("batchAction")))){
+				logger.debug("set action=searchTaskFinishFromPopupPageNoWait");
+				request.setAttribute("action", "searchTaskFinishFromPopupPageNoWait");
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

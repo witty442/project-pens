@@ -161,7 +161,9 @@ public class BatchTaskAction extends I_Action {
 	public ActionForward runBatchFromPageByPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		return new BatchTaskManager().runBatchFromPageByPopup(mapping,form,request,response);
 	}
-	
+	public ActionForward runBatchFromPageByPopupNoWait(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		return new BatchTaskManager().runBatchFromPageByPopupNoWait(mapping,form,request,response);
+	}
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.debug("BatchTask Search Current Action");
 		BatchTaskForm batchTaskForm = (BatchTaskForm) form;
@@ -178,6 +180,9 @@ public class BatchTaskAction extends I_Action {
 			//forward to BatchTask Popup
 			if(Utils.isNull(request.getParameter("batchAction")).equalsIgnoreCase("initBatchFromPageByPopup")){
 				returnText = "batchFromPopup";
+			}
+			if(Utils.isNull(request.getParameter("batchAction")).equalsIgnoreCase("initBatchFromPageByPopupNoWait")){
+				returnText = "batchFromPopupNoWait";
 			}
 			/** Set Condition Search **/
 			MonitorBean[] monitors = dao.findMonitorListNew(user,pageName);
@@ -203,6 +208,10 @@ public class BatchTaskAction extends I_Action {
 			if( "initBatchFromPageByPopup".equalsIgnoreCase(Utils.isNull(request.getParameter("batchAction")))){
 				logger.debug("set action=searchTaskFinishFromPopupPage");
 				request.setAttribute("action", "searchTaskFinishFromPopupPage");
+			}
+			if( "initBatchFromPageByPopupNoWait".equalsIgnoreCase(Utils.isNull(request.getParameter("batchAction")))){
+				logger.debug("set action=searchTaskFinishFromPopupPageNoWait");
+				request.setAttribute("action", "searchTaskFinishFromPopupPageNoWait");
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -334,7 +343,7 @@ public class BatchTaskAction extends I_Action {
 		}
 		return listBoxBean;
 	}
-	private boolean getDispDetailByTaskname(String taskName){
+	public boolean getDispDetailByTaskname(String taskName){
 		boolean param = false;
 		try{
 		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");

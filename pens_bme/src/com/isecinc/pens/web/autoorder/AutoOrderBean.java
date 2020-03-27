@@ -39,8 +39,14 @@ public class AutoOrderBean implements Serializable{
 	private boolean canSave;
 	private String status;
 	private String userName;
+	private String dispNoZero;
 	
-	
+	public String getDispNoZero() {
+		return dispNoZero;
+	}
+	public void setDispNoZero(String dispNoZero) {
+		this.dispNoZero = dispNoZero;
+	}
 	public String getRecommendCalcQty() {
 		return recommendCalcQty;
 	}

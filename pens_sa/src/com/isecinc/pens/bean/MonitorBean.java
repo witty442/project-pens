@@ -23,6 +23,7 @@ private static final long serialVersionUID = -990650039740579753L;
    private BigDecimal monitorId;
    private BigDecimal monitorItemId;
    private String name ;
+   private String thName ;
    private String type ;
    private String channel ;
    private String saleRepCode ;
@@ -34,6 +35,7 @@ private static final long serialVersionUID = -990650039740579753L;
    private Date createDate ;
    private String createUser ;
    private Date updateDate ;
+   private String updateDateDisp ;
    private String updateUser  ;
    private int fileCount;
    private int successCount;
@@ -68,6 +70,18 @@ private static final long serialVersionUID = -990650039740579753L;
 	private User user;
     
 	
+	public String getUpdateDateDisp() {
+		return updateDateDisp;
+	}
+	public void setUpdateDateDisp(String updateDateDisp) {
+		this.updateDateDisp = updateDateDisp;
+	}
+	public String getThName() {
+		return thName;
+	}
+	public void setThName(String thName) {
+		this.thName = thName;
+	}
 	public String getFileName() {
 		return fileName;
 	}

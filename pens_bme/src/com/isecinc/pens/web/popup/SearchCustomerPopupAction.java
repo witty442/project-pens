@@ -96,9 +96,8 @@ public class SearchCustomerPopupAction extends I_Action {
 				 request.setAttribute("Message", "ไม่พบข่อมูล");
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}
 		return "search";

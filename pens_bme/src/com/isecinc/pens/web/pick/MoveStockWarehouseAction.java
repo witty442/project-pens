@@ -15,8 +15,10 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.MoveStockWarehouseBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.BarcodeDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.MoveStockWarehoseDAO;
 import com.isecinc.pens.init.InitialMessages;
@@ -52,7 +54,7 @@ public class MoveStockWarehouseAction extends I_Action {
 			}else{
 				//back Search
 				aForm.setBean(aForm.getBeanCriteria());
-				searchHead(mapping, aForm, request, response);
+				search2(mapping, aForm, request, response);
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -61,7 +63,7 @@ public class MoveStockWarehouseAction extends I_Action {
 		return mapping.findForward("search");
 	}
 	
-	public ActionForward searchHead(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	/*public ActionForward searchHead(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("searchHead");
 			MoveStockWarehouseForm aForm = (MoveStockWarehouseForm) form;
 			User user = (User) request.getSession().getAttribute("user");
@@ -71,19 +73,19 @@ public class MoveStockWarehouseAction extends I_Action {
 			List<MoveStockWarehouseBean> data = null;
 			int totalRow = 0;
 			int totalPage = 0;
-			int pageNumber = 1;
+			int currPage = 1;
 			try {
 				conn = DBConnection.getInstance().getConnection();
 				
 				if("newsearch".equalsIgnoreCase(action)){
-					pageNumber = 1;
+					currPage = 1;
 					totalRow =  MoveStockWarehoseDAO.searchTotalRowMoveStockHis(conn,aForm.getBean());
 					totalPage = Utils.calcTotalPage(totalRow, pageSize);
 					
 					aForm.setTotalPage(totalPage);
 					aForm.setTotalRow(totalRow);
 				}else{
-					pageNumber = !Utils.isNull(request.getParameter("pageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("pageNumber")):1;
+					currPage = !Utils.isNull(request.getParameter("currPage")).equals("")?Utils.convertStrToInt(request.getParameter("currPage")):1;
 				}
 				logger.debug("totalRow:"+aForm.getTotalRow());
 				logger.debug("totalPage:"+aForm.getTotalPage());
@@ -109,7 +111,78 @@ public class MoveStockWarehouseAction extends I_Action {
 		}
 		return mapping.findForward("search");
 	}
-	
+	*/
+	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("search2");
+		MoveStockWarehouseForm aForm = (MoveStockWarehouseForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String msg = "";
+		int currPage = 1;
+		boolean allRec = false;
+		Connection conn = null;
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
+			
+			conn = DBConnection.getInstance().getConnection();
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					//aForm.setBean(aForm.getBeanCriteria());
+				}
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+				
+				//get Total Record
+				aForm.setTotalRecord(MoveStockWarehoseDAO.searchTotalRowMoveStockHis(conn,aForm.getBean()));
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<MoveStockWarehouseBean> items = MoveStockWarehoseDAO.searchMoveStockHis(conn,aForm.getBean(),currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+				if(items.size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+			}else{
+				// Goto from Page
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<MoveStockWarehouseBean> items = MoveStockWarehoseDAO.searchMoveStockHis(conn,aForm.getBean(),currPage,pageSize);
+				aForm.setResultsSearch(items);
+			}
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+		return mapping.findForward("search");
+	}
 	/**
 	 * Prepare without ID
 	 */
@@ -187,9 +260,8 @@ public class MoveStockWarehouseAction extends I_Action {
 			
 			request.setAttribute("Message", msg);
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			if(conn != null){

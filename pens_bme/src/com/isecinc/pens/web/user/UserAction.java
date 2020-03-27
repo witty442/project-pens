@@ -11,9 +11,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MUser;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
@@ -130,7 +132,8 @@ public class UserAction extends I_Action {
 			   request.setAttribute("Message",  e.getMessage());
 			   conn.rollback();
 			}catch(Exception ee){
-				ee.printStackTrace();
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + ee.toString());
+				logger.error(ee.getMessage(),ee);
 			}
 		}finally{
 			try{
@@ -138,7 +141,8 @@ public class UserAction extends I_Action {
 					conn.close();conn=null;
 				}
 			}catch(Exception ee){
-				ee.printStackTrace();
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + ee.toString());
+				logger.error(ee.getMessage(),ee);
 			}
 		}
 		return mapping.findForward("changePassword");
@@ -255,7 +259,8 @@ public class UserAction extends I_Action {
 			request.setAttribute("Message", SystemMessages.getCaption("SaveSucess", Locale.getDefault()));
 			conn.commit();
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			try {
 				conn.rollback();
 			} catch (Exception ex) {}

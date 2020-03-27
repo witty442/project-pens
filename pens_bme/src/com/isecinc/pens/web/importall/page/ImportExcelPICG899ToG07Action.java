@@ -71,7 +71,7 @@ public class ImportExcelPICG899ToG07Action {
 			request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.IMPORT_EXCEL_PIC_G899_TO_G07);//set to popup page to BatchTask
 			
 	   }catch(Exception e){
-		   e.printStackTrace();
+		   request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		   logger.error(e.getMessage(),e);
 	   }
 	   return mapping.findForward("importAll");
@@ -90,9 +90,8 @@ public class ImportExcelPICG899ToG07Action {
 			 logger.debug("BatchTaskName:"+batchTaskForm.getResults()[0].getName());
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -118,9 +117,8 @@ public class ImportExcelPICG899ToG07Action {
 				 request.setAttribute("Message", "ไม่พบข้อมูล");
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -133,9 +131,8 @@ public class ImportExcelPICG899ToG07Action {
 			 request.getSession().removeAttribute("BATCH_TASK_RESULT");
 			 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}

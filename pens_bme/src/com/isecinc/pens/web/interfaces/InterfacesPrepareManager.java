@@ -128,13 +128,6 @@ public class InterfacesPrepareManager {
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS);
 				
 				
-			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)
-					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
-				//default value
-				
-				//clear Task running for next run
-				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_IMPORT_TRANSACTION_LOTUS);
-				
 			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_SALEOUT_WACOAL)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
 				//default value

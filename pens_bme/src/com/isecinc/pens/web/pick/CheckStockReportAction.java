@@ -127,9 +127,8 @@ public class CheckStockReportAction extends I_Action {
 			}
 		} catch (Exception e) {
 			aForm.setResults(null);
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -182,9 +181,8 @@ public class CheckStockReportAction extends I_Action {
 			    logger.debug("\n"+resultHTML.toString());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				// conn.close();
@@ -220,7 +218,8 @@ public class CheckStockReportAction extends I_Action {
 		try {
 			
 		} catch (Exception e) {
-            e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			return "prepare";
 		} finally {
 		}

@@ -56,7 +56,8 @@ function loadMe(){
 		}); 
 		    
 		//submitedGenStockOnhandTemp
-		var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopup&pageName=<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>';
+		var url  = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new';
+			url +='&initBatchAction=initBatchFromPageByPopupNoWait&pageName=<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>';
 		popupFull(url,'<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>');
    <%}%>
 }
@@ -300,7 +301,7 @@ function clearBatchForm(){
 						<tr>
 							<td align="left">
 								<a href="javascript:searchBatchForm('<%=BatchTaskConstants.EXPORT_REPORT_ONHAND_ROBINSON%>')">
-								  <input type="button" value="ตรวจสอบสถานะล่าสุด(Export ทุกสาขา)" class="newPosBtnLong"> 
+								  <input type="button" value="ตรวจสอบสถานะล่าสุด(ค้นหามากกว่า 1 สาขา)" class="newPosBtnLong"> 
 								</a>
 								<!-- <a href="javascript:searchBatchForm()">
 								  <input type="button" value="ตรวจสอบสถานะล่าสุด(Gen Stock EndDate)" class="newPosBtnLong"> 

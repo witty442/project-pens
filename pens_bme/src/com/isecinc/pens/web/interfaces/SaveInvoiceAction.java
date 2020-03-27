@@ -60,7 +60,8 @@ public class SaveInvoiceAction extends I_Action {
 	            aForm.setBean(b);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			
 		}
@@ -83,9 +84,8 @@ public class SaveInvoiceAction extends I_Action {
 			   aForm.setResultsSearch(null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -123,8 +123,8 @@ public class SaveInvoiceAction extends I_Action {
 		try {
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", "err:"+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -164,9 +164,8 @@ public class SaveInvoiceAction extends I_Action {
 			
 			request.setAttribute("Message", msg);
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -211,8 +210,8 @@ public class SaveInvoiceAction extends I_Action {
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
 			conn.rollback();
-            e.printStackTrace();
-			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			try {
 				
 			} catch (Exception e2) {}

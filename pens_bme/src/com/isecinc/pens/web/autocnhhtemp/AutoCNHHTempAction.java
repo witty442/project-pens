@@ -45,7 +45,8 @@ public class AutoCNHHTempAction extends I_Action {
 				aForm.setBean(ad);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			
 		}
@@ -69,9 +70,8 @@ public class AutoCNHHTempAction extends I_Action {
 			request.setAttribute("action","submitedRunBatchTask");//set to popup page to BatchTask
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			if(conn != null){
@@ -100,9 +100,8 @@ public class AutoCNHHTempAction extends I_Action {
 			 logger.debug("batchName:"+batchTaskForm.getResults()[0].getName());
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -127,9 +126,8 @@ public class AutoCNHHTempAction extends I_Action {
 				 request.setAttribute("Message", "ไม่พบข้อมูล");
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -142,9 +140,8 @@ public class AutoCNHHTempAction extends I_Action {
 			 request.getSession().removeAttribute("BATCH_TASK_RESULT");
 			 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -158,8 +155,8 @@ public class AutoCNHHTempAction extends I_Action {
 		try {
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", "err:"+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 		
@@ -192,9 +189,8 @@ public class AutoCNHHTempAction extends I_Action {
 		
 			request.setAttribute("Message", msg);
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			

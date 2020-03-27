@@ -12,7 +12,6 @@
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <jsp:useBean id="shopForm" class="com.isecinc.pens.web.shop.ShopForm" scope="session" />
 <html>
 <head>
@@ -21,7 +20,7 @@
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -65,9 +64,16 @@ function search(path){
 	   alert("กรุณากรอกข้อมูลในการค้นหาอย่างน้อยหนึ่งรายการ");
 	   return false;
    }
-   form.action = path + "/jsp/shopAction.do?do=search&pageName=<%=request.getParameter("pageName")%>";
+   form.action = path + "/jsp/shopAction.do?do=search&action=newsearch&pageName=<%=request.getParameter("pageName")%>";
    form.submit();
    return true;
+}
+function gotoPage(currPage){
+	var form = document.shopForm;
+	var path = form.path.value; 
+	form.action = path + "/jsp/shopAction.do?do=search&pageName=<%=request.getParameter("pageName")%>&currPage="+currPage;
+	form.submit();
+	return true;
 }
 
 function exportExcel(path){
@@ -159,67 +165,91 @@ function clearForm(path){
 					</table>
 			     </div>
 
-				  <!-- ****** RESULT ***************************************************************** -->
-				  <%
-					  //get d-xxx-d parameter d-49489-p=16
-					  String queryStr= request.getQueryString();
-					if(queryStr.indexOf("d-") != -1){
-						queryStr = queryStr.substring(queryStr.indexOf("d-"),queryStr.indexOf("-p")+2 );
-						System.out.println("queryStr:"+queryStr);
-					}
-					
-					  String currentPage = Utils.isNull(request.getParameter(queryStr)).equals("")?"1":Utils.isNull(request.getParameter(queryStr));
-					  String totalPage = "";
-					
-					  List<ShopBean> dataList = shopForm.getResults();
-					  if(dataList != null && dataList.size() >0){
-					    totalPage = String.valueOf((dataList.size()/ 50)+1);
-					  } 
-					  System.out.println("currentPage:"+currentPage+",totalPage:"+totalPage);
+				 <!-- ****** RESULT ***************************************************************** -->
+				 <c:if test="${shopForm.results != null}">
+					    <br/>
+						<% 
+					   int totalPage = shopForm.getTotalPage();
+					   int totalRecord = shopForm.getTotalRecord();
+					   int currPage =  shopForm.getCurrPage();
+					   int startRec = shopForm.getStartRec();
+					   int endRec = shopForm.getEndRec();
+					   int pageSize = shopForm.getPageSize();
+					   int no = Utils.calcStartNoInPage(currPage, pageSize);
 					%>
-						<c:if test="${shopForm.results != null}">
-						    <br/>
-							<display:table style="width:100%;" id="item" name="sessionScope.shopForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
-							    requestURI="#" sort="list" pagesize="50">	
-							    <display:column  title="Sales Date" property="orderDate" sortable="false" class="td_text_center" style="width:8%"/>
-							    <display:column  title="Order No" property="orderNo"  sortable="false" class="td_text_center" style="width:8%"/>
-							    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="td_text" style="width:6%"/>
-							    <display:column  title="Barcode" property="barcode"  sortable="false" class="td_text_center" style="width:10%"/>	
-							    <display:column  title="Style" property="style"  sortable="false" class="td_text_center" style="width:8%"/>	
-							    <display:column  title="Qty" property="qty"  sortable="false" class="td_number" style="width:8%"/>
-							    <display:column  title="Free Item" property="freeItem"  sortable="false" class="td_text_center" style="width:5%"/>	
-							    <%if( !user.getRole().getKey().equalsIgnoreCase(User.WACOAL)) {%>
-							    <display:column  title="Unit Price" property="unitPrice"  sortable="false" class="td_number" style="width:7%"/>		
-							    <display:column  title="Line Amount" property="lineAmount"  sortable="false" class="td_number" style="width:7%"/>
-							    <display:column  title="Discount " property="discount"  sortable="false" class="td_number" style="width:7%"/>	
-							    <display:column  title="Vat Amount " property="vatAmount"  sortable="false" class="td_number" style="width:7%"/>	
-							    <%} %>
-							    <display:column  title="Total Line Amount(In. Vat) " property="totalAmount"  sortable="false" class="td_number" style="width:10%"/>	
-							    <display:column  title="Total Line Amount(Ex. Vat) " property="totalAmountExVat"  sortable="false" class="td_number" style="width:10%"/>	
-							     <%if(currentPage.equalsIgnoreCase(totalPage)){ %>
-							    <display:footer>
-							       <tr class="text_blod">
-							          <td colspan="5" align="right"><b>รวม</b></td>
-							          <td class="td_number"><bean:write name="summary" property="qty"/></td>
+					<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
+					
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch">
+					       <tr>
+					            <th >Sales Date</th>
+					            <th >Order No</th>
+								<th >Pens Item</th>
+								<th >Barcode</th>
+								<th >Style</th>
+								<th >Qty</th>
+								<th >Free Item</th>
+								<th >Unit Price</th>
+								<th >Line Amount</th>
+								<th >Discount</th>
+								<th >Vat Amount</th>
+								<th >Total Line Amount(In. Vat)</th>
+								<th >Total Line Amount(Ex. Vat)</th>
+						   </tr>
+							<% 
+							System.out.println("currPage:"+currPage+",startRec:"+startRec+",endRec:"+endRec);
+							
+							String tabclass ="lineE";
+							List<ShopBean> resultList = shopForm.getResults();
+							
+							for(int n=startRec;n < endRec;n++){
+								ShopBean mc = (ShopBean)resultList.get(n);
+								tabclass ="lineE";
+								if(n%2==0){
+									tabclass="lineO";
+								}
+								%>
+								<tr class="<%=tabclass%>">
+									<td class="td_text_center" width="7%"><%=mc.getOrderDate() %></td>
+									<td class="td_text_center" width="7%"><%=mc.getOrderNo()%></td>
+									<td class="td_text_center" width="7%"><%=mc.getPensItem()%></td>
+								    <td class="td_text_center" width="8%"><%=mc.getBarcode() %></td>
+								    <td class="td_text_center" width="10%"><%=mc.getStyle() %></td>
+									<td class="td_number" width="7%"><%=mc.getQty() %></td>
+									<td class="td_number" width="7%"><%=mc.getFreeItem() %></td>
+									<%if( !user.getRole().getKey().equalsIgnoreCase(User.WACOAL)) {%>
+										<td class="td_number" width="7%"><%=mc.getUnitPrice() %></td>
+										<td class="td_number" width="7%"><%=mc.getLineAmount() %></td>
+										<td class="td_number" width="7%"><%=mc.getDiscount() %></td>
+										<td class="td_number" width="7%"><%=mc.getVatAmount() %></td>
+									<%} %>
+									<td class="td_number" width="7%"><%=mc.getTotalAmount() %></td>
+									<td class="td_number" width="7%"><%=mc.getTotalAmountExVat() %></td>
+								</tr>
+								
+							<%}//for %>
+							<%if(currPage== totalPage){ %>
+							   <tr class="text_blod">
+						          <td colspan="5" align="right"><b>รวม</b></td>
+						          <td class="td_number"><bean:write name="summary" property="qty"/></td>
+						          <td ></td>
+						          <%if( !user.getRole().getKey().equalsIgnoreCase(User.WACOAL)) {%>
 							          <td ></td>
-							          <%if( !user.getRole().getKey().equalsIgnoreCase(User.WACOAL)) {%>
-								          <td ></td>
-								          <td class="td_number"><bean:write name="summary" property="lineAmount"/></td>
-								          <td class="td_number"><bean:write name="summary" property="discount"/></td>
-								          <td class="td_number"><bean:write name="summary" property="vatAmount"/></td>
-							          <%} %>
-							          <td class="td_number"><bean:write name="summary" property="totalAmount"/></td>
-							          <td class="td_number"><bean:write name="summary" property="totalAmountExVat"/></td>
-							      </tr> 
-							    </display:footer>	
-							    <%} %>
-							</display:table>
-					   </c:if>
+							          <td class="td_number"><bean:write name="summary" property="lineAmount"/></td>
+							          <td class="td_number"><bean:write name="summary" property="discount"/></td>
+							          <td class="td_number"><bean:write name="summary" property="vatAmount"/></td>
+						          <%} %>
+						          <td class="td_number"><bean:write name="summary" property="totalAmount"/></td>
+						          <td class="td_number"><bean:write name="summary" property="totalAmountExVat"/></td>
+						      </tr> 
+							<%} %>
+					</table>
+				   </c:if>
 				  
                     <!-- ****** RESULT ***************************************************************** -->
 
 					<!-- hidden field -->
 					<input type="hidden" name="pageName" value="<%=request.getParameter("pageName") %>"/>
+					<input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

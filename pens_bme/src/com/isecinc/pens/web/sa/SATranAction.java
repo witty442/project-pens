@@ -60,7 +60,8 @@ public class SATranAction extends I_Action {
 				aForm.setResultsSearch(aForm.getBean().getItems());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			
 		}
@@ -85,9 +86,8 @@ public class SATranAction extends I_Action {
 			   aForm.setResultsSearch(null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -156,8 +156,8 @@ public class SATranAction extends I_Action {
 	        	return "detail";
 	        }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", "err:"+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -178,7 +178,8 @@ public class SATranAction extends I_Action {
 				aForm.setBean(ad);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			
 		}
@@ -200,9 +201,8 @@ public class SATranAction extends I_Action {
 			   aForm.setResultsSearch(null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -259,9 +259,8 @@ public class SATranAction extends I_Action {
 		
 			request.setAttribute("Message", msg);
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -353,8 +352,8 @@ public class SATranAction extends I_Action {
 		    
 		} catch (Exception e) {
 			conn.rollback();
-            e.printStackTrace();
-			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			try {
 				
 			} catch (Exception e2) {}

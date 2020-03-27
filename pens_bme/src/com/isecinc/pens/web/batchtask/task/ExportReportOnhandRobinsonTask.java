@@ -73,7 +73,7 @@ public class ExportReportOnhandRobinsonTask extends BatchTask implements BatchTa
 	}
 	
 	public String getDescription(){
-		String desc = "Export Report Onhand Lotus (all store) <br/>";
+		String desc = "Search or Export Report Onhand Robinson (more 1 store) <br/>";
 		return desc;
 	}
 	public String getDevInfo(){
@@ -81,7 +81,7 @@ public class ExportReportOnhandRobinsonTask extends BatchTask implements BatchTa
 	}
 	//Display Result Batch MOnitor
 	public boolean isDispDetail(){
-		return true;
+		return false;
 	}
     
 	public String getValidateScript(){
@@ -121,6 +121,13 @@ public class ExportReportOnhandRobinsonTask extends BatchTask implements BatchTa
 			String summaryType = monitorModel.getBatchParamMap().get(PARAM_SUMMARY_TYPE);
 			logger.info("Start Gen StoreCode["+storeCode+"]OrderDate["+asOfDate+"]summaryType["+summaryType+"]...");
 			
+			//By BatchTask
+			monitorModel.setType("EXPORT");
+			monitorModel.setThName("Search or Export มากกว่า 1 สาขา To Excel <br/>(สาขา:"+storeCode+",asOfDate:"+asOfDate);
+			
+			/** Update Status Monitor **/
+			dao.updateMonitor(connMonitor,monitorModel);
+			
 			/** Start process **/ 
 			modelItem = process(connMonitor, connMonitor, monitorModel, modelItem);
 
@@ -144,10 +151,7 @@ public class ExportReportOnhandRobinsonTask extends BatchTask implements BatchTa
 			monitorModel.setStatus(modelItem.getStatus());
 			monitorModel.setFileCount(modelItem.getSuccessCount()>0?1:0);
 			monitorModel.setFileName(modelItem.getFileName());
-			//By BatchTask
-			monitorModel.setType("EXPORT");
-			monitorModel.setThName("Export ทุกสาขา To Excel");
-			
+	
 			/** Update Status Monitor **/
 			dao.updateMonitor(connMonitor,monitorModel);
 		}catch(Exception e){
@@ -196,8 +200,6 @@ public class ExportReportOnhandRobinsonTask extends BatchTask implements BatchTa
 		ReportAllBean resultReport = null;
 		ReportAllBean summary = null;
 		ReportAllBean summaryAll = new ReportAllBean();
-		String storeCodeCheck = "";
-		String[] storeCodeCheckArr = null;
 		List<StoreBean> storeList = null;
 		StringBuffer sql = new StringBuffer("");
 		List<ReportAllBean> allDataList = new ArrayList<ReportAllBean>();
@@ -222,12 +224,12 @@ public class ExportReportOnhandRobinsonTask extends BatchTask implements BatchTa
 			aForm.setBean(criteria);
 			
 			//Get AllStore Lotus
-			if(storeCodeCheck.indexOf("ALL") != -1){
+			if(storeCode.indexOf("ALL") != -1){
 				//All
 				storeList = StoreDAO.getStoreList(conn, com.isecinc.pens.dao.constants.Constants.STORE_TYPE_ROBINSON_CODE);
 			}else{
-				//StoreCode more 1> 020047-1,020049-4
-				storeList = StoreDAO.getStoreList(conn, com.isecinc.pens.dao.constants.Constants.STORE_TYPE_ROBINSON_CODE,SQLHelper.converToTextSqlIn(storeCodeCheck));
+				//StoreCode >1.. 020047-1,020049-4
+				storeList = StoreDAO.getStoreList(conn, com.isecinc.pens.dao.constants.Constants.STORE_TYPE_ROBINSON_CODE,SQLHelper.converToTextSqlIn(storeCode));
 			}
 			//Loop By StoreList
 			if(storeList != null && storeList.size() >0){

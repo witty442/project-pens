@@ -196,7 +196,7 @@ public class AdminConsoleAction extends I_Action {
 					     out.flush();
 					     out.close();
 					 }catch(Exception e){
-					    e.printStackTrace();
+						 logger.error(e.getMessage(),e);
 					 }
 				}
 			}else if(currentTab.equals("tab_execute") && "tab_execute".equalsIgnoreCase(action)){
@@ -226,7 +226,7 @@ public class AdminConsoleAction extends I_Action {
 				      adForm.setResultBKDB(resultBKDB);*/
 				      
 				  } catch(Exception e) {
-				     e.printStackTrace();
+					  logger.error(e.getMessage(),e);
 				  }
 			}else if(currentTab.equals("tab_cleardb") && "tab_cleardb".equalsIgnoreCase(action)){
 				String resultBKDB = "";
@@ -238,7 +238,7 @@ public class AdminConsoleAction extends I_Action {
 					  adForm.setResultClearDB(resultClearDB.toString());*/
 					  
 				  } catch(Exception e) {
-				     e.printStackTrace();
+					  logger.error(e.getMessage(),e);
 				  } 
 			
 			request.setAttribute("currentTab", currentTab);

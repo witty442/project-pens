@@ -128,8 +128,6 @@ public class GenStockOnhandRepTempBigCSubTask {
 			sql.append("\n  AND S.sales_date > (to_date('"+maxSalesDate+"','dd/MM/yyyy') - "+backSalesDay+") ");
 			sql.append("\n  AND S.sales_date <= to_date('"+maxSalesDate+"','dd/MM/yyyy')" );
 			sql.append("\n ) as sales_qty \n");
-			
-			
 			sql.append("\n FROM(");
 			
 			sql.append("\n SELECT M.*");
@@ -204,77 +202,40 @@ public class GenStockOnhandRepTempBigCSubTask {
 				sql.append("\n AND M.STORE_CODE = SALE_OUT.STORE_CODE ");	
 					
 			sql.append("\n LEFT OUTER JOIN( ");
-			    sql.append("\n SELECT  ");
-			    sql.append("\n A.STORE_CODE,A.pens_item, A.group_type,NVL(SUM(A.SALE_IN_QTY),0)  as TRANS_IN_QTY ");
-			    sql.append("\n FROM (  ");
-						sql.append("\n SELECT  ");
-						sql.append("\n M.STORE_CODE,M.ITEM as pens_item, M.group_code as group_type,");
-						sql.append("\n NVL(SUM(QTY),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBI.PENSBME_ORDER M ");
-						sql.append("\n WHERE 1=1  ");
-						sql.append("\n AND M.STORE_CODE LIKE '"+storeCode+"%'");
-						if(initDate != null){
-							 sql.append("\n AND M.order_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
-							 sql.append("\n AND M.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-						}else{
-							 sql.append("\n AND M.order_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-						}
-					    sql.append("\n AND M.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
-					    
-					    //filter Mat in BME_CONFIG_REP
-						sql.append(genWhereFilterConfigRep(c.getPensCustCodeFrom(),"\n\t AND M.group_code"));
-						
-						sql.append("\n AND M.STORE_CODE LIKE '"+storeCode+"%'");
-						sql.append("\n GROUP BY M.STORE_CODE,M.item,M.group_code ");
-						
-						sql.append("\n UNION ALL  ");
-						
-						sql.append("\n SELECT  ");
-						sql.append("\n M.STORE_CODE,I.pens_item, I.group_code as group_type, ");
-						sql.append("\n NVL(COUNT(*),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBI.PENSBME_PICK_STOCK M ,PENSBI.PENSBME_PICK_STOCK_I I ");
-						sql.append("\n WHERE 1=1   ");
-						sql.append("\n AND M.issue_req_no = I.issue_req_no ");
-						sql.append("\n AND M.issue_req_status ='"+PickConstants.STATUS_ISSUED+"'");
-						sql.append("\n AND M.STORE_CODE LIKE '"+storeCode+"%'");
-						if(initDate != null){
-							 sql.append("\n AND M.ISSUE_REQ_DATE  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
-							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-						}else{
-							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-						}
-						sql.append("\n AND M.store_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
-						//filter Mat in BME_CONFIG_REP
-						sql.append(genWhereFilterConfigRep(c.getPensCustCodeFrom(),"\n\t AND I.group_code"));
-						
-						sql.append("\n AND M.STORE_CODE LIKE '"+storeCode+"%'");
-						sql.append("\n GROUP BY M.STORE_CODE,I.pens_item,I.group_code");
-						
-						sql.append("\n UNION ALL  ");
-						
-						sql.append("\n SELECT  ");
-						sql.append("\n M.CUSTOMER_NO AS STORE_CODE,I.pens_item, I.group_code as group_type,");
-						sql.append("\n NVL(SUM(I.ISSUE_QTY),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBI.PENSBME_STOCK_ISSUE M ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I ");
-						sql.append("\n WHERE 1=1   ");
-						sql.append("\n AND M.issue_req_no = I.issue_req_no  ");
-						sql.append("\n AND M.status ='"+PickConstants.STATUS_ISSUED+"'");
-						if(initDate != null){
-							 sql.append("\n AND M.ISSUE_REQ_DATE  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
-							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-						}else{
-							 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-						}
-						sql.append("\n AND M.CUSTOMER_NO LIKE '"+storeCode+"%'");
-						sql.append("\n AND M.customer_no IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
-						//filter Mat in BME_CONFIG_REP
-						sql.append(genWhereFilterConfigRep(c.getPensCustCodeFrom(),"\n\t AND I.group_code"));
-						
-						sql.append("\n AND M.CUSTOMER_NO LIKE '"+storeCode+"%'");
-						sql.append("\n GROUP BY M.CUSTOMER_NO,I.pens_item,I.group_code ");
-						
-			  sql.append("\n ) A ");
-			  sql.append("\n GROUP BY A.STORE_CODE,A.pens_item, A.group_type");
+			sql.append("\n  SELECT ");
+			sql.append("\n  M.customer_code as store_code ,P.item_code as pens_item ");
+		    sql.append("\n ,MI.group_type ,MI.material_master ,MI.barcode ");
+		    sql.append("\n ,NVL(SUM(P.TRANSACTION_QUANTITY),0) as TRANS_IN_QTY");
+			sql.append("\n from PENSBI.XXPENS_INV_BASTRANSACT_V P ");
+			sql.append("\n ,(SELECT PENS_VALUE as customer_code,INTERFACE_DESC as sub_inv ");
+			sql.append("\n   from PENSBI.PENSBME_MST_REFERENCE "); 
+			sql.append("\n   WHERE reference_code ='SubInv' ");
+			sql.append("\n ) M ");
+			sql.append("\n ,( ");
+			sql.append("\n   select pens_value as pens_item,PENS_DESC2 as group_type ");
+			sql.append("\n   ,interface_value as material_master,interface_desc as barcode ");
+			sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE ");
+			sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
+			sql.append("\n  )MI ");
+			sql.append("\n where M.sub_inv = p.subinventory_code ");
+			sql.append("\n and (  P.Transaction_Type_name = 'PO Receipt'");
+			sql.append("\n     OR P.Transaction_Type_name = 'Subinventory Transfer'");
+			sql.append("\n     OR P.Transaction_Type_name = 'BAS Transfer Stock' ");
+			sql.append("\n )"); 
+			sql.append("\n and P.item_code = MI.pens_item  ");
+			sql.append("\n AND M.customer_code LIKE '"+storeCode+"%'");
+			if(initDate != null){
+				 sql.append("\n AND P.transaction_date >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+				 sql.append("\n AND P.transaction_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+			}else{
+				 sql.append("\n AND P.transaction_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+			}
+			sql.append("\n AND M.customer_code IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+			
+			//filter Mat in BME_CONFIG_REP
+			sql.append(genWhereFilterConfigRep(c.getPensCustCodeFrom(),"\n\t AND MI.group_type"));
+			
+			sql.append("\n GROUP BY M.customer_code,P.item_code,MI.group_type,MI.material_master ,MI.barcode");
 			sql.append("\n )TRANS_IN ");
 			
 			sql.append("\n ON  M.pens_item = TRANS_IN.pens_item ");

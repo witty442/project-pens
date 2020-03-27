@@ -194,8 +194,7 @@ body {
 				}
 			}
 			
-			if(   "<%=Constants.TYPE_IMPORT_TRANSACTION_LOTUS%>" == pageName.value
-			   || "<%=Constants.TYPE_IMPORT_POS%>" == pageName.value	
+			if( "<%=Constants.TYPE_IMPORT_POS%>" == pageName.value	
 			  ){
 				var form = document.interfacesForm;
 				var fileNameObj = document.getElementsByName("bean.formDataFile")[0];
@@ -420,10 +419,6 @@ body {
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="GenerateItemMasterHisHer"/>
 		 		</jsp:include>
-		    <%}else if(Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equalsIgnoreCase(pageName)) {%>
-		     	<jsp:include page="../program.jsp">
-					<jsp:param name="function" value="ImportBMEFromLotus"/>
-				</jsp:include>
 			 <%}else if(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equalsIgnoreCase(pageName)) {%>
 		     	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="GenStockEndDateLotus"/>
@@ -637,8 +632,7 @@ body {
 								</td>
 							</tr>
 						</table>	     
-					  <%}else if( Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equals(pageName) 
-							   || Constants.TYPE_IMPORT_SALEOUT_WACOAL.equals(pageName)
+					  <%}else if( Constants.TYPE_IMPORT_SALEOUT_WACOAL.equals(pageName)
 							   || Constants.TYPE_IMPORT_POS.equals(pageName)
 							  ){  %>
 					       <table align="center" border="0" cellpadding="3" cellspacing="10" width="100%">
@@ -731,12 +725,6 @@ body {
 								 <p></p>
 								 <!-- BME Scan Result -->
 								 <jsp:include page="interfacesResultExportBillICC.jsp"></jsp:include>
-					      <% }else if( Constants.TYPE_IMPORT_TRANSACTION_LOTUS.equals(pageName)){ %> 
-							    <p></p>
-							    <jsp:include page="monitor_short.jsp"></jsp:include>
-								<p></p>
-								 <!-- BME Scan Result -->
-								<jsp:include page="interfacesImportTransResult.jsp"></jsp:include>
 						 <% }else if( Constants.TYPE_IMPORT_SALEOUT_WACOAL.equals(pageName)){ %> 
 							    <p></p>
 							    <jsp:include page="monitor_short.jsp"></jsp:include>
@@ -841,6 +829,10 @@ body {
 						<input type="hidden" name="pageName" value="<%=pageName%>"/>
 						
 					 	<jsp:include page="../searchCriteria.jsp"></jsp:include> 
+					 	
+					 	 <!-- Execute delete db(sales-out) by fileName -->
+                          <jsp:include page="../all/deleteBmeSalesOut.jsp" />
+                          
 					</html:form>
 					<!-- BODY -->  
 					</td>

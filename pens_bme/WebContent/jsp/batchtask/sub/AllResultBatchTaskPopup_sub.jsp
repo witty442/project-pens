@@ -8,19 +8,27 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
  <%
+ try{
  BatchTaskForm batchTaskForm = (BatchTaskForm)session.getAttribute("BATCH_TASK_RESULT");
 
  %>
 <!-- Detail -->
 <%
 System.out.println("MonitorItem:"+batchTaskForm.getMonitorItem());
-if(batchTaskForm.getMonitorItem() != null){
+if(batchTaskForm != null && batchTaskForm.getMonitorItem() != null){
+	 
 	 String columnHeadStrArr = batchTaskForm.getMonitorItem().getColumnHeadStrArr();
+	 System.out.println("columnHeadStrArr :"+columnHeadStrArr);
 	 List<MonitorItemResultBean> successList = batchTaskForm.getMonitorItem().getSuccessList();
 	 List<MonitorItemResultBean> failList = batchTaskForm.getMonitorItem().getFailList();
-	 
-	 System.out.println("successList size:"+successList!=null?successList.size():0);
-	 System.out.println("failList size:"+failList!=null?failList.size():0);
+	 System.out.println("2 : successList:"+successList +", failList:"+failList);
+	 if(successList!=null){
+	    System.out.println("successList size:"+successList.size());
+	 }
+	 if(failList!=null){
+	    System.out.println("failList size:"+failList.size());
+	 }
+	 System.out.println("3 :");
 %>
 
 <% if(failList != null && failList.size() >0){
@@ -127,5 +135,12 @@ if(batchTaskForm.getMonitorItem() != null){
 	</table>
   <% }%> 
 <% }%>
+
+<%
+}catch(Exception e){
+	e.printStackTrace();
+}
+%>
+
 					
 								

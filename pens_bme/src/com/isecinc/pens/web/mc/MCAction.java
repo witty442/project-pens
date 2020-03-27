@@ -62,7 +62,8 @@ public class MCAction extends I_Action {
 				aForm.setResultsSearch(aForm.getBean().getItems());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			
 		}
@@ -103,7 +104,8 @@ public class MCAction extends I_Action {
 			   aForm.setResultsSearch(null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			throw e;
@@ -126,7 +128,8 @@ public class MCAction extends I_Action {
 				aForm.setBean(ad);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			
 		}
@@ -148,9 +151,8 @@ public class MCAction extends I_Action {
 			   aForm.setResultsSearch(null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -188,7 +190,8 @@ public class MCAction extends I_Action {
 			   aForm.setBean(bean);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				if(conn != null){
@@ -247,8 +250,8 @@ public class MCAction extends I_Action {
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
 			conn.rollback();
-            e.printStackTrace();
-			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			try {
 				
 			} catch (Exception e2) {}
@@ -279,7 +282,8 @@ public class MCAction extends I_Action {
 				aForm.setResultsSearch(aForm.getBean().getItems());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			
 		}
@@ -303,9 +307,8 @@ public class MCAction extends I_Action {
 			   aForm.setResultsSearch(null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -367,9 +370,8 @@ public class MCAction extends I_Action {
 		    out.flush();
 		    out.close(); 
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 		}
@@ -505,8 +507,8 @@ public class MCAction extends I_Action {
 			aForm.setMode(mode);//Mode Edit
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", "err:"+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -546,9 +548,8 @@ public class MCAction extends I_Action {
 			
 			request.setAttribute("Message", msg);
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -624,8 +625,8 @@ public class MCAction extends I_Action {
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
 			conn.rollback();
-            e.printStackTrace();
-			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			try {
 				
 			} catch (Exception e2) {}

@@ -129,9 +129,8 @@ public class MonitorInterfacesAction extends I_Action {
 			}
 			request.getSession().setAttribute("results", results);
 		} catch (Exception e) {
-			e.printStackTrace();
-			
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}
 		return returnText;
 	}
@@ -243,9 +242,8 @@ public class MonitorInterfacesAction extends I_Action {
 		    m.setMonitorItemBean(i);
 		    interfacesForm.setMonitorBean(m);
 		} catch (Exception e) {
-			e.printStackTrace();
-			
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}
 		return mapping.findForward("showItemExport");
 	}

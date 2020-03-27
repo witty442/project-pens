@@ -11,6 +11,7 @@ import com.isecinc.core.init.I_Initial;
 import com.isecinc.pens.dao.InterfaceDAO;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialParameter;
+import com.pens.util.DBConnection;
 
 /**
  * WebInitialServlet Class for Initial Web Parameter and Configuration
@@ -29,11 +30,18 @@ public class WebInitialServlet extends HttpServlet {
 	public void init() throws ServletException {
 		//logger.debug("Initial PENS...");
 		Connection conn = null;
+		I_Initial initial;
 		try {
+			conn = DBConnection.getInstance().getConnectionApps();
+			
 			logger.info("Initial System Parameter");
 			InitialParameter initParam = new InitialParameter();
 			initParam.init(getInitParameter("parameterfile"), getServletContext());
-      
+			
+			logger.info("Initial System Message");
+			initial = new InitialMessages();
+			initial.init(conn);
+			
 			logger.info("Clear Task All");
 			InterfaceDAO.clearTaskControlMonitorAll();
 		} catch (Exception e) {

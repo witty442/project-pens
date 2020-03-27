@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.ReqFinish"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.dao.ConfirmReturnWacoalDAO"%>
@@ -67,8 +68,9 @@ function openEdit(path,requestNo,mode){
 	form.submit();
 	return true;
 }
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.confFinishForm;
+	var path = document.getElementById("path").value;
 	form.action = path + "/jsp/confFinishAction.do?do=search2&currPage="+currPage;
     form.submit();
     return true;
@@ -173,25 +175,14 @@ function gotoPage(path,currPage){
 					   int totalPage = confFinishForm.getTotalPage();
 					   int totalRecord = confFinishForm.getTotalRecord();
 					   int currPage =  confFinishForm.getCurrPage();
+					   int pageSize = confFinishForm.getPageSize();
 					   int startRec = confFinishForm.getStartRec();
 					   int endRec = confFinishForm.getEndRec();
+					   int no = Utils.calcStartNoInPage(currPage,pageSize );
+					   System.out.println("start No:"+no);
 					%>
-					   
-					<div align="left">
-					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
-					   <span class="pagelinks">
-						หน้าที่ 
-						 <% 
-							 for(int r=0;r<totalPage;r++){
-								 if(currPage ==(r+1)){
-							 %>
-			 				   <strong><%=(r+1) %></strong>
-							 <%}else{ %>
-							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-						 <% }} %>				
-						</span>
-					</div>
+					   <%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
+					
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -203,57 +194,55 @@ function gotoPage(path,currPage){
 									<th >Remark</th>
 									<th >Action</th>						
 							   </tr>
-							<c:forEach var="results" items="${confFinishForm.resultsSearch}" varStatus="rows">
-								<c:choose>
-									<c:when test="${rows.index %2 == 0}">
-										<c:set var="tabclass" value="lineO"/>
-									</c:when>
-									<c:otherwise>
-										<c:set var="tabclass" value="lineE"/>
-									</c:otherwise>
-								</c:choose>
-								
-									<tr class="<c:out value='${tabclass}'/>">
-										<td class="td_text_center" width="10%">${results.no}</td>
+							<% 
+							String tabclass ="lineE";
+							List<ReqFinish> resultList = confFinishForm.getResultsSearch();
+							for(int n=0;n<resultList.size();n++){
+								ReqFinish mc = (ReqFinish)resultList.get(n);
+								if(n%2==0){ 
+									tabclass="lineO";
+								}
+								%>
+									<tr class="<%=tabclass%>">
+										<td class="td_text_center" width="10%"><%=no %></td>
 										<td class="td_text_center" width="10%">
-										   ${results.requestDate}
+										   <%=mc.getRequestDate() %>
 										</td>
-										<td class="td_text_center" width="10%">${results.requestNo}</td>
+										<td class="td_text_center" width="10%"><%=mc.getRequestNo() %></td>
 										<td class="td_text_center" width="10%">
-										    ${results.confirmDate}
+										    <%=mc.getConfirmDate() %>
 										</td>
 										<td class="td_text_center" width="15%">
-											${results.statusDesc}
+											<%=mc.getStatusDesc() %>
 										</td>
 										<td class="td_text_center" width="10%">
-											${results.wareHouse}
+											<%=mc.getWareHouse() %>
 										</td>
 										<td class="td_text" width="15%">
-										    ${results.remark}
+										    <%=mc.getRemark() %>
 										</td>
 										<td class="td_text_center" width="10%">
-										 <c:if test="${results.canEdit == false}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.requestNo}','view')">
+										
+										 <%if(mc.isCanEdit()==false){ %>
+											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=mc.getRequestNo()%>','view')">
 											      View
 											  </a>
-										  </c:if>
-										  <c:if test="${results.canEdit == true}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.requestNo}','edit')">
-											    <c:choose>
-													<c:when test="${results.status == 'O'}">
-														 Confirm
-													</c:when>
-													<c:otherwise>
-														 View
-													</c:otherwise>
-											   </c:choose>      
-											         
+										<%} %>
+										<%if(mc.isCanEdit()==true){ %>
+											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=mc.getRequestNo()%>','edit')">
+											      <%if(mc.getStatus().equalsIgnoreCase("O")){ %>
+											         Confirm
+											      <%}else{%>
+											          View
+											      <%} %>
 											  </a>
-										  </c:if>
+										  <%} %>
 										</td>
 									</tr>
 							
-							  </c:forEach>
+							<%
+							no++;
+							}%>
 					</table>
 				</c:if>
 					<!-- ************************Result ***************************************************-->
@@ -261,6 +250,7 @@ function gotoPage(path,currPage){
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					
 					<!-- hidden field -->
+					<input type="hidden" name="path" id="path" value ="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

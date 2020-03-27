@@ -187,9 +187,8 @@ public class AddItemPickStockAction extends I_Action {
 		try {
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 		
@@ -276,7 +275,8 @@ public class AddItemPickStockAction extends I_Action {
 			}
 			
 		}catch(Exception e){
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			conn.rollback();
 		} finally {
 			if(conn != null){

@@ -138,7 +138,7 @@ try{
 				<th><bean:message key="Order.No" bundle="sysele"/></th>
 				<th><bean:message key="TotalAmount" bundle="sysele"/></th>
 				<th><bean:message key="CreditNoteAmt" bundle="sysele"/></th>
-				<th><bean:message key="Order.Behindhand" bundle="sysele"/></th>
+				<th><bean:message key="Order.Behindhand" bundle="sysele"/>.</th>
 				<th><bean:message key="Order.Payment" bundle="sysele"/></th>
 				<!-- 
 				<th><bean:message key="Amount" bundle="sysele"/></th>

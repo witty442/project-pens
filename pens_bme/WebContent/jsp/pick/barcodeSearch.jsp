@@ -9,13 +9,11 @@
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
-
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <jsp:useBean id="barcodeForm" class="com.isecinc.pens.web.pick.BarcodeForm" scope="session" />
 <%
 if(session.getAttribute("barcodeStatusList") == null){
@@ -82,8 +80,9 @@ function search(path){
 	form.submit();
 	return true;
 }
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.barcodeForm;
+	var path = document.getElementById("path").value;
 	form.action = path + "/jsp/barcodeAction.do?do=search2&currPage="+currPage;
     form.submit();
     return true;
@@ -293,24 +292,9 @@ function getJobNameModel(code){
 					   int currPage =  barcodeForm.getCurrPage();
 					   int startRec = barcodeForm.getStartRec();
 					   int endRec = barcodeForm.getEndRec();
+					   int no = barcodeForm.getStartRec();
 					%>
-					    
-					<div align="left">
-					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
-					   <span class="pagelinks">
-						หน้าที่ 
-						 <% 
-							 for(int r=0;r<totalPage;r++){
-								 if(currPage ==(r+1)){
-							 %>
-			 				   <strong><%=(r+1) %></strong>
-							 <%}else{ %>
-							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-						 <% }} %>				
-						</span>
-					</div>
-						
+					<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -327,11 +311,10 @@ function getJobNameModel(code){
 									<th >Action</th>						
 							   </tr>
 								<% 
-								int no = startRec-1;
 								String tabclass ="";
 								List<Barcode> resultList = barcodeForm.getResultsSearch();
 								for(int n=0;n<resultList.size();n++){
-									no++;
+								
 									Barcode mc = (Barcode)resultList.get(n);
 									if(n%2==0){ 
 									   tabclass="lineO";
@@ -375,7 +358,7 @@ function getJobNameModel(code){
 										 <%} %>
 										</td>
 									</tr>
-								<%}//for %>
+								<% 	no++;}//for %>
 						   <!-- Summary -->
 							  <tr class="">
 							       <td class=""></td> 
@@ -401,6 +384,8 @@ function getJobNameModel(code){
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					
 					<!-- hidden field -->
+					<input type="hidden" name="path" id="path" value ="${pageContext.request.contextPath}"/>
+					
 					</html:form>
 					<!-- BODY -->
 					</td>

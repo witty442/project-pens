@@ -1513,7 +1513,7 @@ public class SummaryDAO {
 				sql.append("\n  and M.pens_desc2 ='"+c.getCodeSearch()+"'");
 				sql.append("\n  order by M.pens_value asc ");
 				
-				logger.debug("sql:"+sql);
+				//logger.debug("sql:"+sql);
 				conn = DBConnection.getInstance().getConnection();
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());

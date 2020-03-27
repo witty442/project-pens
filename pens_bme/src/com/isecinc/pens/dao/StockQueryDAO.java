@@ -53,11 +53,18 @@ public class StockQueryDAO extends PickConstants{
 				sql.append("\n )M ");
 				sql.append("\n GROUP BY M.warehouse,M.group_code, M.PENS_ITEM ");
 				sql.append("\n ORDER BY M.warehouse, M.PENS_ITEM asc");
+         	}else if("SummaryByBoxMat".equalsIgnoreCase(o.getSummaryType())){
+				
+				sql.append("\n SELECT M.BOX_NO,M.job_name");
+				sql.append("\n ,SUBSTR(M.material_master,1,6) as mat,SUM(M.qty) as qty FROM(");
+				sql.append("\n		"+ genSql(o));
+				sql.append("\n )M ");
+				sql.append("\n GROUP BY M.BOX_NO,M.job_name,SUBSTR(M.material_master,1,6) ");
+				sql.append("\n ORDER BY M.BOX_NO,M.job_name,SUBSTR(M.material_master,1,6) asc");
 			}
-			
 			logger.debug("sql:"+sql);
 			
-			conn = DBConnection.getInstance().getConnection();
+			conn = DBConnection.getInstance().getConnectionApps();
 			ps = conn.prepareStatement(sql.toString());
 			
 			rst = ps.executeQuery();
@@ -90,6 +97,12 @@ public class StockQueryDAO extends PickConstants{
 					h.setPensItem(Utils.isNull(rst.getString("pens_item")));
 					h.setGroupCode(Utils.isNull(rst.getString("group_code")));
 			        h.setOnhandQty(Utils.decimalFormat(rst.getInt("qty"),Utils.format_current_no_disgit));
+				 }else if("SummaryByBoxMat".equalsIgnoreCase(o.getSummaryType())){
+				   h.setNo(r);
+				   h.setBoxNo(rst.getString("box_no")); 
+				   h.setName(rst.getString("job_name")); 
+				   h.setGroupCode(rst.getString("mat")); 
+		           h.setOnhandQty(Utils.decimalFormat(rst.getInt("qty"),Utils.format_current_no_disgit));
 				}
 			   items.add(h);
 			   r++;

@@ -65,27 +65,6 @@ public class AdjustStockAction extends I_Action {
 		return mapping.findForward("prepare2");
 	}
 	
-	public ActionForward search2_bk(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("search2");
-		AdjustStockForm aForm = (AdjustStockForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		String msg = "";
-		try {
-			//aForm.setResultsSearch(AdjustStockDAO.searchHead(aForm.getAdjustStock()));
-			if(aForm.getResultsSearch().size() <=0){
-			   request.setAttribute("Message", "ไม่พบข้อมูล");
-			   aForm.setResultsSearch(null);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
-			throw e;
-		}finally{
-			
-		}
-		return mapping.findForward("search2");
-	}
 	
 	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("search2");
@@ -151,7 +130,6 @@ public class AdjustStockAction extends I_Action {
 				
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			throw e;
@@ -176,7 +154,6 @@ public class AdjustStockAction extends I_Action {
 			aForm.setAdjustStock(ad);
 			
 		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
 		return mapping.findForward("clear2");
@@ -219,10 +196,7 @@ public class AdjustStockAction extends I_Action {
 				aForm.setAdjustStock(ad);
 				aForm.setVerify(false);
 				aForm.setMode(mode);//Mode Add new
-				
 			}
-			
-			
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
@@ -277,7 +251,6 @@ public class AdjustStockAction extends I_Action {
 			
 			request.setAttribute("Message", msg);
 		} catch (Exception e) {
-			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			throw e;
@@ -314,7 +287,6 @@ public class AdjustStockAction extends I_Action {
 			request.setAttribute("Message", msg);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			throw e;
@@ -354,7 +326,6 @@ public class AdjustStockAction extends I_Action {
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
 			conn.rollback();
-            e.printStackTrace();
 			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
 			try {
 				
@@ -391,7 +362,6 @@ public class AdjustStockAction extends I_Action {
 			request.setAttribute("Message", "ยืนยันการส่งข้อมูล เรียบร้อยแล้ว");
 		} catch (Exception e) {
 			conn.rollback();
-			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		} finally {
 			try {

@@ -146,8 +146,6 @@ public class ReportAllAction extends I_Action {
 		return mapping.findForward("reportAll");
 	}
 	
-	
-		
 	/**
 	 * Save
 	 */
@@ -179,13 +177,29 @@ public class ReportAllAction extends I_Action {
 			 }
 			 
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 		}
-		return mapping.findForward("reports");
+		return mapping.findForward("reportAll");
+	}
+	
+	/** For batch popup **/
+	public ActionForward genStockEndDateLotus(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		ReportAllForm aForm = (ReportAllForm) form;
+		try {
+			 logger.debug("genStockEndDateLotus");
+			 if("reportOnhandLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 return new ReportOnhandLotusAction().genStockEndDateLotus(mapping, form, request, response);
+			 }
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
+			throw e;
+		}finally{
+		}
+		return mapping.findForward("reportAll");
 	}
 	
 	/** For batch popup after Task success**/
@@ -202,9 +216,8 @@ public class ReportAllAction extends I_Action {
 				 return new ReportOnhandAsOfRobinsonAction().searchBatch(mapping,form, request, response);
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -223,9 +236,8 @@ public class ReportAllAction extends I_Action {
 				 return new ReportOnhandAsOfRobinsonAction().downloadFile(mapping,form, request, response);
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -261,9 +273,8 @@ public class ReportAllAction extends I_Action {
 				 return new ReportOnhandAsOfRobinsonAction().searchBatchForm(mapping,form, request, response);
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -283,9 +294,8 @@ public class ReportAllAction extends I_Action {
 				 return new ReportOnhandAsOfRobinsonAction().clearBatchForm(mapping,form, request, response);
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}

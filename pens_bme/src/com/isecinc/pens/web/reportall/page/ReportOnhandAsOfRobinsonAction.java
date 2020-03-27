@@ -81,6 +81,10 @@ public class ReportOnhandAsOfRobinsonAction extends I_Action {
 				 bean = new ReportAllBean();
 				 bean.setDispHaveQty("true");
 				 
+				//for test
+				 //bean.setSalesDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+				// bean.setPensCustCodeFrom("100002-01,100002-02");
+				 
 				 /** get parameter from Gen AutoOrder Page **/
 				 if( !Utils.isNull(request.getParameter("storeCode")).equals("")){
 					 bean.setPensCustCodeFrom(Utils.isNull(request.getParameter("storeCode")));
@@ -127,21 +131,16 @@ public class ReportOnhandAsOfRobinsonAction extends I_Action {
 		Statement stmt = null;
 		ResultSet rst = null;
 		//prepare parameter
-		String storeCodeCheck = "";
-		String[] storeCodeCheckArr = null;
 		ReportAllBean c = aForm.getBean();
 		List<StoreBean> storeList = null;
 		boolean pass = true;
 		try {
 			logger.debug("Search page["+Utils.isNull(aForm.getPageName())+"]");
 
-			//Check All Store 
-			storeCodeCheck = Utils.isNull(c.getPensCustCodeFrom());
-			storeCodeCheckArr = Utils.isNull(c.getPensCustCodeFrom()).split("\\,");
-			
-			 /** Case StoreCode =ALL Export To Excel **/
+			 /** Case StoreCode =ALL Export To Excel  OR storeCode >1**/
 			if(Utils.isNull(aForm.getBean().getPensCustCodeFrom()).equals("ALL")
-				||  storeCodeCheckArr.length > 1 //for test (1001,1002)
+			    || Utils.isNull(aForm.getBean().getPensCustCodeFrom()).split("\\,").length >1
+			    //for test (1001,1002)
 			  ){  
 				logger.info("Export All Store To Excel ");
 				//Submit Run Batch
@@ -158,7 +157,7 @@ public class ReportOnhandAsOfRobinsonAction extends I_Action {
 				//logger.debug("asOfDate:"+aForm.getBean().getSalesDate());
 				
 				request.getSession().setAttribute("BATCH_PARAM_MAP",batchParaMap);
-				request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.EXPORT_REPORT_ONHAND_LOTUS);//set to popup page to BatchTask
+				request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.EXPORT_REPORT_ONHAND_ROBINSON);//set to popup page to BatchTask
 			}else{
 				 String queryStr= request.getQueryString();
 				 if(queryStr.indexOf("d-") != -1){
@@ -241,6 +240,7 @@ public class ReportOnhandAsOfRobinsonAction extends I_Action {
 		try {
 			logger.debug("PageAction:"+aForm.getPageName());
 			if(Utils.isNull(aForm.getBean().getPensCustCodeFrom()).equals("ALL")
+				|| Utils.isNull(aForm.getBean().getPensCustCodeFrom()).split("\\,").length >1
 					//|| "020047-1".equals(aForm.getBean().getPensCustCodeFrom()) //for test
 			  ){
 				logger.info("Export All Store To Excel ");
@@ -309,9 +309,8 @@ public class ReportOnhandAsOfRobinsonAction extends I_Action {
 			 logger.debug("batchName:"+batchTaskForm.getResults()[0].getName());
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -345,9 +344,8 @@ public class ReportOnhandAsOfRobinsonAction extends I_Action {
 	    	 }
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -484,9 +482,8 @@ public class ReportOnhandAsOfRobinsonAction extends I_Action {
 				 request.setAttribute("Message", "ไม่พบข้อมูล");
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -499,9 +496,8 @@ public class ReportOnhandAsOfRobinsonAction extends I_Action {
 			 request.getSession().removeAttribute("BATCH_TASK_RESULT");
 			 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}

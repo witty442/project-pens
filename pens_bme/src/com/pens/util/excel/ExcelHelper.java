@@ -113,11 +113,11 @@ public class ExcelHelper {
 		    //INPUT DATE EXCEL : OUTPUT dd/mm/yyyy (10/10/2020)
 			}else if("DATE".equalsIgnoreCase(cellType)){
 				if((cellValue instanceof Date )){
-					logger.debug("is_date ::"+cellValue+">:"+cellValue);
+					//logger.debug("is_date ::"+cellValue+">:"+cellValue);
 					ret = DateUtil.stringValue((Date)cellValue, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				}else{
 					//No idea
-					logger.debug("is_no_date :"+cellValue+">:"+cellValue);
+					//logger.debug("is_no_date :"+cellValue+">:"+cellValue);
 					
 					/** is instance of string (cell is string but value is NUMBER )**//*
 					if(Utils.isNumeric(Utils.isNull(cellValue)) && !(cellValue instanceof String)){

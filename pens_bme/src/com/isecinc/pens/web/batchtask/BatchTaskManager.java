@@ -87,6 +87,7 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 		}
 		return mapping.findForward("search");
 	}
+
 public ActionForward runBatchFromPageByPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 	
 	logger.debug("runBatchFromPopupPage");
@@ -137,6 +138,58 @@ public ActionForward runBatchFromPageByPopup(ActionMapping mapping, ActionForm f
 		request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 	}
 	return mapping.findForward("batchFromPopup");
+}
+
+public ActionForward runBatchFromPageByPopupNoWait(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	
+	logger.debug("runBatchFromPageByPopupNoWait");
+	BatchTaskForm batchTaskForm = (BatchTaskForm) form;
+	User userLogin = (User) request.getSession().getAttribute("user");
+	BatchTaskDAO dao = new BatchTaskDAO();
+	boolean canRunBatch = false;
+	EnvProperties env = EnvProperties.getInstance();
+	String pageName = Utils.isNull(request.getParameter("pageName"));
+	try {
+		//logger.debug("UserLogin:"+userLogin.getId()+", RoleLogin:"+userLogin.getType());
+		/** Import Data */
+
+		/** insert to monitor_interface **/
+		MonitorBean monitorModel = new MonitorBean();
+		monitorModel.setName(pageName);
+		monitorModel.setType(pageName);
+		monitorModel.setStatus(Constants.STATUS_START);
+		monitorModel.setCreateUser(userLogin.getUserName());
+		
+		/** Set Param Batch Map **/
+		//Case popup from Get from session (by page set parameter)
+		Map<String,String> batchParamMap = (HashMap<String, String>)request.getSession().getAttribute(BatchTaskConstants.BATCH_PARAM_MAP);
+		monitorModel.setBatchParamMap(batchParamMap);
+		
+		/** Case Form File **/
+		//Case popup from Get from session 
+		logger.debug("dataFromFile:"+request.getSession().getAttribute(BatchTaskConstants.DATA_FILE));
+		monitorModel.setDataFile((FormFile)request.getSession().getAttribute(BatchTaskConstants.DATA_FILE));
+		
+		//clear session from (by page prepare)
+		request.getSession().removeAttribute("DATA_FILE");
+		request.getSession().removeAttribute("PARAM_MAP");
+		
+		//Set User
+		monitorModel.setUser(userLogin);
+	
+		//create Batch Task
+		MonitorBean m = createBatchTask(monitorModel,userLogin,request);
+	   
+		/** Set for Progress Bar Popup **/
+		request.setAttribute("action", "submited");
+		request.setAttribute("no_wait", "no_wait");
+		request.setAttribute("id", m.getTransactionId());
+			
+	} catch (Exception e) {
+		logger.error(e.getMessage(),e);
+		request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+	}
+	return mapping.findForward("batchFromPopupNoWait");
 }
 
 	public MonitorBean createBatchTask(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{

@@ -1750,7 +1750,7 @@ public class ImportProcess {
 				logger.debug("fileName: " + dataFile.getFileName());
 
 				StringBuffer sql = new StringBuffer("");
-				sql.append(" INSERT INTO PENSBME_SALES_FROM_KING( \n");
+				sql.append(" INSERT INTO PENSBI.PENSBME_SALES_FROM_KING( \n");
 				
 				sql.append(" Code, Description, Reference, Unit_Price,  \n");//1-4
 				sql.append(" Unit_cost, Qty, Amount, Cost_amt, \n");//5-8

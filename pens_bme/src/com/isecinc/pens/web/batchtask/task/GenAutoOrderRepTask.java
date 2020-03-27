@@ -155,7 +155,8 @@ public class GenAutoOrderRepTask extends BatchTask implements BatchTaskInterface
             monitorModel.setErrorCode(modelItem.getErrorCode());
 			monitorModel.setStatus(modelItem.getStatus());
 			monitorModel.setFileCount(modelItem.getSuccessCount()>0?1:0);
-			
+			monitorModel.setThName("Gen Order àµ×ÁàµçÁ");
+			monitorModel.setType("GEN");
 			/** Update Status Monitor **/
 			dao.updateMonitor(connMonitor,monitorModel);
 		}catch(Exception e){
@@ -329,8 +330,13 @@ public class GenAutoOrderRepTask extends BatchTask implements BatchTaskInterface
 							orderQty = 0;
 							recommandQty = 0;
 						}else{
-							orderQty = recommandCalcQty;//normal
-							recommandQty = recommandCalcQty;//normal
+							if(recommandCalcQty > wacoalOnhandQty){ //case4 
+								orderQty = wacoalOnhandQty;
+								recommandQty = wacoalOnhandQty;
+							}else{
+							    orderQty = recommandCalcQty;//normal
+							    recommandQty = recommandCalcQty;//normal
+							}
 						}//if
 					}else{
 						//wacoal onhand Qty =0

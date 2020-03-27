@@ -14,8 +14,6 @@
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <jsp:useBean id="adjustStockForm" class="com.isecinc.pens.web.adjuststock.AdjustStockForm" scope="session" />
 <html>
 <head>
@@ -679,7 +677,6 @@ function checkSelect(chk1,chk2){
 									</c:otherwise>
 								</c:choose>
 								
-							
 									<tr class="<c:out value='${tabclass}'/>">
 										<td class="td_text">${results.seqNo}</td>
 										<td class="td_text"><input type="checkbox" name="linechk" value="${results.seqNo}"/></td>

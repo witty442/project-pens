@@ -26,46 +26,78 @@ import com.pens.util.excel.ExcelHeader;
 
 public class CHINAStockOnhandAction {
  private static Logger logger = Logger.getLogger("PENS");
-	
+ private static int pageSize =50;
+ 
  public static ShopForm search(HttpServletRequest request, ShopForm f,User user) throws Exception{
 	   Statement stmt = null;
 		ResultSet rst = null;
 		List<ShopBean> pos = new ArrayList<ShopBean>();
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
+		int currPage = 1;
 		try {
-			conn = DBConnection.getInstance().getConnectionApps();
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
 			
-			//Get Init date
-			Date initDate = new SummaryDAO().searchInitDateMTT(conn,f.getBean().getCustGroup());
-			//gen sql
-			sql = genSQL(conn,f,initDate);
-			stmt = conn.createStatement();
-			rst = stmt.executeQuery(sql.toString());
-			while (rst.next()) {
-				ShopBean item = new ShopBean();
-				item.setGroupCode(Utils.isNull(rst.getString("group_type")));
-				item.setPensItem(Utils.isNull(rst.getString("pens_item")));
-				item.setBarcode(rst.getString("barcode"));
-				item.setStyle(rst.getString("material_master"));
-		
-				item.setInitSaleQty(Utils.decimalFormat(rst.getDouble("INIT_SALE_QTY"),Utils.format_current_2_disgit));
-				item.setTransInQty(Utils.decimalFormat(rst.getDouble("TRANS_IN_QTY"),Utils.format_current_2_disgit));
-				item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("SALE_OUT_QTY"),Utils.format_current_2_disgit));
-				item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("SALE_RETURN_QTY"),Utils.format_current_2_disgit));
-				item.setAdjustQty("0");//wait for spec
-				item.setOnhandQty(Utils.decimalFormat(rst.getDouble("ONHAND_QTY"),Utils.format_current_2_disgit));
+			if("newsearch".equalsIgnoreCase(action)){
+				conn = DBConnection.getInstance().getConnectionApps();
 				
-				pos.add(item);
-			}//while
-
-			if(pos != null && pos.size() >0){
-				f.setResults(pos);
-				//request.getSession().setAttribute("summary" ,item);
+				//Get Init date
+				Date initDate = new SummaryDAO().searchInitDateMTT(conn,f.getBean().getCustGroup());
+				//gen sql
+				sql = genSQL(conn,f,initDate);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					ShopBean item = new ShopBean();
+					item.setGroupCode(Utils.isNull(rst.getString("group_type")));
+					item.setPensItem(Utils.isNull(rst.getString("pens_item")));
+					item.setBarcode(rst.getString("barcode"));
+					item.setStyle(rst.getString("material_master"));
+			
+					item.setInitSaleQty(Utils.decimalFormat(rst.getDouble("INIT_SALE_QTY"),Utils.format_current_2_disgit));
+					item.setTransInQty(Utils.decimalFormat(rst.getDouble("TRANS_IN_QTY"),Utils.format_current_2_disgit));
+					item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("SALE_OUT_QTY"),Utils.format_current_2_disgit));
+					item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("SALE_RETURN_QTY"),Utils.format_current_2_disgit));
+					item.setAdjustQty("0");//wait for spec
+					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("ONHAND_QTY"),Utils.format_current_2_disgit));
+					
+					pos.add(item);
+				}//while
+	
+				if(pos != null && pos.size() >0){
+					f.setResults(pos);
+					//request.getSession().setAttribute("summary" ,item);
+					//calc Paging
+					f.setTotalRecord(f.getResults().size());
+					f.setTotalPage(Utils.calcTotalPage(f.getTotalRecord(), pageSize));
+					f.setPageSize(pageSize);
+					f.setCurrPage(1);
+					//calc startRec endRec
+					int startRec = ((currPage-1)*pageSize);
+					int endRec = (currPage * pageSize);
+				    if(endRec > f.getTotalRecord()){
+					   endRec = f.getTotalRecord();
+				    }
+				    f.setStartRec(startRec);
+				    f.setEndRec(endRec);
+				}else{
+					f.setResults(null);
+					request.getSession().setAttribute("summary" ,null);
+					request.setAttribute("Message", "äÁè¾º¢èÍÁÙÅ");
+				}
 			}else{
-				f.setResults(null);
-				request.getSession().setAttribute("summary" ,null);
-				request.setAttribute("Message", "äÁè¾º¢èÍÁÙÅ");
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				f.setCurrPage(currPage);
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize);
+				int endRec = (currPage * pageSize);
+			    if(endRec > f.getTotalRecord()){
+				   endRec = f.getTotalRecord();
+			    }
+			    f.setStartRec(startRec);
+			    f.setEndRec(endRec);
 			}
 		} catch (Exception e) {
 			throw e;

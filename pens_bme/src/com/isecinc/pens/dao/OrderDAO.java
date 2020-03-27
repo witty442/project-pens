@@ -1019,9 +1019,9 @@ public class OrderDAO {
 				}else if(store_code.startsWith(Constants.STORE_TYPE_OSHOPPING_CODE)){
 				   materialMaster = Utils.isNull(rst.getString("material_master_oshopping"));
 				}else if(store_code.startsWith(Constants.STORE_TYPE_7CATALOG_CODE)){
-				  materialMaster = Utils.isNull(rst.getString("material_master_7catalog"));
+				   materialMaster = Utils.isNull(rst.getString("material_master_7catalog"));
 				}else if(store_code.startsWith(Constants.STORE_TYPE_TVD_CODE)){
-				  materialMaster = Utils.isNull(rst.getString("material_master_tvdirect"));
+				   materialMaster = Utils.isNull(rst.getString("material_master_tvdirect"));
 				}
 				
 				String barcode = Utils.isNull(rst.getString("barcode"));
@@ -1059,8 +1059,8 @@ public class OrderDAO {
 				String whole_price_bf_2 = "";
 				
 				if(whole_price_bf.indexOf(".") != -1){
-				   whole_price_bf_1 = whole_price_bf.substring(0,whole_price_bf.indexOf("."));
-		    	   whole_price_bf_2 = whole_price_bf.substring(whole_price_bf.indexOf(".")+1,whole_price_bf.length());
+				    whole_price_bf_1 = whole_price_bf.substring(0,whole_price_bf.indexOf("."));
+		    	    whole_price_bf_2 = whole_price_bf.substring(whole_price_bf.indexOf(".")+1,whole_price_bf.length());
 				}else{
 					whole_price_bf_1  = whole_price_bf;
 					whole_price_bf_2 = "00";

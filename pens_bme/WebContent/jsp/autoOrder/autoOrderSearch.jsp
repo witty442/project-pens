@@ -35,7 +35,9 @@ System.out.println("accessOrderPage:"+accessOrderPage);
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <style type="text/css">
-
+  .lineNoOnhand{
+     background-color: #ffcccc;
+  }
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
@@ -76,6 +78,12 @@ function loadMe(){
 <%if(autoOrderForm.getResults() != null && autoOrderForm.getResults().size() >0){ %>
   sumTotal();
 <%}%>
+
+//load display no zero onhand
+var showNoZero = document.getElementById("showNoZero");
+showNoZero.value = "<%=autoOrderForm.getBean().getDispNoZero()%>";
+hideRowNoOnhand(showNoZero);
+
 }
 
 function genAutoOrder(path){
@@ -219,6 +227,18 @@ function saveOrderRep(path){
 		startControlSaveLockScreen();
 		
 		form.action = path + "/jsp/autoOrderAction.do?do=save";
+		form.submit();
+		return true;
+	}
+}
+function deleteOrderRep(path){
+	var form = document.autoOrderForm;
+	
+	if(confirm("ยืนยัน ลบข้อมูล Order เตืมเต็ม")){
+		/**  Control Save Lock Screen **/
+		startControlSaveLockScreen();
+		
+		form.action = path + "/jsp/autoOrderAction.do?do=deleteOrderRep";
 		form.submit();
 		return true;
 	}
@@ -371,6 +391,30 @@ function sumTotal(){
 	//convertTo Currency No Digit
 	toCurrenyNoDigit(totalOrderQtyObj);
 }
+
+/* hide or show row table */
+function hideRowNoOnhand(chkObj){
+	var no = document.getElementsByName("no"); 
+	var table = document.getElementById('tblProductContent');
+	var rows = table.getElementsByTagName("tr"); 
+	var c = 0;
+	//alert("rows:"+rows.length);
+	for(var i=0;i<rows.length;i++){
+		if(chkObj.checked == true){
+			if(rows[i].className =="lineNoOnhand"){
+				c++;
+				//alert(rows[i].className);
+				rows[i].style.display ='none';
+				no[i].value = c;
+			}
+		}else{
+			//show all row
+			c++;
+			rows[i].style.display ='';
+			no[i].value = i+1;
+		}
+	}
+}
 </script>
 
 </head>
@@ -485,6 +529,11 @@ function sumTotal(){
 									  <input type="button" value="Generate Order เติมเต็ม " class="newPosBtnLong"> 
 									</a>
 									<%if(autoOrderForm.getBean().isCanSave()){ %>
+									     <a href="javascript:deleteOrderRep('${pageContext.request.contextPath}')">
+									     <input type="button" value="ลบข้อมูล Order เติมเต็ม " class="newPosBtnLong">
+									    </a>	
+									<%} %>
+									<%if(autoOrderForm.getBean().isCanSave()){ %>
 									     <a href="javascript:saveOrderRep('${pageContext.request.contextPath}')">
 									     <input type="button" value="   บันทึก/แก้ไข    " class="newPosBtnLong">
 									    </a>	
@@ -506,6 +555,13 @@ function sumTotal(){
                     
 					<!-- ************************Result ***************************************************-->
 					<%if(autoOrderForm.getResults() != null && autoOrderForm.getResults().size() >0){ %>
+					<div style="padding-left:30px">
+					       <!-- <input type="checkbox" id="showNoZero" /> -->
+					       <html:checkbox property="bean.dispNoZero" styleId="showNoZero"  onclick="hideRowNoOnhand(this)"/>
+					        <b>แสดงเฉพาะรายการที่   (WC Onhand - ยอด Orderที่คีย์ไว้) มากกว่า 0 </b>
+					       
+					</div>
+					 <br/>
 					<div class='tbl-header'>
 					   <table align="center" border="1" cellpadding="3" cellspacing="0" class='table_fix'>
 		               <thread>
@@ -530,19 +586,26 @@ function sumTotal(){
 		               <table id='tblProductContent' class='table_fix' border='1' cellpadding='3' cellspacing='1'> 
                        <tbody> 
 		            <%
+		            String trClass ="lineO";
 		             for(int i=0;i<autoOrderForm.getResults().size();i++){
 		            	 AutoOrderBean item = autoOrderForm.getResults().get(i);
+		            	 trClass ="lineO";
+		            	 if(item.getWacoalOnhandQty().equals("0")){
+		            		 trClass ="lineNoOnhand";
+		            	 }
 		            %>
-		             <tr class='lineO'>
-		               <td class="td_text_center" width="4%"><%=(i+1) %> </td>
+		             <tr class='<%=trClass%>' id ="<%=i%>">
+		               <td class="td_text_center" width="4%">
+		               <input type="text" name="no" class="disableTextCenter" readonly size="1" value="<%=(i+1)%>">
+		               </td>
 		               <td class="td_text_center" width="10%">
-		                 <input type="text" name="groupCode" class="disableText" readonly size="10" value="<%=item.getGroupCode()%>">
+		                 <input type="text" name="groupCode" class="disableTextCenter" readonly size="10" value="<%=item.getGroupCode()%>">
 		               </td>
 		               <td class="td_text_center" width="7%">
-		                 <input type="text" name="sizeColor" class="disableText" readonly size="3" value="<%=item.getSizeColor()%>">
+		                 <input type="text" name="sizeColor" class="disableTextCenter" readonly size="3" value="<%=item.getSizeColor()%>">
 		               </td>
 		               <td class="td_text_center" width="8%">
-		                 <input type="text" name="pensItem" class="disableText" readonly size="6" value="<%=item.getPensItem()%>">
+		                 <input type="text" name="pensItem" class="disableTextCenter" readonly size="6" value="<%=item.getPensItem()%>">
 		               </td>
 		               <td class="td_number" width="10%">
 		                 <input type="text" name="wacoalOnhandQty" class="disableNumber" readonly size="7" value="<%=item.getWacoalOnhandQty()%>">

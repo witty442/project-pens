@@ -107,9 +107,8 @@ public class StockQueryAction extends I_Action {
 			aForm.setBean(b);
 		} catch (Exception e) {
 			aForm.setResults(null);
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -189,9 +188,8 @@ public class StockQueryAction extends I_Action {
 			    out.close();
 	         }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				// conn.close();
@@ -203,6 +201,7 @@ public class StockQueryAction extends I_Action {
 	private StringBuffer genHTML(HttpServletRequest request,StockQueryForm form){
 		StringBuffer h = new StringBuffer("");
 		String a= "@";
+		Map<String, String> chkLineGroupMap = new HashMap<String, String>();
 		try{
 			h.append("<style> \n");
 			h.append(" .num { \n");
@@ -230,6 +229,9 @@ public class StockQueryAction extends I_Action {
 			}else if("SummaryByPensItem".equalsIgnoreCase(form.getBean().getSummaryType())){
 				colSpan = 4;
 				title = "Stock Pick Query By Pens Item";
+			}else if("SummaryByBoxMat".equalsIgnoreCase(form.getBean().getSummaryType())){
+				colSpan = 4;
+				title = "Stock Pick Query By Box ,Group";
 			}
 			
 			h.append("<table border='1'> \n");
@@ -275,11 +277,15 @@ public class StockQueryAction extends I_Action {
 					h.append("<td>เลขที่กล่อง</td> \n");
 					h.append("<td>รับคืนจาก.</td> \n");
 					h.append("<td>จำนวน</td> \n");
-					
 				}else if("SummaryByPensItem".equalsIgnoreCase(form.getBean().getSummaryType())){
-					 h.append("<td>เลขที่กล่อง</td> \n");
+					h.append("<td>เลขที่กล่อง</td> \n");
 					h.append("<td>Pens Item</td> \n");
 					h.append("<td>Group Code.</td> \n");
+					h.append("<td>จำนวน</td> \n");
+				}else if("SummaryByBoxMat".equalsIgnoreCase(form.getBean().getSummaryType())){
+					h.append("<td>เลขที่กล่อง</td> \n");
+					h.append("<td>รับคืนจาก</td> \n");
+					h.append("<td>รุ่น</td> \n");
 					h.append("<td>จำนวน</td> \n");
 				}
 
@@ -312,10 +318,24 @@ public class StockQueryAction extends I_Action {
 					   h.append("<td class='text'>"+s.getPensItem()+"</td> \n");
 					   h.append("<td>"+s.getGroupCode()+"</td> \n");
 					   h.append("<td>"+s.getOnhandQty()+"</td> \n");
+					}else if("SummaryByBoxMat".equalsIgnoreCase(form.getBean().getSummaryType())){
+					  
+						if(chkLineGroupMap.get(s.getBoxNo()+"-"+s.getName())==null){
+					      h.append("<td >"+s.getBoxNo()+"</td> \n");
+					      h.append("<td class='text'>"+s.getName()+"</td> \n");
+					      //set for line griup by boxNo jobName
+					      chkLineGroupMap.put(s.getBoxNo()+"-"+s.getName(), s.getBoxNo()+"-"+s.getName());
+					   }else{
+						   h.append("<td ></td> \n");
+						   h.append("<td class='text'></td> \n");
+					   }
+					   h.append("<td>"+s.getGroupCode()+"</td> \n");
+					   h.append("<td>"+s.getOnhandQty()+"</td> \n");
 					}
 					h.append("</tr>");
 				}//for 
 				
+				//Total
 				 if("SummaryByBox".equalsIgnoreCase(form.getBean().getSummaryType())){
 					  h.append("<td></td> \n");
 					  h.append("<td></td> \n");
@@ -338,6 +358,11 @@ public class StockQueryAction extends I_Action {
 					 if("W3".equalsIgnoreCase(b.getWareHouse())){
 						h.append("<td></td> \n");
 					 }
+					 h.append("<td>Total QTY</td> \n");
+					 h.append("<td>"+b.getTotalQty()+"</td> \n");
+				}else if("SummaryByBoxMat".equalsIgnoreCase(form.getBean().getSummaryType())){
+					 h.append("<td></td> \n");
+					 h.append("<td></td> \n");
 					 h.append("<td>Total QTY</td> \n");
 					 h.append("<td>"+b.getTotalQty()+"</td> \n");
 				}

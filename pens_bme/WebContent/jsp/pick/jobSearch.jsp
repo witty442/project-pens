@@ -1,14 +1,13 @@
+<%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.bean.Job"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
 <%@page import="com.pens.util.*"%>
-<%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -49,6 +48,13 @@ function search(path){
 	form.action = path + "/jsp/jobAction.do?do=search2&action=newsearch";
 	form.submit();
 	return true;
+}
+function gotoPage(currPage){
+	var form = document.jobForm;
+	var path = document.getElementById("path").value;
+	form.action = path + "/jsp/jobAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
 }
 function openEdit(path,jobId,mode){
 	var form = document.jobForm;
@@ -137,12 +143,7 @@ function resetStore(){
 		form.subInv.value = "";
 	}
 }
-function gotoPage(path,currPage){
-	var form = document.jobForm;
-	form.action = path + "/jsp/jobAction.do?do=search2&currPage="+currPage;
-    form.submit();
-    return true;
-}
+
 </script>
 
 </head>		
@@ -280,22 +281,8 @@ function gotoPage(path,currPage){
 					   int endRec = jobForm.getEndRec();
 					   int no = startRec;
 					%>
-					   
-					<div align="left">
-					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
-					   <span class="pagelinks">
-						หน้าที่ 
-						 <% 
-							 for(int r=0;r<totalPage;r++){
-								 if(currPage ==(r+1)){
-							 %>
-			 				   <strong><%=(r+1) %></strong>
-							 <%}else{ %>
-							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-						 <% }} %>				
-						</span>
-					</div>
+					  <%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
+					
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -384,6 +371,7 @@ function gotoPage(path,currPage){
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					
 					<!-- hidden field -->
+					<input type="hidden" name="path" id="path" value ="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

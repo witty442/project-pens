@@ -39,7 +39,10 @@ if("".equals(screentHeight)){
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+
+<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script> --%>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script>
+
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 
@@ -690,10 +693,11 @@ function currencyToNum(str){
 							 for(int r=0;r<totalPage;r++){
 								 if(pageNumber ==(r+1)){
 							 %>
-			 				   <strong><%=(r+1) %></strong>
+			 				   <font size="2"><u><b><%=(r+1) %></b></u></font><font color="#34495E"> |</font>
 							 <%}else{ %>
 							 
 							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
+							    <font color="#34495E"> |</font>
 							    
 						 <% }} %>				
 						</span>
@@ -799,11 +803,12 @@ function currencyToNum(str){
 							 for(int r=0;r<totalPage;r++){
 								 if(pageNumber ==(r+1)){
 							 %>
-			 				   <strong><%=(r+1) %></strong>
+			 				   
+			 				   <font size="2"><u><b><%=(r+1) %></b></u></font><font color="#34495E"> |</font>
 							 <%}else{ %>
 							 
 							    <a href="javascript:gotoPageCaseView('${pageContext.request.contextPath}','<%=(r+1)%>')"  title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-							    
+							    <font color="#34495E"> |</font>
 						 <% }} %>				
 						</span>
 					</div>
@@ -892,7 +897,7 @@ function currencyToNum(str){
 									 
 									  <c:if test="${reqPickStockForm.bean.canEdit == true}">
 										<a href="javascript:save('${pageContext.request.contextPath}')">
-										  <input type="button" value="บันทึก request issue" class="newPosBtnLong"> 
+										  <input type="button" value="บันทึก Request Issue" class="newPosBtnLong"> 
 										 </a>
 									 </c:if>
 									 

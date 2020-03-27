@@ -17,7 +17,8 @@ if("W1".equals(wareHouse) || "W3".equals(wareHouse)
 	<option value="Detail">Detail</option>
 	<option value="SummaryByBox">Summary ตามกล่อง</option>
 	<option value="SummaryByPensItem">Summary ตาม PensItem</option>
+	<option value="SummaryByBoxMat">Summary ตามกล่อง,รุ่น</option>
 <%}else{ %>
-   <option value="Detail">Detail</option>
-   <option value="SummaryByPensItem">Summary ตาม PensItem</option>
+    <option value="Detail">Detail</option>
+    <option value="SummaryByPensItem">Summary ตาม PensItem</option>
 <%}%>

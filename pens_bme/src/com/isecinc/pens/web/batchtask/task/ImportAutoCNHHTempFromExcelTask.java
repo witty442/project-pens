@@ -139,7 +139,7 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
             monitorModel.setErrorCode(modelItem.getErrorCode());
 			monitorModel.setStatus(modelItem.getStatus());
 			monitorModel.setFileCount(modelItem.getSuccessCount()>0?1:0);
-			
+			monitorModel.setType("IMPORT");
 			logger.debug("errorMsg:"+monitorModel.getErrorMsg());
 			/** Update Status Monitor **/
 			dao.updateMonitor(connMonitor,monitorModel);

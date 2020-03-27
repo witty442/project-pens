@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.PageingBean"%>
 <%@page import="com.isecinc.pens.dao.JobDAO"%>
 <%@page import="com.isecinc.pens.web.pick.MoveStockWarehouseAction"%>
 <%@page import="com.isecinc.pens.bean.MoveStockWarehouseBean"%>
@@ -21,9 +22,6 @@
 
 <%
 String dateSession = DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH);
-int pageNumber = 1;
-int start = 0;
-int end = 0;
 
 String screenWidth = Utils.isNull(session.getAttribute("screenWidth"));
 String screenHeight = Utils.isNull(session.getAttribute("screenHeight"));
@@ -77,8 +75,15 @@ function clearForm(path){
 
 function search(path){
 	var form = document.moveStockWarehouseForm;
-	
-	form.action = path + "/jsp/moveStockWarehouseAction.do?do=searchHead&action=newsearch";
+	form.action = path + "/jsp/moveStockWarehouseAction.do?do=search2&action=newsearch";
+	form.submit();
+	return true;
+}
+
+function gotoPage(currPage){
+	var form = document.moveStockWarehouseForm;
+	var path = document.getElementById("path").value;
+	form.action = path + "/jsp/moveStockWarehouseAction.do?do=search2&currPage="+currPage;
 	form.submit();
 	return true;
 }
@@ -91,12 +96,6 @@ function newDoc(path){
 	return true; 
 }
 
-function gotoPage(path,pageNumber){
-	var form = document.moveStockWarehouseForm;
-	form.action = path + "/jsp/moveStockWarehouseAction.do?do=searchHead&pageNumber="+pageNumber;
-	form.submit();
-	return true;
-}
 </script>
 
 </head>		
@@ -198,42 +197,14 @@ function gotoPage(path,pageNumber){
 
             <c:if test="${moveStockWarehouseForm.resultsSearch != null}">
                   <% 
-					
-						String tabclass ="lineE";
-						List<MoveStockWarehouseBean> resultList = moveStockWarehouseForm.getResultsSearch();
-						
-						//calc Page number
-						String action = Utils.isNull(request.getParameter("action"));
-						int totalPage = moveStockWarehouseForm.getTotalPage();
-						int totalRow = moveStockWarehouseForm.getTotalRow();
-						int pageSize = MoveStockWarehouseAction.pageSize;
-	                    if( !"newsearch".equalsIgnoreCase(action)){
-						     pageNumber = !Utils.isNull(request.getParameter("pageNumber")).equals("")?Utils.convertStrToInt(request.getParameter("pageNumber")):1;
-	                    }
-	                    //System.out.println("Screen pageNumber:"+pageNumber);
-	                    start = ((pageNumber-1)*pageSize)+1;
-						end = (pageNumber * pageSize);
-						if(end > totalRow){
-						   end = totalRow;
-						}
-				  %>
-					   <div align="left">
-						   <span class="pagebanner">รายการทั้งหมด  <%=totalRow %> รายการ, แสดงรายการที่  <%=(start) %> ถึง  <%=end %>.</span>
-						   <span class="pagelinks">
-							หน้าที่ 
-							 <% 
-								 for(int r=0;r<totalPage;r++){
-									 if(pageNumber ==(r+1)){
-								 %>
-				 				   <font size="3"><b><%=(r+1) %></b></font>
-								 <%}else{ %>
-								    <font size="2" ><b>
-								      <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-								      </b>
-								    </font>
-							 <% }} %>				
-							</span>
-					  </div>
+					   int totalPage = moveStockWarehouseForm.getTotalPage();
+					   int totalRecord = moveStockWarehouseForm.getTotalRecord();
+					   int currPage =  moveStockWarehouseForm.getCurrPage();
+					   int startRec = moveStockWarehouseForm.getStartRec();
+					   int endRec = moveStockWarehouseForm.getEndRec();
+					   int no = moveStockWarehouseForm.getStartRec();
+					%>
+					<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
             
 					  <table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
 					       <tr>
@@ -245,10 +216,11 @@ function gotoPage(path,pageNumber){
 						   </tr>
 							
 					    <% 
-					     int no = 1;
+					     //int no = 1;
+					    String tabclass="";
 					     List<MoveStockWarehouseBean> resultSearchList = moveStockWarehouseForm.getResultsSearch();
 						 for(int n=0; n <resultSearchList.size() ; n++){
-								MoveStockWarehouseBean mc = (MoveStockWarehouseBean)resultList.get(n);
+								MoveStockWarehouseBean mc = (MoveStockWarehouseBean)resultSearchList.get(n);
 								if(n%2==0){
 									tabclass="lineO";
 								}
@@ -263,7 +235,7 @@ function gotoPage(path,pageNumber){
 									</tr>
 							<%}//for %>
 							
-							<%if(totalPage==pageNumber){ 
+							<%if(1==2){//totalPage==pageNumber){ 
 								//MoveStockWarehouseBean s =  moveStockWarehouseForm.getBean().getSummary();
 							%>
 							<!-- <tr class='hilight_text'> -->
@@ -285,8 +257,7 @@ function gotoPage(path,pageNumber){
 		<!-- ************************Result ***************************************************-->	
 					<!-- hidden field -->
 					<input type="hidden" name="page" value="<%=request.getParameter("page") %>"/>
-					<input type="hidden" name="pageNumber" id="pageNumber" value="<%=pageNumber%>"/>
-					
+					<input type="hidden" name="path" id="path" value ="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

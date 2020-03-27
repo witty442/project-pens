@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.AdjustStock;
 import com.isecinc.pens.bean.AdjustStockSA;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.AdjustStockDAO;
@@ -33,7 +34,7 @@ import com.pens.util.Utils;
  */
 public class AdjustStockSAAction extends I_Action {
 
-	public static int pageSize = 90;
+	public static int pageSize = 60;
 	public static Map<String,String> STORE_TYPE_MAP = new HashMap<String, String>();
 	
 	
@@ -51,8 +52,9 @@ public class AdjustStockSAAction extends I_Action {
 				
 				aForm.setAdjustStockSA(ad);
 			}else if("back".equals(action)){
+				conn = DBConnection.getInstance().getConnectionApps();
 				aForm.setAdjustStockSA(aForm.getAdjustStockSACriteria());
-				aForm.setResultsSearch(AdjustStockSADAO.searchHead(aForm.getAdjustStockSA()));
+				aForm.setResultsSearch(AdjustStockSADAO.searchHeadList(conn,aForm.getAdjustStockSA(),false,1,pageSize));
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
@@ -65,7 +67,7 @@ public class AdjustStockSAAction extends I_Action {
 		return mapping.findForward("prepare2");
 	}
 	
-	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+	/*public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("search2");
 		AdjustStockSAForm aForm = (AdjustStockSAForm) form;
 		User user = (User) request.getSession().getAttribute("user");
@@ -77,12 +79,85 @@ public class AdjustStockSAAction extends I_Action {
 			   aForm.setResultsSearch(null);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			throw e;
 		}finally{
 			
+		}
+		return mapping.findForward("search2");
+	}*/
+	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("search2");
+		AdjustStockSAForm aForm = (AdjustStockSAForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String msg = "";
+		int currPage = 1;
+		boolean allRec = false;
+		Connection conn = null;
+		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
+			
+			conn = DBConnection.getInstance().getConnectionApps();
+			
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					aForm.setAdjustStockSACriteria(aForm.getAdjustStockSA());
+				}
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+				
+				//get Total Record
+				aForm.setTotalRecord(AdjustStockSADAO.searchHeadListTotalRec(conn,aForm.getAdjustStockSA()));
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			   
+				List<AdjustStockSA> items = AdjustStockSADAO.searchHeadList(conn,aForm.getAdjustStockSA(),allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+				if(items.size() <=0){
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				   aForm.setResultsSearch(null);
+				}
+			}else{
+				// Goto from Page
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				logger.debug("currPage:"+currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize)+1;
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+			    
+				//get Items Show by Page Size
+			    List<AdjustStockSA> items = AdjustStockSADAO.searchHeadList(conn,aForm.getAdjustStockSA(),allRec,currPage,pageSize);
+				aForm.setResultsSearch(items);
+				
+			}
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
 		}
 		return mapping.findForward("search2");
 	}
@@ -204,7 +279,6 @@ public class AdjustStockSAAction extends I_Action {
 			
 			request.setAttribute("Message", msg);*/
 		} catch (Exception e) {
-			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			throw e;
@@ -246,7 +320,6 @@ public class AdjustStockSAAction extends I_Action {
 			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
 		} catch (Exception e) {
 			conn.rollback();
-            e.printStackTrace();
 			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
 			try {
 				

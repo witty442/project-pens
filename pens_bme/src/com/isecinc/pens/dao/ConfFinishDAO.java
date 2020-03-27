@@ -78,7 +78,7 @@ public class ConfFinishDAO extends PickConstants{
 				 
 				   h.setNo(r);
 				   h.setRequestDate(DateUtil.stringValue(rst.getTimestamp("request_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   h.setConfirmDate(DateUtil.stringValue(rst.getTimestamp("confirm_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				   h.setConfirmDate(DateUtil.stringValueNull(rst.getTimestamp("confirm_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				   
 				   h.setRequestNo(Utils.isNull(rst.getString("request_no"))); 
 				   h.setStatus(Utils.isNull(rst.getString("status"))); 

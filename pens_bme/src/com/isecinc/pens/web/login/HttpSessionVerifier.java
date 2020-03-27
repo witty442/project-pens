@@ -18,11 +18,11 @@ public class HttpSessionVerifier implements HttpSessionListener {
       Date sessionCreationTime = new Date(event.getSession().getCreationTime());
       Date sessionLastAccessedTime = new Date(event.getSession().getLastAccessedTime());
       int sessionMaxInactiveInterval = event.getSession().getMaxInactiveInterval();
-      logger.warn("Session: " + event.getSession().getId()
+      /*logger.warn("Session: " + event.getSession().getId()
           + " createTime: " + sessionCreationTime
           + " lastAccess: " + sessionLastAccessedTime
           + " with maxInactiveInterval: " + sessionMaxInactiveInterval
-          + " created.");
+          + " created.");*/
       
       HttpSession session = event.getSession();
       //sessions.put(session.getId(), session);
@@ -32,12 +32,12 @@ public class HttpSessionVerifier implements HttpSessionListener {
       Date sessionCreationTime = new Date(event.getSession().getCreationTime());
       Date sessionLastAccessedTime = new Date(event.getSession().getLastAccessedTime());
       int sessionMaxInactiveInterval = event.getSession().getMaxInactiveInterval();
-      logger.warn("Session: " + event.getSession().getId()
+    /*  logger.warn("Session: " + event.getSession().getId()
           + " createTime: " + sessionCreationTime
           + " lastAccess: " + sessionLastAccessedTime
           + " with maxInactiveInterval: " + sessionMaxInactiveInterval
           + " destroyed.");
-      
+      */
       //sessions.remove(event.getSession().getId());
   }
   

@@ -17,24 +17,25 @@ public class MonitorBean implements Serializable{
 
 private static final long serialVersionUID = -990650039740579753L;
    private boolean checked;
-   private   BigDecimal transactionId;
-   private   BigDecimal monitorId;
-   private   BigDecimal monitorItemId;
-   private   String name ;
-   private   String type ;
-   private   String channel ;
-   private   String saleRepCode ;
-   private   String transactionType ;
-   private   Date submitDate ;
-   private   String submitDateDisp ;
-   private   int status ;
-   private   int batchTaskStatus ;
-   private   Date createDate ;
-   private   String createUser ;
-   private   Date updateDate ;
-   private   String updateUser  ;
-   private   int fileCount;
-   private  int successCount;
+   private  BigDecimal transactionId;
+   private  BigDecimal monitorId;
+   private  BigDecimal monitorItemId;
+   private  String name ;
+   private  String type ;
+   private  String channel ;
+   private  String saleRepCode ;
+   private  String transactionType ;
+   private  Date submitDate ;
+   private  String submitDateDisp ;
+   private  int status ;
+   private  int batchTaskStatus ;
+   private  Date createDate ;
+   private  String createUser ;
+   private  Date updateDate ;
+   private  String updateDateDisp ;
+   private  String updateUser  ;
+   private  int fileCount;
+   private int successCount;
    private String errorCode;
    private String errorMsg;
    private String timeInUse;
@@ -67,7 +68,13 @@ private static final long serialVersionUID = -990650039740579753L;
 	private String thName;
     
 	
-   public String getThName() {
+   public String getUpdateDateDisp() {
+		return updateDateDisp;
+	}
+	public void setUpdateDateDisp(String updateDateDisp) {
+		this.updateDateDisp = updateDateDisp;
+	}
+public String getThName() {
 		return thName;
 	}
 	public void setThName(String thName) {

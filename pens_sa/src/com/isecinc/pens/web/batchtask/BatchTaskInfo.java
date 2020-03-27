@@ -7,6 +7,7 @@ import java.util.Map;
 public class BatchTaskInfo implements Serializable {
 
 private static final long serialVersionUID = 1L;
+    private String taskName;
 	private String param;
 	private String buttonName ;
 	private String processName;
@@ -24,6 +25,12 @@ private static final long serialVersionUID = 1L;
 	private List<BatchTaskInfo> paramList;
 	
 	
+	public String getTaskName() {
+		return taskName;
+	}
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
+	}
 	public boolean isDispDetail() {
 		return dispDetail;
 	}

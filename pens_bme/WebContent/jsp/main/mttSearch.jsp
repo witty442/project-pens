@@ -2,9 +2,6 @@
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.dao.GeneralDAO"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
-<%@page import="com.isecinc.pens.dao.JobDAO"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
@@ -18,9 +15,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <jsp:useBean id="mttForm" class="com.isecinc.pens.web.mtt.MTTForm" scope="session" />
 <%
 /*clear session form other page */
@@ -94,8 +89,9 @@ function search(path){
 	form.submit();
 	return true;
 }
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.mttForm;
+	var path = form.path.value;
 	form.action = path + "/jsp/mttAction.do?do=search2&currPage="+currPage;
     form.submit();
     return true;
@@ -308,13 +304,17 @@ function resetStore(){
 					  </div>
 
             <c:if test="${mttForm.results != null}">
-                  	 <jsp:include page="../pageing.jsp">
-				       <jsp:param name="totalPage" value="<%=mttForm.getTotalPage() %>"/>
-				       <jsp:param name="totalRecord" value="<%=mttForm.getTotalRecord() %>"/>
-				       <jsp:param name="currPage" value="<%=mttForm.getCurrPage() %>"/>
-				       <jsp:param name="startRec" value="<%=mttForm.getStartRec() %>"/>
-				       <jsp:param name="endRec" value="<%=mttForm.getEndRec() %>"/>
-			         </jsp:include>
+                  	 <br/>
+				    <% 
+					   int totalPage = mttForm.getTotalPage();
+					   int totalRecord = mttForm.getTotalRecord();
+					   int currPage =  mttForm.getCurrPage();
+					   int startRec = mttForm.getStartRec();
+					   int endRec = mttForm.getEndRec();
+					   int pageSize = mttForm.getPageSize();
+					   int no = Utils.calcStartNoInPage(currPage, pageSize);
+					%>
+					<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 						           <th >Action</th>	
@@ -428,6 +428,7 @@ function resetStore(){
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					
 					<!-- hidden field -->
+					<input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

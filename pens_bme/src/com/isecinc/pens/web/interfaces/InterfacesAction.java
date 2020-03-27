@@ -48,9 +48,8 @@ public class InterfacesAction extends I_Action {
 		try {
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() 
-					+ e.toString());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}
 		return returnText;
@@ -214,9 +213,8 @@ public class InterfacesAction extends I_Action {
 		    out.close();
 		    file.close();
 		} catch (Exception e) {
-			e.printStackTrace();
-			
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}
 		return mapping.findForward("showItemExport");
 	}
@@ -240,9 +238,8 @@ public class InterfacesAction extends I_Action {
 		    m.setMonitorItemBean(i);
 		    interfacesForm.setMonitorBean(m);
 		} catch (Exception e) {
-			e.printStackTrace();
-			
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}
 		return mapping.findForward("showItemExport");
 	}

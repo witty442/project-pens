@@ -45,7 +45,7 @@ public abstract class I_Action extends DispatchAction {
 				forward = prepare(form, request, response);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 		return mapping.findForward(forward);
 	}
@@ -66,7 +66,7 @@ public abstract class I_Action extends DispatchAction {
 		try {
 			forward = search(form, request, response);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 		return mapping.findForward(forward);
 	}
@@ -87,7 +87,7 @@ public abstract class I_Action extends DispatchAction {
 		try {
 			forward = save(form, request, response);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 		return mapping.findForward(forward);
 	}
@@ -108,7 +108,7 @@ public abstract class I_Action extends DispatchAction {
 		try {
 			forward = changeActive(form, request, response);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 		return mapping.findForward(forward);
 	}
@@ -134,7 +134,7 @@ public abstract class I_Action extends DispatchAction {
 		try {
 			setNewCriteria(form);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 		return mapping.findForward("clearform");
 	}

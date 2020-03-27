@@ -542,13 +542,11 @@ public class DateUtil {
 		public static Date parse(String dateString, String format ,Locale locale) throws Exception {
 			Date date = null;
 			SimpleDateFormat ft = new SimpleDateFormat(format, locale);
-			
 			try {
 				date = ft.parse(dateString);
 			} catch (Exception e) {
-				
+				throw e;
 			}
-			
 			return date;
 		}
 		
@@ -561,13 +559,11 @@ public class DateUtil {
 		public static String stringValue(Date date, String format) throws Exception {
 			String dateStr = null;		
 			SimpleDateFormat ft = new SimpleDateFormat(format, Locale.US);
-			
 			try {
 				dateStr = ft.format(date);
 			} catch (Exception e) {
-				
+				throw e;
 			}
-
 			return dateStr;
 		}
 		
@@ -677,5 +673,16 @@ public class DateUtil {
 			c.add(Calendar.DAY_OF_MONTH, backDay);
 			
 			return c.getTime();
+		}
+		
+		public static String convBuddhistToChristDate(String buddhistDate,String format) throws Exception{
+			String christDate = "";
+			try{
+			   Date christDateO = parse(buddhistDate, format,local_th) ;
+			   christDate = stringValue(christDateO, format);
+			}catch(Exception e){
+				throw e;
+			}
+			return christDate;
 		}
 }

@@ -54,17 +54,26 @@ function loadMe(){
 }
 function search(path){
 	var form = document.shopForm;
+	var startDate = form.startDate;
+    var endDate = form.endDate;
+	   
+	if(startDate.value =="" ){
+	   startDate.focus();
+	   alert("กรุณากรอกวันที่");
+	   return false;
+	}
 	form.action = path + "/jsp/shopAction.do?do=search&action=newsearch&pageName=<%=request.getParameter("pageName")%>";
 	form.submit();
 	return true;
 }
-
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.shopForm;
+	var path = form.path.value; 
 	form.action = path + "/jsp/shopAction.do?do=search&pageName=<%=request.getParameter("pageName")%>&currPage="+currPage;
-    form.submit();
-    return true;
+	form.submit();
+	return true;
 }
+
 function exportExcel(path){
 	var form = document.shopForm;
 	form.action = path + "/jsp/shopAction.do?do=export&pageName=<%=request.getParameter("pageName")%>";
@@ -172,13 +181,18 @@ function clearForm(path){
 				   <!-- ****** RESULT ***************************************************************** -->
 				  <%if(shopForm.getResults() != null && shopForm.getResults().size() >0) {%>
 					<%if(shopForm.getBean().getReportType().equalsIgnoreCase("Detail")){ %>	
-						 <jsp:include page="../../pageing.jsp">
-					       <jsp:param name="totalPage" value="<%=shopForm.getTotalPage() %>"/>
-					       <jsp:param name="totalRecord" value="<%=shopForm.getTotalRecord() %>"/>
-					       <jsp:param name="currPage" value="<%=shopForm.getCurrPage() %>"/>
-					       <jsp:param name="startRec" value="<%=shopForm.getStartRec() %>"/>
-					       <jsp:param name="endRec" value="<%=shopForm.getEndRec() %>"/>
-					        </jsp:include>
+						  <br/>
+					    <% 
+						   int totalPage = shopForm.getTotalPage();
+						   int totalRecord = shopForm.getTotalRecord();
+						   int currPage =  shopForm.getCurrPage();
+						   int startRec = shopForm.getStartRec();
+						   int endRec = shopForm.getEndRec();
+						   int pageSize = shopForm.getPageSize();
+						   int no = Utils.calcStartNoInPage(currPage, pageSize);
+						%>
+						<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
+						
 							<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
 						        <tr>
 						            <th rowspan="2">Promotion หลัก</th>
@@ -249,14 +263,17 @@ function clearForm(path){
 							  <%} %>
 						</table>
 						<%}else{ %>
-						
-						 <jsp:include page="../../pageing.jsp">
-					       <jsp:param name="totalPage" value="<%=shopForm.getTotalPage() %>"/>
-					       <jsp:param name="totalRecord" value="<%=shopForm.getTotalRecord() %>"/>
-					       <jsp:param name="currPage" value="<%=shopForm.getCurrPage() %>"/>
-					       <jsp:param name="startRec" value="<%=shopForm.getStartRec() %>"/>
-					       <jsp:param name="endRec" value="<%=shopForm.getEndRec() %>"/>
-					        </jsp:include>
+						<br/>
+						    <% 
+							   int totalPage = shopForm.getTotalPage();
+							   int totalRecord = shopForm.getTotalRecord();
+							   int currPage =  shopForm.getCurrPage();
+							   int startRec = shopForm.getStartRec();
+							   int endRec = shopForm.getEndRec();
+							   int pageSize = shopForm.getPageSize();
+							   int no = Utils.calcStartNoInPage(currPage, pageSize);
+							%>
+							<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
 							<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
 						        <tr>
 									<th rowspan="2">ชื่อโปรโมชั่น</th>
@@ -322,6 +339,7 @@ function clearForm(path){
 
 					<!-- hidden field -->
 					<input type="hidden" name="pageName" value="<%=request.getParameter("pageName") %>"/>
+					<input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

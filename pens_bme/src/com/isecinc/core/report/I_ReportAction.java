@@ -97,7 +97,7 @@ public abstract class I_ReportAction<E> extends DispatchAction {
 		try {
 			setNewCriteria(form);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 		return mapping.findForward("clearform");
 	}

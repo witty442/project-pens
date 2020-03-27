@@ -9,8 +9,6 @@
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="java.util.List"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -32,7 +30,6 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript">
 
 function loadMe(){
@@ -198,7 +195,7 @@ function currencyToNum(str){
 		  <%if(session.getAttribute("resultItems") != null) {%>
 				<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 				     <tr>
-						<th >MaterialMaster</th>
+						<th >MaterialMaster XX</th>
 						<th >Barcode</th>
 						<th >Onhand Qty</th>
 						<th >Qty ที่จะเบิก</th>
@@ -267,17 +264,17 @@ function currencyToNum(str){
 			  <%if(session.getAttribute("saved") !=null){%>
 		           //alert($('#totalQty'));
 		           
-			       if($('#totalQty').val() =='0'){
+			       if(document.getElementById("totalQty").value =='0'){
 			    	   sumQty = "";
 			       }else{
-			    	   sumQty = $('#totalQty').val();
+			    	   sumQty = document.getElementById("totalQty").value;
 			       }
 			       
-			       var rowIndex = $('#rowIndex').val(); //document.getElementsByName("bean.rowIndex")[0].value;
-			       var issueReqNo = $('#issueReqNo').val();//document.getElementsByName("bean.issueReqNo")[0].value;
-			       var actionDB = $('#actionDB').val() ;//document.getElementsByName("bean.status")[0].value;
-			       var totalOnhandQty = $('#totalOnhandQty').val();
-			       var path = $('#path').val();
+			       var rowIndex = document.getElementById("rowIndex").value;
+			       var issueReqNo = document.getElementById("issueReqNo").value;
+			       var actionDB = document.getElementById("actionDB").value;
+			       var totalOnhandQty = document.getElementById("totalOnhandQty").value;//$('#totalOnhandQty').val();
+			       var path = document.getElementById("path").value ;//$('#path').val();
 			       
 			      // alert(totalOnhandQty);
 			       

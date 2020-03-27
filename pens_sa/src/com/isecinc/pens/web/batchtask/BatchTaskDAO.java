@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.MonitorBean;
@@ -30,6 +29,36 @@ import com.pens.util.Utils;
 public class BatchTaskDAO {
 
 	protected static  Logger logger = Logger.getLogger("PENS");
+	
+	public  BatchTaskForm searchBatchLastRun(User user,String pageName){
+		BatchTaskForm batchTaskForm = new BatchTaskForm();
+		try{
+			/** Set Condition Search **/
+			MonitorBean[] monitors = findMonitorListNew(user,pageName);
+			
+			logger.debug("monitors Size:"+monitors.length);
+			if (monitors != null && monitors.length > 0) {
+				
+				//Search interfaceResult (monitorItem)
+				MonitorItemBean monitorItemBean = findMonitorItemBean(user,monitors[0]);
+				batchTaskForm.setMonitorItem(monitorItemBean);
+	
+				// Head Monitor 
+				batchTaskForm.setResults(monitors);
+				
+				//Get BatschTask Info
+				BatchTaskInfo taskInfo = new BatchTaskInfo();
+				taskInfo.setTaskName(pageName);
+				taskInfo.setDispDetail(new BatchTaskAction().getDispDetailByTaskname(pageName));
+				batchTaskForm.setTaskInfo(taskInfo);
+			} else {
+				batchTaskForm.setResults(null);
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return batchTaskForm;
+	}
 	
 	public MonitorBean insertMonitor(MonitorBean model) throws Exception {
 		Connection conn =null;
@@ -180,12 +209,9 @@ public class BatchTaskDAO {
 			" code  ," +
 			" type ," +
 			" amount )" +
-			" VALUES ((select max(id) from monitor_item),?,?,?,?,?) ";
+			" VALUES ((select max(id) from PENSBI.monitor_item),?,?,?,?,?) ";
 			  
 			logger.debug("SQL:"+sql);
-			
-			
-			
 			if( monitorItemDetailBean != null && monitorItemDetailBean.length >0){
 				psIns = conn.prepareStatement(sql);
 				for(int i=0;i<monitorItemDetailBean.length;i++){
@@ -391,14 +417,14 @@ public class BatchTaskDAO {
     public void updateControlMonitor(Connection conn,BigDecimal transactionId,String action) throws Exception {
 		PreparedStatement ps = null;
 		try {
-			String sql = "UPDATE c_monitor SET  transaction_id = "+transactionId+" WHERE action = '"+action+"'";
+			String sql = "UPDATE PENSBI.c_monitor SET  transaction_id = "+transactionId+" WHERE action = '"+action+"'";
 			logger.info("SQL UPDATE:"+sql);
 			int index = 0;
 			ps = conn.prepareStatement(sql);
 			int r = ps.executeUpdate();
 			if(r==0){
 				//insert 
-				sql = "insert into c_monitor(action,transaction_id)values('"+action+"',"+transactionId+")";
+				sql = "insert into PENSBI.c_monitor(action,transaction_id)values('"+action+"',"+transactionId+")";
 				logger.info("SQL INS:"+sql);
 				index = 0;
 				ps = conn.prepareStatement(sql);
@@ -562,13 +588,13 @@ public class BatchTaskDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select monitor.*  \n");
-			sql.append(" , (select count(*) from monitor_item where monitor_item.monitor_id = monitor.monitor_id and status = "+Constants.STATUS_SUCCESS+" )  as success_count  \n");
-			sql.append(" , (select max(id) from monitor_item where monitor_item.monitor_id = monitor.monitor_id)  as monitor_item_id  \n");
-			sql.append(" , (select error_msg from monitor_error_mapping where monitor_error_mapping.error_code = monitor.error_code) as error_disp \n");
-			sql.append(" from monitor  \n");
+			sql.append(" , (select count(*) from PENSBI.monitor_item where monitor_item.monitor_id = monitor.monitor_id and status = "+Constants.STATUS_SUCCESS+" )  as success_count  \n");
+			sql.append(" , (select max(id) from PENSBI.monitor_item where monitor_item.monitor_id = monitor.monitor_id)  as monitor_item_id  \n");
+			sql.append(" , (select error_msg from PENSBI.monitor_error_mapping where monitor_error_mapping.error_code = monitor.error_code) as error_disp \n");
+			sql.append(" from PENSBI.monitor  \n");
 			sql.append(" inner join  \n");
 			sql.append(" ( select max(transaction_id) as transaction_id  \n");
-			sql.append("   from monitor  \n");
+			sql.append("   from PENSBI.monitor  \n");
 			sql.append("   where create_user like '%"+user.getUserName()+"%' \n");
 			sql.append("   and name ='"+name+"'\n");
 			sql.append("  ) s  \n");
@@ -605,8 +631,9 @@ public class BatchTaskDAO {
 	            }else{
 	               m.setErrorMsg(Utils.isNull(rs.getString("error_disp")));
 	            }
+	        	m.setUpdateDateDisp(DateUtil.stringValue(rs.getTimestamp("update_date"),DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,DateUtil.local_th));
 	            
-	            if(Utils.isNull(m.getErrorMsg()).equals("")){
+	        	if(Utils.isNull(m.getErrorMsg()).equals("")){
 	            	logger.debug("errorCode:"+rs.getString("error_code"));
 	            	if( !Utils.isNull(rs.getString("error_code")).equals("")){
 		            	String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_code")));
@@ -1195,6 +1222,7 @@ public class BatchTaskDAO {
 		try {
 			String sql = "UPDATE PENSBI.monitor SET " +
 			" status = ? ,file_count =? ,error_code = ? ,error_msg =? ,transaction_type = ? "+
+			" ,file_name = ? ,type =? ,th_name = ? ,update_date =? "+
 			" WHERE MONITOR_ID = ? and transaction_id =?";
 			
 			logger.debug("SQL:"+sql);
@@ -1208,6 +1236,14 @@ public class BatchTaskDAO {
 			ps.setString(++index, Utils.isNull(model.getErrorCode()).length()> 300?model.getErrorCode().substring(0,299):model.getErrorCode());
 			ps.setString(++index, Utils.isNull(model.getErrorMsg()).length()> 300?model.getErrorMsg().substring(0,299):model.getErrorMsg());
 			ps.setString(++index, Utils.isNull(model.getTransactionType()));
+			ps.setString(++index, Utils.isNull(model.getFileName()));
+			ps.setString(++index, Utils.isNull(model.getType()));
+			ps.setString(++index, Utils.isNull(model.getThName()));
+			if(model.getStatus()==-1 || model.getStatus()==1){
+				ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));
+			}else{
+				ps.setTimestamp(++index,null);
+			}
 			ps.setBigDecimal(++index, model.getMonitorId());
 			ps.setBigDecimal(++index, model.getTransactionId());
 			

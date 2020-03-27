@@ -21,6 +21,8 @@
   
   List<References> storeList = importDAO.getStoreList();
   pageContext.setAttribute("storeList",storeList,PageContext.PAGE_SCOPE);
+  
+  User user = (User) request.getSession().getAttribute("user");
 %>
 <html>
 <head>
@@ -663,6 +665,9 @@ function getCustName(custCode,fieldName,storeType){
 							</tr>
 						</table>
 
+                        <!-- Execute delete db(sales-out) by fileName -->
+                          <jsp:include page="../all/deleteBmeSalesOut.jsp" />
+                          
 						<br>
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">

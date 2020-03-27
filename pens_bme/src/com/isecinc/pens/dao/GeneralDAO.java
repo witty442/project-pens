@@ -1456,8 +1456,8 @@ public class GeneralDAO {
 			String storeName ="";
 			try {
 				sql.append("\n select pens_value , pens_desc  ");
-				sql.append("\n FROM ");
-				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Store' ");
+				sql.append("\n FROM PENSBI.PENSBME_MST_REFERENCE WHERE 1=1 ");
+				sql.append("\n AND reference_code = 'Store' ");
 				sql.append("\n AND pens_value ='"+storeCode+"' \n");
 				sql.append("\n \n");
 				

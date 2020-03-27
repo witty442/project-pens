@@ -313,7 +313,7 @@ public class MTTBeanDAO{
 	}
 	public static StringBuffer genWhereSearchHeadList(MTTBean o) throws Exception{
 		StringBuffer sql = new StringBuffer("");
-		sql.append("\n and status <> '"+STATUS_CANCEL+"' \n");
+		sql.append("\n and status <> '"+STATUS_CANCEL+"' ");
 		
 		if( !Utils.isNull(o.getDocNo()).equals("")){
 			sql.append("\n and doc_no = '"+Utils.isNull(o.getDocNo())+"'");
@@ -332,14 +332,14 @@ public class MTTBeanDAO{
 			Date fDate  = DateUtil.parse(o.getSaleDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			String fStr = DateUtil.stringValue(fDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
-			sql.append("\n and trunc(SALE_DATE) >= to_date('"+fStr+"','dd/mm/yyyy') ");
+			sql.append("\n and SALE_DATE >= to_date('"+fStr+"','dd/mm/yyyy') ");
 		}
 		
 		if( !Utils.isNull(o.getSaleDateTo()).equals("")){
 			Date tDate  = DateUtil.parse(o.getSaleDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			String tStr = DateUtil.stringValue(tDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 
-			sql.append("\n and trunc(SALE_DATE) <= to_date('"+tStr+"','dd/mm/yyyy') ");
+			sql.append("\n and SALE_DATE <= to_date('"+tStr+"','dd/mm/yyyy') ");
 		}
 		
 		if( !Utils.isNull(o.getCreateDateFrom()).equals("")){

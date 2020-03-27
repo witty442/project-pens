@@ -68,7 +68,7 @@ public class ImportLoadStockInitProcess {
 		Row row = null;
 		Cell cell = null;
 		String salesDate = "";
-		String storeNo = "";
+		String storeCode = "";
 		String storeName = "";
 		String qty = "";
 		String groupCode ="";
@@ -129,42 +129,49 @@ public class ImportLoadStockInitProcess {
 				rowNo = 1;
 				row = sheet.getRow(rowNo); 
 				cell = row.getCell((short) 1);
-				storeNo = Utils.isNull(xslUtils.getCellValue(1, cell));
+				storeCode = Utils.isNull(xslUtils.getCellValue(1, cell));
 				cell = row.getCell((short) 2);
 				storeName = Utils.isNull(xslUtils.getCellValue(2, cell));
 				
-				logger.debug("StoreNo:"+storeNo+",countDate:"+salesDate);
+				logger.debug("storeCode:"+storeCode+",countDate:"+salesDate);
 				
-				/** cehck FileName duplicate **/
+				/** check FileName duplicate **/
 				/*boolean dup = importDAO.importStockInitFileNameIsDuplicate(conn, tableInitName,salesDate);
 				if(dup){
 					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  Upload ไปแล้ว");
 					return mapping.findForward("success");
 				}*/
-				 
+				
+				/** validate StoreCode input is valid Master **/ 
+				String storeNameMaster = GeneralDAO.getStoreName(storeCode);
+				if( Utils.isNull(storeNameMaster).equals("")){
+					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  รหัสร้านค้าไม่ถูกต้อง["+storeCode+"] กรุณาตรวจสอบ");
+					return mapping.findForward("success");
+				}
+				
 	            /** Validate Init by custNo,Count_str_date **/
-				if( isInitExist(tableInitName,storeNo,salesDateObj) ){
-					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลวันที่ :"+salesDate+" ร้านค้า:"+storeNo+"-"+storeName+" ถุกสร้างไปแล้ว");
+				if( isInitExist(conn,tableInitName,storeCode,salesDateObj) ){
+					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลวันที่ :"+salesDate+" ร้านค้า:"+storeCode+"-"+storeName+" ถุกสร้างไปแล้ว");
 					return mapping.findForward("success");
 				}
 				
 				/** validate StoreNo **/
 				 if("MTT".equalsIgnoreCase(importType)){
-					 String storeNoTemp = storeNo;
-					 if(storeNo.indexOf("-") != -1){
-					    storeNoTemp = storeNo.substring(0,storeNo.indexOf("-"));
+					 String storeNoTemp = storeCode;
+					 if(storeCode.indexOf("-") != -1){
+					    storeNoTemp = storeCode.substring(0,storeCode.indexOf("-"));
 					 }
 					if( isStoreCodeCanImport(conn,"MTT",storeNoTemp)==false ){
 						request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลร้านค้าไม่ถูกต้อง");
 						return mapping.findForward("success");
 					}
 				 }else{
-					if( !storeNo.startsWith(storeCodeValidate)){
+					if( !storeCode.startsWith(storeCodeValidate)){
 						request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลร้านค้าไม่ถูกต้อง");
 						return mapping.findForward("success");
 					}
 				 }
-				ps.setString(1, storeNo);
+				ps.setString(1, storeCode);
 				ps.setDate(2, new java.sql.Date(salesDateObj.getTime()));
 				ps.setDate(3,new java.sql.Date(new java.util.Date().getTime()));
 				ps.setString(4,user.getUserName());
@@ -213,7 +220,7 @@ public class ImportLoadStockInitProcess {
 					mat = "";
 					qty = "";
 					
-					ps.setString(index++, storeNo);//CUST_NO 1
+					ps.setString(index++, storeCode);//CUST_NO 1
 					ps.setDate(index++, new java.sql.Date(salesDateObj.getTime())); //COUNT_STK_DATE 2
 					
 					for (int colNo = 0; colNo < maxColumnNo; colNo++) {
@@ -356,7 +363,7 @@ public class ImportLoadStockInitProcess {
 				  
 				  importForm.setTotalQty( Utils.decimalFormat(totalQty,Utils.format_current_no_disgit));
 				  importForm.setCountDate(salesDate);
-				  importForm.setStoreCode(storeNo);
+				  importForm.setStoreCode(storeCode);
 				  importForm.setStoreName(storeName);
 			         
 			      conn.rollback();
@@ -385,7 +392,7 @@ public class ImportLoadStockInitProcess {
 			   importForm.setLoadStockInitListSuccessSize(successList!=null?successList.size():0);
 			   importForm.setTotalQty( Utils.decimalFormat(totalQty,Utils.format_current_no_disgit));
 			   importForm.setCountDate(salesDate);
-			   importForm.setStoreCode(storeNo);
+			   importForm.setStoreCode(storeCode);
 			   importForm.setStoreName(storeName);
 				  
 			   request.setAttribute("Message","Upload ไฟล์ "+fileName+" สำเร็จ");
@@ -443,23 +450,17 @@ public class ImportLoadStockInitProcess {
 		}
 		return r;
 	} 
-	  public static boolean isInitExist(String tableName,String custNo,java.util.Date countStkDate) throws Exception {
+	  public static boolean isInitExist(Connection conn ,String tableName,String custNo,java.util.Date countStkDate) throws Exception {
 			PreparedStatement ps = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
-			Connection conn = null;
 			boolean exist = false;
 			try {
 				sql.append(" select cust_no,count_stk_date FROM "+tableName +" WHERE 1=1 \n");
 				sql.append(" and cust_no = '"+custNo+"' \n");
 				sql.append(" and count_stk_date =? \n");
-				
 				logger.debug("sql:"+sql);
-	
-				conn = new DBCPConnectionProvider().getConnection(conn);
-				
 				ps = conn.prepareStatement(sql.toString());
-				
 				ps.setDate(1, new java.sql.Date(countStkDate.getTime())); //COUNT_STK_DATE 2
 				rst = ps.executeQuery();
 				
@@ -473,7 +474,6 @@ public class ImportLoadStockInitProcess {
 				try {
 					rst.close();
 					ps.close();
-					conn.close();
 				} catch (Exception e) {}
 			}
 			return exist;

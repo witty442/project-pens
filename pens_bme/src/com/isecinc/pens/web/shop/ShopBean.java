@@ -46,6 +46,7 @@ public class ShopBean implements  Serializable{
     private String saleOutQty;
     private String saleReturnQty;
     private String adjustQty;
+    private String stockShortQty;
     private String onhandQty;
     
     //shopPromotion
@@ -73,6 +74,12 @@ public class ShopBean implements  Serializable{
     private String modifierLineId;
     
     
+	public String getStockShortQty() {
+		return stockShortQty;
+	}
+	public void setStockShortQty(String stockShortQty) {
+		this.stockShortQty = stockShortQty;
+	}
 	public String getModifierLineId() {
 		return modifierLineId;
 	}

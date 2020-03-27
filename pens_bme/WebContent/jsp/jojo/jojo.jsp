@@ -15,14 +15,22 @@
 <jsp:useBean id="jojoForm" class="com.isecinc.pens.web.jojo.JojoForm" scope="request" />
  <%
  EnvProperties env = EnvProperties.getInstance();
- String startDate = Utils.isNull(request.getParameter("startDate"));
- String endDate = Utils.isNull(request.getParameter("endDate"));
- 
+ String reportName = Utils.isNull(request.getParameter("reportName"));
+ String startDate ="",endDate="",custGroup="";
+ System.out.println("ReportName:"+reportName);
+ if("BME_SALEOUT".equalsIgnoreCase(reportName)){
+	 startDate = Utils.isNull(request.getParameter("startDate"));
+	 endDate = Utils.isNull(request.getParameter("endDate"));
+ }else  if("BME_CHECK_STOCK".equalsIgnoreCase(reportName)){
+	 custGroup = Utils.isNull(request.getParameter("custGroup"));
+ }
  if(Utils.isNull(startDate).equals("")){
 	 //default 01/01/+currentYear
 	 Calendar c= Calendar.getInstance(Utils.local_th);
 	 startDate = "01/01/"+c.get(Calendar.YEAR);
  }
+ 
+ 
  %>
 <html>
 <head>
@@ -44,12 +52,17 @@
 
 <script>
 function loadMe(){
-	 new Epoch('epoch_popup', 'th', document.getElementById('startDate'));
-	 new Epoch('epoch_popup', 'th', document.getElementById('endDate'));
+	document.getElementById("reportName").value ='<%=reportName%>'; 
+	loadCritiria(document.getElementById("reportName"));
 }
 function submitBT(path){
-	var reportType = document.getElementById("reportType").value;
-	if("BME_SALEOUT" == reportType){
+	var reportName = document.getElementById("reportName").value;
+	if(reportName ==""){
+		alert("เลือกรายงานที่ต้องการ");
+		reportName.focus();
+		return false;
+	}
+	if("BME_SALEOUT" == reportName){
 		var startDate = document.getElementById("startDate");
 		var endDate = document.getElementById("endDate");
 		if(startDate.value ==""){
@@ -62,13 +75,15 @@ function submitBT(path){
 			endDate.focus();
 			return false;
 		}
+	}else if("BME_CHECK_STOCK" ==reportName){
+		
 	}
-	document.jojoForm.action = path + "/jsp/jojoAction.do?do=search&reportType="+reportType;
+	document.jojoForm.action = path + "/jsp/jojoAction.do?do=search&reportName="+reportName;
 	document.jojoForm.submit();
 }
 function submitExport(path){
-	var reportType = document.getElementById("reportType").value;
-	if("BME_SALEOUT" == reportType){
+	var reportName = document.getElementById("reportName").value;
+	if("BME_SALEOUT" == reportName){
 		var startDate = document.getElementById("startDate");
 		var endDate = document.getElementById("endDate");
 		if(startDate.value ==""){
@@ -81,13 +96,29 @@ function submitExport(path){
 			endDate.focus();
 			return false;
 		}
+	}else if("BME_CHECK_STOCK" ==reportName){
+		
 	}
-	document.jojoForm.action = path + "/jsp/jojoAction.do?do=export&reportType="+reportType;
+	document.jojoForm.action = path + "/jsp/jojoAction.do?do=export&reportName="+reportName;
 	document.jojoForm.submit();
+}
+function loadCritiria(reportName){
+	//hide all div
+	document.getElementById("DIV_BME_SALEOUT").style.display  = "none";
+	document.getElementById("DIV_BME_CHECK_STOCK").style.display  = "none";
+	if("BME_SALEOUT"==reportName.value){
+		document.getElementById("DIV_BME_SALEOUT").style.display  = "block";
+		
+		new Epoch('epoch_popup', 'th', document.getElementById('startDate'));
+	    new Epoch('epoch_popup', 'th', document.getElementById('endDate'));
+	}else if("BME_CHECK_STOCK"==reportName.value){
+		document.getElementById("DIV_BME_CHECK_STOCK").style.display  = "block";
+		document.getElementById("custGroup").value ='<%=custGroup%>'; 
+	}
 }
 </script>
 </head>		
-<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
+<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
   	<tr>
 		<td colspan="3"><jsp:include page="../header.jsp"/></td>
@@ -123,39 +154,55 @@ function submitExport(path){
 						<!-- BODY -->
 						<html:form action="/jsp/jojoAction">
 						<jsp:include page="../error.jsp"/>
-                          <div align="center">
-                          <img src="${pageContext.request.contextPath}/images2/jojo_manu.jpg" width="300" height="200"/>
-                          </div>
+                        <%--   <div align="center">
+                          <img src="${pageContext.request.contextPath}/images2/jojo_manu.jpg" width="100" height="50"/>
+                          </div> --%>
 						   <table style="width:100%" border="0" align="center" class="text">
 							
 							  <tr>
 							    <td width="30%" align="right"> เลือกรายงานที่ต้องการ:</td>
-							    <td width="30%"><select id="reportType">
+							    <td width="70%">
+							       <select id="reportName" onchange="loadCritiria(this)">
+							        <option value="">กรุณาเลือกรายงาน</option>
 							        <option value="BME_SALEOUT">SaleOut BME</option>
+							        <option value="BME_CHECK_STOCK">BME Check StockDate</option>
 							      </select>
 							     </td> 
-							     <td width="30%" align="right"></td>
 							  </tr>
 							  <tr>
-							    <td colspan="3"  align="center">
-							     <table style="width:100%">
-							       <tr>
-								     <td width="30%" align="right">วันที่เริ่มต้น</td>
-								     <td width="70%">
-								     <input type="text" name="startDate" id="startDate" value="<%=startDate%>"/><font color="red">*</font>-
-								     <input type="text" name="endDate" id="endDate" value="<%=endDate%>"/><font color="red">*</font>
-								     </td>
-								    </tr>
-								   </table>
+							    <td colspan="2"  align="left">
+							     <div id="DIV_BME_SALEOUT" style="display: none">
+								     <table style="width:100%">
+								       <tr>
+									     <td width="30%" align="right">วันที่เริ่มต้น</td>
+									     <td width="70%">
+									     <input type="text" readonly name="startDate" id="startDate" value="<%=startDate%>"/><font color="red">*</font>-
+									     <input type="text" readonly name="endDate" id="endDate" value="<%=endDate%>"/><font color="red">*</font>
+									     </td>
+									    </tr>
+									   </table>
+								   </div>
+								   <div id="DIV_BME_CHECK_STOCK" style="display: none">
+								     <table style="width:100%">
+								       <tr>
+									     <td width="30%" align="right">CustomerGroup</td>
+									     <td width="70%">
+									       <select name="custGroup" id="custGroup">
+									        <option value="">กรุณากลุ่มร้านค้า</option>
+									        <option value="020047">LOTUS</option>
+									        <option value="020049">BIGC</option>
+									      </select>
+									     </td>
+									    </tr>
+									   </table>
+								   </div>
 							    </td>
 							  </tr>
 							  <tr>
-							    <td width="30%" align="right">
+							    <td width="100%" colspan="2" align="center">
 							     <INPUT TYPE="button" class="newPosBtnLong" name ="B_QUERY" VALUE="Search" onclick="submitBT('<%=request.getContextPath()%>');">
 							     <INPUT TYPE="button" class="newPosBtnLong" name ="B_QUERY" VALUE="Export" onclick="submitExport('<%=request.getContextPath()%>');">
 							    </td>
-							    <td></td>
-							     <td></td>
 							  </tr>
 							</table>
 					        

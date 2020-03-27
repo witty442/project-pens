@@ -16,12 +16,14 @@
 <%
 if(session.getAttribute("BATCH_TASK_RESULT") != null){
  BatchTaskForm batchTaskForm = (BatchTaskForm)session.getAttribute("BATCH_TASK_RESULT");
- System.out.println("Page BatchResults: batchTaskForm["+batchTaskForm+"]results lenth["+batchTaskForm.getResults().length+"]");
+ if(batchTaskForm.getResults() != null){
+     System.out.println("Page BatchResults: batchTaskForm["+batchTaskForm+"]results length["+batchTaskForm.getResults().length+"]");
+ }
  MonitorItemBean monitorItemBean = batchTaskForm.getMonitorItem();
 %>
 
 <%if(batchTaskForm.getResults() != null && batchTaskForm.getResults().length >0){ %>
-	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result" >
 		<tr>
         <th> No.</th>
         <th> เลขที่รายการ</th>
@@ -29,8 +31,9 @@ if(session.getAttribute("BATCH_TASK_RESULT") != null){
 		<th> ชื่อ Process(TH)</th>
 		<th> ประเภทข้อมูล</th>
 		<th> ผู้สร้าง</th>
+		<th> วันที่เริ่ม</th>
+		<th> วันที่สำเร็จ</th>
 		<th> สถานะ</th>
-		<th> วันที่ทำรายการล่าสุด</th>
 		<th> Message</th>
 		<th> รายละเอียด</th>
 		</tr>
@@ -38,28 +41,34 @@ if(session.getAttribute("BATCH_TASK_RESULT") != null){
 		 for(int i=0;i<batchTaskForm.getResults().length;i++){
 			 MonitorBean item = batchTaskForm.getResults()[i];
 		%>
-		<tr class="<c:out value='${tabclass}'/>" id="${rows.index+1}">
+		<tr class="" id="">
 		       
-                <td> <%=(i+1)%></td>
-                <td> <%=item.getTransactionId() %></td>
-				<td> <%=item.getName() %></td>
-				<td> <%=item.getThName() %></td>
-				<td> <%=item.getTransactionType() %></td>
-				<td> <%=item.getCreateUser() %></td>
-				<td> 
+                <td width="3%"> <%=(i+1)%></td>
+                <td width="4%"> <%=item.getTransactionId() %></td>
+				<td width="10%"> <%=item.getName() %></td>
+				<td width="20%"> <%=Utils.isNull(item.getThName()) %></td>
+				<td width="3%"> <%=Utils.isNull(item.getTransactionType()) %></td>
+				<td width="4%"> <%=item.getCreateUser() %></td>
+				<td width="7%"> <%=item.getSubmitDateDisp()%></td>
+				<td width="7%"> <%=Utils.isNull(item.getUpdateDateDisp())%></td>  
+				<td width="3%"> 
 				   <%if(item.getStatus()==1){ %>
-				       <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+				     <font color='green' size="2"><b> Success</b></font>
+				   <%}else if(item.getStatus()==0){ %>
+				      <font color='#2892FC' size="2"><b>  Running </b></font>
 				   <%}else{ %>
-				       <img border=0 src="${pageContext.request.contextPath}/icons/uncheck.gif">
+				      <font color='red' size="2"><b> Error</b></font> 
 				   <%} %>
 				</td>
-				<td> <%=item.getSubmitDateDisp()%></td>
-				<td align="left"><%=Utils.isNull(item.getErrorMsg())%> </td>
-			    <td>
+				<td align="left" width="14%"><font color='red'><%=Utils.isNull(item.getErrorMsg())%></font> </td>
+			    <td width="11%">
 			    <!-- Case Export save all path for download after run Batch Success -->
-			      <%if(Utils.isNull(item.getType()).equalsIgnoreCase("export")){ %>
-			      <a href="javascript:downloadFile('<%=item.getFileName()%>')">DownloadFile</a>
-			      <%} %>
+			      <%if(Utils.isNull(item.getType()).equalsIgnoreCase("export")
+			    	 && item.getStatus()==1){ %>
+			         <a href="javascript:downloadFile('<%=item.getFileName()%>')">DownloadFile</a>
+			       <%}else if( Utils.isNull(item.getType()).equalsIgnoreCase("import")){ %>
+		              FileImport:<%=item.getFileName()%>
+		           <%} %>
 			    </td>
 		</tr>
 		<%} %>	

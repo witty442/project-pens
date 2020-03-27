@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.seq.SequenceProcessAll"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="com.pens.util.UserUtils"%>
@@ -44,7 +45,6 @@ Map<String, SalesTargetBean> dataMap = null;
 	  salesrepList = (List<SalesTargetBean>)request.getSession().getAttribute("salesrepList");
 	  dataMap =(Map<String, SalesTargetBean>)request.getSession().getAttribute("dataMap");
   }
-
 %>
 <html>
 <head>
@@ -61,7 +61,7 @@ Map<String, SalesTargetBean> dataMap = null;
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 
 <!-- freeze table  -->
 
@@ -915,6 +915,7 @@ function sumTotalByCurCol(obj,curCol){
 					<!-- hidden field -->
 					<!-- check_save_before_accept: --> <input type="hidden" name="check_save_before_accept" id="check_save_before_accept"/>
 					<!-- valid_total_col: --> <input type="hidden" name="valid_total_col" id="valid_total_col"/>
+					<!-- check user input id --><input type="hidden" name="userInputId" id="userInputId" value="<%=SequenceProcessAll.getIns().getNextValue("UserInputId") %>"/>
 					</html:form>
 					</td>
 					<td width="6px;" background="${pageContext.request.contextPath}/images2/boxcont1_6.gif"></td>

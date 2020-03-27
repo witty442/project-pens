@@ -195,6 +195,13 @@ UL {
 	border-color: #BEBEBE;
 	color: #000000;
 }
+.disableTextCenter {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: #BEBEBE;
+	color: #000000;
+	text-align: center;
+}
 .disableTextBold {
 	background-color: #DCDCDC;
 	border: 1px solid;

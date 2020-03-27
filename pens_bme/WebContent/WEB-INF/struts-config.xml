@@ -180,6 +180,7 @@
 		   scope="session" type="com.isecinc.pens.web.batchtask.BatchTaskAction" >
            <forward name="search" path="/jsp/batchtask/batchTask.jsp"></forward>
            <forward name="batchFromPopup" path="/jsp/batchtask/batchTaskPopup.jsp"></forward>
+           <forward name="batchFromPopupNoWait" path="/jsp/batchtask/batchTaskPopupNoWait.jsp"></forward>
         </action>
         
         <!-- USER -->

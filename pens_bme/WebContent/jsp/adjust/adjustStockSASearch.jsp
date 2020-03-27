@@ -1,11 +1,6 @@
+<%@page import="com.isecinc.pens.bean.AdjustStockSA"%>
 <%@page import="com.pens.util.SIdUtils"%>
-<%@page import="com.isecinc.pens.web.order.OrderAction"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
 <%@page import="com.pens.util.*"%>
-<%@page import="com.isecinc.pens.bean.StoreBean"%>
-<%@page import="com.isecinc.pens.bean.Order"%>
-<%@page import="com.isecinc.pens.dao.ImportDAO"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -18,11 +13,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="adjustStockSAForm" class="com.isecinc.pens.web.adjuststock.AdjustStockSAForm" scope="session" />
 
@@ -41,27 +31,6 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" />
 
 <style type="text/css">
-span.pagebanner {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	margin-top: 10px;
-	display: block;
-	border-bottom: none;
-	font-size: 15px;
-}
-
-span.pagelinks {
-	background-color: #eee;
-	border: 1px dotted #999;
-	padding: 4px 6px 4px 6px;
-	width: 99%;
-	display: block;
-	border-top: none;
-	margin-bottom: -1px;
-	font-size: 15px;
-}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
@@ -97,7 +66,13 @@ function search(path){
 	form.submit();
 	return true;
 }
-
+function gotoPage(currPage){
+	var form = document.adjustStockSAForm;
+	var path = document.getElementById("path").value;
+	form.action = path + "/jsp/adjustStockSAAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
+}
 function openEdit(path,documentNo,mode){
 	var form = document.adjustStockSAForm;
 	form.action = path + "/jsp/adjustStockSAAction.do?do=prepare&documentNo="+documentNo+"&mode="+mode;
@@ -236,8 +211,17 @@ function getStoreNameModel(storeCode){
 					  </div>
 
             <c:if test="${adjustStockSAForm.resultsSearchSize != 0}">
-                  	
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="80%">
+                  	 <% 
+					   int totalPage = adjustStockSAForm.getTotalPage();
+					   int totalRecord = adjustStockSAForm.getTotalRecord();
+					   int currPage =  adjustStockSAForm.getCurrPage();
+					   int startRec = adjustStockSAForm.getStartRec();
+					   int endRec = adjustStockSAForm.getEndRec();
+					   int no = startRec;
+					%> 
+					<%= PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %> 
+					
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearchNoWidth" width="100%">
 						       <tr>
 									<th >No</th>
 									<th >Document No</th>
@@ -247,49 +231,45 @@ function getStoreNameModel(storeCode){
 									<th >Status</th>
 									<th >·°È‰¢</th>						
 							   </tr>
-							<c:forEach var="results" items="${adjustStockSAForm.resultsSearch}" varStatus="rows">
-								<c:choose>
-									<c:when test="${rows.index %2 == 0}">
-										<c:set var="tabclass" value="lineO"/>
-									</c:when>
-									<c:otherwise>
-										<c:set var="tabclass" value="lineE"/>
-									</c:otherwise>
-								</c:choose>
-								
-									<tr class="<c:out value='${tabclass}'/>">
-										<td class="td_text_center">${results.no}</td>
-										<td class="td_text_center">
-										   ${results.documentNo}
-										</td>
-										<td class="td_text_center">${results.transactionDate}</td>
-										<td class="td_text_center">
-											${results.storeCode}
-										</td>
-										<td class="td_text_center">
-										    ${results.storeName}
-										</td>
-										<td class="td_text_center">
-										     ${results.statusDesc}
-										</td>
-										<td class="td_text_center">
-										 <c:if test="${results.canEdit == false}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.documentNo}','view')">
-											          ¥Ÿ
-											  </a>
-										  </c:if>
-										  <c:if test="${results.canEdit == true}">
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '${results.documentNo}','edit')">
-											          ·°È‰¢
-											  </a>
-										  </c:if>
-										</td>
-									</tr>
-							
-							  </c:forEach>
+							   <%							
+							String tabclass ="";
+							List<AdjustStockSA> resultList = adjustStockSAForm.getResultsSearch();
+							for(int n=0;n<resultList.size();n++){
+								AdjustStockSA item = (AdjustStockSA)resultList.get(n);
+								if(n%2==0){ 
+									tabclass="lineO";
+								}else{
+									tabclass ="lineE";
+								}
+								%>
+								<tr class="<%=tabclass%>">
+									<td class="td_text_center"><%=no %></td>
+									<td class="td_text_center"><%=item.getDocumentNo() %></td>
+									<td class="td_text_center"><%=item.getTransactionDate()%></td>
+									<td class="td_text_center"><%=item.getStoreCode() %></td>
+									<td class="td_text">
+									   <%=item.getStoreName() %>
+									</td>
+									<td class="td_text_center">
+									     <%=item.getStatusDesc() %>
+									</td>
+									<td class="td_text_center">
+									 <c:if test="${results.canEdit == false}">
+										  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=item.getDocumentNo()%>','view')">
+										          ¥Ÿ
+										  </a>
+									  </c:if>
+									  <c:if test="${results.canEdit == true}">
+										  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=item.getDocumentNo()%>','edit')">
+										          ·°È‰¢
+										  </a>
+									  </c:if>
+									</td>
+								</tr>
+							  <%no++;
+							  } %>
 					</table>
-								
-								
+						
 					<!-- BUTTON ACTION-->
 					<div align="center">
 						<table  border="0" cellpadding="3" cellspacing="0" >
@@ -300,11 +280,12 @@ function getStoreNameModel(storeCode){
 						</table>
 					</div>
 				</c:if>
-					<!-- ************************Result ***************************************************-->
+			   <!-- ************************Result ***************************************************-->
 					
 				<%-- 	<jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					
 					<!-- hidden field -->
+					<input type="hidden" name="path" id="path" value ="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

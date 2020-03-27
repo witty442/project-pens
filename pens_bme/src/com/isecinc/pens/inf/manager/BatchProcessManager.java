@@ -24,7 +24,6 @@ import com.isecinc.pens.inf.manager.process.GenerateOrderExcel;
 import com.isecinc.pens.inf.manager.process.ImportBillICC;
 import com.isecinc.pens.inf.manager.process.ImportPosProcess;
 import com.isecinc.pens.inf.manager.process.ImportSaleOutWacoalProcess;
-import com.isecinc.pens.inf.manager.process.ImportTransactionLotusProcess;
 import com.isecinc.pens.inf.manager.process.ImportWacoalProcess;
 import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
 import com.isecinc.pens.summary.process.GenerateReportEndDateLotus;
@@ -70,9 +69,6 @@ public class BatchProcessManager {
            	
             	
             /** Process Transaction BME ****************************************************************************/
-            }else if(monitorModel.getType().equals(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)){
-            	monitorModel = (new BatchProcessManager()).processImportTransactionLotus(monitorModel, user,request);
-            	
             }else if(monitorModel.getType().equals(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)){
             	monitorModel = (new BatchProcessManager()).processGenStockEndDateLotus(monitorModel, user,request);
             	
@@ -541,26 +537,6 @@ public class BatchProcessManager {
 				connMonitor.close();
 				connMonitor=null;
 			}
-		}
-		return monitorModel;
-	}
-	
-	public  MonitorBean processImportTransactionLotus(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
-		MonitorTime monitorTime = null;
-		try{
-			logger.debug("import Type:"+monitorModel.getTransactionType());
-
-			monitorTime  = new MonitorTime("Import Transaction Lotus");   
-			
-			//Process Generate 
-			ImportTransactionLotusProcess.runProcess(user,monitorModel);
-			
-			monitorTime.debugUsedTime();
-	
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}finally{
-		
 		}
 		return monitorModel;
 	}

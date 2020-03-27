@@ -12,7 +12,6 @@
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <jsp:useBean id="shopForm" class="com.isecinc.pens.web.shop.ShopForm" scope="session" />
 <html>
 <head>
@@ -21,7 +20,7 @@
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -52,18 +51,6 @@ function loadMe(){
 	//new Epoch('epoch_popup', 'th', document.getElementById('asOfDate'));
 	 $('#asOfDate').calendarsPicker({calendar: $.calendars.instance('thai','th')});
 }
-function search(path){
-	var form = document.shopForm;
-	var asOfDate = form.asOfDate; 
-	if(asOfDate.value ==""){
-		 asOfDate.focus();
-		 alert("กรุณากรอก วันที่ขาย (As Of Date)");
-		 return false;
-	}
-	form.action = path + "/jsp/shopAction.do?do=search&pageName=<%=request.getParameter("pageName")%>";
-	form.submit();
-	return true;
-}
 
 function openPopup(path,pageName,fieldName,multipleCheck){
 	var form = document.shopForm;
@@ -87,11 +74,17 @@ function search(path){
 		 alert("กรุณากรอก วันที่ขาย (As Of Date)");
 		 return false;
 	}
-	form.action = path + "/jsp/shopAction.do?do=search&pageName=<%=request.getParameter("pageName")%>";
+	form.action = path + "/jsp/shopAction.do?do=search&action=newsearch&pageName=<%=request.getParameter("pageName")%>";
 	form.submit();
 	return true;
 }
-
+function gotoPage(currPage){
+	var form = document.shopForm;
+    var path = document.getElementById("path").value;
+	form.action = path + "/jsp/shopAction.do?do=search&pageName=<%=request.getParameter("pageName")%>&currPage="+currPage;
+	form.submit();
+	return true;
+}
 function exportExcel(path){
 	var form = document.shopForm;
 	form.action = path + "/jsp/shopAction.do?do=export&pageName=<%=request.getParameter("pageName")%>";
@@ -216,56 +209,68 @@ function clearForm(path){
 			     </div>
 
 				   <!-- ****** RESULT ***************************************************************** -->
-				 <%
-				  //get d-xxx-d parameter d-49489-p=16
-				  String queryStr= request.getQueryString();
-				if(queryStr.indexOf("d-") != -1){
-					queryStr = queryStr.substring(queryStr.indexOf("d-"),queryStr.indexOf("-p")+2 );
-					System.out.println("queryStr:"+queryStr);
-				}
-				
-				  String currentPage = Utils.isNull(request.getParameter(queryStr));
-				  String totalPage = "";
-				  System.out.println("currentPage:"+currentPage);
-				  List<ShopBean> dataList = shopForm.getResults();
-				  if(dataList != null && dataList.size() >0){
-				    totalPage = String.valueOf((dataList.size()/ 50)+1);
-				  } 
-				%>
+				 
 					<c:if test="${shopForm.results != null}">
-					    <br/>
-						<display:table style="width:100%;" id="item" name="sessionScope.shopForm.results" defaultsort="0"  defaultorder="descending" class="resultDisp"
-						    requestURI="#" sort="list" pagesize="50">	
-						    <display:column  title="Group" property="groupCode" sortable="false" class="td_text_center" style="width:8%"/>
-						    <display:column  title="Pens Item" property="pensItem"  sortable="false" class="td_text" style="width:6%"/>
-						    <display:column  title="Matarial Master" property="style"  sortable="false" class="td_text_center" style="width:8%"/>	
-						    <display:column  title="Barcode" property="barcode"  sortable="false" class="td_text_center" style="width:10%"/>	
-						  
-						    <display:column  title="Initial Stock" property="initSaleQty"  sortable="false" class="td_number" style="width:8%"/>
-						    <display:column  title="Trans In Qty" property="transInQty"  sortable="false" class="td_number" style="width:8%"/>		
-						    <display:column  title="Sale Out Qty" property="saleOutQty"  sortable="false" class="td_number" style="width:8%"/>
-						    <display:column  title="Return Qty" property="saleReturnQty"  sortable="false" class="td_number" style="width:8%"/>	
-						    <display:column  title="Adjust Qty" property="adjustQty"  sortable="false" class="td_number" style="width:8%"/>	
-						    <display:column  title="Onhand Qty " property="onhandQty"  sortable="false" class="td_number" style="width:8%"/>		
-						     <%if(currentPage.equalsIgnoreCase(totalPage)){ %>
-						    <display:footer>
-						      <%-- <tr class="text_blod">
-						          <td colspan="4" align="right"><b>รวม</b></td>
-						          <td class="td_number"><bean:write name="summary" property="initSaleQty"/></td>
-						          <td class="td_number"><bean:write name="summary" property="saleInQty"/></td>
-						          <td class="td_number"><bean:write name="summary" property="saleOutQty"/></td>
-						          <td class="td_number"><bean:write name="summary" property="saleReturnQty"/></td>
-						          <td class="td_number"><bean:write name="summary" property="onhandQty"/></td>
-						      </tr> --%>
-						    </display:footer>	
-						    <%} %>
-						</display:table>
-				   </c:if>
-
+					  <br/>
+				    <% 
+					   int totalPage = shopForm.getTotalPage();
+					   int totalRecord = shopForm.getTotalRecord();
+					   int currPage =  shopForm.getCurrPage();
+					   int startRec = shopForm.getStartRec();
+					   int endRec = shopForm.getEndRec();
+					   int pageSize = shopForm.getPageSize();
+					   int no = Utils.calcStartNoInPage(currPage, pageSize);
+					%>
+					<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
+					
+						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch">
+						       <tr>
+						            <th >Group</th>
+									<th >Pens Item</th>
+									<th >Matarial Master</th>
+									<th >Barcode</th>
+									<th >Initial Stock</th>
+									<th >Trans In Qty</th>
+									<th >Sale Out Qty</th>
+									<th >Return Qty</th>
+									<th >Adjust Qty</th>
+									<th >Stock Short Qty</th>
+									<th >Onhand Qty</th>
+							   </tr>
+							<% 
+							System.out.println("currPage:"+currPage+",startRec:"+startRec+",endRec:"+endRec);
+							
+							String tabclass ="lineE";
+							List<ShopBean> resultList = shopForm.getResults();
+							
+							for(int n=startRec;n < endRec;n++){
+								ShopBean mc = (ShopBean)resultList.get(n);
+								tabclass ="lineE";
+								if(n%2==0){
+									tabclass="lineO";
+								}
+								%>
+								<tr class="<%=tabclass%>">
+									<td class="td_text_center" width="8%"><%=mc.getGroupCode() %></td>
+									<td class="td_text_center" width="8%"><%=mc.getPensItem()%></td>
+									<td class="td_text" width="8%"><%=mc.getStyle()%></td>
+								    <td class="td_text" width="8%"><%=mc.getBarcode() %></td>
+								    <td class="td_number" width="7%"><%=mc.getInitSaleQty() %></td>
+									<td class="td_number" width="7%"><%=mc.getTransInQty() %></td>
+									<td class="td_number" width="7%"><%=mc.getSaleOutQty() %></td>
+									<td class="td_number" width="7%"><%=mc.getSaleReturnQty() %></td>
+									<td class="td_number" width="7%"><%=mc.getAdjustQty() %></td>
+									<td class="td_number" width="7%"><%=mc.getStockShortQty() %></td>
+									<td class="td_number" width="7%"><%=mc.getOnhandQty() %></td>
+								</tr>
+							<%} %>
+					  </table>
+				  </c:if>
                     <!-- ****** RESULT ***************************************************************** -->
 
 					<!-- hidden field -->
 					<input type="hidden" name="pageName" value="<%=request.getParameter("pageName") %>"/>
+					<input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

@@ -1,8 +1,6 @@
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.PayBean"%>
 <%@page import="java.util.Calendar"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
@@ -64,8 +62,9 @@ function search(path){
 	form.submit();
 	return true;
 }
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.payForm;
+	var path = document.getElementById("path").value ;
 	form.action = path + "/jsp/payAction.do?do=search2&currPage="+currPage;
     form.submit();
     return true;
@@ -184,23 +183,11 @@ function printReport(path,docNo){
 					   int currPage =  payForm.getCurrPage();
 					   int startRec = payForm.getStartRec();
 					   int endRec = payForm.getEndRec();
+					   int pageSize = payForm.getPageSize();
+					   int no = Utils.calcStartNoInPage(currPage, pageSize);
 					%>
-					   
-					<div align="left">
-					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
-					   <span class="pagelinks">
-						หน้าที่ 
-						 <% 
-							 for(int r=0;r<totalPage;r++){
-								 if(currPage ==(r+1)){
-							 %>
-			 				   <strong><%=(r+1) %></strong>
-							 <%}else{ %>
-							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-						 <% }} %>				
-						</span>
-					</div>
+					<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
+					
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch">
 						       <tr>
 						            <th >เลขที่เอกสาร</th>
@@ -252,6 +239,7 @@ function printReport(path,docNo){
 				
 		<!-- ************************Result ***************************************************-->	
 					<!-- hidden field -->
+					<input type="hidden" name="path" id="path" value ="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

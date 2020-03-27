@@ -28,7 +28,10 @@ public class CopyDB {
 			//String where =" where id =1";
 
 			/*****************copy  product to test********************/
-			processProductionToUAT("pensbi","PENSBME_MST_REFERENCE"," ");
+			//processProductionToUAT("pensbi","PENSBME_MST_REFERENCE"," ");
+			//processProductionToUAT("pensbi","PENSBME_MST_REFERENCE"," where Reference_code ='Store' ");
+			
+			//processProductionToUAT("pensbi","PENSBME_STYLE_MAPPING"," ");
 			
 		   // processProductionToUAT("pensbi","PENSBME_ONHAND_BME_LOCKED","");
 		   // processProductionToUAT("pensbi","PENSBME_STYLE_MAPPING","");

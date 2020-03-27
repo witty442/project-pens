@@ -1,3 +1,7 @@
+<%@page import="com.isecinc.pens.bean.MonitorItemBean"%>
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskForm"%>
 <%@page import="com.isecinc.pens.bean.MonitorBean"%>
 <%@page import="java.util.List"%>
@@ -12,19 +16,24 @@
 <%
 if(session.getAttribute("BATCH_TASK_RESULT") != null){
  BatchTaskForm batchTaskForm = (BatchTaskForm)session.getAttribute("BATCH_TASK_RESULT");
- System.out.println("Page BatchResults: batchTaskForm["+batchTaskForm+"]results lenth["+batchTaskForm.getResults().length+"]");
+ if(batchTaskForm.getResults() != null){
+     System.out.println("Page BatchResults: batchTaskForm["+batchTaskForm+"]results length["+batchTaskForm.getResults().length+"]");
+ }
+ MonitorItemBean monitorItemBean = batchTaskForm.getMonitorItem();
 %>
 
 <%if(batchTaskForm.getResults() != null && batchTaskForm.getResults().length >0){ %>
-	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result" >
 		<tr>
         <th> No.</th>
         <th> เลขที่รายการ</th>
 		<th> ชื่อ Process</th>
+		<th> ชื่อ Process(TH)</th>
 		<th> ประเภทข้อมูล</th>
 		<th> ผู้สร้าง</th>
 		<th> สถานะ</th>
-		<th> วันที่ทำรายการล่าสุด</th>
+		<th> วันที่เริ่ม</th>
+		<th> วันที่ทำสำเร็จ</th>
 		<th> Message</th>
 		<th> รายละเอียด</th>
 		</tr>
@@ -34,27 +43,40 @@ if(session.getAttribute("BATCH_TASK_RESULT") != null){
 		%>
 		<tr class="<c:out value='${tabclass}'/>" id="${rows.index+1}">
 		       
-                <td> <%=(i+1)%></td>
-                <td> <%=item.getTransactionId() %></td>
-				<td> <%=item.getName() %></td>
-				<td> <%=item.getTransactionType() %></td>
-				<td> <%=item.getCreateUser() %></td>
-				<td> 
+                <td width="3%"> <%=(i+1)%></td>
+                <td width="5%"> <%=item.getTransactionId() %></td>
+				<td width="10%"> <%=item.getName() %></td>
+				<td width="20%"> <%=Utils.isNull(item.getThName()) %></td>
+				<td width="5%"> <%=Utils.isNull(item.getTransactionType()) %></td>
+				<td width="5%"> <%=item.getCreateUser() %></td>
+				<td width="3%"> 
 				   <%if(item.getStatus()==1){ %>
-				       <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+				     <font color='green'><b> Success</b></font>
+				   <%}else if(item.getStatus()==0){ %>
+				      <font color='#2892FC'><b>  Running </b></font>
 				   <%}else{ %>
-				       <img border=0 src="${pageContext.request.contextPath}/icons/uncheck.gif">
+				      <font color='red'><b> Error</b></font> 
 				   <%} %>
 				</td>
-				<td> <%=item.getSubmitDateDisp()%></td>
-				<td align="left"><%=item.getErrorMsg()%> </td>
-			    <td></td>
+				<td width="8%"> <%=item.getSubmitDateDisp()%></td> 
+				<td width="8%"> <%=Utils.isNull(item.getUpdateDateDisp())%></td>   
+				<td align="left" width="10%"><%=Utils.isNull(item.getErrorMsg())%> </td>
+			    <td width="10%">
+			    <!-- Case Export save all path for download after run Batch Success -->
+			      <%if(Utils.isNull(item.getType()).equalsIgnoreCase("export")
+			    	 && item.getStatus()==1){ 
+			      %>
+			      <a href="javascript:downloadFile('<%=item.getFileName()%>')">DownloadFile</a>
+			      <%} %>
+			    </td>
 		</tr>
 		<%} %>	
 	</table>
 <%} %>	
 
   <!-- Result Batch Task Result Import-->
+  <%System.out.println("batchTaskName:"+batchTaskForm.getTaskInfo().getDescription()+":"+batchTaskForm.getTaskInfo().isDispDetail()) ;%>
+  
   <%if(batchTaskForm.getTaskInfo().isDispDetail()){ %>
      <jsp:include page="sub/AllResultBatchTaskPopup_sub.jsp"></jsp:include>
   <%} %>

@@ -32,6 +32,7 @@ import com.isecinc.pens.web.batchtask.BatchTaskConstants;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
 import com.isecinc.pens.web.batchtask.BatchTaskForm;
 import com.isecinc.pens.web.batchtask.task.ExportReportOnhandLotusTask;
+import com.isecinc.pens.web.batchtask.task.GenStockOnhandRepTempTask;
 import com.isecinc.pens.web.importall.ImportAllForm;
 import com.isecinc.pens.web.reportall.ReportAllBean;
 import com.isecinc.pens.web.reportall.ReportAllForm;
@@ -118,8 +119,8 @@ public class ReportOnhandLotusAction extends I_Action {
 		logger.debug("Search page["+Utils.isNull(aForm.getPageName())+"]");
 		try {
 			 /** Case StoreCode =ALL Export To Excel **/
-			if(Utils.isNull(aForm.getBean().getPensCustCodeFrom()).equals("ALL")
-				//|| "020047-1".equals(aForm.getBean().getPensCustCodeFrom()) //for test
+			if(    Utils.isNull(aForm.getBean().getPensCustCodeFrom()).equals("ALL")
+				|| Utils.isNull(aForm.getBean().getPensCustCodeFrom()).split("\\,").length >1
 			  ){  
 				logger.info("Export All Store To Excel ");
 				//Submit Run Batch
@@ -193,8 +194,8 @@ public class ReportOnhandLotusAction extends I_Action {
 		String fileName ="data.xls";
 		try {
 			logger.debug("PageAction:"+aForm.getPageName());
-			if(Utils.isNull(aForm.getBean().getPensCustCodeFrom()).equals("ALL")
-					//|| "020047-1".equals(aForm.getBean().getPensCustCodeFrom()) //for test
+			if(    Utils.isNull(aForm.getBean().getPensCustCodeFrom()).equals("ALL")
+				|| Utils.isNull(aForm.getBean().getPensCustCodeFrom()).split("\\,").length >1
 			  ){
 				logger.info("Export All Store To Excel ");
 				//Submit Run Batch
@@ -241,6 +242,31 @@ public class ReportOnhandLotusAction extends I_Action {
 		return mapping.findForward("reportAll");
 	}
 	
+	/** For batch popup TaskName: GenStockOnhandTempTask **/
+	/** Prepare parameter **/
+	public ActionForward genStockEndDateLotus(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("submit genStockEndDateLotus");
+		ReportAllForm aForm = (ReportAllForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			//Prepare Parameter to BatchTask
+			Map<String, String> batchParaMap = new HashMap<String, String>();
+			batchParaMap.put(GenStockOnhandRepTempTask.PARAM_ASOF_DATE, aForm.getBean().getSalesDate());
+			batchParaMap.put(GenStockOnhandRepTempTask.PARAM_STORE_CODE, aForm.getBean().getPensCustCodeFrom());
+			
+			logger.debug("storeCode:"+aForm.getBean().getPensCustCodeFrom());
+			logger.debug("asOfDate:"+aForm.getBean().getSalesDate());
+			
+			request.getSession().setAttribute("BATCH_PARAM_MAP",batchParaMap);
+			request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.GEN_STOCK_ENDDATE_LOTUS);//set to popup page to BatchTask
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
+			throw e;
+		}finally{
+		}
+		return mapping.findForward("reportAll");
+	}
 	
 	/** For batch popup after Task success**/
 	/** For display BatchTask Result **/
@@ -262,9 +288,8 @@ public class ReportOnhandLotusAction extends I_Action {
 			 logger.debug("batchName:"+batchTaskForm.getResults()[0].getName());
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -298,9 +323,8 @@ public class ReportOnhandLotusAction extends I_Action {
 	    	 }
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -446,9 +470,8 @@ public class ReportOnhandLotusAction extends I_Action {
 				 request.setAttribute("Message", "ไม่พบข้อมูล");
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -461,9 +484,8 @@ public class ReportOnhandLotusAction extends I_Action {
 			 request.getSession().removeAttribute("BATCH_TASK_RESULT");
 			 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}

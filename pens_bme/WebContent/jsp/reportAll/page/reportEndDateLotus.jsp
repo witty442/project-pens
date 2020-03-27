@@ -166,6 +166,61 @@ function gotoAutoOrderPage(path){
 	url = path+'/jsp/autoOrderAction.do?do=prepareSearch&action=new'+param;
 	link(true,url);
 }
+function genReportEndDate(path){
+	var form = document.reportAllForm;
+	var asOfDateFrom = form.salesDate.value;
+	var pensCustCodeFrom = form.pensCustCodeFrom.value;
+	   
+    var param = "&customerCode="+form.pensCustCodeFrom.value;
+        param += "&salesDate="+form.salesDate.value;
+        param += "&pageName=GEN_STOCK_REPORT_ENDDDATE_LOTUS";
+        param += "&pageStaus=child";
+        
+        if(asOfDateFrom ==""){ 
+  		   alert("กรุณากรอกข้อมูลวันที่ As Of");
+  		   asOfDateFrom.focus();
+  		   return false;
+  	   }
+  	    if(pensCustCodeFrom ==""){ 
+  		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
+  		   pensCustCodeFrom.focus();
+  		   return false;
+  	   } 
+  	    
+  	    //Validate Endate Stock
+  	    var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/validEndDateStockLotusAjax.jsp",
+			data : "storeCode=" + pensCustCodeFrom+"&asOfDate="+asOfDateFrom,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+  	    
+  	   // alert(returnString);
+  	    if(returnString != ''){
+  	    	if(returnString =='END_STOCK_LOTUS_NOT_FOUND'){
+  	    		alert("ต้องทำการ End Date Stock จริงอย่างน้อย 1 ครั้ง ");
+  	    	}else if(returnString =='END_STOCK_LOTUS_DATE_MUST_MORE_THAN_ENDING_DATE'){
+  	    		alert("ต้องระบุ วันที่ขาย(as of) ให้มากกว่า วันที่ปิดสต๊อกล่าสุด ");
+  	    	}
+  	    	return false;
+  	    }
+  	    
+        if(confirm("กรุณายืนยันการ  Data เปรียบเทียบนับสต็อก")){
+			url = path + "/jsp/interfacesAction.do?do=runBatch&action="+param;
+			//window.open(encodeURI(url),"",
+					   //"menubar=no,resizable=no,toolbar=no,scrollbars=no,width=<%=screenWidth%>px,height=<%=screenHeight%>px,status=no,left=0,top= 0");
+			var params = [
+			              'height='+screen.height,
+			              'width='+screen.width,
+			              'fullscreen=yes' // only works in IE, but here for completeness
+			          ].join(',');
+			var popup = window.open(encodeURI(url), 'popup_window', params); 
+			popup.moveTo(0,0);
+        }
+}
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">

@@ -139,7 +139,7 @@ public class ImportItemBarcodeCrossRefToOracleFromExcelTask extends BatchTask im
             monitorModel.setErrorCode(modelItem.getErrorCode());
 			monitorModel.setStatus(modelItem.getStatus());
 			monitorModel.setFileCount(modelItem.getSuccessCount()>0?1:0);
-			
+			monitorModel.setType("IMPORT");
 			/** Update Status Monitor **/
 			dao.updateMonitor(connMonitor,monitorModel);
 		}catch(Exception e){

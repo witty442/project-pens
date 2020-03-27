@@ -4,10 +4,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import org.apache.log4j.Logger;
+import org.apache.poi.xssf.extractor.XSSFEventBasedExcelExtractor;
+
+import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 
 public class Test {
-
+	protected static  Logger logger = Logger.getLogger("PENS");
+	
+	public static void main(String[] args) {
+		try {
+			String strExcel = FileUtil.readFile("D:\\Work_ISEC\\Project-BME\\DEV\\DataImport\\TRANS_LOTUS(SaleOut)\\New Format Sales-Out LOTUS_test.xlsb");
+		    logger.debug("strExcel \n"+strExcel);
+		} catch (Exception ex) {
+		   ex.printStackTrace();
+		}
+	}
+	
 	/**
 	 * @param args
 	 * Output 
@@ -42,10 +56,6 @@ public class Test {
 			e.printStackTrace();
 		}
 	}
-	public static void main(String[] args) {
-		double  totalQty = 88;
-	    String ss = Utils.decimalFormat(totalQty,Utils.format_current_no_disgit);
-	    System.out.println(ss);
-	}
+	
 
 }

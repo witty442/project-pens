@@ -63,7 +63,8 @@ public class ITStockAction extends I_Action {
 				aForm.setResultsSearch(aForm.getBean().getItems());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		}finally{
 			if(conn !=null){
 				conn.close();conn=null;
@@ -136,9 +137,8 @@ public class ITStockAction extends I_Action {
 				
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			if(conn != null){
@@ -215,8 +215,8 @@ public class ITStockAction extends I_Action {
 			saveToken(request);	
 
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", "err:"+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -249,9 +249,8 @@ public class ITStockAction extends I_Action {
 		try {
 		
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -334,8 +333,8 @@ public class ITStockAction extends I_Action {
 			}
 		} catch (Exception e) {
 			conn.rollback();
-            e.printStackTrace();
-			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			try {
 				
 			} catch (Exception e2) {}
@@ -374,8 +373,8 @@ public class ITStockAction extends I_Action {
 				     saveToken(request);	
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
-				request.setAttribute("Message", e.getMessage());
+				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+				logger.error(e.getMessage(),e);
 			} finally {
 				try {
 					 conn.close();
@@ -456,8 +455,8 @@ public class ITStockAction extends I_Action {
 			}
 		} catch (Exception e) {
 			logger.info("Print report Error");
-			e.printStackTrace();
-			request.setAttribute("Message", e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 		} finally {
 			try {
 				 conn.close();

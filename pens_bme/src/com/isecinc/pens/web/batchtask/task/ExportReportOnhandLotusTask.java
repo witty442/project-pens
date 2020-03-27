@@ -104,7 +104,7 @@ public class ExportReportOnhandLotusTask extends BatchTask implements BatchTaskI
 	}
 	
 	public String getDescription(){
-		String desc = "Export Report Onhand Lotus (all store) <br/>";
+		String desc = "Export Report Onhand Lotus (More 1 store) <br/>";
 		return desc;
 	}
 	public String getDevInfo(){
@@ -152,6 +152,11 @@ public class ExportReportOnhandLotusTask extends BatchTask implements BatchTaskI
 			String summaryType = monitorModel.getBatchParamMap().get(PARAM_SUMMARY_TYPE);
 			logger.info("Start Gen StoreCode["+storeCode+"]OrderDate["+asOfDate+"]summaryType["+summaryType+"]...");
 			
+			/** Update Status Monitor **/
+			monitorModel.setType("EXPORT");
+			monitorModel.setThName("Search or Export มากกว่า 1 สาขา To Excel <br/>(สาขา:"+storeCode+",asOfDate:"+asOfDate);
+			dao.updateMonitor(connMonitor,monitorModel);
+			
 			/** Start process **/ 
 			modelItem = process(connMonitor, connMonitor, monitorModel, modelItem);
 
@@ -175,12 +180,10 @@ public class ExportReportOnhandLotusTask extends BatchTask implements BatchTaskI
 			monitorModel.setStatus(modelItem.getStatus());
 			monitorModel.setFileCount(modelItem.getSuccessCount()>0?1:0);
 			monitorModel.setFileName(modelItem.getFileName());
-			//By BatchTask
-			monitorModel.setType("EXPORT");
-			monitorModel.setThName("Export ทุกสาขา To Excel");
-			
+	
 			/** Update Status Monitor **/
 			dao.updateMonitor(connMonitor,monitorModel);
+			
 		}catch(Exception e){
 			try{
 				logger.error(e.getMessage(),e);

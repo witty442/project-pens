@@ -98,7 +98,7 @@ public class ImportMasterOrderREPAction {
 			request.getSession().setAttribute("VIEW_DATA",searchRepConfig(conn,excel,reportType,importAllForm.getBean()));
 			
 	   }catch(Exception e){
-		   e.printStackTrace();
+		   request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		   logger.error(e.getMessage(),e);
 	   }finally{
 		   if(conn != null){
@@ -130,7 +130,7 @@ public class ImportMasterOrderREPAction {
 		    out.close();
 			
 	   }catch(Exception e){
-		   e.printStackTrace();
+		   request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		   logger.error(e.getMessage(),e);
 	   }finally{
 		   if(conn != null){
@@ -169,7 +169,7 @@ public class ImportMasterOrderREPAction {
 			}
 			//request.setAttribute("Message", "Import Success");
 	   }catch(Exception e){
-		   e.printStackTrace();
+		   request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		   logger.error(e.getMessage(),e);
 	   }
 	   return mapping.findForward("importAll");

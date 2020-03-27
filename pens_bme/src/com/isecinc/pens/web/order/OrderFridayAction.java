@@ -302,9 +302,8 @@ public class OrderFridayAction extends I_Action {
 			}
 		
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			if(conn != null){
@@ -476,8 +475,8 @@ public class OrderFridayAction extends I_Action {
 			 
 		} catch (Exception e) {
 			//conn.rollback();
-            e.printStackTrace();
-			request.setAttribute("Message", e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			try {
 				
 			} catch (Exception e2) {}

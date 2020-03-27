@@ -16,6 +16,7 @@ public class SalesTargetForm extends I_Form {
     private String subPageName;
     private SalesTargetBean bean ;
   
+  
 	public List<SalesTargetBean> getResults() {
 		return results;
 	}

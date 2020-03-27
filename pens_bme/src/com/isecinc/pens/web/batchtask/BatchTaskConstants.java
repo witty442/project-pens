@@ -22,4 +22,7 @@ public static String DATA_FILE  ="DATA_FILE";
  public static String IMPORT_EXCEL_PIC_G899_TO_G07 = "ImportExcelPICG899ToG07";
  public static String EXPORT_REPORT_ONHAND_LOTUS = "ExportReportOnhandLotus";
  public static String EXPORT_REPORT_ONHAND_ROBINSON = "ExportReportOnhandRobinson";
+ public static String IMPORT_EXCEL_SWITCH_ITEM_ADJStock = "ImportExcelSwitchItemAdjStock";
+ public static String IMPORT_XLS_SALESOUT_LOTUS = "ImportExcelSalesOutLotus";
+ public static String GEN_STOCK_ENDDATE_LOTUS = "GenStockEndDateLotus";
 }

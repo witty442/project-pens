@@ -93,7 +93,7 @@ public class SQLHelper {
         int columnCount = 0;
         StringBuffer str = new StringBuffer("");
 		try{
-			System.out.println("sql:"+sql);   
+			logger.debug("sql:"+sql);   
 			conn = DBConnection.getInstance().getConnectionApps();
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
@@ -107,6 +107,7 @@ public class SQLHelper {
 			for(int i=1;i<=columnCount;i++){
 				    //System.out.println("["+i+"]"+rsm.getColumnName(i));
 				    str.append("<th> \n");
+				   // logger.debug("XXXcolumnType:"+rsm.getColumnType(i));
 	            	str.append(rsm.getColumnName(i));
 	            	str.append("</th>");
 			}
@@ -117,7 +118,11 @@ public class SQLHelper {
 				str.append("<tr> \n");  
 				for(int i=1;i<=columnCount;i++){
 					  str.append("<td class='text'>");
-		              str.append(Utils.isNull(rs.getString(rsm.getColumnName(i))));
+					  if(rsm.getColumnType(i)==93){//timestamp
+						  str.append(DateUtil.stringValue(rs.getTimestamp(rsm.getColumnName(i)),DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH));
+					  }else{
+		                 str.append(Utils.isNull(rs.getString(rsm.getColumnName(i))));
+					  }
 		              str.append("</td>");
 				}
 			    str.append("</tr> ");  
@@ -208,6 +213,30 @@ public class SQLHelper {
 			try{
 				if(ps != null){
 				   ps.close();ps = null;
+				}
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+		return recordUpdate;
+  }
+	public static int excUpdateOneSql(String sqlOne) {
+		Connection conn = null;
+	    PreparedStatement ps =null;
+	    int recordUpdate = 0;
+		try{  
+			conn = DBConnection.getInstance().getConnectionModel();
+		    ps = conn.prepareStatement(sqlOne);
+			recordUpdate = ps.executeUpdate();
+		}catch(Exception e){
+	      logger.error(e.getMessage(),e);
+		}finally{
+			try{
+				if(ps != null){
+				   ps.close();ps = null;
+				}
+				if(conn != null){
+					conn.close();conn = null;
 				}
 			}catch(Exception e){
 				logger.error(e.getMessage(),e);

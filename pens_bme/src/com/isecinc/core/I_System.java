@@ -33,7 +33,6 @@ public abstract class I_System {
 			caption = bundle.getString(message);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			e.printStackTrace();
 		}
 		return caption;
 	}

@@ -158,24 +158,6 @@ public class InterfacesSearchManager  {
 					request.setAttribute("Message", "Data not found");
 				}
 				
-			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_TRANSACTION_LOTUS)){
-				
-				/** Set Condition Search **/
-				MonitorBean[] results = dao.findMonitorListNew(user,Constants.TYPE_IMPORT_TRANSACTION_LOTUS);
-				
-				if (results != null && results.length > 0) {
-					interfacesForm.setResults(results);
-					
-					//Search interfaceResult (monitorItem)
-					MonitorItemBean monitorItemBeanResult = dao.findMonitorItemBean(user,results[0]);
-					//logger.debug("")
-					interfacesForm.setMonitorItemBeanResult(monitorItemBeanResult);
-					
-					request.setAttribute("Message", results[0].getErrorMsg());
-				} else {
-					request.setAttribute("Message", "Data not found");
-				}
-				
 			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)){
 				
 				/** Set Condition Search **/

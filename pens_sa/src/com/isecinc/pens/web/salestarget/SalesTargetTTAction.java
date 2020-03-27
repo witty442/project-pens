@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.exception.DataDuplicateException;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;
@@ -140,7 +141,8 @@ public class SalesTargetTTAction  {
 			conn.setAutoCommit(false);
 			
 			SalesTargetBean bean = aForm.getBean();
-		
+           
+			
 			//save Item target_temp
 			List<SalesTargetBean> productMKTList =(List<SalesTargetBean>)request.getSession().getAttribute("productMKTList");
 			List<SalesTargetBean> salesrepList = (List<SalesTargetBean>)request.getSession().getAttribute("salesrepList");
@@ -184,6 +186,8 @@ public class SalesTargetTTAction  {
 						l.setCreateUser(user.getUserName());
 						l.setUpdateUser(user.getUserName());
 						l.setSessionId(sessionId);
+						
+							
 	                    //add product
 						productDataSaveListBySalesrep.add(l);
 			
@@ -212,7 +216,9 @@ public class SalesTargetTTAction  {
 	    			h.setCreateUser(user.getUserName());
 	    			h.setUpdateUser(user.getUserName());
 	    			h.setSessionId(sessionId);
-	    			
+	    			h.setUserInputId(Utils.convertStrToLong(request.getParameter("userInputId")));
+					logger.debug("userInputId:"+h.getUserInputId());
+					
 	        	    logger.debug("** Prepare head *****");
 	        	    logger.debug("salesrepCode:"+h.getSalesrepCode()+",id:"+h.getId());
 	        	    
@@ -254,13 +260,17 @@ public class SalesTargetTTAction  {
 			//unlock page 
 			request.getSession().removeAttribute("TTSUPER_LOCKPAGE");
 			
-		} catch (Exception e) {
+		} catch (DataDuplicateException e) {
 			conn.rollback();
-            e.printStackTrace();
-			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
+			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้  พบข้อมูลซ้ำ  <br/> กรุณาตรวจสอบว่าไม่ได้เปิด 2 หน้าจอพร้อมกัน <br/> หากไม่ได้ กรุณาแจ้งไอที  \n");
 			try {
 				
 			} catch (Exception e2) {}
+			return "detailTTSUPER";
+		} catch (Exception e) {
+			conn.rollback();
+            logger.error(e.getMessage(),e);
+			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
 			return "detailTTSUPER";
 		} finally {
 			try {

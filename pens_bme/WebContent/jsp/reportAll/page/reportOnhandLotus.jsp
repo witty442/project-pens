@@ -56,8 +56,13 @@ function loadMe(){
 		}); 
 		    
 		//submitedGenStockOnhandTemp
-		var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopup&pageName=<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>';
-		popupFull(url,'<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>');
+		<%if(BatchTaskConstants.GEN_STOCK_ENDDATE_LOTUS.equalsIgnoreCase(Utils.isNull(request.getAttribute("BATCH_TASK_NAME")))){%>
+		   var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopup&pageName=<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>';
+		   popupFull(url,'<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>');
+		<%}else{%>
+		   var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopupNoWait&pageName=<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>';
+		   popupFull(url,'<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>');
+		<%}%>
    <%}%>
 }
 
@@ -105,7 +110,31 @@ function exportExcel(){
 	form.submit();
 	return true;
 }
-function genEndDateLotus(path){
+function genStockEndDateLotus(path){
+	var form = document.reportAllForm;
+	var asOfDateFrom = form.salesDate.value;
+	var pensCustCodeFrom = form.pensCustCodeFrom.value;
+	   
+    var param = "&customerCode="+form.pensCustCodeFrom.value;
+        param += "&salesDate="+form.salesDate.value;
+        param += "&pageName=GEN_STOCK_ENDDDATE_LOTUS";
+        param += "&pageStaus=child";
+        
+        if(asOfDateFrom ==""){ 
+ 		   alert("กรุณากรอกข้อมูลวันที่ As Of");
+ 		   asOfDateFrom.focus();
+ 		   return false;
+ 	   }
+ 	    if(pensCustCodeFrom ==""){ 
+ 		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
+ 		   pensCustCodeFrom.focus();
+ 		   return false;
+ 	   } 
+ 	form.action = path + "/jsp/reportAllAction.do?do=genStockEndDateLotus";
+ 	form.submit();
+}
+
+function genStockEndDateLotus_BK(path){
 	var form = document.reportAllForm;
 	var asOfDateFrom = form.salesDate.value;
 	var pensCustCodeFrom = form.pensCustCodeFrom.value;
@@ -287,7 +316,7 @@ function clearBatchForm(){
 							</td>
 							 <td align="right" width="25%" nowrap>
 							  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
-									<a href="javascript:genEndDateLotus('${pageContext.request.contextPath}')">
+									<a href="javascript:genStockEndDateLotus('${pageContext.request.contextPath}')">
 									  <input type="button" value="Gen Stock End Date" class="newPosBtn">
 									</a>
 								<%} %>
@@ -299,9 +328,15 @@ function clearBatchForm(){
 				 <table  border="0" cellpadding="3" cellspacing="0" >
 						<tr>
 							<td align="left">
-								<a href="javascript:searchBatchForm('<%=BatchTaskConstants.EXPORT_REPORT_ONHAND_LOTUS%>')">
-								  <input type="button" value="ตรวจสอบสถานะล่าสุด(Export ทุกสาขา)" class="newPosBtnLong"> 
-								</a>
+							    <%if ( Utils.userInRole(user,new String[]{User.PICKADMIN}) ){%>
+									<a href="javascript:searchBatchForm('<%=BatchTaskConstants.GEN_STOCK_ENDDATE_LOTUS%>')">
+									  <input type="button" value="ตรวจสอบสถานะล่าสุด(Batch)" class="newPosBtnLong"> 
+									</a>
+								<%}else{ %>
+								   <a href="javascript:searchBatchForm('<%=BatchTaskConstants.EXPORT_REPORT_ONHAND_LOTUS%>')">
+									  <input type="button" value="ตรวจสอบสถานะล่าสุด(Batch)" class="newPosBtnLong"> 
+									</a>
+								<%} %>
 								<!-- <a href="javascript:searchBatchForm()">
 								  <input type="button" value="ตรวจสอบสถานะล่าสุด(Gen Stock EndDate)" class="newPosBtnLong"> 
 								</a> -->

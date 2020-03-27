@@ -15,6 +15,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.exception.DataDuplicateException;
 import com.isecinc.pens.process.SequenceProcessAll;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
@@ -1284,6 +1285,7 @@ public class SalesTargetTTDAO {
 					 //  logger.debug("itemCode["+l.getItemCode()+"]status["+l.getStatus()+"]");
 					   if( !l.getStatus().equals("DELETE")){
 						   l.setId(h.getId());
+						   l.setUserInputId(h.getUserInputId());
 						   lineId++;
 						   l.setLineId(lineId);
 						   insertItemByMKT_TT(conn, l);
@@ -1299,6 +1301,7 @@ public class SalesTargetTTDAO {
 				   for(int i=0;i<h.getItems().size();i++){
 					   SalesTargetBean l = (SalesTargetBean)h.getItems().get(i);
 					   l.setId(h.getId());
+					   l.setUserInputId(h.getUserInputId());
 					   logger.debug("Line ID:"+l.getLineId());
 					   if(l.getLineId() ==0){
 	                        //get next line id =(max_line_id+1);
@@ -1349,6 +1352,11 @@ public class SalesTargetTTDAO {
 					//convert to target month year quarter
 					h = convertCriteria(h);
 					
+					//check duplicate all case (TTSUPPER duplicate no reason )
+					if(isTargetTempHeadDup(conn, h)){
+						throw new DataDuplicateException("DataDuplicate :please check");
+					}
+					
 					//save Head
 					insertXXPENS_BI_SALES_TARGET_TEMP_ByTTSUPER(conn, h);
 					//save line
@@ -1358,6 +1366,7 @@ public class SalesTargetTTDAO {
 						 //  logger.debug("itemCode["+l.getItemCode()+"]status["+l.getStatus()+"]");
 						   if( !Utils.isNull(l.getStatus()).equals("DELETE")){
 							   l.setId(h.getId());
+							   l.setUserInputId(h.getUserInputId());
 							   lineId++;
 							   l.setLineId(lineId);
 							   insertXXPENS_BI_SALES_TARGET_TEMP_L_ByTTSUPER(conn, l);
@@ -1374,6 +1383,7 @@ public class SalesTargetTTDAO {
 					   for(int i=0;i<h.getItems().size();i++){
 						   SalesTargetBean l = (SalesTargetBean)h.getItems().get(i);
 						   l.setId(h.getId());
+						   l.setUserInputId(h.getUserInputId());
 						   logger.debug("Line ID:"+l.getLineId());
 						   if(l.getLineId() ==0){
 		                        //get next line id =(max_line_id+1);
@@ -1463,6 +1473,52 @@ public class SalesTargetTTDAO {
 		}finally{
 		}
 	}
+	
+	/**
+	 * check SalesTargetTemp is Duplicate
+	 * @param conn
+	 * @param cri
+	 * @return
+	 */
+	public static boolean isTargetTempHeadDup(Connection conn,SalesTargetBean cri){
+		boolean dup = false;
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		try{
+			sql.append("\n select count(*) as c");
+			sql.append("\n from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
+			sql.append("\n where 1=1");
+			sql.append("\n and M.target_month = '"+Utils.isNull(cri.getTargetMonth())+"'");
+			sql.append("\n and M.target_quarter = '"+Utils.isNull(cri.getTargetQuarter())+"'");
+			sql.append("\n and M.target_year = '"+Utils.isNull(cri.getTargetYear())+"'");
+			sql.append("\n and M.division = '"+Utils.isNull(cri.getDivision())+"' ");//B = credit,van sales
+			sql.append("\n and M.brand = '"+cri.getBrand()+"'");
+			sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(cri.getCustCatNo())+"'");
+			sql.append("\n and M.salesrep_id = "+Utils.isNull(cri.getSalesrepId())+"");
+			sql.append("\n and M.sales_channel = '"+Utils.isNull(cri.getSalesChannelNo())+"'");
+			
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if (rst.next()) {
+				if(rst.getInt("c")>0){
+					dup = true;
+				}
+			}//if
+			logger.debug("isTargetTempHeadDup -->>"+dup);
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+	 return dup;
+	}
+	
 	/**
 	 * getMaxLineID
 	 * @param conn
@@ -1648,8 +1704,8 @@ public class SalesTargetTTDAO {
 				sql.append(" INSERT INTO XXPENS_BI_SALES_TARGET_TT \n");
 				sql.append(" (ID, TARGET_MONTH,  \n");
 				sql.append("  TARGET_QUARTER, TARGET_YEAR, CUSTOMER_CATEGORY, ZONE, BRAND, \n");
-				sql.append("  BRAND_GROUP, STATUS, CREATE_USER, CREATE_DATE,PERIOD)  \n");
-			    sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?) \n");
+				sql.append("  BRAND_GROUP, STATUS, CREATE_USER, CREATE_DATE,PERIOD,USER_INPUT_ID)  \n");
+			    sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 				
@@ -1665,7 +1721,7 @@ public class SalesTargetTTDAO {
 				ps.setString(c++, o.getCreateUser());
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, o.getPeriod());
-				
+				ps.setLong(c++, o.getUserInputId());
 				ps.executeUpdate();
 				
 			}catch(Exception e){
@@ -2099,8 +2155,8 @@ public class SalesTargetTTDAO {
 					sql.append("  SALESREP_ID, SALESREP_CODE, TARGET_MONTH,  \n");
 					sql.append("  TARGET_QUARTER, TARGET_YEAR, CUSTOMER_CATEGORY,  \n");
 					sql.append("  DIVISION, SALES_CHANNEL, BRAND, \n");
-					sql.append("  BRAND_GROUP, STATUS, CREATE_USER, CREATE_DATE,PERIOD,CUSTOMER_GROUP,SESSION_ID)  \n");
-				    sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
+					sql.append("  BRAND_GROUP, STATUS, CREATE_USER, CREATE_DATE,PERIOD,CUSTOMER_GROUP,SESSION_ID,USER_INPUT_ID)  \n");
+				    sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
 					
 					ps = conn.prepareStatement(sql.toString());
 					
@@ -2123,7 +2179,7 @@ public class SalesTargetTTDAO {
 					ps.setString(c++, o.getPeriod());
 					ps.setString(c++, o.getCustomerGroup());
 					ps.setString(c++, o.getSessionId());
-					
+					ps.setLong(c++, o.getUserInputId());
 					ps.executeUpdate();
 					
 				}catch(Exception e){
@@ -2174,8 +2230,8 @@ public class SalesTargetTTDAO {
 					sql.append(" INSERT INTO XXPENS_BI_SALES_TARGET_TEMP_L \n");
 					sql.append(" (ID,LINE_ID, INVENTORY_ITEM_ID, INVENTORY_ITEM_CODE,\n");
 					sql.append(" TARGET_QTY, TARGET_AMOUNT, STATUS,  \n");
-					sql.append(" REMARK, REJECT_REASON, CREATE_USER, CREATE_DATE,AMT_AVG12,AMT_AVG3,PRICE,SESSION_ID)  \n");
-				    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?) \n");
+					sql.append(" REMARK, REJECT_REASON, CREATE_USER, CREATE_DATE,AMT_AVG12,AMT_AVG3,PRICE,SESSION_ID,USER_INPUT_ID)  \n");
+				    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?) \n");
 					
 					ps = conn.prepareStatement(sql.toString());
 					
@@ -2194,6 +2250,7 @@ public class SalesTargetTTDAO {
 					ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getOrderAmt3Month())));
 					ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getPrice())));
 					ps.setString(c++, o.getSessionId());
+					ps.setLong(c++, o.getUserInputId());
 					ps.executeUpdate();
 				}catch(Exception e){
 					throw e;
@@ -2212,7 +2269,7 @@ public class SalesTargetTTDAO {
 					StringBuffer sql = new StringBuffer("");
 					sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TEMP_L \n");
 					sql.append(" SET TARGET_QTY =?, TARGET_AMOUNT =?, REMARK =?  \n");
-					sql.append(" ,UPDATE_USER =?, UPDATE_DATE=? ,SESSION_ID =?  \n");
+					sql.append(" ,UPDATE_USER =?, UPDATE_DATE=? ,SESSION_ID =? ,USER_INPUT_ID =?  \n");
 				    sql.append(" WHERE ID =? AND LINE_ID = ?\n");
 					
 					ps = conn.prepareStatement(sql.toString());
@@ -2223,6 +2280,7 @@ public class SalesTargetTTDAO {
 					ps.setString(c++, o.getCreateUser());
 					ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 					ps.setString(c++, o.getSessionId());
+					ps.setLong(c++, o.getUserInputId());
 					
 					ps.setLong(c++, o.getId());
 					ps.setLong(c++, o.getLineId());
@@ -2324,8 +2382,8 @@ public class SalesTargetTTDAO {
 				sql.append(" INSERT INTO XXPENS_BI_SALES_TARGET_TT_L \n");
 				sql.append(" (ID,LINE_ID, INVENTORY_ITEM_ID, INVENTORY_ITEM_CODE,\n");
 				sql.append(" TARGET_QTY, TARGET_AMOUNT, STATUS,  \n");
-				sql.append(" REMARK, REJECT_REASON, CREATE_USER, CREATE_DATE,AMT_AVG12,AMT_AVG3,PRICE)  \n");
-			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?) \n");
+				sql.append(" REMARK, REJECT_REASON, CREATE_USER, CREATE_DATE,AMT_AVG12,AMT_AVG3,PRICE,USER_INPUT_ID)  \n");
+			    sql.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?) \n");
 				
 				ps = conn.prepareStatement(sql.toString());
 				
@@ -2343,7 +2401,7 @@ public class SalesTargetTTDAO {
 				ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getOrderAmt12Month())));
 				ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getOrderAmt3Month())));
 				ps.setBigDecimal(c++, new BigDecimal(Utils.convertStrToDouble(o.getPrice())));
-
+				ps.setLong(c++, o.getUserInputId());
 				ps.executeUpdate();
 			}catch(Exception e){
 				throw e;
@@ -2363,7 +2421,7 @@ public class SalesTargetTTDAO {
 				StringBuffer sql = new StringBuffer("");
 				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TT_L \n");
 				sql.append(" SET TARGET_QTY =?, TARGET_AMOUNT =?, REMARK =?  \n");
-				sql.append(" ,UPDATE_USER =?, UPDATE_DATE=?  \n");
+				sql.append(" ,UPDATE_USER =?, UPDATE_DATE=? ,USER_INPUT_ID = ? \n");
 			    sql.append(" WHERE ID =? AND LINE_ID = ?\n");
 				
 				ps = conn.prepareStatement(sql.toString());
@@ -2373,6 +2431,7 @@ public class SalesTargetTTDAO {
 				ps.setString(c++, o.getRemark());
 				ps.setString(c++, o.getCreateUser());
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
+				ps.setLong(c++, o.getUserInputId());
 				
 				ps.setLong(c++, o.getId());
 				ps.setLong(c++, o.getLineId());

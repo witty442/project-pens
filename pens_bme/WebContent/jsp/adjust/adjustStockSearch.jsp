@@ -63,8 +63,9 @@ function search(path){
 	return true;
 }
 
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.adjustStockForm;
+	var path = document.getElementById("path").value;
 	form.action = path + "/jsp/adjustStockAction.do?do=search2&currPage="+currPage;
     form.submit();
     return true;
@@ -216,23 +217,9 @@ function getStoreNameModel(storeCode){
 					   int startRec = adjustStockForm.getStartRec();
 					   int endRec = adjustStockForm.getEndRec();
 					   int no = startRec;
-					%>
-					   
-					<div align="left">
-					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
-					   <span class="pagelinks">
-						หน้าที่ 
-						 <% 
-							 for(int r=0;r<totalPage;r++){
-								 if(currPage ==(r+1)){
-							 %>
-			 				   <strong><%=(r+1) %></strong>
-							 <%}else{ %>
-							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-						 <% }} %>				
-						</span>
-					</div>
+					%> 
+					<%= PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %> 
+					
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -296,18 +283,15 @@ function getStoreNameModel(storeCode){
 									</tr>
 							
 							 <% no++;}//for %>
-					</table>
-								
+					</table>	
 								
 					<!-- BUTTON ACTION-->
 					<div align="center">
 						<table  border="0" cellpadding="3" cellspacing="0" >
-							<tr><td>
-														
-								</td>
-							</tr>
+							<tr><td></td></tr>
 						</table>
 					</div>
+					<input type="hidden" name="path" id="path" value ="${pageContext.request.contextPath}"/>
 				</c:if>
 					<!-- ************************Result ***************************************************-->
 					

@@ -11,13 +11,10 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.web.autoorder.AutoOrderForm;
-import com.isecinc.pens.web.batchtask.BatchTaskConstants;
-import com.isecinc.pens.web.batchtask.BatchTaskDAO;
-import com.isecinc.pens.web.batchtask.BatchTaskForm;
+import com.isecinc.pens.web.batchtask.task.ImportExcelSwitchItemAdjStockTask;
 import com.isecinc.pens.web.importall.page.ImportExcelPICG899ToG07Action;
+import com.isecinc.pens.web.importall.page.ImportFileSwitchItemAdjustStockAction;
 import com.isecinc.pens.web.importall.page.ImportMasterOrderREPAction;
-import com.isecinc.pens.web.reportall.page.ReportEndDateLotusAction;
 import com.pens.util.Utils;
 
 /**
@@ -42,6 +39,8 @@ public class ImportAllAction extends I_Action {
 			     return new ImportMasterOrderREPAction().prepare(form, request, response);
 			 }else if("ImportExcelPICG899ToG07".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				 return new ImportExcelPICG899ToG07Action().prepare(form, request, response);
+			 }else if("ImportFileSwitchItemAdjustStock".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new ImportFileSwitchItemAdjustStockAction().prepare(form, request, response);
 			 }
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -84,11 +83,12 @@ public class ImportAllAction extends I_Action {
 				 return new ImportMasterOrderREPAction().importExcel(mapping, aForm, request, response);
 			 }else if("ImportExcelPICG899ToG07".equalsIgnoreCase(aForm.getPageName())){
 				return new ImportExcelPICG899ToG07Action().importExcel(mapping,form, request, response);
+			 }else if("ImportFileSwitchItemAdjustStock".equalsIgnoreCase(aForm.getPageName()) ){
+				 return new ImportFileSwitchItemAdjustStockAction().importExcel(mapping,form, request, response);
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 		}
@@ -134,11 +134,12 @@ public class ImportAllAction extends I_Action {
 				 //return new ReportEndDateLotusAction().searchBatch(mapping, aForm, request, response);
 			 }else if("ImportExcelPICG899ToG07".equalsIgnoreCase(aForm.getPageName())){
 		        return new ImportExcelPICG899ToG07Action().searchBatch(mapping, aForm, request, response);
+			 }else if("ImportFileSwitchItemAdjustStock".equalsIgnoreCase(aForm.getPageName()) ){
+				 return new ImportFileSwitchItemAdjustStockAction().searchBatch(mapping,form, request, response);
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -154,11 +155,12 @@ public class ImportAllAction extends I_Action {
 				 
 			 }else if("ImportExcelPICG899ToG07".equalsIgnoreCase(aForm.getPageName())){
 		        return new ImportExcelPICG899ToG07Action().searchBatchForm(mapping, aForm, request, response);
+			 }else if("ImportFileSwitchItemAdjustStock".equalsIgnoreCase(aForm.getPageName()) ){
+				 return new ImportFileSwitchItemAdjustStockAction().searchBatchForm(mapping,form, request, response);
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}
@@ -173,11 +175,12 @@ public class ImportAllAction extends I_Action {
 				 
 			 }else if("ImportExcelPICG899ToG07".equalsIgnoreCase(aForm.getPageName())){
 		        return new ImportExcelPICG899ToG07Action().clearBatchForm(mapping, aForm, request, response);
+			 }else if("ImportFileSwitchItemAdjustStock".equalsIgnoreCase(aForm.getPageName()) ){
+				 return new ImportFileSwitchItemAdjustStockAction().clearBatchForm(mapping,form, request, response);
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{	
 		}

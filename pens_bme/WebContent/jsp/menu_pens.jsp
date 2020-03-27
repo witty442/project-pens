@@ -180,20 +180,23 @@
 			   </li>
 	            <li><a class="parent"><span><%no++;out.print(no);%>.Load File Sales Transaction</span></a>
 			       <ul>
-				       <li>
-		          	       <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/interfacesAction.do?do=prepare&pageAction=new&pageName=<%=Constants.TYPE_IMPORT_TRANSACTION_LOTUS%>');">
-		          	       <span>3.1 <bean:message key="ImportBMEFromLotus" bundle="sysprop"/></span></a>
-		               </li>
+		               <li>
+				          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.IMPORT_XLS_SALESOUT_LOTUS%>');">
+				          <span>3.1.<bean:message key="<%=BatchTaskConstants.IMPORT_XLS_SALESOUT_LOTUS%>" bundle="sysprop"/></span></a>
+				       </li> 
+		               
 		               <!-- OLD FORMAT IMPORT -->
 		                <li>
 						   <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=bigc&action=new');">3.2 
 						   <span><bean:message bundle="sysprop" key="ImportBMEFromBigC"/></span></a>
 						</li> 
 						 
-						 <li>
+						 <!-- King -->
+					    <li>
 							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=king&action=new');">3.3 
 							<span><bean:message bundle="sysprop" key="ImportBMEFromKing"/></span></a>
-						</li>
+						</li> 
+						
 						 <li>
 							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=tops&action=new');">3.4 
 							<span><bean:message bundle="sysprop" key="ImportBMEFromTops"/></span></a>
@@ -213,7 +216,9 @@
 				
 				<%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
 					<li>
-						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=physical&action=new');"><%no++;out.print(no);%>.<span><bean:message bundle="sysprop" key="ImportBMEPhysical"/></span></a>
+						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&page=physical&action=new');">
+						<%no++;out.print(no);%>.<span><bean:message bundle="sysprop" key="ImportBMEPhysical"/></span>
+						</a>
 					</li>
 					<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 						<li>
@@ -238,7 +243,9 @@
          
          <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 	          	 <li>
-	          		<a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/genCNAction.do?do=prepare');"><span><%no++;out.print(no);%>.<bean:message key="genCN" bundle="sysprop"/></span></a>
+	          		<a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/genCNAction.do?do=prepare');">
+	          		<span><%no++;out.print(no);%>.<bean:message key="genCN" bundle="sysprop"/></span>
+	          		</a>
 	          	</li>
          <%} %>
           		
@@ -246,13 +253,22 @@
 		   <%subNo=0; %>
 		       <ul>
 		           <li>
-				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitLotus');"><%out.print(no);%>.<%subNo++;out.print(subNo);%> <span><bean:message bundle="sysprop" key="LoadStockInitLotus"/></span></a>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitLotus');">
+				       <%out.print(no);%>.<%subNo++;out.print(subNo);%> <span>
+				        <bean:message bundle="sysprop" key="LoadStockInitLotus"/></span>
+				        </a>
 			       </li>
 			       <li>
-				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitBigC');"><%out.print(no);%>.<%subNo++;out.print(subNo);%> <span><bean:message bundle="sysprop" key="LoadStockInitBigC"/></span></a>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitBigC');">
+				       <%out.print(no);%>.<%subNo++;out.print(subNo);%> 
+				       <span><bean:message bundle="sysprop" key="LoadStockInitBigC"/></span>
+				       </a>
 			      </li>
 			      <li>
-				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitMTT');"><%out.print(no);%>.<%subNo++;out.print(subNo);%> <span><bean:message bundle="sysprop" key="LoadStockInitMTT"/></span></a>
+				       <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAction.do?do=prepare&action=new&page=LoadStockInitMTT');">
+				       <%out.print(no);%>.<%subNo++;out.print(subNo);%> 
+				       <span><bean:message bundle="sysprop" key="LoadStockInitMTT"/></span>
+				       </a>
 			      </li>
 		       </ul>
 		  </li>
@@ -450,15 +466,10 @@
 			 <li><a class="parent" ><span><%no++;out.print(no);%>.รายงาน Robinson</span></a>
 			 <%subNo=0; %>
 			    <ul>
-			      <!-- OLD Version -->
-			        <li>
-				     <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandAsOfRobinson');">
-				     <span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message bundle="sysprop" key="onhandAsOf_Robinson"/>(OLD)</span></a>
-			       </li> 
 			       <li>
 						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reportAllAction.do?do=prepare&action=new&pageName=reportOnhandAsOfRobinson');">
 						  <span><%out.print(no);%>.<%subNo++;out.print(subNo);%> 
-						  <bean:message bundle="sysprop" key="onhandAsOf_Robinson"/>(NEW)</span>
+						  <bean:message bundle="sysprop" key="onhandAsOf_Robinson"/></span>
 						</a>
 					</li> 
 					
@@ -544,7 +555,7 @@
 		         <li>
 		           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/importAllAction.do?do=prepare&action=new&pageName=ImportMasterOrderREP');">
 		           <span><%no++;out.print(no);%>.<bean:message key="ImportMasterOrderREP" bundle="sysprop"/></span></a>
-		        </li> 
+		         </li> 
 		     
 		         <li>
 		          <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/autoOrderAction.do?do=prepareSearch&action=new');">
@@ -591,10 +602,21 @@
  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK,User.PICKADMIN,User.SALE}) ){ no=0;%>
 	 <li><a  href="javascript: void(0)" class="parent"><span>Transaction</span></a>
 		<ul>
-			<li>
-				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/adjustStockAction.do?do=prepare2&action=new');">
-				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="adjustStock"/></span></a>
-			</li>
+			
+			<li><a class="parent" ><span><%no++;out.print(no);%>.B'me Inventory Adjustment</span></a>
+			 <%subNo=0; %>
+			    <ul>
+			      <li>
+					 <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/importAllAction.do?do=prepare&action=new&pageName=ImportFileSwitchItemAdjustStock');">
+					 <span><%subNo++;out.print(no+"."+subNo);%>.<bean:message bundle="sysprop" key="ImportFileSwitchItemAdjustStock"/></span></a>
+				   </li>   
+		           <li>
+				     <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/adjustStockAction.do?do=prepare2&action=new');">
+				     <span><%subNo++;out.print(no+"."+subNo);%>.<bean:message bundle="sysprop" key="adjustStock"/></span></a>
+			       </li>
+			   </ul>	    
+		    </li> 
+		    
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/adjustStockSAAction.do?do=prepare2&action=new');">
 				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="adjustStockSA"/></span></a>

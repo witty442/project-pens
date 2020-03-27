@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.bean.MonitorBean"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -13,46 +15,50 @@
 		<tr>
         <th> No.</th>
         <th> เลขที่รายการ</th>
-		<th> ประเภท</th>
+		<th> ชื่อ Process</th>
+		<th> ชื่อ Process(TH)</th>
 		<th> ประเภทข้อมูล</th>
 		<th> ผู้สร้าง</th>
 		<th> สถานะ</th>
-		<th> วันที่ทำรายการล่าสุด</th>
+		<th> วันที่เริ่ม</th>
+		<th> วันที่ทำสำเร็จ</th>
 		<th> Message</th>
 		<th> รายละเอียด</th>
 		</tr>
-		<c:forEach var="results" items="${batchTaskForm.results}" varStatus="rows">
-		<c:choose>
-			<c:when test="${rows.index %2 == 0}">
-				<c:set var="tabclass" value="lineO"/>
-			</c:when>
-			<c:otherwise>
-				<c:set var="tabclass" value="lineE"/>
-			</c:otherwise>
-		</c:choose>
-		
-		<tr class="<c:out value='${tabclass}'/>" id="${rows.index+1}">
+		<%
+		 for(int i=0;i<batchTaskForm.getResults().length;i++){
+			 MonitorBean item = batchTaskForm.getResults()[i];
+		%>
+		<tr>
 		       
-                <td> <c:out value='${rows.index+1}'/></td>
-                <td> ${results.transactionId}</td>
-				<td> ${results.type}</td>
-				<td> ${results.transactionType}</td>
-				<td> ${results.createUser}</td>
-				<td> 
-				  <c:choose>
-					<c:when test="${results.status == 1}">
-						<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-					</c:when>
-					<c:otherwise>
-						<img border=0 src="${pageContext.request.contextPath}/icons/uncheck.gif">
-					</c:otherwise>
-				   </c:choose>
+                <td width="3%"> <%=(i+1)%></td>
+                <td width="5%"> <%=item.getTransactionId() %></td>
+				<td width="10%"> <%=item.getName() %></td>
+				<td width="20%"> <%=Utils.isNull(item.getThName()) %></td>
+				<td width="5%"> <%=Utils.isNull(item.getTransactionType()) %></td>
+				<td width="5%"> <%=item.getCreateUser() %></td>
+				<td width="3%"> 
+				   <%if(item.getStatus()==1){ %>
+				     <font color='green'><b> Success</b></font>
+				   <%}else if(item.getStatus()==0){ %>
+				      <font color='#2892FC'><b>  Running </b></font>
+				   <%}else{ %>
+				      <font color='red'><b> Error</b></font> 
+				   <%} %>
 				</td>
-				<td> ${results.submitDateDisp}</td>
-				<td align="left"> ${results.errorMsg}</td>
-			    <td></td>
+				<td width="8%"> <%=item.getSubmitDateDisp()%></td>
+				<td width="8%"> <%=Utils.isNull(item.getUpdateDateDisp())%></td>  
+				<td align="left" width="10%"><%=Utils.isNull(item.getErrorMsg())%> </td>
+			    <td width="10%">
+			    <!-- Case Export save all path for download after run Batch Success -->
+			      <%if(Utils.isNull(item.getType()).equalsIgnoreCase("export")
+			    	 && item.getStatus()==1){ 
+			      %>
+			      <a href="javascript:downloadFile('<%=item.getFileName()%>')">DownloadFile</a>
+			      <%} %>
+			    </td>
 		</tr>
-		</c:forEach>
+		<%} %>	
 	</table>
 </c:if>
 
@@ -60,9 +66,11 @@
  String pageName = request.getParameter("pageName");
  //System.out.println("pageName:"+pageName);
 %>
-
-<%if(batchTaskForm.getTaskInfo().isDispDetail()){ %>
+ <%if(batchTaskForm.getTaskInfo().isDispDetail()){ %>
    <jsp:include page="sub/AllResultBatchTask_sub.jsp"></jsp:include>
-<%} %>
+ <%} %>
+
+
+ 
 					
 								

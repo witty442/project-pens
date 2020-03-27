@@ -233,7 +233,10 @@ public class AutoOrderDAO {
 			sql.append("\n where R.pens_item = W.pens_item ");
 			sql.append("\n and R.store_code ='"+bean.getStoreCode()+"'");
 			sql.append("\n and R.ORDER_DATE = to_date('"+tDateStr+"','dd/mm/yyyy')");
-			sql.append("\n and W.onhand_qty <> 0");
+			
+			//for test
+			//sql.append("\n and rownum <=10 ");
+			
 			sql.append("\n order by R.STORE_CODE,R.GROUP_CODE ");
 			logger.debug("sql:"+sql);
 			
@@ -424,7 +427,25 @@ public class AutoOrderDAO {
 			}
 		}
 	}
-	
+	public static void deleteOrderRep(Connection conn,String storeCode,String orderDate) throws Exception{
+		PreparedStatement ps = null;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			sql.append(" delete from PENSBI.BME_ORDER_REP where 1=1");
+			sql.append(" and STORE_CODE ='"+storeCode+"' \n" );
+			sql.append(" and order_date =to_date('"+DateUtil.convBuddhistToChristDate(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy') \n" );
+	        logger.debug("sql:\n"+sql.toString());
+
+			ps = conn.prepareStatement(sql.toString());
+			ps.executeUpdate();
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+		}
+	}
 	public static void updateMasterConfig(String refCode,String custGroup,String inputQty) throws Exception{
 		Connection conn = null;
 		PreparedStatement ps = null;

@@ -112,18 +112,23 @@ public class AdjustStockDAO {
 		StringBuilder sql = new StringBuilder();
 		int totalRec = 0;
 		try {
-			sql.append("\n SELECT count(*) as c from PENSBI.PENSBME_ADJUST_INVENTORY    \n");
-			sql.append("\n where 1=1   \n");
+			sql.append("\n SELECT count(*) as c FROM ( ");
+			sql.append("\n  SELECT DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
+			sql.append("\n  STORE_NAME,BANK_NO,ORG,SUB_INV,REFERENCE,STATUS,STATUS_MESSAGE ");
+			sql.append("\n  FROM PENSBI.PENSBME_ADJUST_INVENTORY  ");
+			sql.append("\n  where 1=1  ");
 			if( !Utils.isNull(o.getDocumentNo()).equals("")){
-				sql.append("\n and document_no = '"+Utils.isNull(o.getDocumentNo())+"'  ");
+				sql.append("\n  and document_no = '"+Utils.isNull(o.getDocumentNo())+"'  ");
 			}
 			if( !Utils.isNull(o.getStoreCode()).equals("")){
-				sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
+				sql.append("\n  and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
 			}
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				sql.append("\n and TRANSACTION_DATE = ? ");
+				sql.append("\n  and TRANSACTION_DATE = ? ");
 			}
-			sql.append("\n order by document_no asc ");
+			sql.append("\n   GROUP BY DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
+			sql.append("\n   STORE_NAME,BANK_NO,ORG,SUB_INV,REFERENCE,STATUS,STATUS_MESSAGE ");
+			sql.append("\n )");
 			logger.debug("sql:"+sql);
 			
 			ps = conn.prepareStatement(sql.toString());
@@ -159,10 +164,10 @@ public class AdjustStockDAO {
 		try {
 			sql.append("\n select M.* from (");
 			sql.append("\n select A.* ,rownum as r__ from (");
-				sql.append("\n SELECT DISTINCT DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
-				sql.append("\n   STORE_NAME,BANK_NO,ORG,SUB_INV,REFERENCE,STATUS,STATUS_MESSAGE ");
-				sql.append("\n from PENSBI.PENSBME_ADJUST_INVENTORY    \n");
-				sql.append("\n where 1=1   \n");
+				sql.append("\n  SELECT DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
+				sql.append("\n  STORE_NAME,BANK_NO,ORG,SUB_INV,REFERENCE,STATUS,STATUS_MESSAGE ");
+				sql.append("\n  from PENSBI.PENSBME_ADJUST_INVENTORY  ");
+				sql.append("\n  where 1=1  ");
 				if( !Utils.isNull(o.getDocumentNo()).equals("")){
 					sql.append("\n and document_no = '"+Utils.isNull(o.getDocumentNo())+"'  ");
 				}
@@ -172,8 +177,10 @@ public class AdjustStockDAO {
 				if( !Utils.isNull(o.getTransactionDate()).equals("")){
 					sql.append("\n and TRANSACTION_DATE = ? ");
 				}
-			   sql.append("\n order by document_no desc ");
-			sql.append("\n   )A ");
+			sql.append("\n   GROUP BY DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
+			sql.append("\n   STORE_NAME,BANK_NO,ORG,SUB_INV,REFERENCE,STATUS,STATUS_MESSAGE ");
+			sql.append("\n   order by document_no desc ");
+			sql.append("\n )A ");
         	// get record start to end 
             if( !allRec){
         	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
@@ -454,8 +461,6 @@ public class AdjustStockDAO {
 		  return orderNo;
 	}
 	 
-	
-	
 	private static void saveModel(Connection conn,AdjustStock o) throws Exception{
 		PreparedStatement ps = null;
 		logger.debug("Insert");

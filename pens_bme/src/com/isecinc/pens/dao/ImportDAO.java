@@ -491,7 +491,7 @@ public class ImportDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select *  from PENSBME_MST_REFERENCE WHERE Reference_code ='"+type+"' and interface_value ='"+storeNo+"' \n");
 			
-		    logger.debug("SQL:"+sql.toString());
+		    //logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
@@ -903,7 +903,7 @@ public class ImportDAO {
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select * from PENSBME_STYLE_MAPPING WHERE style ='"+styleNo+"' \n");
 			
-		    logger.debug("SQL:"+sql.toString());
+		    //logger.debug("SQL:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){

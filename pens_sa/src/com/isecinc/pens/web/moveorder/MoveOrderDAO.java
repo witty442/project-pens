@@ -176,7 +176,7 @@ public class MoveOrderDAO {
 		
 		//Case Check dispReasonOnly no Condition below 
 		if( !Utils.isNull(o.getDispHaveReason()).equals("")){
-			sql.append("\n and H.comments is not null or H.reason is not null ");
+			sql.append("\n and (H.comments is not null or H.reason is not null) ");
 			
 		}else{
 			if( !Utils.isNull(o.getDocType()).equals("") && !Utils.isNull(o.getDocType()).equals("ALL")){

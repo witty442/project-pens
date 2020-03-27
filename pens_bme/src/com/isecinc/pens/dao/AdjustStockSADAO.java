@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.AdjustStock;
 import com.isecinc.pens.bean.AdjustStockSA;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.dao.constants.Constants;
@@ -98,37 +99,90 @@ public class AdjustStockSADAO {
 			}
 		}
 	}
-	
-	public static List<AdjustStockSA> searchHead(AdjustStockSA o ) throws Exception {
+	public static int searchHeadListTotalRec(Connection conn,AdjustStockSA o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
-		Connection conn = null;
+		int totalRec = 0;
+		try {
+			sql.append("\n SELECT count(*) as c  FROM(");
+			sql.append("\n SELECT DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
+			sql.append("\n STORE_NAME,STATUS,STATUS_MESSAGE ");
+			sql.append("\n from PENSBI.PENSBME_ADJUST_SALES   ");
+			sql.append("\n where 1=1   \n");
+			if( !Utils.isNull(o.getDocumentNo()).equals("")){
+				sql.append("\n and document_no = '"+Utils.isNull(o.getDocumentNo())+"'  ");
+			}
+			if( !Utils.isNull(o.getStoreCode()).equals("")){
+				sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
+			}
+			if( !Utils.isNull(o.getTransactionDate()).equals("")){
+				sql.append("\n and TRANSACTION_DATE = ? ");
+			}
+			sql.append("\n GROUP BY DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
+			sql.append("\n STORE_NAME,STATUS,STATUS_MESSAGE ");
+			sql.append("\n ) ");
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			if( !Utils.isNull(o.getTransactionDate()).equals("")){
+				Date tDate  = DateUtil.parse(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				ps.setDate(1,new java.sql.Date(tDate.getTime()));
+			}
+			
+			rst = ps.executeQuery();
+			if(rst.next()){
+				totalRec = rst.getInt("c");
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+				
+			} catch (Exception e) {}
+		}
+		return totalRec;
+	}
+	public static List<AdjustStockSA> searchHeadList(Connection conn,AdjustStockSA o ,boolean allRec,int currPage,int pageSize )  throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
 		AdjustStockSA h = null;
 		List<AdjustStockSA> items = new ArrayList<AdjustStockSA>();
 		int r = 1;
 		int c = 1;
 		try {
-			sql.append("\n SELECT DISTINCT DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
-			sql.append("\n   STORE_NAME,STATUS,STATUS_MESSAGE ");
-			sql.append("\n from PENSBME_ADJUST_SALES    \n");
-			sql.append("\n where 1=1   \n");
-			
-			if( !Utils.isNull(o.getDocumentNo()).equals("")){
-				sql.append("\n and document_no = '"+Utils.isNull(o.getDocumentNo())+"'  ");
+			sql.append("\n select M.* from (");
+			sql.append("\n select A.* ,rownum as r__ from (");
+				sql.append("\n SELECT DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
+				sql.append("\n STORE_NAME,STATUS,STATUS_MESSAGE ");
+				sql.append("\n from PENSBI.PENSBME_ADJUST_SALES    \n");
+				sql.append("\n where 1=1   \n");
+				if( !Utils.isNull(o.getDocumentNo()).equals("")){
+					sql.append("\n and document_no = '"+Utils.isNull(o.getDocumentNo())+"'  ");
+				}
+				if( !Utils.isNull(o.getStoreCode()).equals("")){
+					sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
+				}
+				if( !Utils.isNull(o.getTransactionDate()).equals("")){
+					sql.append("\n and TRANSACTION_DATE = ? ");
+				}
+				sql.append("\n GROUP BY DOCUMENT_NO,TRANSACTION_DATE,STORE_CODE,");
+				sql.append("\n STORE_NAME,STATUS,STATUS_MESSAGE ");
+				sql.append("\n order by document_no desc ");
+			sql.append("\n   )A ");
+        	// get record start to end 
+            if( !allRec){
+        	  sql.append("\n    WHERE rownum < (("+currPage+" * "+pageSize+") + 1 )  ");
+            } 
+        	sql.append("\n )M  ");
+			if( !allRec){
+			   sql.append("\n  WHERE r__ >= ((("+currPage+"-1) * "+pageSize+") + 1)  ");
 			}
-			
-			if( !Utils.isNull(o.getStoreCode()).equals("")){
-				sql.append("\n and store_code = '"+Utils.isNull(o.getStoreCode())+"'  ");
-			}
-			
-			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				sql.append("\n and TRANSACTION_DATE = ? ");
-			}
-			sql.append("\n order by document_no desc ");
 			logger.debug("sql:"+sql);
 			
-			conn = DBConnection.getInstance().getConnection();
 			ps = conn.prepareStatement(sql.toString());
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
 				Date tDate  = DateUtil.parse(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -136,30 +190,25 @@ public class AdjustStockSADAO {
 			}
 			
 			rst = ps.executeQuery();
-
 			while(rst.next()) {
-			  
-				   h = new AdjustStockSA();
-				   h.setNo(r);
-				   h.setTransactionDate(DateUtil.stringValue(rst.getDate("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				   h.setDocumentNo(Utils.isNull(rst.getString("document_no")));
-				   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
-				   h.setStoreName(Utils.isNull(rst.getString("store_name")));
-				   h.setStatus(Utils.isNull(rst.getString("status"))); 
-				   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("status")))); 
-				   h.setStatusMessage(Utils.isNull(rst.getString("status_message"))); 
-				   
-				   if(Utils.isNull(rst.getString("status")).equals(STATUS_CANCEL) ){
-					   h.setCanEdit(false);
-				   }else{
-					   h.setCanEdit(true); 
-				   }
- 
+			   h = new AdjustStockSA();
+			   h.setNo(r);
+			   h.setTransactionDate(DateUtil.stringValue(rst.getDate("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   h.setDocumentNo(Utils.isNull(rst.getString("document_no")));
+			   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
+			   h.setStoreName(Utils.isNull(rst.getString("store_name")));
+			   h.setStatus(Utils.isNull(rst.getString("status"))); 
+			   h.setStatusDesc(getStatusDesc(Utils.isNull(rst.getString("status")))); 
+			   h.setStatusMessage(Utils.isNull(rst.getString("status_message"))); 
+			   
+			   if(Utils.isNull(rst.getString("status")).equals(STATUS_CANCEL) ){
+				   h.setCanEdit(false);
+			   }else{
+				   h.setCanEdit(true); 
+			   }
 			   items.add(h);
 			   r++;
-			   
 			}//while
-
 		} catch (Exception e) {
 			throw e;
 		} finally {

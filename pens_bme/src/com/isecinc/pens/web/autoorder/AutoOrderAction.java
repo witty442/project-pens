@@ -60,6 +60,7 @@ public class AutoOrderAction extends I_Action {
 				//prepare parameter
 				AutoOrderBean bean = new AutoOrderBean();
 				bean.setOrderDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+				bean.setDispNoZero("true");
 				
 				/** get parameter from Gen Report Page **/
 				 if( !Utils.isNull(request.getParameter("storeCode")).equals("")){
@@ -100,9 +101,8 @@ public class AutoOrderAction extends I_Action {
 			request.getSession().setAttribute(BatchTaskConstants.BATCH_PARAM_MAP,batchParaMap);
 			request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.GEN_STOCK_ONHAND_REP_TEMP);//set to popup page to BatchTask
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 		}
@@ -156,9 +156,8 @@ public class AutoOrderAction extends I_Action {
 				 search(mapping, form, request, response); 
 			 }
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			
@@ -319,6 +318,42 @@ public class AutoOrderAction extends I_Action {
 		}
 		return "search";
 	}
+	public ActionForward deleteOrderRep(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("deleteOrderRep");
+		AutoOrderForm aForm = (AutoOrderForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		try {
+			conn =DBConnection.getInstance().getConnectionApps();
+			aForm.getBean().setUserName(user.getUserName());
+			//validate data can Confirm
+			String canR = AutoOrderDAO.canConfirmOrderRepToOder(conn, aForm.getBean().getOrderDate(),aForm.getBean().getStoreCode());
+			if(canR.equalsIgnoreCase("0")){
+				request.setAttribute("Message", "ข้อมูลร้านนี้ ถูก Confirm to Order ไปแล้ว  ไม่สามารถลบข้อมูลได้");
+				return mapping.findForward("search");
+			}
+			if(canR.equalsIgnoreCase("1")){
+				
+				aForm.getBean().setUserName(user.getUserName());
+		
+				//delete OrderRep
+				AutoOrderDAO.deleteOrderRep(conn,aForm.getBean().getStoreCode(),aForm.getBean().getOrderDate());
+				
+				request.setAttribute("Message", "ยืนยัน ลบข้อมูล Order เติมเต็มเรียบร้อยแล้ว ");
+				
+			    aForm.getBean().setCanSave(false);
+			    aForm.setResults(null);
+			    request.getSession().removeAttribute("BATCH_TASK_RESULT");
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			conn.close();
+		}
+	   return mapping.findForward("search");
+	}
+	
 	public ActionForward confirmTempRepToOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("confirmTempRepToOrder");
 		AutoOrderForm aForm = (AutoOrderForm) form;

@@ -104,6 +104,7 @@ public class ConfFinishAction extends I_Action {
 				}
 				//default currPage = 1
 				aForm.setCurrPage(currPage);
+				aForm.setPageSize(pageSize);
 				
 				//get Total Record
 				aForm.setTotalRecord(ConfFinishDAO.searchTotalHead(conn,aForm.getBean()));
@@ -145,9 +146,8 @@ public class ConfFinishAction extends I_Action {
 				aForm.setResultsSearch(items);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			if(conn != null){
@@ -253,9 +253,8 @@ public class ConfFinishAction extends I_Action {
 			
 			request.setAttribute("Message", msg);
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
 			throw e;
 		}finally{
 			

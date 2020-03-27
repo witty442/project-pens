@@ -2,9 +2,6 @@
 <%@page import="com.isecinc.pens.bean.ReqFinish"%>
 <%@page import="com.isecinc.pens.dao.constants.PickConstants"%>
 <%@page import="com.isecinc.pens.dao.ReqReturnWacoalDAO"%>
-<%@page import="com.isecinc.pens.dao.JobDAO"%>
-<%@page import="java.util.HashMap"%>
-<%@page import="java.util.Map"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
@@ -18,12 +15,7 @@
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <jsp:useBean id="reqFinishForm" class="com.isecinc.pens.web.pick.ReqFinishForm" scope="session" />
-<%
-
-%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -57,19 +49,20 @@ function search(path){
 	form.submit();
 	return true;
 }
-
+function gotoPage(currPage){
+	var form = document.reqFinishForm;
+	var path = document.getElementById("path").value;
+	form.action = path + "/jsp/reqFinishAction.do?do=search2&currPage="+currPage;
+    form.submit();
+    return true;
+}
 function openEdit(path,requestDate,requestNo,mode){
 	var form = document.reqFinishForm;
 	form.action = path + "/jsp/reqFinishAction.do?do=prepare&requestDate="+requestDate+"&requestNo="+requestNo+"&mode="+mode;
 	form.submit();
 	return true;
 }
-function gotoPage(path,currPage){
-	var form = document.reqFinishForm;
-	form.action = path + "/jsp/reqFinishAction.do?do=search2&currPage="+currPage;
-    form.submit();
-    return true;
-}
+
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -176,23 +169,10 @@ function gotoPage(path,currPage){
 					   int startRec = reqFinishForm.getStartRec();
 					   int endRec = reqFinishForm.getEndRec();
 					   int pageSize = reqFinishForm.getPageSize();
+					   int no = Utils.calcStartNoInPage(currPage, pageSize);
 					%>
-					   
-					<div align="left">
-					   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
-					   <span class="pagelinks">
-						หน้าที่ 
-						 <% 
-							 for(int r=0;r<totalPage;r++){
-								 if(currPage ==(r+1)){
-							 %>
-			 				   <strong><%=(r+1) %></strong>
-							 <%}else{ %>
-							    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-							       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-						 <% }} %>				
-						</span>
-					</div>
+					<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
+					
 						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 						       <tr>
 									<th >No</th>
@@ -203,7 +183,7 @@ function gotoPage(path,currPage){
 									<th >Action</th>						
 							   </tr>
 							<% 
-							int no = (currPage-1)*pageSize;
+							//int no = (currPage-1)*pageSize;
 							String tabclass ="lineE";
 							List<ReqFinish> resultList = reqFinishForm.getResultsSearch();
 							for(int n=0;n<resultList.size();n++){
@@ -211,7 +191,6 @@ function gotoPage(path,currPage){
 								if(n%2==0){ 
 									tabclass="lineO";
 								}
-								no++;
 								%>
 									<tr class="<%=tabclass%>">
 										<td class="td_text_center" width="5%"><%=no%></td>
@@ -229,11 +208,12 @@ function gotoPage(path,currPage){
 											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=mc.getRequestDate()%>','<%=mc.getRequestNo()%>','edit')">
 											       <font size="2">    แก้ไข</font>
 											  </a>
-										 <%} %>
+										 <% } %>
 										</td>
 									</tr>
 							
-							 <%} %>
+							 <% no++;
+							 } %>
 					</table>
 				</c:if>
 					<!-- ************************Result ***************************************************-->
@@ -241,6 +221,7 @@ function gotoPage(path,currPage){
 					<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 					
 					<!-- hidden field -->
+					<input type="hidden" name="path" id="path" value ="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

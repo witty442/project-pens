@@ -97,8 +97,15 @@ public class SalesTargetBean implements Serializable{
 	private List<SalesTargetBean> itemsList;
 	StringBuffer dataStrBuffer;
 	String sessionId;
+	private long userInputId;
 	
 	
+	public long getUserInputId() {
+		return userInputId;
+	}
+	public void setUserInputId(long userInputId) {
+		this.userInputId = userInputId;
+	}
 	public String getSessionId() {
 		return sessionId;
 	}
