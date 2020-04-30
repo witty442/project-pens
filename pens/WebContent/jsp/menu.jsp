@@ -253,17 +253,23 @@
     <li><a  href="javascript: void(0)" class="parent">รายการทั่วไป</a><%no=0; %>
     	<ul>
     	   <%if(role.equalsIgnoreCase(User.TT)){ %>
-    		<li>
+    		  <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/requestPromotionAction.do?do=prepare';"><span><%no++;out.print(no);%>.บันทึกใบอนุมัติจัดรายการร้านค้า</span></a>
-            </li>
+              </li>
             <%} %>
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareCustomer&action=new';"><span><%no++;out.print(no);%>.<bean:message key="Stock" bundle="sysprop"/> </span></a>
             </li>
              <%if(role.equalsIgnoreCase(User.TT)){ %>
-              <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockReturnAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.<bean:message key="StockReturn" bundle="sysprop"/> </span></a>
-              </li>
+	              <li>
+	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockReturnAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.<bean:message key="StockReturn" bundle="sysprop"/> </span></a>
+	              </li>
+	              <li>
+	            	 <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/boxNoNissinReport.jsp';"><span><%no++;out.print(no);%>.ใบปะหน้ากล่อง ของเสีย(Nissin)</span></a>
+	              </li>
+	              <li>
+	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockDiscountAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.<bean:message key="StockDiscount" bundle="sysprop"/> </span></a>
+	              </li>
              <%} %>
          </ul>
       </li>
@@ -288,9 +294,12 @@
 		        <li>
             	 <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockVan/stockVanPDReport.jsp';"><span><%no++;out.print(no);%>.<bean:message key="StockVanPDReport" bundle="sysprop"/> </span></a>
               </li>
-		      <%--    <li>
+              <li>
+            	 <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/boxNoNissinReport.jsp';"><span><%no++;out.print(no);%>.ใบปะหน้ากล่อง ของเสีย(Nissin)</span></a>
+              </li>
+		        <%--   <li>
 		          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/requisitionProductAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.<bean:message key="RequisitionProduct" bundle="sysprop"/> </span></a>
-		        </li> --%>
+		        </li>  --%>
 		     </ul>
 	     </li>
 	 <%} %>

@@ -11,7 +11,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +36,9 @@ import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.batchtask.BatchTaskConstants;
+import com.isecinc.pens.web.batchtask.BatchTaskDAO;
+import com.isecinc.pens.web.batchtask.BatchTaskForm;
 import com.isecinc.pens.web.importall.ImportAllBean;
 import com.isecinc.pens.web.importall.ImportAllForm;
 import com.isecinc.pens.web.popup.PopupForm;
@@ -68,7 +73,9 @@ public class ImportMasterOrderREPAction {
 				 request.getSession().setAttribute("results", null);
 				 request.getSession().setAttribute("summary",null);
 				 request.getSession().removeAttribute("TOPIC_NAME");
-				 request.getSession().removeAttribute("VIEW_DATA");    
+				 request.getSession().removeAttribute("VIEW_DATA");   
+				 request.getSession().removeAttribute("BATCH_TASK_RESULT");//clear session BatchTaskForm
+				 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
 				 importAllForm.setResults(null);
 				 importAllForm.setBean(new ImportAllBean());
 			 }
@@ -145,6 +152,8 @@ public class ImportMasterOrderREPAction {
 		User user = (User) request.getSession().getAttribute("user");
 		try{
 			request.getSession().removeAttribute("VIEW_DATA");
+			request.getSession().removeAttribute("BATCH_TASK_RESULT");
+			request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
 			String refCode = Utils.isNull(request.getParameter("refCode"));
 			logger.debug("importExcel RefCode:"+refCode);
 			
@@ -164,7 +173,17 @@ public class ImportMasterOrderREPAction {
 			//3 PENSBI.BME_CONFIG_REP  By CustGroup
 			if(refCode.equalsIgnoreCase("ref_config")){
 			   if(ImportAllForm.getDataFile3() != null && !Utils.isNull(ImportAllForm.getDataFile3().getFileName()).equals("") ){
-				  ImportAllForm = importExcelRepConfig(ImportAllForm, user, request);
+				  //ImportAllForm = importExcelRepConfig(ImportAllForm, user, request);
+				   
+				 //Prepare Parameter to BatchTask
+					Map<String, String> batchParaMap = new HashMap<String, String>();
+					batchParaMap.put("custGroup", ImportAllForm.getBean().getCustGroup());
+					request.getSession().setAttribute(BatchTaskConstants.BATCH_PARAM_MAP,batchParaMap);
+					request.getSession().setAttribute(BatchTaskConstants.DATA_FILE,ImportAllForm.getDataFile3());
+					
+					//set to Start BatchTaskName
+					request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.IMPORT_EXCEL_ORDER_REP_CONFIG);//set to popup page to BatchTask
+					
 			   }
 			}
 			//request.setAttribute("Message", "Import Success");
@@ -174,7 +193,75 @@ public class ImportMasterOrderREPAction {
 	   }
 	   return mapping.findForward("importAll");
 	}
-
+	public ActionForward searchBatch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchBatch");
+		ImportAllForm aForm = (ImportAllForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			 request.getSession().removeAttribute("ERROR_LIST");
+			 request.getSession().removeAttribute("SUCCESS_LIST");
+			
+			 //searchBatch
+			 BatchTaskForm batchTaskForm = (BatchTaskForm)request.getSession().getAttribute("batchTaskForm");
+			 
+			 request.getSession().setAttribute("BATCH_TASK_RESULT",batchTaskForm);
+			 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
+			
+			 logger.debug("BatchTaskName:"+batchTaskForm.getResults()[0].getName());
+			
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{
+			
+		}
+		return mapping.findForward("importAll");
+	}
+	public ActionForward searchBatchForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchBatchForm");
+		ImportAllForm aForm = (ImportAllForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			 request.getSession().removeAttribute("ERROR_LIST");
+			 request.getSession().removeAttribute("SUCCESS_LIST");
+	         aForm.setResults(null);
+	         
+			 BatchTaskForm batchTaskForm = new BatchTaskDAO().searchBatchLastRun(user, BatchTaskConstants.IMPORT_EXCEL_ORDER_REP_CONFIG);
+			 if(batchTaskForm.getResults() != null && batchTaskForm.getResults().length >0){
+				 logger.debug("batchTaskForm result size:"+batchTaskForm.getResults().length);
+				 
+				 request.getSession().setAttribute("BATCH_TASK_RESULT",batchTaskForm);
+				 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
+				 
+				 logger.debug("batchName:"+batchTaskForm.getResults()[0].getName());
+			 }else{
+				 request.setAttribute("Message", "ไม่พบข้อมูล");
+			 }
+		} catch (Exception e) {
+			
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{	
+		}
+		return mapping.findForward("importAll");
+	}
+	public ActionForward clearBatchForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clearBatchForm");
+		ImportAllForm aForm = (ImportAllForm) form;
+		try {
+			 request.getSession().removeAttribute("BATCH_TASK_RESULT");
+			 request.getSession().removeAttribute("batchTaskForm");//clear session BatchTaskForm
+		} catch (Exception e) {
+			
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}finally{	
+		}
+		return mapping.findForward("importAll");
+	}
 	public ImportAllForm importExcelRepConfig(ImportAllForm ImportAllForm,User user,HttpServletRequest request)  throws Exception {
 		Connection conn = null;
 		PreparedStatement ps = null;

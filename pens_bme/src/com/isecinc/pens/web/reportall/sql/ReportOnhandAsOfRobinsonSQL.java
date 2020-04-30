@@ -46,7 +46,7 @@ public class ReportOnhandAsOfRobinsonSQL {
 				sql.append("\n ,SUM(A.ONHAND_QTY) AS ONHAND_QTY");
 				sql.append("\n FROM(");
 			}else{
-			  sql.append("\n SELECT A.* FROM(");
+			    sql.append("\n SELECT A.* FROM(");
 			}
 			sql.append("\n SELECT M.*");
 			
@@ -65,19 +65,19 @@ public class ReportOnhandAsOfRobinsonSQL {
 							"\n -(" +
 							"\n     NVL(SALE_OUT.SALE_OUT_QTY,0)  " +//SaleOut
 							"\n   + NVL(SALE_RETURN.SALE_RETURN_QTY,0) " +//Return
+							"\n  )" +
 							"\n   + ( NVL(STOCK_ISSUE.ISSUE_QTY,0)+NVL(STOCK_RECEIPT.RECEIPT_QTY,0) )" + //Adjust
 							"\n   + NVL(STOCK_SHORT.STOCK_SHORT_QTY,0) " +//Short
-							"\n  )" +
 					   "\n  ) ONHAND_QTY");
 			
 			sql.append("\n FROM(  ");
 			   sql.append("\n SELECT DISTINCT AA.* FROM(");
-					sql.append("\n SELECT DISTINCT ");
+					sql.append("\n SELECT ");
 					sql.append("\n M.customer_code,M.customer_desc,M.cust_no,P.inventory_item_code as pens_item,");
 					sql.append("\n MP.group_type ");
-					sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+					sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
 					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
@@ -116,12 +116,12 @@ public class ReportOnhandAsOfRobinsonSQL {
 					sql.append("\n UNION ALL");
 					
 					sql.append("\n SELECT ");
-   				    sql.append("\n DISTINCT L.CUST_NO as customer_code ,M.customer_desc,M.cust_no,L.PENS_ITEM, ");
+   				    sql.append("\n L.CUST_NO as customer_code ,M.customer_desc,M.cust_no,L.PENS_ITEM, ");
 					sql.append("\n L.GROUP_CODE as group_type ");
-					sql.append("\n FROM PENSBME_MTT_INIT_STK H,PENSBME_MTT_ONHAND_INIT_STK L");
+					sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBI.PENSBME_MTT_ONHAND_INIT_STK L");
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
-					sql.append("\n   PENSBME_MST_REFERENCE M ");
+					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   where M.reference_code ='Store' ");
 					//Filter By StoreType
 					sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "pens_value"));
@@ -140,16 +140,15 @@ public class ReportOnhandAsOfRobinsonSQL {
 						sql.append("\n AND L.GROUP_CODE LIKE '"+c.getGroup()+"%' ");
 					}
 					sql.append("\n UNION ALL");
-					sql.append("\n SELECT DISTINCT");
+					sql.append("\n SELECT ");
 					sql.append("\n  L.CUST_NO as customer_code ");
-					sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE " +
-							"       M.pens_value = L.cust_no AND M.reference_code ='Store') as customer_desc ");
-					sql.append("\n ,(select M.interface_value from PENSBME_MST_REFERENCE M WHERE " +
-							"       M.pens_value = L.cust_no AND M.reference_code ='Store') as cust_no ");
+					sql.append("\n ,(select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE " );
+					sql.append("\n   M.pens_value = L.cust_no AND M.reference_code ='Store') as customer_desc ");
+					sql.append("\n ,(select M.interface_value from PENSBI.PENSBME_MST_REFERENCE M WHERE " );
+					sql.append("\n   M.pens_value = L.cust_no AND M.reference_code ='Store') as cust_no ");
 					sql.append("\n ,L.PENS_ITEM ,L.GROUP_CODE as group_type ");
-					sql.append("\n FROM PENSBME_SALES_OUT L");
-					sql.append("\n WHERE 1=1 ");
-					sql.append("\n AND L.status <> 'AB' ");
+					sql.append("\n FROM PENSBI.PENSBME_SALES_OUT L");
+					sql.append("\n WHERE L.status <> 'AB' ");
 					if(initDate != null){
 						 sql.append("\n AND L.sale_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
 						 sql.append("\n AND L.sale_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -167,16 +166,66 @@ public class ReportOnhandAsOfRobinsonSQL {
 					if( !Utils.isNull(c.getGroup()).equals("")){
 						sql.append("\n AND L.GROUP_CODE LIKE '"+c.getGroup()+"%' ");
 					}
+					sql.append("\n UNION ALL");
+					
+					sql.append("\n /** adjust stock_issue **/");
+					sql.append("\n select L.store_code as customer_code");
+					sql.append("\n ,(select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE " );
+					sql.append("\n   M.pens_value = L.store_code AND M.reference_code ='Store') as customer_desc ");
+					sql.append("\n ,(select M.interface_value from PENSBI.PENSBME_MST_REFERENCE M WHERE " );
+					sql.append("\n   M.pens_value = L.store_code AND M.reference_code ='Store') as cust_no ");
+					sql.append("\n ,L.item_issue as pens_item,L.item_issue_desc as group_type ");
+					sql.append("\n FROM PENSBI.PENSBME_ADJUST_INVENTORY L" );
+					sql.append("\n WHERE L.STORE_CODE LIKE '"+Constants.STORE_TYPE_ROBINSON_CODE+"%'"); 
+					sql.append("\n AND L.item_issue_desc is not null");
+					if( !Utils.isNull(c.getSalesDate()).equals("")){
+		                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					}
+					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+						sql.append("\n AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					}
+					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+						sql.append("\n AND L.item_issue >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+						sql.append("\n AND L.item_issue <='"+Utils.isNull(c.getPensItemTo())+"' ");
+					}
+					if( !Utils.isNull(c.getGroup()).equals("")){
+						sql.append("\n AND L.item_issue_desc LIKE '"+c.getGroup()+"%' ");
+					}
+					sql.append("\n UNION ALL");
+					
+					sql.append("\n /** adjust stock_receipt **/");
+					sql.append("\n SELECT L.STORE_CODE as customer_code");
+					sql.append("\n ,(select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE " );
+					sql.append("\n   M.pens_value = L.store_code AND M.reference_code ='Store') as customer_desc ");
+					sql.append("\n ,(select M.interface_value from PENSBI.PENSBME_MST_REFERENCE M WHERE " );
+					sql.append("\n   M.pens_value = L.store_code AND M.reference_code ='Store') as cust_no ");
+					sql.append("\n ,L.item_receipt as pens_item,L.item_receipt_desc as group_type ");
+					sql.append("\n FROM PENSBI.PENSBME_ADJUST_INVENTORY L ");
+					sql.append("\n WHERE L.STORE_CODE LIKE '"+Constants.STORE_TYPE_ROBINSON_CODE+"%'"); 
+					sql.append("\n AND L.item_receipt_desc is not null");
+					if( !Utils.isNull(c.getSalesDate()).equals("")){
+		                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					}
+					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
+						sql.append("\n AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
+					}
+					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+						sql.append("\n AND L.item_receipt >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+						sql.append("\n AND L.item_receipt <='"+Utils.isNull(c.getPensItemTo())+"' ");
+					}
+					if( !Utils.isNull(c.getGroup()).equals("")){
+						sql.append("\n AND L.item_receipt_desc LIKE '"+c.getGroup()+"%' ");
+					}
 					sql.append("\n )AA");
            sql.append("\n )M ");
            sql.append("\n LEFT OUTER JOIN(	 ");
 	       /**** INIT MTT STOCK *****************/
       		    sql.append("\n SELECT L.CUST_NO as customer_code,L.PENS_ITEM, ");
 				sql.append("\n L.GROUP_CODE as group_type, SUM(QTY) AS INIT_SALE_QTY ");
-				sql.append("\n FROM PENSBME_MTT_INIT_STK H,PENSBME_MTT_ONHAND_INIT_STK L");
+				sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBI.PENSBME_MTT_ONHAND_INIT_STK L");
 				sql.append("\n ,( ");
 				sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
-				sql.append("\n   PENSBME_MST_REFERENCE M ");
+				sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 				sql.append("\n   WHERE M.reference_code ='Store' ");
 				//Filter By StoreType
 				sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "pens_value"));
@@ -207,7 +256,7 @@ public class ReportOnhandAsOfRobinsonSQL {
    		   /******** SALE_OUT *****************/
    				    sql.append("\n SELECT L.CUST_NO as customer_code,L.PENS_ITEM, ");
 			        sql.append("\n L.GROUP_CODE as group_type, count(*) AS SALE_OUT_QTY ");
-					sql.append("\n FROM PENSBME_SALES_OUT L");
+					sql.append("\n FROM PENSBI.PENSBME_SALES_OUT L");
 					sql.append("\n WHERE 1=1 ");
 					sql.append("\n AND L.STATUS <> 'AB' ");
 					sql.append("\n ANd L.CUST_NO LIKE '"+Constants.STORE_TYPE_ROBINSON_CODE+"%'");
@@ -236,12 +285,12 @@ public class ReportOnhandAsOfRobinsonSQL {
 			 /******** SALE_IN *****************/
 					sql.append("\n SELECT M.customer_code ,P.inventory_item_code as pens_item,  ");
 					sql.append("\n MP.group_type, NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
-					sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+					sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc from ");
-					sql.append("\n   PENSBME_MST_REFERENCE M ");
+					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE M.reference_code ='Store' ");
 					//Filter By StoreType
 					sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "pens_value"));
@@ -285,12 +334,12 @@ public class ReportOnhandAsOfRobinsonSQL {
 			 /******** SALE_RETURN *****************/
 					sql.append("\n SELECT M.customer_code,P.inventory_item_code as pens_item,  ");
 					sql.append("\n MP.group_type,NVL(SUM(RETURNED_QTY),0)  as SALE_RETURN_QTY ");
-					sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+					sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc from ");
-					sql.append("\n   PENSBME_MST_REFERENCE M ");
+					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE M.reference_code ='Store' ");
 					//Filter By StoreType
 					sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "pens_value"));

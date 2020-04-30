@@ -205,6 +205,7 @@
 		<form-bean name="creditNoPaidReportForm" type="com.isecinc.pens.web.report.creditpaid.CreditNoPaidReportForm" />
 		<form-bean name="transferForm" type="com.isecinc.pens.web.transfer.TransferForm" />
 		<form-bean name="stockReturnForm" type="com.isecinc.pens.web.stockreturn.StockReturnForm" />
+		<form-bean name="stockDiscountForm" type="com.isecinc.pens.web.stockdiscount.StockDiscountForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -781,7 +782,10 @@
 			<forward name="detail" path="/jsp/stockReturn/stockReturn.jsp"/>
 			<forward name="printPopup" path="/jsp/stockReturn/printStockReturnPopup.jsp"/>
 		</action>
-		
+		<action name="stockDiscountForm" path="/jsp/stockDiscountAction" parameter="do" scope="request" type="com.isecinc.pens.web.stockdiscount.StockDiscountAction" >
+			<forward name="search" path="/jsp/stockDiscount/stockDiscountSearch.jsp" />
+			<forward name="detail" path="/jsp/stockDiscount/stockDiscount.jsp"/>
+		</action>
 		<action name="transferForm" path="/jsp/transferAction" parameter="do" scope="session" type="com.isecinc.pens.web.transfer.TransferAction" >
 		    <forward name="search" path="/jsp/transfer/transferSearch.jsp" />
 			 <forward name="detail" path="/jsp/transfer/transfer.jsp"/>
@@ -805,7 +809,7 @@
 			<forward name="export" path="/jsp/moveOrder/moveOrderSummary.jsp" />
 		</action>
 		
-		<!-- MoveOrder -->
+		<!-- BillPlan -->
 		<action name="billPlanForm" path="/jsp/billPlanAction" parameter="do" scope="request" type="com.isecinc.pens.web.billplan.BillPlanAction" >
 			<forward name="prepare" path="/jsp/billPlan/billPlanSearch.jsp" />
 			<forward name="search" path="/jsp/billPlan/billPlanSearch.jsp" />

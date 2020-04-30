@@ -1,7 +1,7 @@
 package com.pens.util.excel;
 
 public class ExcelHeader {
-	static String a= "@";
+	public static String a= "@";
 	static String a2= "#";
 	public static StringBuffer EXCEL_HEADER = new StringBuffer("");
 	static{

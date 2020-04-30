@@ -199,6 +199,10 @@ function saveAction(path){
 	if( !validateTableData()){return false;}
 	
 	if(confirm("ยืนยันบันทึกข้อมูล")){
+		
+	  /**Control Save Lock Screen **/
+	  startControlSaveLockScreen();
+		
 	  form.action = path + "/jsp/prodShowServlet";
 	  form.submit();
 	  return true;
@@ -708,3 +712,7 @@ function setBrandName(brandObj,rowId){
 }
 %>
 </html>
+
+<!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

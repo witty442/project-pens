@@ -48,7 +48,7 @@ import com.isecinc.pens.model.MStockReturn;
 import com.isecinc.pens.web.reqPromotion.RequestPromotionForm;
 
 /**
- * Summary Action
+ * Stock Return Action
  * 
  * @author WITTY
  * 
@@ -56,6 +56,7 @@ import com.isecinc.pens.web.reqPromotion.RequestPromotionForm;
 public class StockReturnAction extends I_Action {
 
 	private int MAX_ROW_PAGE = 50;
+	
 	/**
 	 * Prepare without ID
 	 */
@@ -64,7 +65,6 @@ public class StockReturnAction extends I_Action {
 		String forward = "search";
 		StockReturnForm stockForm = (StockReturnForm) form;
 		try {
-			  
 			 logger.debug("prepare :"+request.getParameter("action"));
 			 User user = (User) request.getSession(true).getAttribute("user");
 			 

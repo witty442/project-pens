@@ -68,6 +68,7 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
@@ -199,7 +200,7 @@ function switchPrintType(){
 								กำหนดจุด #1
 								<font color="red">*</font>
 								 <html:text property="customer.tripDay" size="10" styleId="tripDay"  readonly="false" styleClass="normalText" 
-								 onkeydown="return inputNum(event);"/>
+								 onblur="return isNum(this);" maxlength="2"/>
 								 <%-- <html:select property="customer.tripDay" >
 										<html:options collection="tripDayList" property="key" labelProperty="name"/>
 									</html:select>

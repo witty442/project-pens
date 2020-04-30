@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.batchtask.BatchTaskDispBean"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.MonitorItemBean"%>
 <%@page import="com.isecinc.pens.bean.MonitorItemResultBean"%>
@@ -10,23 +11,35 @@
 
 <!-- Detail -->
 <%
+//for filter dispay some detail
+BatchTaskDispBean dispBean= batchTaskForm.getTaskInfo().getDispBean();
+		
 System.out.println("MonitorItem:"+batchTaskForm.getMonitorItem());
 if(batchTaskForm.getMonitorItem() != null){
 	 String columnHeadStrArr = batchTaskForm.getMonitorItem().getColumnHeadStrArr();
 	 List<MonitorItemResultBean> successList = batchTaskForm.getMonitorItem().getSuccessList();
 	 List<MonitorItemResultBean> failList = batchTaskForm.getMonitorItem().getFailList();
 %>
-
-	<%if(failList != null && failList.size() >0){
+<!-- ************* FAIL******************************************* -->
+<%if(failList != null && failList.size() >0){
 		//Gen Column Head Table
 	  if( !Utils.isNull(columnHeadStrArr).equals("")){
 		String[] columnHeadArr = columnHeadStrArr.split("\\|");
 	%>
 	<p></p>
-	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
-	<tr>
-	  <th colspan="<%=columnHeadArr.length%>"><font color="#921F06">จำนวน Row ที่ไม่สามารถ Import ได้   ${batchTaskForm.monitorItem.failCount} Row </font></th>
-	</tr>
+	<!-- Head -->
+	<% if(dispBean.isDispRecordFailHead()){ %>
+		<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+		<tr>
+		  <th colspan="<%=columnHeadArr.length%>">
+		  <font color="#921F06">จำนวน Row ที่ไม่สามารถ Import ได้   ${batchTaskForm.monitorItem.failCount} Row </font>
+		  </th>
+		</tr>
+		</table>
+	<%} %>
+	
+<%	if(dispBean.isDispRecordFailDetail()){ %>
+    <table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
 		<% 
 			for(int c=0;c<columnHeadArr.length;c++){
@@ -64,7 +77,9 @@ if(batchTaskForm.getMonitorItem() != null){
 		</tr>
 		<%} %>
 	</table>
-  <%} %>
+  <%} }%>
+
+<!-- *************SUCCESS******************************************* -->
 
 <% if(successList != null && successList.size() >0){ 
 	//Gen Column Head Table
@@ -72,11 +87,17 @@ if(batchTaskForm.getMonitorItem() != null){
 	   String[] columnHeadArr = columnHeadStrArr.split("\\|");
 %> 
     <p></p>
-	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
-	<tr>
-	  <th colspan="<%=columnHeadArr.length%>">จำนวน Row ที่สามารถ Import ได้   ${batchTaskForm.monitorItem.successCount} Row </th>
-	</tr>
-	<tr>
+    <% if(dispBean.isDispRecordSuccessHead()){ %>
+		<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+		<tr>
+		  <th colspan="<%=columnHeadArr.length%>">จำนวน Row ที่สามารถ Import ได้   ${batchTaskForm.monitorItem.successCount} Row </th>
+		</tr>
+		</table>
+	<%} %>
+	
+	<% if(dispBean.isDispRecordSuccessDetail()){ %>
+	  <table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+	  <tr>
 		<% 
 		
 			for(int c=0;c<columnHeadArr.length;c++){
@@ -114,8 +135,10 @@ if(batchTaskForm.getMonitorItem() != null){
 		</tr>
 		<%} %>
 	</table>
-   <%} %>
+   <%} 
+   }
+ %>
 	 
-<% }%>
+<% } //if root%>
 					
 								

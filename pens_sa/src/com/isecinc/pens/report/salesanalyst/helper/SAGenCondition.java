@@ -754,7 +754,7 @@ public class SAGenCondition {
 			sql.append("\t\t"+" '1' AS A \n");
 			sql.append("\t\t"+" FROM "+SAInitial.TABLE_VIEW+" V \n");
 			sql.append("\t\t"+" WHERE 1=1 \n ");
-			sql.append("\t\t"+" AND "+salesBean.getGroupBy()+" IS NOT NULL \n");
+			//sql.append("\t\t"+" AND "+salesBean.getGroupBy()+" IS NOT NULL \n");
 			/** Condition Filter **/
 			sql.append(genSqlWhereCondition(salesBean));
 			
@@ -787,7 +787,7 @@ public class SAGenCondition {
 			sql.append("\t\t"+" '1' AS A \n");
 			sql.append("\t\t"+" FROM "+SAInitial.TABLE_VIEW+" V \n");
 			sql.append("\t\t"+" WHERE 1=1 \n ");
-			sql.append("\t\t"+" AND "+salesBean.getGroupBy()+" IS NOT NULL \n");
+			//sql.append("\t\t"+" AND "+salesBean.getGroupBy()+" IS NOT NULL \n");
 			/** Condition Filter **/
 			sql.append("\t\t"+  genSqlWhereCondition(salesBean));
 			
@@ -937,7 +937,8 @@ public class SAGenCondition {
 		colGroupName = reportU.getShortColName(colGroupName);
 			
 		columnTop.append(genGroupBySQL(groupBy) +", ");			
-		columnAll.append(groupBy +", ");;
+		//EDIT 24/04/2563
+		columnAll.append(SAInitial.genSQLNA(groupBy) +", ");
 		
 		if( !"0".equals(Utils.isNull(salesBean.getColNameDisp1()))){
 			

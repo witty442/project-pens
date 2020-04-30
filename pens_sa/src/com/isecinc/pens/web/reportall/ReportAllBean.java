@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import com.isecinc.pens.web.boxno.BoxNoBean;
 import com.isecinc.pens.web.projectc.ProjectCBean;
 import com.isecinc.pens.web.stock.StockBean;
 public class ReportAllBean implements  Serializable{
@@ -16,7 +17,17 @@ public class ReportAllBean implements  Serializable{
 
    private ProjectCBean projectCBean;
    private StockBean stockBean;
+   private BoxNoBean boxNoBean;
    
+   
+	public BoxNoBean getBoxNoBean() {
+	return boxNoBean;
+}
+
+public void setBoxNoBean(BoxNoBean boxNoBean) {
+	this.boxNoBean = boxNoBean;
+}
+
 	public ProjectCBean getProjectCBean() {
 		return projectCBean;
 	}

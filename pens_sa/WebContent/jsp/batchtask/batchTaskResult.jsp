@@ -66,7 +66,7 @@
  String pageName = request.getParameter("pageName");
  //System.out.println("pageName:"+pageName);
 %>
- <%if(batchTaskForm.getTaskInfo().isDispDetail()){ %>
+ <%if(batchTaskForm.getTaskInfo().getDispBean().isDispDetail()){ %>
    <jsp:include page="sub/AllResultBatchTask_sub.jsp"></jsp:include>
  <%} %>
 

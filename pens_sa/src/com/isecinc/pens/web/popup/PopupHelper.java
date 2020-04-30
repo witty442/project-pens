@@ -38,7 +38,8 @@ public class PopupHelper {
 		 	headName = "PD/หน่วยรถ("+pageName+")";
 		 	codeSearchTxtName = "PD/หน่วยรถ";
 		 	descSearchTxtName = "ชื่อ PD/หน่วยรถ";
-	    }else  if("PD".equalsIgnoreCase(pageName)){
+	    }else  if("PD".equalsIgnoreCase(pageName) || "PDProvince".equalsIgnoreCase(pageName)
+	    		|| "PDBoxNo".equalsIgnoreCase(pageName)){
 		 	headName = "PD("+pageName+")";
 		 	codeSearchTxtName = "PD";
 		 	descSearchTxtName = "ชื่อ PD";

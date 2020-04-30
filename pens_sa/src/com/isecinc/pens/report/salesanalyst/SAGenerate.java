@@ -24,6 +24,7 @@ import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Debug;
 import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 
 
@@ -33,8 +34,8 @@ import com.pens.util.Utils;
  */
 public class SAGenerate {
    
-	//public static  Debug debug = new Debug(true,Debug.level_0);//debug all
-	public static  Debug debug = new Debug(true,Debug.level_1);//debug some by user
+	public static  Debug debug = new Debug(true,Debug.level_0);//debug all
+	//public static  Debug debug = new Debug(true,Debug.level_1);//debug some by user
     
 	public static SAUtils reportU = new SAUtils();
 	
@@ -456,7 +457,7 @@ public class SAGenerate {
 			String groupBy = groupByBean.getDispText();
 			
 			Boolean isNoDisplayed = ArrayUtils.contains(arrayfldNoDisplayCode,groupBy); 
-			
+		
 			//style='border:1px solid black; '
 			htmlStr.append("<table  width='100%' class='result2' id='sort-table' cellpadding='4' cellspacing='2'> <thead> \n");
 			
@@ -576,23 +577,32 @@ public class SAGenerate {
 				found = true;
 				isFoundDataInRow = false;
 				StringBuffer rowNoHtml = new StringBuffer("");
-                debug.debug("rs next");
+                debug.debug("rs next groupByBean.getName():"+groupByBean.getName());
+                
 				if("Invoice_Date".equalsIgnoreCase(groupByBean.getName())){
 					String dateStr = DateUtil.stringValue(new Date(rs.getDate(groupByBean.getName()+"_DESC",Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 					debug.debug("dateStr:"+dateStr);
 					if(!isNoDisplayed)
-				    rowHtml.append(" <td>"+dateStr+"</td>  \n");
+				    rowHtml.append(" <td class='text'>"+dateStr+"</td>  \n");
 
 				}else if("SALES_ORDER_DATE".equalsIgnoreCase(groupByBean.getName())){
 					String dateStr = DateUtil.stringValue(new Date(rs.getDate(groupByBean.getName()+"_DESC",Calendar.getInstance(Locale.US)).getTime()),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 					debug.debug("dateStr:"+dateStr);
 					if(!isNoDisplayed)
-				    rowHtml.append(" <td>"+dateStr+"</td>  \n");
-
+				       rowHtml.append(" <td class='text'>"+dateStr+"</td>  \n");
+					
+				}else if("SALES_ORDER_NO".equalsIgnoreCase(groupByBean.getName())
+						|| "INVOICE_NO".equalsIgnoreCase(groupByBean.getName())){
+					if(!isNoDisplayed)
+						rowHtml.append(" <td align='left' class='text'>"+rs.getString(groupByBean.getName()+"_CODE")+"</td> \n");
+					
+					//rowHtml.append(" <td align='left' style='mso-number-format:@'>"+rs.getString(groupByBean.getName()+"_DESC")+"</td>  \n");
+					rowHtml.append(" <td align='left' class='text'>"+rs.getString(groupByBean.getName()+"_DESC")+"</td>  \n");
 				}else{
 					if(!isNoDisplayed)
-					rowHtml.append(" <td align='left'>"+rs.getString(groupByBean.getName()+"_CODE")+"</td> \n");
-					rowHtml.append(" <td align='left'>"+rs.getString(groupByBean.getName()+"_DESC")+"</td>  \n");
+					   rowHtml.append(" <td align='left' class='text'>"+rs.getString(groupByBean.getName()+"_CODE")+"</td> \n");
+					
+					rowHtml.append(" <td align='left' class='text'>"+rs.getString(groupByBean.getName()+"_DESC")+"</td>  \n");
 				}
 				
 				/** Calculation Summary All Row For Loop  ***/

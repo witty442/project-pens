@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.reportall.page.BoxNoNissinReportAction;
 import com.isecinc.pens.web.reportall.page.ProjectCReportAction;
 import com.isecinc.pens.web.reportall.page.StockReturnAction;
 import com.pens.util.Utils;
@@ -43,6 +44,8 @@ public class ReportAllAction extends I_Action {
 					 return new ProjectCReportAction().prepare(form, request, response);
 				 }else if("StockReturn".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 					 return new StockReturnAction().prepare(form, request, response);
+				 }else if("BoxNoNissinReport".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+					 return new BoxNoNissinReportAction().prepare(form, request, response);
 				 }
 			 }
 		} catch (Exception e) {
@@ -78,6 +81,8 @@ public class ReportAllAction extends I_Action {
 				 return new ProjectCReportAction().search(form, request, response);
 			 }else if("StockReturn".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
 				 return new StockReturnAction().search(form, request, response);
+			 }else if("BoxNoNissinReport".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 return new BoxNoNissinReportAction().search(form, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -92,7 +97,9 @@ public class ReportAllAction extends I_Action {
 			logger.debug("PageAction:"+request.getParameter("page"));
 			 if("ProjectCReport".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
 				 return new ProjectCReportAction().export(mapping, aForm, request, response);
-			 }
+			 }else if("BoxNoNissinReport".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 return new BoxNoNissinReportAction().export(mapping, aForm, request, response);
+		     }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
@@ -106,6 +113,8 @@ public class ReportAllAction extends I_Action {
 			logger.debug("PageName:"+aForm.getPageName());
 		    if("StockReturn".equalsIgnoreCase(aForm.getPageName()) ){
 			   return new StockReturnAction().printReport(mapping, form, request, response);
+		    }else if("BoxNoNissinReport".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+			   return new BoxNoNissinReportAction().printReport(mapping, aForm, request, response);
 		    }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -113,6 +122,7 @@ public class ReportAllAction extends I_Action {
 		}
 		return mapping.findForward("reportAll");
 	}
+	
 	/**
 	 * Save
 	 */
@@ -145,6 +155,4 @@ public class ReportAllAction extends I_Action {
 	protected void setNewCriteria(ActionForm form) throws Exception {
 
 	}
-	
-	
 }

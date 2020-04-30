@@ -699,12 +699,19 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
 	 var style ="<style>"
 	         +".summary{"
 		     +"   font-weight: bold;"
+		     +" } "
+			 +".text{"
+		     +"   mso-number-format:'@';"
 		     +" } ";
 		     +"</style> ";
-	 var headerTable = genHeadTable(path);
+		     
+	//export excel thai unicode character support
+	style+="<meta charset='utf-8'>";
+		     
+	var headerTable = genHeadTable(path);
 	// alert(headerTable);
 	 
-    var tab_text= headerTable+"\n <table border='2px'><tr bgcolor=''>";
+    var tab_text= style+headerTable+"\n <table border='2px'><tr bgcolor=''>";
     var textRange; var j=0;
     tab = document.getElementById('sort-table'); // id of table
 
@@ -730,7 +737,8 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
         txtArea1.document.close();
         txtArea1.focus(); 
         sa=txtArea1.document.execCommand("SaveAs",true,"Say Thanks to Submit.xls");
-    }else{                 //other browser not tested on IE 11
+    }else{                 
+    	//other browser not tested on IE 11
        // sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));  
     
     	 // Specify file name
@@ -739,6 +747,7 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
         var downloadLink = document.createElement("a");
         document.body.appendChild(downloadLink);
         
+        //alert(tab_text);
         // Create a link to the file
         downloadLink.href = 'data:application/vnd.ms-excel, ' + encodeURIComponent(tab_text);
      

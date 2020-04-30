@@ -552,7 +552,7 @@ $(function() {
 	<p><font size="4"><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></font></p>
 	<p align="center"> <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="linkToInterfaces('<%=request.getContextPath() %>');" value="ไปยังหน้าดึงข้อมูลจากส่วนกลาง"/></a>&nbsp;&nbsp;
 	 <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="close();" value="ปิดหน้าจอ"/></a></p>
-	<p align="center"><font size="2" color="green"><b>App Version [02-2563] for check deploy</b></font> </p>
+	<p align="center"><font size="2" color="green"><b>App Version [04-2563] for verify deploy success</b></font> </p>
 </div>
 
 </body>

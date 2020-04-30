@@ -19,7 +19,7 @@ import com.pens.util.Utils;
 public class BrandDAO {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	 public static BrandBean findCustomer(BrandBean bean) throws Exception {
+	 public static BrandBean findBrand(BrandBean bean) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			BrandBean resultBean = null;
@@ -51,4 +51,69 @@ public class BrandDAO {
 			}
 			return resultBean;
 		}
+	 
+
+		public static String getBrandGroup(Connection conn,String brandNo){
+			String salesChannelDesc = "";
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			try{
+				if(Utils.isNull(brandNo).equals("")){
+					return "";
+				}
+				
+				sql.append("\n  SELECT brand_group_no from XXPENS_BI_MST_BRAND_GROUP M  ");
+				sql.append("\n  where  brand_no ='"+brandNo+"' \n");
+
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					salesChannelDesc =Utils.isNull(rst.getString("brand_group_no"));
+				}//while
+				
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+		  return salesChannelDesc;
+		}
+		
+		public static String getBrandName(Connection conn,String brandNo){
+			String salesChannelDesc = "";
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			try{
+				if(Utils.isNull(brandNo).equals("")){
+					return "";
+				}
+				
+				sql.append("\n  SELECT brand_desc from XXPENS_BI_MST_BRAND M  ");
+				sql.append("\n  where  brand_no ='"+brandNo+"' \n");
+
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					salesChannelDesc =Utils.isNull(rst.getString("brand_desc"));
+				}//while
+				
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+		  return salesChannelDesc;
+		}
+
+		
 }

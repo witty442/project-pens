@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.batchtask.BatchTaskDispBean"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskForm"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.MonitorItemBean"%>
@@ -8,28 +9,53 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
  <%
+ try{
  BatchTaskForm batchTaskForm = (BatchTaskForm)session.getAttribute("BATCH_TASK_RESULT");
+ 
+ //for filter dispay some detail
+ BatchTaskDispBean dispBean= batchTaskForm.getTaskInfo().getDispBean();
 
  %>
 <!-- Detail -->
 <%
 System.out.println("MonitorItem:"+batchTaskForm.getMonitorItem());
-if(batchTaskForm.getMonitorItem() != null){
+if(batchTaskForm != null && batchTaskForm.getMonitorItem() != null){
+	 
 	 String columnHeadStrArr = batchTaskForm.getMonitorItem().getColumnHeadStrArr();
+	 System.out.println("columnHeadStrArr :"+columnHeadStrArr);
 	 List<MonitorItemResultBean> successList = batchTaskForm.getMonitorItem().getSuccessList();
 	 List<MonitorItemResultBean> failList = batchTaskForm.getMonitorItem().getFailList();
+	
+	 if(successList!=null){
+	    System.out.println("successList size:"+successList.size());
+	 }
+	 if(failList!=null){
+	    System.out.println("failList size:"+failList.size());
+	 }
 %>
 
-	<%if(failList != null && failList.size() >0){
-		//Gen Column Head Table
+<!-- ************* FAIL******************************************* -->
+<% if(failList != null && failList.size() >0){
+	  //Gen Column Head Table
 	  if( !Utils.isNull(columnHeadStrArr).equals("")){
 		String[] columnHeadArr = columnHeadStrArr.split("\\|");
 	%>
 	<p></p>
-	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
-	<tr>
-	  <th colspan="<%=columnHeadArr.length%>"><font color="#921F06">จำนวน Row ที่ไม่สามารถ Import ได้   <%=batchTaskForm.getMonitorItem().getFailCount() %> Row </font></th>
-	</tr>
+	<% if(dispBean.isDispRecordFailHead()){ %>
+		<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+			<tr>
+			  <th colspan="<%=columnHeadArr.length%>">
+			   <font color="#921F06">จำนวน Row ที่ไม่สามารถ Import ได้   <%=batchTaskForm.getMonitorItem().getFailCount() %> Row </font>
+			  </th>
+			</tr>
+		</table>
+    <%} %>
+    
+<% 
+if(dispBean.isDispRecordFailDetail()){
+	if(columnHeadArr != null && columnHeadArr.length >0){ 
+%> 
+    <table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
 		<% 
 			for(int c=0;c<columnHeadArr.length;c++){
@@ -66,27 +92,42 @@ if(batchTaskForm.getMonitorItem() != null){
 			<% }%>
 		</tr>
 		<%} %>
+	  <%} %>
 	</table>
-  <%} %>
+  <%
+   }//if
+  } //if dispFailDetail
+%>
 
-<% 
+
+<!-- *************SUCCESS******************************************* -->
+<%  
+  if(successList != null && successList.size() >0){ 
 	//Gen Column Head Table
 	String[] columnHeadArr = null;
     if( !Utils.isNull(columnHeadStrArr).equals("")){
 	    columnHeadArr = columnHeadStrArr.split("\\|");
     %> 
 	    <p></p>
-		<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
-		<tr>
-		  <th colspan="<%=columnHeadArr.length%>">จำนวน Row ที่สามารถ Import ได้   <%=batchTaskForm.getMonitorItem().getSuccessCount() %> Row </th>
-		</tr>
+		<% if(dispBean.isDispRecordSuccessHead()){ %>
+		  <table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+			<tr>
+			  <th colspan="<%=columnHeadArr.length%>">
+			     จำนวน Row ที่สามารถ Import ได้   <%=batchTaskForm.getMonitorItem().getSuccessCount() %> Row 
+			  </th>
+			</tr>
+		  </table>
+	    <%} %>
 	<%} %>
-	
-	<% if(successList != null && successList.size() >0){ %> 
+
+<% 
+ if(dispBean.isDispRecordSuccessDetail()){
+	if(columnHeadArr != null && columnHeadArr.length >0){ %> 
+	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
 		<% for(int c=0;c<columnHeadArr.length;c++){%>
 		  <th width="5%"><%=columnHeadArr[c]%></th>
-		<% } %>
+		<% }//for %>
 	</tr>
 	<%
 	 String[] lineArr = null;
@@ -117,9 +158,19 @@ if(batchTaskForm.getMonitorItem() != null){
 			<%}%>
 		</tr>
 		<%} %>
+	  <%} %>
 	</table>
-   <%} %>
-	 
-<% }%>
+<% 
+      } //if dispSuccessDetail
+   }//if successList 
+}//if root
+%>
+
+<%
+}catch(Exception e){
+	e.printStackTrace();
+}
+%>
+
 					
 								

@@ -246,9 +246,10 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n  null as estimate_qty ,");
 			sql.append("\n  null as estimate_amt ,");
 			sql.append("\n  null as price,");
-			sql.append("\n  '"+curBean.getSessionId()+"' as session_id");
+			sql.append("\n  '"+curBean.getSessionId()+"' as session_id ,");
+			sql.append("\n  0 as user_input_id ");
 			sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_TARGET_TEMP WHERE ID="+idCopy);
-		    //logger.debug("sql:"+sql);
+		    logger.debug("sql:"+sql);
 			
 			ps = conn.prepareStatement(sql.toString());
 			ps.execute();
@@ -311,7 +312,8 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n   where P.INVENTORY_ITEM_ID =L.INVENTORY_ITEM_ID " );
 			sql.append("\n   and P.list_header_id ="+priceListId+") as price ,");
 			
-			sql.append("\n  '"+curBean.getSessionId()+"' as SESSION_ID");
+			sql.append("\n  '"+curBean.getSessionId()+"' as SESSION_ID ,");
+			sql.append("\n  0 as user_input_id ");
 			sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_TARGET_TEMP_L L ");
 			
 			//old code

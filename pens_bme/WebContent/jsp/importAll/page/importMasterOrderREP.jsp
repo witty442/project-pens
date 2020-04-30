@@ -40,6 +40,20 @@
 
 <script type="text/javascript">
 function loadMe(){
+	/** for popup BatchTask in page **/
+	 <%if( !"".equals(Utils.isNull(request.getAttribute("BATCH_TASK_NAME")))){%>
+	    //lockscreen
+	    var path = document.getElementById("path").value;
+	    /** Init progressbar **/
+		$(function() {
+			// update the block message 
+	        $.blockUI({ message: "<h2>กำลังทำรายการ     กรุณารอสักครู่......</h2>" }); 
+		}); 
+		    
+		//submitedGenStockOnhandTemp
+		var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopup&pageName=<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>';
+		popupFull(url,'<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>');
+  <%}%>
 }
 function importExcel(refCode){
 	var form = document.importAllForm;
@@ -210,6 +224,31 @@ function loadDataAjax(refCode){
 		}
 	}
 }
+/** for Batch Task **/
+function searchBatch(){
+	//unlockScreen
+	setTimeout($.unblockUI, 100); 
+	 
+	var form = document.importAllForm;
+	var path = form.path.value;
+	form.action = path + "/jsp/importAllAction.do?do=searchBatch";
+	form.submit();
+	return true;
+}
+function searchBatchForm(){
+	var path = document.getElementById("path").value;
+	var form = document.importAllForm;
+	form.action = path + "/jsp/importAllAction.do?do=searchBatchForm";
+	form.submit();
+	return true;
+}
+function clearBatchForm(){
+	var path = document.getElementById("path").value;
+	var form = document.importAllForm;
+	form.action = path + "/jsp/importAllAction.do?do=clearBatchForm";
+	form.submit();
+	return true;
+}
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -286,6 +325,14 @@ function loadDataAjax(refCode){
 								     <input type="button" value="แสดงข้อมูล " class="newPosBtnLong" onclick="javascript:viewData('rep_config')">
 								     <input type="button" value="Export " class="newPosBtnLong" onclick="javascript:exportData('rep_config')">
 								     <input type="button" value="  Clear  " class="newPosBtnLong" onclick="javascript:clearForm()">
+								     
+								      &nbsp;&nbsp;&nbsp; 
+					            	 <a href="javascript:searchBatchForm()">
+									    <input type="button" value="ตรวจสอบสถานะล่าสุด" class="newPosBtnLong"> 
+									 </a>
+									<!--  <a href="javascript:clearBatchForm()">
+									    <input type="button" value="   Clear   " class="newPosBtnLong">
+									 </a>	 -->		
 								</td>
 							</tr> 
 							<tr>
@@ -392,6 +439,8 @@ function loadDataAjax(refCode){
 						   <input type="button" value="  Clear  " class="newPosBtnLong" onclick="javascript:clearForm()">
 						</div> -->
 						
+						 <!-- Disp BatchTask Lastest Run -->
+		                <jsp:include page="/jsp/batchtask/batchTaskPopupResult.jsp"/>
 						
 						<!-- Result -->
 						<%
@@ -424,9 +473,9 @@ function loadDataAjax(refCode){
 								//Gen Column Head Table (list[0] = head table)
 								columnHeadArr = failList.get(0).split("\\|");
 							%>
-							<tr>
-							  <th colspan="<%=columnHeadArr.length+1%>"><font color="#921F06">จำนวน Row ที่ไม่สามารถ Import ได้  <%=failList.size()-1 %> Row </font></th>
-							</tr>
+								<tr>
+								  <th colspan="<%=columnHeadArr.length+1%>"><font color="#921F06">จำนวน Row ที่ไม่สามารถ Import ได้  <%=failList.size()-1 %> Row </font></th>
+								</tr>
 							<%}else{ 
 								//Gen Column Head Table (list[0] = head table)
 								columnHeadArr = successList.get(0).split("\\|");

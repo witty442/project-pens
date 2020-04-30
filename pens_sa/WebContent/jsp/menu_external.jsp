@@ -92,6 +92,8 @@ function link(isCrossServer,url){
             </li>
 	     </ul>
      </li>
+      <li><a  href="javascript:javascript:link(true,'${pageContext.request.contextPath}/jsp/boxNoAction.do?do=prepare&action=new');"><span>ใบปะหน้ากล่อง ของเสีย(Nissin)<%no=0; %></span>
+      </li>
 </ul>
 
   

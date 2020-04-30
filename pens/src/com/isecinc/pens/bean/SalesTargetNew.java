@@ -42,7 +42,7 @@ public class SalesTargetNew extends I_PO implements Serializable {
 		if (rst.getTimestamp("TARGET_TO") != null)
 			setTargetTo(DateToolsUtil.convertToString(rst.getTimestamp("TARGET_TO")));
 		
-		System.out.println("productId:"+rst.getString("PRODUCT_ID")); 
+		//System.out.println("productId:"+rst.getString("PRODUCT_ID")); 
 		
 		setProduct(new MProduct().find(rst.getString("PRODUCT_ID")));
 		
@@ -137,6 +137,55 @@ public class SalesTargetNew extends I_PO implements Serializable {
 
 	/** Sub UOM */
 	private UOM subUOM;
+
+	private String period;
+	private String month;
+	private String year;
+	
+	/** period Sales Date **/
+	private String salesStartDate;
+	private String salesEndDate;
+	
+	
+	public String getMonth() {
+		return month;
+	}
+
+	public void setMonth(String month) {
+		this.month = month;
+	}
+
+	public String getYear() {
+		return year;
+	}
+
+	public void setYear(String year) {
+		this.year = year;
+	}
+
+	public String getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(String period) {
+		this.period = period;
+	}
+
+	public String getSalesStartDate() {
+		return salesStartDate;
+	}
+
+	public void setSalesStartDate(String salesStartDate) {
+		this.salesStartDate = salesStartDate;
+	}
+
+	public String getSalesEndDate() {
+		return salesEndDate;
+	}
+
+	public void setSalesEndDate(String salesEndDate) {
+		this.salesEndDate = salesEndDate;
+	}
 
 	public int getId() {
 		return id;

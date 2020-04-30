@@ -53,6 +53,7 @@ import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
+import com.isecinc.pens.web.batchtask.BatchTaskDispBean;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.isecinc.pens.web.batchtask.subtask.GenStockOnhandRepTempLotusSubTask;
@@ -111,8 +112,14 @@ public class ExportReportOnhandLotusTask extends BatchTask implements BatchTaskI
 		return "";
 	}
 	//Display Result Batch MOnitor
-	public boolean isDispDetail(){
-		return true;
+	public BatchTaskDispBean getBatchDisp(){
+		BatchTaskDispBean dispBean = new BatchTaskDispBean();
+		dispBean.setDispDetail(true);
+		dispBean.setDispRecordFailHead(true);
+		dispBean.setDispRecordFailDetail(true);
+		dispBean.setDispRecordSuccessHead(true);
+		dispBean.setDispRecordSuccessDetail(true);
+		return dispBean;
 	}
     
 	public String getValidateScript(){
@@ -279,7 +286,7 @@ public class ExportReportOnhandLotusTask extends BatchTask implements BatchTaskI
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{
-			
+			workbook=null;
 		}
 		return monitorItemBean;	
 	}
@@ -295,10 +302,10 @@ public class ExportReportOnhandLotusTask extends BatchTask implements BatchTaskI
 						,"Adjust ","Stock short","Onhand Qty ","Price List","Amount"}; 
 		    columns = columns2;
 		 }
-	
+		Sheet sheet = null;
 		try{
 			CreationHelper createHelper = workbook.getCreationHelper();
-			Sheet sheet = workbook.createSheet("DATA");
+			sheet = workbook.createSheet("DATA");
 			
 			// Create a Font for styling header cells
 	        Font headerFont = workbook.createFont();
@@ -444,7 +451,8 @@ public class ExportReportOnhandLotusTask extends BatchTask implements BatchTaskI
 		}catch(Exception e){
 			throw e;
 		}finally{
-			
+			sheet = null;
+			workbook = null;
 		}
 	}
 	

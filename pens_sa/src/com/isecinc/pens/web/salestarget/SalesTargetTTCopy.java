@@ -156,7 +156,8 @@ public class SalesTargetTTCopy {
 			sql.append("\n  '"+curBean.getCreateUser()+"_copy' as CREATE_USER, ");
 			sql.append("\n  sysdate as CREATE_DATE, ");
 			sql.append("\n  '' as UPDATE_USER, ");
-			sql.append("\n  null as UPDATE_DATE ");
+			sql.append("\n  null as UPDATE_DATE, ");
+			sql.append("\n  0 as user_input_id ");
 			sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_TARGET_TT WHERE ID="+idCopy);
 		    logger.debug("sql:"+sql);
 			
@@ -217,8 +218,8 @@ public class SalesTargetTTCopy {
 			sql.append("\n    where P.INVENTORY_ITEM_ID =L.INVENTORY_ITEM_ID " );
 			//witty edit:04/02/2020 (get only active )
 			sql.append("\n    and P.end_date_active is null ");
-			sql.append("\n    and P.list_header_id ="+priceListId+") as price ");//Price
-			
+			sql.append("\n    and P.list_header_id ="+priceListId+") as price, ");//Price
+			sql.append("\n    0 as user_input_id ");
 			sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_TARGET_TT_L L ");
 			sql.append("\n  WHERE L.ID="+idCopy);
 		   logger.debug("sql:"+sql);

@@ -22,6 +22,7 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.CustomerDAO;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.SalesrepChannelDAO;
 import com.isecinc.pens.dao.SalesrepDAO;
@@ -688,7 +689,7 @@ public class OrderVanVOProcess  {
 			h.append("<td colspan="+colspan+">ภาคตามการดูแล:"+SalesrepZoneDAO.getSalesZoneDesc(conn,head.getSalesZone())+"   | พนักงานขาย :"+head.getSalesrepCode()+"-"+salesrepName+" </td>\n");
 			h.append("</tr> \n");
 			h.append("</tr> \n");
-			h.append("<td colspan="+colspan+">รหัสร้านค้า:"+head.getCustomerCode()+"-"+GeneralDAO.getCustName(conn,head.getCustomerCode())+" </td>\n");
+			h.append("<td colspan="+colspan+">รหัสร้านค้า:"+head.getCustomerCode()+"-"+CustomerDAO.getCustName(conn,head.getCustomerCode())+" </td>\n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
 			h.append(" <td colspan="+colspan+"> \n");
@@ -743,7 +744,7 @@ public class OrderVanVOProcess  {
 			h.append("<td colspan="+colspan+">ภาคตามการดูแล:"+SalesrepZoneDAO.getSalesZoneDesc(conn,head.getSalesZone())+"   | พนักงานขาย :"+head.getSalesrepCode()+"-"+salesrepName+" </td>\n");
 			h.append("</tr> \n");
 			h.append("</tr> \n");
-			h.append("<td colspan="+colspan+">รหัสร้านค้า:"+head.getCustomerCode()+"-"+GeneralDAO.getCustName(conn,head.getCustomerCode())+" </td>\n");
+			h.append("<td colspan="+colspan+">รหัสร้านค้า:"+head.getCustomerCode()+"-"+CustomerDAO.getCustName(conn,head.getCustomerCode())+" </td>\n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
 			h.append(" <td colspan="+colspan+"> \n");

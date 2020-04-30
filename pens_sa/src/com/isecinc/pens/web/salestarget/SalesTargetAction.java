@@ -121,8 +121,9 @@ public class SalesTargetAction extends I_Action {
 					
 				}else if (SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){
 					sales = new SalesTargetBean();
+					sales.setDispRoundUp("true");
 					SalesTargetPDControlPage.prepareSearchSalesTargetPD(request, conn, user,pageName);
-					forward ="searchPD";
+					forward ="all";
 				}
 				
 				//set bean session
@@ -294,7 +295,7 @@ public class SalesTargetAction extends I_Action {
 					  request.getSession().setAttribute("salesTargetForm_RESULTS", salesReuslt.getDataStrBuffer());
 					  foundData = true;
 				   }
-				   forward ="searchPD";
+				   forward ="all";
 			}
 			
 			if(foundData==false){

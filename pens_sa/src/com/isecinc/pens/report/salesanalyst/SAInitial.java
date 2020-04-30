@@ -60,6 +60,9 @@ public class SAInitial {
 	public static final String TYPE_SEARCH_YEAR = "YEAR";
 	public static final String TABLE_VIEW = "XXPENS_BI_SALES_ANALYSIS_V";
 	
+	public static final String COLUMN_TEXT_NA ="N/A";
+	public static final String COLUMN_NUMBER_NA ="0";
+	
 	//For Prefix ColumnName CALL NO DUP 
 	public static final String NO_DUP_PREFIX = "ND_";
 	
@@ -69,6 +72,8 @@ public class SAInitial {
 	SAGenCondition saGen = new SAGenCondition();
 	SAUtils saU = new SAUtils();
 	private static SAInitial salesAnalystProcess;
+	
+	
 	
 	public static SAInitial getInstance(){
 		
@@ -543,7 +548,9 @@ public class SAInitial {
 			// Sub SQl Order
 			if(isColumnOrder){
 				sql.append("\t SELECT DISTINCT  \n");
-				sql.append("\t"+ Utils.isNull(salesBean.getGroupBy()) +", \n ");
+				//EDIT 24/04/2563
+				sql.append("\t"+ genSQLNA(Utils.isNull(salesBean.getGroupBy())) +", \n ");
+				
 				sql.append("\t"+ saGen.genSQLGetDesc(salesBean.getGroupBy()));
 				sql.append("\t"+ saGen.genSQLGetCode(salesBean.getGroupBy()));
 				sql.append("\t"+"'1' AS A \n");
@@ -593,7 +600,9 @@ public class SAInitial {
 			// Sub SQl Invoice
 			if(isColumnInvoice){
 				sql.append("\t"+"SELECT DISTINCT \n");
-				sql.append("\t"+ Utils.isNull(salesBean.getGroupBy()) +", \n ");
+				//EDIT 24/04/2563
+				sql.append("\t"+ genSQLNA(Utils.isNull(salesBean.getGroupBy())) +", \n ");
+				
 				sql.append("\t"+ saGen.genSQLGetDesc(salesBean.getGroupBy()));
 				sql.append("\t"+ saGen.genSQLGetCode(salesBean.getGroupBy()));
 				sql.append("\t"+"'1' AS A \n");
@@ -986,6 +995,25 @@ public class SAInitial {
 			   rs.close();rs=null;
 			}
 		}
+	}
+	
+	public static String genSQLNA(String columnName){
+		String sqlR = columnName;
+		
+		//No Edit case column is null
+		/*if( columnName.equalsIgnoreCase("Customer_id")
+	     || columnName.equalsIgnoreCase("Organization_id")
+	     || columnName.equalsIgnoreCase("Order_type_id")
+	     || columnName.equalsIgnoreCase("inventory_item_id")
+	     || columnName.equalsIgnoreCase("Salesrep_id")
+	     || columnName.equalsIgnoreCase("SHIP_TO_SITE_USE_ID")
+	     || columnName.equalsIgnoreCase("BILL_TO_SITE_USE_ID")
+	    ){
+			sqlR = "NVL("+columnName+","+COLUMN_NUMBER_NA+") as "+columnName;
+		}else{
+			sqlR = "NVL("+columnName+",'"+COLUMN_TEXT_NA+"') as "+columnName;
+		}*/
+		return sqlR;
 	}
 
 }

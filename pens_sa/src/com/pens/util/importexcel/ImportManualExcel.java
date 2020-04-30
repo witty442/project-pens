@@ -47,6 +47,8 @@ public class ImportManualExcel {
 			///importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/ข้อมูลสาขาของร้านค้า.xlsx",9,0);
 			
 			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/ORDER_REP/MasterBmeOrderRep.xlsx",2,0);
+			
+			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/pd_sales_zone.xlsx",3,0);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

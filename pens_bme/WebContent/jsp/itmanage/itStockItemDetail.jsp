@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.web.itmanage.ITManageForm"%>
 <%@page import="com.isecinc.pens.web.itmanage.ITManageBean"%>
@@ -18,7 +19,7 @@
 
 <%
 User user = (User) request.getSession().getAttribute("user");
-List<ITManageBean> itemNameList = (List<ITManageBean>)session.getAttribute("ITEM_NAME_LIST");
+List<PopupBean> itemTypeList = (List<PopupBean>)session.getAttribute("ITEM_TYPE_LIST");
 %>
 <html>
 <head>
@@ -97,7 +98,11 @@ function save(path){
 		return false;
 	}
 	
-	if(isSelectOne()){
+	if( !validateData()){
+		alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+		return false;
+	}
+	if(isSelectOne() ){
 		/**Control Save Lock Screen **/
 		startControlSaveLockScreen();
 		
@@ -107,6 +112,26 @@ function save(path){
 	}
 	return false;
 }
+function validateData(){
+	var pass = true;
+	var itemName = document.getElementsByName("itemName");
+	var itemType = document.getElementsByName("itemType");
+	for(var i= 0;i<itemName.length;i++){
+		if(itemName[i].value != ""){
+			if( itemType[i].value =="" ){
+			    itemType[i].className ='errorText';
+			    pass = false;
+			}
+		}
+		//no error
+		if(pass){
+			itemType[i].className ='';
+		}
+		//alert("rows["+i+"]:"+rows[i].className);
+	}// for
+	return pass ;
+}
+
 function isSelectOne(){
 	//todo play with type
 	var itemName = document.getElementsByName("itemName");
@@ -191,7 +216,6 @@ function getAutoKeypress(e,obj,pageName){
 		}
 	}
 }
-
 function getAutoDetail(obj,pageName){
 	var returnString = "";
 	var form = document.itManageForm;
@@ -312,9 +336,8 @@ function getAutoDetail(obj,pageName){
 						   <table id="tblProduct" align="center" width="75%" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth">
 						       <tr>
 						            <th >ลำดับ</th>
-									<th >อุปกรณ์  
-									 
-									</th>
+						            <th >ประเภท </th>
+									<th >อุปกรณ์/รุ่น </th>
 									<th >Serial No</th>
 									<th >จำนวน</th>
 									<th >หมายุหตุ</th>
@@ -337,16 +360,20 @@ function getAutoDetail(obj,pageName){
 										  <input type="hidden" name="lineId" id="lineId"  value="">
 										  <input type="text" name="no" id="no" size="1" readonly value="<%=(n+1) %>" tabindex="-1" class="disableText">
 										</td>
-										<td class="td_text" width="15%">
-										   <input type="text" name="itemName" id="itemName" size="50" maxlength="60" tabindex="<%out.print(tabindex);tabindex++;%>" autoComplete='off'> 
-										  <%--  <select name="itemName" id="itemName">
-										     <option></option>
-										     <%for(int i=0;i<itemNameList.size();i++){ 
-										    	 ITManageBean item = itemNameList.get(i);
-										         out.println("<option value='"+item.getItemName()+"'>"+item.getSeq()+"-"+item.getItemName()+"</option>"); 
+										<td class="td_text" width="10%">
+										    <% String itemType = "";
+										    for(int i=0;i<itemTypeList.size();i++){ 
+										    	 PopupBean itemO = itemTypeList.get(i);
+										    	 if(n==i){
+										    		 itemType = itemO.getValue();
+										    	 }
 										     }
 										     %>
-										   </select> --%>
+										    <input type="text" name="itemType" id="itemType" size="20" readonly value="<%=itemType%>" tabindex="-1" class="disableText">
+										</td>
+										<td class="td_text" width="15%">
+										   <input type="text" name="itemName" id="itemName" size="50" maxlength="60" tabindex="<%out.print(tabindex);tabindex++;%>" autoComplete='off'> 
+										 
 										</td>
 										<td class="td_text" width="15%">
 										<input type="text" name="serialNo" id="serialNo" size="30" maxlength="30" tabindex="<%out.print(tabindex);tabindex++;%>" autoComplete='off'>
@@ -375,22 +402,22 @@ function getAutoDetail(obj,pageName){
 										  <input type="hidden" name="lineId" id="lineId"  value="<%=item.getLineId()%>">
 										  <input type="text" name="no" id="no" size="1" readonly value="<%=(n+1) %>"  tabindex="-1" class='disableText'>
 										</td>
+										<td class="td_text" width="10%">
+										  <% String itemType = "";
+										    for(int i=0;i<itemTypeList.size();i++){ 
+										    	 PopupBean itemO = itemTypeList.get(i);
+										    	 if(n==i){
+										    		 itemType = itemO.getValue();
+										    	 }
+										     }
+										     %>
+										    <input type="text" name="itemType" id="itemType" size="20" readonly value="<%=itemType%>" tabindex="-1" class="disableText">
+										</td>
 										<td class="td_text" width="15%">
 										  <input type="text" name="itemName" id="itemName" size="50" maxlength="60" 
 										  tabindex="<%out.print(tabindex);tabindex++;%>" 
 										  autoComplete='off' value="<%=Utils.isNull(item.getItemName())%>"/> 
-										  <%-- <select name="itemName" id="itemName">
-										     <option></option>
-											 <%for(int i=0;i<itemNameList.size();i++){ 
-										    	 ITManageBean itemL = itemNameList.get(i);
-										    	 if(itemL.getItemName().equalsIgnoreCase(item.getItemName())){
-										    	   out.println("<option value='"+itemL.getItemName()+"' selected>"+itemL.getSeq()+"-"+itemL.getItemName()+"</option>");
-										    	 }else{
-										           out.println("<option value='"+itemL.getItemName()+"'>"+itemL.getSeq()+"-"+itemL.getItemName()+"</option>");
-										    	 }
-										     }
-										     %>
-										    </select> --%>
+										 
 										</td>
 										<td class="td_text" width="15%">
 										<input type="text" name="serialNo" value="<%=Utils.isNull(item.getSerialNo()) %>" id="serialNo" 

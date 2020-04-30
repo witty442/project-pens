@@ -28,6 +28,7 @@ import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
+import com.isecinc.pens.web.batchtask.BatchTaskDispBean;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.isecinc.pens.web.reportall.ReportAllBean;
@@ -80,8 +81,10 @@ public class ExportReportOnhandRobinsonTask extends BatchTask implements BatchTa
 		return "";
 	}
 	//Display Result Batch MOnitor
-	public boolean isDispDetail(){
-		return false;
+	 public BatchTaskDispBean getBatchDisp(){
+		BatchTaskDispBean dispBean = new BatchTaskDispBean();
+		dispBean.setDispDetail(false);
+		return dispBean;
 	}
     
 	public String getValidateScript(){
@@ -391,7 +394,7 @@ public class ExportReportOnhandRobinsonTask extends BatchTask implements BatchTa
 	        headerCellStyle.setFont(headerFont);
 	        
 	        Row headerRow = sheet.createRow(0);
-	        Cell cell = headerRow.createCell(0);cell.setCellValue("รายงาน B'me Stock on-hand at Lotus(As Of)");
+	        Cell cell = headerRow.createCell(0);cell.setCellValue("รายงาน B'me Stock on-hand at Robinson(As Of)");
 	        cell.setCellStyle(headerCellStyle);
 	        //merge column
 	        sheet.addMergedRegion(new CellRangeAddress(0,0,0,10));

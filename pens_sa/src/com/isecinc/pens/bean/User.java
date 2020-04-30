@@ -49,7 +49,8 @@ public class User extends I_PO implements Serializable {
 	public static final String TTMGR = "TTMGR";//ManagerSale
 	
 	public static final String PD ="PD";
-	public static final String VANSALES = "VANSALES";
+	public static final String VANSALES = "VANSALES";//Dummy Role
+	public static final String CREDITSALES = "CREDITSALES";//Dummy Role
 	public static final String COVERAGE = "COVERAGE";
 	public static final String B2B_MAKRO = "MAKRO";
 	public static final String PREORDER = "PREORDER";
@@ -224,13 +225,26 @@ public class User extends I_PO implements Serializable {
     private String roleStockVan;
     private String roleMC;
     private String roleSA;
-    private String roleVanSales;
+ 
     private String roleOnhand;
     private String roleCoverage;
     private String roleB2B;
     private String roleMkt;
+    private String salesrepFullName;
     
+   // private String roleVanSales;
+   // private String roleCreditSales;
     
+	
+
+	public String getSalesrepFullName() {
+		return salesrepFullName;
+	}
+
+	public void setSalesrepFullName(String salesrepFullName) {
+		this.salesrepFullName = salesrepFullName;
+	}
+
 	public String getRoleMkt() {
 		return roleMkt;
 	}
@@ -261,14 +275,6 @@ public class User extends I_PO implements Serializable {
 
 	public void setRoleOnhand(String roleOnhand) {
 		this.roleOnhand = roleOnhand;
-	}
-
-	public String getRoleVanSales() {
-		return roleVanSales;
-	}
-
-	public void setRoleVanSales(String roleVanSales) {
-		this.roleVanSales = roleVanSales;
 	}
 
 	public String getRoleSA() {

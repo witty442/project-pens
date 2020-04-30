@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.GeneralDAO;
+import com.pens.util.UserUtils;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -962,6 +965,89 @@ public static StringBuffer genResultStockVanPD(StockOnhandForm stockVanForm,Http
    	 e.printStackTrace();
    }
       return out;
-	}
+ }
 
+public static StringBuffer genResultStockVanPDBySalesZone(StockOnhandForm stockVanForm,HttpServletRequest request,String typeExport) throws Exception{
+	   StringBuffer out = new StringBuffer("");
+	   String td_text_center = "td_text_center";
+	   String td_text = "td_text";
+	   String td_number = "td_number";
+	   String td_number_bold = "td_number_bold";
+	   String userZoneAll = "";
+	   try{
+		   User user = (User)request.getSession().getAttribute("user");
+		   userZoneAll = GeneralDAO.getSalesZoneMapCustTTByUser(user);
+		   logger.debug("userSalesZone:"+userZoneAll);
+		   
+		   /** Case Export to Excel **/
+		   if("EXCEL".equalsIgnoreCase(typeExport)){
+			   out.append(ExcelHeader.EXCEL_HEADER);//excel style
+			   
+			   td_text_center = "text";
+			   td_text = "text";
+			   td_number = "currency";
+			   td_number_bold = "currency_bold";
+		   }
+		   List<StockOnhandBean> columnList = (List<StockOnhandBean>)request.getSession().getAttribute("COLUMN_LIST");
+		   if(columnList ==null || (columnList !=null && columnList.size()==0)){
+			   return new StringBuffer("");
+		   }
+		   /*********************** Head Table ******************************************************/
+		   out.append("<table id='tblProduct' align='center' border='1' width='100%' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
+		   out.append("<tr> \n");
+		   if(columnList != null && columnList.size()>0){   
+   				out.append("<th>SKU</th> \n");
+         	    for(int k=0;k<columnList.size();k++){
+                  StockOnhandBean s = (StockOnhandBean)columnList.get(k);
+                  if("0".equalsIgnoreCase(s.getSalesZone()) 
+                	  && (userZoneAll.indexOf("0") != -1 || userZoneAll.equalsIgnoreCase("all")) ){
+                     out.append("<th>กรุงเทพ ตะวันตก</th> \n");
+                  }else  if("1".equalsIgnoreCase(s.getSalesZone())
+                	 && (userZoneAll.indexOf("1") != -1 || userZoneAll.equalsIgnoreCase("all")) ){
+                	 out.append("<th>กรุงเทพ ตะวันออก</th> \n");
+                  }else  if("2".equalsIgnoreCase(s.getSalesZone())
+                	 && (userZoneAll.indexOf("2") != -1 || userZoneAll.equalsIgnoreCase("all")) ){
+                 	 out.append("<th>เหนือ</th> \n");
+                  }else  if("3".equalsIgnoreCase(s.getSalesZone())
+                	&& (userZoneAll.indexOf("3") != -1 || userZoneAll.equalsIgnoreCase("all")) ){
+                 	 out.append("<th>อิสาน</th> \n");
+                  }else  if("4".equalsIgnoreCase(s.getSalesZone())
+                	&& (userZoneAll.indexOf("4") != -1 || userZoneAll.equalsIgnoreCase("all")) ){
+                	out.append("<th>ใต้</th> \n");
+                  }
+               }//for 
+   			}
+		   out.append("</tr>");
+		   /********************* Head Table ***************************************************/
+		      
+		   /********************* Row Detail ***************************************************/
+		   List<StockOnhandBean> resultList = stockVanForm.getResultsSearch();
+		   String tabclass ="";
+		   StockOnhandBean rowItem = null;
+		   StockOnhandBean columnDataBean = null;
+		   for(int n=0;n<resultList.size();n++){
+		   		rowItem = (StockOnhandBean)resultList.get(n);
+		   		if(n%2==0){ 
+		   			tabclass="lineO";
+		   		}else{
+		   			tabclass ="lineE";
+		   		}
+		   		out.append("<tr class="+tabclass+">");
+		   	    out.append("<td class='"+td_text_center+"' width='5%'>"+rowItem.getProductCode()+"</td> \n");
+			   	 if(rowItem.getRowColumnDataList() != null && rowItem.getRowColumnDataList() .size()>0){ 
+			        for(int c=0;c<rowItem.getRowColumnDataList().size();c++){
+			        	columnDataBean = (StockOnhandBean)rowItem.getRowColumnDataList().get(c);
+			        	if (userZoneAll.indexOf(""+c) != -1 || userZoneAll.equalsIgnoreCase("all")) {
+			        	   out.append("<td class='"+td_number+"' width='5%'>"+Utils.isNullDoubleStrToZero(columnDataBean.getSalesZoneQty())+"</td> \n");
+			        	}
+			        }//for 2
+			   	 }//if
+		   	    out.append("</tr>");
+		   }//for
+		   out.append("</table>");
+	   }catch(Exception e){
+		  logger.error(e.getMessage(),e);
+	   }
+	   return out;
+   }
 }

@@ -847,7 +847,18 @@
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W4');">
 				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="reqPickStockW4"/></span></a>
 			</li>
-			 
+			  <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W5');">
+				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="reqPickStockW5"/></span></a>
+			</li>
+			 <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W6');">
+				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="reqPickStockW6"/></span></a>
+			</li>
+			 <li>
+				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reqPickStockAction.do?do=prepare2&action=new&wareHouse=W7');">
+				<span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="reqPickStockW7"/></span></a>
+			</li>
 	    </ul>  
 	<%} %>
 	</li>

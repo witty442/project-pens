@@ -67,14 +67,14 @@ public class DateUtil {
 		   yyyy1 = Integer.parseInt(date1Str.substring(3,7));
 		   mm2 = Integer.parseInt(date2Str.substring(0,2));
 		   yyyy2 = Integer.parseInt(date2Str.substring(3,7));
-		   System.out.println("mm1:"+mm1);
-		   System.out.println("yyyy1:"+yyyy1);
+		   logger.debug("mm1:"+mm1);
+		   logger.debug("yyyy1:"+yyyy1);
 		   
 		   int diffMonthOfYear = (yyyy2-yyyy1)*12;
 		    diffMonth = (mm2+diffMonthOfYear)-mm1;
-		   
+
 		}catch(Exception e){
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 		return  diffMonth;
 	}
@@ -674,5 +674,22 @@ public class DateUtil {
 		c.add(Calendar.DAY_OF_MONTH, backDay);
 		
 		return c.getTime();
+	}
+	/**
+	 * check date 1 and date is same period Month year
+	 * @param date1
+	 * @param date2
+	 * @return is same period month year return true ,
+	 */
+	public static boolean isSamePeriodMonthYear(Date date1, Date date2) throws Exception{
+		if (date1 == null || date2 == null) {
+			return false;
+		}
+		String date1Str = stringValue(date1,"yyyyMM");
+		String date2Str = stringValue(date2,"yyyyMM");
+		if(date1Str.equalsIgnoreCase(date2Str)){
+			return true;
+		}
+		return false;
 	}
 }

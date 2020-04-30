@@ -118,10 +118,10 @@ public class SalesTargetExport {
 		String action ="";
 		char singleQuote ='"';
 		String nextCustomerTemp= "";
-		double totalQty = 0;
-		double totalAmount = 0;
-		double grandTotalQty = 0;
-		double grandTotalAmount = 0;
+		double totalQty = 0,totalAmount = 0;
+		double grandTotalQty = 0,grandTotalAmount = 0;
+		double totalEstimateQty = 0,totalEstimateAmount = 0;
+		double grandTotalEstimateQty = 0,grandTotalEstimateAmount = 0;
 		int n = 0;
 		int rowId = 0;
 		try{
@@ -178,19 +178,19 @@ public class SalesTargetExport {
 						h.append("</td> \n");
 						h.append("<td class='td_text_center' width='8%'>"+item.getInvoicedAmt()+"</td> \n");
 						
-						h.append("<td class='td_text_center' width='8%'> \n");
+						h.append("<td class='td_text_right' width='8%'> \n");
 						h.append("  <input type='text' name='estimateQty' id='estimateQty' class='enableNumber'");
 						h.append("    value ='"+item.getEstimateQty()+"' size='4' \n");
 						h.append("    onblur='isNumPositive(this);calcEstimateAmt(this,"+rowId+")' autocomplete='off' />");
 						h.append("  <input type='hidden' id ='ids' name='ids' value ='"+item.getId()+"' /> \n");
 						h.append("</td> \n");
-						h.append("<td class='td_text_center' width='8%'> \n");
+						h.append("<td class='td_text_right' width='8%'> \n");
 						h.append("  <input type='text' name='price' id='price' class='enableNumber'");
 						h.append("    value ='"+item.getPrice()+"' size='4' \n");
 						h.append("    onblur='isNumPositive(this);calcEstimateAmt(this,"+rowId+")' autocomplete='off' />");
 						h.append("</td> \n");
 						
-						h.append("<td class='td_text_center' width='8%'> \n");
+						h.append("<td class='td_text_right' width='8%'> \n");
 						h.append("  <input type='text' name='estimateAmt' id='estimateAmt' class='disableNumber' readonly value ='"+item.getEstimateAmt()+"' size='10'/>");
 						h.append("</td> \n");
 					}
@@ -202,6 +202,11 @@ public class SalesTargetExport {
 				totalAmount += Utils.convertStrToDouble(item.getTargetAmount());
 				grandTotalQty += Utils.convertStrToDouble(item.getTargetQty());
 				grandTotalAmount += Utils.convertStrToDouble(item.getTargetAmount());
+				
+				totalEstimateQty += Utils.convertStrToDouble(item.getEstimateQty());
+				totalEstimateAmount += Utils.convertStrToDouble(item.getEstimateAmt());
+				grandTotalEstimateQty += Utils.convertStrToDouble(item.getEstimateQty());
+				grandTotalEstimateAmount+= Utils.convertStrToDouble(item.getEstimateAmt());
 				
 				/** Gen Total Summary By Customer Code*/
 				n = i+1;
@@ -228,14 +233,16 @@ public class SalesTargetExport {
 						if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
 							h.append("<td class=''></td> \n");
 							h.append("<td class=''></td> \n");
+							h.append("<td class='td_number_bold'><B> "+Utils.decimalFormat(totalEstimateQty, Utils.format_current_no_disgit)+"</B></td> \n");
 							h.append("<td class=''></td> \n");
-							h.append("<td class=''></td> \n");
-							h.append("<td class=''></td> \n");
+							h.append("<td class='td_number_bold'><B>"+Utils.decimalFormat(totalEstimateAmount, Utils.format_current_2_disgit)+"</B></td> \n");
 						}
 				    h.append("</tr> \n");
 				    //reset Total Summary
 				    totalQty =0;
 					totalAmount = 0;
+					totalEstimateQty = 0;
+					totalEstimateAmount = 0;
 				}
 		    }
 			h.append("<tr class='hilight_text'> \n");
@@ -256,9 +263,9 @@ public class SalesTargetExport {
 				if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
 					h.append("<td class=''></td> \n");
 					h.append("<td class=''></td> \n");
+					h.append("<td class='td_number_bold'><B>"+Utils.decimalFormat(grandTotalEstimateQty, Utils.format_current_no_disgit)+"</B></td> \n");
 					h.append("<td class=''></td> \n");
-					h.append("<td class=''></td> \n");
-					h.append("<td class=''></td> \n");
+					h.append("<td class='td_number_bold'><B>"+Utils.decimalFormat(grandTotalEstimateAmount, Utils.format_current_2_disgit)+"</B></td> \n");
 				}
 			h.append("</tr> \n");
 			h.append("</table> \n");
@@ -282,13 +289,14 @@ public class SalesTargetExport {
 		StringBuffer h = new StringBuffer("");
 		String className = "";
 		String nextCustomerTemp= "";
-		double totalQty = 0;
-		double totalAmount = 0;
-		double grandTotalQty = 0;
-		double grandTotalAmount = 0;
+		double totalQty = 0,totalAmount = 0;
+		double grandTotalQty = 0,grandTotalAmount = 0;
+		double totalEstimateQty = 0,totalEstimateAmount = 0;
+		double grandTotalEstimateQty = 0,grandTotalEstimateAmount = 0;
 		int n = 0;
 		int rowId = 0;
 		try{
+		
 			if(o.getItems() != null && o.getItems().size() >0){
 				
 				//logger.debug("status:"+o.getStatus());
@@ -340,6 +348,11 @@ public class SalesTargetExport {
 				grandTotalQty += Utils.convertStrToDouble(item.getTargetQty());
 				grandTotalAmount += Utils.convertStrToDouble(item.getTargetAmount());
 				
+				totalEstimateQty += Utils.convertStrToDouble(item.getEstimateQty());
+				totalEstimateAmount += Utils.convertStrToDouble(item.getEstimateAmt());
+				grandTotalEstimateQty += Utils.convertStrToDouble(item.getEstimateQty());
+				grandTotalEstimateAmount+= Utils.convertStrToDouble(item.getEstimateAmt());
+				
 				/** Gen Total Summary By Customer Code*/
 				n = i+1;
 				nextCustomerTemp = "";
@@ -364,14 +377,16 @@ public class SalesTargetExport {
 						if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
 							h.append("<td class=''></td> \n");
 							h.append("<td class=''></td> \n");
+							h.append("<td class='td_number_bold'><B> "+Utils.decimalFormat(totalEstimateQty, Utils.format_current_no_disgit)+"</B></td> \n");
 							h.append("<td class=''></td> \n");
-							h.append("<td class=''></td> \n");
-							h.append("<td class=''></td> \n");
+							h.append("<td class='td_number_bold'><B>"+Utils.decimalFormat(totalEstimateAmount, Utils.format_current_2_disgit)+"</B></td> \n");
 						}
 				    h.append("</tr> \n");
 				    //reset Total Summary
 				    totalQty =0;
 					totalAmount = 0;
+					totalEstimateQty =0;
+					totalEstimateAmount = 0;
 				}
 		    }
 			h.append("<tr class='hilight_text'> \n");
@@ -391,9 +406,9 @@ public class SalesTargetExport {
 				if(Utils.isNull(o.getStatus()).equals(SalesTargetConstants.STATUS_FINISH)){
 					h.append("<td class=''></td> \n");
 					h.append("<td class=''></td> \n");
-					h.append("<td class=''></td> \n");
-					h.append("<td class=''></td> \n");
-					h.append("<td class=''></td> \n");
+					h.append("<td class='td_number_bold'><B>"+Utils.decimalFormat(grandTotalEstimateQty, Utils.format_current_no_disgit)+"</B></td> \n");
+			        h.append("<td class=''></td> \n");
+			        h.append("<td class='td_number_bold'><B>"+Utils.decimalFormat(grandTotalEstimateAmount, Utils.format_current_2_disgit)+"</B></td> \n");
 				}
 			h.append("</tr> \n");
 			h.append("</table> \n");

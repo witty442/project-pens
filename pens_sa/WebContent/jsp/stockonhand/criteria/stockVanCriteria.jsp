@@ -31,29 +31,31 @@ function clearForm(path){
 }
 function search(path){
 	var form = document.stockOnhandForm;
-	if( form.pdType.value ==""){
-		alert("กรุณาระบุ ประเภท");
-		form.pdType.focus();
-		return false;
-	}
-	if( form.dispType.value ==""){
-		alert("กรุณาระบุ รูปแบบการแสดงผล");
-		form.pdType.focus();
-		return false;
-	}
-	if( form.dispType.value =="1"){
-		if( form.brand.value =="" && form.productCode.value ==""){
-			alert("กรุณาระบุแบรนด์");
-			form.brand.focus();
+	if(form.dispType.value !="3"){
+		if( form.pdType.value ==""){
+			alert("กรุณาระบุ ประเภท");
+			form.pdType.focus();
 			return false;
 		}
-	}
-	
-	if( form.pdType.value =="V"){
-		if( form.dispPlan.checked){
-			alert("ยอดแพลนระหว่างทางที่ยังไม่ได้รับ มีเฉพาะกรณี สต๊อก PD เท่านั้น");
-			form.dispPlan.focus();
+		if( form.dispType.value ==""){
+			alert("กรุณาระบุ รูปแบบการแสดงผล");
+			form.pdType.focus();
 			return false;
+		}
+		if( form.dispType.value =="1"){
+			if( form.brand.value =="" && form.productCode.value ==""){
+				alert("กรุณาระบุแบรนด์");
+				form.brand.focus();
+				return false;
+			}
+		}
+		
+		if( form.pdType.value =="V"){
+			if( form.dispPlan.checked){
+				alert("ยอดแพลนระหว่างทางที่ยังไม่ได้รับ มีเฉพาะกรณี สต๊อก PD เท่านั้น");
+				form.dispPlan.focus();
+				return false;
+			}
 		}
 	}
 	
@@ -172,6 +174,7 @@ function setDataPopupValue(code,desc,pageName){
 		        <html:option value=""> </html:option>
 				<html:option value="1">แนวตั้ง : PD/หน่วยรถ  | แนวนอน :  รหัสสินค้า  </html:option>
 				<html:option value="2">แนวตั้ง : รหัสสินค้า   |  แนวนอน :  PD/หน่วยรถ</html:option>
+			    <html:option value="3">แสดงผลรวม ระดับภาค</html:option>
 		    </html:select>
 		</td> 
 	</tr>	

@@ -195,6 +195,12 @@ UL {
 	border-color: #BEBEBE;
 	color: #000000;
 }
+.errorText {
+	background-color: #DCDCDC;
+	border: 1px solid;
+	border-color: red;
+	color: #000000;
+}
 .disableTextCenter {
 	background-color: #DCDCDC;
 	border: 1px solid;

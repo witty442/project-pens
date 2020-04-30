@@ -28,7 +28,7 @@ window.onload = function(){
  	    
  	    //import file Excel
  	    var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopup&pageName=<%=BatchTaskConstants.IMPORT_B2B_MAKRO_FROM_EXCEL%>';
- 	     popupFull(url,'Import Excel');
+ 	    popupBatchTaskPopup(url);
 	<%}%>
 	
 	<%if( "submitedExport".equals(request.getAttribute("action"))){%>

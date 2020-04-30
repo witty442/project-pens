@@ -168,7 +168,7 @@ public class PageingGenerate {
 		return h;
 	}
 	
-	public static PageingBean genPageingByList(int totalRecord,int pageSize, int currPage){
+	public static PageingBean genPageingByList1(int totalRecord,int pageSize, int currPage){
 		PageingBean pageingBean = new PageingBean();
 		StringBuffer h = new StringBuffer("");
 		int totalPage = 0;

@@ -113,6 +113,8 @@ function save(path){
 		alert("ไม่มีข้อมูลกำหนด");
 		return false;
 	}
+	/** lock screen save **/
+	startControlSaveLockScreen();
 	
 	document.pdReceiptForm.action = path + "/jsp/pdReceipt.do?do=save&"+p_receiptId+"&"+p_paymentMethods+"&"+p_pdPaidDate+"&"+p_chequeDate;
 	document.pdReceiptForm.submit();

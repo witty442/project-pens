@@ -19,7 +19,7 @@ private static final long serialVersionUID = 1L;
     private String validateScript;
     private String description;
     private String devInfo;
-    private boolean dispDetail;
+    private BatchTaskDispBean dispBean;
 	private Map<String, BatchTaskInfo> paramMap;
 	private List<BatchTaskInfo> paramList;
 	
@@ -30,11 +30,12 @@ private static final long serialVersionUID = 1L;
 	public void setTaskName(String taskName) {
 		this.taskName = taskName;
 	}
-	public boolean isDispDetail() {
-		return dispDetail;
+	
+	public BatchTaskDispBean getDispBean() {
+		return dispBean;
 	}
-	public void setDispDetail(boolean dispDetail) {
-		this.dispDetail = dispDetail;
+	public void setDispBean(BatchTaskDispBean dispBean) {
+		this.dispBean = dispBean;
 	}
 	public String getDevInfo() {
 		return devInfo;

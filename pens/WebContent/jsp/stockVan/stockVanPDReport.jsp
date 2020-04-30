@@ -44,7 +44,7 @@
   //System.out.println("Current IP:"+currentIP);
 
   //case Server Test contextPath = pens_sa_test
-	if("192.168.202.8XX".equals(currentIP)){ //On Witty dev
+	if("192.168.202.8".equals(currentIP)){ //On Witty dev
 		 contextPathServerCross ="/pens_sa";
 	     hostServerCross = "http://localhost:8080";
 	 }else{
@@ -53,7 +53,7 @@
 			 hostServerCross = "http://"+ipServerCross+":8081";
 		 }else{
 			 contextPathServerCross ="/pens_sa_test"; //ON UAT SERVER DD_SERVER
-			 hostServerCross = "http://192.168.37.185:8081"; 
+			 hostServerCross = "http://192.168.202.7:8082"; 
 			 
 			 //test now on local
 			 //contextPathServerCross ="/pens_sa";
@@ -105,7 +105,6 @@ function linkSub(){
 
  }
 function refreshPage(){
-	
 	window.location = document.getElementById("path").value+"/jsp/stockVan/stockVanPDReport.jsp";
 }
 

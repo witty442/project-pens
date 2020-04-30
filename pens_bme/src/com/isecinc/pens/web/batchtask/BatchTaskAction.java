@@ -129,7 +129,7 @@ public class BatchTaskAction extends I_Action {
 				String validateScript = getValidateScriptByTaskname(pageName);
 				taskInfo.setValidateScript(validateScript);
 				//get Show BatchTask Detail
-				taskInfo.setDispDetail(getDispDetailByTaskname(pageName));
+				taskInfo.setDispBean(getBatchDispByTaskname(pageName));
 				
 				batchTaskForm.setTaskInfo(taskInfo);
 
@@ -342,8 +342,8 @@ public class BatchTaskAction extends I_Action {
 		}
 		return listBoxBean;
 	}
-	public  boolean getDispDetailByTaskname(String taskName){
-		boolean param = false;
+	public  BatchTaskDispBean getBatchDispByTaskname(String taskName){
+		BatchTaskDispBean param = null;
 		try{
 		   Class cls = Class.forName("com.isecinc.pens.web.batchtask.task."+taskName+"Task");
    		   Object obj = cls.newInstance();
@@ -351,10 +351,10 @@ public class BatchTaskAction extends I_Action {
    		  //no paramater
    		   Class noparams[] = {};
    		
-   		   Method method = cls.getDeclaredMethod("isDispDetail", noparams);
+   		   Method method = cls.getDeclaredMethod("getBatchDisp", noparams);
 		   Object ob =  method.invoke(obj, null);
 		   
-		   param = (Boolean)ob;
+		   param = (BatchTaskDispBean)ob;
 		   logger.debug("return:"+ob);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

@@ -82,6 +82,9 @@ input[type=checkbox]
   -o-transform: scale(2); /* Opera */
   padding: 2px;
 }
+.text{
+	mso-number-format:"\@";
+}
  #scroll {
 <%if(!"0".equals(screenWidth)){%>
     width:<%=screenWidth%>px; 

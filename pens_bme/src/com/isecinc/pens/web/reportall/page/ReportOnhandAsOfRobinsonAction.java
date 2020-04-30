@@ -527,13 +527,13 @@ public class ReportOnhandAsOfRobinsonAction extends I_Action {
 			h.append(ExcelHeader.EXCEL_HEADER);
 			
 			if("GroupCode".equalsIgnoreCase(aForm.getBean().getSummaryType())){
-				colspan ="11";
+				colspan ="9";
 			}
 			//Header
 			h.append("<table border='1'> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colspan+"'>รายงาน B'me Stock on-hand at Lotus(As Of)</td> \n");
+			h.append("<td align='left' colspan='"+colspan+"'>รายงาน B'me Stock on-hand at Robinson(As Of)</td> \n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");

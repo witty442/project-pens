@@ -67,6 +67,7 @@ public class AddItemPickStockAction extends I_Action {
              
             logger.debug("issueReqNo :"+issueReqNo);
             logger.debug("issueReqDate :"+issueReqDate);
+            logger.debug("groupCode :"+groupCode);
             logger.debug("status :"+status);
             logger.debug("requestor :"+requestor);
             logger.debug("custGroup :"+custGroup);

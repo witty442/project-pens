@@ -22,6 +22,7 @@ public class ITManageBean implements Serializable{
 	
 
 	private int lineId;
+	private String itemType;
 	private String itemName;
 	private String serialNo;
 	private String qty;
@@ -29,8 +30,21 @@ public class ITManageBean implements Serializable{
 	private boolean canPrint;
 	private List<ITManageBean> items;
 	private int seq;
+	private StringBuffer dataStrBuffer;
 	
 	
+	public StringBuffer getDataStrBuffer() {
+		return dataStrBuffer;
+	}
+	public void setDataStrBuffer(StringBuffer dataStrBuffer) {
+		this.dataStrBuffer = dataStrBuffer;
+	}
+	public String getItemType() {
+		return itemType;
+	}
+	public void setItemType(String itemType) {
+		this.itemType = itemType;
+	}
 	public int getSeq() {
 		return seq;
 	}

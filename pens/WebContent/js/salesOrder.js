@@ -202,6 +202,9 @@ function presave(path) {
 	//Validate item vat and no vat not in same bill
 	if( !validateItemVatOrNoNotInSameBill()){return false;}
 	
+	/**Control Save Lock Screen **/
+    startControlSaveLockScreen();
+    
 	document.orderForm.action = path + "/jsp/saleOrderAction.do?do=preSave";
 	document.orderForm.submit();
 	return true;
@@ -270,6 +273,10 @@ function save(path,role) {
 	if( !validateVanCreditLimit()){return false;}
 	
 	if(!createProductList()){return false;}
+	
+	/**Control Save Lock Screen **/
+    startControlSaveLockScreen();
+    
 	document.orderForm.action = path + "/jsp/saleOrderAction.do?do=save";
 	document.orderForm.submit();
 	return true;

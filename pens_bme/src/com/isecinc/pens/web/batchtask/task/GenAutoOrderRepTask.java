@@ -46,6 +46,7 @@ import com.isecinc.pens.process.OrderKeyBean;
 import com.isecinc.pens.process.OrderNoGenerate;
 import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
+import com.isecinc.pens.web.batchtask.BatchTaskDispBean;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.isecinc.pens.web.batchtask.subtask.GenStockOnhandRepTempLotusSubTask;
@@ -94,8 +95,14 @@ public class GenAutoOrderRepTask extends BatchTask implements BatchTaskInterface
 	public String getDevInfo(){
 		return "PENSBI.BME_ORDER_REP";
 	}
-	public boolean isDispDetail(){
-		return true;
+	public BatchTaskDispBean getBatchDisp(){
+		BatchTaskDispBean dispBean = new BatchTaskDispBean();
+		dispBean.setDispDetail(true);
+		dispBean.setDispRecordFailHead(true);
+		dispBean.setDispRecordFailDetail(true);
+		dispBean.setDispRecordSuccessHead(true);
+		dispBean.setDispRecordSuccessDetail(true);
+		return dispBean;
 	}
 	public String getValidateScript(){
 		String script ="";

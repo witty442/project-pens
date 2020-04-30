@@ -13,8 +13,9 @@
  // System.out.println("Role:"+user.getRole().getKey());
   
 %>
-<%if ( Utils.isNull(user.getRoleVanSales()).equalsIgnoreCase(User.VANSALES)){ %>
-   <jsp:include page="menu_vansales.jsp" flush="true"/>
+<%if ( Utils.isNull(user.getUserGroupName()).equalsIgnoreCase("Van Sales")
+	|| Utils.isNull(user.getUserGroupName()).equalsIgnoreCase("Credit Sales")){ %>
+   <jsp:include page="menu_external.jsp" flush="true"/>
 <%}else{%>
    <jsp:include page="menu_pens.jsp" flush="true"/>
 <%}%>

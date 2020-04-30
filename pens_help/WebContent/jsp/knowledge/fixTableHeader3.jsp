@@ -95,7 +95,11 @@ TABLE.table_fix td{
 </style>
 </head>
 <body>
-
+<p>
+fix head table alternative 3 (work colspan and rowspan)
+<br/>
+ (sample page preNissinOrder(pens_sa) ,Page AutoOrder(pens_bme))
+</p>
   <!--for demo wrap-->
   <div class="tbl-header">
     <table cellpadding="0" cellspacing="0" border="1" class='table_fix'>

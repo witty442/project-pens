@@ -168,8 +168,6 @@ PageVisit.processPageVisit(request,pageNameTemp);
 						        <jsp:include page="criteria/TTADMIN_Criteria.jsp" flush="true" />   
 						    <%}else if(SalesTargetConstants.PAGE_MTADMIN.equalsIgnoreCase(pageName)){ %>
 						        <jsp:include page="criteria/MTADMIN_Criteria.jsp" flush="true" />   
-						    <%}else if(SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){ %>
-						        <jsp:include page="criteria/SalesTargetPDCriteria.jsp" flush="true"/> 
 						    <%} %>
 					    </div>
 					  
@@ -177,14 +175,7 @@ PageVisit.processPageVisit(request,pageNameTemp);
 					  <%
 					  //System.out.println("Results:"+request.getSession().getAttribute("salesTargetForm_RESULTS"));
 					  if(request.getSession().getAttribute("salesTargetForm_RESULTS") != null) {
-						  if(SalesTargetConstants.PAGE_SALES_TARGET_PD.equalsIgnoreCase(pageName)){ 
-							  out.println("<div id ='scroll' >");
-						       out.println(request.getSession().getAttribute("salesTargetForm_RESULTS"));
-						      out.println("</div>");
-						  }else{ 
-					          out.println(request.getSession().getAttribute("salesTargetForm_RESULTS"));
-					      } 
-					  
+						 out.println(request.getSession().getAttribute("salesTargetForm_RESULTS"));
 					  %>
 						<!-- ************************Result ***************************************************-->
 						  <%if(SalesTargetConstants.PAGE_MTMGR.equalsIgnoreCase(pageName)){ %>

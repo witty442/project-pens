@@ -49,7 +49,7 @@ public class BatchTaskDAO {
 				//Get BatschTask Info
 				BatchTaskInfo taskInfo = new BatchTaskInfo();
 				taskInfo.setTaskName(pageName);
-				taskInfo.setDispDetail(new BatchTaskAction().getDispDetailByTaskname(pageName));
+				taskInfo.setDispBean(new BatchTaskAction().getBatchDispByTaskname(pageName));
 				batchTaskForm.setTaskInfo(taskInfo);
 			} else {
 				batchTaskForm.setResults(null);

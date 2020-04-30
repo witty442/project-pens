@@ -4,7 +4,7 @@ package com.pens.util;
 public class Test {
 
 	public static void main(String[] args) {
-		 String ddmmyyyy ="10/12/2562";
+		 String ddmmyyyy ="PD : PD บริษัท เอส.อาร์. ซุปเปอร์มาร์ท จำกัด(เพชรบูรณ์)";
          System.out.println("result:"+ddmmyyyy.replaceAll("\\/", ""));
 	}
 

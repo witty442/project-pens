@@ -25,4 +25,5 @@ public static String DATA_FILE  ="DATA_FILE";
  public static String IMPORT_EXCEL_SWITCH_ITEM_ADJStock = "ImportExcelSwitchItemAdjStock";
  public static String IMPORT_XLS_SALESOUT_LOTUS = "ImportExcelSalesOutLotus";
  public static String GEN_STOCK_ENDDATE_LOTUS = "GenStockEndDateLotus";
+ public static String IMPORT_EXCEL_ORDER_REP_CONFIG = "ImportExcelOrderRepConfig";
 }

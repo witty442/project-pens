@@ -213,6 +213,22 @@ public class ITManageAction extends I_Action {
 		}
 		return  mapping.findForward("printPayPopup");
 	}
+	public ActionForward exportAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
+		logger.debug(" exportAll ");
+		ITManageForm aForm = (ITManageForm) form;
+		try {
+			if(PAGE_IT_STOCK.equals(aForm.getPageName())){
+				 return new ITStockAction().exportAll(mapping, aForm, request, response);
+			}
+		} catch (Exception e) {
+			logger.info("Print report  Error");
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
+		} finally {
+			
+		}
+		return  mapping.findForward("printPayPopup");
+	}
 	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)

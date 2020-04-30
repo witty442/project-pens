@@ -1,288 +1,170 @@
-/** backup 1 year **/
-/**012560 */
-CREATE TABLE c_temp_location(
-	lat varchar(40),
-	lng varchar(40),
-	create_date timestamp,
-	error varchar(200)
-);
-/** 06/2560 **/
-alter table t_stock_line modify create_date date;
-alter table t_order add po_number varchar(20);
-/** 06/2560/Credit **/
-alter table t_stock_line
-add (  qty2 decimal(15,5),
-       qty3 decimal(15,5),
-       sub  decimal(15,5),
-       sub2 decimal(15,5),
-       sub3 decimal(15,5),
-       EXPIRE_DATE2 date,
-       EXPIRE_DATE3 date,
-       uom2 varchar(20)
-);
 
-/** 08/2560 **/
-alter table t_stock 
-add(back_avg_month varchar(5));
+/** 01-2561 **/
+alter table t_temp_import_trans
+modify seq decimal(15,2);
 
-alter table t_stock_line
-add(avg_order_qty int);
+alter table t_order_line add selling_price decimal(15,5);
 
-alter table t_stock_line
-modify expire_date date ;
+insert into pens.c_control_code values ('OrderUtils','canPrintBillCreditCaseVan','Y');
 
-alter table m_customer
-add (lat varchar(100),
-	lng varchar(100)
-	);
-	
-alter table m_customer
-add (trip_day varchar(5),
-	trip_day2 varchar(5),
-	trip_day3 varchar(5)
-	);
-	
-delete from pens.c_reference where reference_id in (2601,2602,2603,2604);
-insert into pens.c_reference values ('2601','PartyType','ร้านโชห่วย','ร้านโชห่วย' ,'P','Y','Y');
-insert into pens.c_reference values ('2602','PartyType','ร้านขายยา','ร้านขายยา','D','Y','Y' );
-insert into pens.c_reference values ('2603','PartyType','ร้านเพ็ทช็อป','ร้านเพ็ทช็อป','A','Y','Y');
-insert into pens.c_reference values ('2604','PartyType','7/11','7/11','S','Y','Y');
-
-insert into pens.c_reference values ('2700','CustShowTrip','ShowOnlyTrip','ShowOnlyTrip','Y','Y','Y');
-
-/** 10/2560 **/
-alter table c_reference modify value varchar(20);
- 
-insert into pens.c_reference values ('2800','CreditDateFix','CreditDateFix','CreditDateFix','01/01/2560','Y','Y');
-insert into pens.c_reference values ('2801','VanDateFix','VanDateFix','VanDateFix Case PD_PAID NO','01/10/2560','Y','Y');
-
-CREATE TABLE pens.t_receipt_pdpaid_no (
-	ORDER_NO varchar(20) NOT NULL,
+create  table t_pd_receipt_his (
+    ORDER_NO varchar(20) NOT NULL,
 	CUSTOMER_ID int(10),
 	ORDER_DATE date,
 	RECEIPT_AMOUNT decimal(10,2),
 	PDPAID_DATE date,
 	PD_PAYMENTMETHOD varchar(4),
+	EXPORTED char(1),
 	CREATED timestamp NOT NULL,
 	CREATED_BY int(10),
 	PRIMARY KEY (ORDER_NO)
 );
-CREATE TABLE pens.c_control_code (
-	class_name varchar(50) NOT NULL,
-	method_name varchar(50) NOT NULL,
-	ISACTIVE char(1) ,
-	PRIMARY KEY (class_name,method_name)
-);
-insert into pens.c_control_code values ('OrderUtils','canSaveCreditVan','Y');
-insert into pens.c_control_code values ('RunUpdateSalesAppAutoServlet','startDeploySalesAppAuto','N');
-alter table m_modifier_attr modify value_from decimal(12,4);
-alter table m_modifier_attr modify value_to decimal(12,4);
+insert into pens.c_control_code values ('RunScriptDBAction','runManualScriptProcessOLD','N');
+insert into pens.c_control_code values ('RunScriptDBAction','runManualScriptProcessNEW','Y');
+insert into pens.c_control_code values ('OrderProcess','fillLinesShowPromotion','Y');
+insert into pens.c_control_code values ('ModifierProcess','promotionalGoodProcessNew','Y');
+insert into pens.c_control_code values ('OrderProcess','sumQtyProductPromotionDuplicate','Y');
+/** 02-2561 **/
+insert into pens.c_control_code values ('PrinterUtils','selectPrinterSmallIsOnlineCheckOnline','Y');
+/** 05/2561 **/
+alter table t_order add van_payment_method varchar(15);
+insert into pens.c_reference values ('2900','VanPaymentMethod','เงินสด','เงินสด ','CASH','Y','Y');
+insert into pens.c_reference values ('2901','VanPaymentMethod','เงินเชื่อ','เงินเชื่อ','CREDIT','Y','Y');
 
-/** 11/2560 **/
-CREATE  TABLE pens.i_import_config (
-	table_name varchar(50) NOT NULL,
-	import_type varchar(40) NOT NULL,
-	script_sql varchar(1000) NOT NULL,
-	PRIMARY KEY (table_name,import_type)
-);
-delete from i_import_config where import_type ='pre-import-master';
-insert into  i_import_config values('m_modifier','pre-import-master','delete from m_relation_modifier|delete from m_qualifier|delete from m_modifier_attr|delete from m_modifier_line|delete from m_modifier|');
-insert into  i_import_config values('m_pricelist','pre-import-master','delete from m_pricelist|');
-insert into  i_import_config values('m_product_category','pre-import-master','delete from m_product_category|');
-insert into  i_import_config values('m_product_price','pre-import-master','delete from m_product_price|');
-insert into  i_import_config values('m_sales_target_new','pre-import-master','delete  from m_sales_target_new where MONTH(TARGET_FROM) = MONTH(sysdate())   AND YEAR(TARGET_FROM) = YEAR(sysdate())|');
-insert into  i_import_config values('m_uom','pre-import-master','delete from m_uom|');
-insert into  i_import_config values('m_uom_class','pre-import-master','delete from m_uom_class|');
-insert into  i_import_config values('m_uom_class_conversion','pre-import-master','delete from m_uom_class_conversion|');
-insert into  i_import_config values('m_uom_conversion','pre-import-master','delete from m_uom_conversion|');
+/** 06/2561 **/
+insert into pens.c_reference values ('3000','ProdShowFileSize','ขนาดไฟล์  Prod Show upload(KB)','ขนาดไฟล์  Prod Show upload(KB)','2000','Y','Y');
 
-CREATE TABLE pens.c_control_salesapp_version (
-	config_type varchar(50) NOT NULL,
-	value varchar(200) NOT NULL,
-	updated date,
-	PRIMARY KEY (config_type)
+create table t_prod_show(
+  Order_no varchar(30)not null,
+  Customer_no varchar(30)not null,	
+  doc_date	date,
+  remark varchar(100),
+  Exported	char(1),
+  CREATED timestamp NOT NULL,
+  CREATED_BY int(10),
+  UPDATED datetime ,
+  UPDATED_BY int(10),
+  PRIMARY KEY (order_no)
 );
-insert into pens.c_control_code values ('BatchImportWorker','reimportUpdateTrans','N');
-
-alter TABLE t_credit_note add doc_status varchar(5);
-update t_credit_note set doc_status ='SV' where (doc_status ='' or doc_status is null);
-
-CREATE  TABLE pens.t_adjust (
-	adjust_id bigint NOT NULL,
-	ar_invoice_no varchar(20) NOT NULL,
-	adjust_date date not null,
-	adjust_type varchar(20) NOT NULL,
-	adjust_amount decimal(10,2),
-	reason varchar(100) ,
-	comment varchar(100) ,
-	UPDATED timestamp,
-	UPDATED_BY int(10),
-	CREATED_BY int(10),
-	CREATED timestamp NOT NULL,
-	PRIMARY KEY (adjust_id)
+	
+create  table t_prod_show_line(
+ Order_no varchar(30)not null,
+  id int not null,
+  brand varchar(10)not null,	
+  pic1 varchar(100)not null,
+  pic2 varchar(100),
+  pic3 varchar(100),
+  CREATED timestamp NOT NULL,
+  CREATED_BY int(10),
+  UPDATED datetime ,
+  UPDATED_BY int(10),
+  PRIMARY KEY (order_no,id)
 );
-CREATE   TABLE pens.t_temp_import_trans (
-    file_name varchar(100) NOT NULL,
+
+/** 06/2561 Credit Version 2 **/
+alter table t_req_promotion add exported char(1);
+insert into pens.c_control_code values ('UpdateSalesProcess','ImportReceiptFunction2','Y');
+alter table pens.t_temp_import_trans modify seq decimal(15,3);
+CREATE TABLE pens.t_temp_import_trans_err (
+	file_name varchar(100) NOT NULL,
 	table_name varchar(50) NOT NULL,
 	import_type varchar(30) NOT NULL,
-	key_no varchar(100) not null,
-	line_str varchar(1000) not null,
+	key_no varchar(100) NOT NULL,
+	line_str varchar(1000) NOT NULL,
 	AMOUNT decimal(10,2),
-	receipt_no varchar(100) ,
-	seq bigint not null,
-	error_msg varchar(1000) not null,
-	created timestamp
+	receipt_no varchar(100),
+	seq decimal(15,3),
+	error_msg varchar(1000) NOT NULL,
+	created timestamp NOT NULL,
+	doc_status varchar(5)
 );
-CREATE TABLE pens.t_receipt_his (
-    TRANS_ID int(10) NOT NULL,
-	RECEIPT_ID int(10) NOT NULL,
-	RECEIPT_NO varchar(20) NOT NULL,
-	RECEIPT_DATE date,
-	ORDER_TYPE varchar(5),
-	CUSTOMER_ID int(10),
-	CUSTOMER_NAME varchar(200),
-	PAYMENT_METHOD varchar(5),
-	BANK varchar(100),
-	CHEQUE_NO varchar(20),
-	CHEQUE_DATE date,
-	RECEIPT_AMOUNT decimal(10,2),
-	INTERFACES char(1) NOT NULL,
-	DOC_STATUS char(5),
+
+/** 03/2562 **/
+INSERT INTO pens.c_doctype VALUES (444, 'StockReturn', 'StockReturn', 'Y');
+insert into pens.c_control_code values ('ClearDupDB','clearDupCustDB','N');
+insert into pens.c_control_code values ('SessionUtils','clearSessionUnusedFormModel','Y');
+alter table c_reference add is_load char(1);
+
+INSERT INTO c_reference(REFERENCE_ID, CODE, name, DESCRIPTION, value, ISACTIVE, is_load) 
+VALUES (2502, 'backDateInvStkReturn', 'backDateInvoiceStockReturn', 'backDateInvoiceStockReturn', '12', 'Y', 'N');
+CREATE TABLE pens.t_stock_return_init (
+	CUSTOMER_CODE varchar(30) NOT NULL,
+	ar_invoice_no varchar(30) NOT NULL,
+	inventory_item_id int(10) NOT NULL,
+	pri_qty decimal(15,5),
 	USER_ID int(10),
+	PRIMARY KEY (CUSTOMER_CODE,ar_invoice_no,inventory_item_id)
+);
+CREATE TABLE pens.t_stock_return (
+	request_number varchar(30) NOT NULL,
+	CUSTOMER_ID int(10) NOT NULL,
+	request_date date NOT NULL,
+	back_date date NOT NULL,
+	description varchar(300),
+	total_nonvat_amount decimal(15,5),
+	total_vat_amount decimal(15,5),
+	total_amount decimal(15,5),
+	status varchar(2),
+	exported char(1),
+	USER_ID int(10),
+	CREATED timestamp not null,
+	CREATED_BY varchar(20),
+	UPDATED timestamp NULL DEFAULT NULL,
+	UPDATED_BY varchar(20),
+	PRIMARY KEY (request_number)
+);
+CREATE TABLE pens.t_stock_return_line (
+	request_number varchar(30) NOT NULL,
+	line_number int(10) NOT NULL,
+	inventory_item_id int(10) NOT NULL,
+	ar_invoice_no varchar(30) NOT NULL,
+	
+	pri_qty decimal(15,5),
+	uom1_qty decimal(15,5),
+	uom2_qty decimal(15,5),
+	
+	uom2 varchar(20),
+	uom1_pac decimal(15,5),
+	uom2_pac decimal(15,5),
+	uom1_price decimal(15,5),
+	
+	uom1_Conv_Rate decimal(15,5),
+	uom2_Conv_Rate decimal(15,5),
+	
+	discount decimal(15,5),
+	total_amount decimal(15,5),
+	status varchar(2),
+	exported char(1),
+	USER_ID int(10),
+	CREATED timestamp not null,
+	CREATED_BY varchar(20),
+	UPDATED timestamp NULL DEFAULT NULL,
+	UPDATED_BY varchar(20),
+	PRIMARY KEY (request_number,line_number)
+);
+alter table ad_user add money_to_pens char(1);
+CREATE TABLE pens.t_bank_transfer (
+	line_id int(10) NOT NULL,
+	USER_ID int(10) NOT NULL,
+	create_date date NOT NULL,
+	transfer_date date NOT NULL,
+	transfer_type varchar(10) NOT NULL,
+	transfer_bank varchar(10) NOT NULL,
+	transfer_time varchar(10) NOT NULL,
+	amount decimal(15,5),
+	cheque_no varchar(30),
+	cheque_date date,
+	status varchar(2),
+	exported char(1),
 	CREATED timestamp NOT NULL,
-	CREATED_BY int(10),
+	CREATED_BY varchar(20),
 	UPDATED datetime,
-	UPDATED_BY int(10),
-	CREDIT_CARD_TYPE varchar(10),
-	DESCRIPTION varchar(200),
-	PREPAID char(1) NOT NULL,
-	APPLY_AMOUNT decimal(10,2),
-	EXPORTED char(1) NOT NULL,
-	INTERNAL_BANK varchar(5),
-	ISPDPAID varchar(1),
-	PDPAID_DATE date,
-	PD_PAYMENTMETHOD varchar(4),
-	TEMP2_EXPORTED varchar(1),
-	PRIMARY KEY (TRANS_ID,RECEIPT_ID)
-);
-CREATE TABLE pens.t_receipt_line_his (
-   TRANS_ID int(10) NOT NULL,
-	RECEIPT_LINE_ID int(10) NOT NULL,
-	LINE_NO int(10),
-	RECEIPT_ID int(10),
-	AR_INVOICE_NO varchar(20),
-	SALES_ORDER_NO varchar(20),
-	INVOICE_AMOUNT decimal(10,2),
-	CREDIT_AMOUNT decimal(10,2),
-	PAID_AMOUNT decimal(10,2),
-	REMAIN_AMOUNT decimal(10,2),
-	ORDER_ID int(10),
-	ORDER_LINE_ID int(10),
-	UPDATED datetime,
-	UPDATED_BY int(10),
-	CREATED_BY int(10),
-	CREATED timestamp NOT NULL,
-	DESCRIPTION varchar(200),
-	PRIMARY KEY (TRANS_ID,RECEIPT_LINE_ID)
-);
-CREATE TABLE pens.t_receipt_match_his (
-   TRANS_ID int(10) NOT NULL,
-	RECEIPT_MATCH_ID int(10) NOT NULL,
-	RECEIPT_BY_ID int(10),
-	RECEIPT_LINE_ID int(10),
-	PAID_AMOUNT decimal(15,5),
-	CREATED timestamp NOT NULL,
-	CREATED_BY int(10),
-	UPDATED datetime,
-	UPDATED_BY int(10),
-	RECEIPT_ID int(10),
-	PRIMARY KEY (TRANS_ID,RECEIPT_MATCH_ID)
+	UPDATED_BY varchar(20),
+	PRIMARY KEY (line_id)
 );
 
-CREATE TABLE pens.t_receipt_cn_his (
-   TRANS_ID int(10) NOT NULL,
-	RECEIPT_CN_ID int(10) NOT NULL,
-	CREDIT_NOTE_ID int(10) NOT NULL,
-	RECEIPT_ID int(10) NOT NULL,
-	CREATED timestamp NOT NULL,
-	CREATED_BY int(10) NOT NULL,
-	UPDATED timestamp,
-	UPDATED_BY int(10),
-	PAID_AMOUNT decimal(10,2),
-	REMAIN_AMOUNT decimal(10,2),
-	credit_amount decimal(10,2),
-	PRIMARY KEY (TRANS_ID,RECEIPT_CN_ID)
-);
-
-CREATE TABLE pens.t_receipt_match_cn_his (
-  TRANS_ID int(10) NOT NULL,
-	RECEIPT_MATCH_CN_ID int(10) NOT NULL,
-	RECEIPT_BY_ID int(10),
-	RECEIPT_CN_ID int(10),
-	PAID_AMOUNT decimal(10,2),
-	CREATED datetime,
-	CREATED_BY int(10),
-	UPDATED datetime,
-	UPDATED_BY int(10),
-	RECEIPT_ID int(10),
-	PRIMARY KEY (TRANS_ID,RECEIPT_MATCH_CN_ID)
-);
-
-CREATE TABLE pens.t_receipt_by_his (
-   TRANS_ID int(10) NOT NULL,
-	RECEIPT_BY_ID int(10) NOT NULL,
-	PAYMENT_METHOD varchar(5),
-	BANK varchar(100),
-	CHEQUE_NO varchar(20),
-	CHEQUE_DATE date,
-	RECEIPT_AMOUNT decimal(10,2),
-	CREDIT_CARD_TYPE varchar(30),
-	PAID_AMOUNT decimal(10,2),
-	REMAIN_AMOUNT decimal(10,2),
-	RECEIPT_ID int(10) NOT NULL,
-	CREATED_BY int(10),
-	UPDATED datetime,
-	UPDATED_BY int(10),
-	CREATED timestamp NOT NULL,
-	SEED_ID varchar(30),
-	CREDITCARD_EXPIRED varchar(5),
-	WRITE_OFF char(1) NOT NULL,
-	receive_Cash_Date date,
-	PRIMARY KEY (TRANS_ID,RECEIPT_BY_ID)
-);
-
-delete from c_reference where code='PaymentMethod';
-insert into c_reference values (1101,'PaymentMethod','เงินสด','เงินสด','CS','Y','Y');
-insert into c_reference values (1102,'PaymentMethod','เช็ค','เช็ค','CH','Y','Y');
-insert into c_reference values (1103,'PaymentMethod','Bank Transfer','เงินโอน','TR','Y','Y');
-insert into c_reference values (1104,'PaymentMethod','บัตรเครดิต','บัตรเครดิต','CR','Y','Y');
-insert into c_reference values (1105,'PaymentMethod','ชำระผ่าน PD','ชำระผ่าน PD','PD','N','Y');
-insert into c_reference values (1106,'PaymentMethod','ชำระผ่านแอร์เพย์','ชำระผ่านแอร์เพย์','AP','N','Y');
-
-alter table c_reference modify name varchar(255);
-delete from c_reference where code='TransferBank';
-insert into pens.c_reference values (2302 ,'TransferBank','ธนาคารไทยพาณิชย์|สาขาสาธุประดิษฐ์|068-2-81805-7' , 'ธนาคารไทยพาณิชย์-สาขาสาธุประดิษฐ์ 068-2-81805-7','002','Y','Y');					
-insert into pens.c_reference values (2303 ,'TransferBank','ธนาคารกสิกรไทย|สาขาท่าเรือสาธุประดิษฐ์|048-2-51789-9' , 'ธนาคารกสิกรไทย-สาขาท่าเรือสาธุประดิษฐ์ 048-2-51789-9','005','Y','Y');					
-insert into pens.c_reference values (2304 ,'TransferBank','ธนาคาร กรุงไทย จำกัด (มหาชน)|สาขาสาธุประดิษฐ์|083-0-32922-6' , 'ธนาคาร กรุงไทย จำกัด (มหาชน)-สาขาสาธุประดิษฐ์ 083-0-32922-6','009','Y','Y');					
-insert into pens.c_reference values (2305 ,'TransferBank','ธนาคารกรุงเทพ|สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์|195-4-75514-4' , 'ธนาคารกรุงเทพ-สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์ 195-4-75514-4','006','Y','Y');					
-insert into pens.c_reference values (2306 ,'TransferBank','ธนาคารกรุงเทพ|สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์|195-4-75402-2' , 'ธนาคารกรุงเทพ-สาขาถนนรัชดา-สี่แยกสาธุประดิษฐ์ 195-4-75402-2','001','Y','Y');					
-
-alter table t_receipt_by add receive_Cash_Date date;
-alter table t_receipt_by_his add receive_Cash_Date date;
-alter table t_temp_import_trans add doc_status varchar(5);
-
-insert into pens.c_lockbox values (3,'LCK03',2304,123);	
-insert into pens.c_lockbox values (4,'LCK01',2306,123);	
-insert into pens.c_lockbox values (5,'LCK05',2303,123);				
-insert into pens.c_lockbox values (6,'LCK06',2305,123);		
-insert into pens.c_lockbox values (7,'LCK07',2302,123);	
-
-update c_lockbox set lockbox_name ='LCK01' where lockbox_id =4;
-delete from c_lockbox where lockbox_id =1;
-
-alter table m_product add taxable char(1);
-alter table t_order add total_amount_non_vat decimal(15,2);
-alter table t_order_line add taxable char(1);
-update t_order_line set taxable ='Y' where (taxable ='' or taxable is null);
-
-alter table t_receipt_line add import_trans_id bigint;
+delete from pens.c_reference where reference_id in (2601,2602,2603,2604);
+insert into pens.c_reference values ('2601','PartyType','ร้านโชห่วย','ร้านโชห่วย' ,'P','Y','Y');
+insert into pens.c_reference values ('2602','PartyType','ร้านธงฟ้า','ร้านธงฟ้า','B','Y','Y' );
+insert into pens.c_reference values ('2603','PartyType','ร้านเพ็ทช็อป','ร้านเพ็ทช็อป','A','N','Y');
+insert into pens.c_reference values ('2604','PartyType','7/11','7/11','S','N','Y');

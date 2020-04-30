@@ -289,12 +289,17 @@ public class MOrderLine extends I_Model<OrderLine> {
 	 * @param targets
 	 * @throws Exception
 	 */
-	public void compareSalesTarget(SalesTargetNew[] targets,String dateFrom,String dateTo) throws Exception {
-		Connection conn = null;
+	public void compareSalesTarget(Connection conn,SalesTargetNew[] targets,SalesTargetNew salesTarget) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
+		String dateFrom="";
+		String dateTo ="";
 		try {
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			dateFrom = salesTarget.getSalesStartDate();
+			dateTo = salesTarget.getSalesEndDate();
+			logger.debug("dateFrom:"+dateFrom);
+			logger.debug("dateTo:"+dateTo);
+			
 			stmt = conn.createStatement();
 			String sql = "";
 			double totalAmount = 0;
@@ -389,9 +394,6 @@ public class MOrderLine extends I_Model<OrderLine> {
 			try {
 				stmt.close();
 			} catch (Exception e) {}
-			try {
-				conn.close();
-			} catch (Exception e2) {}
 		}
 	}
 
@@ -422,12 +424,15 @@ public class MOrderLine extends I_Model<OrderLine> {
 		}
 		sql += "  and ORDER_ID in ( \r\n";
 		sql += "	select ORDER_ID from t_order where doc_status = 'SV' \r\n";
+
 		sql += "	  and order_date >= '" + (DateToolsUtil.convertToTimeStamp(dateFrom==null?t.getTargetFrom():dateFrom)) + "' \r\n";
 		sql += "	  and order_date <= '" + (DateToolsUtil.convertToTimeStamp(dateTo==null?t.getTargetTo():dateTo)) + "' \r\n";
+		
 		sql += "	  and user_id = " + t.getUserId() + " \r\n";
 		sql += "	  and ar_invoice_no is not null \r\n";
 		sql += "  ) \r\n";
 
+		logger.debug("sql:\n"+sql.toString());
 		return sql;
 	}
 	

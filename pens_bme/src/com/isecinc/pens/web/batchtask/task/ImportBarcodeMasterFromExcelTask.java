@@ -29,6 +29,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
+import com.isecinc.pens.web.batchtask.BatchTaskDispBean;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.pens.util.Constants;
@@ -92,8 +93,14 @@ public class ImportBarcodeMasterFromExcelTask extends BatchTask implements Batch
 	public String getDevInfo(){
 		return "PENSBI.PENSBME_MST_REFERENCE";
 	}
-	public boolean isDispDetail(){
-		return true;
+	public BatchTaskDispBean getBatchDisp(){
+		BatchTaskDispBean dispBean = new BatchTaskDispBean();
+		dispBean.setDispDetail(true);
+		dispBean.setDispRecordFailHead(true);
+		dispBean.setDispRecordFailDetail(true);
+		dispBean.setDispRecordSuccessHead(true);
+		dispBean.setDispRecordSuccessDetail(true);
+		return dispBean;
 	}
 
 	public String getValidateScript(){

@@ -2,6 +2,7 @@
 package com.pens.util;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -146,6 +147,13 @@ public class Utils {
 		NumberFormat formatter = new DecimalFormat(format);
 		//No Round 
 		formatter.setRoundingMode(java.math.RoundingMode.DOWN);
+		return formatter.format(num);
+	}
+	
+	// Round Up  2.11 -> 3
+	public static String decimalFormatRoundUp(double num,String format){
+		NumberFormat formatter = new DecimalFormat(format);
+		formatter.setRoundingMode(RoundingMode.UP);
 		return formatter.format(num);
 	}
 	

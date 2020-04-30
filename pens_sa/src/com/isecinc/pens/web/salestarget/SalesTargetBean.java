@@ -93,13 +93,35 @@ public class SalesTargetBean implements Serializable{
 	private String reportType;
 	private String dispType;
 	private String pdQty;
+	private String pdStockQty;
 	
 	private List<SalesTargetBean> itemsList;
 	StringBuffer dataStrBuffer;
 	String sessionId;
 	private long userInputId;
+	private String dispCurrentStockPD;
+	private String dispRoundUp;
+		
+	    
+	public String getDispRoundUp() {
+		return dispRoundUp;
+	}
+	public void setDispRoundUp(String dispRoundUp) {
+		this.dispRoundUp = dispRoundUp;
+	}
 	
-	
+	public String getPdStockQty() {
+		return pdStockQty;
+	}
+	public void setPdStockQty(String pdStockQty) {
+		this.pdStockQty = pdStockQty;
+	}
+	public String getDispCurrentStockPD() {
+		return dispCurrentStockPD;
+	}
+	public void setDispCurrentStockPD(String dispCurrentStockPD) {
+		this.dispCurrentStockPD = dispCurrentStockPD;
+	}
 	public long getUserInputId() {
 		return userInputId;
 	}

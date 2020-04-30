@@ -62,6 +62,10 @@ public class LoginAction extends DispatchAction {
 			//Case Van Login dummy
 			if(user ==null && loginForm.getUserName().toLowerCase().startsWith("v")){
 				user = loginDummyVan(loginForm.getUserName(), loginForm.getPassword());
+			 
+			//Case user creditSale not found in c_user_info login by dummy
+			}else if(user ==null && loginForm.getUserName().toLowerCase().startsWith("s")){
+				user = loginDummyCredit(loginForm.getUserName(), loginForm.getPassword());
 			}
             
 			if (user == null) {
@@ -106,7 +110,7 @@ public class LoginAction extends DispatchAction {
 	
 	public ActionForward loginCrossServer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
-		Connection conn = null;
+		//Connection conn = null;
 		LoginForm loginForm = null;
 		String forwordStr = "pathRedirect";
 		String url = "";
@@ -149,11 +153,17 @@ public class LoginAction extends DispatchAction {
 			User user = new User();
 			user.setUserName(userName);
 			user.setPassword(password);
-			user.setUserGroupName("Van Sales");
-			user.setRoleVanSales(User.VANSALES);
+			if(userName.startsWith("S")){
+			   user.setUserGroupName("Credit Sales");
+			}else{
+			   user.setUserGroupName("Van Sales");
+			}
 			SalesrepBean salesrepBean =  SalesrepDAO.getSalesrepBeanByCode(user.getUserName());
 			if(salesrepBean != null){
 				user.setName(user.getUserName() +" "+salesrepBean.getSalesrepFullName());
+				user.setId(Utils.convertStrToInt(salesrepBean.getSalesrepId()));
+				user.setCode(salesrepBean.getCode());
+				user.setSalesrepFullName(salesrepBean.getSalesrepFullName());
 			}
 			
 			request.getSession(true).setAttribute("user", user);
@@ -179,13 +189,12 @@ public class LoginAction extends DispatchAction {
 			request.getSession(true).setAttribute("screenWidth", screenWidth);
 			request.getSession(true).setAttribute("GEN_PDF_SUCCESS", null);
 		} catch (Exception e) {
-			e.printStackTrace();
 			logger.error(e.getMessage());
 			request.setAttribute("errormsg", e.getMessage());
 			return mapping.findForward("fail");
 		} finally {
 			try {
-				conn.close();
+				//conn.close();
 			} catch (Exception e2) {}
 		}
 		return mapping.findForward(forwordStr);
@@ -201,7 +210,30 @@ public class LoginAction extends DispatchAction {
 				user.setName(user.getUserName() +" "+salesrepBean.getSalesrepFullName());
 				user.setPassword(password);
 				user.setUserGroupName("Van Sales");
-				user.setRoleVanSales(User.VANSALES);
+				//user.setRoleVanSales(User.VANSALES);
+				user.setId(Utils.convertStrToInt(salesrepBean.getSalesrepId()));
+				user.setCode(salesrepBean.getCode());
+				user.setSalesrepFullName(salesrepBean.getSalesrepFullName());
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(), e);
+		}
+		return user;
+	}
+	private User loginDummyCredit(String userName,String password){
+		User user = null;
+		try{
+			SalesrepBean salesrepBean =  SalesrepDAO.getSalesrepBeanByCode(userName);
+			if(salesrepBean != null && password.equalsIgnoreCase("1234")){
+				user = new User();
+				user.setUserName(userName);
+				user.setName(user.getUserName() +" "+salesrepBean.getSalesrepFullName());
+				user.setPassword(password);
+				user.setUserGroupName("Credit Sales");
+				//user.setRoleCreditSales(User.CREDITSALES);
+				user.setId(Utils.convertStrToInt(salesrepBean.getSalesrepId()));
+				user.setCode(salesrepBean.getCode());
+				user.setSalesrepFullName(salesrepBean.getSalesrepFullName());
 			}
 		}catch(Exception e){
 			logger.error(e.getMessage(), e);

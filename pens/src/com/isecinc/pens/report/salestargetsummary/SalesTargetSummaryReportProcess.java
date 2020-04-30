@@ -21,15 +21,16 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MSalesTargetNew;
 import com.isecinc.pens.model.MOrderLine;
+import com.isecinc.pens.model.MSalesTargetPeriod;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.model.MUOMConversion;
 
 
 /**
- * InvoiceDetailReportProcess Report
+ * SalesTargetSummaryReportProcess Report
  * 
- * @author Aneak.t
- * @version $Id: PerformanceReportProcess.java,v 1.0 10/11/2010 15:52:00 aneak.t Exp $
+ * @author WITTY
+ * @version $Id:$
  * 
  */
 
@@ -72,7 +73,6 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 		int i =0;
 		List<SalesTargetSummaryReport> pos = new ArrayList<SalesTargetSummaryReport>();
 		// Get Sales Target Match With Sales Order
-		
 		String p_dateFrom =report.getDateFrom();
 		String p_dateTo = report.getDateTo();
 		String p_productCodeFrom = report.getProductCodeFrom();
@@ -82,8 +82,22 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 	
 		int month = c.get(Calendar.MONTH)+1;
 		int year = c.get(Calendar.YEAR);
+		logger.debug("month:"+month+",year:"+year);
 		
-		logger.debug("month:"+month);
+		//New Requirement 30/03/2563 get period sales order from Config Table(pens.m_sales_target_period)
+		/*SalesTargetNew salesPeriod = MSalesTargetPeriod.getSalesPeriodDate(conn, String.valueOf(month), String.valueOf(year));
+		if(salesPeriod ==null){
+			//default by Target period date
+			salesPeriod = new SalesTargetNew();
+			salesPeriod.setMonth(String.valueOf(month));
+			salesPeriod.setYear(String.valueOf(year));
+			salesPeriod.setSalesStartDate(p_dateFrom);
+			salesPeriod.setSalesEndDate(p_dateTo);
+		}*/
+		
+		SalesTargetNew salesPeriod = new SalesTargetNew();
+		salesPeriod.setSalesStartDate(p_dateFrom);
+		salesPeriod.setSalesEndDate(p_dateTo);
 		
 		StringBuffer whereClause = new StringBuffer();
 		whereClause.append(" AND User_ID = "+user.getId());
@@ -102,7 +116,7 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 		
 		logger.debug("whereClause:"+whereClause.toString());
 		if(stns != null){
-			new MOrderLine().compareSalesTarget(stns, p_dateFrom, p_dateTo);
+			new MOrderLine().compareSalesTarget(conn,stns,salesPeriod);
 			
 			for(SalesTargetNew stn : stns){
 				SalesTargetSummaryReport result = new SalesTargetSummaryReport();

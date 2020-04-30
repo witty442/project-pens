@@ -1,11 +1,15 @@
 package com.isecinc.pens.web.itmanage;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +24,7 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.web.reportall.ReportAllForm;
 import com.pens.util.BeanParameter;
 import com.pens.util.BundleUtil;
 import com.pens.util.DBConnection;
@@ -46,16 +51,17 @@ public class ITStockAction extends I_Action {
 		Connection conn = null;
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
+			conn = DBConnection.getInstance().getConnectionApps();
+			
 			if("new".equals(action)){
 				aForm.setResultsSearch(null);
 				ITManageBean ad = new ITManageBean();
 				ad.setCreateUser(user.getUserName());
 				aForm.setBean(ad);
 			    
-				/*//init itemNameList
-				request.getSession().setAttribute("ITEM_NAME_LIST", ITStockDAO.initItemList());*/
+				//init itemNameList
+				request.getSession().setAttribute("ITEM_TYPE_LIST", ITStockDAO.initItemTypeList(conn));
 			}else if("back".equals(action)){
-				conn = DBConnection.getInstance().getConnection();
 				
 				ITManageBean cri  =aForm.getBeanCriteria();
 				//cri.setDocNo("");
@@ -292,6 +298,7 @@ public class ITStockAction extends I_Action {
 			
 			//Items
 			String[] lineId =request.getParameterValues("lineId");
+			String[] itemType =request.getParameterValues("itemType");
 			String[] itemName =request.getParameterValues("itemName");
 			String[] serialNo =request.getParameterValues("serialNo");
 			String[] qty =request.getParameterValues("qty");
@@ -302,9 +309,9 @@ public class ITStockAction extends I_Action {
 			
 			for(int i=0;i<5;i++){
 				ITManageBean item = new ITManageBean();
-
 				item.setLineId(Utils.convertStrToInt(lineId[i]));
-				item.setItemName(Utils.isNull(itemName[i]));
+				item.setItemType(Utils.isNull(itemType[i]));
+				item.setItemName(Utils.isNullDefault(itemName[i]," "));
 				item.setSerialNo(Utils.isNull(serialNo[i]));
 				item.setQty(Utils.isNull(qty[i]));
 				item.setRemark(Utils.isNull(remark[i]));
@@ -313,7 +320,7 @@ public class ITStockAction extends I_Action {
 				item.setCreateUser(user.getUserName());
 				item.setUpdateUser(user.getUserName());
 				
-				if( !Utils.isNull(item.getItemName()).equals("")){
+				if( !Utils.isNull(item.getItemType()).equals("")){
 					//insert
 					item.setLineId(i+1);
 					ITStockDAO.insertITStockItem(conn, item);
@@ -436,8 +443,8 @@ public class ITStockAction extends I_Action {
 						 bean.setQty("");
 						 bean.setRemark("");
 						 h.getItems().add(bean);
-					}
-				}
+					}//for
+				}//if
 
 				//Gen Report
 				String fileName = "it_stock_report";
@@ -449,9 +456,6 @@ public class ITStockAction extends I_Action {
 				//set printer success
 				request.setAttribute("printerSuccess", "printerSuccess");
 				logger.info("Print report PayIn Success");
-			}else{
-				request.setAttribute("Message", "ไม่พบข้อมูล ");
-				return  mapping.findForward("detail");
 			}
 		} catch (Exception e) {
 			logger.info("Print report Error");
@@ -465,6 +469,44 @@ public class ITStockAction extends I_Action {
 			}
 		}
 		return  mapping.findForward("printPayPopup");
+	}
+	public ActionForward exportAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("exportAll");
+		ITManageForm aForm = (ITManageForm) form;
+		User user = (User) request.getSession().getAttribute("user");;
+		String fileName ="data.xls";
+		Connection conn = null;
+		try {
+			conn = DBConnection.getInstance().getConnectionApps();
+			
+		    ITManageBean bean = ITStockDAO.searchReportList(conn,aForm.getBean());
+		    if(bean != null && bean.getDataStrBuffer() != null && bean.getDataStrBuffer().length() >0){
+	
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename="+fileName);
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(bean.getDataStrBuffer().toString());
+			    w.flush();
+			    w.close();
+	
+			    out.flush();
+			    out.close();
+		     }else{
+				request.setAttribute("Message", "ไม่พบข้อมูล");
+			 }
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {
+				
+			}
+		}
+		return mapping.findForward("reportAll");
 	}
 	
 	@Override

@@ -56,4 +56,45 @@ public class CustomerDAO {
 			}
 			return resultBean;
 		}
+	 
+	 public static String getCustName(String custCode) throws Exception{
+		 Connection conn = null;
+		 try{
+			 conn = DBConnection.getInstance().getConnection();
+			 return getCustName(conn,custCode);
+		 }catch(Exception e){
+			 throw e;
+		 }finally{
+			conn.close();
+		 }
+	}
+	public static String getCustName(Connection conn,String custCode){
+		String salesChannelDesc = "";
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		try{
+			if(Utils.isNull(custCode).equals("")){
+				return "";
+			}
+			sql.append("\n  SELECT customer_desc from PENSBI.XXPENS_BI_MST_CUSTOMER M  ");
+			sql.append("\n  where  customer_code ='"+custCode+"' \n");
+
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if (rst.next()) {
+				salesChannelDesc =Utils.isNull(rst.getString("customer_desc"));
+			}//while
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+	  return salesChannelDesc;
+	}
 }

@@ -53,6 +53,7 @@ public class StockOnhandForm extends I_Form {
 			this.getBean().setDispPlan("");
 			this.getBean().setDispHaveQty("");
 			this.getBean().setDispPrice("");
+			
 		}
 	}
     

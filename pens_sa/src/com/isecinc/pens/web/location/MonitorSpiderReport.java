@@ -307,6 +307,7 @@ public class MonitorSpiderReport {
 				sql.append("\n  where 1=1 ");
 				sql.append("\n  and cs.primary_salesrep_id = s.salesrep_id ");
 				sql.append("\n  and cs.code = s.code ");
+				sql.append("\n  and REGEXP_LIKE(cs.trip1,'^[[:digit:]]+$')  ");
 				//genWhereCondSql
 				sql.append(     genWhereCondSql(conn, "", c));
 				//genDay trip1
@@ -317,7 +318,7 @@ public class MonitorSpiderReport {
 					  
 					 sql.append("\n and (nvl(cs.trip1,0) >= "+startTrip +" and nvl(cs.trip1,0) <= "+endTrip +")");
 				}else{
-					 sql.append("\n and nvl(cs.trip1,0) = "+startTrip);
+					 sql.append("\n and nvl(cs.trip1,0) = "+startTrip+"");
 				}//if
 				sql.append("\n UNION ");
 				//Trip2
@@ -328,6 +329,7 @@ public class MonitorSpiderReport {
 				sql.append("\n  where 1=1 ");
 				sql.append("\n  and cs.primary_salesrep_id = s.salesrep_id ");
 				sql.append("\n  and cs.code = s.code ");
+				sql.append("\n  and REGEXP_LIKE(cs.trip2,'^[[:digit:]]+$')  ");
 				//genWhereCondSql
 				sql.append(     genWhereCondSql(conn, "", c));
 				//genDay trip1
@@ -338,7 +340,7 @@ public class MonitorSpiderReport {
 					  
 					 sql.append("\n and (nvl(cs.trip2,0) >= "+startTrip +" and nvl(cs.trip2,0) <= "+endTrip +")");
 				}else{
-					 sql.append("\n and nvl(cs.trip2,0) = "+startTrip);
+					 sql.append("\n and nvl(cs.trip2,0) = "+startTrip+"");
 				}//if
 				sql.append("\n UNION ");
 				//trip3
@@ -349,6 +351,7 @@ public class MonitorSpiderReport {
 				sql.append("\n  where 1=1 ");
 				sql.append("\n  and cs.primary_salesrep_id = s.salesrep_id ");
 				sql.append("\n  and cs.code = s.code ");
+				sql.append("\n  and REGEXP_LIKE(cs.trip3,'^[[:digit:]]+$')  ");
 				//genWhereCondSql
 				sql.append(     genWhereCondSql(conn, "", c));
 				//genDay trip1
@@ -359,7 +362,7 @@ public class MonitorSpiderReport {
 					  
 					 sql.append("\n and (nvl(cs.trip3,0) >= "+startTrip +" and nvl(cs.trip3,0) <= "+endTrip +")");
 				}else{
-					 sql.append("\n and nvl(cs.trip3,0) = "+startTrip);
+					 sql.append("\n and nvl(cs.trip3,0) = "+startTrip+"");
 				}//if
 				sql.append("\n UNION ");
 				//Case No set Trip (??)What 

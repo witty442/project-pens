@@ -28,6 +28,7 @@ import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
+import com.isecinc.pens.web.batchtask.BatchTaskDispBean;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.pens.util.Constants;
@@ -70,8 +71,14 @@ public class ImportItemGPRobinsonFromExcelTask extends BatchTask implements Batc
 	public String getDevInfo(){
 		return "PENSBI.PENSBME_ITEMBY_GP";
 	}
-	public boolean isDispDetail(){
-		return true;
+	public BatchTaskDispBean getBatchDisp(){
+		BatchTaskDispBean dispBean = new BatchTaskDispBean();
+		dispBean.setDispDetail(true);
+		dispBean.setDispRecordFailHead(true);
+		dispBean.setDispRecordFailDetail(true);
+		dispBean.setDispRecordSuccessHead(true);
+		dispBean.setDispRecordSuccessDetail(true);
+		return dispBean;
 	}
 	public String getValidateScript(){
 		String script ="";

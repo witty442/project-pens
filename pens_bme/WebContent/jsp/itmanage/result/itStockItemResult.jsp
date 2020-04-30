@@ -15,32 +15,19 @@
    int currPage =  itManageForm.getCurrPage();
    int startRec = itManageForm.getStartRec();
    int endRec = itManageForm.getEndRec();
+   int no = Utils.calcStartNoInPage(currPage, itManageForm.getPageSize());
 %>
+   <%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
    
-<div align="left">
-   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
-   <span class="pagelinks">
-	หน้าที่ 
-	 <% 
-		 for(int r=0;r<totalPage;r++){
-			 if(currPage ==(r+1)){
-		 %>
-			   <strong><%=(r+1) %></strong>
-		 <%}else{ %>
-		    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-		       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-	 <% }} %>				
-	</span>
-</div>
 	<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearch">
-	       <tr>
-	            <th >รหัสพนักงานขาย</th>
-				<th >ชื่อ-นามสกุล</th>
-				<th >เบิกคืน</th>
-				<th >วันที่ทำรายการ</th>
-				<th >แก้ไข /ดู </th>
-				<th >Copy</th>
-		   </tr>
+       <tr>
+            <th >รหัสพนักงานขาย</th>
+			<th >ชื่อ-นามสกุล</th>
+			<th >เบิกคืน</th>
+			<th >วันที่ทำรายการ</th>
+			<th >แก้ไข /ดู </th>
+			<th >Copy</th>
+	   </tr>
 		<% 
 		String tabclass ="lineE";
 		List<ITManageBean> resultList = itManageForm.getResultsSearch();
@@ -51,24 +38,24 @@
 				tabclass="lineO";
 			}
 			%>
-				<tr class="<%=tabclass%>">
-					<td class="td_text_center" width="10%"><%=mc.getSalesrepCode() %></td>
-					<td class="td_text" width="15%"><%=mc.getSalesrepFullName()%></td>
-					<td class="td_text_center" width="10%"><%=mc.getDocType().equalsIgnoreCase("Return")?"คืน":"เบิก"%>
-					</td>
-				    <td class="td_text_center" width="10%"><%=mc.getDocDate() %></td>
-				    
-					<td class="td_text_center" width="10%">
-						 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getId()%>')">
-						             แก้ไข /ดู 
-						 </a>
-					</td>
-					<td class="td_text_center" width="10%">
-						 <a href="javascript:openCopy('${pageContext.request.contextPath}','<%=mc.getId()%>')">
-						     Copy
-						 </a>
-					</td>
-				</tr>
+			<tr class="<%=tabclass%>">
+				<td class="td_text_center" width="10%"><%=mc.getSalesrepCode() %></td>
+				<td class="td_text" width="15%"><%=mc.getSalesrepFullName()%></td>
+				<td class="td_text_center" width="10%"><%=mc.getDocType().equalsIgnoreCase("Return")?"คืน":"เบิก"%>
+				</td>
+			    <td class="td_text_center" width="10%"><%=mc.getDocDate() %></td>
+			    
+				<td class="td_text_center" width="10%">
+					 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getId()%>')">
+					    <b> แก้ไข /ดู </b>
+					 </a>
+				</td>
+				<td class="td_text_center" width="10%">
+					 <a href="javascript:openCopy('${pageContext.request.contextPath}','<%=mc.getId()%>')">
+					    <b> Copy</b>
+					 </a>
+				</td>
+			</tr>
 		<%} %>
 		 
 </table>

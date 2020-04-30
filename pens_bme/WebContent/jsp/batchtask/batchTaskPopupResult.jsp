@@ -76,9 +76,11 @@ if(session.getAttribute("BATCH_TASK_RESULT") != null){
 <%} %>	
 
   <!-- Result Batch Task Result Import-->
-  <%System.out.println("batchTaskName:"+batchTaskForm.getTaskInfo().getDescription()+":"+batchTaskForm.getTaskInfo().isDispDetail()) ;%>
+  <%
+  System.out.println("batchTaskName:"+batchTaskForm.getTaskInfo().getDescription()+":"+batchTaskForm.getTaskInfo().getDispBean().isDispDetail()) ;
+  %>
   
-  <%if(batchTaskForm.getTaskInfo().isDispDetail()){ %>
+  <%if(batchTaskForm.getTaskInfo().getDispBean().isDispDetail()){ %>
      <jsp:include page="sub/AllResultBatchTaskPopup_sub.jsp"></jsp:include>
   <%} %>
 <%} %>	

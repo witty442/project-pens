@@ -59,7 +59,8 @@ function loadMe(){
 		    
 		//submitedGenStockOnhandTemp
 		var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopup&pageName=<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>';
-		popupFull(url,'<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>');
+		//popupFull(url,'<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>');
+		popupBatchTaskPopup(url);
    <%}%>
 }
 

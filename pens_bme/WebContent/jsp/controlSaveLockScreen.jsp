@@ -72,7 +72,7 @@
 var progressCount = 0;//CountPercent
 function startControlSaveLockScreenProgressBar(){
 	//To disable f5
-	 $(document).bind("keydown", disableF5);
+	//$(document).bind("keydown", disableF5);
 	   
     /** Init progressbar **/
     progressCount =1;
@@ -96,8 +96,8 @@ function updateProgress(status){
  	 }else{ //Success
  		 progressCount = 100;
  		 
- 		 $("#percent").html("<b>"+progressCount+" %</b>");
- 		
+ 		 //$("#percent").html("<b>"+progressCount+" %</b>");
+ 		 document.getElementById('percent').html = "<b>"+progressCount+" %</b>";
  		 document.getElementById('bar').setAttribute("style"," height: 40px;background-color: green;width:"+progressCount+"%");
  		 
  	 }  
@@ -106,8 +106,10 @@ function updateProgress(status){
  	 if (progressCount < 100) {  
  		  progressCount = Math.round(progressCount * 100) / 100;
  	
-	   	  $("#percent").html("<b>"+progressCount+" %</b>");
- 		  $("#progress").show();
+	   	  //$("#percent").html("<b>"+progressCount+" %</b>");
+ 		  //$("#progress").show();
+ 		  document.getElementById('percent').html = "<b>"+progressCount+" %</b>";
+ 		  document.getElementById('progress').style.visibility = 'visible';
  		  //set progress count
  		  document.getElementById('bar').setAttribute("style"," height: 40px;background-color: green;width:"+progressCount+"%");
 	  }
@@ -116,8 +118,8 @@ function updateProgress(status){
  function checkStatus(){
  	var status =  "0";//running
  	/** Task Not Success  and Re Check Status**/
-	    updateProgress(status);
-     window.setTimeout("checkStatus();", 2000);
+	updateProgress(status);
+    window.setTimeout("checkStatus();", 2000);
  }
  function disableF5(e) {
 		if (e.which == 116) e.preventDefault(); 

@@ -10,9 +10,9 @@ public class BarcodeUtils {
 	
 	public static void main(String[] a){
 		try{
-			logger.debug("885987000101:"+genBarcode("885987000101"));
-			logger.debug("885987000102:"+genBarcode("885987000102"));
-			logger.debug("885987000103:"+genBarcode("885987000103"));
+			System.out.println("885987000110:"+genBarcode("885987000110"));
+			//System.out.println("885987000108:"+genBarcode("885987000108"));
+			//System.out.println("885987000109:"+genBarcode("885987000109"));
 		}catch(Exception e){
 			e.printStackTrace();
 		}

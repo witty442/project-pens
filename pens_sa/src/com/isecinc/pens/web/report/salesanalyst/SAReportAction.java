@@ -25,6 +25,7 @@ import com.isecinc.pens.report.salesanalyst.SAInitial;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 
 
 /**
@@ -177,11 +178,15 @@ public class SAReportAction extends I_Action {
 				EXCEL_HEADER.append(" } \n");
 				EXCEL_HEADER.append("</style> \n");*/
 		    	
+		  
+		    	EXCEL_HEADER = ExcelHeader.EXCEL_HEADER;
+		    	
 		    	EXCEL_HEADER.append("<style> \n");
 		    	EXCEL_HEADER.append(" table, th, td{ \n");
 				EXCEL_HEADER.append("  height: 50px; \n");
 				EXCEL_HEADER.append(" } \n");
 				EXCEL_HEADER.append("</style> \n");
+		    	
 				
 		    	/** Replace Tag Html Img = img_XX **/
 		    	htmlCode = htmlCode.replaceAll("<img", "<img_xx");
@@ -192,6 +197,7 @@ public class SAReportAction extends I_Action {
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
 				response.setContentType("application/vnd.ms-excel");
 				
+				logger.debug(headerHtml);
 				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
 				w.write(headerHtml);
 			    w.flush();

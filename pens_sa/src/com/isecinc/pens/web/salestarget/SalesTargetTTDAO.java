@@ -1339,8 +1339,20 @@ public class SalesTargetTTDAO {
 		try{
 			for(int r=0;r<salesrepDataSaveList.size();r++){
 				h = salesrepDataSaveList.get(r);
-				//check documentNo
-				if(h.getId()==0){
+				
+				//check id is Exist
+				if(h.getId()==0 ){
+					//convert to target month year quarter
+					h = convertCriteria(h);
+					long idHeadExist = getIdTargetTempHead(conn, h);
+				    logger.debug("idHeadExist:"+idHeadExist);
+				    if(idHeadExist != 0){
+				       h.setId(idHeadExist);
+				    }
+				}
+				logger.debug("h.id="+h.getId());
+				
+				if(h.getId()==0 ){
 					//Gen Next ID Sequence
 					Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP");
 					if(id==0){
@@ -1353,9 +1365,9 @@ public class SalesTargetTTDAO {
 					h = convertCriteria(h);
 					
 					//check duplicate all case (TTSUPPER duplicate no reason )
-					if(isTargetTempHeadDup(conn, h)){
+					/*if(isTargetTempHeadDup(conn, h)){
 						throw new DataDuplicateException("DataDuplicate :please check");
-					}
+					}*/
 					
 					//save Head
 					insertXXPENS_BI_SALES_TARGET_TEMP_ByTTSUPER(conn, h);
@@ -1480,13 +1492,13 @@ public class SalesTargetTTDAO {
 	 * @param cri
 	 * @return
 	 */
-	public static boolean isTargetTempHeadDup(Connection conn,SalesTargetBean cri){
-		boolean dup = false;
+	public static long getIdTargetTempHead(Connection conn,SalesTargetBean cri){
+		long id = 0;
 		Statement stmt = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		try{
-			sql.append("\n select count(*) as c");
+			sql.append("\n select distinct id ");
 			sql.append("\n from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
 			sql.append("\n where 1=1");
 			sql.append("\n and M.target_month = '"+Utils.isNull(cri.getTargetMonth())+"'");
@@ -1496,17 +1508,16 @@ public class SalesTargetTTDAO {
 			sql.append("\n and M.brand = '"+cri.getBrand()+"'");
 			sql.append("\n and M.CUSTOMER_CATEGORY = '"+Utils.isNull(cri.getCustCatNo())+"'");
 			sql.append("\n and M.salesrep_id = "+Utils.isNull(cri.getSalesrepId())+"");
-			sql.append("\n and M.sales_channel = '"+Utils.isNull(cri.getSalesChannelNo())+"'");
+			
+			//sql.append("\n and M.sales_channel = '"+Utils.isNull(cri.getSalesChannelNo())+"'");
 			
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			if (rst.next()) {
-				if(rst.getInt("c")>0){
-					dup = true;
-				}
+				id= rst.getLong("id");
 			}//if
-			logger.debug("isTargetTempHeadDup -->>"+dup);
+			logger.debug("ID_TargetTempHeadDup -->>"+id);
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -1516,7 +1527,7 @@ public class SalesTargetTTDAO {
 				stmt.close();
 			} catch (Exception e) {}
 		}
-	 return dup;
+	 return id;
 	}
 	
 	/**

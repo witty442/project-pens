@@ -48,6 +48,7 @@
 		<form-bean name="vanForm" type="com.isecinc.pens.web.van.VanForm"/>
 		<form-bean name="projectCForm" type="com.isecinc.pens.web.projectc.ProjectCForm"/>
 		<form-bean name="reportAllForm" type="com.isecinc.pens.web.reportall.ReportAllForm" />
+		<form-bean name="boxNoForm" type="com.isecinc.pens.web.boxno.BoxNoForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -135,7 +136,7 @@
 		
 		<action name="salesTargetForm" path="/jsp/salesTargetAction" parameter="do" scope="session" type="com.isecinc.pens.web.salestarget.SalesTargetAction">
 			<forward name="search" path="/jsp/salestarget/salesTargetSearch.jsp" />
-			<forward name="searchPD" path="/jsp/salestarget/salesTargetPDSearch.jsp" />
+			<forward name="all" path="/jsp/salestarget/salesTargetAll.jsp" />
 			<forward name="detail" path="/jsp/salestarget/salesTarget.jsp" />
 			<forward name="detailTTMKT" path="/jsp/salestarget/salesTargetTTMKT.jsp" />
 			<forward name="detailTTSUPER" path="/jsp/salestarget/salesTargetTTSUPER.jsp" />
@@ -200,6 +201,11 @@
 			<forward name="reportAll" path="/jsp/reportAll/reportAll.jsp" />
 			<!-- <forward name="detail" path="/jsp/manualStock/manualStock.jsp" /> -->
 		</action>
+		<action name="boxNoForm" path="/jsp/boxNoAction" parameter="do" scope="session" type="com.isecinc.pens.web.boxno.BoxNoAction" >
+			<forward name="search" path="/jsp/boxNo/boxNoSearch.jsp" />
+			<forward name="detail" path="/jsp/boxNo/boxNo.jsp"/>
+		</action>
+		
 	</action-mappings>
  
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

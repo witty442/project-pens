@@ -421,10 +421,13 @@ public class SalesTargetDAO {
 			o.setTotalOrderAmt12Month(Utils.decimalFormat(totalOrderAmt12Month, Utils.format_current_2_disgit));
 			o.setTotalOrderAmt3Month(Utils.decimalFormat(totalOrderAmt3Month, Utils.format_current_2_disgit));
 			o.setCanFinish(canFinish);
+		
 			if(foundFinish){
 				o.setStatus(SalesTargetConstants.STATUS_FINISH);
+			}else{
+				o.setStatus("");
 			}
-			
+			logger.debug("foundFinish:"+foundFinish+",status:"+o.getStatus());
 		} catch (Exception e) {
 			throw e;
 		} finally {

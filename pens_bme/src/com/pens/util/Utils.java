@@ -45,9 +45,11 @@ public class Utils {
 	      
 	public static void main(String[] args){
 	    try{	
-	    	String input ="BME ME1D33B2NN เสื้อชั้นในบีมี590";
-	    	System.out.println(input.substring(input.indexOf(" ")+1,input.lastIndexOf(" ")));
-	        
+	    	//String input ="BME ME1D33B2NN เสื้อชั้นในบีมี590";
+	    	//System.out.println(input.substring(input.indexOf(" ")+1,input.lastIndexOf(" ")));
+	        System.out.println("101:"+(1%100));
+	        System.out.println("100:"+(100%100));
+	        System.out.println("200:"+(200%100));
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
@@ -831,6 +833,13 @@ public class Utils {
 		String str = (String) obj;
 		return str.trim();
 	}
+	public static String isNullDefault(Object obj,String defaultStr){
+		if(obj == null || (obj != null && isNull(obj).equals("")))
+		  return defaultStr;
+		String str = (String) obj;
+		return str.trim();
+	}
+	
 	public static String convertSciToDecimal(String scientificNotation){
 		//String scientificNotation = "8.854922341299E12";
 		Double scientificDouble = Double.parseDouble(scientificNotation);

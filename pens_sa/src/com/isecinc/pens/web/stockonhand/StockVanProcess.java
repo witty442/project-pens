@@ -144,7 +144,11 @@ public class StockVanProcess extends I_Action {
 				   request.getSession().setAttribute("stockOnhandForm_RESULT",null);
 				   aForm.setResultsSearch(null);
 				}else{
-					request.setAttribute("stockOnhandForm_RESULT", StockVanExport.genResultStockVanPD(aForm, request,"HTML"));
+					if( !Utils.isNull(aForm.getBean().getDispType()).equals("3")){
+					   request.setAttribute("stockOnhandForm_RESULT", StockVanExport.genResultStockVanPD(aForm, request,"HTML"));
+					}else{
+					   request.setAttribute("stockOnhandForm_RESULT", StockVanExport.genResultStockVanPDBySalesZone(aForm, request,"HTML"));
+					}
 				}
 			}else{
 			   //get max column by product or PD

@@ -26,6 +26,7 @@ import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
+import com.isecinc.pens.web.batchtask.BatchTaskDispBean;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.pens.util.Constants;
@@ -66,8 +67,14 @@ public class ImportExcelPICG899ToG07Task extends BatchTask implements BatchTaskI
 	}
 	
 	//Show detail BatchTaskResult or no
-	public boolean isDispDetail(){
-		return true;
+	public BatchTaskDispBean getBatchDisp(){
+		BatchTaskDispBean dispBean = new BatchTaskDispBean();
+		dispBean.setDispDetail(true);
+		dispBean.setDispRecordFailHead(true);
+		dispBean.setDispRecordFailDetail(true);
+		dispBean.setDispRecordSuccessHead(true);
+		dispBean.setDispRecordSuccessDetail(true);
+		return dispBean;
 	}
 	public String getValidateScript(){
 		String script ="";

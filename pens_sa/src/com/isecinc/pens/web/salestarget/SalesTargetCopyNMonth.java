@@ -219,7 +219,8 @@ public class SalesTargetCopyNMonth {
 			sql.append("\n  null as estimate_qty ,");
 			sql.append("\n  null as estimate_amt ,");
 			sql.append("\n  null as price,");
-			sql.append("\n  '"+curBean.getSessionId()+"' as session_id");
+			sql.append("\n  '"+curBean.getSessionId()+"' as session_id,");
+			sql.append("\n  0 as user_input_id ");
 			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP WHERE ID="+idCopy);
 		   // logger.debug("sql:"+sql);
 			
@@ -289,7 +290,8 @@ public class SalesTargetCopyNMonth {
 			sql.append("\n  (SELECT max(P.unit_price) from apps.xxpens_om_price_list_v P " );
 			sql.append("\n   where P.INVENTORY_ITEM_ID = L.INVENTORY_ITEM_ID " );
 			sql.append("\n   and P.list_header_id in("+ SQLHelper.converToTextSqlIn(priceListId)+")) as price ,");
-			sql.append("\n  '"+curBean.getSessionId()+"' as session_id");
+			sql.append("\n  '"+curBean.getSessionId()+"' as session_id,");
+			sql.append("\n  0 as user_input_id ");
 			sql.append("\n  FROM XXPENS_BI_SALES_TARGET_TEMP_L L ");
 			
 			//OLD

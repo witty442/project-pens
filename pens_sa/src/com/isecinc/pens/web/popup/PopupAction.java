@@ -190,7 +190,15 @@ public class PopupAction extends I_Action {
 				 
 			}else if("PD".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For SalestargetPD
-				 results = PopupDAO.searchPDList(popupForm,"P");
+				 results = PopupDAO.searchPDList(popupForm,"P",false);
+				 
+			}else if("PDProvince".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For SalestargetPD
+				 results = PopupDAO.searchPDList(popupForm,"P",true);
+				 
+			}else if("PDBoxNo".equalsIgnoreCase(popupForm.getPageName()) ){
+				//For BoxNo Page (return nissin box)
+				 results = PopupDAO.searchPDBoxNoList(popupForm,"P"); 
 				 
 			}else if("CustomerProjectC".equalsIgnoreCase(popupForm.getPageName()) ){
 				 results = PopupDAO.searchCustomerCreditSalesProjectCList(request,popupForm);
@@ -199,13 +207,15 @@ public class PopupAction extends I_Action {
 				 results = PopupDAO.searchCustomerBranchCreditSalesProjectCList(request,popupForm);
 			}
 			
-			 if(results != null && results.size() >0){
-				 request.getSession().setAttribute("DATA_LIST", results);
-			 }else{
-				 request.getSession().setAttribute("Message", "ไม่พบข่อมูล");
-			 }
-			 //mark flag search
-			 request.getSession().setAttribute("search_submit", "search");
+			logger.debug("results size["+results.size()+"]");
+			if(results != null && results.size() >0){
+			   request.getSession().setAttribute("DATA_LIST", results);
+			}else{
+			   request.getSession().removeAttribute("DATA_LIST");
+			   request.getSession().setAttribute("Message", "ไม่พบข่อมูล");
+			}
+			//mark flag search
+			request.getSession().setAttribute("search_submit", "search");
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()

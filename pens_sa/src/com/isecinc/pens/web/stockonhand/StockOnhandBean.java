@@ -39,6 +39,7 @@ public class StockOnhandBean implements Comparable<StockOnhandBean> ,Serializabl
 	private String createUser;
 	private String updateUser;
 	private String salesZone;
+	private String salesZoneName;
 	private String subInv;
 	private String subInvDesc;
 	private String reportType;
@@ -76,7 +77,20 @@ public class StockOnhandBean implements Comparable<StockOnhandBean> ,Serializabl
 	private String suggestedPoQty;
 	private String status;
 	
-
+	private String salesZoneQty;
+   
+	public String getSalesZoneQty() {
+		return salesZoneQty;
+	}
+	public void setSalesZoneQty(String salesZoneQty) {
+		this.salesZoneQty = salesZoneQty;
+	}
+	public String getSalesZoneName() {
+		return salesZoneName;
+	}
+	public void setSalesZoneName(String salesZoneName) {
+		this.salesZoneName = salesZoneName;
+	}
 	public String getCurrentQty() {
 		return currentQty;
 	}

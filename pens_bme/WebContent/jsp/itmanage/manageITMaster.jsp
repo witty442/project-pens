@@ -51,7 +51,7 @@ try{
 		  ITStockDAO.insertITMaster(conn, bean);
 		}
 		//Reinit itemNameList
-		request.getSession().setAttribute("ITEM_NAME_LIST", ITStockDAO.initItemList());
+		//request.getSession().setAttribute("ITEM_NAME_LIST", ITStockDAO.initItemList());
 		itemNameList = (List<ITManageBean>)session.getAttribute("ITEM_NAME_LIST");
 		msg ="บันทึกข้อมูลเรียบร้อยแล้ว <br/>";
 	}

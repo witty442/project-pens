@@ -18,7 +18,7 @@ import com.isecinc.pens.web.importall.page.ImportMasterOrderREPAction;
 import com.pens.util.Utils;
 
 /**
- * Summary Action
+ * ImportAllAction
  * 
  * @author WITTY
  * 
@@ -131,7 +131,7 @@ public class ImportAllAction extends I_Action {
 		ImportAllForm aForm = (ImportAllForm) form;
 		try {
 			 if("importMasterOrderREP".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
-				 //return new ReportEndDateLotusAction().searchBatch(mapping, aForm, request, response);
+				 return new ImportMasterOrderREPAction().searchBatch(mapping, aForm, request, response);
 			 }else if("ImportExcelPICG899ToG07".equalsIgnoreCase(aForm.getPageName())){
 		        return new ImportExcelPICG899ToG07Action().searchBatch(mapping, aForm, request, response);
 			 }else if("ImportFileSwitchItemAdjustStock".equalsIgnoreCase(aForm.getPageName()) ){
@@ -152,7 +152,7 @@ public class ImportAllAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		try {
 			 if("importMasterOrderREP".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
-				 
+				 return new ImportMasterOrderREPAction().searchBatchForm(mapping, aForm, request, response);
 			 }else if("ImportExcelPICG899ToG07".equalsIgnoreCase(aForm.getPageName())){
 		        return new ImportExcelPICG899ToG07Action().searchBatchForm(mapping, aForm, request, response);
 			 }else if("ImportFileSwitchItemAdjustStock".equalsIgnoreCase(aForm.getPageName()) ){
@@ -172,7 +172,7 @@ public class ImportAllAction extends I_Action {
 		ImportAllForm aForm = (ImportAllForm) form;
 		try {
 			 if("importMasterOrderREP".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
-				 
+				 return new ImportMasterOrderREPAction().clearBatchForm(mapping, aForm, request, response);
 			 }else if("ImportExcelPICG899ToG07".equalsIgnoreCase(aForm.getPageName())){
 		        return new ImportExcelPICG899ToG07Action().clearBatchForm(mapping, aForm, request, response);
 			 }else if("ImportFileSwitchItemAdjustStock".equalsIgnoreCase(aForm.getPageName()) ){

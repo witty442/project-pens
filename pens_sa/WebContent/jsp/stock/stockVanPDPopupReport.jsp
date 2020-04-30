@@ -15,8 +15,8 @@ System.out.println("pageName:"+pageName);
 %>
 
   <%if(StockConstants.PAGE_STOCK_CLOSE_VAN.equalsIgnoreCase(pageName)){ %>
-      <jsp:include page="page/stockCloseVanPage.jsp" flush="true" /> 
+      <jsp:include page="page/stockCloseVanPopupPage.jsp" flush="true" /> 
   <%}else if(StockConstants.PAGE_STOCK_CLOSEPD_VAN.equalsIgnoreCase(pageName)){ %>
-      <jsp:include page="page/stockPDVanPage.jsp" flush="true" />   
+      <jsp:include page="page/stockPDVanPopupPage.jsp" flush="true" />   
   <% } %>
 			

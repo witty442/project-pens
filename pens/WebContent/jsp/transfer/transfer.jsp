@@ -58,6 +58,9 @@ function clearForm(path) {
 }
 function save(path,moveOrderType){
 	if(checkTableCanSave()){
+		/** lock screen save **/
+		startControlSaveLockScreen();
+		
 		document.transferForm.action = path + "/jsp/transferAction.do?do=save";
 		document.transferForm.submit();
 		return true;
@@ -591,5 +594,7 @@ function sumTotal(){
 </table>
 </body>
 </html>
-
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->
 

@@ -45,7 +45,10 @@ public class SalesTargetForm extends I_Form {
 	
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 
-		
+		if(getBean() != null){
+			getBean().setDispCurrentStockPD("");
+			getBean().setDispRoundUp("");
+		}
 	}
     
    

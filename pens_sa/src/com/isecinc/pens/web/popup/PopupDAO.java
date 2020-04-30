@@ -101,23 +101,38 @@ public class PopupDAO {
 			}
 			return pos;
 		}
-	 public static List<PopupForm> searchPDList(PopupForm c,String pdCodeLike) throws Exception {
+	 public static List<PopupForm> searchPDList(PopupForm c,String pdCodeLike,boolean addProvince) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			List<PopupForm> pos = new ArrayList<PopupForm>();
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
 			try {
-				sql.append("\n SELECT distinct secondary_inventory_name,description ");
-				sql.append("\n from apps.mtl_secondary_inventories subinv where 1=1");
-				if( !Utils.isNull(c.getCodeSearch()).equals("")){
-					sql.append("\n and subinv.secondary_inventory_name ='"+c.getCodeSearch()+"' ");
+				if(addProvince){
+				   sql.append("\n SELECT distinct secondary_inventory_name,(description ||'('|| attribute6 ||')') as description ");
+				   sql.append("\n from apps.mtl_secondary_inventories subinv where 1=1");
+					if( !Utils.isNull(c.getCodeSearch()).equals("")){
+						sql.append("\n and subinv.secondary_inventory_name ='"+c.getCodeSearch()+"' ");
+					}
+					if( !Utils.isNull(c.getDescSearch()).equals("")){
+						sql.append("\n and (subinv.secondary_inventory_name Like '%"+c.getDescSearch()+"%'");
+						sql.append("\n  or attribute6 Like '%"+c.getDescSearch()+"%' )");
+					}
+				    sql.append("\n and subinv.secondary_inventory_name Like '"+pdCodeLike+"%'");
+				    sql.append("\n order by  subinv.secondary_inventory_name ");
+				}else{
+					sql.append("\n SELECT distinct secondary_inventory_name,description ");
+					sql.append("\n from apps.mtl_secondary_inventories subinv where 1=1");
+					if( !Utils.isNull(c.getCodeSearch()).equals("")){
+						sql.append("\n and subinv.secondary_inventory_name ='"+c.getCodeSearch()+"' ");
+					}
+					if( !Utils.isNull(c.getDescSearch()).equals("")){
+						sql.append("\n and subinv.description LIKE '%"+c.getDescSearch()+"%' ");
+					}
+				    sql.append("\n and subinv.secondary_inventory_name Like '"+pdCodeLike+"%'");
+				    sql.append("\n order by  subinv.secondary_inventory_name ");
 				}
-				if( !Utils.isNull(c.getDescSearch()).equals("")){
-					sql.append("\n and subinv.description LIKE '%"+c.getDescSearch()+"%' ");
-				}
-			    sql.append("\n and subinv.secondary_inventory_name Like '"+pdCodeLike+"%'");
-			    sql.append("\n order by  subinv.secondary_inventory_name ");
+				
 			    
 				logger.debug("sql:"+sql);
 				conn = DBConnection.getInstance().getConnectionApps();
@@ -145,7 +160,66 @@ public class PopupDAO {
 			}
 			return pos;
 		}
-	
+	 public static List<PopupForm> searchPDBoxNoList(PopupForm c,String pdCodeLike) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.append("\n select A.* FROM (");
+			    sql.append("\n SELECT distinct secondary_inventory_name,(description ||'('|| attribute6 ||')') as description ");
+			    sql.append("\n from apps.mtl_secondary_inventories subinv where 1=1");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and subinv.secondary_inventory_name ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and (subinv.secondary_inventory_name Like '%"+c.getDescSearch()+"%'");
+					sql.append("\n  or attribute6 Like '%"+c.getDescSearch()+"%' )");
+				}
+			    sql.append("\n and subinv.secondary_inventory_name Like '"+pdCodeLike+"%'");
+			    
+			    sql.append("\n UNION ALL ");
+			    
+			    //union all pd external (no pd pens)
+			    sql.append("\n SELECT PD_CODE as  secondary_inventory_name ,PD_DESC as description");
+			    sql.append("\n FROM PENSBI.XXPENS_BI_MST_PD_EXTERNAL WHERE 1=1");
+			    if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and PD_CODE ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and PD_DESC Like '%"+c.getDescSearch()+"%'");
+				}
+			    sql.append("\n and PD_CODE Like '"+pdCodeLike+"%'");
+			    sql.append("\n )A ");
+			    sql.append("\n order by  A.secondary_inventory_name ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnectionApps();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("secondary_inventory_name"));
+					item.setDesc(rst.getString("description"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
 	 public static List<PopupForm> searchItemStockVanList(PopupForm c) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;

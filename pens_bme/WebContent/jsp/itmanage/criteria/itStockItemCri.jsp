@@ -21,8 +21,9 @@ function search(path){
 	form.submit();
 	return true;
 }
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.itManageForm;
+	var path = document.getElementById("path").value;
 	form.action = path + "/jsp/itManageAction.do?do=searchHead&currPage="+currPage;
     form.submit();
     return true;
@@ -31,6 +32,13 @@ function newDoc(path){
 	 var form = document.itManageForm;
 	var param ="&id=0";
 	form.action = path + "/jsp/itManageAction.do?do=prepare&mode=add"+param;
+	form.submit();
+	return true; 
+}
+
+function exportAll(path){
+	 var form = document.itManageForm;
+	form.action = path + "/jsp/itManageAction.do?do=exportAll&";
 	form.submit();
 	return true; 
 }
@@ -170,6 +178,14 @@ function editItemMaster(path) {
 				<td>		
 					<html:text property="bean.zoneName" styleId ="zoneName" styleClass="disableText" readonly="true" size="50"></html:text>
 				   <html:hidden property="bean.zone" styleId ="zone" />
+				
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				ประเภทเอกสาร:
+				<html:select property="bean.docType">
+				  <html:option value=""></html:option>
+				  <html:option value="Requisition">เบิก</html:option>
+				  <html:option value="Return">คืน</html:option>
+				</html:select>
 				</td>
 			</tr>
 	   </table>
@@ -180,14 +196,16 @@ function editItemMaster(path) {
 				   
 					<a href="javascript:search('${pageContext.request.contextPath}')">
 					  <input type="button" value="    ค้นหา      " class="newPosBtnLong"> 
-					</a>
+					</a> &nbsp; &nbsp;	
 					<a href="javascript:newDoc('${pageContext.request.contextPath}')">
 					  <input type="button" value="    เพิ่มรายการใหม่      " class="newPosBtnLong"> 
-					</a>
+					</a> &nbsp; &nbsp;	
 					<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 					  <input type="button" value="   Clear   " class="newPosBtnLong">
-					</a>		
-					  &nbsp; &nbsp;	
+					</a>&nbsp; &nbsp;	
+					<a href="javascript:exportAll('${pageContext.request.contextPath}')">
+					  <input type="button" value=" Export ข้อมูลการเบิกล่าสุดของทุกหน่วย " class="newPosBtnLong"> 
+					</a>&nbsp; &nbsp;	
 					<%-- <a href="javascript:editItemMaster('${pageContext.request.contextPath}')">
 					     <input type="button" name="addItemMaster"
 					      value="เพิ่ม/แก้ไข ลิสรายชื่ออุปกรณ์"  class="newPosBtnLong"/>

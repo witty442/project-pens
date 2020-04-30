@@ -122,3 +122,26 @@ function popupFull(url){
       var popup = window.open(url, 'popup_window', params); 
       popup.moveTo(0,0);
 }
+function popupBatchTaskPopup(url){
+	
+	// Fixes dual-screen position   Most browsers  Firefox
+    var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+    var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+
+    var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+    var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+   
+    //manual screen
+    var w = width;
+    var h = 200;
+    var systemZoom = width / window.screen.availWidth;
+    var left = (width - w) / 2 / systemZoom + dualScreenLeft
+    var top = (height - h) / 2 / systemZoom + dualScreenTop
+    var title ='Submit Batch Task';
+    var newWindow = window.open(url, title, 'scrollbars=no,location=no,resizable=no,titlebar=no, width=' + (w/systemZoom) + ', height=' + (h/systemZoom) + ', top=' + top + ', left=' + left);
+
+    // Puts focus on the newWindow
+    if (window.focus) {
+        newWindow.focus();
+    }
+}

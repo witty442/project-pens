@@ -313,6 +313,14 @@
                 </a> 
               </li>  
            <%} %>
+           <%if ( UserUtils.userInRole("ROLE_VANDOC",user,new String[]{User.ADMIN, User.VANDOC}) ){ %>
+               <li>
+	               <a href="#" class="parent" 
+	               onclick="window.location='${pageContext.request.contextPath}/jsp/reportAllAction.do?do=prepare&pageName=BoxNoNissinReport&action=new';">
+	               <span><%no++;out.print(no);%>.<bean:message key="BoxNoNissinReport" bundle="sysprop"/></span>
+	               </a>  
+	            </li>  
+	       <%} %>
 		</ul>
 	</li>  
 <%}%>
@@ -386,6 +394,7 @@
 	 </ul>
 	</li>      
 <%}%>
+
 <!-- ************************************************************************** -->
 <li>
    <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/changePassword.jsp';"><span>เปลี่ยนรหัสผ่าน</span></a>	

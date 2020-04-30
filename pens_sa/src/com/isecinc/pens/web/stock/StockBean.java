@@ -53,6 +53,8 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	private String avgQty6;
 	private String expireDate;
 	private String requestDate;
+	private String billStoreCount;
+	private String checkStoreCount;
 	//total
 	private String salesZone;
 	private String salesZoneName;
@@ -78,6 +80,22 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 
     
     
+	public String getBillStoreCount() {
+		return billStoreCount;
+	}
+
+	public void setBillStoreCount(String billStoreCount) {
+		this.billStoreCount = billStoreCount;
+	}
+
+	public String getCheckStoreCount() {
+		return checkStoreCount;
+	}
+
+	public void setCheckStoreCount(String checkStoreCount) {
+		this.checkStoreCount = checkStoreCount;
+	}
+
 	public String getRequestNo() {
 		return requestNo;
 	}
@@ -719,6 +737,30 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	            }
 	        };
 	        
+	        public static Comparator<StockBean> BILL_STORE_COUNT_ASC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return Integer.parseInt(o1.billStoreCount) - Integer.parseInt(o2.billStoreCount);
+	            }
+	        };
+	        public static Comparator<StockBean> BILL_STORE_COUNT_DESC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return Integer.parseInt(o2.billStoreCount) - Integer.parseInt(o1.billStoreCount);
+	            }
+	        };
+	        public static Comparator<StockBean> CHECK_STORE_COUNT_ASC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return Integer.parseInt(o1.checkStoreCount) - Integer.parseInt(o2.checkStoreCount);
+	            }
+	        };
+	        public static Comparator<StockBean> CHECK_STORE_COUNT_DESC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return Integer.parseInt(o2.checkStoreCount) - Integer.parseInt(o1.checkStoreCount);
+	            }
+	        };
 	       /* public static Comparator<StockBean> SKU = new Comparator<StockBean>() {
 	            @Override
 	            public int compare(StockBean o1, StockBean o2) {

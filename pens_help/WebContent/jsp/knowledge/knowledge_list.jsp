@@ -221,7 +221,77 @@
 		    </textarea>
 		</div>	 
    </td></tr>
-   
+   <tr><td>
+        <b> Export To Excel By Javascript <a href="javascript:showDiv('div_exportExcelByJavascript');">Show Detail</a></b>
+         <div style="display: none;" id="div_exportExcelByJavascript">
+              <textarea rows="50" cols="160">
+              function fnExcelReport(){
+	 var path = document.getElementById("path").value;
+	 var style ="<style>"
+	         +".summary{"
+		     +"   font-weight: bold;"
+		     +" } "
+			 +".text{"
+		     +"   mso-number-format:'@';"
+		     +" } ";
+		     +"</style> ";
+		     
+	//export excel thai unicode character support
+	style+="<meta charset='utf-8'>";
+		     
+	var headerTable = genHeadTable(path);
+	// alert(headerTable);
+	 
+    var tab_text= style+headerTable+"\n <table border='2px'><tr bgcolor=''>";
+    var textRange; var j=0;
+    tab = document.getElementById('sort-table'); // id of table
+
+    for(j = 0 ; j < tab.rows.length ; j++){     
+        tab_text=tab_text+tab.rows[j].innerHTML+"</tr>";
+        //tab_text=tab_text+"</tr>";
+    }
+
+    tab_text= tab_text+"</table>";
+    tab_text= tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
+    tab_text= tab_text.replace(/<img[^>]*>/gi,""); // remove if u want images in your table
+    tab_text= tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // reomves input params
+
+    var ua = window.navigator.userAgent;
+   // alert("ua:"+ua);
+    var msie = ua.indexOf("MSIE "); 
+
+    if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+    {
+        alert("msie > 0");
+        txtArea1.document.open("txt/html","replace");
+        txtArea1.document.write(tab_text);
+        txtArea1.document.close();
+        txtArea1.focus(); 
+        sa=txtArea1.document.execCommand("SaveAs",true,"Say Thanks to Submit.xls");
+    }else{                 
+    	//other browser not tested on IE 11
+       // sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));  
+    
+    	 // Specify file name
+        var filename = filename?filename+'.xls':'data.xls';
+        // Create download link element
+        var downloadLink = document.createElement("a");
+        document.body.appendChild(downloadLink);
+        
+        //alert(tab_text);
+        // Create a link to the file
+        downloadLink.href = 'data:application/vnd.ms-excel, ' + encodeURIComponent(tab_text);
+     
+        // Setting the file name
+        downloadLink.download = filename;
+         
+        //triggering the function
+        downloadLink.click();
+    }
+}
+		    </textarea>
+		</div>	 
+   </td></tr>
   </table>
 </body>
 </html>

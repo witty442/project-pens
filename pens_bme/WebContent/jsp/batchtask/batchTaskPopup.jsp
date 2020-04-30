@@ -185,6 +185,7 @@ body {
 	   var stepMinUp = 1;
 	   var stepHaftMinUp = 0.5;
 	   var stepDotOne = 0.1;
+	   var stepDotZeroZeroOne = 0.001;
 	   var progressCount = 0;
 	   var useTimeMillisecs = 0;
 	   var startTime = new Date();
@@ -203,7 +204,9 @@ body {
 	   
 	   function updateProgress(status){
 	    	 if(status != '1' && status != "-1"){ //Running
-	    		 if(progressCount > 95){
+	    		 if(progressCount > 97){
+			      progressCount += stepDotZeroZeroOne; 
+	    		 }else if(progressCount > 95){
 		    	   progressCount += stepDotOne; 
 	    		 }else if(progressCount > 90){
 	    		   progressCount += stepHaftMinUp; 

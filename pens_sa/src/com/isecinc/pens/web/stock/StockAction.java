@@ -71,55 +71,54 @@ public class StockAction extends I_Action {
 			String popup = Utils.isNull(request.getParameter("popup")); 
 			pageName = Utils.isNull(request.getParameter("pageName"));
 			
-		
-				if("new".equals(action)){
-					pageName = Utils.isNull(request.getParameter("pageName"));
-					request.getSession().setAttribute("stockForm_RESULTS",null);
-					request.getSession(true).setAttribute("GEN_PDF_SUCCESS", null);
+			if("new".equals(action)){
+				pageName = Utils.isNull(request.getParameter("pageName"));
+				request.getSession().setAttribute("stockForm_RESULTS",null);
+				request.getSession(true).setAttribute("GEN_PDF_SUCCESS", null);
+				
+				StockBean sales = new StockBean();
+				logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
+				
+				//init Connection
+				conn = DBConnection.getInstance().getConnection();
+				
+				if (StockConstants.PAGE_STOCK_CREDIT.equalsIgnoreCase(pageName)){
+					StockControlPage.prepareSearchCreditReport(request, conn, user,pageName);
+					sales.setDispRequestDate("true");
+					sales.setDispLastUpdate("true");
 					
-					StockBean sales = new StockBean();
-					logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
-					
-					//init Connection
-					conn = DBConnection.getInstance().getConnection();
-					
-					if (StockConstants.PAGE_STOCK_CREDIT.equalsIgnoreCase(pageName)){
-						StockControlPage.prepareSearchCreditReport(request, conn, user,pageName);
-						sales.setDispRequestDate("true");
-						sales.setDispLastUpdate("true");
-						
-					}else if (StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){
-						sales.setStartDate(CConstants.getConstants(CConstants.STOCKCREDIT_CODE, CConstants.STOCK_CALLC_CREDIT_START_DATE).getValue());
-						//Case Sales Login filter show only salesrepCode 
-						if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
-							sales.setSalesrepCode(user.getUserName().toUpperCase());
-						}
-						//test 
-						/*sales.setCustomerCode("00249015");
-						sales.setBrand("101");*/
-					}else if (StockConstants.PAGE_STOCK_CLOSE_VAN.equalsIgnoreCase(pageName)){
-						forward ="stockVanReport";
-						StockControlPage.prepareSearchStockCloseVanReport(request, conn, user,pageName);
-						if(popup.equalsIgnoreCase("false")){
-							forward ="search";
-						}
-						
-					}else if (StockConstants.PAGE_STOCK_CLOSEPD_VAN.equalsIgnoreCase(pageName)){
-						forward ="stockVanReport";
-						StockControlPage.prepareSearchStockPDVanReport(request, conn, user,pageName);
-						if(popup.equalsIgnoreCase("false")){
-							forward ="search";
-						}
-					}else if (StockConstants.PAGE_STOCK_CR_EXPIRE.equalsIgnoreCase(pageName)){
-						StockControlPage.prepareSearchCreditExpireReport(request, conn, user,pageName);
-						
+				}else if (StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){
+					sales.setStartDate(CConstants.getConstants(CConstants.STOCKCREDIT_CODE, CConstants.STOCK_CALLC_CREDIT_START_DATE).getValue());
+					//Case Sales Login filter show only salesrepCode 
+					if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
+						sales.setSalesrepCode(user.getUserName().toUpperCase());
 					}
-					aForm.setBean(sales);
-				}else if("back".equals(action)){
-					pageName = aForm.getPageName();
-					logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
+					//test 
+					/*sales.setCustomerCode("00249015");
+					sales.setBrand("101");*/
+				}else if (StockConstants.PAGE_STOCK_CLOSE_VAN.equalsIgnoreCase(pageName)){
+					forward ="stockVanReport";
+					StockControlPage.prepareSearchStockCloseVanReport(request, conn, user,pageName);
+					if(popup.equalsIgnoreCase("false")){
+						forward ="search";
+					}
+					
+				}else if (StockConstants.PAGE_STOCK_CLOSEPD_VAN.equalsIgnoreCase(pageName)){
+					forward ="stockVanReport";
+					StockControlPage.prepareSearchStockPDVanReport(request, conn, user,pageName);
+					if(popup.equalsIgnoreCase("false")){
+						forward ="search";
+					}
+				}else if (StockConstants.PAGE_STOCK_CR_EXPIRE.equalsIgnoreCase(pageName)){
+					StockControlPage.prepareSearchCreditExpireReport(request, conn, user,pageName);
 					
 				}
+				aForm.setBean(sales);
+			}else if("back".equals(action)){
+				pageName = aForm.getPageName();
+				logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
+				
+			}
 			
 			logger.debug("forward:"+forward);
 		} catch (Exception e) {
@@ -143,7 +142,6 @@ public class StockAction extends I_Action {
 		try {
 			logger.debug("search Head :pageName["+pageName+"]");
 	
-		
 				  //Search Report
 				if(StockConstants.PAGE_STOCK_CREDIT.equalsIgnoreCase(pageName)){
 					if(action.equalsIgnoreCase("sort")){

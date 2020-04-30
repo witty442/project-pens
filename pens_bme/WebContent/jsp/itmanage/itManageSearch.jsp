@@ -164,6 +164,7 @@ function setDataPopupValue(code,desc,desc2,desc3,pageName){
 		                   
 					    <!-- hidden field -->
 					   <html:hidden property="pageName"/>
+					   <input type="hidden" name="path" id ="path" value="${pageContext.request.contextPath}"/>
 					</html:form>
 					<!-- BODY -->
 					</td>

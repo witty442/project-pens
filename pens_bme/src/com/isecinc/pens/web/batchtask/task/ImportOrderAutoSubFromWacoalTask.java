@@ -19,6 +19,7 @@ import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
+import com.isecinc.pens.web.batchtask.BatchTaskDispBean;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.pens.util.Constants;
@@ -62,8 +63,14 @@ public class ImportOrderAutoSubFromWacoalTask extends BatchTask implements Batch
 		return "Import Order(PENSBI.PENSBME_ORDER) Customer in (PENSBI.PENSBME_MST_REFERENCE reference_code = 'AutoPOtoORACLE') To Oracle "
 				+ "<br/> (apps.XXPENS_PO_ORDER_IMPORT_MST,apps.XXPENS_PO_ORDER_IMPORT_DT) ";
 	}
-	public boolean isDispDetail(){
-		return true;
+	public BatchTaskDispBean getBatchDisp(){
+		BatchTaskDispBean dispBean = new BatchTaskDispBean();
+		dispBean.setDispDetail(true);
+		dispBean.setDispRecordFailHead(true);
+		dispBean.setDispRecordFailDetail(true);
+		dispBean.setDispRecordSuccessHead(true);
+		dispBean.setDispRecordSuccessDetail(true);
+		return dispBean;
 	}
 	public List<BatchTaskListBean> getParamListBox(){
 		List<BatchTaskListBean> listAll = new ArrayList<BatchTaskListBean>();

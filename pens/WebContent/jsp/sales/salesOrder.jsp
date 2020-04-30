@@ -987,3 +987,8 @@ function validateVanCreditLimit(){
 <div id="brand-dialog"></div>
 <div id="selectProduct" >No Product To Display!</div>
 <div id="error-dialog"><div id="error-dialog-message" style="color:red;"></div></div>
+
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->
+

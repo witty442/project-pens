@@ -341,10 +341,9 @@ function addItemPickStock(path,index,groupCode,pensItem){
 	     param += "&index="+index;
 	        
 		url = path + "/jsp/addItemPickStockAction.do?do=prepare&action=new"+param;
-		//window.open(encodeURI(url),"",
-				   //"menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=680px,height=<%=screentHeight%>,status=no,left="+ 50 + ",top=" + 0);
+
 		var adjustDelFromFullHeight = -10;
-		PopupCenterFullHeightCustom(url, "Add Request Pick Item", 680,adjustDelFromFullHeight);
+		PopupCenterFullHeightCustom(encodeURI(url), "Add Request Pick Item", 680,adjustDelFromFullHeight);
 	}
 	return false;
 }

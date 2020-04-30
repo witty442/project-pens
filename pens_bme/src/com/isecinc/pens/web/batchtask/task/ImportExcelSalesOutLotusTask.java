@@ -25,6 +25,7 @@ import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.web.batchtask.BatchTask;
 import com.isecinc.pens.web.batchtask.BatchTaskDAO;
+import com.isecinc.pens.web.batchtask.BatchTaskDispBean;
 import com.isecinc.pens.web.batchtask.BatchTaskInterface;
 import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.pens.util.Constants;
@@ -61,8 +62,14 @@ public class ImportExcelSalesOutLotusTask extends BatchTask implements BatchTask
 	}
 	
 	//Show detail BatchTaskResult or no
-	public boolean isDispDetail(){
-		return true;
+	public BatchTaskDispBean getBatchDisp(){
+		BatchTaskDispBean dispBean = new BatchTaskDispBean();
+		dispBean.setDispDetail(true);
+		dispBean.setDispRecordFailHead(true);
+		dispBean.setDispRecordFailDetail(true);
+		dispBean.setDispRecordSuccessHead(true);
+		dispBean.setDispRecordSuccessDetail(true);
+		return dispBean;
 	}
 	public String getValidateScript(){
 		String script ="";
@@ -442,16 +449,22 @@ public class ImportExcelSalesOutLotusTask extends BatchTask implements BatchTask
 				ps.setDouble(index++, Utils.convertStrToDouble(qty));
 				ps.setDouble(index++, 0);//Gross_sales
 				ps.setDouble(index++, 0);//return_amt
-				ps.setDouble(index++, netSalesInclVat);
-				ps.setDouble(index++, vatAmount);
-				ps.setDouble(index++, netSalesExcVat);
+				
+				ps.setDouble(index++, netSalesInclVat);//NET_SALES_INCL_VAT
+				ps.setDouble(index++, vatAmount);//VAT_AMT
+				ps.setDouble(index++, netSalesExcVat);//NET_SALES_EXC_VAT
+				
 				ps.setDouble(index++, gpPercent);
-				ps.setDouble(index++, gpAmount);
-				ps.setDouble(index++, vatOnGpAmount);
-				ps.setDouble(index++, gpAmountInclVat);
-				ps.setDouble(index++, 0);//ap_amount
-				ps.setDouble(index++, 0);//TOTAL_VAT_AMT
-				ps.setDouble(index++, 0);//AP_AMOUNT_INCL_VAT
+				//OLD Case 1
+				ps.setDouble(index++, 0);//gpAmount
+				ps.setDouble(index++, 0);//vatOnGpAmount
+				ps.setDouble(index++, 0);//gpAmountInclVat
+				
+				//new Edit 07/04/2020:Case1
+				ps.setDouble(index++, gpAmount);//ap_amount (GROSS SALES EXCL VAT Excel:column:15)
+				ps.setDouble(index++, vatOnGpAmount);//TOTAL_VAT_AMT (VAT AMOUNT Excel:19)
+				ps.setDouble(index++, gpAmountInclVat);//AP_AMOUNT_INCL_VAT(AMOUNT PAYABLE INCL VAT Excel:20)
+				
 				ps.setDate(index++, new java.sql.Date(new Date().getTime()));
 				ps.setString(index++, monitorModel.getCreateUser());
 				
