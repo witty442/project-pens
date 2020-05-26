@@ -4,8 +4,15 @@ public class StockBeanUtils {
 	double priAllQty;
 	double priQty;
 	double subQty;
+	private double remainAmount;
 	
 	
+	public double getRemainAmount() {
+		return remainAmount;
+	}
+	public void setRemainAmount(double remainAmount) {
+		this.remainAmount = remainAmount;
+	}
 	public double getPriAllQty() {
 		return priAllQty;
 	}

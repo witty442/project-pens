@@ -13,7 +13,7 @@ import com.pens.util.DBConnection;
  * SequenceProcessAll Class
  * 
  * @author Witty
- * @version $Id: SequenceProcessAll.java,v 1.0 18/07/2010 15:52:00 atiz.b Exp $
+ * @version $Id: SequenceProcessAll.java,v 1.0 18/07/2012 15:52:00 $
  * 
  */
 public class SequenceProcessAll {

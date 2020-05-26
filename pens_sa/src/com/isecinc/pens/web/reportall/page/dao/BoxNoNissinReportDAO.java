@@ -96,7 +96,7 @@ public class BoxNoNissinReportDAO {
 	int c =1;
 	try{
 		//GenDocNo
-		BigDecimal seq = SequenceProcessAll.getIns().getNextValue("XXPENS_BI_CONTROL_WASTE_BOXNO");
+		BigDecimal seq = SequenceProcessAll.getIns().getNextValue("XXPENS_BI_CONTROL_WASTE_BOXNO", new Date());
 		String docNo = "B"+DateUtil.stringValue(new Date(), "yyMM",DateUtil.local_th)+Utils.decimalFormat(seq.doubleValue(),"00");
 		o.setDocNo(docNo);
 		logger.debug("docNo:"+o.getDocNo());
@@ -334,16 +334,16 @@ public class BoxNoNissinReportDAO {
 		int totalBox = 0;
 		List<BoxNoBean> itemsList = new ArrayList<BoxNoBean>();
 		try {
-			sql.append("\n  SELECT " );
-			sql.append("\n   h.period,h.period_desc,h.pd_code");
-			sql.append("\n  ,(select A.description from(");
+			sql.append("\n SELECT " );
+			sql.append("\n  h.period,h.period_desc,h.pd_code");
+			sql.append("\n ,( select A.description from(");
 			sql.append("\n   select sn.secondary_inventory_name as pd_code ");
 			sql.append("\n   ,(sn.description ||'('|| sn.attribute6 ||')') as description ");
-			sql.append("\n   from apps.mtl_secondary_inventories sn ");
-			sql.append("\n   where sn.secondary_inventory_name like 'P%'  ");
-			sql.append("\n   union all");
-			sql.append("\n   select pd_code, pd_desc as description from PENSBI.XXPENS_BI_MST_PD_EXTERNAL ");
-			sql.append("\n   where pd_code like 'P%'");
+			sql.append("\n    from apps.mtl_secondary_inventories sn ");
+			sql.append("\n    where sn.secondary_inventory_name like 'P%'  ");
+			sql.append("\n    union all");
+			sql.append("\n    select pd_code, pd_desc as description from PENSBI.XXPENS_BI_MST_PD_EXTERNAL ");
+			sql.append("\n    where pd_code like 'P%'");
 			sql.append("\n   )A where A.pd_code = h.pd_code");
 			sql.append("\n  ) as pd_desc");
 			sql.append("\n  ,sum(h.total_box) as total_box" );
@@ -351,8 +351,8 @@ public class BoxNoNissinReportDAO {
 			sql.append("\n  where 1=1 ");
 			//Gen Where SQL
 			sql.append(genWhereCondSql(conn, mCriteria, user,true));
-			sql.append("\n  GROUP BY h.period,h.period_desc,h.pd_code  \n");
-			sql.append("\n  ORDER BY h.pd_code asc  \n");
+			sql.append("\n  GROUP BY h.period,h.period_desc,h.pd_code  ");
+			sql.append("\n  ORDER BY h.pd_code asc ");
 			logger.debug("sql:"+sql);
 		
 			stmt = conn.createStatement();

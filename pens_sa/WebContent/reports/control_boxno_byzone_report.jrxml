@@ -98,7 +98,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="16"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{pdCode}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[" "+$F{pdCode}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="402" y="0" width="154" height="23"/>

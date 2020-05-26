@@ -9,11 +9,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.process.SequenceProcessAll;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class StockMCDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -508,7 +508,7 @@ public class StockMCDAO {
 			  
 			//logger.debug("SQL:"+sql);
 			//Gen ID running
-			model.setId(SequenceProcessAll.getIns().getNextValue("MC_COUNTSTK_HEADER"));
+			model.setId(SequenceProcessAll.getIns().getNextValue("MC_COUNTSTK_HEADER").intValue());
 
 			ps = conn.prepareStatement(sql.toString());
 			

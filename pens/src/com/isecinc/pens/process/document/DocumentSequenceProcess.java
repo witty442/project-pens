@@ -48,6 +48,7 @@ public abstract class DocumentSequenceProcess {
 	protected static final int STOCK_NUMBER = 222;
 	protected static final int PRODSHOW_NUMBER = 333;
 	protected static final int STOCK_RETURN_NUMBER = 444;
+	protected static final int STOCK_DISCOUNT_NUMBER = 555;
 	protected static final int MAX_SEQ_NO = 9999;
 	
 	protected SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", new Locale("th", "TH"));

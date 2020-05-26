@@ -1,10 +1,12 @@
 package com.isecinc.pens.model;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -12,39 +14,42 @@ import org.apache.log4j.Logger;
 
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
+import util.NumberToolsUtil;
 
+import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.StockDiscount;
 import com.isecinc.pens.bean.StockDiscountLine;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.PopupDAO;
+import com.isecinc.pens.dao.StockBeanUtils;
+import com.isecinc.pens.dao.StockUtilsDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.document.StockReturnDocumentProcess;
+import com.isecinc.pens.init.InitialReferences;
+import com.isecinc.pens.process.document.StockDiscountDocumentProcess;
 import com.isecinc.pens.web.popup.PopupForm;
 
 
 public class MStockDiscount {
 
-	private Logger logger = Logger.getLogger("PENS"); 
+	private static Logger logger = Logger.getLogger("PENS"); 
 	public static String STATUS_SAVE = "SV";//Active
 	public static String STATUS_VOID = "VO";//cancel
 	
 	public static String STATUS_EXPORTED = "Y";//Active
 	public static String STATUS_NO_EXPORTED = "N";//cancel
 	
-	public static String ORG_ID_DEFAULT = "84";
 	
     private static double totalAmount = 0;
     
-    public int getTotalRowStockReturn(Connection conn,StockDiscount bean,User user) throws Exception {
+    public int getTotalRowStockDiscount(Connection conn,StockDiscount bean,User user) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		int totalRow = 0;
 		StringBuffer sql = new StringBuffer("");
 		try{
-			sql.append(" select count(*) as c from t_stock_return h ");
+			sql.append(" select count(*) as c from t_stock_discount h ");
 			sql.append("\n  where 1=1 ");
 			sql.append("\n  and  h.user_id ="+user.getId()+"");
 			
@@ -77,7 +82,7 @@ public class MStockDiscount {
 		
 		return totalRow;
 	}
-    public List<StockDiscount> searchStockReturnList(Connection conn ,StockDiscount mCriteria,User user,String whereCause,int start) throws Exception {
+    public List<StockDiscount> searchStockDiscountList(Connection conn ,StockDiscount mCriteria,User user,String whereCause,int start) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		List<StockDiscount> list = new ArrayList<StockDiscount>();
@@ -86,7 +91,7 @@ public class MStockDiscount {
 		try {
 			sql.append("\n select A.* from (");
 			sql.append("\n  SELECT h.*, C.name as customer_name ,C.code as customer_code");
-			sql.append("\n   from t_stock_return h, m_customer C");
+			sql.append("\n   from t_stock_discount h, m_customer C");
 			sql.append("\n  where C.customer_id=h.customer_id ");
 			sql.append("\n  and  h.user_id ="+user.getId()+"");
 			
@@ -151,13 +156,13 @@ public class MStockDiscount {
 		}
 		return list;
     }
-    public int getMaxLineNumberStockReturnLine(Connection conn,String requestNumber) throws Exception {
+    public int getMaxLineNumberStockDiscountLine(Connection conn,String requestNumber) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		int maxLineId = 0;
 		StringBuffer sql = new StringBuffer("");
 		try{
-			sql.append(" select max(line_number) as line_number from t_stock_return_line h ");
+			sql.append(" select max(line_number) as line_number from t_stock_discount_line h ");
 			sql.append("\n  where h.request_number ='"+requestNumber+"'");
 	
 			logger.debug("sql:"+sql.toString());
@@ -193,34 +198,34 @@ public class MStockDiscount {
 				
 				Date requestDate = Utils.parse(head.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
-				requestNumber = new StockReturnDocumentProcess().getNextDocumentNo(requestDate,user.getCode(),user.getId(), conn);
+				requestNumber = new StockDiscountDocumentProcess().getNextDocumentNo(requestDate,user.getCode(),user.getId(), conn);
 				
 				//prepare MoveOrder
 				logger.debug("requestNumber["+requestNumber+"]");
 				//prepare MoveOrder Model
 				head.setRequestNumber(requestNumber);
 
-				head = insertStockReturn(conn , head);
+				head = insertStockDiscount(conn , head);
 				
 			}else{
-				updateStockReturn(conn , head);
+				updateStockDiscount(conn , head);
 			}
 			
 	        //insert or update line
 			if(head.getLineList() != null && head.getLineList().size() > 0){
 				//get max lineId
-				int maxLineNumber =getMaxLineNumberStockReturnLine(conn, head.getRequestNumber());
+				int maxLineNumber =getMaxLineNumberStockDiscountLine(conn, head.getRequestNumber());
 				// Process normal
 				for(int i =0;i< head.getLineList().size();i++){
 					StockDiscountLine line = (StockDiscountLine)head.getLineList().get(i);
 					line.setUpdateBy(head.getCreatedBy());
 					
 					if(line.getLineId() != 0){
-						updateStockReturnLine(conn,head, line);
+						updateStockDiscountLine(conn,head, line);
 					}else{
 						maxLineNumber++;
 				        line.setLineId(maxLineNumber);
-					    insertStockReturnLine(conn,head, line);
+					    insertStockDiscountLine(conn,head, line);
 					}
 					//set for no del line
 					lineIdNodel += line.getLineId()+",";
@@ -231,7 +236,7 @@ public class MStockDiscount {
 			if(head.getLineNoDeleteList() != null && head.getLineNoDeleteList().size() > 0){
 				for(int i =0;i< head.getLineNoDeleteList().size();i++){
 					String lineNumber = (String)head.getLineNoDeleteList().get(i);
-					int r = deleteStockReturnLine(conn, head.getRequestNumber(),Utils.convertStrToInt(lineNumber));
+					int r = deleteStockDiscountLine(conn, head.getRequestNumber(),Utils.convertStrToInt(lineNumber));
 					
 					logger.debug("delete requestNumber["+head.getRequestNumber()+"]lineId["+lineNumber+"]result["+r+"]");
 				}
@@ -241,7 +246,7 @@ public class MStockDiscount {
 			if( !Utils.isNull(lineIdNodel).equals("")){
 				lineIdNodel = lineIdNodel.substring(0,lineIdNodel.length()-1);
 				
-				int r = deleteStockReturnLineNotInLineId(conn, head.getRequestNumber(),lineIdNodel);
+				int r = deleteStockDiscountLineNotInLineId(conn, head.getRequestNumber(),lineIdNodel);
 				logger.debug("Delete Step 2 result:"+r);
 			}
 			
@@ -266,13 +271,13 @@ public class MStockDiscount {
 		}
 	}
 	
-	public StockDiscount updateStockReturn(StockDiscount head) throws Exception {
+	public StockDiscount updateStockDiscount(StockDiscount head) throws Exception {
 		Connection conn = null;
 		try {
 		    conn = new DBCPConnectionProvider().getConnection(conn);
 		    conn.setAutoCommit(false);
 		    
-		    updateStockReturn(conn,head);
+		    updateStockDiscount(conn,head);
 		    
 		    conn.commit();
 		} catch (Exception ex) {
@@ -286,15 +291,15 @@ public class MStockDiscount {
 		return head;
 	}
 	
-	private StockDiscount updateStockReturn(Connection conn ,StockDiscount head) throws Exception {
+	private StockDiscount updateStockDiscount(Connection conn ,StockDiscount head) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
 			
-			StringBuffer sql = new StringBuffer("update t_stock_return \n");
+			StringBuffer sql = new StringBuffer("update t_stock_discount \n");
 			sql.append(" set  request_date = ? ,description =? ");
-			sql.append(" ,total_nonvat_amount =? ,total_vat_amount =?,total_amount =? \n"); 
-			sql.append(" ,updated =? ,updated_by = ?   \n"); 
+			sql.append(" ,line_amount =? ,vat_amount =?,net_amount =? \n"); 
+			sql.append(" ,updated =? ,updated_by = ? ,vat_rate =?  \n"); 
 			sql.append(" where request_number =?  \n");
 
 			//logger.debug("SQL:"+sql);
@@ -303,11 +308,12 @@ public class MStockDiscount {
 			ps = conn.prepareStatement(sql.toString());
 			ps.setDate(++index, new java.sql.Date(DateToolsUtil.convertToTimeStamp(head.getRequestDate()).getTime()));//request_date
 			ps.setString(++index, Utils.isNull(head.getDescription()));
-			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalAllNonVatAmount()));
-			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalAllVatAmount()));
-			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalAllAmount()));
+			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalLineAmount()));
+			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalVatAmount()));
+			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalNetAmount()));
 			ps.setDate(++index, Utils.getCurrentSqlDate());//updated
 			ps.setString(++index, head.getUpdateBy());//updated_by
+			ps.setString(++index, head.getVatRate());
 			ps.setString(++index, head.getRequestNumber());//request_number
 
 			int ch = ps.executeUpdate();
@@ -324,7 +330,7 @@ public class MStockDiscount {
 		return head;
 	}
 	
-	public StockDiscount updateCancelStockReturn(StockDiscount head) throws Exception {
+	public StockDiscount updateCancelStockDiscount(StockDiscount head) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
 		Connection conn = null;
@@ -332,9 +338,9 @@ public class MStockDiscount {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			conn.setAutoCommit(false);
 			
-			StringBuffer sql = new StringBuffer("update t_stock_return \n");
+			StringBuffer sql = new StringBuffer("update t_stock_discount \n");
 			sql.append(" set  status = ?  ,description = ? \n"); 
-			sql.append(" ,updated =? ,updated_by = ? ,total_nonvat_amount=?,total_vat_amount=? ,total_amount=? \n"); 
+			sql.append(" ,updated =? ,updated_by = ? ,line_amount=?,vat_amount=? ,net_amount=? \n"); 
 			sql.append(" where request_number =?  \n");
 
 			//logger.debug("SQL:"+sql);
@@ -345,9 +351,9 @@ public class MStockDiscount {
 			ps.setString(++index, Utils.isNull(head.getDescription()));//Description
 			ps.setDate(++index, Utils.getCurrentSqlDate());//updated
 			ps.setString(++index, head.getUpdateBy());//updated_by
-			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalAllNonVatAmount()));
-			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalAllVatAmount()));
-			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalAllAmount()));
+			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalLineAmount()));
+			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalVatAmount()));
+			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalNetAmount()));
 			ps.setString(++index, head.getRequestNumber());//request_number
 
 			int ch = ps.executeUpdate();
@@ -370,16 +376,16 @@ public class MStockDiscount {
 	}
 	
 	
-	private StockDiscount insertStockReturn(Connection conn ,StockDiscount model) throws Exception {
+	private StockDiscount insertStockDiscount(Connection conn ,StockDiscount model) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			StringBuffer sql = new StringBuffer("INSERT INTO t_stock_return( \n");
+			StringBuffer sql = new StringBuffer("INSERT INTO t_stock_discount( \n");
 			sql.append(" request_number, request_date, description, \n");
 			sql.append(" status,exported, USER_ID, CREATED,CREATED_BY,customer_id \n");
-			sql.append(",total_nonvat_amount,total_vat_amount,total_amount \n");
+			sql.append(",line_amount,vat_amount,net_amount,vat_rate \n");
 			sql.append(",back_date,updated) \n");
-			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
+			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) \n");
 			  
 			//logger.debug("SQL:"+sql);
 			
@@ -394,9 +400,10 @@ public class MStockDiscount {
 			ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(++index, model.getCreatedBy());
 			ps.setInt(++index, model.getCustomerId());
-			ps.setDouble(++index, Utils.convertStrToDouble(model.getTotalAllNonVatAmount()));
-			ps.setDouble(++index, Utils.convertStrToDouble(model.getTotalAllVatAmount()));
-			ps.setDouble(++index, Utils.convertStrToDouble(model.getTotalAllAmount()));
+			ps.setDouble(++index, Utils.convertStrToDouble(model.getTotalLineAmount()));
+			ps.setDouble(++index, Utils.convertStrToDouble(model.getTotalVatAmount()));
+			ps.setDouble(++index, Utils.convertStrToDouble(model.getTotalNetAmount()));
+			ps.setString(++index, Utils.isNull(model.getVatRate()));
 			ps.setDate(++index, new java.sql.Date((Utils.parse(model.getBackDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 			ps.setNull(++index,java.sql.Types.TIMESTAMP);//updated 
 			
@@ -415,18 +422,17 @@ public class MStockDiscount {
 	}
 	
 
-	private boolean insertStockReturnLine(Connection conn ,StockDiscount head,StockDiscountLine line) throws Exception {
+	private boolean insertStockDiscountLine(Connection conn ,StockDiscount head,StockDiscountLine line) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			StringBuffer sql = new StringBuffer("INSERT INTO t_stock_return_line( \n");
-			sql.append(" request_number, line_number, inventory_item_id,ar_invoice_no, \n"); 
+			StringBuffer sql = new StringBuffer("INSERT INTO t_stock_discount_line( \n");
+			sql.append(" request_number, line_number, inventory_item_id,product_name,ar_invoice_no, \n"); 
 			sql.append(" pri_qty,uom1_qty,uom2_qty, uom2,uom1_pac,uom2_pac, \n");
-			sql.append(" uom1_price,discount,total_amount, \n");
-			//sql.append(" remain_pri_all_qty,remain_pri_qty,remain_sub_qty, \n");
+			sql.append(" uom1_price,line_amount,vat_amount,net_amount, \n");
 			sql.append(" uom1_Conv_Rate,uom2_Conv_Rate, \n");
 			sql.append(" status,exported, USER_ID, CREATED, CREATED_BY,UPDATED) \n");//24
-			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");//,?,?,?) \n");
+			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
 			//logger.debug("SQL:"+sql);
 			int index = 0;
@@ -436,6 +442,7 @@ public class MStockDiscount {
 			ps.setString(++index, head.getRequestNumber());//request_number
 			ps.setInt(++index, line.getLineId());//line_number
 			ps.setInt(++index, Utils.convertStrToInt(line.getInventoryItemId()));//inventory_item_id
+			ps.setString(++index, Utils.isNull(line.getProductName()));//arInvoiceNo
 			ps.setString(++index, Utils.isNull(line.getArInvoiceNo()));//arInvoiceNo
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getPriQty()));// priQty = calc from(uom1Qty and uom2Qty)
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getUom1Qty()));//
@@ -444,8 +451,9 @@ public class MStockDiscount {
 			ps.setInt(++index, Utils.convertStrToInt(line.getUom1Pac()));//
 			ps.setInt(++index, Utils.convertStrToInt(line.getUom2Pac()));//
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getUom1Price()));//uom1 price/ ctn
-			ps.setDouble(++index, Utils.convertStrToDouble(line.getDiscount()));//
-			ps.setDouble(++index, Utils.convertStrToDouble(line.getTotalAmount()));//
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getLineAmount()));//
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getVatAmount()));//
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getNetAmount()));//
 			
 		/*	ps.setDouble(++index, Utils.convertStrToDouble(line.getRemainPriAllQty()));// 
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getRemainPriQty()));//
@@ -475,13 +483,13 @@ public class MStockDiscount {
 		return result;
 	}
 	
-	private boolean updateStockReturnLine(Connection conn ,StockDiscount head,StockDiscountLine line) throws Exception {
+	private boolean updateStockDiscountLine(Connection conn ,StockDiscount head,StockDiscountLine line) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			StringBuffer sql = new StringBuffer("update t_stock_return_line set \n");
-			sql.append(" inventory_item_id =?,ar_invoice_no =?,pri_qty =?, uom1_qty =? ,uom2_qty =? , uom2=? , \n");
-			sql.append(" uom1_pac=?, uom2_pac=? ,uom1_price=? ,discount =? ,total_amount =? ,");
+			StringBuffer sql = new StringBuffer("update t_stock_discount_line set \n");
+			sql.append(" inventory_item_id =?,product_name =? ,ar_invoice_no =?,pri_qty =?, uom1_qty =? ,uom2_qty =? , uom2=? , \n");
+			sql.append(" uom1_pac=?, uom2_pac=? ,uom1_price=? ,line_amount =? ,vat_amount=? ,net_amount =? ,");
 			//sql.append(" remain_pri_all_qty =?,remain_pri_qty=?,remain_sub_qty=?, \n");
 			sql.append(" uom1_Conv_Rate=?,uom2_Conv_Rate=?, \n");
 			sql.append(" USER_ID=?, UPDATED =?, UPDATED_BY =?  \n");
@@ -493,6 +501,7 @@ public class MStockDiscount {
 			ps = conn.prepareStatement(sql.toString());
 			
 			ps.setInt(++index, Utils.convertStrToInt(line.getInventoryItemId()));//inventory_item_id
+			ps.setString(++index, Utils.isNull(line.getProductName()));//
 			ps.setString(++index, Utils.isNull(line.getArInvoiceNo()));//
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getPriQty()));// preQty = calc from(Uom1Qty and uom2Tyq)
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getUom1Qty()));//
@@ -501,8 +510,9 @@ public class MStockDiscount {
 			ps.setInt(++index, Utils.convertStrToInt(line.getUom1Pac()));//
 			ps.setInt(++index, Utils.convertStrToInt(line.getUom2Pac()));//
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getUom1Price()));//uom1 price/ ctn
-			ps.setDouble(++index, Utils.convertStrToDouble(line.getDiscount()));//
-			ps.setDouble(++index, Utils.convertStrToDouble(line.getTotalAmount()));//
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getLineAmount()));//
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getVatAmount()));//
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getNetAmount()));//
 			
 			/*ps.setDouble(++index, Utils.convertStrToDouble(line.getRemainPriAllQty()));// 
 			ps.setDouble(++index, Utils.convertStrToDouble(line.getRemainPriQty()));//
@@ -532,11 +542,11 @@ public class MStockDiscount {
 		return result;
 	}
 	
-	private boolean updateStockReturnLineCaseLineCancel(Connection conn ,StockDiscount head,StockDiscountLine line) throws Exception {
+	private boolean updateStockDiscountLineCaseLineCancel(Connection conn ,StockDiscount head,StockDiscountLine line) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			StringBuffer sql = new StringBuffer("update t_stock_return_line set \n");
+			StringBuffer sql = new StringBuffer("update t_stock_discount_line set \n");
 			sql.append(" status = ? , \n"); 
 			sql.append(" USER_ID=?, UPDATED =?, UPDATED_BY =?  \n");
 			sql.append(" WHERE request_number=? and line_number = ? \n");
@@ -568,11 +578,11 @@ public class MStockDiscount {
 		return result;
 	}
 	
-	private boolean deleteStockReturnLineByRequestNumber(Connection conn ,StockDiscount head) throws Exception {
+	private boolean deleteStockDiscountLineByRequestNumber(Connection conn ,StockDiscount head) throws Exception {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			StringBuffer sql = new StringBuffer("delete from t_stock_return_line   \n");
+			StringBuffer sql = new StringBuffer("delete from t_stock_discount_line   \n");
 			sql.append(" WHERE request_number=? \n");
 			
 			logger.debug("SQL:"+sql);
@@ -594,12 +604,12 @@ public class MStockDiscount {
 		}
 		return result;
 	}
-	private int deleteStockReturnLine(Connection conn ,String requestNumber,int lineNumber) throws Exception {
+	private int deleteStockDiscountLine(Connection conn ,String requestNumber,int lineNumber) throws Exception {
 		int r= 0;
 		PreparedStatement ps = null;
 		try {
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" delete from t_stock_return_line  \n");
+			sql.append(" delete from t_stock_discount_line  \n");
 			sql.append(" WHERE request_number=? \n");
 			sql.append(" and line_number=? \n");
 			
@@ -620,12 +630,12 @@ public class MStockDiscount {
 		}
 		return r;
 	}
-	private int deleteStockReturnLineNotInLineId(Connection conn ,String requestNumber,String notInLineId) throws Exception {
+	private int deleteStockDiscountLineNotInLineId(Connection conn ,String requestNumber,String notInLineId) throws Exception {
 		int r= 0;
 		PreparedStatement ps = null;
 		try {
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" delete from t_stock_return_line  \n");
+			sql.append(" delete from t_stock_discount_line  \n");
 			sql.append(" WHERE request_number=? \n");
 			sql.append(" and line_number not in("+notInLineId+") \n");
 			
@@ -651,7 +661,7 @@ public class MStockDiscount {
         Date backDate = null;
 		StringBuilder sql = new StringBuilder();
 		try {
-			sql.append("\n  SELECT back_date from t_stock_return h");
+			sql.append("\n  SELECT back_date from t_stock_discount h");
 			sql.append("\n  where  h.request_number ='"+ requestNumber + "'");
 			logger.debug("sql:" + sql);
 
@@ -673,7 +683,7 @@ public class MStockDiscount {
 		return backDate;
 	}
 	
-	public StockDiscount searchStockReturn(StockDiscount mCriteria, User user)
+	public StockDiscount searchStockDiscount(StockDiscount mCriteria, User user)
 			throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -684,7 +694,7 @@ public class MStockDiscount {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 
 			sql.append("\n  SELECT h.*, C.name as customer_name ,C.code as customer_code");
-			sql.append("\n  from t_stock_return h, m_customer C");
+			sql.append("\n  from t_stock_discount h, m_customer C");
 			sql.append("\n  where C.customer_id=h.customer_id ");
 			sql.append("\n  and  h.request_number ='"+ mCriteria.getRequestNumber() + "'");
 			sql.append("\n  and  h.user_id ='" + mCriteria.getUserId() + "'");
@@ -723,9 +733,10 @@ public class MStockDiscount {
 			    m.setCreated(Utils.stringValue(rst.getDate("created"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			    m.setUpdated(Utils.stringValue(rst.getDate("updated"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			    
-			    m.setTotalAllNonVatAmount(Utils.convertDoubleToStr(rst.getDouble("total_nonvat_amount"),Utils.format_current_2_disgit));
-			    m.setTotalAllVatAmount(Utils.convertDoubleToStr(rst.getDouble("total_vat_amount"),Utils.format_current_2_disgit));
-			    m.setTotalAllAmount(Utils.convertDoubleToStr(rst.getDouble("total_amount"),Utils.format_current_2_disgit));
+			    m.setTotalLineAmount(Utils.convertDoubleToStr(rst.getDouble("line_amount"),Utils.format_current_2_disgit));
+			    m.setTotalVatAmount(Utils.convertDoubleToStr(rst.getDouble("vat_amount"),Utils.format_current_2_disgit));
+			    m.setTotalNetAmount(Utils.convertDoubleToStr(rst.getDouble("net_amount"),Utils.format_current_2_disgit));
+			    m.setVatRate(Utils.isNull(rst.getString("vat_rate")));
 			    
 			    // Check canEdit
 				if ((STATUS_SAVE.equals(m.getStatus()) && STATUS_NO_EXPORTED
@@ -736,7 +747,7 @@ public class MStockDiscount {
 			
 			// Find Lines
 			totalAmount = 0;
-			m.setLineList(searchStockReturnLine(conn,user, m));
+			m.setLineList(searchStockDiscountLine(conn,user, m));
 			
 		} catch (Exception e) {
 			throw e;
@@ -754,7 +765,7 @@ public class MStockDiscount {
 		return m;
 	}
 	  
-	  public List<StockDiscountLine> searchStockReturnLine(Connection conn,User user,StockDiscount mCriteria) throws Exception {
+	  public List<StockDiscountLine> searchStockDiscountLine(Connection conn,User user,StockDiscount mCriteria) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			List<StockDiscountLine> lineList = new ArrayList<StockDiscountLine>();
@@ -764,7 +775,7 @@ public class MStockDiscount {
 			try {
 				sql.append("\n SELECT A.* FROM ( ");
 				sql.append("\n   SELECT l.* , (select p.code from m_product p where p.product_id = l.inventory_item_id)as code ");
-				sql.append("\n   from t_stock_return_line l ");
+				sql.append("\n   from t_stock_discount_line l ");
 				sql.append("\n   WHERE l.request_number ='"+mCriteria.getRequestNumber()+"'");
 				sql.append("\n   and l.status ='SV' ");
 				sql.append("\n  ) A ORDER BY A.line_number asc \n");
@@ -773,7 +784,6 @@ public class MStockDiscount {
 				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
-
 				while (rst.next()) {
 				  StockDiscountLine m = new StockDiscountLine();
 				  no++;
@@ -782,15 +792,21 @@ public class MStockDiscount {
 				  m.setLineId(rst.getInt("line_number"));
 				  m.setInventoryItemId(rst.getString("inventory_item_id"));
 				  m.setArInvoiceNo(rst.getString("ar_invoice_no"));
-				  Product mp = new MProduct().find(rst.getString("inventory_item_id"));
-				  m.setProduct(mp);
-				  m.setProductCode(mp.getCode());
-				  m.setProductName(mp.getName());
+				  //Case key By Product
+				  if( !Utils.isNull(m.getInventoryItemId()).equals("0")){
+					  Product mp = new MProduct().find(rst.getString("inventory_item_id"));
+					  m.setProduct(mp);
+					  m.setProductCode(mp.getCode());
+					  m.setProductName(mp.getName());
+				  }else{
+					 //Case Key By Detail
+					  m.setProductCode("");
+					  m.setProductName(Utils.isNull(rst.getString("product_name")));
+				  }
 				  m.setPriQty(Utils.convertDoubleToStr(rst.getDouble("pri_qty"),Utils.format_current_5_digit));
 				  m.setUom1Qty(Utils.convertDoubleToStr(rst.getDouble("uom1_qty"),Utils.format_current_2_disgit));
 				  m.setUom2Qty(Utils.convertDoubleToStr(rst.getDouble("uom2_qty"),Utils.format_current_2_disgit));
 				  m.setUom2(Utils.isNull(rst.getString("uom2")));
-				  
 				  
 				  m.setUom1ConvRate(Utils.convertDoubleToStr(rst.getDouble("uom1_conv_rate"),Utils.format_current_2_disgit));
 				  m.setUom2ConvRate(Utils.convertDoubleToStr(rst.getDouble("uom2_conv_rate"),Utils.format_current_2_disgit));
@@ -810,23 +826,27 @@ public class MStockDiscount {
 				  popupForm.setUserId(mCriteria.getUserId());
 				  popupForm.setProductCode(m.getProductCode());
 				  popupForm.setRequestNumber(mCriteria.getRequestNumber());
-				  List<PopupForm> results = PopupDAO.searchInvoiceStockReturn(popupForm,"",user);
+				  popupForm.setCodeSearch(m.getArInvoiceNo());//wit:edit 05/05/2563 case display remainPriQty wrong
+				  
+				  List<PopupForm> results = searchInvoiceStockDiscount(popupForm,"",user);
 				  if(results != null && results.size()>0){ 
 					  PopupForm remain = results.get(0);
 				      m.setRemainPriAllQty(remain.getPriAllQty());
 				      m.setRemainPriQty(remain.getPriQty());
 				      m.setRemainSubQty(remain.getSubQty());
+				      m.setRemainAmount(remain.getRemainAmount());
 				  }
+				  
 				  m.setUom1Pac(Utils.convertDoubleToStrDefaultNoDigit(rst.getDouble("uom1_pac"),""));
 				  m.setUom2Pac(Utils.convertDoubleToStrDefaultNoDigit(rst.getDouble("uom2_pac"),""));
 				  m.setUom1Price(Utils.decimalFormat(rst.getDouble("uom1_price"),Utils.format_current_2_disgit));
-				  m.setDiscount(Utils.decimalFormat(rst.getDouble("discount"),Utils.format_current_2_disgit));
-				  m.setTotalAmount(Utils.decimalFormat(rst.getDouble("total_amount"),Utils.format_current_2_disgit));
+				  m.setLineAmount(Utils.decimalFormat(rst.getDouble("line_amount"),Utils.format_current_2_disgit));
+				  m.setVatAmount(Utils.decimalFormat(rst.getDouble("vat_amount"),Utils.format_current_2_disgit));
+				  m.setNetAmount(Utils.decimalFormat(rst.getDouble("net_amount"),Utils.format_current_2_disgit));
 				  
 				  m.setStatus(rst.getString("status"));
 				  m.setStatusLabel("Y".equals(m.getStatus())?"ใช้งาน":"ยกเลิก");
 				  m.setExported(rst.getString("exported"));
-				
 				  m.setUserId(rst.getString("user_id"));
 				  m.setCreatedBy(rst.getString("created_by"));
 				  
@@ -870,7 +890,7 @@ public class MStockDiscount {
 			StockDiscountLine m = null;
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT l.request_number ,l.line_number,l.qty from t_stock_return_line l ");
+				sql.append("\n  SELECT l.request_number ,l.line_number,l.qty from t_stock_discount_line l ");
 				sql.append("\n  where l.request_number ='"+requestNumber+"'");
 				sql.append("\n  and l.line_number ="+lineNo+"");
 				
@@ -904,7 +924,7 @@ public class MStockDiscount {
 			int nextLineNo = 1;
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT max(l.line_number) as max_line_no from t_stock_return_line l ");
+				sql.append("\n  SELECT max(l.line_number) as max_line_no from t_stock_discount_line l ");
 				sql.append("\n  where l.request_number ='"+requestNumber+"'");
 				
 			    logger.debug("sql:"+sql);
@@ -932,20 +952,20 @@ public class MStockDiscount {
 			try {
 				StringBuffer sql = new StringBuffer("");
 			
-				sql.append(" update t_stock_return h \n");
-				sql.append(" set total_nonvat_amount = ( \n");
-				sql.append("   select ROUND(sum(total_amount),2) \n");
-				sql.append("   from t_stock_return_line l where h.request_number = l.request_number \n");
+				sql.append(" update t_stock_discount h \n");
+				sql.append(" set line_amount = ( \n");
+				sql.append("   select ROUND(sum(line_amount),2) \n");
+				sql.append("   from t_stock_discount_line l where h.request_number = l.request_number \n");
 				sql.append("   and l.status ='SV' \n");
 				sql.append("  ) \n");
-				sql.append(",total_vat_amount = ( \n");
-				sql.append("   select ROUND(sum(total_amount) *0.07,2) \n");
-				sql.append("   from t_stock_return_line l where h.request_number = l.request_number \n");
+				sql.append(",vat_amount = ( \n");
+				sql.append("   select ROUND(sum(vat_amount),2) \n");
+				sql.append("   from t_stock_discount_line l where h.request_number = l.request_number \n");
 				sql.append("   and l.status ='SV' \n");
 				sql.append(") \n");
-				sql.append(",total_amount = ( \n");
-				sql.append("   select ROUND( (sum(total_amount) +sum(total_amount) *0.07 ),2) \n");
-				sql.append("   from t_stock_return_line l where h.request_number = l.request_number \n");
+				sql.append(",net_amount = ( \n");
+				sql.append("   select ROUND(sum(net_amount),2) \n");
+				sql.append("   from t_stock_discount_line l where h.request_number = l.request_number \n");
 				sql.append("   and l.status ='SV' \n");
 				sql.append(") \n");
 				sql.append(" where  h.request_number ='"+head.getRequestNumber()+"' \n");
@@ -965,4 +985,396 @@ public class MStockDiscount {
 			}
 			return result;
 		}
+	  
+	  /************************* Stock Discount (invoice Qty Popup) ***********************************************/
+	 public static List<PopupForm> searchInvoiceStockDiscount(PopupForm c,String operation,User user) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			String backDate = "";
+			StockBeanUtils stockBean = null;
+			double remainAmount = 0;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+				
+				//Case requestNumber is not null get back from stockDiscount
+				if( !Utils.isNull(c.getRequestNumber()).equals("")){
+					Date backDateObj = new MStockDiscount().getBackDate(conn, Utils.isNull(c.getRequestNumber()));
+					backDate = Utils.stringValue(backDateObj, Utils.DD_MM_YYYY_WITH_SLASH);
+				}else{
+					// get back_date(from c_reference) for get data
+					List<References> backDateInvoiceStockDiscountList = InitialReferences.getReferenceListByCode(conn,InitialReferences.BACKDATE_INVOICE_STOCKDISCOUNT);
+					if(backDateInvoiceStockDiscountList != null ){
+					   References refbackDate =  backDateInvoiceStockDiscountList.get(0);
+					   Calendar curdate = Calendar.getInstance();
+					   curdate.add(Calendar.MONTH, -1*Integer.parseInt(refbackDate.getKey()));
+					   
+					   logger.debug("backDate:"+curdate.getTime());
+					   backDate = Utils.stringValue(curdate.getTime(), Utils.DD_MM_YYYY_WITH_SLASH);
+					   //set to 01/mm/yyyy
+					   backDate = "01/"+backDate.substring(3,backDate.length());
+					   logger.debug("backDate:"+backDate);
+					}
+				}
+				
+				sql.append("\n select h.ar_invoice_no,COALESCE(sum(l.qty),0) as qty" );
+				sql.append("\n from t_order h ,t_order_line l ");
+				sql.append("\n where h.order_id = l.order_id ");
+				sql.append("\n and h.ar_invoice_no is not null ");
+				sql.append("\n and h.ar_invoice_no <> '' ");
+				sql.append("\n and l.promotion <> 'Y' ");
+				sql.append("\n and l.iscancel <> 'Y' ");
+				sql.append("\n and h.user_id = " +c.getUserId());
+				sql.append("\n and h.customer_id =(select customer_id from m_customer where code='"+c.getCustomerCode()+"')");
+				/** can search invoice by customer ,no productCode **/
+				if(!Utils.isNull(c.getProductCode()).equals("")){
+				  sql.append("\n and l.product_id =(select product_id from m_product where code='"+c.getProductCode()+"')");
+				}
+				sql.append("\n and order_date >= STR_TO_DATE('"+backDate+"', '%d/%m/%Y') ");
+				sql.append("\n and doc_status <> 'VO' ");
+			
+				if("equals".equalsIgnoreCase(operation)){
+					if( !Utils.isNull(c.getCodeSearch()).equals("")){
+						sql.append("\n and h.ar_invoice_no ='"+c.getCodeSearch()+"'");
+					}
+					if( !Utils.isNull(c.getDescSearch()).equals("")){
+						sql.append("\n and h.ar_invoice_no = '"+c.getDescSearch()+"'");
+					}
+				}else{
+					if( !Utils.isNull(c.getCodeSearch()).equals("")){
+						sql.append("\n and h.ar_invoice_no LIKE '%"+c.getCodeSearch()+"%' ");
+					}
+					if( !Utils.isNull(c.getDescSearch()).equals("")){
+						sql.append("\n and h.ar_invoice_no LIKE '%"+c.getDescSearch()+"%' ");
+					}
+				}
+				/** not in stock_discount_init **/
+				sql.append("\n and h.ar_invoice_no not in(select ar_invoice_no from t_stock_discount_init) ");
+				
+				sql.append("\n GROUP BY h.ar_invoice_no ");
+				sql.append("\n ORDER BY h.ar_invoice_no asc ");
+				
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no=0;
+				while (rst.next()) {
+					no++;
+					PopupForm item = new PopupForm();
+					item.setNo(no);
+					item.setCode(Utils.isNull(rst.getString("ar_invoice_no")));
+					if(!Utils.isNull(c.getProductCode()).equals("")){
+					    item.setPrice(getOrderItemPriceByArInvoiceNo(conn, c, backDate, user, Utils.isNull(rst.getString("ar_invoice_no"))));
+						//calc priQty
+						stockBean = calcStockDiscountPriQtyByArInvoice(conn,c.getRequestNumber(), Utils.isNull(rst.getString("ar_invoice_no")),backDate,c,user );
+						if(stockBean != null){
+						   item.setDesc(""+stockBean.getPriAllQty());
+						   item.setPriAllQty(Utils.decimalFormat(stockBean.getPriAllQty(),Utils.format_current_5_digit));
+						   item.setPriQty(Utils.decimalFormat(stockBean.getPriQty(),Utils.format_current_5_digit));
+						   item.setSubQty(Utils.decimalFormat(stockBean.getSubQty(),Utils.format_current_5_digit));
+
+						}
+						
+						//calc remain amount by invoice
+						remainAmount = calcStockDiscountRemianAmountByInvoice(conn,c.getRequestNumber(), Utils.isNull(rst.getString("ar_invoice_no")),c.getProductCode(),backDate,c,user );
+						item.setRemainAmount(Utils.decimalFormat(remainAmount,Utils.format_current_2_disgit));
+						
+						if(( stockBean != null && stockBean.getPriAllQty() > 0.00 )
+							||(remainAmount > 0)){
+						   pos.add(item);
+					    }
+					}else{
+						/** Case in search (productCode is null) **/
+						item.setDesc("0");
+						item.setPriAllQty("0");
+						item.setPriQty("0");
+						item.setSubQty("0");
+						
+						//calc remain amount by invoice
+						remainAmount = calcStockDiscountRemianAmountByInvoice(conn,c.getRequestNumber(), Utils.isNull(rst.getString("ar_invoice_no")),null,backDate,c,user );
+						item.setRemainAmount(Utils.decimalFormat(remainAmount,Utils.format_current_2_disgit));
+						if(remainAmount > 0){
+						   pos.add(item);
+						}
+					}
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+		 
+	  public static String getOrderItemPriceByArInvoiceNo(Connection conn,PopupForm c,String backDate,User user,String arInvoiceNo) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			String price ="";
+			try {
+				sql.append("\n select distinct l.price" );
+				sql.append("\n from t_order h ,t_order_line l ");
+				sql.append("\n where h.order_id = l.order_id ");
+				sql.append("\n and h.ar_invoice_no is not null ");
+				sql.append("\n and h.ar_invoice_no <> '' ");
+				sql.append("\n and h.user_id = " +c.getUserId());
+				sql.append("\n and h.customer_id =(select customer_id from m_customer where code='"+c.getCustomerCode()+"')");
+				sql.append("\n and l.product_id =(select product_id from m_product where code='"+c.getProductCode()+"')");
+				sql.append("\n and h.doc_status <> 'VO' ");
+				sql.append("\n and l.promotion <> 'Y' ");
+				sql.append("\n and h.order_date >= STR_TO_DATE('"+backDate+"', '%d/%m/%Y') ");
+			    sql.append("\n and h.ar_invoice_no ='"+arInvoiceNo+"'");
+				
+				logger.debug("sql:"+sql);
+			
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					price = Utils.decimalFormat(rst.getDouble("price"),Utils.format_current_2_disgit);
+	
+				}//if
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return price;
+		}
+	 
+	 public static StockBeanUtils calcStockDiscountPriQtyByArInvoice(Connection conn,String curRequestNumber
+			 ,String arInvoiceNo,String dateStart,PopupForm c,User user) throws Exception {
+		    StockBeanUtils bean = new StockBeanUtils();
+		    Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			double priQtyInit = 0;
+			double priQtyNotInCurrRequestNumber = 0;
+			double priAllQty = 0;
+			String productId = "";
+			try {
+				sql.append("\n select h.ar_invoice_no,l.product_id,l.uom_id,COALESCE(sum(l.qty),0) as remain_pri_qty" );
+				sql.append("\n from t_order h ,t_order_line l ");
+				sql.append("\n where h.order_id = l.order_id ");
+				sql.append("\n and h.ar_invoice_no is not null ");
+				sql.append("\n and h.ar_invoice_no <> '' ");
+				sql.append("\n and doc_status <> 'VO' ");
+				sql.append("\n and h.user_id = " +c.getUserId());
+				sql.append("\n and h.customer_id =(select customer_id from m_customer where code='"+c.getCustomerCode()+"')");
+				sql.append("\n and l.product_id =(select product_id from m_product where code='"+c.getProductCode()+"')");
+				sql.append("\n and order_date >= STR_TO_DATE('"+dateStart+"', '%d/%m/%Y') ");
+				sql.append("\n and h.ar_invoice_no ='"+arInvoiceNo+"'");
+				sql.append("\n GROUP BY h.ar_invoice_no ,l.product_id,l.uom_id");
+				sql.append("\n ORDER BY h.ar_invoice_no asc ");
+				
+				//logger.debug("sql:"+sql);
+			
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					priAllQty += StockUtilsDAO.calcPriQty(conn,rst.getString("product_id"), rst.getString("uom_id"), rst.getInt("remain_pri_qty"));
+                    productId = rst.getString("product_id");
+				}//while
+				//logger.debug("priAllQty:"+priAllQty);
+				
+				/** del stockReturnItem <> curRequestnumber **/
+				priQtyNotInCurrRequestNumber = getPriQtyExistNotInCurrentNumber(conn, arInvoiceNo, curRequestNumber, productId);
+				//logger.debug("priQtyNotInCurrRequestNumber:"+priQtyNotInCurrRequestNumber);
+				
+				/** PriQtyInit ***/
+				priQtyInit =0;// getPriQtyInt(conn,user, arInvoiceNo, c.getCustomerCode(), productId);
+				//logger.debug("priQtyInit:"+priQtyInit);		
+						
+				/**  = priQtyall +(neg priQtyInit) - priQty(exist <> curRequestNumber) **/
+				//logger.debug("Calc priAllQty["+priAllQty+"]-priQtyInit["+priQtyInit+"]-priQtyNotInCurrReqNum["+priQtyNotInCurrRequestNumber+"]");
+				priAllQty =  priAllQty + priQtyInit - priQtyNotInCurrRequestNumber;
+				priAllQty = NumberToolsUtil.round(priAllQty, 5, BigDecimal.ROUND_HALF_UP); 
+				//logger.debug("Result priAllQty:"+priAllQty);
+				
+				bean.setPriAllQty(priAllQty);
+				
+				/*** Calc remain priQty to pri_qty and sub_qty ***/
+				String tempPriAllQty = priAllQty+"";
+				double priQty = Utils.convertStrToDouble(tempPriAllQty.substring(0,tempPriAllQty.indexOf(".")));
+				double subQtyTemp =Utils.convertStrToDouble(tempPriAllQty.substring(tempPriAllQty.indexOf("."),tempPriAllQty.length()));
+				//logger.debug("priQty["+priQty+"]");
+				//logger.debug("subQtyTemp["+subQtyTemp+"]");
+				
+				//get Uom2
+				Product p = new MProduct().getStockReturnProduct(c.getProductCode(),user);
+				double subQty = 0;
+				if(p != null){
+				   subQty = StockUtilsDAO.calcPriQtyToSubQty(conn, productId, p.getUom2(), subQtyTemp); 
+				}
+				//logger.debug("after clac subQty["+subQty+"]");
+				
+				bean.setPriQty(priQty);
+				bean.setSubQty(subQty);
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return bean;
+		}
+
+	 public static double getPriQtyExistNotInCurrentNumber(Connection conn,String arInvoiceNo,String curRequestNumber,String productId) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			double existPriQty = 0;
+			try {
+				sql.append("\n select l.inventory_item_id as product_id,COALESCE(sum(l.pri_qty),0) as existPriQty" );
+				sql.append("\n from t_stock_discount_line l ");
+				sql.append("\n where 1=1");
+				if( !Utils.isNull(curRequestNumber).equals("")){
+				  sql.append("\n and l.request_number <> '"+curRequestNumber+"'");
+				}
+				sql.append("\n and l.ar_invoice_no ='"+arInvoiceNo+"'");
+				sql.append("\n and l.inventory_item_id ="+productId+"");
+				sql.append("\n GROUP BY l.inventory_item_id ");
+				
+				logger.debug("sql:"+sql);
+			
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					existPriQty  = rst.getDouble("existPriQty");
+				}//while
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return existPriQty;
+		}
+
+	 public static double getPriQtyInt1(Connection conn,User user,String arInvoiceNo,String customerCode,String productId) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			double existPriQty = 0;
+			try {
+				sql.append("\n select COALESCE(sum(l.pri_qty),0) as init_pri_Qty" );
+				sql.append("\n from pens.t_stock_discount_init l ");
+				sql.append("\n where 1=1");
+				sql.append("\n and l.customer_code = '"+customerCode+"'");
+				sql.append("\n and l.ar_invoice_no ='"+arInvoiceNo+"'");
+				sql.append("\n and l.inventory_item_id ="+productId+"");
+				sql.append("\n and l.user_id ="+user.getId()+"");
+				sql.append("\n GROUP BY l.inventory_item_id ");
+				
+				//+ current store_return (requestNumber)
+				
+				logger.debug("sql:"+sql);
+			
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if (rst.next()) {
+					existPriQty  = rst.getDouble("init_pri_Qty");
+				}//while
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return existPriQty;
+		}
+
+	 /** Calc RemainAmount By 1(Arinvoice and product) or 2(arInvoice) **/
+	 public static double calcStockDiscountRemianAmountByInvoice(Connection conn,String curRequestNumber
+			 ,String arInvoiceNo,String productCode,String backDate,PopupForm c,User user) throws Exception {
+		    Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			double remainAmount = 0;
+			try {
+				//Case requestNumber is not null get back from stockDiscount
+				if(Utils.isNull(backDate).equals("")){
+					if( !Utils.isNull(c.getRequestNumber()).equals("")){
+						Date backDateObj = new MStockDiscount().getBackDate(conn, Utils.isNull(c.getRequestNumber()));
+						backDate = Utils.stringValue(backDateObj, Utils.DD_MM_YYYY_WITH_SLASH);
+					}else{
+						// get back_date(from c_reference) for get data
+						List<References> backDateInvoiceStockDiscountList = InitialReferences.getReferenceListByCode(conn,InitialReferences.BACKDATE_INVOICE_STOCKDISCOUNT);
+						if(backDateInvoiceStockDiscountList != null ){
+						   References refbackDate =  backDateInvoiceStockDiscountList.get(0);
+						   Calendar curdate = Calendar.getInstance();
+						   curdate.add(Calendar.MONTH, -1*Integer.parseInt(refbackDate.getKey()));
+						   
+						   logger.debug("backDate:"+curdate.getTime());
+						   backDate = Utils.stringValue(curdate.getTime(), Utils.DD_MM_YYYY_WITH_SLASH);
+						   //set to 01/mm/yyyy
+						   backDate = "01/"+backDate.substring(3,backDate.length());
+						   logger.debug("backDate:"+backDate);
+						}
+					}
+				}
+				
+				sql.append("\n select h.ar_invoice_no,COALESCE(sum(l.total_amount),0) as remain_amount" );
+				sql.append("\n ,( select sum(line_amount) from t_stock_discount_line d");
+				sql.append("\n    where d.ar_invoice_no = h.ar_invoice_no");
+				if( !Utils.isNull(curRequestNumber).equals("")){
+				   sql.append("\n   and d.request_number <>'"+curRequestNumber+"'");
+				}
+				if( !Utils.isNull(productCode).equals("")){
+				  // sql.append("\n   and d.inventory_item_id in(select product_id from m_product where code='"+c.getProductCode()+"')");
+				}
+				sql.append("\n  ) as discount_amount ");
+				sql.append("\n from t_order h ,t_order_line l  ");
+				sql.append("\n where h.order_id = l.order_id ");
+				sql.append("\n and h.ar_invoice_no is not null ");
+				sql.append("\n and h.ar_invoice_no <> '' ");
+				sql.append("\n and h.doc_status <> 'VO' ");
+				sql.append("\n and l.iscancel <> 'Y' ");
+				sql.append("\n and h.user_id = " +c.getUserId());
+				sql.append("\n and h.customer_id =(select customer_id from m_customer where code='"+c.getCustomerCode()+"')");
+				if( !Utils.isNull(productCode).equals("")){
+				   // sql.append("\n and l.product_id =(select product_id from m_product where code='"+c.getProductCode()+"')");
+				}
+				sql.append("\n and order_date >= STR_TO_DATE('"+backDate+"', '%d/%m/%Y') ");
+				sql.append("\n and h.ar_invoice_no ='"+arInvoiceNo+"'");
+				sql.append("\n GROUP BY h.ar_invoice_no");
+				
+				logger.debug("sql:"+sql);
+			
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if(rst.next()) {
+					logger.debug("remain_amount:"+rst.getDouble("remain_amount"));
+					logger.debug("discount_amount:"+rst.getDouble("discount_amount"));
+					remainAmount = rst.getDouble("remain_amount")-rst.getDouble("discount_amount");
+					
+				}//while
+				logger.debug("remainAmount:"+remainAmount);
+			
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return remainAmount;
+		}
+
 }

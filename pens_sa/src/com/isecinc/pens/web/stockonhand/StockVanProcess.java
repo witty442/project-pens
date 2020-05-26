@@ -223,8 +223,11 @@ public class StockVanProcess extends I_Action {
 			conn = DBConnection.getInstance().getConnectionApps();
 			List<StockOnhandBean> items = stockVanForm.getResultsSearch();
 		    if(items!= null && items.size() >0){
-		    	resultTable = StockVanExport.genResultStockVanPD(stockVanForm, request,"EXCEL");
-				
+		    	if( !Utils.isNull(stockVanForm.getBean().getDispType()).equals("3")){
+		    	   resultTable = StockVanExport.genResultStockVanPD(stockVanForm, request,"EXCEL");
+		    	}else{
+		    	   resultTable = StockVanExport.genResultStockVanPDBySalesZone(stockVanForm, request,"EXCEL");
+		    	}
 				java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
 				response.setContentType("application/vnd.ms-excel");

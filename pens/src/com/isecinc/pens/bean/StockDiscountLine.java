@@ -59,14 +59,16 @@ public class StockDiscountLine extends I_PO implements Serializable{
 	private String uom1Pac;
 	private String uom2Pac;
 	private String uom1Price;
-	private String discount;
-	private String totalAmount;
+	private String lineAmount;
+	private String vatAmount;
+	private String netAmount;
 	private String arInvoiceNo;
 
 	private String remainPriAllQty;
 	private String remainPriQty;
 	private String remainSubQty;
-	    
+	private String remainAmount; 
+	
 	/** optional for report **/
 	private String orderNo;
 	private String customerName;
@@ -76,6 +78,26 @@ public class StockDiscountLine extends I_PO implements Serializable{
 
 	
 	
+	public String getRemainAmount() {
+		return remainAmount;
+	}
+
+
+	public void setRemainAmount(String remainAmount) {
+		this.remainAmount = remainAmount;
+	}
+
+
+	public String getVatAmount() {
+		return vatAmount;
+	}
+
+
+	public void setVatAmount(String vatAmount) {
+		this.vatAmount = vatAmount;
+	}
+
+
 	public String getRemainPriAllQty() {
 		return remainPriAllQty;
 	}
@@ -392,24 +414,24 @@ public class StockDiscountLine extends I_PO implements Serializable{
 	}
 
 
-	public String getDiscount() {
-		return discount;
+	public String getLineAmount() {
+		return lineAmount;
 	}
 
 
-	public void setDiscount(String discount) {
-		this.discount = discount;
+	public void setLineAmount(String lineAmount) {
+		this.lineAmount = lineAmount;
 	}
 
 
-	public String getTotalAmount() {
-		return totalAmount;
+	public String getNetAmount() {
+		return netAmount;
 	}
 
 
-	public void setTotalAmount(String totalAmount) {
-		this.totalAmount = totalAmount;
+	public void setNetAmount(String netAmount) {
+		this.netAmount = netAmount;
 	}
-   
     
+
 }

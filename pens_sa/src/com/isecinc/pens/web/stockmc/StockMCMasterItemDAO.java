@@ -4,15 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.process.SequenceProcessAll;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class StockMCMasterItemDAO {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -207,7 +206,7 @@ public class StockMCMasterItemDAO {
 			  
 			//logger.debug("SQL:"+sql);
 			//Gen ID running
-			model.setId(SequenceProcessAll.getIns().getNextValue("MC_COUNTSTK_HEADER"));
+			model.setId(SequenceProcessAll.getIns().getNextValue("MC_COUNTSTK_HEADER").intValue());
 
 			ps = conn.prepareStatement(sql.toString());
 			

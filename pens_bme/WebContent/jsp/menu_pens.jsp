@@ -675,7 +675,7 @@
 		        </li> 
 		    <%} %>
 		    <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE}) ){ %>
-	           <%--   <li>
+	          <%--    <li>
 		           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/manualStockAction.do?do=prepareSearch&action=new');">
 		           <span><%no++;out.print(no);%>.<bean:message key="ManualStock" bundle="sysprop"/>
 		           </span></a>
@@ -702,6 +702,12 @@
  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE,User.PICK}) ){ no=0;%>
 	<li><a  href="javascript: void(0)" class="parent" ><span>Pick</span></a>
 		<ul>
+		    <li>
+	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/pickManualStockAction.do?do=prepare&action=new');">
+	           <span><%no++;out.print(no);%>.<bean:message key="PickManualStock" bundle="sysprop"/>
+	           </span></a>
+	        </li> 
+		        
 	     <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/jobAction.do?do=prepare2&action=new');">

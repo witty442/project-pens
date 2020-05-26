@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.bean.StockReturnLine"%>
+<%@page import="com.isecinc.pens.bean.StockReturn"%>
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -28,6 +30,7 @@ String backPage = Utils.isNull(request.getParameter("backPage"));
 if(backPage.equals("")){
 	backPage = Utils.isNull(request.getAttribute("backPage"));
 }
+List<References> reasonReturnList = (List)session.getAttribute("reasonReturnList");
 %>
 <html>
 <head>
@@ -88,7 +91,137 @@ function  gotoReport(path, reportType,requestNumber){
 	   document.stockReturnForm.action =  path+"/jsp/stockReturnAction.do?"+param;
 	   document.stockReturnForm.submit(); 
 }
+/**
+ * AddRow(setFocus)
+ */
+function addRow(setFocus){
+	
+	//Check can add new Row
+	if( !canAddNewRow()){
+		alert("ไม่สามารถเพิ่มรายการมากกว่า  12 รายการ  กรุณาเปิดรายการใหม่");
+		return false;
+	}
+	
+	var rows = $('#tblProduct tr').length-1;
+	var className = 'lineO';
+	if(rows%2 !=0){
+		className = 'lineE';
+	}
+	var rowId = rows-1;
+    var tabIndex = parseFloat(document.getElementById("tabIndex").value);
+    var no = 1;
+    //calc no (for case del row)
+    var itemCode = document.getElementsByName("productCode");
+	var status = document.getElementsByName("status");
+	for(var i=0;i<itemCode.length;i++){
+		 if(status[i].value !='DELETE'){
+			 no++; 
+		 }
+	}//for
+	
+	tabIndex++;
+	
+	//alert("rows:"+rows+",rowId["+rowId+"]");
+	
+	var rowData ="<tr class='"+className+"'>"+
+	    "<td class='td_text_center' width='5%'> " +
+	    "  <input type='checkbox' tabindex ='-1' name='linechk' id='lineChk' value='0'/>" +
+	    "  <input type='hidden' tabindex ='-1' name='lineId' id='lineId' value='0'/>"+
+	    "  <input type='hidden' tabindex ='-1' name='status' id='status' value='SV' />"+
+	    "</td>"+
+	    "<td class='td_text_center' width='5%'> " +
+	    "  <input type='text' name='no' value='"+no+"' id='no' size='2' readonly class='disableTextCenter'>" +
+	    "</td>"+
+	   
+	    "<td class='td_text_center' width='6%'> "+
+	    "  <input type='text' name='productCode' id='productCode' size='5' class='normalText' "+
+	    "   onkeypress='getProductKeypress(event,this,"+rowId+")' "+
+	    "   onchange='checkProductOnblur(event,this,"+rowId+")' " +
+	    "   tabindex ="+tabIndex+
+	    "  autoComplete='off'/>  </td>"+
+	    "<td class='td_text'  width='15%'> "+
+	    " <input type='text' tabindex ='-1' name='productName' size='40' readonly class='disableText' />" +
+	    " <input type='hidden' tabindex ='-1' name='inventoryItemId' id='inventoryItemId'/>"+
+	    " <input type='hidden' size='3' class='disableText' tabindex ='-1' name='uom1ConvRate' id='uom1ConvRate'/>"+
+	    " <input type='hidden' size='3' class='disableText' tabindex ='-1' name='uom2ConvRate' id='uom2ConvRate'/>"+
+	    "</td>";
+	    tabIndex++;
+	    rowData +="<td class='td_text_center'  width='10%' nowrap> "+
+	    " <input type='text' name='arInvoiceNo' id='arInvoiceNo' autoComplete='off' value ='' size='9'  readonly tabindex ="+tabIndex+"/>" +
+	    " <input type='button' name='bt3' value='...' onclick='openPopupInvoice("+no+")'/> "+
+	    "</td>";
+		rowData +="<td class='td_number'  width='6%'> "+
+	    " <!--remainPriAllQty:--><input type='text' size='8' name='remainPriAllQty' id='remainPriAllQty' value ='' readonly class='disableNumber'/>" +
+	    " <!--remainPriQty:--><input type='hidden' size='3' class='disableText' name='remainPriQty' id='remainPriQty' value =''  readonly />" +
+	    " <!--remainSubQty:--><input type='hidden' size='3' class='disableText' name='remainSubQty' id='remainSubQty' value =''  readonly />" +
+	    "</td>";
+	    tabIndex++;
+	    rowData +="<td class='td_text_center'  width='5%' nowrap> "+
+	    "<select id='reason' name='reason' tabindex ="+tabIndex+">"+
+		"  <option></option> ";
+		<%
+		   if(reasonReturnList != null){
+		    	for(int r=0;r<reasonReturnList.size();r++){
+		    		References itemRef = reasonReturnList.get(r);
+		    		%>
+		    		rowData +=" <option value='<%=itemRef.getKey()%>'><%=itemRef.getDesc()%></option> ";
+		    		<%
+		    	}//for
+		    }//if
+		%>
+		rowData +="</select> ";
+		
+	    tabIndex++;
+	    rowData +="<td class='td_number' width='6%'> "+
+	    " <input type='text' tabindex ="+tabIndex+
+	    "  value='' name='uom1Qty' size='5' "+
+	    "  onblur ='sumTotalInRow("+no+")' autoComplete='off'"+
+	    "  onkeydown='return isNum0to9andpoint(this,event);'class='numberText' /> "+
+	    " <!--priQty:--><input type='hidden' size='3' tabindex ='-1' class='disableText' name='priQty' id='priQty'/>"+
+	    "  </td>"+
+	    tabIndex++;
+	    rowData +="<td class='td_number' width='6%'> "+
+	    " <input type='text' tabindex ="+tabIndex+
+	    "  value='' name='uom2Qty' size='5' "+
+	    "  onblur ='sumTotalInRow("+no+")' "+
+	    "  onkeydown='return isNum0to9andpoint(this,event);' class='numberText' autoComplete='off'/> "+
+	    "  </td>";
+	
+	    rowData +="<td class='td_text_center' width='7%'> "+
+	    "  <input type='text' name='uom2' value='' id='uom2' size='3' readonly class='disableText'>"+
+	    "  </td>"+
+	    "<td class='td_number'  width='7%'> "+
+	    " <input type='text' name='uom1Pac' id='uom1Pac' value ='' size='6' readonly class='disableNumber'/>" +
+	    "</td>"+
+	    "<td class='td_number'  width='7%'> "+
+	    " <input type='text' name='uom2Pac' id='uom2Pac' value ='' size='6' readonly class='disableNumber'/>" +
+	    "</td>"+
+	    "<td class='td_number'  width='7%'> "+
+	    " <input type='text' name='uom1Price' id='uom1Price' value ='' size='6' readonly class='disableNumber'/>" +
+	    "</td>";
+	    tabIndex++;
+	    rowData +="<td class='td_number' width='7%'> "+
+	    " <input type='text' tabindex ="+tabIndex+
+	    "  value='' name='discount' size='5' onblur='sumTotalInRow("+no+")' "+
+	    "  onkeydown='return isNum(this,event);' class='numberText' autoComplete='off'/> "+
+	    "  </td>";
+	    rowData +="<td class='td_number' width='7%'> "+
+	    "  <input type='text' name='totalAmount' id='totalAmount' size='10' readonly class='disableNumber'>"+
+	    "  </td>"+
+	    "</tr>";
 
+	//alert(rowData);
+    $('#tblProduct').append(rowData);
+    //set next tabIndex
+    document.getElementById("tabIndex").value = tabIndex;
+    
+    //set focus default
+    var itemCode = document.getElementsByName("productCode");
+    //alert(setFocus);
+    if(setFocus){
+       itemCode[rowId-1].focus();
+    }
+}
 function gotoReportXXXX(path, reportType,requestNumber){
 	 var param ="report_name=stock_return_report";
 	     param +="&reportType="+reportType;
@@ -221,6 +354,7 @@ function gotoReportXXXX(path, reportType,requestNumber){
 										<th rowspan="3">ชื่อสินค้า</th>
 										<th rowspan="3">เลขที่บิล</th>
 										<th rowspan="3">จำนวนหีบคงเหลือในบิลที่สามารถคืนได้</th>
+										<th rowspan="3">เหตุผลในการคืนสินค้า</th>
 										<th colspan="5">สำหรับพนักงานขาย</th>
 										<th rowspan="3">ราคาขายต่อหีบ</th>
 										<th colspan="2">จำนวนเงิน</th>
@@ -238,101 +372,110 @@ function gotoReportXXXX(path, reportType,requestNumber){
 										<th>หีบ</th>
 										<th>เศษ</th>
 									</tr>
-								 <c:set var="tabIndex" value="${0}"/>
-						         <c:forEach var="results" items="${stockReturnForm.lines}" varStatus="rows">
-									<c:choose>
-										<c:when test="${rows.index %2 == 0}">
-											<c:set var="tabclass" value="lineO"/>
-										</c:when>
-										<c:otherwise>
-											<c:set var="tabclass" value="lineE"/>
-										</c:otherwise>
-									</c:choose>
-									<c:set var="tabIndex" value="${tabIndex + 1}" />
-
-									<tr class="${tabclass}">
+                             <% 
+                              String tabclass = "";
+                              String selected = "";
+                              if(stockReturnForm.getLines() != null){
+									for(int i=0;i<stockReturnForm.getLines().size();i++){
+										 StockReturnLine item = stockReturnForm.getLines().get(i); 
+										 tabclass = i%2==0?"lineO":"lineE";
+									%>
+									<tr class="<%=tabclass%>">
 									    <td class = "td_text_center" width="5%">
-										  <input type="checkbox" name="linechk" value="${results.lineId}" />
-										  <input type="hidden" name="lineId" id="lineId" value ="${results.lineId}"/>
-										   <input type="hidden" name="status" id="status" value ="${results.status}"/>
+										  <input type="checkbox" name="linechk" value="<%=item.getLineId() %>" />
+										  <input type="hidden" name="lineId" id="lineId" value ="<%=item.getLineId() %>"/>
+										   <input type="hidden" name="status" id="status" value ="<%=item.getStatus() %>"/>
 										</td>
 										 <td class = "td_text_center" width="5%">
-										   <input type='text' name='no' value='${rows.index + 1}' size='2' id="no" readonly class="disableTextCenter">
+										   <input type='text' name='no' value='<%=(i+1) %>' size='2' id="no" readonly class="disableTextCenter">
 										 </td>
 										
 										<td class ="td_text_center"  width="6%">
-											<input type="text" name="productCode" id="productCode" value ="${results.productCode}" size="5"
-										        onkeypress="getProductKeypress(event,this,${results.no})"
-											    onkeydown="getProductKeydown(event,this,${results.no})"
-											    onchange="checkProductOnblur(event,this,${results.no})" 
-											    readonly class="disableText"  tabindex="${tabIndex}"
+											<input type="text" name="productCode" id="productCode" value ="<%=item.getProductCode() %>" size="5"
+										        onkeypress="getProductKeypress(event,this,<%=item.getNo() %>)"
+											    onkeydown="getProductKeydown(event,this,<%=item.getNo() %>)"
+											    onchange="checkProductOnblur(event,this,<%=item.getNo() %>)" 
+											    readonly class="disableText"  tabindex="<%=tabIndex %>}"
 											    autoComplete="off"
 											  /> 
 										</td>
 										
 										<td class="td_text"  width="15%">
-									       <input type="text" name="productName" id="productName" value ="${results.productName}" size="40" readonly class="disableText"/>
-									       <input type="hidden" name="inventoryItemId" id="inventoryItemId" value ="${results.inventoryItemId}"/>
+									       <input type="text" name="productName" id="productName" value ="<%=item.getProductName() %>" size="40" readonly class="disableText"/>
+									       <input type="hidden" name="inventoryItemId" id="inventoryItemId" value ="<%=item.getInventoryItemId() %>"/>
 									     
-									       <input type="hidden" size='3' class='disableText' name="uom1ConvRate" id="uom1ConvRate" value ="${results.uom1ConvRate}"/>
-									       <input type="hidden" size='3' class='disableText' name="uom2ConvRate" id="uom2ConvRate" value ="${results.uom2ConvRate}"/>	
+									       <input type="hidden" size='3' class='disableText' name="uom1ConvRate" id="uom1ConvRate" value ="<%=item.getUom1ConvRate() %>"/>
+									       <input type="hidden" size='3' class='disableText' name="uom2ConvRate" id="uom2ConvRate" value ="<%=item.getUom2ConvRate() %>"/>	
 										</td>
 										<td class="td_text_center"  width="10%" nowrap>  
 									        <input type="text" tabindex="<% tabIndex++; out.print(tabIndex);%>"
-											value="${results.arInvoiceNo}" name="arInvoiceNo" size="9" id="arInvoiceNo" />
-										    <input type="button" name="bt3" value="..." onclick="openPopupInvoice(${rows1.index + 1})"/>
+											value="<%=item.getArInvoiceNo() %>" name="arInvoiceNo" size="9" id="arInvoiceNo" />
+										    <input type="button" name="bt3" value="..." onclick="openPopupInvoice(<%=(i + 1)%>)"/>
 										</td>
 										<td class="td_number"  width="5%">
-										  <!-- remainPriAllQty: --><input type="text" size="8" name="remainPriAllQty" id="remainPriAllQty" value ="${results.remainPriAllQty}" readonly class="disableNumber"/>	  
-										  <!-- remainPriQty: --><input type="hidden" size='3' class='disableText' name="remainPriQty" id="priQty" value ="${results.remainPriQty}"/>
-									      <!-- remainSubQty: --><input type="hidden" size='3' class='disableText' name="remainSubQty" id="subQty" value ="${results.remainSubQty}"/>
+										  <!-- remainPriAllQty: --><input type="text" size="8" name="remainPriAllQty" id="remainPriAllQty" value ="<%=item.getRemainPriAllQty() %>" readonly class="disableNumber"/>	  
+										  <!-- remainPriQty: --><input type="hidden" size='3' class='disableText' name="remainPriQty" id="priQty" value ="<%=item.getRemainPriQty() %>"/>
+									      <!-- remainSubQty: --><input type="hidden" size='3' class='disableText' name="remainSubQty" id="subQty" value ="<%=item.getRemainSubQty() %>"/>
+										</td>
+										<td class="td_number"  width="5%">
+										 <select id="reason" name="reason">
+										   <option></option>
+										  <%
+										    if(reasonReturnList != null){
+										    	for(int r=0;r<reasonReturnList.size();r++){
+										    		References itemRef = reasonReturnList.get(r);
+										    		selected = itemRef.getKey().equalsIgnoreCase(item.getReason())?"selected":"";
+										    		out.println("<option value='"+itemRef.getKey()+"' "+(selected)+">"+itemRef.getDesc()+"</option>");
+										    	}
+										    }
+										  %>
+										 </select>
 										</td>
 										<td class="td_number" width="6%">
-										  
-										    <c:set var="tabIndex" value="${tabIndex + 1}" />
 											<input type="text"
-											tabindex="${tabIndex}"
-											value="${results.uom1Qty}" name="uom1Qty" size="5"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=item.getUom1Qty() %>" name="uom1Qty" size="5"
 											onkeydown="return isNum0to9andpoint(this,event);"
 											onblur ="sumTotalInRow(${results.no})"
 											class="numberText"  autoComplete="off"/>
-											<!-- priQty: --><input type="hidden" name="priQty" class='disableText' size='3' id="priQty" value ="${results.priQty}"/>
+											<!-- priQty: --><input type="hidden" name="priQty" class='disableText' size='3' id="priQty" value ="<%=item.getPriQty() %>"/>
 										</td>
 										<td class="td_number" width="6%">
-										    <c:set var="tabIndex" value="${tabIndex + 1}" />
 											<input type="text"
-											tabindex="${tabIndex}"
-											value="${results.uom2Qty}" name="uom2Qty" size="5"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=item.getUom2Qty() %>" name="uom2Qty" size="5"
 											onkeydown="return isNum(this,event);"
-											onblur ="sumTotalInRow(${results.no})"
+											onblur ="sumTotalInRow(<%=item.getNo() %>)"
 											class="numberText"  autoComplete="off"/>
 										</td>
 										<td class="td_text_center" width="6%">
-										  <input type='text' name='uom2'  size='3' value='${results.uom2}' id="uom2"  readonly class="disableText">
+										  <input type='text' name='uom2'  size='3' value='<%=item.getUom2() %>' id="uom2"  readonly class="disableText">
 										</td>
 										<td class="td_number" width="7%">
-										  <input type='text' name='uom1Pac'  size='6' value='${results.uom1Pac}' id="uom1Pac"  readonly class="disableNumber">
+										  <input type='text' name='uom1Pac'  size='6' value='<%=item.getUom1Pac() %>' id="uom1Pac"  readonly class="disableNumber">
 										</td>
 										<td class="td_number" width="7%">
-										  <input type='text' name='uom2Pac'  size='6' value='${results.uom2Pac}' id="uom2Pac"  readonly class="disableNumber">
+										  <input type='text' name='uom2Pac'  size='6' value='<%=item.getUom2Pac() %>' id="uom2Pac"  readonly class="disableNumber">
 										</td>
 										<td class="td_number" width="7%">
-										  <input type='text' name='uom1Price'  size='6' value='${results.uom1Price}' id="uom1Price"  readonly class="disableNumber">
+										  <input type='text' name='uom1Price'  size='6' value='<%=item.getUom1Price()%>' id="uom1Price"  readonly class="disableNumber">
 										</td>
 	       							    <td class="td_number" width="7%">
-										    <c:set var="tabIndex" value="${tabIndex + 1}" />
 											<input type="text"
-											tabindex="${tabIndex}"
-											value="${results.discount}" name="discount" size="5"
+											tabindex="<% tabIndex++; out.print(tabIndex);%>"
+											value="<%=item.getDiscount() %>" name="discount" size="5"
 											onkeydown="return isNum(this,event);"
-											onblur ="sumTotalInRow(${results.no})"
+											onblur ="sumTotalInRow(<%=item.getNo() %>)"
 											class="numberText" autoComplete="off" />
 										</td>
 										<td class="td_number" width="7%">
-										  <input type='text' name='totalAmount'  size='10' value='${results.totalAmount}' id="price" readonly class="disableNumber">
+										  <input type='text' name='totalAmount'  size='10' value='<%=item.getTotalAmount() %>' id="price" readonly class="disableNumber">
 										</td>
 									</tr>
-								</c:forEach>
+								<%
+									}//for
+                                 }//if
+								%>
 								  
 								</table>
 								<!--  Results -->

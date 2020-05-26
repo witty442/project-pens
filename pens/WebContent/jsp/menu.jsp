@@ -267,9 +267,9 @@
 	              <li>
 	            	 <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/boxNoNissinReport.jsp';"><span><%no++;out.print(no);%>.ใบปะหน้ากล่อง ของเสีย(Nissin)</span></a>
 	              </li>
-	              <li>
+	               <li>
 	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockDiscountAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.<bean:message key="StockDiscount" bundle="sysprop"/> </span></a>
-	              </li>
+	              </li> 
              <%} %>
          </ul>
       </li>

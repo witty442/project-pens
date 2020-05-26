@@ -223,6 +223,7 @@ public class StockReturnDAO {
 			sql.append("\n   where B.salesrep_code=substr(H.request_no,1,4)) as salesrep_full_name ");
 			sql.append("\n ,H.customer_number ,C.party_name ,CS.address,CS.amphur,CS.province");
 			sql.append("\n ,H.request_no ,H.request_date ,H.comments ,H.net_amount,H.vat_amount,H.total_amount");
+			sql.append("\n ,H.reason");
 			sql.append("\n FROM apps.xxpens_om_rma_order_mst H");
 			sql.append("\n ,apps.xxpens_ar_cust_sales_all CS");
 			sql.append("\n ,apps.xxpens_ar_customer_all_v C");
@@ -239,7 +240,7 @@ public class StockReturnDAO {
 				m = new StockReturn();
 				m.setRequestNumber(rst.getString("request_no"));
 			    m.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
-			    m.setDescription(rst.getString("comments"));
+			    m.setDescription(Utils.isNull(rst.getString("comments")));
 				m.setCustomerCode(Utils.isNull(rst.getString("customer_number")));
 				m.setCustomerName(Utils.isNull(rst.getString("party_name")));
 				
@@ -271,61 +272,64 @@ public class StockReturnDAO {
 			}
 		}
 		return m;
-	}
-	  
-	  public List<StockReturnLine> searchStockReturnLineReport(Connection conn,User user,StockBean mCriteria) throws Exception {
-			Statement stmt = null;
-			ResultSet rst = null;
-			List<StockReturnLine> lineList = new ArrayList<StockReturnLine>();
-			StringBuilder sql = new StringBuilder();
-			int no = 0;
+ }
+	
+  public List<StockReturnLine> searchStockReturnLineReport(Connection conn,User user,StockBean mCriteria) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<StockReturnLine> lineList = new ArrayList<StockReturnLine>();
+		StringBuilder sql = new StringBuilder();
+		int no = 0;
+		try {
+			sql.append("\n select H.request_no");
+			sql.append("\n ,D.line_no,D.trx_number,P.segment1,P.description");
+			sql.append("\n ,D.PRI_REQ_QTY ,D.SEC_REQ_QTY ,D.SEC_REQ_UOM ,D.PRI_REQ_CONV");
+			sql.append("\n ,D.discount ,D.amount ,D.reason_code ");
+			sql.append("\n ,(select c.description from apps.fnd_lookup_values c ");
+			sql.append("\n   where c.lookup_type ='CREDIT_MEMO_REASON' and c.attribute15 = 'Y' ");
+			sql.append("\n   and c.lookup_code = D.reason_code )as reason_desc ");
+			sql.append("\n FROM apps.xxpens_om_rma_order_mst H");
+			sql.append("\n ,apps.xxpens_om_rma_order_dt D"); 
+			sql.append("\n ,apps.xxpens_om_item_mst_v P ");
+			sql.append("\n WHERE H.request_no =D.request_no");
+			sql.append("\n AND D.inventory_item_id = P.inventory_item_id");
+			sql.append("\n AND H.request_no ='"+ mCriteria.getRequestNo() + "'");
+			sql.append("\n ORDER BY D.line_no asc \n");
+			
+			logger.debug("sql:"+sql);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+			  StockReturnLine m = new StockReturnLine();
+			  no++;
+			  m.setNo(no);
+			  m.setRequestNumber(rst.getString("request_no"));
+			  m.setLineId(rst.getInt("line_no"));
+			  m.setProductCode(rst.getString("segment1"));
+			  m.setProductName(rst.getString("description"));
+			  m.setArInvoiceNo(rst.getString("trx_number"));
+			  m.setUom1Qty(Utils.decimalFormat(rst.getDouble("PRI_REQ_QTY"),Utils.format_current_2_disgit));
+			  m.setUom2Qty(Utils.decimalFormat(rst.getDouble("SEC_REQ_QTY"),Utils.format_current_2_disgit));
+			  m.setUom2(Utils.isNull(rst.getString("SEC_REQ_UOM")));
+			  m.setUom1Pac(Utils.decimalFormat(rst.getDouble("PRI_REQ_CONV"),Utils.format_number_no_disgit));
+			  m.setDiscount(Utils.decimalFormat(rst.getDouble("discount"),Utils.format_current_2_disgit));
+			  m.setTotalAmount(Utils.decimalFormat(rst.getDouble("amount"),Utils.format_current_2_disgit));
+			  m.setReasonDesc(Utils.isNull(rst.getString("reason_desc")));
+			  
+			  lineList.add(m);
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
 			try {
-				sql.append("\n select H.request_no");
-				sql.append("\n ,D.line_no,D.trx_number,P.segment1,P.description");
-				sql.append("\n ,D.PRI_REQ_QTY ,D.SEC_REQ_QTY ,D.SEC_REQ_UOM ,D.PRI_REQ_CONV");
-				sql.append("\n ,D.discount ,D.amount ");
-				sql.append("\n FROM apps.xxpens_om_rma_order_mst H");
-				sql.append("\n ,apps.xxpens_om_rma_order_dt D"); 
-				sql.append("\n ,apps.xxpens_om_item_mst_v P ");
-				sql.append("\n WHERE H.request_no =D.request_no");
-				sql.append("\n AND D.inventory_item_id = P.inventory_item_id");
-				sql.append("\n AND H.request_no ='"+ mCriteria.getRequestNo() + "'");
-				sql.append("\n ORDER BY D.line_no asc \n");
-				
-				logger.debug("sql:"+sql);
-				
-				stmt = conn.createStatement();
-				rst = stmt.executeQuery(sql.toString());
-
-				while (rst.next()) {
-				  StockReturnLine m = new StockReturnLine();
-				  no++;
-				  m.setNo(no);
-				  m.setRequestNumber(rst.getString("request_no"));
-				  m.setLineId(rst.getInt("line_no"));
-				  m.setProductCode(rst.getString("segment1"));
-				  m.setProductName(rst.getString("description"));
-				  m.setArInvoiceNo(rst.getString("trx_number"));
-				  m.setUom1Qty(Utils.decimalFormat(rst.getDouble("PRI_REQ_QTY"),Utils.format_current_2_disgit));
-				  m.setUom2Qty(Utils.decimalFormat(rst.getDouble("SEC_REQ_QTY"),Utils.format_current_2_disgit));
-				  m.setUom2(Utils.isNull(rst.getString("SEC_REQ_UOM")));
-				  m.setUom1Pac(Utils.decimalFormat(rst.getDouble("PRI_REQ_CONV"),Utils.format_number_no_disgit));
-				  m.setDiscount(Utils.decimalFormat(rst.getDouble("discount"),Utils.format_current_2_disgit));
-				  m.setTotalAmount(Utils.decimalFormat(rst.getDouble("amount"),Utils.format_current_2_disgit));
-
-				   lineList.add(m);
-				}//while
-
-			} catch (Exception e) {
-				throw e;
-			} finally {
-				try {
-					rst.close();
-					stmt.close();
-				} catch (Exception e) {}
-			}
-			return lineList;
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
 		}
+		return lineList;
+	}
 	  
 
 	/**

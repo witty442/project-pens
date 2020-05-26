@@ -12,11 +12,11 @@ import java.util.Locale;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.process.SequenceProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * I_Model Class

@@ -15,6 +15,8 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.PopupDAO;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.model.MStockDiscount;
+import com.isecinc.pens.model.MStockReturn;
 
 /**
  * Summary Action
@@ -61,6 +63,15 @@ public class PopupAction extends I_Action {
 				 request.getSession().setAttribute("keys", null);
 				 request.getSession().setAttribute("descs", null);
 				 forward = "searchInvoiceStockReturn";
+			 }else  if("new".equalsIgnoreCase(request.getParameter("action")) && "INVOICE_STOCK_DISCOUNT".equalsIgnoreCase(request.getParameter("page"))){
+				 request.setAttribute("INVOICE_LIST", null);
+				 popupForm.setCodeSearch("");
+				 popupForm.setDescSearch("");
+				 
+				 request.getSession().setAttribute("codes", null);
+				 request.getSession().setAttribute("keys", null);
+				 request.getSession().setAttribute("descs", null);
+				 forward = "searchInvoiceStockDiscount";
 			 }
 			
 		} catch (Exception e) {
@@ -97,7 +108,9 @@ public class PopupAction extends I_Action {
 		String forward = "";
 		try {
 			String storeType = Utils.isNull(request.getParameter("storeType"));
+			logger.debug("Page["+request.getParameter("page")+"]");
 			logger.debug("StoreType["+storeType+"]");
+			
 			if("BRAND".equalsIgnoreCase(request.getParameter("page"))){
 				 List<PopupForm> results = PopupDAO.searchBrand(popupForm,"");
 				 if(results != null && results.size() >0){
@@ -135,7 +148,7 @@ public class PopupAction extends I_Action {
 				popupForm.setProductCode(productCode);
 				popupForm.setRequestNumber(requestNumber);
 				
-				 List<PopupForm> results = PopupDAO.searchInvoiceStockReturn(popupForm,"",user);
+				 List<PopupForm> results = MStockReturn.searchInvoiceStockReturn(popupForm,"",user);
 				 
 				 if(results != null && results.size() >0){
 					 request.setAttribute("INVOICE_LIST", results);
@@ -143,6 +156,28 @@ public class PopupAction extends I_Action {
 					 request.setAttribute("Message", "ไม่พบข่อมูล");
 				 }
 				 forward = "searchInvoiceStockReturn";
+				 
+			}else if("INVOICE_STOCK_DISCOUNT".equalsIgnoreCase(request.getParameter("page"))){
+				String productCode = Utils.isNull(request.getParameter("productCode"));
+				String userId = Utils.isNull(request.getParameter("userId"));
+				String customerCode = Utils.isNull(request.getParameter("customerCode"));
+				String requestNumber = Utils.isNull(request.getParameter("requestNumber"));
+				
+				logger.debug("popup requestNumber:"+requestNumber);
+				
+				popupForm.setCustomerCode(customerCode);
+				popupForm.setUserId(userId);
+				popupForm.setProductCode(productCode);
+				popupForm.setRequestNumber(requestNumber);
+				
+				List<PopupForm> results = MStockDiscount.searchInvoiceStockDiscount(popupForm,"",user);
+				 
+				if(results != null && results.size() >0){
+				   request.setAttribute("INVOICE_LIST", results);
+				}else{
+				   request.setAttribute("Message", "ไม่พบข่อมูล");
+				}
+				forward = "searchInvoiceStockDiscount";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -152,7 +187,6 @@ public class PopupAction extends I_Action {
 		}
 		return forward;
 	}
-
 	
 	/**
 	 * Save

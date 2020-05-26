@@ -138,9 +138,10 @@ public static String getSqlPrepareSelect(TableBean tableBean,User userBean){
 	            "	d.uom2_conv_rate, \n"+
 	            "	d.uom1_price, \n"+
 	            "	d.discount, \n"+
-	            "	d.total_amount \n"+
+	            "	d.total_amount, \n"+
+	            "	d.reason \n"+
 	            "	FROM t_stock_return h,t_stock_return_line d 	\n"+
-	            "   WHERE d.request_number =h.request_number \n"+
+	            "   WHERE d.request_number = h.request_number \n"+
                 "   AND d.request_number ='"+requestNumber+"' \n";
             logger.debug("sql: \n"+sql);
 			ps = conn.prepareStatement(sql);

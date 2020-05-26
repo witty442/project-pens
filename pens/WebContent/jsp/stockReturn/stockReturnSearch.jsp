@@ -77,12 +77,12 @@ function createNewStockReturn(path){
 	return true;
 }
 
- function gotoPage(path,page){
-		document.stockReturnForm.action = path + "/jsp/stockReturnAction.do?do=search&rf=Y";
-		document.getElementsByName('curPage')[0].value = page;
-		document.stockReturnForm.submit();
-		return true;
-	}
+function gotoPage(path,page){
+	document.stockReturnForm.action = path + "/jsp/stockReturnAction.do?do=search&rf=Y";
+	document.getElementsByName('curPage')[0].value = page;
+	document.stockReturnForm.submit();
+	return true;
+}
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">

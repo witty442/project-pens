@@ -16,11 +16,11 @@ import com.isecinc.pens.bean.MonitorItemDetailBean;
 import com.isecinc.pens.bean.MonitorItemResultBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.exception.ExceptionHandle;
-import com.isecinc.pens.process.SequenceProcessAll;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * @author WITTY
@@ -95,10 +95,10 @@ public class BatchTaskDAO {
 			  
 			logger.debug("SQL:"+sql);
 			if(model.getTransactionId() ==null){
-				 model.setTransactionId(new BigDecimal(SequenceProcessAll.getIns().getNextValue("monitor")));
+				 model.setTransactionId(SequenceProcessAll.getIns().getNextValue("monitor"));
 			}
 			if(model.getMonitorId() ==null){
-				 model.setMonitorId(new BigDecimal(SequenceProcessAll.getIns().getNextValue("monitor_2")));
+				 model.setMonitorId(SequenceProcessAll.getIns().getNextValue("monitor_2"));
 			}
 			logger.debug("Transaction id:"+model.getTransactionId());
 
@@ -157,7 +157,7 @@ public class BatchTaskDAO {
 			logger.debug("SQL:"+sql);
 			logger.debug("SucessCound:"+model.getSuccessCount());
 			if(model.getId() ==null){
-				model.setId(new BigDecimal(SequenceProcessAll.getIns().getNextValue("monitor_item")));
+				model.setId(SequenceProcessAll.getIns().getNextValue("monitor_item"));
 			}
 			
 			int index = 0;

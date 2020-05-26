@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+<%@page import="java.sql.Connection"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
@@ -16,8 +18,11 @@ String dateTo = (String)request.getParameter("dateto");
 SalesTargetNew[] stn = null;
 
 String error = "";
-double totalTargetAmount = 0;;
+double totalTargetAmount = 0;
+Connection conn = null;
 try{
+	conn = DBConnection.getInstance().getConnection();
+	
 	String whereCause = "  and user_id = "+user.getId();
 	
 	if(dateFrom.length()>0 && dateTo.length()==0){
@@ -47,13 +52,16 @@ try{
 	if(stn == null)error = InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc();
 	if(stn!=null){
 		//for check sales amount
-		new MOrderLine().compareSalesTarget(stn,null,null);
+		new MOrderLine().compareSalesTarget(conn,stn,null);
 	}
 }catch(Exception e){
 	e.printStackTrace();
 	error = e.toString();
 }finally{
-	
+	if(conn != null){
+		conn.close();
+		conn = null;
+	}
 }
 
 int i=0;

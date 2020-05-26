@@ -1,7 +1,5 @@
 
 function cancelStockDiscount(path){
-	//alert(moveOrderType+":"+requestNumber);
-	
 	//if(confirm("ยืนยันการ ยกเลิกรายการ")){
 		//var input= confirmInputReason();
 		//if(input){
@@ -20,8 +18,32 @@ function confirmInputReason(){
 	}
 	return desc;
 }
+
+/** onchange vatRate **/
+function reCalcChangeVatRate(){
+	/** Case change VatRate  recalc row new **/
+	var productName = document.getElementsByName("productName");
+	var status = document.getElementsByName("status");
+	var index= 0;
+	for(var i=0;i<productName.length;i++){
+		index++;
+		if(productName[i].value !="" && status[i].value != "DELETE"){
+			sumTotalInRow(index,"AMOUNT");
+		}
+	}
+}
+
 function save(path,moveOrderType){
 	if(checkTableCanSave()){
+		
+		var reason = document.getElementById("description");
+		if(reason.value.length <10){
+			alert("กรุณาระบุ เหตุผลการให้ส่วนลดร้านค้า  อย่าน้อย 10 ตัวอักษร");
+			reason.focus();
+			return false;
+		}
+		
+		
 		/**Control Save Lock Screen **/
 		startControlSaveLockScreen();
 		
@@ -31,8 +53,24 @@ function save(path,moveOrderType){
 	}
 	return false;
 }
-function checkTableCanSave(){
+function canAddNewRow(){
+	var maxRow =12;
+	var countRow = 0;
 	var itemCode = document.getElementsByName("productCode");
+	var status = document.getElementsByName("status");
+	for(var i=0;i<itemCode.length;i++){
+		 if(status[i].value !='DELETE'){
+			 countRow++; 
+		 }
+	}//for
+	if(countRow < maxRow){
+		return true;
+	}
+	return false;
+}
+function checkTableCanSave(){
+	var productCode = document.getElementsByName("productCode");
+	var productName = document.getElementsByName("productName");
 	var arInvoiceNo = document.getElementsByName("arInvoiceNo");
 	var remainPriQty = document.getElementsByName("remainPriQty");
 	var uom1Qty = document.getElementsByName("uom1Qty");
@@ -41,21 +79,27 @@ function checkTableCanSave(){
 	var uom1Pac = document.getElementsByName("uom1Pac");
 	var uom2Pac = document.getElementsByName("uom2Pac");
 	var uom1Price = document.getElementsByName("uom1Price");
-	var discount = document.getElementsByName("discount");
-	var totalAmount = document.getElementsByName("totalAmount");
+	var lineAmount = document.getElementsByName("lineAmount");
 	
 	var status = document.getElementsByName("status");
+	var docType = document.getElementById("docType").value;
 	var r = true;
 	var error = false;
 	var rowSelectOne = false;
 	
-	for(var i=0;i<itemCode.length;i++){
+	for(var i=0;i<productCode.length;i++){
 	 // alert(itemCode[i].value+":"+status[i].value+":"+arInvoiceNo[i].value);
-	   if(itemCode[i].value !='' && status[i].value !='DELETE'){
-	      itemCode[i].className ='enableNumber';
-	      uom1Qty[i].className ='enableNumber';
-	      uom2Qty[i].className ='enableNumber';
+	   if( ( productCode[i].value !='' || productName[i].value !='') 
+		    && status[i].value !='DELETE'){
+		   
+		   if( docType =="KEY_PRODUCT"){
+		      productCode[i].className ='enableNumber';
+	          uom1Qty[i].className ='enableNumber';
+	          uom2Qty[i].className ='enableNumber';
+		   }
+		   
 	      arInvoiceNo[i].className ='normalTextInput';
+	      lineAmount[i].className ='enableNumber';
 	      
 		  rowSelectOne = true;
 		  
@@ -64,10 +108,16 @@ function checkTableCanSave(){
 			  arInvoiceNo[i].className ='errorTextInput';
 			  error = true;
 		  }
-		  if(uom1Qty[i].value =='' && uom2Qty[i].value==''){
-			  uom1Qty[i].className ='errorNumberInput';
-		      uom2Qty[i].className ='errorNumberInput';
-		      error = true;
+		  if( lineAmount[i].value =='' ){
+			  lineAmount[i].className ='errorNumberInput';
+			  error = true;
+		  }
+		  if( docType =="KEY_PRODUCT"){
+			  if(uom1Qty[i].value =='' && uom2Qty[i].value==''){
+				  uom1Qty[i].className ='errorNumberInput';
+			      uom2Qty[i].className ='errorNumberInput';
+			      error = true;
+			  }
 		  }
 		}//if
 	}//for
@@ -94,12 +144,9 @@ function escapeParameter(param){
 	return param.replace("%","%25");
 }
 
-function popCalendar(thisObj, thisEvent) {
-	new Epoch('epoch_popup', 'th', thisObj);
-}
 function checkProductOnblur(e,itemCodeObj,rowId){
 	 //alert("ONBLUR");
-	//alert(itemCodeObj.value);
+	//alert("rowId:"+rowId);
 	var productName = document.getElementsByName("productName");
 	if(productName[rowId-1].value ==''){
 		itemCodeObj.value ='';
@@ -107,7 +154,8 @@ function checkProductOnblur(e,itemCodeObj,rowId){
 	}
 }
 
-function sumTotalInRow(index){
+function sumTotalInRow(index,calcType){
+	var vatRate = document.getElementById("vatRate");
 	var pcsQty = 0;
 	var priQty = document.getElementsByName("priQty");
 	var remainPriAllQty = document.getElementsByName("remainPriAllQty");
@@ -117,52 +165,117 @@ function sumTotalInRow(index){
 	var uom1ConvRate = document.getElementsByName("uom1ConvRate");
 	var uom2ConvRate = document.getElementsByName("uom2ConvRate");
 	var uom1Price = document.getElementsByName("uom1Price");
-	var discount = document.getElementsByName("discount");
-	var totalAmount = document.getElementsByName("totalAmount");
+	var lineAmount = document.getElementsByName("lineAmount");
+	var vatAmount = document.getElementsByName("vatAmount");
+	var netAmount = document.getElementsByName("netAmount");
 	
 	var productCode = document.getElementsByName("productCode");
 	var arInvoiceNo = document.getElementsByName("arInvoiceNo");
-	
-	if(productCode[index-1].value != '' && arInvoiceNo[index-1].value != ''
-		&& (uom1Qty[index-1].value != '' || uom2Qty[index-1].value != '') ){
-		//convert uom2Qty to Pri_qty
-		if(uom2Qty[index-1].value != '' && convetTxtObjToFloat(uom2ConvRate[index-1]) > 0){
-			var qty2Temp = (convetTxtObjToFloat(uom2ConvRate[index-1])/convetTxtObjToFloat(uom1ConvRate[index-1]))*convetTxtObjToFloat(uom2Qty[index-1]);
-			console.log("qty2Temp:"+qty2Temp);
-			pcsQty = parseFloat(qty2Temp);
-			console.log("pcsQty:"+pcsQty);
-			//convert to 5 digit
-			pcsQty = toFixed(pcsQty,5);
-			console.log("pcsQty toFixed5:"+pcsQty);
-		}
-		//alert("["+uom1Qty[index-1].value+"]:["+pcsQty+"]");
-		console.log("uom1Qty[index-1]:"+convetTxtObjToFloat(uom1Qty[index-1]));
-		var priQtyTemp = convetTxtObjToFloat(uom1Qty[index-1]) + parseFloat(pcsQty);
-		console.log("priQtyTemp:"+priQtyTemp);
-		priQty[index-1].value = priQtyTemp;
+	var remainAmount = document.getElementsByName("remainAmount");
+	//alert("calcType:"+calcType);
+	if(productCode[index-1].value != '' && arInvoiceNo[index-1].value != ''){
 		
-		//compare priQty <= remainPriAllQty 
-		if(priQtyTemp > convetTxtObjToFloat(remainPriAllQty[index-1])){
-			alert("จำนวนที่คีย์ มากกว่าจำนวนในบิลที่สามารถคืนได้ กรุณาตรวจสอบ");
-			uom1Qty[index-1].focus();
-			uom1Qty[index-1].className ="errorNumber";
-			uom2Qty[index-1].className ="errorNumber";
-			totalAmount[index-1].value ="0";
-			uom1Qty[index-1].value ="";
-			uom2Qty[index-1].value ="";
-			priQty[index-1].value = "";
-		}else{
-			uom1Qty[index-1].className ="enableNumber";
-			uom2Qty[index-1].className ="enableNumber";
+		//Validate CtnQty,subQty
+	   if(calcType=="CTN" && (uom1Qty[index-1].value != '' || uom2Qty[index-1].value != '')) {
+			//convert uom2Qty to Pri_qty
+			if(uom2Qty[index-1].value != '' && convetTxtObjToFloat(uom2ConvRate[index-1]) > 0){
+				var qty2Temp = (convetTxtObjToFloat(uom2ConvRate[index-1])/convetTxtObjToFloat(uom1ConvRate[index-1]))*convetTxtObjToFloat(uom2Qty[index-1]);
+				console.log("qty2Temp:"+qty2Temp);
+				pcsQty = parseFloat(qty2Temp);
+				console.log("pcsQty:"+pcsQty);
+				//convert to 5 digit
+				pcsQty = toFixed(pcsQty,5);
+				console.log("pcsQty toFixed5:"+pcsQty);
+			}
+			//alert("["+uom1Qty[index-1].value+"]:["+pcsQty+"]");
+			console.log("uom1Qty[index-1]:"+convetTxtObjToFloat(uom1Qty[index-1]));
+			var priQtyTemp = convetTxtObjToFloat(uom1Qty[index-1]) + parseFloat(pcsQty);
+			console.log("priQtyTemp:"+priQtyTemp);
+			priQty[index-1].value = priQtyTemp;
 			
-			//calc total Amount = (priQty*uom1Price) -discount
-			totalAmount[index-1].value = priQtyTemp * (convetTxtObjToFloat(uom1Price[index-1]) - convetTxtObjToFloat(discount[index-1]) );
-			toCurreny(totalAmount[index-1]);
+			//compare priQty <= remainPriAllQty 
+			if(priQtyTemp > convetTxtObjToFloat(remainPriAllQty[index-1])){
+				alert("จำนวนที่คีย์ มากกว่าจำนวนในบิลที่สามารถทำได้ กรุณาตรวจสอบ");
+				uom1Qty[index-1].focus();
+				uom1Qty[index-1].className ="errorNumber";
+				uom2Qty[index-1].className ="errorNumber";
+				uom1Qty[index-1].value ="";
+				uom2Qty[index-1].value ="";
+				priQty[index-1].value = "";
+			}else{
+				uom1Qty[index-1].className ="enableNumber";
+				uom2Qty[index-1].className ="enableNumber";
+			}
+	   }
+	   
+	   //calc remainAmount = remainAmount -(lineAmount(same invoiceNo) not same product in page )
+		var sumLineAmountByArInvoiceNotCurTemp = sumLineAmountByArInvoiceNotCur(index,arInvoiceNo[index-1].value);
+		//alert("sumLineAmountByArInvoiceNotCurTemp:"+sumLineAmountByArInvoiceNotCurTemp);
+		remainAmountCalcTemp = convetTxtObjToFloat(remainAmount[index-1])-sumLineAmountByArInvoiceNotCurTemp;
+		  
+	   //calc Vat 7 of lineAmount
+		var vatAmountTemp = convetTxtObjToFloat(lineAmount[index-1]) * (convetTxtObjToFloat(vatRate)/100);
+		vatAmount[index-1].value = vatAmountTemp;
+		toCurreny(vatAmount[index-1]);
+		
+		//calc Net Amount = discount +vat (vat 7)
+		if(vatRate.value =="7"){
+		   netAmount[index-1].value = convetTxtObjToFloat(lineAmount[index-1]) + vatAmountTemp;
+		}else{
+			//vatRate <> 7  netAmount = discount - vat
+			netAmount[index-1].value = convetTxtObjToFloat(lineAmount[index-1]) - vatAmountTemp;
 		}
-		//cal amount totalAllRowAmount
+		toCurreny(netAmount[index-1]);
+		
+		//compare netAmount vs remainAmount in invoiceNo
+		if(convetTxtObjToFloat(lineAmount[index-1]) > remainAmountCalcTemp ){
+			alert("ยอดเงินรวมเกินยอด Invoice amt คงเหลือในบิลนี้ กรุณาอ้างบิลอื่นใหม");
+			lineAmount[index-1].value ="";
+			vatAmount[index-1].value ="";
+			netAmount[index-1].value = "";
+		}
+		
+		//calc total Amount all row
 		sumTotalAllRow();
+		
+	/** Case productCode is null **/
+	}else if(productCode[index-1].value == '' && arInvoiceNo[index-1].value != ''){
+	   /** Calc VatAmount of Discount ***/
+	   if(calcType=="AMOUNT" && lineAmount[index-1].value != ''){
+		   //alert("calcType["+calcType+"]lineAmount:"+lineAmount[index-1].value);
+		   
+		   //calc remainAmount = remainAmount -(lineAmount(same invoiceNo) not same product in page )
+			var sumLineAmountByArInvoiceNotCurTemp = sumLineAmountByArInvoiceNotCur(index,arInvoiceNo[index-1].value);
+			//alert("sumLineAmountByArInvoiceNotCurTemp:"+sumLineAmountByArInvoiceNotCurTemp);
+			var remainAmountCalcTemp = convetTxtObjToFloat(remainAmount[index-1])-sumLineAmountByArInvoiceNotCurTemp;
+			
+		   //calc Vat 7 of lineAmount
+			var vatAmountTemp = convetTxtObjToFloat(lineAmount[index-1]) * (convetTxtObjToFloat(vatRate)/100);
+			vatAmount[index-1].value = vatAmountTemp;
+			toCurreny(vatAmount[index-1]);
+			
+			//calc Net Amount = discount +vat (vat 7)
+			if(vatRate.value =="7"){
+			   netAmount[index-1].value = convetTxtObjToFloat(lineAmount[index-1]) + vatAmountTemp;
+			}else{
+				//vatRate <> 7  netAmount = discount - vat
+				netAmount[index-1].value = convetTxtObjToFloat(lineAmount[index-1]) - vatAmountTemp;
+			}
+			toCurreny(netAmount[index-1]);
+			
+			//compare netAmount vs remainAmount in invoiceNo
+			if(convetTxtObjToFloat(lineAmount[index-1]) > remainAmountCalcTemp ){
+				alert("ยอดเงินรวมเกินยอด Invoice amt คงเหลือในบิลนี้ กรุณาอ้างบิลอื่นใหม");
+				lineAmount[index-1].value ="";
+				vatAmount[index-1].value ="";
+				netAmount[index-1].value = "";
+			}
+	   }
+	   
+	   //calc total Amount all row
+	   sumTotalAllRow();
 	}else{
-		if(productCode[index-1].value == ''){
+		/*if(productCode[index-1].value == ''){
 			alert("กรุณาระบุ รหัสสินค้าก่อน ");
 			productCode[index-1].className ="errorTextInput";
 			productCode[index-1].focus();
@@ -170,7 +283,7 @@ function sumTotalInRow(index){
 			uom2Qty[index-1].value = "";
 		}else{
 			productCode[index-1].className ="normalTextInput";
-		}
+		}*/
 		 
 		if(arInvoiceNo[index-1].value == ''){
 			alert("กรุณาระบุ เลขที่บิล ก่อน ");
@@ -183,35 +296,35 @@ function sumTotalInRow(index){
 		}
 	}
 }
-
 function sumTotalAllRow(){
 	var itemCode = document.getElementsByName("productCode");
-	var totalAmount = document.getElementsByName("totalAmount");
+	var productName = document.getElementsByName("productName");
+	var lineAmount = document.getElementsByName("lineAmount");
+	var vatAmount = document.getElementsByName("vatAmount");
+	var netAmount = document.getElementsByName("netAmount");
 	var status = document.getElementsByName("status");
 	
-	var totalAllNonVatAmount = document.getElementById("totalAllNonVatAmount");
-	var totalAllVatAmount = document.getElementById("totalAllVatAmount");
-	var totalAllAmount = document.getElementById("totalAllAmount");
-	var sumAllNonVat= 0;
-	
+	var lineAmountTemp = 0;
+	var vatAmountTemp = 0;
+	var netAmountTemp = 0;
 	for(var i=0;i<itemCode.length;i++){
 	 // alert(itemCode[i].value+":"+status[i].value+":"+arInvoiceNo[i].value);
-	   if(itemCode[i].value !='' && status[i].value !='DELETE'){
-		   sumAllNonVat += convetTxtObjToFloat(totalAmount[i]);
+	   if( (itemCode[i].value !='' || productName[i].value !='') && status[i].value !='DELETE'){
+		   lineAmountTemp += convetTxtObjToFloat(lineAmount[i]);
+		   vatAmountTemp += convetTxtObjToFloat(vatAmount[i]);
+		   netAmountTemp += convetTxtObjToFloat(netAmount[i]);
 	   }
 	}//for
-	
-	totalAllNonVatAmount.value = sumAllNonVat;
-	//calc vat
-	totalAllVatAmount.value = sumAllNonVat*0.07;
-	//totalAmount
-	totalAllAmount.value = sumAllNonVat + (sumAllNonVat*0.07);
+	document.getElementById("totalLineAmount").value = lineAmountTemp;
+	document.getElementById("totalVatAmount").value = vatAmountTemp;
+	document.getElementById("totalNetAmount").value = netAmountTemp;
 	
 	//convert to currency
-	toCurreny(totalAllNonVatAmount);
-	toCurreny(totalAllVatAmount);
-	toCurreny(totalAllAmount);
+	toCurreny(document.getElementById("totalLineAmount"));
+	toCurreny(document.getElementById("totalVatAmount"));
+	toCurreny(document.getElementById("totalNetAmount"));
 }
+
 //Check enter only
 function  getProductKeypress(e,itemCodeObj,rowId){
 //	alert("keypress");
@@ -226,8 +339,9 @@ function  getProductKeypress(e,itemCodeObj,rowId){
 	var uom1Pac = document.getElementsByName("uom1Pac");
 	var uom2Pac = document.getElementsByName("uom2Pac");
 	var uom1Price = document.getElementsByName("uom1Price");
-	var discount = document.getElementsByName("discount");
-	var totalAmount = document.getElementsByName("totalAmount");
+	var lineAmount = document.getElementsByName("lineAmount");
+	var vatAmount = document.getElementsByName("vatAmount");
+	var netAmount = document.getElementsByName("netAmount");
 	var uom1ConvRate = document.getElementsByName("uom1ConvRate");
 	var uom2ConvRate = document.getElementsByName("uom2ConvRate");
 	
@@ -244,8 +358,9 @@ function  getProductKeypress(e,itemCodeObj,rowId){
 			uom1Pac[rowId-1].value = '';
 			uom2Pac[rowId-1].value = '';
 			//uom1Price[rowId-1].value = '';
-			discount[rowId-1].value = '';
-			totalAmount[rowId-1].value = '';
+			lineAmount[rowId-1].value = '';
+			vatAmount[rowId-1].value = '';
+			netAmount[rowId-1].value = '';
 			uom1ConvRate[rowId-1].value = '';
 			uom2ConvRate[rowId-1].value = '';
 		}else{
@@ -286,16 +401,41 @@ function getProductModel(itemCodeObj,rowId){
 	var uom1Pac = document.getElementsByName("uom1Pac");
 	var uom2Pac = document.getElementsByName("uom2Pac");
 	var uom1Price = document.getElementsByName("uom1Price");
-	var discount = document.getElementsByName("discount");
-	var totalAmount = document.getElementsByName("totalAmount");
+	var lineAmount = document.getElementsByName("lineAmount");
+	var vatAmount = document.getElementsByName("vatAmount");
+	var netAmount = document.getElementsByName("netAmount");
 	var uom1ConvRate = document.getElementsByName("uom1ConvRate");
 	var uom2ConvRate = document.getElementsByName("uom2ConvRate");
+	
+	/** validate prodcutCode on same Brand in Doc **/
+	if(checkItemIsMoreOneBrand(rowId)){
+		itemCodeObj.className ="errorTextInput";
+		alert("รหัสสินค้า ไม่ได้อยู่ในแบรนด์เดียวกัน กรุณาตรวจสอบ")  ;
+		itemCodeObj.focus();
+			
+		productName[rowId-1].value = '';
+		inventoryItemId[rowId-1].value = '';
+		arInvoiceNo[rowId-1].value = '';
+		remainPriQty[rowId-1].value = '';
+		uom1Qty[rowId-1].value = '';
+		uom2Qty[rowId-1].value = '';
+		uom2[rowId-1].value = '';
+		uom1Pac[rowId-1].value = '';
+		uom2Pac[rowId-1].value = '';
+		//uom1Price[rowId-1].value = '';
+		lineAmount[rowId-1].value = '';
+		vatAmount[rowId-1].value = '';
+		netAmount[rowId-1].value = '';
+		uom1ConvRate[rowId-1].value = '';
+		uom2ConvRate[rowId-1].value = '';
+		return false;
+	}
 	
 	//pass parameter
 	var param  = "productCode=" + itemCodeObj.value+"&requestNumber="+document.getElementById("requestNumber").value;
 	var returnString = "";
 	var getData = $.ajax({
-			url: path+"/jsp/stockReturn/ajax/getProductStockReturnQuery.jsp",
+			url: path+"/jsp/stockDiscount/ajax/getProductStockDiscountQuery.jsp",
 			data : param,
 			async: false,
 			cache: false,
@@ -320,8 +460,9 @@ function getProductModel(itemCodeObj,rowId){
 			uom1Pac[rowId-1].value = '';
 			uom2Pac[rowId-1].value = '';
 			//uom1Price[rowId-1].value = '';
-			discount[rowId-1].value = '';
-			totalAmount[rowId-1].value = '';
+			lineAmount[rowId-1].value = '';
+			vatAmount[rowId-1].value = '';
+			netAmount[rowId-1].value = '';
 			uom1ConvRate[rowId-1].value = '';
 			uom2ConvRate[rowId-1].value = '';
 		}else{
@@ -338,109 +479,45 @@ function getProductModel(itemCodeObj,rowId){
 			//uom1Price[rowId-1].value = s[5];
 			uom1ConvRate[rowId-1].value = s[6];
 			uom2ConvRate[rowId-1].value = s[7];
+			
+			productName[rowId-1].readOnly = true;
+			productName[rowId-1].className = "disableText";
+			
+			//disable key detail
+			disableInputDetail(rowId);
 		}
 	return found;
 }
 
-/**
- * AddRow(setFocus)
- */
-function addRow(setFocus){
-	var rows = $('#tblProduct tr').length-1;
-	var className = 'lineO';
-	if(rows%2 !=0){
-		className = 'lineE';
+function disableInputProduct(rowId){
+	if(document.getElementById("docType").value ==""){
+	   document.getElementById("docType").value ="KEY_DETAIL";
 	}
-	var rowId = rows-1;
-    var tabIndex = parseFloat(document.getElementById("tabIndex").value);
-    var no = rows-1;
-	tabIndex++;
 	
-	//alert("rowId["+rowId+"]");
+	var productCode = document.getElementsByName("productCode");
+	var uom1Qty = document.getElementsByName("uom1Qty");
+	var uom2Qty = document.getElementsByName("uom2Qty");
 	
-	var rowData ="<tr class='"+className+"'>"+
-	    "<td class='td_text_center' width='5%'> " +
-	    "  <input type='checkbox' tabindex ='-1' name='linechk' id='lineChk' value='0'/>" +
-	    "  <input type='hidden' tabindex ='-1' name='lineId' id='lineId' value='0'/>"+
-	    "  <input type='hidden' tabindex ='-1' name='status' id='status' value='SV' />"+
-	    "</td>"+
-	    "<td class='td_text_center' width='5%'> " +
-	    "  <input type='text' name='no' value='"+no+"' id='no' size='2' readonly class='disableTextCenter'>" +
-	    "</td>"+
-	   
-	    "<td class='td_text_center' width='6%'> "+
-	    "  <input type='text' name='productCode' id='productCode' size='5' class='normalText' "+
-	    "   onkeypress='getProductKeypress(event,this,"+rowId+")' "+
-	    "   onchange='checkProductOnblur(event,this,"+rowId+")' " +
-	    "   tabindex ="+tabIndex+
-	    "  autoComplete='off'/>  </td>"+
-	    "<td class='td_text'  width='15%'> "+
-	    " <input type='text' tabindex ='-1' name='productName' size='40' readonly class='disableText' />" +
-	    " <input type='hidden' tabindex ='-1' name='inventoryItemId' id='inventoryItemId'/>"+
-	    " <input type='hidden' size='3' class='disableText' tabindex ='-1' name='uom1ConvRate' id='uom1ConvRate'/>"+
-	    " <input type='hidden' size='3' class='disableText' tabindex ='-1' name='uom2ConvRate' id='uom2ConvRate'/>"+
-	    "</td>";
-	    tabIndex++;
-	    rowData +="<td class='td_text_center'  width='10%' nowrap> "+
-	    " <input type='text' name='arInvoiceNo' id='arInvoiceNo' autoComplete='off' value ='' size='9'  readonly tabindex ="+tabIndex+"/>" +
-	    " <input type='button' name='bt3' value='...' onclick='openPopupInvoice("+no+")'/> "+
-	    "</td>"+
-	    "<td class='td_number'  width='6%'> "+
-	    " <!--remainPriAllQty:--><input type='text' size='8' name='remainPriAllQty' id='remainPriAllQty' value ='' readonly class='disableNumber'/>" +
-	    " <!--remainPriQty:--><input type='hidden' size='3' class='disableText' name='remainPriQty' id='remainPriQty' value =''  readonly />" +
-	    " <!--remainSubQty:--><input type='hidden' size='3' class='disableText' name='remainSubQty' id='remainSubQty' value =''  readonly />" +
-	    "</td>"+
-	   
-	    tabIndex++;
-	    rowData +="<td class='td_number' width='6%'> "+
-	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='uom1Qty' size='5' "+
-	    "  onblur ='sumTotalInRow("+no+")' autoComplete='off'"+
-	    "  onkeydown='return isNum0to9andpoint(this,event);'class='numberText' /> "+
-	    " <!--priQty:--><input type='hidden' size='3' tabindex ='-1' class='disableText' name='priQty' id='priQty'/>"+
-	    "  </td>"+
-	    tabIndex++;
-	    rowData +="<td class='td_number' width='6%'> "+
-	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='uom2Qty' size='5' "+
-	    "  onblur ='sumTotalInRow("+no+")' "+
-	    "  onkeydown='return isNum0to9andpoint(this,event);' class='numberText' autoComplete='off'/> "+
-	    "  </td>";
+	productCode[rowId-1].readOnly = true;
+	uom1Qty[rowId-1].readOnly = true;
+	uom2Qty[rowId-1].readOnly = true;
 	
-	    rowData +="<td class='td_text_center' width='7%'> "+
-	    "  <input type='text' name='uom2' value='' id='uom2' size='3' readonly class='disableText'>"+
-	    "  </td>"+
-	    "<td class='td_number'  width='7%'> "+
-	    " <input type='text' name='uom1Pac' id='uom1Pac' value ='' size='6' readonly class='disableNumber'/>" +
-	    "</td>"+
-	    "<td class='td_number'  width='7%'> "+
-	    " <input type='text' name='uom2Pac' id='uom2Pac' value ='' size='6' readonly class='disableNumber'/>" +
-	    "</td>"+
-	    "<td class='td_number'  width='7%'> "+
-	    " <input type='text' name='uom1Price' id='uom1Price' value ='' size='6' readonly class='disableNumber'/>" +
-	    "</td>";
-	    tabIndex++;
-	    rowData +="<td class='td_number' width='7%'> "+
-	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='discount' size='5' onblur='sumTotalInRow("+no+")' "+
-	    "  onkeydown='return isNum(this,event);' class='numberText' autoComplete='off'/> "+
-	    "  </td>";
-	    rowData +="<td class='td_number' width='7%'> "+
-	    "  <input type='text' name='totalAmount' id='totalAmount' size='10' readonly class='disableNumber'>"+
-	    "  </td>"+
-	    "</tr>";
-
-	//alert(rowData);
-    $('#tblProduct').append(rowData);
-    //set next tabIndex
-    document.getElementById("tabIndex").value = tabIndex;
-    
-    //set focus default
-    var itemCode = document.getElementsByName("productCode");
-    //alert(setFocus);
-    if(setFocus){
-       itemCode[rowId-1].focus();
-    }
+	productCode[rowId-1].className = "disableText";
+	uom1Qty[rowId-1].className = "disableText";
+	uom2Qty[rowId-1].className = "disableText";
+	
+	//alert("loadMe");
+	addRow(true);	
+}
+function disableInputDetail(rowId){
+	if(document.getElementById("docType").value ==""){
+	   document.getElementById("docType").value ="KEY_PRODUCT";
+	}
+	
+	var productCode = document.getElementsByName("productCode");
+	var productName = document.getElementsByName("productName");
+	productName[rowId-1].readOnly = true;
+	productName[rowId-1].className = "disableText";
 }
 function nextRowKeypress(e,rowId){
 	var TABKEY =9;
@@ -462,16 +539,16 @@ function removeRow(path){
 		var arInvoiceNo = document.getElementsByName("arInvoiceNo");
 		var drow;
 		var bcheck=false;
-		var ietmCodeArr ="";
+		var itemCodeArr ="";
 		for(var i=0;i<chk.length;i++){
 			if(chk[i].checked){
-				drow = tbl.rows[i+3];
+				drow = tbl.rows[i+1];
 				status[i].value ="DELETE";
 				$(drow).hide();
 				bcheck=true;
 				
 				//alert(itemCode[i].value);
-				ietmCodeArr += (itemCode[i].value+"_"+arInvoiceNo[i].value)+"|";
+				itemCodeArr += (itemCode[i].value+"_"+arInvoiceNo[i].value)+"|";
 			}
 		}
 		if(!bcheck){
@@ -482,6 +559,9 @@ function removeRow(path){
 			
 			//resum Total 
 			sumTotalAllRow();
+			
+			//key Product Or detail 1 type only
+			checkDocType();
 		}
 	}
 	return false;
@@ -589,8 +669,10 @@ function openPopupInvoiceModel(path,index,userId){
 	var form = document.stockDiscountForm;
 	//alert("index:"+index);
 	var productCodeObj = document.getElementsByName("productCode")[index-1];
-	
-	if(productCodeObj.value != '' && $("#customerCode").val() != ''){
+	var productNameObj = document.getElementsByName("productName")[index-1];
+
+	if($("#customerCode").val() != '' && $("#vatRate").val() != '' 
+		&&( productCodeObj.value != '' || productNameObj.value != '') ){
 	    var param  = "&index="+index;
 	        param += "&productCode="+productCodeObj.value;
 	        param += "&userId="+userId;
@@ -598,51 +680,100 @@ function openPopupInvoiceModel(path,index,userId){
 	        param += "&requestNumber="+$("#requestNumber").val();
 	        param += "&backDate="+$("#backDate").val();
 	        //alert(param);
-		var url = path + "/jsp/popupAction.do?do=prepare&page=INVOICE_STOCK_RETURN&action=new"+param;
+		var url = path + "/jsp/popupAction.do?do=prepare&page=INVOICE_STOCK_DISCOUNT&action=new"+param;
 		PopupCenterFullHeight(url,"",600);
 	}else{
 		if($("#customerCode").val() == ''){
 		   alert("กรุณาระบุรหัส ร้านค้าก่อน");
 		   $("#customerCode").focus();
 		}
-		if(productCodeObj.value == ''){	
-		   alert("กรุณาระบุรหัสสินค้าก่อน ");
-		   productCodeObj.focus();
+		if($("#vatRate").val() == ''){
+		   alert("กรุณาระบุ Vat Rate");
+		   $("#vatRate").focus();
+		}
+		if(productCodeObj.value == '' || productNameObj.value == ''){
+			 alert("กรุณาระบุรหัสสินค้า หรือ รายละเอียด");
+			 productCodeObj.focus();
 		}
 	}
 }
 
-function setInvoiceValue(code,priAllQty,priQty,subQty,uom1Price,index){
+function setInvoiceValue(code,priAllQty,priQty,subQty,uom1Price,remainAmount,index){
+	var productCode = document.getElementsByName("productCode")[index-1];
 	var arInvoiceNo = document.getElementsByName("arInvoiceNo")[index-1];
 	var remainPriAllQty = document.getElementsByName("remainPriAllQty")[index-1];
 	var remainPriQty = document.getElementsByName("remainPriQty")[index-1];
 	var remainSubQty = document.getElementsByName("remainSubQty")[index-1];
 	var uom1PriceObj = document.getElementsByName("uom1Price")[index-1];
+	var remainAmountObj = document.getElementsByName("remainAmount")[index-1];
+	if(productCode.value != ""){
+		if(code != ''){
+		  arInvoiceNo.value = code;
+		  remainPriAllQty.value = priAllQty;
+		  remainPriQty.value = priQty;
+		  remainSubQty.value = subQty;
+		  uom1PriceObj.value = uom1Price;
 	
-	if(code != ''){
-	  arInvoiceNo.value = code;
-	  remainPriAllQty.value = priAllQty;
-	  remainPriQty.value = priQty;
-	  remainSubQty.value = subQty;
-	  uom1PriceObj.value = uom1Price;
-	  
-	  if(checkItemDuplicate(index)){
-		 arInvoiceNo.className ="errorTextInput";
-		 alert("ไม่สามารถ กรอกข้อมูลสินค้าเดียวกันได้ ใน InvoiceNo เดียวกัน")  ;
-		 arInvoiceNo.value = '';
-		 remainPriAllQty.value = '';
-		 remainPriQty.value = '';
-		 remainSubQty.value = '';
-		 uom1PriceObj.value = '';
-	  }else{
+		  remainAmountObj.value = remainAmount;//from popup
+		  
 		  arInvoiceNo.className ="normalTextInput";
-	  }
+		  if(checkItemDuplicate(index)){
+			 arInvoiceNo.className ="errorTextInput";
+			 alert("ไม่สามารถ กรอกข้อมูลสินค้าเดียวกันได้ ใน InvoiceNo เดียวกัน")  ;
+			 arInvoiceNo.value = '';
+			 remainPriAllQty.value = '';
+			 remainPriQty.value = '';
+			 remainSubQty.value = '';
+			 uom1PriceObj.value = '';
+			 remainAmountObj.value = '';
+		  }
+		}else{
+			/** not found **/
+		   arInvoiceNo.value = '';
+		   remainPriAllQty.value = '';
+		   remainPriQty.value = '';
+		   remainSubQty.value = '';
+		   uom1PriceObj.value ='';
+		   remainAmountObj.value = '';
+		}
 	}else{
-	   arInvoiceNo.value = '';
-	   remainPriAllQty.value = '';
-	   remainPriQty.value = '';
-	   remainSubQty.value = '';
-	   uom1PriceObj.value ='';
+		/** case search  no productCode **/
+		if(code != ''){
+		  arInvoiceNo.value = code;
+		  remainPriAllQty.value = priAllQty;
+		  remainPriQty.value = priQty;
+		  remainSubQty.value = subQty;
+		  uom1PriceObj.value = uom1Price;
+		  remainAmountObj.value = remainAmount;
+		  
+		  var uom1Qty = document.getElementsByName("uom1Qty")[index-1];
+		  var uom2Qty = document.getElementsByName("uom2Qty")[index-1];
+		  
+		  uom1Qty.readOnly = true;
+		  uom2Qty.readOnly = true;
+		  uom1Qty.className = "disableNumber";
+		  uom2Qty.className = "disableNumber";
+		  
+		  arInvoiceNo.className ="normalTextInput";
+		  if(checkInvoiceDuplicate(index)){
+			 arInvoiceNo.className ="errorTextInput";
+			 alert("ไม่สามารถ กรอกข้อมูล InvoiceNo เดียวกันได้")  ;
+			 arInvoiceNo.value = '';
+			 remainPriAllQty.value = '';
+			 remainPriQty.value = '';
+			 remainSubQty.value = '';
+			 uom1PriceObj.value = '';
+			 remainAmountObj.value = '';
+		  }
+		}else{
+		   /** not found **/
+		   arInvoiceNo.value = '';
+		   remainPriAllQty.value = '';
+		   remainPriQty.value = '';
+		   remainSubQty.value = '';
+		   uom1PriceObj.value ='';
+		   remainAmountObj.value = '';
+		}
 	}
 } 
 function checkItemDuplicate(curRowIdChk){
@@ -653,6 +784,7 @@ function checkItemDuplicate(curRowIdChk){
 	var itemCodeCheck = itemCode[curRowIdChk-1].value;
 	var arInvoiceNoCheck = arInvoiceNo[curRowIdChk-1].value;
 	var curCheck = itemCodeCheck+"_"+arInvoiceNoCheck;
+
 	var checkTemp = "";
 	var dup = false;
 	for(var i=0;i<itemCode.length;i++){
@@ -664,4 +796,94 @@ function checkItemDuplicate(curRowIdChk){
 	   }
 	}//for
 	return dup;
+}
+function checkInvoiceDuplicate(curRowIdChk){
+	var arInvoiceNo = document.getElementsByName("arInvoiceNo");
+	var status = document.getElementsByName("status");
+
+	var curArInvoiceNoCheck = arInvoiceNo[curRowIdChk-1].value;
+	var checkTemp = "";
+	var dup = false;
+	for(var i=0;i<status.length;i++){
+	   if(status[i].value !='DELETE' && (i != (curRowIdChk-1)) ){
+		   checkTemp = arInvoiceNo[i].value;
+		   if(checkTemp==curArInvoiceNoCheck){
+			   dup = true;
+		   }
+	   }
+	}//for
+	return dup;
+}
+
+//sum all row lineAmount same arInvoiceNo <> not cur rowId
+function sumLineAmountByArInvoiceNotCur(curRowIdChk,arInvoiceNoCur){
+	var lineAmount = document.getElementsByName("lineAmount");
+	var arInvoiceNo = document.getElementsByName("arInvoiceNo");
+	var status = document.getElementsByName("status");
+	var totalLineAmount = 0;
+	for(var i=0;i<status.length;i++){
+	   if(status[i].value !='DELETE' && (i != (curRowIdChk-1)) ){
+		   if(arInvoiceNo[i].value ==arInvoiceNoCur){
+			   totalLineAmount += convetTxtObjToFloat(lineAmount[i]);
+		   }
+	   }
+	}//for
+	return totalLineAmount;
+}
+
+function checkItemIsMoreOneBrand(curRowIdChk){
+	var itemCode = document.getElementsByName("productCode");
+	var arInvoiceNo = document.getElementsByName("arInvoiceNo");
+	var status = document.getElementsByName("status");
+	
+	var itemCodeCheck = itemCode[curRowIdChk-1].value;
+	var arInvoiceNoCheck = arInvoiceNo[curRowIdChk-1].value;
+	var curBrandCheck =itemCodeCheck.substring(0,3) ;
+
+	var brandCheckTemp = "";
+	var brandError = false;
+	for(var i=0;i<itemCode.length;i++){
+	   if(status[i].value !='DELETE' && (i != (curRowIdChk-1)) ){
+		   brandCheckTemp = itemCode[i].value.substring(0,3);
+		   if(brandCheckTemp !="" && brandCheckTemp !=curBrandCheck){
+			   brandError = true;
+		   }
+	   }
+	}//for
+	return brandError;
+}
+
+/** check DocType from 1 row **/
+function checkDocType(){
+	var productCode = document.getElementsByName("productCode");
+	var productName = document.getElementsByName("productName");
+	var status = document.getElementsByName("status");
+	var docTypeObj = document.getElementById("docType");
+	
+	var docType ="";
+	if(productCode.length >=1){
+		 if(status[0].value !='DELETE'){
+			 if(productCode[0].value != ""){
+			    docTypeObj.value = "KEY_PRODUCT";
+			 }else {
+				docTypeObj.value = "KEY_DETAIL"; 
+			 }
+		 }else{
+			// row blank reset docType
+			docTypeObj.value = "";
+			//enbale can key 2 Type
+			var productCode = document.getElementsByName("productCode");
+			var productName = document.getElementsByName("productName");
+			for(var i=0;i<productCode.length;i++){
+				productCode[i].readOnly = false;
+				productName[i].readOnly = false;
+				productCode[i].className = 'normalText';
+				productName[i].className = 'normalText';
+			}
+		 }
+	}else{
+		// row blank reset docType
+		docTypeObj.value = "";
+	}
+	
 }

@@ -15,13 +15,12 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.process.SequenceProcessAll;
-import com.isecinc.pens.web.stock.StockBean;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.UserUtils;
 import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class SalesTargetDAO {
 
@@ -739,7 +738,7 @@ public class SalesTargetDAO {
 			//check documentNo
 			if(h.getId()==0){
 				//Gen Next ID Sequence
-				Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP");
+				Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP").intValue();
 				if(id==0){
 					id = 1;
 				}

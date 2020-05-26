@@ -3,14 +3,10 @@ package com.isecinc.pens.report.salesanalyst;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.core.bean.References;
-import com.isecinc.pens.bean.GroupRole;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.web.profilesearch.ManageProfileSearchBean;
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;

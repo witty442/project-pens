@@ -13,3 +13,4 @@ uom2_pac,N,10,INT_NOCUR,,N
 uom1_price,N,11,CHAR,,N
 discount,N,12,CHAR,,N
 total_amount,N,13,CHAR,,N
+reason,N,14,CHAR,,N

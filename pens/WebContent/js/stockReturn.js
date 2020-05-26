@@ -31,9 +31,26 @@ function save(path,moveOrderType){
 	}
 	return false;
 }
+function canAddNewRow(){
+	var maxRow =12;
+	var countRow = 0;
+	var itemCode = document.getElementsByName("productCode");
+	var status = document.getElementsByName("status");
+	for(var i=0;i<itemCode.length;i++){
+		 if(status[i].value !='DELETE'){
+			 countRow++; 
+		 }
+	}//for
+	if(countRow < maxRow){
+		return true;
+	}
+	return false;
+}
+
 function checkTableCanSave(){
 	var itemCode = document.getElementsByName("productCode");
 	var arInvoiceNo = document.getElementsByName("arInvoiceNo");
+	var reason = document.getElementsByName("reason");
 	var remainPriQty = document.getElementsByName("remainPriQty");
 	var uom1Qty = document.getElementsByName("uom1Qty");
 	var uom2Qty = document.getElementsByName("uom2Qty");
@@ -62,6 +79,10 @@ function checkTableCanSave(){
 		 // alert("["+qty[i].value+"]["+sub[i].value+"]["+expireDate[i].value+"]");
 		  if( arInvoiceNo[i].value =='' ){
 			  arInvoiceNo[i].className ='errorTextInput';
+			  error = true;
+		  }
+		  if( reason[i].value =='' ){
+			  reason[i].className ='errorTextInput';
 			  error = true;
 		  }
 		  if(uom1Qty[i].value =='' && uom2Qty[i].value==''){
@@ -264,7 +285,9 @@ function  getProductKeypress(e,itemCodeObj,rowId){
 				productCode[index].readOnly = true;
 				//qty[index].focus();
         		//Add New Row Auto
-				addRow(false);	
+				if(canAddNewRow()){
+				  addRow(false);	
+				}
 			}//if
 		}//if
 	}//if
@@ -342,106 +365,7 @@ function getProductModel(itemCodeObj,rowId){
 	return found;
 }
 
-/**
- * AddRow(setFocus)
- */
-function addRow(setFocus){
-	var rows = $('#tblProduct tr').length-1;
-	var className = 'lineO';
-	if(rows%2 !=0){
-		className = 'lineE';
-	}
-	var rowId = rows-1;
-    var tabIndex = parseFloat(document.getElementById("tabIndex").value);
-    var no = rows-1;
-	tabIndex++;
-	
-	//alert("rowId["+rowId+"]");
-	
-	var rowData ="<tr class='"+className+"'>"+
-	    "<td class='td_text_center' width='5%'> " +
-	    "  <input type='checkbox' tabindex ='-1' name='linechk' id='lineChk' value='0'/>" +
-	    "  <input type='hidden' tabindex ='-1' name='lineId' id='lineId' value='0'/>"+
-	    "  <input type='hidden' tabindex ='-1' name='status' id='status' value='SV' />"+
-	    "</td>"+
-	    "<td class='td_text_center' width='5%'> " +
-	    "  <input type='text' name='no' value='"+no+"' id='no' size='2' readonly class='disableTextCenter'>" +
-	    "</td>"+
-	   
-	    "<td class='td_text_center' width='6%'> "+
-	    "  <input type='text' name='productCode' id='productCode' size='5' class='normalText' "+
-	    "   onkeypress='getProductKeypress(event,this,"+rowId+")' "+
-	    "   onchange='checkProductOnblur(event,this,"+rowId+")' " +
-	    "   tabindex ="+tabIndex+
-	    "  autoComplete='off'/>  </td>"+
-	    "<td class='td_text'  width='15%'> "+
-	    " <input type='text' tabindex ='-1' name='productName' size='40' readonly class='disableText' />" +
-	    " <input type='hidden' tabindex ='-1' name='inventoryItemId' id='inventoryItemId'/>"+
-	    " <input type='hidden' size='3' class='disableText' tabindex ='-1' name='uom1ConvRate' id='uom1ConvRate'/>"+
-	    " <input type='hidden' size='3' class='disableText' tabindex ='-1' name='uom2ConvRate' id='uom2ConvRate'/>"+
-	    "</td>";
-	    tabIndex++;
-	    rowData +="<td class='td_text_center'  width='10%' nowrap> "+
-	    " <input type='text' name='arInvoiceNo' id='arInvoiceNo' autoComplete='off' value ='' size='9'  readonly tabindex ="+tabIndex+"/>" +
-	    " <input type='button' name='bt3' value='...' onclick='openPopupInvoice("+no+")'/> "+
-	    "</td>"+
-	    "<td class='td_number'  width='6%'> "+
-	    " <!--remainPriAllQty:--><input type='text' size='8' name='remainPriAllQty' id='remainPriAllQty' value ='' readonly class='disableNumber'/>" +
-	    " <!--remainPriQty:--><input type='hidden' size='3' class='disableText' name='remainPriQty' id='remainPriQty' value =''  readonly />" +
-	    " <!--remainSubQty:--><input type='hidden' size='3' class='disableText' name='remainSubQty' id='remainSubQty' value =''  readonly />" +
-	    "</td>"+
-	   
-	    tabIndex++;
-	    rowData +="<td class='td_number' width='6%'> "+
-	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='uom1Qty' size='5' "+
-	    "  onblur ='sumTotalInRow("+no+")' autoComplete='off'"+
-	    "  onkeydown='return isNum0to9andpoint(this,event);'class='numberText' /> "+
-	    " <!--priQty:--><input type='hidden' size='3' tabindex ='-1' class='disableText' name='priQty' id='priQty'/>"+
-	    "  </td>"+
-	    tabIndex++;
-	    rowData +="<td class='td_number' width='6%'> "+
-	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='uom2Qty' size='5' "+
-	    "  onblur ='sumTotalInRow("+no+")' "+
-	    "  onkeydown='return isNum0to9andpoint(this,event);' class='numberText' autoComplete='off'/> "+
-	    "  </td>";
-	
-	    rowData +="<td class='td_text_center' width='7%'> "+
-	    "  <input type='text' name='uom2' value='' id='uom2' size='3' readonly class='disableText'>"+
-	    "  </td>"+
-	    "<td class='td_number'  width='7%'> "+
-	    " <input type='text' name='uom1Pac' id='uom1Pac' value ='' size='6' readonly class='disableNumber'/>" +
-	    "</td>"+
-	    "<td class='td_number'  width='7%'> "+
-	    " <input type='text' name='uom2Pac' id='uom2Pac' value ='' size='6' readonly class='disableNumber'/>" +
-	    "</td>"+
-	    "<td class='td_number'  width='7%'> "+
-	    " <input type='text' name='uom1Price' id='uom1Price' value ='' size='6' readonly class='disableNumber'/>" +
-	    "</td>";
-	    tabIndex++;
-	    rowData +="<td class='td_number' width='7%'> "+
-	    " <input type='text' tabindex ="+tabIndex+
-	    "  value='' name='discount' size='5' onblur='sumTotalInRow("+no+")' "+
-	    "  onkeydown='return isNum(this,event);' class='numberText' autoComplete='off'/> "+
-	    "  </td>";
-	    rowData +="<td class='td_number' width='7%'> "+
-	    "  <input type='text' name='totalAmount' id='totalAmount' size='10' readonly class='disableNumber'>"+
-	    "  </td>"+
-	    "</tr>";
 
-	//alert(rowData);
-    $('#tblProduct').append(rowData);
-    //set next tabIndex
-    document.getElementById("tabIndex").value = tabIndex;
-    
-    //set focus default
-    var itemCode = document.getElementsByName("productCode");
-    //alert(setFocus);
-    if(setFocus){
-       itemCode[rowId-1].focus();
-    }
-}
 function nextRowKeypress(e,rowId){
 	var TABKEY =9;
 	var ENTERKEY =13;

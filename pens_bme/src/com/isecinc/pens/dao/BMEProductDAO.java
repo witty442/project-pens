@@ -28,7 +28,7 @@ public class BMEProductDAO {
 				sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 				sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 				sql.append("\n   ,MP.PENS_DESC2 as GROUP_CODE ");
-				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,XXPENS_OM_ITEM_MST_V I");
+				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
 				sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
 				sql.append("\n   AND MP.pens_desc6 in ('MAYA' , 'TM21') ");
 				sql.append("\n   AND MP.pens_value =I.segment1 ");
@@ -45,9 +45,9 @@ public class BMEProductDAO {
 				sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 				sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 				sql.append("\n   ,MP.PENS_DESC2 as GROUP_CODE ");
-				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ");
+				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
 				sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_FRIDAY_ITEM+"')");
-				
+				sql.append("\n   AND MP.pens_value =I.segment1 ");
 			}else {
 				//default all to lotus
 				sql.append("\n   SELECT DISTINCT I.inventory_item_id as product_id");
@@ -55,10 +55,18 @@ public class BMEProductDAO {
 				sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 				sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 				sql.append("\n   ,MP.PENS_DESC2 as GROUP_CODE ");
-				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ");
+				
+			/*	sql.append("\n  ,select count(*) as c FROM PENSBI.PENSBME_ONHAND_BME_LOCKED ");
+				sql.append("\n   WHERE BARCODE = MP.INTERFACE_DESC");
+				sql.append("\n  and material_master = MP.INTERFACE_VALUE");
+				sql.append("\n  and GROUP_ITEM =MP.PENS_DESC2");
+				sql.append("\n  and pens_item = MP.PENS_VALUE ) as retail_price_bf");*/
+				 
+				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
 				sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
-			
+				sql.append("\n   AND MP.pens_value =I.segment1 ");
 			}
+			
 			logger.debug("sql:"+sql);
 			conn = DBConnection.getInstance().getConnectionApps();
 			stmt = conn.createStatement();

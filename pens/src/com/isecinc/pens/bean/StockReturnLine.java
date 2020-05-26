@@ -30,6 +30,8 @@ public class StockReturnLine extends I_PO implements Serializable{
 	private String updateBy;
 	private String actionDate;
 	private String conversionRate;
+	private String reason;
+	private String reasonDesc;
 	private boolean canEdit = false;
 
 	private int no;
@@ -76,6 +78,26 @@ public class StockReturnLine extends I_PO implements Serializable{
 
 	
 	
+	public String getReasonDesc() {
+		return reasonDesc;
+	}
+
+
+	public void setReasonDesc(String reasonDesc) {
+		this.reasonDesc = reasonDesc;
+	}
+
+
+	public String getReason() {
+		return reason;
+	}
+
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
+
+
 	public String getRemainPriAllQty() {
 		return remainPriAllQty;
 	}

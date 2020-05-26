@@ -20,6 +20,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import util.BahtText;
 import util.BeanParameter;
 import util.DBCPConnectionProvider;
 import util.ReportUtilServlet;
@@ -29,10 +30,6 @@ import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.Address;
-import com.isecinc.pens.bean.Customer;
-import com.isecinc.pens.bean.RequestPromotion;
-import com.isecinc.pens.bean.RequestPromotionCost;
-import com.isecinc.pens.bean.RequestPromotionLine;
 import com.isecinc.pens.bean.StockDiscount;
 import com.isecinc.pens.bean.StockDiscountLine;
 import com.isecinc.pens.bean.User;
@@ -41,12 +38,8 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MAddress;
-import com.isecinc.pens.model.MCustomer;
-import com.isecinc.pens.model.MPriceList;
-import com.isecinc.pens.model.MRequestPromotion;
 import com.isecinc.pens.model.MStockDiscount;
 import com.isecinc.pens.model.MStockReturn;
-import com.isecinc.pens.web.reqPromotion.RequestPromotionForm;
 
 /**
  * Stock Return Action
@@ -74,6 +67,10 @@ public class StockDiscountAction extends I_Action {
 				stockForm.setResults(null);
 				stockForm.setBean(new StockDiscount());
 				
+				//Get vatRate from config
+	 			 List<References> vatRateList = InitialReferences.getReferenceListByCode(InitialReferences.VATRATE_INVOICE_STOCKDISCOUNT);
+	 			 request.getSession().setAttribute("VATRATE_LIST", vatRateList);
+	 			 
 			 }else if("back".equalsIgnoreCase(request.getParameter("action"))){
 				 if(request.getSession().getAttribute("_CRITERIA") != null){
 				     stockForm.getCriteria().setBean((StockDiscount)request.getSession().getAttribute("_CRITERIA"));
@@ -191,7 +188,7 @@ public class StockDiscountAction extends I_Action {
 				totalRow = 0;
 				
 				/** Get TotalRow **/
-			    totalRow = new MStockDiscount().getTotalRowStockReturn(conn, stockForm.getBean(), user);
+			    totalRow = new MStockDiscount().getTotalRowStockDiscount(conn, stockForm.getBean(), user);
 			    if(totalRow > 0){
 			    	double t = new Double(totalRow)/new Double(MAX_ROW_PAGE);
 			    	logger.debug("t:"+t);
@@ -215,17 +212,20 @@ public class StockDiscountAction extends I_Action {
 			end =  MAX_ROW_PAGE;
 			whereCause +="\n limit "+start+","+end;
 			
-			List<StockDiscount> results= new MStockDiscount().searchStockReturnList(conn,stockForm.getBean(),user,whereCause,start);//new method optimize
+			List<StockDiscount> results= new MStockDiscount().searchStockDiscountList(conn,stockForm.getBean(),user,whereCause,start);//new method optimize
 			stockForm.setResults(results);
 			stockForm.setTotalPage(totalPage);
 			stockForm.setTotalRow(totalRow);
 			stockForm.setCurPage(currPage);
 			
 			request.getSession().setAttribute("criteria_stock",stockForm.getBean());
-						
-			if (results != null) {
+			
+			logger.debug("results size:"+results.size());
+			
+			if (results != null && results .size() >0) {
 				stockForm.getCriteria().setSearchResult(results.size());
 			} else {
+				stockForm.setResults(null);
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 			}
 		} catch (Exception e) {
@@ -275,10 +275,15 @@ public class StockDiscountAction extends I_Action {
 			bean.setShowSaveBtn(true);
 			bean.setShowCancelBtn(false);
 			 
-			//for test
-			/*bean.setCustomerCode("15803004");
-			bean.setCustomerId(1349);
-			bean.setCustomerName("ร้านเงินสมบูรณ์ ๒ (หยุดวันอาทิตย์ และไม่รับสินค้าช่วงเช้า)");*/
+			//for test 1
+			/*bean.setCustomerCode("20510002");
+			bean.setCustomerId(541);
+			bean.setCustomerName("บริษัท วาไรตี้ซุปเปอร์สโตร์ จำกัด");*/
+			
+			//for test 2
+			/*bean.setCustomerCode("26201005");
+			bean.setCustomerId(1402);
+			bean.setCustomerName("ร้าน อึ้งลักเส็ง");*/
 			 
 			stockForm.setBean(bean);
 			 
@@ -303,11 +308,12 @@ public class StockDiscountAction extends I_Action {
 	}
 	
 	
-	public ActionForward viewStockReturn(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("viewStockReturn");
+	public ActionForward viewStockDiscount(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("viewStockDiscount");
 		StockDiscountForm stockForm = (StockDiscountForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
+		
 			//save search page criteria 
 			request.getSession().setAttribute("_CRITERIA",stockForm.getBean());
 			
@@ -319,8 +325,10 @@ public class StockDiscountAction extends I_Action {
 			 stockForm.getBean().setRequestNumber(requestNumber);
 			 StockDiscount m = prepareUpdateStockReturn(user, stockForm);
 			 
-			 m = new MStockDiscount().searchStockReturn(m,user);
+			 m = new MStockDiscount().searchStockDiscount(m,user);
              m.setShowPrintBtn(true);
+
+             logger.debug("VatRate:"+m.getVatRate());
 			 stockForm.setBean(m);
 			 //Set Lines
 			 stockForm.setLines(m.getLineList());
@@ -343,7 +351,7 @@ public class StockDiscountAction extends I_Action {
 				 stockForm.getBean().setShowSaveBtn(true);
 				 stockForm.getBean().setShowCancelBtn(true);
 			 }
-			 
+			
 			// save token
 			saveToken(request);
 			
@@ -367,10 +375,11 @@ public class StockDiscountAction extends I_Action {
 			request.getSession().setAttribute("backPage", backPage);
 			
 			StockDiscount m = prepareCancelStockReturn(user, stockForm);
-			mDAO.updateCancelStockReturn(m);
+			mDAO.updateCancelStockDiscount(m);
 			 
 			 /** Search **/
-			 m = mDAO.searchStockReturn(stockForm.getBean(),user);
+			 m = mDAO.searchStockDiscount(stockForm.getBean(),user);
+			
 			 stockForm.setBean(m);
 			 //Set Lines
 			 stockForm.setLines(m.getLineList());
@@ -424,6 +433,7 @@ public class StockDiscountAction extends I_Action {
 			//Set Item
 			String[] lineId = request.getParameterValues("lineId");
 			String[] productCode = request.getParameterValues("productCode");
+			String[] productName = request.getParameterValues("productName");
 			String[] inventoryItemId = request.getParameterValues("inventoryItemId");
 			String[] status = request.getParameterValues("status");
 			String[] arInvoiceNo = request.getParameterValues("arInvoiceNo");
@@ -441,8 +451,9 @@ public class StockDiscountAction extends I_Action {
 			String[] uom2Pac = request.getParameterValues("uom2Pac");
 			
 			String[] uom1Price = request.getParameterValues("uom1Price");
-			String[] discount = request.getParameterValues("discount");
-			String[] totalAmount = request.getParameterValues("totalAmount");
+			String[] lineAmount = request.getParameterValues("lineAmount");
+			String[] vatAmount = request.getParameterValues("vatAmount");
+			String[] netAmount = request.getParameterValues("netAmount");
 			
 			String[] uom1ConvRate = request.getParameterValues("uom1ConvRate");
 			String[] uom2ConvRate = request.getParameterValues("uom2ConvRate");
@@ -452,12 +463,14 @@ public class StockDiscountAction extends I_Action {
 			//add value to Results
 			if(productCode != null && productCode.length > 0){
 				for(int i=0;i<productCode.length;i++){
-					if( !Utils.isNull(productCode[i]).equals("") && !Utils.isNull(status[i]).equals("DELETE")){
+					if( ( !Utils.isNull(productCode[i]).equals("") || !Utils.isNull(productName[i]).equals("") )
+						&& !Utils.isNull(status[i]).equals("DELETE")){
 						StockDiscountLine l = new StockDiscountLine();
 						 logger.debug("lineId:"+lineId[i]);
 						 
 						 l.setLineId(Utils.convertStrToInt(lineId[i]));
 						 l.setProductCode(Utils.isNull(productCode[i]));
+						 l.setProductName(Utils.isNull(productName[i]));
 						 l.setInventoryItemId(Utils.isNull(inventoryItemId[i]));
 						 l.setArInvoiceNo(arInvoiceNo[i]);
 						 l.setPriQty(Utils.isNull(priQty[i]));//ctn
@@ -477,13 +490,14 @@ public class StockDiscountAction extends I_Action {
 						 l.setUom1Pac(uom1Pac[i]);
 						 l.setUom2Pac(uom2Pac[i]);
 						 l.setUom1Price(uom1Price[i]);//ctn /price
-						 l.setDiscount(discount[i]);
-						 l.setTotalAmount(totalAmount[i]);
+						 l.setLineAmount(lineAmount[i]);
+						 l.setVatAmount(vatAmount[i]);
+						 l.setNetAmount(netAmount[i]);
 						 
 						 l.setCreatedBy(user.getUserName());
 						 l.setUpdateBy(user.getUserName());
 						 itemList.add(l);
-					}else if( !Utils.isNull(productCode[i]).equals("") 
+					}else if( (!Utils.isNull(productCode[i]).equals("") || !Utils.isNull(productName[i]).equals(""))
 						    && Utils.isNull(status[i]).equals("DELETE") 
 						    && Utils.convertStrToInt(lineId[i]) != 0){
 						 itemDeleteList.add(lineId[i]);
@@ -511,7 +525,7 @@ public class StockDiscountAction extends I_Action {
 				msg = InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc();
 			}
 			
-			m = mDAO.searchStockReturn(m,user);
+			m = mDAO.searchStockDiscount(m,user);
 			m.setShowPrintBtn(true);
 			stockForm.setBean(m);
 			stockForm.setLines(m.getLineList());
@@ -573,107 +587,7 @@ public class StockDiscountAction extends I_Action {
 		return m;
 	}
     
-    public ActionForward printReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("printReport");
-		StockDiscountForm f = (StockDiscountForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-		Connection conn = null;
-		StockDiscount p  =null;
-		String fileNameExport  = "";
-		try { 
-			ReportUtilServlet reportServlet = new ReportUtilServlet();
-			HashMap<String,Object> parameterMap = new HashMap<String,Object>();
-			ServletContext context = request.getSession().getServletContext();
-	
-			String fileName = "stock_return_mainreport";
-            String fileJasper = BeanParameter.getReportPath() + fileName;
-          
-            //init connection 
-			conn = new DBCPConnectionProvider().getConnection(conn);
-			
-			//head
-			String logopath =   context.getRealPath("/images/pens_logo_fit.jpg");//
-			logger.debug("requestNumber:"+Utils.isNull(request.getParameter("requestNumber")));
-			logger.debug("reportType:"+Utils.isNull(request.getParameter("reportType")));
-			
-			//get parameter
-			f.getBean().setRequestNumber(Utils.isNull(request.getParameter("requestNumber")));
-        	f.getBean().setUserId(user.getId()+"");
-        	  
-            if("1".equalsIgnoreCase(Utils.isNull(request.getParameter("reportType")))){
-            	parameterMap.put("subReportName","สำหรับบริหารขาย");
-            	//parameterMap.put("subReportName2","(ต้นฉบับ)");
-            	
-            	fileNameExport = "StockRe_"+f.getBean().getRequestNumber()+".pdf";
-            	
-            }else{
-            	parameterMap.put("subReportName","สำหรับคลังสินค้า");
-            	//parameterMap.put("subReportName2","(สำเนา)");
-            	fileNameExport = "StockRe_"+f.getBean().getRequestNumber()+".pdf";
-            }
-            //get head detail
-            p = new MStockDiscount().searchStockReturn(f.getBean(), user);
-			
-            logger.debug("request_number: "+p.getRequestNumber());
-            //detail
-			List<StockDiscountLine> mResultList = new MStockDiscount().searchStockReturnLine(conn,user, f.getBean());
-			//fix row detail =12
-			if(mResultList != null && mResultList.size() >0){
-				int diff = 12-mResultList.size();
-				int no = mResultList.size();
-			    for(int i=0;i<diff;i++){
-			    	StockDiscountLine line = new StockDiscountLine();
-			    	no++;
-			    	line.setNo(no); 
-			    	mResultList.add(line);
-				}
-			}
-			
-			parameterMap.put("pens_logo_fit",logopath);
-			parameterMap.put("request_date",p.getRequestDate());
-			parameterMap.put("request_number",p.getRequestNumber());
-			parameterMap.put("customer_code",p.getCustomerCode());
-			parameterMap.put("customer_name",p.getCustomerName());
-			parameterMap.put("description",p.getDescription());
-			parameterMap.put("totalAllAmount",p.getTotalAllAmount());
-			parameterMap.put("totalAllVatAmount",p.getTotalAllVatAmount());
-			parameterMap.put("totalAllNonVatAmount",p.getTotalAllNonVatAmount());
-			parameterMap.put("sales_code",user.getCode());
-			parameterMap.put("sales_name",user.getName());
-			parameterMap.put("printDate",Utils.isNull(p.getPrintDate()));
-			parameterMap.put("userPrint",user.getName());
-			
-			Address address = new MAddress().findAddressByCustomerId(conn, p.getCustomerId()+"","B");
-			if(address != null){
-				parameterMap.put("address",address.getLine1()+" "+address.getLine2());
-				parameterMap.put("address2",address.getLine3()+" "+address.getProvince().getName()+" "+address.getPostalCode());
-			}
-			
-			parameterMap.put("parameter_subreport",parameterMap);
-            parameterMap.put("found_data_subreport","found");
-            parameterMap.put("subDataList", mResultList);
-            parameterMap.put("SUBREPORT_DIR",BeanParameter.getReportPath());
-            
-			if(mResultList != null && mResultList.size()>0){
-				//set for display report
-				List<StockDiscountLine> showList = new ArrayList<StockDiscountLine>();
-				showList.add(new StockDiscountLine());
-				
-				reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName,showList ,fileNameExport);
-			    
-				//request.setAttribute("printReport2", "printReport2");
-			}else{
-				request.setAttribute("Message","Data not found");
-			}
-			// save token
-			saveToken(request);
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
-		}
-		return null;//mapping.findForward("printPopup");
-	}
-    
+
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
 		StockDiscountForm stockForm = (StockDiscountForm) form;
@@ -692,7 +606,117 @@ public class StockDiscountAction extends I_Action {
 		}
 		return mapping.findForward("clear");
 	}
-	
+	 public ActionForward printReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+			logger.debug("printReport");
+			StockDiscountForm stockForm = (StockDiscountForm) form;
+			User user = (User) request.getSession().getAttribute("user");
+			Connection conn = null;
+			StockDiscount p  =null;
+			String fileNameExport  = "";
+			MStockDiscount mDAO = new MStockDiscount();
+			try { 
+				ReportUtilServlet reportServlet = new ReportUtilServlet();
+				HashMap<String,Object> parameterMap = new HashMap<String,Object>();
+				ServletContext context = request.getSession().getServletContext();
+		
+				String fileName = "stock_discount_mainreport";
+	            String fileJasper = BeanParameter.getReportPath() + fileName;
+	          
+	            //init connection 
+				conn = DBConnection.getInstance().getConnection();
+				
+				//head
+				String logopath =   context.getRealPath("/images2/pens_logo_fit.jpg");//
+				logger.debug("requestNumber:"+stockForm.getBean().getRequestNumber());
+				
+	            fileNameExport = "Discount_"+stockForm.getBean().getRequestNumber()+".pdf";
+	            	
+	            //get head detail
+	            stockForm.getBean().setUserId(""+user.getId());
+	            p = mDAO.searchStockDiscount(stockForm.getBean(),user);
+				
+	            logger.debug("request_number: "+p.getRequestNumber());
+	            //detail
+				List<StockDiscountLine> mResultList = p.getLineList();
+				//fix row detail =12
+				if(mResultList != null && mResultList.size() >0){
+					int diff = 12-mResultList.size();
+					int no = mResultList.size();
+				    for(int i=0;i<diff;i++){
+				    	StockDiscountLine line = new StockDiscountLine();
+				    	no++;
+				    	line.setNo(no); 
+				    	line.setProductName("");
+				    	mResultList.add(line);
+					}
+				}
+				
+				//subReport1
+				HashMap<String,Object> subParameterMap1 = new HashMap<String,Object>();
+				subParameterMap1.put("reportName","ใบอนุมัติให้ส่วนลดให้ร้านค้า");
+				subParameterMap1.put("reportName2","(ต้นฉบับ)");  	 	
+				subParameterMap1.put("pens_logo_fit",logopath);
+				subParameterMap1.put("request_date",p.getRequestDate());
+				subParameterMap1.put("request_number",p.getRequestNumber());
+				subParameterMap1.put("customer_code",p.getCustomerCode());
+				subParameterMap1.put("customer_name",p.getCustomerName());
+				subParameterMap1.put("description",p.getDescription());
+				subParameterMap1.put("totalLineAmount",p.getTotalLineAmount());
+				subParameterMap1.put("totalVatAmount",p.getTotalVatAmount());
+				subParameterMap1.put("totalNetAmount",p.getTotalNetAmount());
+				subParameterMap1.put("totalCount",p.getLineList().size()+"");
+				subParameterMap1.put("totalNetAmountLetter",BahtText.getBahtText(new BigDecimal(Utils.convertStrToDouble(p.getTotalNetAmount()))));
+				subParameterMap1.put("sales_code",user.getCode());
+				subParameterMap1.put("sales_name",user.getName());
+				subParameterMap1.put("printDate",Utils.isNull(p.getPrintDate()));
+				subParameterMap1.put("userPrint",user.getName());
+				
+				//subReport2
+				HashMap<String,Object> subParameterMap2 = new HashMap<String,Object>();
+				subParameterMap2.put("reportName","ใบอนุมัติให้ส่วนลดให้ร้านค้า");
+				subParameterMap2.put("reportName2","(สำเนา)");   	
+				subParameterMap2.put("pens_logo_fit",logopath);
+				subParameterMap2.put("request_date",p.getRequestDate());
+				subParameterMap2.put("request_number",p.getRequestNumber());
+				subParameterMap2.put("customer_code",p.getCustomerCode());
+				subParameterMap2.put("customer_name",p.getCustomerName());
+				subParameterMap2.put("description",p.getDescription());
+				subParameterMap2.put("totalLineAmount",p.getTotalLineAmount());
+				subParameterMap2.put("totalVatAmount",p.getTotalVatAmount());
+				subParameterMap2.put("totalNetAmount",p.getTotalNetAmount());
+				subParameterMap2.put("totalCount",p.getLineList().size()+"");
+				subParameterMap2.put("totalNetAmountLetter",BahtText.getBahtText(new BigDecimal(Utils.convertStrToDouble(p.getTotalNetAmount()))));
+				subParameterMap2.put("sales_code",user.getCode());
+				subParameterMap2.put("sales_name",user.getName());
+				subParameterMap2.put("printDate",Utils.isNull(p.getPrintDate()));
+				subParameterMap2.put("userPrint",user.getName());
+				
+				//mainReport
+				parameterMap.put("parameter_subreport",parameterMap);
+	            parameterMap.put("found_data_subreport","found");
+	            parameterMap.put("subDataList", mResultList);
+	            parameterMap.put("SUBREPORT_DIR",BeanParameter.getReportPath());
+	            parameterMap.put("parameter_subreport1",subParameterMap1);
+	            parameterMap.put("parameter_subreport2",subParameterMap2);
+	            
+				if(mResultList != null && mResultList.size()>0){
+					//set for display report
+					List<StockDiscountLine> showList = new ArrayList<StockDiscountLine>();
+					showList.add(new StockDiscountLine());
+					
+					reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName,showList ,fileNameExport);
+				    
+				}else{
+					request.setAttribute("Message","Data not found");
+				}
+				
+			} catch (Exception e) {
+				logger.error(e.getMessage(),e);
+			}finally{
+				conn.close();conn=null;
+			}
+			return null;
+		}
 	
 	@Override
 	protected String changeActive(ActionForm form, HttpServletRequest request, HttpServletResponse response)

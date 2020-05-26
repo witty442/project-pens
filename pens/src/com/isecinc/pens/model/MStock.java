@@ -785,12 +785,13 @@ public class MStock {
 				sql.append("\n   and ( ");
 				sql.append("\n       t.order_id in( ");
 				sql.append("\n         select order_id from t_order where doc_status ='SV' ");
-				sql.append("\n         and substr(ar_invoice_no,3,4) in ("+arInvoieNoMonth+") ");
+				sql.append("\n         and (    substr(ar_invoice_no,3,4) in ("+arInvoieNoMonth+") ");
+				sql.append("\n               or substr(ar_invoice_no,4,4) in ("+arInvoieNoMonth+") )");
 				sql.append("\n         and user_id ="+user.getId());
 				sql.append("\n         and customer_id ="+mCriteria.getCustomerId());
 				sql.append("\n       ) ");
-				sql.append("\n       and   ");
-				sql.append("\n      substr(t.ar_invoice_no,3,4) in ("+arInvoieNoMonth+")");
+				sql.append("\n       and (   substr(t.ar_invoice_no,3,4) in ("+arInvoieNoMonth+")");
+				sql.append("\n            or substr(t.ar_invoice_no,4,4) in ("+arInvoieNoMonth+") )");
 				sql.append("\n    ) ");
 				sql.append("\n   group by t.product_id ,m.product_code ,m.product_name,m.uom1 ,m.uom2 "); 
 				sql.append("\n  ) A ORDER BY A.product_code asc \n");

@@ -1679,6 +1679,7 @@ public class OrderAction extends I_Action {
 			boolean baddr = false;
 			String fileType =  request.getParameter("fileType");
 			
+			
 			String orderId = request.getParameter("orderId");
 			String visitDate = request.getParameter("visitDate");
 			String reportType = request.getParameter("reportType");
@@ -1690,6 +1691,7 @@ public class OrderAction extends I_Action {
 			lines = new MOrderLine().lookUp(reportForm.getOrder().getId());
 			reportForm.setLines(new OrderProcess().fillLinesShow(lines));
 			lines = reportForm.getLines();
+			
 			String receiptNo = new MReceipt().getLastestReceiptFromOrder(order.getId());
 
 			//Check Cash or Cheque
@@ -1827,6 +1829,7 @@ public class OrderAction extends I_Action {
 				}else{
 				  taxInvoice.setProductCode(no+")"+line.getProduct().getCode());	
 				}
+				
 				taxInvoice.setProductName(line.getProduct().getName());
 				taxInvoice.setUomId(line.getProduct().getUom().getId());
 				taxInvoice.setMainQty(new Double(line.getQty1()).intValue());
@@ -1852,6 +1855,11 @@ public class OrderAction extends I_Action {
 				lstData.add(taxInvoice);
 				no++;
 			}
+			
+			/*logger.debug("lstData size:"+lstData.size());
+			TaxInvoiceReport debug = lstData.get(lstData.size()-1);
+			logger.debug("ID:"+debug.getId()+",ProductCode:"+debug.getProductCode());*/
+
 			logger.debug("order.getTotalAmount():"+order.getTotalAmount());
 			logger.debug("order.getVatAmount():"+order.getVatAmount());
 			logger.debug("order.getNetAmount():"+order.getNetAmount());
@@ -1871,11 +1879,16 @@ public class OrderAction extends I_Action {
 				  fileName = "tax_invoice_summary_2_report";
 				}
 			}*/
+			
+			//debug
+			/*fileName = "tax_invoice_summary_new_pdf_report";//test
+			fileType ="PDF";//test
+*/			
+			
 			logger.info("Report Name:"+fileName);
 			String fileJasper = BeanParameter.getReportPath() + fileName;
 			reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
-			//reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName, lstData);
-		
+				
 			//stamp dateTime print
 			new MOrder().updatePrintTaxInvoiceStamp(conn,order.getOrderNo(), pReportTitle);
 			

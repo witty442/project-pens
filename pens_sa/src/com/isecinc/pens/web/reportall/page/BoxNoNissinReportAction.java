@@ -158,7 +158,7 @@ public class BoxNoNissinReportAction extends I_Action {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			throw e;
@@ -175,7 +175,6 @@ public class BoxNoNissinReportAction extends I_Action {
 		logger.debug("export : ");
 		User user = (User) request.getSession().getAttribute("user");
 		ReportAllForm aForm = (ReportAllForm) form;
-		String pageName = aForm.getPageName();
 		Connection conn = null;
 		String action = "";
 		String forward ="reportAll";
@@ -200,7 +199,6 @@ public class BoxNoNissinReportAction extends I_Action {
 			}else{
 				request.setAttribute("Message", "ไม่พบข้อมูล");
 			}
-			
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -214,65 +212,66 @@ public class BoxNoNissinReportAction extends I_Action {
 		}
 		return mapping.findForward(forward);
 	}
-	 public ActionForward printReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-			logger.debug("printReport");
-			String reportName = Utils.isNull(request.getParameter("reportName"));
-			logger.debug("reportName:"+reportName);
-			if("controlBoxNoReport".equalsIgnoreCase(reportName)){
-				return printReportControlBoxNo(mapping, form, request, response);
-			}else if("controlBoxNoByZoneReport".equalsIgnoreCase(reportName)){
-				return printReportControlBoxNoByZone(mapping, form, request, response);
-			}
-			return null;
-	 }
-	 
-	 public ActionForward printReportControlBoxNo(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-			logger.debug("printReportControlBoxNo");
-			User user = (User) request.getSession().getAttribute("user");
-			Connection conn = null;
-			BoxNoBean p  =null;
-			String fileNameExport  = "ReturnNissin.pdf";
-			String fileName = "control_boxno_report";
-            String fileJasper = BeanParameter.getReportPath() + fileName;
-			try { 
-				ReportUtilServlet reportServlet = new ReportUtilServlet();
-				HashMap<String,Object> parameterMap = new HashMap<String,Object>();
-
-	            //init connection 
-				conn = DBConnection.getInstance().getConnectionApps();
-		        p = new BoxNoBean();
-		        p.setPeriod(Utils.isNull(request.getParameter("period")));
-		        p.setPdCode(Utils.isNull(request.getParameter("pdCode")));
 	
-				p = BoxNoNissinReportDAO.searchBoxNoReportList(conn, user, p);
-				List<BoxNoBean> itemList = p.getItemsList();
-				if(itemList != null && itemList.size() >0){
-					//save print,count and gen DocNo
-					p = BoxNoNissinReportDAO.savePrintControlBoxNo(conn,user,p);
-					
-					//set parameter report
-					parameterMap.put("printDate",DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,DateUtil.local_th));
-					parameterMap.put("userName",user.getUserName());
-					parameterMap.put("pdCode",p.getPdCode() +" "+BoxNoNissinReportDAO.getPdDesc(conn, "S", p.getPdCode()));
-					parameterMap.put("period",p.getPeriod());
-					parameterMap.put("docNo",p.getDocNo());
-					parameterMap.put("sumTotalBox",p.getTotalBox());
-					
-					reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName,itemList ,fileNameExport);
-				}else{
-					request.setAttribute("Message","ไม่พบข้อมูล");
-				}
-				// save token
-				saveToken(request);
-			} catch (Exception e) {
-				logger.error(e.getMessage(),e);
-			}finally{
-				if(conn != null){
-				   conn.close();conn=null;
-				}
-			}
-			return null;
+ public ActionForward printReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("printReport");
+		String reportName = Utils.isNull(request.getParameter("reportName"));
+		logger.debug("reportName:"+reportName);
+		if("controlBoxNoReport".equalsIgnoreCase(reportName)){
+			return printReportControlBoxNo(mapping, form, request, response);
+		}else if("controlBoxNoByZoneReport".equalsIgnoreCase(reportName)){
+			return printReportControlBoxNoByZone(mapping, form, request, response);
 		}
+		return null;
+ }
+	 
+ public ActionForward printReportControlBoxNo(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("printReportControlBoxNo");
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		BoxNoBean p  =null;
+		String fileNameExport  = "ReturnNissin.pdf";
+		String fileName = "control_boxno_report";
+        String fileJasper = BeanParameter.getReportPath() + fileName;
+		try { 
+			ReportUtilServlet reportServlet = new ReportUtilServlet();
+			HashMap<String,Object> parameterMap = new HashMap<String,Object>();
+
+            //init connection 
+			conn = DBConnection.getInstance().getConnectionApps();
+	        p = new BoxNoBean();
+	        p.setPeriod(Utils.isNull(request.getParameter("period")));
+	        p.setPdCode(Utils.isNull(request.getParameter("pdCode")));
+
+			p = BoxNoNissinReportDAO.searchBoxNoReportList(conn, user, p);
+			List<BoxNoBean> itemList = p.getItemsList();
+			if(itemList != null && itemList.size() >0){
+				//save print,count and gen DocNo
+				p = BoxNoNissinReportDAO.savePrintControlBoxNo(conn,user,p);
+				
+				//set parameter report
+				parameterMap.put("printDate",DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,DateUtil.local_th));
+				parameterMap.put("userName",user.getUserName());
+				parameterMap.put("pdCode",p.getPdCode() +" "+BoxNoNissinReportDAO.getPdDesc(conn, "S", p.getPdCode()));
+				parameterMap.put("period",p.getPeriod());
+				parameterMap.put("docNo",p.getDocNo());
+				parameterMap.put("sumTotalBox",p.getTotalBox());
+				
+				reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName,itemList ,fileNameExport);
+			}else{
+				request.setAttribute("Message","ไม่พบข้อมูล");
+			}
+			// save token
+			saveToken(request);
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+		}finally{
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+		return mapping.findForward("reportAll");
+	}
 	
 	 public ActionForward printReportControlBoxNoByZone(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("printReportControlBoxNoByZone");
@@ -293,8 +292,9 @@ public class BoxNoNissinReportAction extends I_Action {
 	        p.setSalesZone(Utils.isNull(request.getParameter("salesZone")));
 
 			p = BoxNoNissinReportDAO.searchBoxNoByZoneReportList(conn, user, p);
-			
+		
 			List<BoxNoBean> itemList = p.getItemsList();
+			logger.debug("size:"+itemList.size());
 			if(itemList != null && itemList.size() >0){
 				//set parameter report
 				parameterMap.put("printDate",DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_HH_MM_SS_WITH_SLASH,DateUtil.local_th));
@@ -316,7 +316,7 @@ public class BoxNoNissinReportAction extends I_Action {
 			   conn.close();conn=null;
 			}
 		}
-		return null;
+		return mapping.findForward("reportAll");
 	}
 	
 	/**

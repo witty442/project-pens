@@ -10,10 +10,10 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.process.SequenceProcessAll;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class SalesTargetTTCopy {
 
@@ -136,7 +136,7 @@ public class SalesTargetTTCopy {
 		StringBuilder sql = new StringBuilder();
 		BigDecimal idNew = null;
 		try {
-			idNew =new BigDecimal(SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TT"));
+			idNew = SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TT");
 			if(idNew.compareTo(new BigDecimal("0")) ==0){
 				idNew = new BigDecimal("1");
 			}

@@ -103,8 +103,10 @@ public class ExportHelper {
 								&& (transactionType.equals(tableBean.getTransactionType())) ){
 							    
 								logger.debug("CanExport :"+tableBean.getTableName());
+								
 								/** init table properties  */
 								tableBean.setColumnBeanList(initColumn(path,tableBean));
+								
 								/** Gen SQL Insert And Update***/
 								tableBean = genPrepareSQL(tableBean,userBean);
 								/** Store Data Map **/

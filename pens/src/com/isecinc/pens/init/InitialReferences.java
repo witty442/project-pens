@@ -9,6 +9,7 @@ import com.isecinc.core.Database;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.init.I_Initial;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.model.MProductCategory;
 
 /**
@@ -58,6 +59,10 @@ public class InitialReferences extends I_Initial {
 	public static final String ProdShowFileSize = "ProdShowFileSize";
 	public static final String TRANSFER_BANK_VAN = "TransferBankVAN";
 	public static final String BACKDATE_INVOICE_STOCKRETURN = "backDateInvStkReturn"; 
+	public static final String BACKDATE_INVOICE_STOCKDISCOUNT = "backDateInvStkDis"; 
+	public static final String VATRATE_INVOICE_STOCKDISCOUNT = "vatRateInvStkDis"; 
+	public static final String REASON_RETURN = "ReasonReturn"; 
+
 	
 	private static Hashtable<String, List<References>> referenes = new Hashtable<String, List<References>>();
 
@@ -145,6 +150,21 @@ public class InitialReferences extends I_Initial {
 		}
 		return re;
 	}
+	public static List<References> getReferenceListByCode(String code) throws Exception{
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getReferenceListByCode(conn, code);
+		}catch(Exception e){
+		  throw e;
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+
+	}
+	
 	public static List<References> getReferenceListByCode(Connection conn,String code) {
 		List<References> refList = null;
 		try {

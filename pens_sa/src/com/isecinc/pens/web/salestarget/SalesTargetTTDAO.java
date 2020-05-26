@@ -15,12 +15,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.exception.DataDuplicateException;
-import com.isecinc.pens.process.SequenceProcessAll;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.UserUtils;
 import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class SalesTargetTTDAO {
 
@@ -1269,7 +1268,7 @@ public class SalesTargetTTDAO {
 			//check documentNo
 			if(h.getId()==0){
 				//Gen Next ID Sequence
-				Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TT");
+				Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TT").intValue();
 				if(id==0){
 					id = 1;
 				}
@@ -1354,7 +1353,7 @@ public class SalesTargetTTDAO {
 				
 				if(h.getId()==0 ){
 					//Gen Next ID Sequence
-					Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP");
+					Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP").intValue();
 					if(id==0){
 						id = 1;
 					}
@@ -1430,7 +1429,7 @@ public class SalesTargetTTDAO {
 				//check documentNo
 				if(h.getId()==0){
 					//Gen Next ID Sequence
-					Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP");
+					Integer id =SequenceProcessAll.getIns().getNextValue("XXPENS_BI_SALES_TARGET_TEMP").intValue();
 					if(id==0){
 						id = 1;
 					}

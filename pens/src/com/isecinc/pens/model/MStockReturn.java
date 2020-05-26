@@ -14,7 +14,9 @@ import org.apache.log4j.Logger;
 
 import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
+import util.NumberToolsUtil;
 
+import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.StockReturn;
@@ -22,8 +24,11 @@ import com.isecinc.pens.bean.StockReturnLine;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.PopupDAO;
+import com.isecinc.pens.dao.StockBeanUtils;
+import com.isecinc.pens.dao.StockUtilsDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.StockReturnDocumentProcess;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.sun.org.apache.bcel.internal.classfile.LineNumber;
@@ -31,7 +36,7 @@ import com.sun.org.apache.bcel.internal.classfile.LineNumber;
 
 public class MStockReturn {
 
-	private Logger logger = Logger.getLogger("PENS"); 
+	private static Logger logger = Logger.getLogger("PENS"); 
 	public static String STATUS_SAVE = "SV";//Active
 	public static String STATUS_VOID = "VO";//cancel
 	
@@ -429,8 +434,8 @@ public class MStockReturn {
 			sql.append(" uom1_price,discount,total_amount, \n");
 			//sql.append(" remain_pri_all_qty,remain_pri_qty,remain_sub_qty, \n");
 			sql.append(" uom1_Conv_Rate,uom2_Conv_Rate, \n");
-			sql.append(" status,exported, USER_ID, CREATED, CREATED_BY,UPDATED) \n");//24
-			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");//,?,?,?) \n");
+			sql.append(" status,exported, USER_ID, CREATED, CREATED_BY,UPDATED,reason) \n");//24
+			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");//,?,?,?) \n");
 
 			//logger.debug("SQL:"+sql);
 			int index = 0;
@@ -464,6 +469,7 @@ public class MStockReturn {
 			ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(++index, line.getCreatedBy());//CREATED_BY
 			ps.setNull(++index,java.sql.Types.TIMESTAMP);//updated 
+			ps.setString(++index, line.getReason());//reason
 			
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
@@ -488,7 +494,7 @@ public class MStockReturn {
 			sql.append(" uom1_pac=?, uom2_pac=? ,uom1_price=? ,discount =? ,total_amount =? ,");
 			//sql.append(" remain_pri_all_qty =?,remain_pri_qty=?,remain_sub_qty=?, \n");
 			sql.append(" uom1_Conv_Rate=?,uom2_Conv_Rate=?, \n");
-			sql.append(" USER_ID=?, UPDATED =?, UPDATED_BY =?  \n");
+			sql.append(" USER_ID=?, UPDATED =?, UPDATED_BY =? ,reason = ? \n");
 			sql.append(" WHERE request_number=? and line_number = ? \n");
 			
 			logger.debug("SQL:"+sql);
@@ -518,6 +524,7 @@ public class MStockReturn {
 			ps.setString(++index, head.getUserId());//USER_ID
 			ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));//updateDate
 			ps.setString(++index, line.getUpdateBy());//UPDATE_BY
+			ps.setString(++index, line.getReason());//reason
 			
 			ps.setString(++index, head.getRequestNumber());//request_number
 			ps.setInt(++index, line.getLineId());//line_number
@@ -768,6 +775,7 @@ public class MStockReturn {
 			try {
 				sql.append("\n SELECT A.* FROM ( ");
 				sql.append("\n   SELECT l.* , (select p.code from m_product p where p.product_id = l.inventory_item_id)as code ");
+				sql.append("\n  ,(select description from c_reference c where code ='ReasonReturn' and c.value = l.reason )as reason_desc ");
 				sql.append("\n   from t_stock_return_line l ");
 				sql.append("\n   WHERE l.request_number ='"+mCriteria.getRequestNumber()+"'");
 				sql.append("\n   and l.status ='SV' ");
@@ -777,7 +785,6 @@ public class MStockReturn {
 				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
-
 				while (rst.next()) {
 				  StockReturnLine m = new StockReturnLine();
 				  no++;
@@ -814,7 +821,9 @@ public class MStockReturn {
 				  popupForm.setUserId(mCriteria.getUserId());
 				  popupForm.setProductCode(m.getProductCode());
 				  popupForm.setRequestNumber(mCriteria.getRequestNumber());
-				  List<PopupForm> results = PopupDAO.searchInvoiceStockReturn(popupForm,"",user);
+				  popupForm.setCodeSearch(m.getArInvoiceNo());//wit:edit 05/05/2563 case display remainPriQty wrong
+				  
+				  List<PopupForm> results = searchInvoiceStockReturn(popupForm,"",user);
 				  if(results != null && results.size()>0){ 
 					  PopupForm remain = results.get(0);
 				      m.setRemainPriAllQty(remain.getPriAllQty());
@@ -843,7 +852,8 @@ public class MStockReturn {
 				  if( (STATUS_SAVE.equals(m.getStatus()) && STATUS_NO_EXPORTED.equals(m.getExported()) ) ){
 					  m.setCanEdit(true);
 				  }
-				  
+				  m.setReason(Utils.isNull(rst.getString("reason")));
+				  m.setReasonDesc(Utils.isNull(rst.getString("reason_desc")));
 				  lineList.add(m);
 				}//while
 
@@ -969,4 +979,293 @@ public class MStockReturn {
 			}
 			return result;
 		}
+	  
+	 /************************* Stock Return (invoice Qty Popup) ***********************************************/
+	 public static List<PopupForm> searchInvoiceStockReturn(PopupForm c,String operation,User user) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			String backDate = "";
+			StockBeanUtils stockBean = null;
+			try {
+				conn = DBConnection.getInstance().getConnection();
+				
+				//Case requestNumber is not null get back from stockReturn
+				if( !Utils.isNull(c.getRequestNumber()).equals("")){
+					Date backDateObj = new MStockReturn().getBackDate(conn, Utils.isNull(c.getRequestNumber()));
+					backDate = Utils.stringValue(backDateObj, Utils.DD_MM_YYYY_WITH_SLASH);
+				}else{
+					// get back_date(from c_reference) for get data
+					List<References> backDateInvoiceStockReturnList = InitialReferences.getReferenceListByCode(conn,InitialReferences.BACKDATE_INVOICE_STOCKRETURN);
+					if(backDateInvoiceStockReturnList != null ){
+					   References refbackDate =  backDateInvoiceStockReturnList.get(0);
+					   Calendar curdate = Calendar.getInstance();
+					   curdate.add(Calendar.MONTH, -1*Integer.parseInt(refbackDate.getKey()));
+					   
+					   logger.debug("backDate:"+curdate.getTime());
+					   backDate = Utils.stringValue(curdate.getTime(), Utils.DD_MM_YYYY_WITH_SLASH);
+					   //set to 01/mm/yyyy
+					   backDate = "01/"+backDate.substring(3,backDate.length());
+					   logger.debug("backDate:"+backDate);
+					}
+				}
+				
+				sql.append("\n select h.ar_invoice_no,COALESCE(sum(l.qty),0) as qty" );
+				sql.append("\n from t_order h ,t_order_line l ");
+				sql.append("\n where h.order_id = l.order_id ");
+				sql.append("\n and h.ar_invoice_no is not null ");
+				sql.append("\n and h.ar_invoice_no <> '' ");
+				sql.append("\n and l.promotion <> 'Y' ");
+				sql.append("\n and l.iscancel <> 'Y' ");
+				sql.append("\n and h.user_id = " +c.getUserId());
+				sql.append("\n and h.customer_id =(select customer_id from m_customer where code='"+c.getCustomerCode()+"')");
+				sql.append("\n and l.product_id =(select product_id from m_product where code='"+c.getProductCode()+"')");
+				sql.append("\n and order_date >= STR_TO_DATE('"+backDate+"', '%d/%m/%Y') ");
+				sql.append("\n and doc_status <> 'VO' ");
+			
+				if("equals".equalsIgnoreCase(operation)){
+					if( !Utils.isNull(c.getCodeSearch()).equals("")){
+						sql.append("\n and h.ar_invoice_no ='"+c.getCodeSearch()+"'");
+					}
+					if( !Utils.isNull(c.getDescSearch()).equals("")){
+						sql.append("\n and h.ar_invoice_no = '"+c.getDescSearch()+"'");
+					}
+				}else{
+					if( !Utils.isNull(c.getCodeSearch()).equals("")){
+						sql.append("\n and h.ar_invoice_no LIKE '%"+c.getCodeSearch()+"%' ");
+					}
+					if( !Utils.isNull(c.getDescSearch()).equals("")){
+						sql.append("\n and h.ar_invoice_no LIKE '%"+c.getDescSearch()+"%' ");
+					}
+				}
+				sql.append("\n GROUP BY h.ar_invoice_no ");
+				sql.append("\n ORDER BY h.ar_invoice_no asc ");
+				
+				logger.debug("sql:"+sql);
+			
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no=0;
+				while (rst.next()) {
+					no++;
+					PopupForm item = new PopupForm();
+					item.setNo(no);
+					item.setCode(Utils.isNull(rst.getString("ar_invoice_no")));
+					item.setPrice(getOrderItemPriceByArInvoiceNo(conn, c, backDate, user, Utils.isNull(rst.getString("ar_invoice_no"))));
+					
+					//calc priQty
+					stockBean = calcStockReturnPriQtyByArInvoice(conn,c.getRequestNumber(), Utils.isNull(rst.getString("ar_invoice_no")),backDate,c,user );
+					if(stockBean != null){
+					   item.setDesc(""+stockBean.getPriAllQty());
+					   item.setPriAllQty(Utils.decimalFormat(stockBean.getPriAllQty(),Utils.format_current_5_digit));
+					   item.setPriQty(Utils.decimalFormat(stockBean.getPriQty(),Utils.format_current_5_digit));
+					   item.setSubQty(Utils.decimalFormat(stockBean.getSubQty(),Utils.format_current_5_digit));
+					   
+					   if(stockBean.getPriAllQty() > 0.00){
+					      pos.add(item);
+					   }
+					}
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+ public static String getOrderItemPriceByArInvoiceNo(Connection conn,PopupForm c,String backDate,User user,String arInvoiceNo) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		String price ="";
+		try {
+			sql.append("\n select distinct l.price" );
+			sql.append("\n from t_order h ,t_order_line l ");
+			sql.append("\n where h.order_id = l.order_id ");
+			sql.append("\n and h.ar_invoice_no is not null ");
+			sql.append("\n and h.ar_invoice_no <> '' ");
+			sql.append("\n and h.user_id = " +c.getUserId());
+			sql.append("\n and h.customer_id =(select customer_id from m_customer where code='"+c.getCustomerCode()+"')");
+			sql.append("\n and l.product_id =(select product_id from m_product where code='"+c.getProductCode()+"')");
+			sql.append("\n and h.doc_status <> 'VO' ");
+			sql.append("\n and l.promotion <> 'Y' ");
+			sql.append("\n and h.order_date >= STR_TO_DATE('"+backDate+"', '%d/%m/%Y') ");
+		    sql.append("\n and h.ar_invoice_no ='"+arInvoiceNo+"'");
+			
+			logger.debug("sql:"+sql);
+		
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if (rst.next()) {
+				price = Utils.decimalFormat(rst.getDouble("price"),Utils.format_current_2_disgit);
+
+			}//if
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+		return price;
+	}
+ 
+ public static StockBeanUtils calcStockReturnPriQtyByArInvoice(Connection conn,String curRequestNumber
+		 ,String arInvoiceNo,String dateStart,PopupForm c,User user) throws Exception {
+	    StockBeanUtils bean = new StockBeanUtils();
+	    Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		double priQtyInit = 0;
+		double priQtyNotInCurrRequestNumber = 0;
+		double priAllQty = 0;
+		String productId = "";
+		try {
+			sql.append("\n select h.ar_invoice_no,l.product_id,l.uom_id,COALESCE(sum(l.qty),0) as remain_pri_qty" );
+			sql.append("\n from t_order h ,t_order_line l ");
+			sql.append("\n where h.order_id = l.order_id ");
+			sql.append("\n and h.ar_invoice_no is not null ");
+			sql.append("\n and h.ar_invoice_no <> '' ");
+			sql.append("\n and doc_status <> 'VO' ");
+			sql.append("\n and h.user_id = " +c.getUserId());
+			sql.append("\n and h.customer_id =(select customer_id from m_customer where code='"+c.getCustomerCode()+"')");
+			sql.append("\n and l.product_id =(select product_id from m_product where code='"+c.getProductCode()+"')");
+			sql.append("\n and order_date >= STR_TO_DATE('"+dateStart+"', '%d/%m/%Y') ");
+			sql.append("\n and h.ar_invoice_no ='"+arInvoiceNo+"'");
+			sql.append("\n GROUP BY h.ar_invoice_no ,l.product_id,l.uom_id");
+			sql.append("\n ORDER BY h.ar_invoice_no asc ");
+			
+			//logger.debug("sql:"+sql);
+		
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+				priAllQty += StockUtilsDAO.calcPriQty(conn,rst.getString("product_id"), rst.getString("uom_id"), rst.getInt("remain_pri_qty"));
+                productId = rst.getString("product_id");
+			}//while
+			//logger.debug("priAllQty:"+priAllQty);
+			
+			/** del stockReturnItem <> curRequestnumber **/
+			priQtyNotInCurrRequestNumber = getPriQtyExistNotInCurrentNumber(conn, arInvoiceNo, curRequestNumber, productId);
+			//logger.debug("priQtyNotInCurrRequestNumber:"+priQtyNotInCurrRequestNumber);
+			
+			/** PriQtyInit ***/
+			priQtyInit = getPriQtyInt(conn,user, arInvoiceNo, c.getCustomerCode(), productId);
+			//logger.debug("priQtyInit:"+priQtyInit);		
+					
+			/**  = priQtyall +(neg priQtyInit) - priQty(exist <> curRequestNumber) **/
+			//logger.debug("Calc priAllQty["+priAllQty+"]-priQtyInit["+priQtyInit+"]-priQtyNotInCurrReqNum["+priQtyNotInCurrRequestNumber+"]");
+			priAllQty =  priAllQty + priQtyInit - priQtyNotInCurrRequestNumber;
+			priAllQty = NumberToolsUtil.round(priAllQty, 5, BigDecimal.ROUND_HALF_UP); 
+			//logger.debug("Result priAllQty:"+priAllQty);
+			
+			bean.setPriAllQty(priAllQty);
+			
+			/*** Calc remain priQty to pri_qty and sub_qty ***/
+			String tempPriAllQty = priAllQty+"";
+			double priQty = Utils.convertStrToDouble(tempPriAllQty.substring(0,tempPriAllQty.indexOf(".")));
+			double subQtyTemp =Utils.convertStrToDouble(tempPriAllQty.substring(tempPriAllQty.indexOf("."),tempPriAllQty.length()));
+			//logger.debug("priQty["+priQty+"]");
+			//logger.debug("subQtyTemp["+subQtyTemp+"]");
+			
+			//get Uom2
+			Product p = new MProduct().getStockReturnProduct(c.getProductCode(),user);
+			double subQty = 0;
+			if(p != null){
+			   subQty = StockUtilsDAO.calcPriQtyToSubQty(conn, productId, p.getUom2(), subQtyTemp); 
+			}
+			//logger.debug("after clac subQty["+subQty+"]");
+			
+			bean.setPriQty(priQty);
+			bean.setSubQty(subQty);
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+		return bean;
+	}
+
+ public static double getPriQtyExistNotInCurrentNumber(Connection conn,String arInvoiceNo,String curRequestNumber,String productId) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		double existPriQty = 0;
+		try {
+			sql.append("\n select l.inventory_item_id as product_id,COALESCE(sum(l.pri_qty),0) as existPriQty" );
+			sql.append("\n from t_stock_return_line l ");
+			sql.append("\n where 1=1");
+			if( !Utils.isNull(curRequestNumber).equals("")){
+			  sql.append("\n and l.request_number <> '"+curRequestNumber+"'");
+			}
+			sql.append("\n and l.ar_invoice_no ='"+arInvoiceNo+"'");
+			sql.append("\n and l.inventory_item_id ="+productId+"");
+			sql.append("\n GROUP BY l.inventory_item_id ");
+			
+			//+ current store_return (requestNumber)
+			
+			logger.debug("sql:"+sql);
+		
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if (rst.next()) {
+				existPriQty  = rst.getDouble("existPriQty");
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+		return existPriQty;
+	}
+
+ public static double getPriQtyInt(Connection conn,User user,String arInvoiceNo,String customerCode,String productId) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		double existPriQty = 0;
+		try {
+			sql.append("\n select COALESCE(sum(l.pri_qty),0) as init_pri_Qty" );
+			sql.append("\n from pens.t_stock_return_init l ");
+			sql.append("\n where 1=1");
+			sql.append("\n and l.customer_code = '"+customerCode+"'");
+			sql.append("\n and l.ar_invoice_no ='"+arInvoiceNo+"'");
+			sql.append("\n and l.inventory_item_id ="+productId+"");
+			sql.append("\n and l.user_id ="+user.getId()+"");
+			sql.append("\n GROUP BY l.inventory_item_id ");
+			
+			//+ current store_return (requestNumber)
+			
+			logger.debug("sql:"+sql);
+		
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if (rst.next()) {
+				existPriQty  = rst.getDouble("init_pri_Qty");
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e) {}
+		}
+		return existPriQty;
+	}
 }

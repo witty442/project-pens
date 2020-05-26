@@ -227,6 +227,7 @@
 			<forward name="searchBrand" path="/jsp/pop/searchBrandPopup.jsp" />
 			<forward name="searchInvoice" path="/jsp/pop/searchInvoicePopup.jsp" />
 			<forward name="searchInvoiceStockReturn" path="/jsp/pop/searchInvoiceStockReturnPopup.jsp" />
+			<forward name="searchInvoiceStockDiscount" path="/jsp/pop/searchInvoiceStockDiscountPopup.jsp" />
 		</action>
 		
 		<!-- LOGIN -->

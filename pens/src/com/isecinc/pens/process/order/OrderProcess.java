@@ -445,10 +445,10 @@ public List<OrderLine> fillLinesShow(List<OrderLine> lines) throws Exception {
 					}
 				}
 				
-				logger.debug("UOM1:"+line.getUom1());
+				/*logger.debug("UOM1:"+line.getUom1());
 				logger.debug("UOM2:"+line.getUom1());
 				logger.debug("productCode:"+line.getProduct().getCode());
-				logger.debug("fullUOM:"+line.getFullUom());
+				logger.debug("fullUOM:"+line.getFullUom());*/
 				
 				i++;
 			}

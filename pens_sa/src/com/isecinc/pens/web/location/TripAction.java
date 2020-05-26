@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.directory.SearchResult;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,11 +22,11 @@ import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SalesrepDAO;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.process.SequenceProcessAll;
 import com.pens.util.DBConnection;
 import com.pens.util.MonitorTime;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
+import com.pens.util.seq.SequenceProcessAll;
 
 
 public class TripAction {
@@ -648,7 +647,7 @@ public class TripAction {
 	logger.debug("insertCustTripChangeHis customerCode["+o.getCustomerCode()+"]");
 	long id = 0;
 	try{
-		id = SequenceProcessAll.getIns().getNextValue("XXPENS_BI_CUST_TRIP_CHANGE_HIS");
+		id = SequenceProcessAll.getIns().getNextValue("XXPENS_BI_CUST_TRIP_CHANGE_HIS").longValue();
 		
 		StringBuffer sql = new StringBuffer("");
 		sql.append(" INSERT INTO PENSBI.XXPENS_BI_CUST_TRIP_CHANGE_HIS \n");

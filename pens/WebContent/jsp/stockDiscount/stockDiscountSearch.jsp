@@ -42,7 +42,6 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
-
 function loadMe(){
 	new Epoch('epoch_popup', 'th', document.getElementById('requestDateFrom'));
 	new Epoch('epoch_popup', 'th', document.getElementById('requestDateTo'));
@@ -58,14 +57,14 @@ function search(path){
 	return true;
 }
 
-function viewStockReturn(path,requestNumber){
+function viewStockDiscount(path,requestNumber){
 	var param ="&requestNumber="+requestNumber;
-	document.stockDiscountForm.action = path + "/jsp/stockDiscountAction.do?do=viewStockReturn&action=view"+param;
+	document.stockDiscountForm.action = path + "/jsp/stockDiscountAction.do?do=viewStockDiscount&action=view"+param;
 	document.stockDiscountForm.submit();
 	return true;
 }
 
-function createNewStockReturn(path){
+function createNewStockDiscount(path){
 	var param = "";
 	    //param +="&backAvgMonth="+document.getElementsByName('bean.backAvgMonth')[0].value;
 	document.stockDiscountForm.action = path + "/jsp/stockDiscountAction.do?do=createNewStock"+param;
@@ -73,12 +72,12 @@ function createNewStockReturn(path){
 	return true;
 }
 
- function gotoPage(path,page){
-		document.stockDiscountForm.action = path + "/jsp/stockDiscountAction.do?do=search&rf=Y";
-		document.getElementsByName('curPage')[0].value = page;
-		document.stockDiscountForm.submit();
-		return true;
-	}
+function gotoPage(path,page){
+	document.stockDiscountForm.action = path + "/jsp/stockDiscountAction.do?do=search&rf=Y";
+	document.getElementsByName('curPage')[0].value = page;
+	document.stockDiscountForm.submit();
+	return true;
+}
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -129,7 +128,6 @@ function createNewStockReturn(path){
 							<td align="left" width="40%" ><html:text property="bean.requestDateTo" styleId="requestDateTo" readonly="true" styleClass="\" autoComplete=\"off"/></td>
 						 </tr>
 						 <tr>
-						
 						 </tr>
 					</table>
 					<br>
@@ -138,15 +136,14 @@ function createNewStockReturn(path){
 						<tr>
 							<td align="center">
 								<input type="button" value="ค้นหา" class="newPosBtn" onclick="search('${pageContext.request.contextPath}')">
-								<input type="button" value="เพิ่มรายการใหม่" class="newPosBtn" onclick="createNewStockReturn('${pageContext.request.contextPath}')">
+								<input type="button" value="เพิ่มรายการใหม่" class="newPosBtn" onclick="createNewStockDiscount('${pageContext.request.contextPath}')">
 								<input type="button" value="Clear" class="newNegBtn" onclick="clearForm('${pageContext.request.contextPath}')">
 							</td>
 						</tr>
-					</table>				
-                    
+					</table>	
 					<!-- RESULT -->
 					<!-- Paging -->
-					 <c:if test="${stockDiscountForm.results != null}">
+					 <c:if test="${stockDiscountForm.results != null }">
 						<span class="pagebanner">พบรายการ  ${stockDiscountForm.totalRow} รายการ  ,แสดงรายการทั้งหมด </span>
 						 <span class="pagelinks">หน้า
 							<c:forEach var="i" begin="1" end="${stockDiscountForm.totalPage}">
@@ -158,7 +155,6 @@ function createNewStockReturn(path){
 								 </c:if> 
 						    </c:forEach>
 					    </span>
-					    
 					    <table align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
 							<tr >
 								<th>No.</th>
@@ -183,26 +179,23 @@ function createNewStockReturn(path){
 							    <td class="td_text_center" width="5%"><c:out value='${item.requestDate}'/></td>
 								<td class="td_text_center" width="10%"><c:out value='${item.customerCode}'/></td>
 								<td class="td_text" width="20%"><c:out value='${item.customerName}'/></td>
-								
 								<td class="td_text_center" width="10%">
-								  
 								   <c:choose>
 										<c:when test="${item.exported == 'Y'}">
-											 <a href="#" onclick="javascript:viewStockReturn('${pageContext.request.contextPath}','${item.requestNumber}');">
+											 <a href="#" onclick="javascript:viewStockDiscount('${pageContext.request.contextPath}','${item.requestNumber}');">
 									           <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif">
 								             </a>
 										</c:when> 
 										<c:otherwise>
-											 <a href="#" onclick="javascript:viewStockReturn('${pageContext.request.contextPath}','${item.requestNumber}');">
+											 <a href="#" onclick="javascript:viewStockDiscount('${pageContext.request.contextPath}','${item.requestNumber}');">
 											  <img border=0 src="${pageContext.request.contextPath}/icons/process.gif">
 										   </a>
 										</c:otherwise>
 									</c:choose>
 								</td>
-								
 							</tr>
 							</c:forEach>
-							</table>
+						</table>
 					</c:if>	
 					
 				<!-- Result -->	

@@ -42,7 +42,16 @@ public class PopupForm extends ActionForm implements Serializable{
 	private String priAllQty;
 	private String priQty;
 	private String subQty;
+	private String remainAmount;
 	
+	public String getRemainAmount() {
+		return remainAmount;
+	}
+
+	public void setRemainAmount(String remainAmount) {
+		this.remainAmount = remainAmount;
+	}
+
 	public String getPriAllQty() {
 		return priAllQty;
 	}

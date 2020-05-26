@@ -362,6 +362,9 @@ public class AutoOrderDAO {
 			Date orderDate  = DateUtil.parse(h.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			String orderDateStr = DateUtil.stringValue(orderDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			
+			/** Get OrderNo is Exist Case user key before Gen ***/
+			orderNoMap = getOrderNoExistMap(conn, orderDateStr);
+					
 			sql.append("\n select O.* ");
 			sql.append("\n ,OH.retail_price_bf ,OH.whole_price_bf,OH.barcode");
 			sql.append("\n from PENSBI.BME_ORDER_REP O,PENSBI.PENSBME_ONHAND_BME OH ");
@@ -400,12 +403,41 @@ public class AutoOrderDAO {
             		orderNo = orderNoMap.get(o.getStoreCode());
             	}
 	    		o.setOrderNo(orderNo);
-	    		o.setCreateUser(h.getUserName());
+	    		o.setCreateUser(h.getUserName()+"(genA)");
 	    		//Insert Or Update
 	    		OrderDAO.saveOrderFromGenAuto(conn, o);
 			}//for
 		}catch(Exception e){
 			throw e;
+		}
+	}
+	
+	public static Map<String,String> getOrderNoExistMap(Connection conn,String orderDateStr) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuffer sql = new StringBuffer("");
+		Map<String, String> orderNoMap = new HashMap<String, String>();
+		try{
+			sql.append("\n select distinct store_code,order_no from PENSBI.PENSBME_ORDER");
+			sql.append("\n where ORDER_DATE = to_date('"+orderDateStr+"','dd/mm/yyyy')");
+			
+	        logger.debug("sql:"+sql.toString());
+
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			while(rs.next()){
+				orderNoMap.put(Utils.isNull(rs.getString("store_code")), Utils.isNull(rs.getString("order_no")));
+			}
+			return orderNoMap;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(ps != null){
+				ps.close();ps=null;
+			}
+			if(rs != null){
+				rs.close();rs=null;
+			}
 		}
 	}
 	

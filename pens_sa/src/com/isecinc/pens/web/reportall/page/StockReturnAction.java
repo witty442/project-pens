@@ -235,17 +235,8 @@ public class StockReturnAction extends I_Action {
 				f.getBean().getStockBean().setRequestNo(Utils.isNull(request.getParameter("requestNo")));
 	        	//f.getBean().setUserId(user.getId()+"");
 	        	  
-	            if("1".equalsIgnoreCase(Utils.isNull(request.getParameter("reportType")))){
-	            	parameterMap.put("subReportName","สำหรับบริหารขาย");
-	            	//parameterMap.put("subReportName2","(ต้นฉบับ)");
+	            fileNameExport = "StockRe_"+f.getBean().getStockBean().getRequestNo()+".pdf";
 	            	
-	            	fileNameExport = "StockRe_"+f.getBean().getStockBean().getRequestNo()+".pdf";
-	            	
-	            }else{
-	            	parameterMap.put("subReportName","สำหรับคลังสินค้า");
-	            	//parameterMap.put("subReportName2","(สำเนา)");
-	            	fileNameExport = "StockRe_"+f.getBean().getStockBean().getRequestNo()+".pdf";
-	            }
 	            //get head detail
 	            p = new StockReturnDAO().searchStockReturnReport(conn,f.getBean().getStockBean(), user);
 				
@@ -264,27 +255,53 @@ public class StockReturnAction extends I_Action {
 					}
 				}
 				
-				parameterMap.put("pens_logo_fit",logopath);
-				parameterMap.put("request_date",p.getRequestDate());
-				parameterMap.put("request_number",p.getRequestNumber());
-				parameterMap.put("customer_code",p.getCustomerCode());
-				parameterMap.put("customer_name",p.getCustomerName());
-				parameterMap.put("description",p.getDescription());
-				parameterMap.put("totalAllAmount",p.getTotalAllAmount());
-				parameterMap.put("totalAllVatAmount",p.getTotalAllVatAmount());
-				parameterMap.put("totalAllNonVatAmount",p.getTotalAllNonVatAmount());
-				parameterMap.put("sales_code",p.getSalesCode());
-				parameterMap.put("sales_name",p.getSalesName());
-				//parameterMap.put("printDate",Utils.isNull(p.getPrintDate()));
-				parameterMap.put("userPrint",user.getName());
+				//subReport1
+				HashMap<String,Object> subParameterMap1 = new HashMap<String,Object>();
+				subParameterMap1.put("reportName","ใบอนุมัติให้คืนคลัง PENS รอทำลาย");
+				subParameterMap1.put("reportName2","(ต้นฉบับ)");  	
+				subParameterMap1.put("reportName3","(สำหรับบัญชีลูกหนี้)");  	
+				subParameterMap1.put("pens_logo_fit",logopath);
+				subParameterMap1.put("request_date",p.getRequestDate());
+				subParameterMap1.put("request_number",p.getRequestNumber());
+				subParameterMap1.put("customer_code",p.getCustomerCode());
+				subParameterMap1.put("customer_name",p.getCustomerName());
+				subParameterMap1.put("description",p.getDescription());
+				subParameterMap1.put("totalAllAmount",p.getTotalAllAmount());
+				subParameterMap1.put("totalAllVatAmount",p.getTotalAllVatAmount());
+				subParameterMap1.put("totalAllNonVatAmount",p.getTotalAllNonVatAmount());
+				subParameterMap1.put("sales_code",user.getCode());
+				subParameterMap1.put("sales_name",user.getName());
+				subParameterMap1.put("printDate",Utils.isNull(p.getPrintDate()));
+				subParameterMap1.put("userPrint",user.getName());
+				subParameterMap1.put("address",p.getAddress1()+" "+p.getAddress2());
 				
-				parameterMap.put("address",p.getAddress1());
-				parameterMap.put("address2",p.getAddress2());
+				//subReport2
+				HashMap<String,Object> subParameterMap2 = new HashMap<String,Object>();
+				subParameterMap2.put("reportName","ใบอนุมัติให้คืนคลัง PENS รอทำลาย");
+				subParameterMap2.put("reportName2","(สำเนา)");  
+				subParameterMap2.put("reportName3","(สำหรับคลังสินค้า)");  	
+				subParameterMap2.put("pens_logo_fit",logopath);
+				subParameterMap2.put("request_date",p.getRequestDate());
+				subParameterMap2.put("request_number",p.getRequestNumber());
+				subParameterMap2.put("customer_code",p.getCustomerCode());
+				subParameterMap2.put("customer_name",p.getCustomerName());
+				subParameterMap2.put("description",p.getDescription());
+				subParameterMap2.put("totalAllAmount",p.getTotalAllAmount());
+				subParameterMap2.put("totalAllVatAmount",p.getTotalAllVatAmount());
+				subParameterMap2.put("totalAllNonVatAmount",p.getTotalAllNonVatAmount());
+				subParameterMap2.put("sales_code",user.getCode());
+				subParameterMap2.put("sales_name",user.getName());
+				subParameterMap2.put("printDate",Utils.isNull(p.getPrintDate()));
+				subParameterMap2.put("userPrint",user.getName());
+				subParameterMap2.put("address",p.getAddress1()+" "+p.getAddress2());
 				
+				//mainReport
 				parameterMap.put("parameter_subreport",parameterMap);
 	            parameterMap.put("found_data_subreport","found");
 	            parameterMap.put("subDataList", mResultList);
 	            parameterMap.put("SUBREPORT_DIR",BeanParameter.getReportPath());
+	            parameterMap.put("parameter_subreport1",subParameterMap1);
+	            parameterMap.put("parameter_subreport2",subParameterMap2);
 	            
 				if(mResultList != null && mResultList.size()>0){
 					//set for display report
@@ -293,7 +310,6 @@ public class StockReturnAction extends I_Action {
 					
 					reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName,showList ,fileNameExport);
 				    
-					//request.setAttribute("printReport2", "printReport2");
 				}else{
 					request.setAttribute("Message","Data not found");
 				}

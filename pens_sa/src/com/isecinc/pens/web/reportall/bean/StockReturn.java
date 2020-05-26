@@ -44,7 +44,7 @@ public class StockReturn {
 	private String printDate; 
 	private String updated; 
 	private String created; 
-
+	
 	/** Customer */
 	private int customerId;
 	private String customerCode; 
@@ -59,7 +59,8 @@ public class StockReturn {
 	private List<StockReturnLine> lineList;
     private List<String> lineNoDeleteList;
 
-    
+   
+
 	public String getSalesCode() {
 		return salesCode;
 	}

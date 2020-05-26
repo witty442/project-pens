@@ -24,41 +24,24 @@
 		<form-bean name="memberImportForm" type="com.isecinc.pens.web.dataimports.member.MemberImportForm" />
 		<!-- Import -->
 		<form-bean name="importForm" type="com.isecinc.pens.web.imports.ImportForm" />
-		<!-- Import -->
 		<form-bean name="summaryForm" type="com.isecinc.pens.web.summary.SummaryForm" />
-		
 		<form-bean name="popupForm" type="com.isecinc.pens.web.popup.PopupForm" />
-		
 		<form-bean name="masterForm" type="com.isecinc.pens.web.master.MasterForm" />
-		
 		<form-bean name="orderForm" type="com.isecinc.pens.web.order.OrderForm" />
 		<form-bean name="orderFridayForm" type="com.isecinc.pens.web.order.OrderForm" />
 		<form-bean name="orderAllForm" type="com.isecinc.pens.web.order.OrderForm" />
-		
 		<form-bean name="reportForm" type="com.isecinc.pens.web.report.ReportForm" />
-		
 		<form-bean name="searchValuePopupForm" type="com.isecinc.pens.web.popup.SearchValuePopupForm" />
-		
 		<form-bean name="adjustStockForm" type="com.isecinc.pens.web.adjuststock.AdjustStockForm" />
-		
 		<form-bean name="adjustStockSAForm" type="com.isecinc.pens.web.adjuststock.AdjustStockSAForm" />
-		
 		<form-bean name="jobForm" type="com.isecinc.pens.web.pick.JobForm" />
-		
 		<form-bean name="barcodeForm" type="com.isecinc.pens.web.pick.BarcodeForm" />
-		
 		<form-bean name="stockPickQueryForm" type="com.isecinc.pens.web.pick.StockPickQueryForm" />
-		
 		<form-bean name="reqReturnWacoalForm" type="com.isecinc.pens.web.pick.ReqReturnWacoalForm" />
-		
 		<form-bean name="confirmReturnWacoalForm" type="com.isecinc.pens.web.pick.ConfirmReturnWacoalForm" />
-		
 		<form-bean name="pickStockForm" type="com.isecinc.pens.web.pick.PickStockForm" />
-		
 		<form-bean name="pickStockGroupForm" type="com.isecinc.pens.web.pick.PickStockForm" />
-		
 		<form-bean name="renewBoxForm" type="com.isecinc.pens.web.pick.RenewBoxForm" />
-		
 		<form-bean name="reqFinishForm" type="com.isecinc.pens.web.pick.ReqFinishForm" />
 		<form-bean name="confFinishForm" type="com.isecinc.pens.web.pick.ConfFinishForm" />
 		<form-bean name="reqPickStockForm" type="com.isecinc.pens.web.pick.ReqPickStockForm" />
@@ -124,6 +107,7 @@
 	    <form-bean name="reportAllForm" type="com.isecinc.pens.web.reportall.ReportAllForm" />
 	    <form-bean name="importAllForm" type="com.isecinc.pens.web.importall.ImportAllForm" />
 	    <form-bean name="autoCNHHTempForm" type="com.isecinc.pens.web.autocnhhtemp.AutoCNHHTempForm" />
+	    <form-bean name="pickManualStockForm" type="com.isecinc.pens.web.pick.PickManualStockForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -409,6 +393,12 @@
 			<forward name="prepare" path="/jsp/pick/barcode.jsp" />
 			<forward name="clear" path="/jsp/pick/barcode.jsp" />
 			<forward name="addRow" path="/jsp/pick/barcode.jsp" />
+			
+			<forward name="manualStock" path="/jsp/pick/manualStock.jsp" />
+		</action>
+	
+		<action name="pickManualStockForm" path="/jsp/pickManualStockAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.PickManualStockAction">
+			<forward name="search" path="/jsp/pick/pickManualStock.jsp" />
 		</action>
 		
 		<action name="scanCheckForm" path="/jsp/scanCheckAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ScanCheckAction">

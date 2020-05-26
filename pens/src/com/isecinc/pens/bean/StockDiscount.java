@@ -14,11 +14,11 @@ public class StockDiscount {
 	private String haveStock;
     private String backAvgMonth;
     private String backDate;
-    
+    private String vatRate;
 	/** properties**/
-	private String totalAllAmount;
-	private String totalAllVatAmount;
-	private String totalAllNonVatAmount;
+    private String totalLineAmount;
+	private String totalVatAmount;
+	private String totalNetAmount;
 	private String no;    
 	private String requestNumber ;       
 	private String requestDate ;
@@ -54,6 +54,14 @@ public class StockDiscount {
     private List<String> lineNoDeleteList;
 
     
+	public String getVatRate() {
+		return vatRate;
+	}
+
+	public void setVatRate(String vatRate) {
+		this.vatRate = vatRate;
+	}
+
 	public boolean isShowPrintBtn() {
 		return showPrintBtn;
 	}
@@ -200,28 +208,32 @@ public class StockDiscount {
 		this.exportedLabel = exportedLabel;
 	}
     
-	public String getTotalAllAmount() {
-		return totalAllAmount;
+
+
+	public String getTotalVatAmount() {
+		return totalVatAmount;
 	}
 
-	public void setTotalAllAmount(String totalAllAmount) {
-		this.totalAllAmount = totalAllAmount;
+	public void setTotalVatAmount(String totalVatAmount) {
+		this.totalVatAmount = totalVatAmount;
 	}
 
-	public String getTotalAllVatAmount() {
-		return totalAllVatAmount;
+	
+
+	public String getTotalLineAmount() {
+		return totalLineAmount;
 	}
 
-	public void setTotalAllVatAmount(String totalAllVatAmount) {
-		this.totalAllVatAmount = totalAllVatAmount;
+	public void setTotalLineAmount(String totalLineAmount) {
+		this.totalLineAmount = totalLineAmount;
 	}
 
-	public String getTotalAllNonVatAmount() {
-		return totalAllNonVatAmount;
+	public String getTotalNetAmount() {
+		return totalNetAmount;
 	}
 
-	public void setTotalAllNonVatAmount(String totalAllNonVatAmount) {
-		this.totalAllNonVatAmount = totalAllNonVatAmount;
+	public void setTotalNetAmount(String totalNetAmount) {
+		this.totalNetAmount = totalNetAmount;
 	}
 
 	public String getStatusLabel() {

@@ -7,9 +7,9 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.isecinc.pens.process.SequenceProcessAll;
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class ExceptionHandle {
     public static Map<String,String> ERROR_MAPPING = new HashMap<String,String>();
@@ -121,7 +121,7 @@ public class ExceptionHandle {
 				//System.out.println("Insert Error Msg");
 				if( !Utils.isNull(errorMsg).equals("")){
 				   stInsert = conn.createStatement();
-				   int errorId = SequenceProcessAll.getIns().getNextValue(conn, "m_error_mapping");
+				   int errorId = SequenceProcessAll.getIns().getNextValue(conn, "m_error_mapping").intValue();
 				   stInsert.execute(" INSERT INTO monitor_error_mapping(error_id,error_code,error_msg)values("+errorId+",'"+errorCode+"','"+errorMsg+"')");
 				}
 			}
