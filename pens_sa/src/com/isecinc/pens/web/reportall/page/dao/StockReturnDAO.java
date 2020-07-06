@@ -284,7 +284,7 @@ public class StockReturnDAO {
 			sql.append("\n select H.request_no");
 			sql.append("\n ,D.line_no,D.trx_number,P.segment1,P.description");
 			sql.append("\n ,D.PRI_REQ_QTY ,D.SEC_REQ_QTY ,D.SEC_REQ_UOM ,D.PRI_REQ_CONV");
-			sql.append("\n ,D.discount ,D.amount ,D.reason_code ");
+			sql.append("\n ,D.discount ,D.amount ,D.reason_code,D.EXPIRED_DATE ");
 			sql.append("\n ,(select c.description from apps.fnd_lookup_values c ");
 			sql.append("\n   where c.lookup_type ='CREDIT_MEMO_REASON' and c.attribute15 = 'Y' ");
 			sql.append("\n   and c.lookup_code = D.reason_code )as reason_desc ");
@@ -316,7 +316,7 @@ public class StockReturnDAO {
 			  m.setDiscount(Utils.decimalFormat(rst.getDouble("discount"),Utils.format_current_2_disgit));
 			  m.setTotalAmount(Utils.decimalFormat(rst.getDouble("amount"),Utils.format_current_2_disgit));
 			  m.setReasonDesc(Utils.isNull(rst.getString("reason_desc")));
-			  
+			  m.setExpireDate(DateUtil.stringValueChkNull(rst.getDate("expired_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			  lineList.add(m);
 			}//while
 

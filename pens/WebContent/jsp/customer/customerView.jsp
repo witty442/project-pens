@@ -122,7 +122,7 @@ body {
 								<td align="right" colspan="2">
 								  <html:radio property="customer.printType" styleId="printType" value="H" onclick="switchPrintType()" disabled="true"></html:radio>สำนักงานใหญ่ 
 								</td>
-								<td align="left" colspan="3">
+								<td align="left">
 									 <html:radio property="customer.printType" styleId="printType" value="B" onclick="switchPrintType()" disabled="true"></html:radio>สาขาที่
 								     <html:text property="customer.printBranchDesc" styleId="printBranchDesc" readonly="true" styleClass="disableText"/>
 								&nbsp;&nbsp;&nbsp;

@@ -6,7 +6,9 @@
 <%
 String outputText = "";
 try{
-	System.out.println("PageName:"+request.getParameter("pageName"));
+	//System.out.println("PageName:"+request.getParameter("pageName"));
+	//System.out.println("pensItem:"+request.getParameter("pensItem"));
+	//System.out.println("materialMaster:"+request.getParameter("materialMaster"));
 	outputText = new AutoKeypressAction().search(request);
 }catch(Exception e){
 	e.printStackTrace();

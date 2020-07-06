@@ -103,6 +103,7 @@ table#productList tbody td.number{text-align:right;}
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.scannerdetection.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 
 <!-- Test new version jquery -->
 <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -247,6 +248,7 @@ function getProductKeypressByBarcodeModel(path,barcode){
 				product.uomLabel2 = products[i].uom2;
 				product.price1 = products[i].price1;
 				product.price2 = products[i].price2;
+				product.priceAfDiscount = products[i].priceAfDiscount;
 				
 				//alert(products[i].qty1);
 				product.qty1 = products[i].qty1;
@@ -269,6 +271,7 @@ function getProductKeypressByBarcodeModel(path,barcode){
 				
 				product.taxable = products[i].taxable;
 				product.promotion = productType;
+				product.productNonBme = products[i].productNonBme;//add 02/06/2563
 				
 				addProduct('${pageContext.request.contextPath}', product);
 				
@@ -412,6 +415,7 @@ style="height: 100%;">
 											<input type='hidden' name='lines.price' value='${lines1.price}'>
 											<input type='hidden' name='lines.price1' value='${lines1.price1}'>
 											<input type='hidden' name='lines.price2' value='${lines1.price2}'>
+											<input type='hidden' name='lines.priceAfDiscount' value='${lines1.priceAfDiscount}'>
 											<input type='hidden' name='lines.qty' value='${lines1.qty}'>
 											<input type='hidden' name='lines.qty1' value='${lines1.qty1}'>
 											<input type='hidden' name='lines.qty2' value='${lines1.qty2}'>
@@ -440,6 +444,7 @@ style="height: 100%;">
 											
 											<input type='hidden' name='lines.sellingPrice' value='${lines1.sellingPrice}'>
 											<input type='hidden' name='lines.modifierLineId' value='${lines1.modifierLineId}'>
+											<input type='hidden' name='lines.productNonBme' value='${lines1.productNonBme}'>
 										</td>
 										<td class="td_text_center" width="5%">
 											<c:choose>

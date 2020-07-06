@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bank_transfer_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="userPrint" class="java.lang.String"/>
+	<parameter name="totalAmount" class="java.lang.String"/>
+	<field name="transferType" class="java.lang.String"/>
+	<field name="transferBank" class="java.lang.String"/>
+	<field name="transferDate" class="java.lang.String"/>
+	<field name="transferTime" class="java.lang.String"/>
+	<field name="amount" class="java.lang.String"/>
+	<field name="chequeNo" class="java.lang.String"/>
+	<field name="chequeDate" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="90" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="555" height="25"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="18"/>
+				</textElement>
+				<text><![CDATA[บริษัท เพนส์ มาร์เก็ตติ้ง แอนด์ ดิสทริบิวชั่น จำกัด]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="25" width="555" height="25"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="16"/>
+				</textElement>
+				<text><![CDATA[รายงานการปฏิบัติงาน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="473" y="50" width="47" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="15"/>
+				</textElement>
+				<text><![CDATA[หน้า]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="533" y="50" width="9" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="15"/>
+				</textElement>
+				<text><![CDATA[/]]></text>
+			</staticText>
+			<textField evaluationTime="Page">
+				<reportElement x="520" y="50" width="13" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="542" y="50" width="13" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="40" splitType="Stretch">
+			<staticText>
+				<reportElement x="49" y="2" width="176" height="38"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<text><![CDATA[ธราคารของ PENS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="307" y="2" width="87" height="38"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<text><![CDATA[ยอดเงินโอน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="271" y="2" width="36" height="38"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<text><![CDATA[เวลาโอน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="2" width="48" height="38"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<text><![CDATA[ประเภทการโอน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="225" y="2" width="46" height="38"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<text><![CDATA[วันที่โอน]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="394" y="1" width="100" height="38"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<text><![CDATA[เลขที่เช็ค]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="494" y="1" width="62" height="38"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<text><![CDATA[วันที่หน้าเช็ค]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="494" y="0" width="62" height="20"/>
+				<box>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{chequeDate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="307" y="0" width="87" height="20"/>
+				<box>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{amount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="225" y="0" width="46" height="20"/>
+				<box>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{transferDate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="49" y="0" width="176" height="20"/>
+				<box>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement>
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{transferBank}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="1" y="0" width="48" height="20"/>
+				<box>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{transferType}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="271" y="0" width="36" height="20"/>
+				<box>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{transferTime}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="394" y="0" width="100" height="20"/>
+				<box>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{chequeNo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<lastPageFooter>
+		<band/>
+	</lastPageFooter>
+	<summary>
+		<band height="55" splitType="Stretch">
+			<textField>
+				<reportElement x="413" y="31" width="142" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{userPrint}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MM-yyyy HH:mm:ss">
+				<reportElement x="43" y="31" width="142" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="31" width="43" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<text><![CDATA[พิมพ์วันที่ : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="1" width="306" height="20"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ยอดรวม]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="307" y="1" width="87" height="20"/>
+				<box>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Angsana New" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalAmount}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="0" width="554" height="1"/>
+				<graphicElement>
+					<pen lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

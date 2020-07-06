@@ -71,6 +71,9 @@ public class ReportAllForm extends I_Form {
 		if(getBean() != null){
 		   //getBean().setDispZeroStock("");
 		   //getBean().setDispHaveQty("");
+			if(getBean().getStockBean() != null){
+			   getBean().getStockBean().setDispExpireSoon("");
+			}
 		}
 		
 	}

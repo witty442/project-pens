@@ -210,6 +210,9 @@ public class ShopBillDetailAction {
 				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n    AND H.ORDER_DATE = to_date('"+dateStr+"','dd/mm/yyyy')");
 			}
+			if( !Utils.isNull(o.getBmeProductOnly()).equals("")){
+				sql.append("\n   AND MP.PENS_ITEM NOT IN( select pens_item from PENSBI.PENSBME_PRICELIST where non_bme ='Y')");
+			}
 			if(newVersion){
 			   sql.append("\n     group by MP.MATERIAL_MASTER");
 			}else{

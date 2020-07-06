@@ -49,12 +49,29 @@ public class ImportManualExcel {
 			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/ORDER_REP/MasterBmeOrderRep.xlsx",2,0);
 			
 			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/pd_sales_zone.xlsx",3,0);
+			
+			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/Thailand Zip Code.xlsx",4,0);
+			
+			/*importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/ร้านค้าเครดิต.xlsx",0,3,0);
+			importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/ร้านค้าเครดิต.xlsx",1,3,0);
+			importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/ร้านค้าเครดิต.xlsx",2,3,0);
+			importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/ร้านค้าเครดิต.xlsx",3,3,0);
+			importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/ร้านค้าเครดิต.xlsx",4,3,0);*/
+			
+			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/Master Buds.xlsx",8,0);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
 	
+public static void importExcel(String dataBaseType,String db,String inputFile,int sheetNo,int maxColumn,int colcheck) throws Exception{
+		importExcelModel(dataBaseType,db,inputFile,sheetNo,maxColumn,colcheck);
+}
 public static void importExcel(String dataBaseType,String db,String inputFile,int maxColumn,int colcheck) throws Exception{
+	importExcelModel(dataBaseType,db,inputFile,0,maxColumn,colcheck);
+}
+
+public static void importExcelModel(String dataBaseType,String db,String inputFile,int sheetNo,int maxColumn,int colcheck) throws Exception{
 	 Connection conn = null;
 	 StringBuffer sql = new StringBuffer();
 	 UploadXLSUtil xslUtils = new UploadXLSUtil();
@@ -76,12 +93,12 @@ public static void importExcel(String dataBaseType,String db,String inputFile,in
 		
 		if("xls".equalsIgnoreCase(fileType)){
 		   wb1 = new HSSFWorkbook(dataFile);//97-2003
-		   sheet = wb1.getSheetAt(0);
+		   sheet = wb1.getSheetAt(sheetNo);
 		   logger.debug("number of sheet: " + wb1.getNumberOfSheets());
 		}else{
 		   OPCPackage pkg = OPCPackage.open(dataFile);
 		   wb2 = new XSSFWorkbook(pkg);
-		   sheet = wb2.getSheetAt(0);
+		   sheet = wb2.getSheetAt(sheetNo);
 		   logger.debug("number of sheet: " + wb2.getNumberOfSheets());
 		}
 		
@@ -153,7 +170,7 @@ public static void importExcel(String dataBaseType,String db,String inputFile,in
 			//String rowCheck = Utils.isNull(cellCheckValue);
 			logger.debug("row["+i+"]rowCheck["+cellCheckValue+"]");
 			if(cellCheckValue==null){
-				break;
+				//break;
 			}
 			
 			for (int colNo = 0; colNo < maxColumnNo; colNo++) {

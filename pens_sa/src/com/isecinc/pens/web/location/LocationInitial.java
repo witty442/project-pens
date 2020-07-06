@@ -60,6 +60,7 @@ public class LocationInitial extends LocationControlPage {
 			List<References> dispTypeList = new ArrayList<References>();
 			dispTypeList.add(new References("MAP","แสดงเป็นแผนที่"));
 			dispTypeList.add(new References("DATA","แสดงเป็นข้อมูล"));
+			dispTypeList.add(new References("DATA_SUMMARY","แสดงเป็นสรุปข้อมูล"));
 			session.setAttribute("dispTypeList", dispTypeList);
 			
 			/** init year **/

@@ -132,10 +132,12 @@ TABLE.tableSearchNoSet TD {
 	font-weight: bold;
 }
 .td_text_center{
+	text-align: center;
 	align:center;
 }
 .td_text_center_bold{
 	align:center;
+	text-align: center;
 	font-weight: bold;
 }
 table.tableSearchNoWidth td.td_text_right {

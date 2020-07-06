@@ -117,6 +117,7 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		setTripDay( Utils.isNull(rst.getString("TRIP_DAY")));
 		setTripDay2( Utils.isNull(rst.getString("TRIP_DAY2")));
 		setTripDay3( Utils.isNull(rst.getString("TRIP_DAY3")));
+		setCustGroup( Utils.isNull(rst.getString("cust_group")));
 	}
 
 	/**
@@ -149,6 +150,16 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 	private String tripDay;
 	private String tripDay2;
 	private String tripDay3;
+	private String custGroup;
+	
+	
+	public String getCustGroup() {
+		return custGroup;
+	}
+
+	public void setCustGroup(String custGroup) {
+		this.custGroup = custGroup;
+	}
 
 	public String getTripDay() {
 		return tripDay;

@@ -39,6 +39,7 @@ pageContext.setAttribute("shippingMethod",shippingMethod,PageContext.PAGE_SCOPE)
 List<References> partyTypeList = InitialReferences.getReferenes().get(InitialReferences.PARTY_TYPE);
 pageContext.setAttribute("partyTypeList",partyTypeList,PageContext.PAGE_SCOPE);
 
+
 //init tripList
 request.setAttribute("tripDayList", CustomerHelper.initTripList());
 
@@ -298,6 +299,7 @@ function setMainCustomer(code, name){
 										 </html:select> --%>
 									<%} %>
 								 </td>
+							
 							</tr>
 							<tr>
 								<td align="right" colspan="2"><b><bean:message key="Customer.Code" bundle="sysele"/></b>&nbsp;&nbsp;</td>

@@ -35,6 +35,7 @@ import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MRequestPromotion;
+import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 
 /**
  * Summary Action
@@ -537,6 +538,14 @@ public class RequestPromotionAction extends I_Action {
 			
 			// save token
 			saveToken(request);
+			
+			/** 
+			* Process run after this action 
+			* get sql manual script from 'c_after_action_sql' 
+			* and run script by action name 
+			**/
+			ProcessAfterAction.processAfterAction(ProcessAfterAction.SAVE_REQ_PROMOTION,m.getRequestNo());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()

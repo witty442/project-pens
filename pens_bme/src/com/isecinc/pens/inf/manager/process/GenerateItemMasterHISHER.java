@@ -50,6 +50,7 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 		int qty = 0;
 		double wholePriceBF = 0;
 		double retailPriceBF = 0;
+		String nonBme="";
 		StringBuffer outputLine = new StringBuffer("");
 		StringBuffer outputFile = new StringBuffer("");
 		try{
@@ -73,10 +74,10 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			sql.append("\n ,(select max(pens_value) from PENSBME_MST_REFERENCE  M ");
 			sql.append("\n  WHERE M.reference_code = 'LotusItem' ");
 			sql.append("\n  AND M.interface_desc = A.barcode ) as pens_item ");
-			sql.append("\n ,NVL(sum(A.qty),0) as qty ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF ");
+			sql.append("\n ,NVL(sum(A.qty),0) as qty ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF,A.NON_BME ");
 			sql.append("\n FROM( ");
 			sql.append("\n 		SELECT m.interface_desc as barcode, O.group_code, M.interface_value as product_code, 0 as qty ");
-			sql.append("\n 		,NVL(O.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(O.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n 		,NVL(O.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(O.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF,O.NON_BME ");
 			sql.append("\n 		FROM PENSBME_PRICELIST O  ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_MST_REFERENCE M	 ");
 			sql.append("\n   		ON  O.group_code = M.pens_desc2     ");
@@ -84,10 +85,10 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			sql.append("\n 		where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and   O.product = '"+productType+"'");
 			sql.append("\n 		and  ( O.interface_icc = 'N' or O.interface_icc is null)	 ");
-			sql.append("\n 		group by M.interface_desc, O.group_code,M.interface_value,O.WHOLE_PRICE_BF,O.RETAIL_PRICE_BF ");
+			sql.append("\n 		group by M.interface_desc, O.group_code,M.interface_value,O.WHOLE_PRICE_BF,O.RETAIL_PRICE_BF,O.NON_BME ");
 			sql.append("\n  )A ");
 			sql.append("\n  WHERE A.barcode not in(select barcode from PENSBME_BARCODE_IN_ICC) ");
-			sql.append("\n group by A.barcode, A.group_code, A.product_code,A.WHOLE_PRICE_BF,A.RETAIL_PRICE_BF ");
+			sql.append("\n group by A.barcode, A.group_code, A.product_code,A.WHOLE_PRICE_BF,A.RETAIL_PRICE_BF,A.NON_BME ");
 			sql.append("\n order by A.group_code ,A.product_code ,A.barcode ");
 			
 			logger.debug("sql:"+sql.toString());
@@ -105,6 +106,7 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 				qty = rs.getInt("qty");
 				wholePriceBF  = rs.getDouble("WHOLE_PRICE_BF");
 				retailPriceBF =  rs.getDouble("RETAIL_PRICE_BF");
+				nonBme = Utils.isNull(rs.getString("non_bme"));
 				
 				//validate MST 
 				if("".equals(productCode)){
@@ -124,7 +126,7 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 					   
 					}else{
 						 //Gen Line
-						outputLine.append(genLine(configMap,date,groupCode,barcode,pensItem,productCode,qty,wholePriceBF,retailPriceBF));
+						outputLine.append(genLine(configMap,date,groupCode,barcode,pensItem,productCode,qty,wholePriceBF,retailPriceBF,nonBme));
 					   
 						successCount++;
 						//insert result msg
@@ -272,7 +274,7 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 	
 	private static String genLine(Map<String, String> configMap,Date date,String groupCode
 			,String barcode,String pensItem,String productCode,
-			int qty,double wholePriceBF,double retailPriceBF) throws Exception{
+			int qty,double wholePriceBF,double retailPriceBF,String nonBme) throws Exception{
 		
 		String line="";
 		String sizeCode ="";
@@ -310,18 +312,24 @@ public class GenerateItemMasterHISHER extends InterfaceUtils{
 			       
 			/**8 */line += appendRightByLength(productCode," ",15);//ITEM_ID	รหัสสินค้า	CHAR(15)
 			       line += debug(no,appendRightByLength(productCode," ",15));no++;
-			       
-			   	/** new Case Product (AM1001LGY[9], edit:25102019**/
-			    //productCode ME1M03A3BL
-			     if(productCode.length()==10){
-			    	//AM1001XLGY[10]
-			        sizeCode =productCode.substring(6,8);
-			        colorCode =productCode.substring(8,10);
-			     }else{
-			    	//AM1001LGY[9]
-			        sizeCode =productCode.substring(6,7)+" ";
-			        colorCode =productCode.substring(7,9);  
-			     }
+			    
+			    /** Edit 28/05/2563 : case product none bme no color and size **/
+			    if("Y".equalsIgnoreCase(nonBme)){
+			    	sizeCode ="----";
+			    	colorCode ="---";
+			    }else{
+				   	/** new Case Product (AM1001LGY[9], edit:25/10/2019**/
+				    //productCode ME1M03A3BL
+				     if(productCode.length()==10){
+				    	//AM1001XLGY[10]
+				        sizeCode =productCode.substring(6,8);//XL
+				        colorCode =productCode.substring(8,10);//GY
+				     }else{
+				    	//AM1001LGY[9]
+				        sizeCode =productCode.substring(6,7)+" ";//L
+				        colorCode =productCode.substring(7,9);//GY  
+				     }
+			    }
 			logger.debug("productCode["+productCode+"]sizeCode["+sizeCode+"]colorCode["+colorCode+"]");
 			/**9 */line += appendRightByLength(sizeCode," ",4);//SIZE_CODE	ขนาดของสินค้า	CHAR(4)
 			       line += debug(no,appendRightByLength(sizeCode," ",4));no++;

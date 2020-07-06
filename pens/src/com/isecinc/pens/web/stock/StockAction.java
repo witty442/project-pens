@@ -32,6 +32,7 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MStock;
+import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 
 /**
  * Summary Action
@@ -631,8 +632,16 @@ public class StockAction extends I_Action {
 			}
 			// save token
 			saveToken(request);
+			
+			/** 
+			* Process run after this action 
+			* get sql manual script from 'c_after_action_sql' 
+			* and run script by action name 
+			**/
+			ProcessAfterAction.processAfterAction(ProcessAfterAction.SAVE_STOCK_CUSTOMER,stockForm.getBean().getRequestNumber());
+
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 			return "new";
 		} finally {
 			try {

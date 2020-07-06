@@ -940,7 +940,7 @@ function validateVanCreditLimit(){
 						<html:hidden property="order.customerId"/>
 						<html:hidden property="order.exported" value="N"/>
 						<html:hidden property="order.isCash" value="N"/>
-					   
+					    <html:hidden property="order.custGroup"/>
 							
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
 						

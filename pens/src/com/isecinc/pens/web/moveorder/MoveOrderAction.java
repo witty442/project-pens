@@ -28,6 +28,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MMoveOrder;
 import com.isecinc.pens.model.MPriceList;
+import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 
 /**
  * Summary Action
@@ -413,6 +414,14 @@ public class MoveOrderAction extends I_Action {
 			 
 			// save token
 			saveToken(request);
+			
+			/** 
+			* Process run after this action 
+			* get sql manual script from 'c_after_action_sql' 
+			* and run script by action name 
+			**/ 
+			ProcessAfterAction.processAfterAction(ProcessAfterAction.SAVE_MOVE_ORDER,moveOrderForm.getMoveOrder().getRequestNumber());
+
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
 					+ e.getMessage());

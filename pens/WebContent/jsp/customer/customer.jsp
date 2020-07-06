@@ -221,7 +221,7 @@ function switchPrintType(){
 								</td>
 								<td align="right"><bean:message key="Customer.PartyType" bundle="sysele"/><font color="red">*</font></td>
 								<td align="left">
-									<html:select property="customer.businessType" styleId="businessType">
+									<html:select property="customer.businessType" styleId="businessType" >
 									    <!-- OLD Code -->
 										<%-- <html:option value="P"><bean:message key="PartyType.Personal" bundle="sysele"/></html:option>
 										<html:option value="O"><bean:message key="PartyType.Org" bundle="sysele"/></html:option> --%>

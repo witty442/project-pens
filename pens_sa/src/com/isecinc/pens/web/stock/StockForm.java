@@ -45,6 +45,9 @@ public class StockForm extends I_Form {
 	  if(getBean() !=null){
 		  getBean().setDispRequestDate("");
 		  getBean().setDispLastUpdate("");
+		  getBean().setDispOrderOnly("");
+		  getBean().setDispExpired("");
+		  getBean().setDispExpireSoon("");
 	  }
 		
 	}

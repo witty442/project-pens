@@ -2,6 +2,7 @@ package com.isecinc.pens.web.location;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class LocationBean implements  Serializable,Comparable<LocationBean>{
@@ -63,9 +64,53 @@ public class LocationBean implements  Serializable,Comparable<LocationBean>{
 	private String startDate;
 	private String endDate;
 	private String salesZone;
+    private Date checkInDate;
+    private Date salesAppDate;
+    private Date mergDate;
+    private String distance;
+    private String fileName;
+    
+    
+	public Date getMergDate() {
+		return mergDate;
+	}
 
-	
-   
+	public void setMergDate(Date mergDate) {
+		this.mergDate = mergDate;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getDistance() {
+		return distance;
+	}
+
+	public void setDistance(String distance) {
+		this.distance = distance;
+	}
+
+	public Date getCheckInDate() {
+		return checkInDate;
+	}
+
+	public void setCheckInDate(Date checkInDate) {
+		this.checkInDate = checkInDate;
+	}
+
+	public Date getSalesAppDate() {
+		return salesAppDate;
+	}
+
+	public void setSalesAppDate(Date salesAppDate) {
+		this.salesAppDate = salesAppDate;
+	}
+
 	public String getCustomerTypeDB() {
 		return customerTypeDB;
 	}
@@ -475,6 +520,14 @@ public class LocationBean implements  Serializable,Comparable<LocationBean>{
 		        @Override
 		        public int compare(LocationBean o1, LocationBean o2) {
 		            return Integer.parseInt(o1.getTripDay())-(Integer.parseInt(o2.getTripDay()));
+		        }
+		    };
+		    
+		    public static Comparator<LocationBean> CHECKIN_CREATE_DATE_ASC = new Comparator<LocationBean>() {
+		        @Override
+		        public int compare(LocationBean o1, LocationBean o2) {
+		        	//if()
+		            return o1.getMergDate().compareTo(o2.getMergDate());
 		        }
 		    };
 		 }

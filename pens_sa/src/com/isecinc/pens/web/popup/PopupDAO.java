@@ -486,8 +486,51 @@ public class PopupDAO {
 			return pos;
 		}
 	
-	 
-	 public static List<PopupForm> searchCustomerList(PopupForm c) throws Exception {
+	 public static List<PopupForm> searchCustomerMasterList(PopupForm c) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			List<PopupForm> pos = new ArrayList<PopupForm>();
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			try {
+				sql.append("\n SELECT distinct M.customer_code ,M.customer_desc " );
+				sql.append("\n from PENSBI.XXPENS_BI_MST_CUSTOMER M ");
+				sql.append("\n where 1=1  ");
+				if( !Utils.isNull(c.getCodeSearch()).equals("")){
+					sql.append("\n and M.customer_code ='"+c.getCodeSearch()+"' ");
+				}
+				if( !Utils.isNull(c.getDescSearch()).equals("")){
+					sql.append("\n and M.short_name LIKE '%"+c.getDescSearch()+"%' ");
+				}
+				sql.append("\n  ORDER BY M.customer_code asc ");
+				
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				int no = 0;
+				while (rst.next()) {
+					PopupForm item = new PopupForm();
+					no++;
+					item.setNo(no);
+					item.setCode(rst.getString("customer_code"));
+					item.setDesc(rst.getString("customer_desc"));
+					pos.add(item);
+					
+				}//while
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e) {}
+			}
+			return pos;
+		}
+	 public static List<PopupForm> searchCustomerSalesList(PopupForm c) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			List<PopupForm> pos = new ArrayList<PopupForm>();
@@ -1038,7 +1081,7 @@ public class PopupDAO {
 					sql.append("\n and M.item_name LIKE '%"+c.getDescSearch()+"%' ");
 				}
 				if( !Utils.isNull(brand).equals("")){
-					sql.append("\n and M.brand = '"+brand+"' ");
+					sql.append("\n and M.brand in ("+SQLHelper.converToTextSqlIn(brand)+" )");
 				}
 				
 				sql.append("\n  ORDER BY M.item_no asc ");
@@ -1192,7 +1235,6 @@ public class PopupDAO {
 				if( !Utils.isNull(brand).equals("")){
 					sql.append("\n and substr(A.product_code,1,3) = '"+brand+"' ");
 				}
-				
 				sql.append("\n  ORDER BY A.product_code asc ");
 				
 				logger.debug("sql:"+sql);

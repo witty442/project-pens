@@ -57,8 +57,12 @@ if(session.getAttribute("screenWidth") != null){
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+
+<!-- For fix Head and Column Table -->
+ <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script> 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-stickytable-3.0.js"></script>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/jquery-stickytable-3.0.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 
 <script>
 /** disable back button alway **/
@@ -90,11 +94,11 @@ function searchReport(path){
 		$('#customerCode').focus();
 		return false;
 	 } 
-	 if( $('#brand').val()==""){
+	 /* if( $('#brand').val()==""){
 		alert("กรุณาระบุ แบรนด์");
 		$('#brand').focus();
 		return false;
-	 } 
+	 }  */
 	 if( $('#reportType').val()==""){
 		alert("กรุณาระบุ รูปแบบ");
 		$('#reportType').focus();
@@ -111,11 +115,11 @@ function exportReport(path){
 		$('#customerCode').focus();
 		return false;
 	 } 
-	 if( $('#brand').val()==""){
+	/*  if( $('#brand').val()==""){
 		alert("กรุณาระบุ แบรนด์");
 		$('#brand').focus();
 		return false;
-	 } 
+	 }  */
 	 if( $('#reportType').val()==""){
 		alert("กรุณาระบุ รูปแบบ");
 		$('#reportType').focus();
@@ -174,7 +178,7 @@ function openPopup(path,pageName){
 		    param +="&userName=<%=user.getUserName()%>";
 		<%}%>
 	}else if("Brand" == pageName){
-		param += "&selectone=true";
+		param += "&selectone=false";
 	}
 	url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
 	PopupCenterFullHeight(url,"",600);
@@ -191,6 +195,19 @@ function setDataPopupValue(code,desc,pageName){
 		form.salesrepCode.value = code;
 	}
 } 
+function openDetail(recordType,requestDate,itemCode){
+	var form = document.stockForm;
+	var path = document.getElementById("path").value;
+	var param  = "startDate="+form.startDate.value;
+	    param += "&salesrepCode="+form.salesrepCode.value;
+	    param += "&customerCode="+form.customerCode.value;
+	    param += "&brand="+form.brand.value;
+	    param += "&requestDate="+requestDate;
+	    param += "&itemCode="+itemCode;
+	    param += "&recordType="+recordType;
+	var url = path +"/jsp/stock/popup/detailStockCallCardPopup.jsp?"+param;
+	PopupCenter(url,"",250,250);
+}
 </script>
 <style>
 .td_bg_lineH{
@@ -253,8 +270,8 @@ function setDataPopupValue(code,desc,pageName){
 			<!-- Hidden Field -->
 		    <html:hidden property="pageName" value="<%=pageName %>"/>
 		    <html:hidden property="popup" value="<%=popup %>"/>
-		        
 		    <input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
+		    
 	      	<!-- TABLE BODY -->
 	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
 	      		<tr style="height: 9px;">
@@ -273,14 +290,14 @@ function setDataPopupValue(code,desc,pageName){
 						<div align="center">
 						<table align="center" border="0" cellpadding="3" cellspacing="0" >
 					       <tr>
-					            <td colspan="2">
+					            <td colspan="3">
 					             ใช้ข้อมูลตั้งแต่ &nbsp;&nbsp;
 					              <html:text property="bean.startDate" styleId="startDate" size="10" readonly="true" styleClass="\" autoComplete=\"off"/> 
 					            &nbsp; ถึงปัจจุบัน</td>
 							</tr>
 							<tr>
 					            <td align="right">พนักงานขาย</td>
-								<td>
+								<td colspan="2">
 								    <html:text property="bean.salesrepCode" styleId="salesrepCode" size="20" styleClass="\" autoComplete=\"off" />
 								     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','SalesrepCreditSales')"/>   
 								&nbsp;&nbsp;&nbsp;&nbsp;
@@ -291,15 +308,15 @@ function setDataPopupValue(code,desc,pageName){
 								</td>
 							</tr>	
 							<tr>
-					            <td align="right"> แบรนด์ <font color="red">*</font></td>
-								<td>
+					            <td align="right"> แบรนด์ <!-- <font color="red">*</font> --></td>
+								<td colspan="2">
 								   <html:text property="bean.brand" styleId="brand" size="20" styleClass="\" autoComplete=\"off" />
 								    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','Brand')"/>   
 								&nbsp;&nbsp;&nbsp;&nbsp;
 								รูปแบบการแสดงผล&nbsp;
 								 <html:select property="bean.reportType">
-								     <html:option value="2">แสดง SKU แนวนอน</html:option>
 								     <html:option value="1">แสดง SKU แนวตั้ง</html:option>
+								     <html:option value="2">แสดง SKU แนวนอน</html:option>
 								  </html:select>
 								</td>
 							</tr>	
@@ -308,8 +325,11 @@ function setDataPopupValue(code,desc,pageName){
 								<td>
 								   <table  border="0" cellpadding="3" cellspacing="0" >
 							         <tr> <td align="left" class="td_bg_lineS">บรรทัดสีฟ้า คือ ข้อมูลที่ได้นับสต๊อก</td> </tr>
-								      <tr> <td align="left" class="td_bg_lineA">บรรทัดสีส้ม คือ ข้อมูลการเปิดบิลขายและคืน (รวมของแถม)</td></tr>
+								      <tr> <td align="left" class="td_bg_lineA">บรรทัดสีส้ม คือ ข้อมูลการเปิดบิลขายและแถม</td></tr>
 								    </table>
+								   </td>
+								   <td>
+								    <html:checkbox property="bean.dispOrderOnly">&nbsp; แสดงเฉพาะข้อมูลยอดขาย</html:checkbox>
 								</td>
 							</tr>	
 					   </table>
@@ -331,29 +351,25 @@ function setDataPopupValue(code,desc,pageName){
 						</table>
 
 					    </div>
-					  
+					 
 					   <!-- ************************Result ***************************************************-->
 					  <%
 					 // System.out.println("Results:"+request.getSession().getAttribute("RESULTS"));
 					  if(request.getSession().getAttribute("stockForm_RESULTS") != null) {
-						  if(   StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){
 					   %>
-							<div id ="scroll" align="center">
-								<% out.println(request.getSession().getAttribute("stockForm_RESULTS")); %>
-							</div>
-					  <% 
-						  }else{
-					          out.println(request.getSession().getAttribute("stockForm_RESULTS"));
-						  }
-					  }
-					  %>
+						<% out.println(request.getSession().getAttribute("stockForm_RESULTS")); %>
+						<script>
+							//load jquery
+							$(function() {
+								//Load fix column and Head
+								$('#myTable').stickyTable({overflowy: true});
+							});
+						</script>
+					 <%}%>
 					<!-- ************************Result ***************************************************-->
 					</html:form>
 					<!-- BODY -->
-					
-					<script>
-					   loadSalesrepCodeList();
-					</script>
+				
 					</td>
 					<td width="6px;" background="${pageContext.request.contextPath}/images2/boxcont1_6.gif"></td>
 				</tr>

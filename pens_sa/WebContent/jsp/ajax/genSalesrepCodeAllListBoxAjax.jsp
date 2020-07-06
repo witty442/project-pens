@@ -10,6 +10,7 @@
 String salesChannelNo = Utils.isNull(request.getParameter("salesChannelNo"));
 String custCatNo = Utils.isNull(request.getParameter("custCatNo"));
 String salesZone = Utils.isNull(request.getParameter("salesZone"));
+String salesrepCode = Utils.isNull(request.getParameter("salesrepCode"));
 String roleNameChk = Utils.isNull(request.getParameter("roleNameChk"));
 String pageName = Utils.isNull(request.getParameter("pageName")); //for spacification by pageName
 
@@ -18,6 +19,7 @@ System.out.println("custCatNo:"+custCatNo);
 System.out.println("salesZone:"+salesZone);
 List<PopupBean> dataList= null;
 User user = (User)session.getAttribute("user");
+String selected ="";
 try{
 	dataList = SalesrepDAO.searchSalesrepListAll(pageName,salesChannelNo,custCatNo,salesZone,user,roleNameChk); 
 	
@@ -26,8 +28,10 @@ if(dataList != null){
 	%>
 	<option value=""></option>
 	<%} %>
-	<%for(PopupBean u : dataList){ %>
-	<option value="<%=u.getSalesrepCode()%>"><%=u.getSalesrepCode()%></option>
+	<%for(PopupBean u : dataList){ 
+		selected = u.getSalesrepCode().equalsIgnoreCase(salesrepCode)?"selected":"";
+	%>
+	   <option <%=selected %> value="<%=u.getSalesrepCode()%>"><%=u.getSalesrepCode()%></option>
 	<%}//for
  }//if
 }catch(Exception e){ 

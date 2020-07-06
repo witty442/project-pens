@@ -1,0 +1,6 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL
+RECORD_TYPE,N,0,CHAR,,N           
+bill_plan_no,N,1,CHAR,,N
+bill_plan_request_date,N,2,DATE,,N           
+sales_code,N,3,CHAR,,N
+file_name,N,4,CHAR,,N

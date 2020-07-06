@@ -675,6 +675,17 @@ public class DateUtil {
 		
 		return c.getTime();
 	}
+	
+	//BackDay negative (-1) Month
+	public static Date getBackDateMonth(Date date, int backMonth) {
+		if (date == null) {
+			return null;
+		}
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.MONTH, backMonth);
+		
+		return c.getTime();
+	}
 	/**
 	 * check date 1 and date is same period Month year
 	 * @param date1

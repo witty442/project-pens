@@ -24,11 +24,16 @@ public class ToolManageReport {
 	
 	public static StringBuffer genReport(Connection conn,ToolManageBean bean,String action) throws Exception{
 		StringBuffer h = null;
+		StringBuffer rowH = null;
 		String key  ="";//storeCode-item
 		String tableStyle ="align='center' border='0' cellpadding='3' cellspacing='2' class='tableSearchNoWidth' width='100%'";
 		List<ToolManageBean> rowList = null;
-		Map<String,Integer> sumItemMap = new HashMap<String, Integer>();
+		Map<String,Integer> sumRowMap = new HashMap<String, Integer>();
+		Map<String,Integer> sumColumnMap = new HashMap<String, Integer>();
 		int columnWidthPercent= 0;
+		ToolManageBean store = null;
+		ToolManageBean item = null;
+		ToolManageBean data = null;
 		try{
 	    	if("ExportToExcel".equalsIgnoreCase(action)){
 	    		 tableStyle ="border='1'";
@@ -62,6 +67,42 @@ public class ToolManageReport {
 	    	Map<String, ToolManageBean> dataMap = searchDataToMap(conn, bean,storeList);
 	    	
 			if(rowList != null && rowList.size() >0){
+				
+				//SumColMap and SumRowMap for check <> 0
+				for(int r=0;r<rowList.size();r++){
+					store = (ToolManageBean)rowList.get(r);
+					for(int c=0;c<itemList.size();c++){
+						item = (ToolManageBean)itemList.get(c);
+						if(bean.getReportType().equals("Summary")){
+						   key = store.getCustGroup()+"|"+item.getItem();
+						}else{
+						   key = store.getStoreCode()+"|"+item.getItem();
+						}
+						data = dataMap.get(key);
+						//Sum by Column
+						if(sumColumnMap.get(item.getItem()) != null){
+							int prevQty = sumColumnMap.get(item.getItem());
+							int newQty = data!=null?Utils.convertStrToInt(data.getQty()):0;
+							//logger.debug("prevQty:"+prevQty);
+							//logger.debug("newQty:"+newQty);
+							sumColumnMap.put(item.getItem(), (prevQty+newQty));
+						}else{
+							sumColumnMap.put(item.getItem(), data!=null?Utils.convertStrToInt(data.getQty()):0);
+						}
+						
+						//sumRow for check all row <> 0
+						if(sumRowMap.get(r+"") != null){
+							int prevQty = sumRowMap.get(r+"");
+							int newQty = data!=null?Utils.convertStrToInt(data.getQty()):0;
+							//logger.debug("prevQty:"+prevQty);
+							//logger.debug("newQty:"+newQty);
+							sumRowMap.put(r+"", (prevQty+newQty));
+						}else{
+							sumRowMap.put(r+"", data!=null?Utils.convertStrToInt(data.getQty()):0);
+						}
+					}//for column
+				}//for row
+				
 				h = new StringBuffer("");
 				h.append(ExcelHeader.EXCEL_HEADER);
 				h.append("<table "+tableStyle+"> \n");
@@ -75,25 +116,27 @@ public class ToolManageReport {
 				//Gen Header By Item
 				for(int i=0;i<itemList.size();i++){
 					ToolManageBean s = (ToolManageBean)itemList.get(i);
-				    h.append("<th>"+s.getItem()+"<br/>"+s.getItemName()+"</th> \n");
+					logger.debug("sumColumnMap["+s.getItem()+"]["+sumColumnMap.get(item.getItem()) +"]");
+					if(sumColumnMap.get(s.getItem()) != 0){
+				       h.append("<th>"+s.getItem()+"<br/>"+s.getItemName()+"</th> \n");
+					}
 				}
 				h.append("</tr> \n");
 				
-				ToolManageBean store = null;
-				ToolManageBean item = null;
-				ToolManageBean data = null;
+			
 				String tabclass ="lineE";
 				//Loop Store
 				for(int r=0;r<rowList.size();r++){
 					store = (ToolManageBean)rowList.get(r);
 					tabclass=r%2==0?"lineO":"lineE";
-				
-					h.append("<tr class='"+tabclass+"'> \n");
+					
+				    rowH = new StringBuffer("");
+				    rowH.append("<tr class='"+tabclass+"'> \n");
 					if(bean.getReportType().equals("Summary")){
-					   h.append("<td class='text' align='left' width='15%'>"+store.getCustGroup()+"-"+store.getCustGroupName()+"</td> \n");
+						rowH.append("<td class='text' align='left' width='15%'>"+store.getCustGroup()+"-"+store.getCustGroupName()+"</td> \n");
 					}else{
-					   h.append("<td class='text' align='left' width='15%'>"+store.getStoreCode()+"-"+store.getStoreName()+"</td> \n");
-					   h.append("<td class='text' align='left' width='5%'>"+DateUtil.stringValue(store.getCountStkDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td> \n");
+						rowH.append("<td class='text' align='left' width='15%'>"+store.getStoreCode()+"-"+store.getStoreName()+"</td> \n");
+						rowH.append("<td class='text' align='left' width='5%'>"+DateUtil.stringValueNull(store.getCountStkDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td> \n");
 					}
 					//Loop Item
 					for(int c=0;c<itemList.size();c++){
@@ -104,36 +147,32 @@ public class ToolManageReport {
 						   key = store.getStoreCode()+"|"+item.getItem();
 						}
 						data = dataMap.get(key);
-						if(data != null){
-						   //logger.debug("get key:"+key+",QTY["+data.getQty()+"]");
-					       h.append("<td align='right' class='num' width='"+columnWidthPercent+"%'>"+data.getQty()+"</td> \n");
-						}else{
-						  // logger.debug("get key:"+key+",QTY[0]");
-						   h.append("<td  align='right' class='num' width='"+columnWidthPercent+"%'>0</td> \n");
-						}
-						//Sum by Item
-						if(sumItemMap.get(item.getItem()) != null){
-							int prevQty = sumItemMap.get(item.getItem());
-							int newQty = data!=null?Utils.convertStrToInt(data.getQty()):0;
-							//logger.debug("prevQty:"+prevQty);
-							//logger.debug("newQty:"+newQty);
-							sumItemMap.put(item.getItem(), (prevQty+newQty));
-						}else{
-							sumItemMap.put(item.getItem(), data!=null?Utils.convertStrToInt(data.getQty()):0);
-						}
-						
+						//no display column all row =0
+						if(sumColumnMap.get(item.getItem()) != 0){
+							if(data != null){
+							   //logger.debug("get key:"+key+",QTY["+data.getQty()+"]");
+								rowH.append("<td align='right' class='num' width='"+columnWidthPercent+"%'>"+data.getQty()+"</td> \n");
+							}else{
+							  // logger.debug("get key:"+key+",QTY[0]");
+								rowH.append("<td  align='right' class='num' width='"+columnWidthPercent+"%'>0</td> \n");
+							}
+					    }
 					}//for Loop Item
-					h.append("</tr> \n");
+					rowH.append("</tr> \n");
+					h.append(rowH);
+					
 				}//for Loop Store
 				//Summary
 				 h.append("<tr> \n");
 				 h.append("<td  align='right' colspan='2'><b>รวม</b></td> \n");
 				 for(int i=0;i<itemList.size();i++){
 					ToolManageBean s = (ToolManageBean)itemList.get(i);
-				    h.append("<td align='right'><b>"+(Utils.decimalFormat(sumItemMap.get(s.getItem()),Utils.format_current_no_disgit))+"</b></th> \n");
-				 }
+					//no display column all row =0
+					if(sumColumnMap.get(s.getItem()) != 0){
+				       h.append("<td align='right'><b>"+(Utils.decimalFormat(sumColumnMap.get(s.getItem()),Utils.format_current_no_disgit))+"</b></th> \n");
+					}//if
+				 }//for
 				 h.append("</tr> \n");
-				
 				h.append("</table> \n");
 			    
 				//logger.debug("table str: \n"+h.toString());

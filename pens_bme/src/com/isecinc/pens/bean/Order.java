@@ -62,9 +62,15 @@ public class Order implements Serializable{
 	//criteria
 	private String pensItemFrom;
 	private String pensItemTo;
-	
+	private String nonBme;
 
 	
+	public String getNonBme() {
+		return nonBme;
+	}
+	public void setNonBme(String nonBme) {
+		this.nonBme = nonBme;
+	}
 	public String getGroupProductType() {
 		return groupProductType;
 	}

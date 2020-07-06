@@ -331,9 +331,9 @@ function setDataPopupValue(code,desc,pageName){
 								    </span>
 								     <html:hidden property="bean.period" styleId="period"/>
 									 <span id="div_day">วันที่ &nbsp;</span>
-								    <html:text property="bean.startDate" styleId="startDate" size="20" readonly="true" styleClass="disableText"/>
+								    <html:text property="bean.startDate" styleId="startDate" size="20" readonly="true"  styleClass="\" autoComplete=\"off"/>
 								        -
-									<html:text property="bean.endDate" styleId="endDate" size="20" readonly="true" styleClass="disableText"/>
+									<html:text property="bean.endDate" styleId="endDate" size="20" readonly="true"  styleClass="\" autoComplete=\"off"/>
 								</td>
 							</tr>
 							<tr>

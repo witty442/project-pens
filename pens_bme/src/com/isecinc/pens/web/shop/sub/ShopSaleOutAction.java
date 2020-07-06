@@ -359,6 +359,9 @@ public class ShopSaleOutAction {
 				dateStr = DateUtil.stringValue(dateTemp, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				sql.append("\n AND ORDER_DATE = to_date('"+dateStr+"','dd/mm/yyyy')");
 			}
+			if( !Utils.isNull(f.getBean().getBmeProductOnly()).equals("")){
+				sql.append("\n AND MP.PENS_ITEM NOT IN( select pens_item from PENSBI.PENSBME_PRICELIST where non_bme ='Y')");
+			}
 			sql.append("\n GROUP BY M.ORDER_DATE ,M.ORDER_NUMBER");
 			sql.append("\n ,MP.PENS_ITEM,MP.MATERIAL_MASTER,MP.BARCODE");
 			sql.append("\n ,D.PROMOTION ,D.PRICE ");

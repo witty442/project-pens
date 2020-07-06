@@ -43,6 +43,7 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	private String price;
 	private String priQty;
 	private String secQty;
+	private String secUom;
 	private String orderQty;
 	private String avgQty;
 	private String avgQty1;
@@ -54,6 +55,7 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	private String expireDate;
 	private String requestDate;
 	private String billStoreCount;
+	private String orderStoreCount;
 	private String checkStoreCount;
 	//total
 	private String salesZone;
@@ -68,6 +70,7 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	private String dispType;
 	private String dispRequestDate;
 	private String dispLastUpdate;
+	private String dispOrderOnly;
 	
 	private List<StockBean> itemsList;
     private StringBuffer dataStrBuffer;
@@ -75,11 +78,116 @@ public class StockBean implements Comparable<StockBean>,Serializable{
     private String orderSortType;
     private String recordType;
     private String brandSaveZoneDay;
-    private String productExpireDay;
+    private String remainDayRequestDate;
+    private String remainDaySysDate;
     private String requestNo;
+    private String invoiceDate;
+    private String invoiceNo;
+    private String compareDate;
+    private String dispExpireSoon;
+    private String dispExpired;
+    private String remainDay;
+    private String shelfLifeDay;
+    private String halfShelfLifeDay;
+    private String brandGroupType;
+   
 
-    
-    
+	public String getDispExpired() {
+		return dispExpired;
+	}
+
+	public void setDispExpired(String dispExpired) {
+		this.dispExpired = dispExpired;
+	}
+
+	public String getShelfLifeDay() {
+		return shelfLifeDay;
+	}
+
+	public void setShelfLifeDay(String shelfLifeDay) {
+		this.shelfLifeDay = shelfLifeDay;
+	}
+
+	public String getBrandGroupType() {
+		return brandGroupType;
+	}
+
+	public void setBrandGroupType(String brandGroupType) {
+		this.brandGroupType = brandGroupType;
+	}
+
+	public String getHalfShelfLifeDay() {
+		return halfShelfLifeDay;
+	}
+
+	public void setHalfShelfLifeDay(String halfShelfLifeDay) {
+		this.halfShelfLifeDay = halfShelfLifeDay;
+	}
+
+	public String getRemainDay() {
+		return remainDay;
+	}
+
+	public void setRemainDay(String remainDay) {
+		this.remainDay = remainDay;
+	}
+
+	public String getSecUom() {
+		return secUom;
+	}
+
+	public void setSecUom(String secUom) {
+		this.secUom = secUom;
+	}
+
+	public String getDispExpireSoon() {
+		return dispExpireSoon;
+	}
+
+	public void setDispExpireSoon(String dispExpireSoon) {
+		this.dispExpireSoon = dispExpireSoon;
+	}
+
+	public String getCompareDate() {
+		return compareDate;
+	}
+
+	public void setCompareDate(String compareDate) {
+		this.compareDate = compareDate;
+	}
+
+	public String getInvoiceDate() {
+		return invoiceDate;
+	}
+
+	public void setInvoiceDate(String invoiceDate) {
+		this.invoiceDate = invoiceDate;
+	}
+
+	public String getInvoiceNo() {
+		return invoiceNo;
+	}
+
+	public void setInvoiceNo(String invoiceNo) {
+		this.invoiceNo = invoiceNo;
+	}
+
+	public String getDispOrderOnly() {
+		return dispOrderOnly;
+	}
+
+	public void setDispOrderOnly(String dispOrderOnly) {
+		this.dispOrderOnly = dispOrderOnly;
+	}
+
+	public String getOrderStoreCount() {
+		return orderStoreCount;
+	}
+
+	public void setOrderStoreCount(String orderStoreCount) {
+		this.orderStoreCount = orderStoreCount;
+	}
+
 	public String getBillStoreCount() {
 		return billStoreCount;
 	}
@@ -103,13 +211,21 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	public void setRequestNo(String requestNo) {
 		this.requestNo = requestNo;
 	}
-
-	public String getProductExpireDay() {
-		return productExpireDay;
+   
+	public String getRemainDayRequestDate() {
+		return remainDayRequestDate;
 	}
 
-	public void setProductExpireDay(String productExpireDay) {
-		this.productExpireDay = productExpireDay;
+	public void setRemainDayRequestDate(String remainDayRequestDate) {
+		this.remainDayRequestDate = remainDayRequestDate;
+	}
+
+	public String getRemainDaySysDate() {
+		return remainDaySysDate;
+	}
+
+	public void setRemainDaySysDate(String remainDaySysDate) {
+		this.remainDaySysDate = remainDaySysDate;
 	}
 
 	public String getBrandSaveZoneDay() {
@@ -724,19 +840,31 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	            }
 	        };
 	        
-	        public static Comparator<StockBean> PRODUCT_EXPIRE_DAY_ASC = new Comparator<StockBean>() {
+	        public static Comparator<StockBean> REMAIN_DAY_REQUEST_DATE_ASC = new Comparator<StockBean>() {
 	            @Override
 	            public int compare(StockBean o1, StockBean o2) {
-	                return Integer.parseInt(o1.productExpireDay) - Integer.parseInt(o2.productExpireDay);
+	                return Utils.convertToInt(o1.remainDayRequestDate) - Utils.convertToInt(o2.remainDayRequestDate);
 	            }
 	        };
-	        public static Comparator<StockBean> PRODUCT_EXPIRE_DAY_DESC = new Comparator<StockBean>() {
+	        public static Comparator<StockBean> REMAIN_DAY_REQUEST_DATE_DESC = new Comparator<StockBean>() {
 	            @Override
 	            public int compare(StockBean o1, StockBean o2) {
-	                return Integer.parseInt(o2.productExpireDay) - Integer.parseInt(o1.productExpireDay);
+	                return Utils.convertToInt(o2.remainDayRequestDate) - Utils.convertToInt(o1.remainDayRequestDate);
 	            }
 	        };
 	        
+	        public static Comparator<StockBean> REMAIN_DAY_SYS_DATE_ASC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return Utils.convertToInt(o1.remainDaySysDate) - Utils.convertToInt(o2.remainDaySysDate);
+	            }
+	        };
+	        public static Comparator<StockBean> REMAIN_DAY_SYS_DATE_DESC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return Utils.convertToInt(o2.remainDaySysDate) - Utils.convertToInt(o1.remainDaySysDate);
+	            }
+	        };
 	        public static Comparator<StockBean> BILL_STORE_COUNT_ASC = new Comparator<StockBean>() {
 	            @Override
 	            public int compare(StockBean o1, StockBean o2) {
@@ -747,6 +875,18 @@ public class StockBean implements Comparable<StockBean>,Serializable{
 	            @Override
 	            public int compare(StockBean o1, StockBean o2) {
 	                return Integer.parseInt(o2.billStoreCount) - Integer.parseInt(o1.billStoreCount);
+	            }
+	        };
+	        public static Comparator<StockBean> ORDER_STORE_COUNT_ASC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return Integer.parseInt(o1.orderStoreCount) - Integer.parseInt(o2.orderStoreCount);
+	            }
+	        };
+	        public static Comparator<StockBean> ORDER_STORE_COUNT_DESC = new Comparator<StockBean>() {
+	            @Override
+	            public int compare(StockBean o1, StockBean o2) {
+	                return Integer.parseInt(o2.orderStoreCount) - Integer.parseInt(o1.orderStoreCount);
 	            }
 	        };
 	        public static Comparator<StockBean> CHECK_STORE_COUNT_ASC = new Comparator<StockBean>() {

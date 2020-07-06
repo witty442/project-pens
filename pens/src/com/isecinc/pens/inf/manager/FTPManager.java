@@ -437,7 +437,7 @@ public class FTPManager {
 	
 	public String[]  getManualScriptImportExport(String prefix,String salesType,String salesCode,String encoding) throws Exception{
 		FTPClient ftp = null;
-		String[] dataStreamStr = new String[3];
+		String[] dataStreamStr = new String[4];
 		String pathFullName = "";
 		try {			
 			ftp = new FTPClient();
@@ -463,11 +463,19 @@ public class FTPManager {
 			logger.debug("Get Stream FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyCode()+"-"+ftp.getReplyString());
 			
 			ftp.completePendingCommand();
+
+			//3 PLSQL/SalesType /credit_import_before_script.sql
+			pathFullName ="/Manual-script/plsql/"+salesType+"_"+prefix+"_script.sql";
+			logger.debug("PLSQL SalesType pathGetFileFull:"+pathFullName);
+			dataStreamStr[2] = convertStreamToString(ftp.retrieveFileStream(pathFullName),encoding);
+			logger.debug("Get Stream FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyCode()+"-"+ftp.getReplyString());
 			
-			//3 BySales/import_before/V207_script.sql
+			ftp.completePendingCommand();
+			
+			//4 BySales/import_before/V207_script.sql
 			pathFullName = env.getProperty("path.manual.BySales")+prefix+"/script_"+salesCode+".sql";
 			logger.debug("BySales pathGetFileFull:"+pathFullName);
-			dataStreamStr[2] = convertStreamToString(ftp.retrieveFileStream(pathFullName),encoding);
+			dataStreamStr[3] = convertStreamToString(ftp.retrieveFileStream(pathFullName),encoding);
 			logger.debug("Get Stream FTP Response "+ftp.getControlEncoding()+" :"+ftp.getReplyCode()+"-"+ftp.getReplyString());
 			
 			return dataStreamStr;

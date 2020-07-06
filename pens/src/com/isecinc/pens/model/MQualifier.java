@@ -1,9 +1,15 @@
 package com.isecinc.pens.model;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 
 import com.isecinc.core.model.I_Model;
+import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.Qualifier;
+import com.isecinc.pens.inf.helper.DBConnection;
+import com.isecinc.pens.inf.helper.Utils;
 
 /**
  * MQualifier Class
@@ -45,5 +51,37 @@ public class MQualifier extends I_Model<Qualifier> {
 		Qualifier[] array = new Qualifier[pos.size()];
 		array = pos.toArray(array);
 		return array;
+	}
+	
+	public boolean canUseModifierLineId(String custGroup,int modifierLineId) throws Exception {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		boolean canUseModifierLineId =true;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			String  sql ="\n select * from m_qualifier where qualifier_context ='CUSTOMER_GROUP' ";
+					sql+="\n and qualifier_type='Customer Group'";
+					sql+="\n and qualifier_value='"+custGroup+"'";
+					sql+="\n and modifier_Line_Id="+modifierLineId+"";
+					
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				if( Utils.isNull(rst.getString("operator")).equals("NOT =")){
+					canUseModifierLineId = false;
+				}
+			}
+			return canUseModifierLineId;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				conn.close();
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
 	}
 }

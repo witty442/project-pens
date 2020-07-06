@@ -18,7 +18,7 @@ public class PopupHelper {
 	    }else  if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
 	      || "CustomerVanProdShow".equalsIgnoreCase(pageName) || "CustomerLocation".equalsIgnoreCase(pageName)
 	      || "CustomerCreditPromotion".equalsIgnoreCase(pageName)|| "CustomerLocNoTrip".equalsIgnoreCase(pageName) 
-	      || "CustomerStockMC".equalsIgnoreCase(pageName)){
+	      || "CustomerStockMC".equalsIgnoreCase(pageName) || "CustomerMaster".equalsIgnoreCase(pageName)){
 	    	
 	    	if("CustomerLocNoTrip".equalsIgnoreCase(pageName)){
 	    	  headName = "<span title='"+pageName+"'>ร้านค้า(ที่ยังไม่การกำหนด จุด/Trip)</span>";

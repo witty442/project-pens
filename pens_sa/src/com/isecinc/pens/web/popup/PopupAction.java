@@ -127,8 +127,11 @@ public class PopupAction extends I_Action {
 				 results = PopupDAO.searchBrandStockVanList(popupForm);
 				 
 			}else if("Customer".equalsIgnoreCase(popupForm.getPageName()) ){
-				//For SalesTarget
-				 results = PopupDAO.searchCustomerList(popupForm);
+				//For SalesTarget Table:XXPENS_BI_MST_CUST_SALES
+				 results = PopupDAO.searchCustomerSalesList(popupForm);
+				 
+			}else if("CustomerMaster".equalsIgnoreCase(popupForm.getPageName()) ){
+				 results = PopupDAO.searchCustomerMasterList(popupForm);
 				 
 			}else if("CustomerStock".equalsIgnoreCase(popupForm.getPageName()) ){
 				//For Stock

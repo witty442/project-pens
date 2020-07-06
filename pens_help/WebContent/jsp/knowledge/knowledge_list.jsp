@@ -153,6 +153,11 @@
          <a href="http://localhost:8080/pens_help/jsp/knowledge/fixTableHeader3.jsp">Show Detail</a></b>
    </td></tr>
     <tr><td>
+         <b>  ***(use)fix head table alternative 4 (work fix column and row jquery-stickytable-3.0.js) (sample page stock CallCard(pens_sa) )
+           <a href="http://localhost:8080/pens_help/jsp/knowledge/fixTableHeader4.jsp">Show Detail</a>
+         </b>
+   </td></tr>
+    <tr><td>
         <b> Disable Back Button Javascript <a href="javascript:showDiv('div_disable_back');">Show Detail</a></b>
          <div style="display: none;" id="div_disable_back">
               <textarea rows="20" cols="160">

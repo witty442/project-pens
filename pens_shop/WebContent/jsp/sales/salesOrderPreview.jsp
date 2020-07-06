@@ -297,6 +297,7 @@ function calcChangeAmountModel(custAmountObj){
 											<input type='hidden' name='lines.price' value='${lines1.price}'>
 											<input type='hidden' name='lines.price1' value='${lines1.price1}'>
 											<input type='hidden' name='lines.price2' value='${lines1.price2}'>
+											<input type='hidden' name='lines.priceAfDiscount' value='${lines1.priceAfDiscount}'>
 											<input type='hidden' name='lines.qty' value='${lines1.qty}'>
 											<input type='hidden' name='lines.qty1' value='${lines1.qty1}'>
 											<input type='hidden' name='lines.qty2' value='${lines1.qty2}'>
@@ -324,6 +325,7 @@ function calcChangeAmountModel(custAmountObj){
 											<input type='hidden' name='lines.taxable' value='${lines1.taxable}'>
 											<input type='hidden' name='lines.sellingPrice' value='${lines1.sellingPrice}'>
 											<input type='hidden' name='lines.modifierLineId' value='${lines1.modifierLineId}'>
+											<input type='hidden' name='lines.productNonBme' value='${lines1.productNonBme}'>
 										</td>
 										<td class="td_text_center" width="5%">${lines1.fullUom}</td>
 										<td class="td_text_right" width="10%">

@@ -1,99 +1,182 @@
-<%@page import="com.pens.util.SIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<!-- Control Save Lock Screen -->
-<link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.blockUI.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
-<script type="text/javascript">
-/** prevent Back button **/
-function preventback(){
-	window.history.forward();
+<!-- Control Save Lock Screen No Jquery-->
+<style>
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
-setTimeout("preventback()",0);
-//window.onload=function(){null};
 
-/** prevent alert user press refresh and back alert **/
-/* window.onbeforeunload = function() { 
-return "กดปุ่มนี้ ข้อมูลอาจเกิดความเสียหาย ต้องกดใช่หรือไม่."; 
-};   */
+/* Modal Content */
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
 
+/* Add Animation */
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
 
-/*** Control Save Lock Screen ***/
-   var progressCount = 0;//CountPercent
-   function startControlSaveLockScreen(){
-	   //To disable f5
-	    $(document).bind("keydown", disableF5);
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.close {
+  color: white;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.modal-header {
+  padding: 2px 16px;
+  background-color: #fefefe;
+  color: white;
+}
+.modal-body {padding: 2px 16px;}
+
+</style>
+
+<script>
+<!--Progress Bar -->
+var progressCount = 0;//CountPercent
+function startControlSaveLockScreenProgressBar(){
+	//To disable f5
+	//$(document).bind("keydown", disableF5);
 	   
-		/** Init progressbar **/
-		$(function() {
-			///$("#dialog").dialog({ height: 200,width:650,modal:true });
-		   $.blockUI({ message: $('#dialog'), css: {left:'20%', right:'20%' ,top: '20%',height: '25%', width: '60%' } }); 
-		}); 
-		
-       window.setTimeout("checkStatus();", 800);
-   	   updateProgress(status.value);
-    } 
-   
-   function updateProgress(status){
-    	 if(status != '1' && status != "-1"){ //Running
-    		 if(progressCount > 90){
-	    	   progressCount += 0.01; 
-    		 }else if(progressCount > 80){
-    		   progressCount += 0.5; 
-    		 }else if(progressCount > 50){
-    		   progressCount += 1; 
-    		 }else{
-    		   progressCount += 3;
-    		 }
-    	 }else{ //Success
-    		 progressCount = 100;
-    		 
-    		 $("#percent").html("<b>"+progressCount+" %</b>");
-    		 document.getElementById('bar').setAttribute("style"," height: 40px;background-color: green;width:"+progressCount+"%");
-    		 
-    		// $("#progress").hide();
-    		 
-    		 setTimeout(function(){ $("#progress").hide();}, 3000);
-    	 }  
-    	  
-    	 //var progress = $("#progressbar") .progressbar("option","value");
-    	 if (progressCount < 100) {  
-    		 progressCount = Math.round(progressCount * 100) / 100;
-    		 
-	   	      $("#percent").html("<b>"+progressCount+" %</b>");
-    		  $("#progress").show();
-    		  //set progress count
-    		  document.getElementById('bar').setAttribute("style"," height: 40px;background-color: green;width:"+progressCount+"%");
-	   	 }
-    }
-    /** Check Status Recursive **/
-    function checkStatus(){
-    	var status =  "0";//running
-    	/** Task Not Success  and Re Check Status**/
-	    updateProgress(status);
-        window.setTimeout("checkStatus();", 2000);
-    }
-    function disableF5(e) {
-		if (e.which == 116) e.preventDefault(); 
-	}
-/*** Control Save Lock Screen ***/
-</script>
+    /** Init progressbar **/
+    progressCount =1;
+    document.getElementById('bar').setAttribute("style"," height: 40px;background-color: green;width:"+progressCount+"%");
+    
+    window.setTimeout("checkStatus();", 500);
+    updateProgress(status.value);
+ } 
 
-<!-- Progress Bar -->
-<div id="dialog" style="display: none">
- <table style="align:center" border="0" cellpadding="1" cellspacing="0" width="100%">
-    <tr>
-		<td align="left" width ="100%">
-		  <div style="height:50px;align:center">
-		     <h3><b>กรุณารอสักครู่ กำลังทำรายการ  &nbsp;
-		     <font color="red"><u>!!! กรุณาอย่ากดปุ่ม Back หรือ  Reload เพราะอาจทำให้ข้อมูลผิดพลาดได้</u></font> </b></h3>
-		  </div>
-		  <div id="progress" style="height:50px;width:100%;align:center;">
-               <div id="percent" style="align:center"></div>     
-		       <div id="bar"></div>  
-          </div>   
-		 </td>
-	</tr>
-   </table>   	      
+function updateProgress(status){
+ 	 if(status != '1' && status != "-1"){ //Running
+ 		 if(progressCount > 90){
+	    	   progressCount += 0.1; 
+ 		 }else if(progressCount > 80){
+ 		   progressCount += 0.5; 
+ 		 }else if(progressCount > 50){
+ 		   progressCount += 1; 
+ 		 }else{
+ 		   progressCount += 3;
+ 		 }
+ 	 }else{ //Success
+ 		 progressCount = 100;
+ 		 
+ 		 //$("#percent").html("<b>"+progressCount+" %</b>");
+ 		 document.getElementById('percent').html = "<b>"+progressCount+" %</b>";
+ 		 document.getElementById('bar').setAttribute("style"," height: 40px;background-color: green;width:"+progressCount+"%");
+ 		 
+ 	 }  
+ 	  
+ 	 //var progress = $("#progressbar") .progressbar("option","value");
+ 	 if (progressCount < 100) {  
+ 		  progressCount = Math.round(progressCount * 100) / 100;
+ 	
+	   	  //$("#percent").html("<b>"+progressCount+" %</b>");
+ 		  //$("#progress").show();
+ 		  document.getElementById('percent').html = "<b>"+progressCount+" %</b>";
+ 		  document.getElementById('progress').style.visibility = 'visible';
+ 		  //set progress count
+ 		  document.getElementById('bar').setAttribute("style"," height: 40px;background-color: green;width:"+progressCount+"%");
+	  }
+ }
+ /** Check Status Recursive **/
+ function checkStatus(){
+ 	var status =  "0";//running
+ 	/** Task Not Success  and Re Check Status**/
+	updateProgress(status);
+    window.setTimeout("checkStatus();", 2000);
+ }
+ function disableF5(e) {
+		if (e.which == 116) e.preventDefault(); 
+}
+ 
+</script>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <p>...</p>
+      <p>...</p>
+       <b><font color="black" size="3">กรุณารอสักครู่ กำลังทำรายการ  &nbsp;</font></b>
+    </div>
+    <div class="modal-body">
+      <p><font color="red" size="2"><b>!!! กรุณาอย่ากดปุ่ม Back หรือ  Reload เพราะอาจทำให้ข้อมูลผิดพลาดได้ </b></font></p>
+       <div id="progress" style="height:50px;width:100%;align:center;">
+            <div id="percent" style="align:center"></div>     
+		    <div id="bar"></div>  
+       </div>  
+       <p>&nbsp;&nbsp;</p>
+       <p>&nbsp;&nbsp;</p>
+    </div>
+  </div>
 </div>
+
+<script>
+//Get the modal
+var modal = document.getElementById("myModal");
+
+function startControlSaveLockScreen(){
+	//Get the modal
+	var modal = document.getElementById("myModal");
+	modal.style.display = "block";
+	
+	//init progress bar
+	startControlSaveLockScreenProgressBar();
+}
+
+// Get the button that opens the modal
+var btn = document.getElementById("save");
+
+// Get the <span> element that closes the modal
+/* var span = document.getElementsByClassName("close")[0];
+ */
+ 
+// When the user clicks on <span> (x), close the modal
+/* span.onclick = function() {
+  modal.style.display = "none";
+} */
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+   // modal.style.display = "none";
+  }
+}
+</script>

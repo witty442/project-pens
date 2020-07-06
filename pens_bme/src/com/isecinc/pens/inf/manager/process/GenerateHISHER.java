@@ -51,6 +51,7 @@ public class GenerateHISHER extends InterfaceUtils{
 		int qty = 0;
 		double wholePriceBF = 0;
 		double retailPriceBF = 0;
+		String nonBme = "";
 		StringBuffer outputLine = new StringBuffer("");
 		StringBuffer outputFile = new StringBuffer("");
 		try{
@@ -74,7 +75,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			//Get Config Map ALL
 			configMap = InterfaceUtils.getConfigInterfaceAllBySubject(conn, "PENSTOCK",productType);
 			sql.append("\n SELECT A.barcode, A.group_code ,A.product_code ");
-			sql.append("\n , NVL(sum(A.qty),0) as qty ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF ");
+			sql.append("\n , NVL(sum(A.qty),0) as qty ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF,A.NON_BME ");
 			sql.append("\n FROM( ");
 			sql.append("\n 		SELECT O.barcode, O.group_code " );
 			sql.append("\n      ,( select max(M.interface_value) from PENSBME_MST_REFERENCE  M");
@@ -82,6 +83,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n        AND M.reference_code = 'LotusItem' )  as product_code ");
 			sql.append("\n      , NVL(sum(O.qty),0) as qty ");
 			sql.append("\n 		, NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n 		, P.NON_BME ");
 			sql.append("\n 		FROM PENSBME_ORDER O  ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n   		ON  P.group_code = O.group_code ");
@@ -90,7 +92,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n 		where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and O.order_date = ?  ");
 			sql.append("\n 		and  ( (O.exported <> 'Y' and O.exported <> 'G') or O.exported is null)	 ");
-			sql.append("\n 		group by O.barcode, O.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
+			sql.append("\n 		group by O.barcode, O.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF,P.NON_BME ");
 			
 			sql.append("\n 		UNION ALL ");
 			
@@ -101,6 +103,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n        AND M.reference_code = 'LotusItem')  as product_code ");
 			sql.append("\n      , NVL(sum(I.issue_qty),0) as qty ");
 			sql.append("\n 		, NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n 		, P.NON_BME ");
 			sql.append("\n 		from PENSBME_STOCK_ISSUE H ,PENSBME_STOCK_ISSUE_ITEM I  ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n 		ON P.group_code = I.group_code ");
@@ -112,7 +115,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n 		and H.cust_group = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and H.delivery_date = ?  ");
 			sql.append("\n 		and  ( (H.exported <> 'Y' and H.exported <> 'G') or H.exported is null)	 ");
-			sql.append("\n 		group by I.barcode, I.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
+			sql.append("\n 		group by I.barcode, I.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF,P.NON_BME ");
 			
 			/** Pick Stock edit :14/11/2019 **/
 			sql.append("\n 		UNION ALL ");
@@ -125,6 +128,7 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n 		, I.group_code,I.material_master as product_code" );
 			sql.append("\n      , count(*) as qty ");
 			sql.append("\n 		, NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n 		, P.NON_BME ");
 			sql.append("\n 		from PENSBME_PICK_STOCK H ,PENSBME_PICK_STOCK_I I  ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n 		ON P.group_code = I.group_code ");
@@ -136,10 +140,10 @@ public class GenerateHISHER extends InterfaceUtils{
 			sql.append("\n 		and H.cust_group = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and H.delivery_date = ?  ");
 			sql.append("\n 		and  ( (H.exported <> 'Y' and H.exported <> 'G') or H.exported is null)	 ");
-			sql.append("\n 		group by I.pens_item,I.material_master, I.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF ");
+			sql.append("\n 		group by I.pens_item,I.material_master, I.group_code,P.WHOLE_PRICE_BF,P.RETAIL_PRICE_BF,P.NON_BME ");
 			
 			sql.append("\n )A ");
-			sql.append("\n group by A.barcode, A.group_code, A.product_code,A.WHOLE_PRICE_BF,A.RETAIL_PRICE_BF ");
+			sql.append("\n group by A.barcode, A.group_code, A.product_code,A.WHOLE_PRICE_BF,A.RETAIL_PRICE_BF,A.NON_BME");
 			sql.append("\n order by A.group_code ,A.product_code ");
 			
 			logger.debug("sql:"+sql.toString());
@@ -160,6 +164,7 @@ public class GenerateHISHER extends InterfaceUtils{
 				qty = rs.getInt("qty");
 				wholePriceBF  = rs.getDouble("WHOLE_PRICE_BF");
 				retailPriceBF =  rs.getDouble("RETAIL_PRICE_BF");
+				nonBme = Utils.isNull(rs.getString("non_bme"));
 				
 				//validate MST 
 				if("".equals(productCode)){
@@ -179,7 +184,7 @@ public class GenerateHISHER extends InterfaceUtils{
 					   
 					}else{
 						 //Gen Line
-						outputLine.append(genLine(configMap,groupCode,barcode,pensItem,productCode,qty,wholePriceBF,retailPriceBF));
+						outputLine.append(genLine(configMap,groupCode,barcode,pensItem,productCode,qty,wholePriceBF,retailPriceBF,nonBme));
 					     
 						successCount++;
 						//insert result msg
@@ -360,7 +365,7 @@ public class GenerateHISHER extends InterfaceUtils{
 	
 	private static String genLine(Map<String, String> configMap,String groupCode
 			,String barcode,String pensItem,String productCode,
-			int qty,double wholePriceBF,double retailPriceBF) throws Exception{
+			int qty,double wholePriceBF,double retailPriceBF,String nonBme) throws Exception{
 		
 		String line="";
 		String sizeCode ="";
@@ -400,17 +405,23 @@ public class GenerateHISHER extends InterfaceUtils{
 			/**8 */line += appendRightByLength(productCode," ",15);//ITEM_ID	รหัสสินค้า	CHAR(15)
 			       line += debug(no,appendRightByLength(productCode," ",15));no++;
 			       
-		    	/** new Case Product (AM1001LGY[9], edit:25102019**/
-			    //productCode ME1M03A3BL
-			     if(productCode.length()==10){
-			    	//AM1001XLGY[10]
-			        sizeCode =productCode.substring(6,8);
-			        colorCode =productCode.substring(8,10);
-			     }else{
-			    	//AM1001LGY[9]
-			        sizeCode =productCode.substring(6,7)+" ";
-			        colorCode =productCode.substring(7,9);  
-			     }
+		       /** Edit 28/05/2563 : case product none bme no color and size **/
+			    if("Y".equalsIgnoreCase(nonBme)){
+			    	sizeCode ="----";
+			    	colorCode ="---";
+			    }else{
+			    	/** new Case Product (AM1001LGY[9], edit:25102019**/
+				    //productCode ME1M03A3BL
+				     if(productCode.length()==10){
+				    	//AM1001XLGY[10]
+				        sizeCode =productCode.substring(6,8);
+				        colorCode =productCode.substring(8,10);
+				     }else{
+				    	//AM1001LGY[9]
+				        sizeCode =productCode.substring(6,7)+" ";
+				        colorCode =productCode.substring(7,9);  
+				     }
+			    }
 				//logger.debug("productCode["+productCode+"]sizeCode["+sizeCode+"]colorCode["+colorCode+"]");
 			/**9 */line += appendRightByLength(sizeCode," ",4);//SIZE_CODE	ขนาดของสินค้า	CHAR(4)
 			       line += debug(no,appendRightByLength(sizeCode," ",4));no++;

@@ -23,15 +23,15 @@ public class BMEProductDAO {
 		Connection conn = null;
 		try {
 			if(Utils.isNull(c.getCustGroup()).equalsIgnoreCase(PickConstants.STORE_TYPE_TERMINAL_CODE)){
-				sql.append("\n   SELECT DISTINCT I.inventory_item_id as product_id");
-				sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
+				sql.append("\n select M.* , BL.WHOLE_PRICE_BF, BL.RETAIL_PRICE_BF");
+				sql.append("\n FROM ( ");
+				sql.append("\n   SELECT DISTINCT MP.PENS_VALUE as PENS_ITEM ");
 				sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 				sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 				sql.append("\n   ,MP.PENS_DESC2 as GROUP_CODE ");
-				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
+				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP");
 				sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
 				sql.append("\n   AND MP.pens_desc6 in ('MAYA' , 'TM21') ");
-				sql.append("\n   AND MP.pens_value =I.segment1 ");
 				//condition
 				if( !Utils.isNull(c.getPensItem()).equals("")){
 					sql.append("\n  AND MP.PENS_VALUE ='"+Utils.isNull(c.getPensItem())+"'");
@@ -39,32 +39,52 @@ public class BMEProductDAO {
 				if( !Utils.isNull(c.getMaterialMaster()).equals("")){
 					sql.append("\n  AND MP.INTERFACE_VALUE ='"+Utils.isNull(c.getMaterialMaster())+"'");
 				}
+				sql.append("\n ) M ,PENSBI.PENSBME_ONHAND_BME_LOCKED BL");
+				sql.append("\n WHERE M.barcode = BL.barcode ");
+				sql.append("\n AND M.MATERIAL_MASTER = BL.MATERIAL_MASTER ");
+				sql.append("\n AND M.PENS_ITEM = BL.PENS_ITEM ");
+				
 			}else if(Utils.isNull(c.getCustGroup()).equalsIgnoreCase(PickConstants.STORE_TYPE_FRIDAY_CODE)){
-				sql.append("\n   SELECT DISTINCT I.inventory_item_id as product_id");
-				sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
+				sql.append("\n select M.* , BL.WHOLE_PRICE_BF, BL.RETAIL_PRICE_BF");
+				sql.append("\n FROM ( ");
+				sql.append("\n   SELECT DISTINCT MP.PENS_VALUE as PENS_ITEM ");
 				sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 				sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 				sql.append("\n   ,MP.PENS_DESC2 as GROUP_CODE ");
-				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
+				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP");
 				sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_FRIDAY_ITEM+"')");
-				sql.append("\n   AND MP.pens_value =I.segment1 ");
+				//condition
+				if( !Utils.isNull(c.getPensItem()).equals("")){
+					sql.append("\n  AND MP.PENS_VALUE ='"+Utils.isNull(c.getPensItem())+"'");
+				}
+				if( !Utils.isNull(c.getMaterialMaster()).equals("")){
+					sql.append("\n  AND MP.INTERFACE_VALUE ='"+Utils.isNull(c.getMaterialMaster())+"'");
+				}
+				sql.append("\n ) M ,PENSBI.PENSBME_ONHAND_BME_LOCKED_FRI BL");
+				sql.append("\n WHERE M.barcode = BL.barcode ");
+				sql.append("\n AND M.MATERIAL_MASTER = BL.MATERIAL_MASTER ");
+				sql.append("\n AND M.PENS_ITEM = BL.PENS_ITEM ");
 			}else {
 				//default all to lotus
-				sql.append("\n   SELECT DISTINCT I.inventory_item_id as product_id");
-				sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
+				sql.append("\n select M.* , BL.WHOLE_PRICE_BF, BL.RETAIL_PRICE_BF");
+				sql.append("\n FROM ( ");
+				sql.append("\n    SELECT DISTINCT MP.PENS_VALUE as PENS_ITEM ");
 				sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 				sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 				sql.append("\n   ,MP.PENS_DESC2 as GROUP_CODE ");
-				
-			/*	sql.append("\n  ,select count(*) as c FROM PENSBI.PENSBME_ONHAND_BME_LOCKED ");
-				sql.append("\n   WHERE BARCODE = MP.INTERFACE_DESC");
-				sql.append("\n  and material_master = MP.INTERFACE_VALUE");
-				sql.append("\n  and GROUP_ITEM =MP.PENS_DESC2");
-				sql.append("\n  and pens_item = MP.PENS_VALUE ) as retail_price_bf");*/
-				 
-				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
+				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ");
 				sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
-				sql.append("\n   AND MP.pens_value =I.segment1 ");
+				//condition
+				if( !Utils.isNull(c.getPensItem()).equals("")){
+					sql.append("\n  AND MP.PENS_VALUE ='"+Utils.isNull(c.getPensItem())+"'");
+				}
+				if( !Utils.isNull(c.getMaterialMaster()).equals("")){
+					sql.append("\n  AND MP.INTERFACE_VALUE ='"+Utils.isNull(c.getMaterialMaster())+"'");
+				}
+				sql.append("\n ) M ,PENSBI.PENSBME_ONHAND_BME_LOCKED BL");
+				sql.append("\n WHERE M.barcode = BL.barcode ");
+				sql.append("\n AND M.MATERIAL_MASTER = BL.MATERIAL_MASTER ");
+				sql.append("\n AND M.PENS_ITEM = BL.PENS_ITEM ");
 			}
 			
 			logger.debug("sql:"+sql);
@@ -79,7 +99,9 @@ public class BMEProductDAO {
 				item.setPensItem(rst.getString("pens_item"));
 				item.setMaterialMaster(rst.getString("material_master"));
 				item.setGroupCode(rst.getString("group_code"));
-			
+				item.setBarcode(rst.getString("barcode"));
+			    item.setWholePriceBF(Utils.decimalFormat(rst.getDouble("whole_price_bf")));
+			    item.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price_bf")));
 			}//while
 
 		} catch (Exception e) {

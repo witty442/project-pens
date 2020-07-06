@@ -72,8 +72,15 @@ public class ShopBean implements  Serializable{
     private boolean canEdit;
     private String reportType;
     private String modifierLineId;
+    private String bmeProductOnly;
     
     
+	public String getBmeProductOnly() {
+		return bmeProductOnly;
+	}
+	public void setBmeProductOnly(String bmeProductOnly) {
+		this.bmeProductOnly = bmeProductOnly;
+	}
 	public String getStockShortQty() {
 		return stockShortQty;
 	}

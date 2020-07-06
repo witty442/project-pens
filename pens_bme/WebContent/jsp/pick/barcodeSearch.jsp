@@ -51,7 +51,6 @@ function clearForm(path){
 	form.submit();
 	return true;
 }
-
 function exportExcel(path){
 	var form = document.barcodeForm;
 	
@@ -66,7 +65,6 @@ function exportExcel(path){
 	form.submit();
 	return true;
 }
-
 function search(path){
 	var form = document.barcodeForm;
 	if( $('#transactionDate').val()=="" && $('#boxNo').val()==""
@@ -93,7 +91,12 @@ function openEdit(path,jobId,boxNo,mode){
 	form.submit();
 	return true;
 }
-
+function openEditManualStock(path,jobId,boxNo,mode){
+	var form = document.barcodeForm;
+	form.action = path + "/jsp/barcodeAction.do?do=prepareManualStock&jobId="+jobId+"&boxNo="+boxNo+"&mode="+mode;
+	form.submit();
+	return true;
+}
 function openJobPopup(path){
     var param = "";
 	url = path + "/jsp/searchJobPopupAction.do?do=prepare3&action=new"+param;
@@ -101,7 +104,6 @@ function openJobPopup(path){
 	//		   "menubar=no,resizable=no,toolbar=no,scrollbars=yes,width=600px,height=540px,status=no,left="+ 50 + ",top=" + 0);
 	PopupCenterFullHeight(url,"",500);
 }
-
 function setStoreMainValue(code,desc,storeCode,storeName,storeNo,subInv,wareHouse,wareHouseDesc){
 	//alert(types+":"+desc);
 	document.getElementsByName("job.jobId")[0].value = code;
@@ -114,7 +116,6 @@ function setStoreMainValue(code,desc,storeCode,storeName,storeNo,subInv,wareHous
 	document.getElementsByName("job.wareHouse")[0].value = wareHouse;
 	document.getElementsByName("job.wareHouseDesc")[0].value = wareHouseDesc;
 }
-
 function getJobNameKeypress(e,code){
 	var form = document.barcodeForm;
 	if(e != null && e.keyCode == 13){
@@ -125,7 +126,6 @@ function getJobNameKeypress(e,code){
 		}
 	}
 }
-
 //Return String :jobName|StoreCode|StioreName|StoreNo|subInv|wareHouse|wareHouseDesc
 function getJobNameModel(code){
 	var returnString = "";
@@ -166,7 +166,6 @@ function getJobNameModel(code){
 	}
 }
 </script>
-
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
@@ -277,6 +276,9 @@ function getJobNameModel(code){
 										<a href="javascript:openEdit('${pageContext.request.contextPath}','','','add')">
 										  <input type="button" value="   เพิ่มรายการใหม่   " class="newPosBtnLong">
 										</a>	
+										<a href="javascript:openEditManualStock('${pageContext.request.contextPath}','','','add')">
+										  <input type="button" value="เพิ่มรายการใหม่(Manual)" class="newPosBtnLong">
+										</a>
 										<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 										  <input type="button" value="   Clear   " class="newPosBtnLong">
 										</a>						
@@ -325,15 +327,15 @@ function getJobNameModel(code){
 								
 									<tr class="<%=tabclass%>">
 										<td class="td_text_center" width="3%"><%=no %></td>
-										<td class="td_text" width="5%"><%=mc.getBoxNo() %></td>
-										<td class="td_text" width="5%"><%=mc.getTransactionDate() %></td>
-										<td class="td_text" width="5%"><%=mc.getJobId() %></td>
+										<td class="td_text_center" width="5%"><%=mc.getBoxNo() %></td>
+										<td class="td_text_center" width="5%"><%=mc.getTransactionDate() %></td>
+										<td class="td_text_center" width="5%"><%=mc.getJobId() %></td>
 										<td class="td_text" width="13%"><%=mc.getName() %></td>
-										<td class="td_text" width="8%"><%=mc.getStoreCode() %></td>
-										<td class="td_text" width="5%">
+										<td class="td_text_center" width="8%"><%=mc.getStoreCode() %></td>
+										<td class="td_text_center" width="5%">
 											<%=mc.getSubInv() %>
 										</td>
-										<td class="td_text" width="5%">
+										<td class="td_text_center" width="5%">
 											<%=mc.getStoreNo() %>
 										</td>
 										<td class="td_text_right" width="5%">
@@ -352,9 +354,15 @@ function getJobNameModel(code){
 											  </a>
 										 <%} %>
 										  <% if(mc.isCanEdit()==true){ %>
-											  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=mc.getJobId() %>','<%=mc.getBoxNo() %>','edit')">
+										   <% if("ManualStock".equalsIgnoreCase(mc.getType())){ %>
+										      <a href="javascript:openEditManualStock('${pageContext.request.contextPath}', '<%=mc.getJobId() %>','<%=mc.getBoxNo() %>','edit')">
 											        <font size="2"><b> แก้ไข</b></font>
-											  </a>
+											   </a>
+										   <% }else{ %>
+											   <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=mc.getJobId() %>','<%=mc.getBoxNo() %>','edit')">
+											        <font size="2"><b> แก้ไข</b></font>
+											   </a>
+										   <%} %>
 										 <%} %>
 										</td>
 									</tr>

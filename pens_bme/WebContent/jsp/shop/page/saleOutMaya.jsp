@@ -138,6 +138,8 @@ function clearForm(path){
 						<html:text property="bean.startDate" styleId="startDate" readonly="false" size="10"/>
 						&nbsp;&nbsp;ถึง วันที่ขาย&nbsp;&nbsp;
 					    <html:text property="bean.endDate" styleId="endDate" readonly="false" size="10"/>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<html:checkbox property="bean.bmeProductOnly">&nbsp;เฉพาะสินค้า B'me</html:checkbox>
 						</td>
 					  </tr>
 					 </table>

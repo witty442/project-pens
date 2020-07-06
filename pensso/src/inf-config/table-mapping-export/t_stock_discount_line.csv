@@ -1,0 +1,17 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL
+RECORD_TYPE,N,0,CHAR,,N           
+REQUEST_NUMBER  ,N,1,CHAR,,N
+LINE_NUMBER,N,2,CHAR,,N
+INVENTORY_ITEM_ID,N,3,CHAR,,N
+product_name,N,4,CHAR,,N
+ar_invoice_no,N,5,CHAR,,N
+uom1_qty,N,6,CHAR,,N
+uom2_qty,N,7,CHAR,,N
+uom1,N,8,CHAR,,N
+uom2,N,9,CHAR,,N
+uom1_pac,N,10,INT_NOCUR,,N
+uom2_pac,N,11,INT_NOCUR,,N
+uom1_price,N,12,CHAR,,N
+line_amount,N,13,CHAR,,N
+vat_amount,N,14,CHAR,,N
+net_amount,N,15,CHAR,,N

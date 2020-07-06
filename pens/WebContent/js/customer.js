@@ -124,6 +124,7 @@ function save(path) {
 function saveEdit(path) {
 	if(!createAddressList()){return false;}
 	if(!createContactList()){return false;}
+	
 	document.customerForm.action = path + "/jsp/customerAction.do?do=saveEdit";
 	document.customerForm.submit();
 	return true;

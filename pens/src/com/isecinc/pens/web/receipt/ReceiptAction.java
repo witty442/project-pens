@@ -42,6 +42,7 @@ import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MReceiptMatchCN;
 import com.isecinc.pens.model.MTrxHistory;
+import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 
 /**
  * Receipt Action
@@ -451,6 +452,13 @@ public class ReceiptAction extends I_Action {
 			// Search Again
 			prepare(String.valueOf(receipt.getId()), receiptForm, request, response);
 			
+			/** 
+			* Process run after this action 
+			* get sql manual script from 'c_after_action_sql' 
+			* and run script by action name 
+			**/
+			ProcessAfterAction.processAfterAction(ProcessAfterAction.SAVE_RECEIPT,receiptForm.getReceipt().getReceiptNo());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			receiptForm.getReceipt().setId(receiptId);

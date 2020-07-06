@@ -28,6 +28,8 @@ import com.isecinc.pens.bean.ProductCategory;
 import com.isecinc.pens.bean.ProductPrice;
 import com.isecinc.pens.bean.Qualifier;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.helper.FileUtil;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MModifier;
 import com.isecinc.pens.model.MModifierAttr;
@@ -88,7 +90,7 @@ public class ModifierProcess {
 	 * @param conn
 	 * @throws Exception
 	 */
-	public void findModifier(List<OrderLine> orderLines, User user, Connection conn) throws Exception {
+	public void findModifier(List<OrderLine> orderLines, User user, Connection conn,String custGroup) throws Exception {
 		logger.debug("Find Modifier..");
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -121,15 +123,23 @@ public class ModifierProcess {
 				
 				sql = createSQL(  BeanParameter.getModifierItemCategory()
 						        , String.valueOf(product.getProductCategory().getId())
-						        , oline.getProduct().getId(), oline.getUom().getId()
-						        ,LEVEL_LINE, user);
-
+						        , oline.getProduct().getId()
+						        , oline.getUom().getId()
+						        , LEVEL_LINE
+						        , user
+						        ,custGroup);
+				
 				if(isDebug){
-				  logger.info("Item Category LINE Modifier >> SQL[\n "+sql+"\n]");
+				  //logger.info("Item Category LINE Modifier >> SQL[\n "+sql+"\n]");
+					if( !Utils.isNull(custGroup).equals("")){
+				       FileUtil.writeFile("d:/dev_temp/temp/c4_cust/GetItemCategory_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
+					}else{
+					   FileUtil.writeFile("d:/dev_temp/temp/c4/GetItemCategory_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
+					}
 				}
 				
 				rst = stmt.executeQuery(sql);
-				processModifier(rst, oline);
+				processModifier(rst, oline,BeanParameter.getModifierItemCategory());
 
 				if(rst != null) { 
 					rst.close();
@@ -141,17 +151,25 @@ public class ModifierProcess {
 				  logger.info("Item LINE Modifier..Step by Product["+product+"]");
 				}
 				
-				sql = createSQL(  BeanParameter.getModifierItemNumber()
-						        , String.valueOf(product.getId()) 
-						        , oline.getProduct().getId(), oline.getUom().getId()
-						        , LEVEL_LINE, user);
+				sql = createSQL( BeanParameter.getModifierItemNumber()
+				        , String.valueOf(product.getId()) 
+				        , oline.getProduct().getId()
+				        , oline.getUom().getId()
+				        , LEVEL_LINE
+				        , user
+				        ,custGroup);
 				
 				if(isDebug){
-				  logger.info("Item LINE Modifier >>SQL[\n "+sql+"\n]");
+				   //logger.info("Item LINE Modifier >>SQL[\n "+sql+"\n]");
+					if( !Utils.isNull(custGroup).equals("")){
+						FileUtil.writeFile("d:/dev_temp/temp/c4_cust/GetItemNumber_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
+					}else{
+				        FileUtil.writeFile("d:/dev_temp/temp/c4/GetItemNumber_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
+					}
 				}
 				
 				rst = stmt.executeQuery(sql);
-				processModifier(rst, oline);
+				processModifier(rst, oline,BeanParameter.getModifierItemNumber());
 
 				logger.info("AddLines Size["+addLines.size()+"]");
 				if(rst != null) { 
@@ -159,7 +177,7 @@ public class ModifierProcess {
 					rst = null;
 				}
 
-			}// line
+			}// for line
 
 			if(isDebug){
 			  logger.info("************** END  LINE Modifier ************************************"); 
@@ -197,7 +215,7 @@ public class ModifierProcess {
 						itemCats.add(cat);
 					}
 				}
-			}
+			}//for
 			
 			if(isDebug){
 				logger.info("************ END Product Category From OrderLine product and distinct productCategory*******"); 
@@ -211,21 +229,31 @@ public class ModifierProcess {
 				  logger.info("Loop ProductCategory Step By item"+item);
 				}
 				
-				sql = createSQL(BeanParameter.getModifierItemCategory(), String.valueOf(item.getId()), 0, "",LEVEL_LINEGROUP, user);
-				
+			    sql = createSQL(BeanParameter.getModifierItemCategory()
+			    	  , String.valueOf(item.getId())
+			    	  , 0
+			    	  , ""
+			    	  ,LEVEL_LINEGROUP
+			    	  , user
+			    	  ,custGroup);
 				if(isDebug){
-				  logger.info("CateId["+item.getId()+"Loop Cate LINEGROUP>> SQL[\n "+sql+"\n]");
+				   //logger.info("CateId["+item.getId()+"Loop Cate LINEGROUP>> SQL[\n "+sql+"\n]");
+					if( !Utils.isNull(custGroup).equals("")){
+					    FileUtil.writeFile("d:/dev_temp/temp/c4_cust/GetLineGroup_CatID_"+item.getId()+"_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
+					}else{
+				        FileUtil.writeFile("d:/dev_temp/temp/c4/GetLineGroup_CatID_"+item.getId()+"_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
+					}
 				}
 				
 				rst = stmt.executeQuery(sql);
 				
-				processModifierLINEGROUP(rst, orderLines, BeanParameter.getModifierItemCategory());
+				processModifierLINEGROUP(rst, orderLines, BeanParameter.getModifierItemCategory(),custGroup);
 				
 				if(rst != null) { 
 					rst.close();
 					rst = null;
 				}
-			}
+			}//for
 			
 			if(isDebug){
 			  logger.info(" ************* End  Item Category LINEGROUP Modifier ***************************************");
@@ -270,14 +298,14 @@ public class ModifierProcess {
 			stmt = conn.createStatement();
 			logger.debug("Item Category Modifier..");
 			sql = createSQL(BeanParameter.getModifierItemCategory(), String.valueOf(product.getProductCategory()
-					.getId()), product.getId(), "", "", user);
+					.getId()), product.getId(), "", "", user,"");
 			rst = stmt.executeQuery(sql);
 			listDesc.addAll(getLineDescription(rst));
 
 			// ITEM MODIFIER
 			logger.debug("Item Modifier..");
 			sql = createSQL(BeanParameter.getModifierItemNumber(), String.valueOf(product.getId()), product.getId(),
-					"", "", user);
+					"", "", user,"");
 			rst = stmt.executeQuery(sql);
 			listDesc.addAll(getLineDescription(rst));
 
@@ -378,9 +406,10 @@ public class ModifierProcess {
 	 * @param oline
 	 * @throws Exception
 	 */
-	private void processModifier(ResultSet rst, OrderLine oline) throws Exception {
+	private void processModifier(ResultSet rst, OrderLine oline,String typeItem) throws Exception {
+		int count = 0;
 		if(isDebug){
-		  logger.debug("*********** processModifier***********************");
+		  logger.debug("*********** processModifier["+typeItem+"]***********************");
 		}
 		boolean useHead = false;
 		boolean useLine = false;
@@ -392,13 +421,13 @@ public class ModifierProcess {
 		useLines.add(oline);
 
 		while (rst.next()) {
-            
+            count++;
 			useHead = false;
 
 			getAllModifer(rst);
 
 			if(isDebug){
-			  logger.info("Loop ***************************");
+			  logger.info("No["+count+"]Loop ***************************");
 			}
 			// check start - end
 			// header first then line
@@ -470,7 +499,7 @@ public class ModifierProcess {
 	 * @param oline
 	 * @throws Exception
 	 */
-	private void processModifierLINEGROUP(ResultSet rst, List<OrderLine> orderLines, String attr) throws Exception {
+	private void processModifierLINEGROUP(ResultSet rst, List<OrderLine> orderLines, String attr,String custGroup) throws Exception {
     
 		if(isDebug){
 		  logger.info(" ******* Start processModifierLINEGROUP****************************************");
@@ -486,6 +515,7 @@ public class ModifierProcess {
 		String excludeSQL = "";
 		ModifierAttr[] excludeAttrs;
 		boolean bExclude = false;
+		boolean canUseModifierLineId = true;
 		
 		while (rst.next()) {
 			useHead = false;
@@ -562,19 +592,24 @@ public class ModifierProcess {
 					}//for 
 					
 					/**  Process Modifier with OrderLines   Process Line is no Exclude**/
+
+					//FIND NOT= (MODIFIER_LINE ) in M_QUALIFIER
+					if( !Utils.isNull(custGroup).equals("")){
+					    canUseModifierLineId = new MQualifier().canUseModifierLineId(custGroup, modifierLine.getId());
+					}
+					logger.info("canUseModifierLineId["+modifierLine.getId()+"]["+canUseModifierLineId+"]");
 					
 					// Discount
-					if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierDiscount())) {
+					if (canUseModifierLineId && modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierDiscount())) {
 						discountProcess(sumQty, sumAmount, noExcludeLines, true);
 					}
 					// Price break Header
-					if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierPricebreakheader())) {
+					if (canUseModifierLineId && modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierPricebreakheader())) {
 						priceBreakProcess(sumQty, sumAmount, noExcludeLines, true);
 					}
 					
 					// Promotional Good
-					if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierPromotiongood())) {
-						
+					if (canUseModifierLineId && modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierPromotiongood())) {
 						//if ( ModifierControl.METHOD_PROMOTION_GOODS_2.equalsIgnoreCase(ModifierControl.getMethodPromotiomGoodsControl()) ){
 						 if(ControlCode.canExecuteMethod("ModifierProcess", "promotionalGoodProcessNew")){
 							//New Code
@@ -583,9 +618,7 @@ public class ModifierProcess {
 						     //default (old code)
 							promotionalGoodProcess(sumQty);
 					    }
-						
-					}
-					
+					}//if
 				}//if
 			} else {
 				logger.info("No Promotion..");
@@ -720,13 +753,34 @@ public class ModifierProcess {
 					discount *= modifierLine.getValues();
 					for (OrderLine line : useLines) {
 						lineDiscount = discount * line.getQty() / sumQty;
-						if (line.getBestDiscount() == 0) line.setBestDiscount(lineDiscount);
-						if (line.getBestDiscount() < lineDiscount) line.setBestDiscount(lineDiscount);
+						//WIT ADD:29/06/2563 calc bestDiscount more one c4 (add old discount+newDiscount)
+						 
+						logger.info("BreakType[RECURRING] :StoreBestDiscount["+line.getStoreBestDiscount()+"]");
+						if(line.getStoreBestDiscount() != 0){
+							if (line.getBestDiscount() == 0) {
+								line.setBestDiscount(lineDiscount);
+							}
+							if (line.getBestDiscount() < lineDiscount){
+								line.setBestDiscount(lineDiscount);
+							}
+							line.setBestDiscount(line.getStoreBestDiscount()+lineDiscount);
+							line.setStoreBestDiscount(line.getBestDiscount());
+						}else{
+							if (line.getBestDiscount() == 0) {
+								line.setBestDiscount(lineDiscount);
+								line.setStoreBestDiscount(line.getBestDiscount());//for sum more one  line c4
+							}
+							if (line.getBestDiscount() < lineDiscount){
+								line.setBestDiscount(lineDiscount);
+								line.setStoreBestDiscount(line.getBestDiscount());//for sum more one  line c4
+							}
+						}
+						
 						
 						if(isDebug){
 						  logger.info("BreakType[RECURRING] :BestDiscount["+line.getBestDiscount()+"] result lineDiscount["+lineDiscount+"]");
 						}
-					}
+					}//for
 				}
 			}
 		} else {
@@ -1223,7 +1277,7 @@ public class ModifierProcess {
 	 * @param uom
 	 * @return SQL String
 	 */
-	private String createSQL(String attr, String attrValue, int productId, String uom, String levelType, User user) {
+	private String createSQL(String attr, String attrValue, int productId, String uom, String levelType, User user,String custGroup) {
 		String sql = "";
 		// Product Category Modifier
 		sql = "select a.MODIFIER_ATTR_ID, a.MODIFIER_LINE_ID, a.MODIFIER_ID \r\n";
@@ -1239,7 +1293,9 @@ public class ModifierProcess {
 		// sql += "  and date_format(b.end_date,'%Y%m%d') >= date_format(current_timestamp,'%Y%m%d') ";
 		sql += "  and a.product_attribute = '" + attr + "' \r\n";
 		sql += "  and a.product_attribute_value = '" + attrValue + "' \r\n";
-		if (uom.length() > 0) sql += "  and a.product_uom_id = '" + uom + "' \r\n";
+		if (uom.length() > 0) {
+			sql += "  and a.product_uom_id = '" + uom + "' \r\n";
+		}
 		sql += "  and a.MODIFIER_LINE_ID not in (select rm.MODIFIER_LINE_TO_ID from m_relation_modifier rm) \r\n";
 
 		// only Line Level
@@ -1248,7 +1304,7 @@ public class ModifierProcess {
 					+ levelType + "' and isactive = 'Y' ) \r\n";
 
 		// join order qualifier
-		sql += "  and a.modifier_id IN (\r\n";
+		sql += " and a.modifier_id IN (\r\n";
 		sql += " select modifier_id from m_qualifier \r\n";
 		sql += " where operator = '=' \r\n";
 		sql += "   and isexclude = 'N' \r\n";
@@ -1266,47 +1322,76 @@ public class ModifierProcess {
 
 		sql += ")\r\n";
 
-		// join customer qualifier
-		if (terriory.length() > 0) {
+	
+			// join customer qualifier
+			if (terriory.length() > 0) {
+	
+				// in territory
+				sql += " and (a.MODIFIER_LINE_ID IN (\n";
+				sql += "    select MODIFIER_LINE_ID \n";
+				sql += "    from m_qualifier \n";
+				sql += "    where QUALIFIER_CONTEXT = '" + BeanParameter.getLineQualifierContext() + "' \n";
+				sql += "    and QUALIFIER_TYPE = '" + BeanParameter.getLineQualifierType() + "' \n";
+				sql += "    and OPERATOR = '=' \n";
+				sql += "    and ISEXCLUDE = 'N' \n";
+				sql += "    and ISACTIVE = 'Y' \n";
+				sql += "    and QUALIFIER_VALUE = '" + territoryName + "' \n";
+				sql += "    ) \n";
+	
+				// no qualifier
+				sql += "   or a.MODIFIER_LINE_ID NOT IN ( \n";
+				sql += "     select MODIFIER_LINE_ID \n";
+				sql += "     from m_qualifier \n";
+				sql += "     where QUALIFIER_CONTEXT = '" + BeanParameter.getLineQualifierContext() + "' \n";
+				sql += "     and QUALIFIER_TYPE = '" + BeanParameter.getLineQualifierType() + "' \n";
+				sql += "     and OPERATOR = '=' \n";
+				sql += "     and ISEXCLUDE = 'N' \n";
+				sql += "     and ISACTIVE = 'Y' \n";
+				sql += "   ) \n";
 
-			// in territory
-			sql += "  and (a.MODIFIER_LINE_ID IN (\r\n";
-			sql += "select MODIFIER_LINE_ID \r\n";
-			sql += "from m_qualifier \r\n";
-			sql += "where QUALIFIER_CONTEXT = '" + BeanParameter.getLineQualifierContext() + "' \r\n";
-			sql += "  and QUALIFIER_TYPE = '" + BeanParameter.getLineQualifierType() + "' \r\n";
-			sql += "  and OPERATOR = '=' \r\n";
-			sql += "  and ISEXCLUDE = 'N' \r\n";
-			sql += "  and ISACTIVE = 'Y' \r\n";
-			sql += "  and QUALIFIER_VALUE = '" + territoryName + "' \r\n";
-			sql += ") \r\n";
-
-			// no qualifier
-			sql += "  or a.MODIFIER_LINE_ID NOT IN (\r\n";
-			sql += "select MODIFIER_LINE_ID \r\n";
-			sql += "from m_qualifier \r\n";
-			sql += "where QUALIFIER_CONTEXT = '" + BeanParameter.getLineQualifierContext() + "' \r\n";
-			sql += "  and QUALIFIER_TYPE = '" + BeanParameter.getLineQualifierType() + "' \r\n";
-			sql += "  and OPERATOR = '=' \r\n";
-			sql += "  and ISEXCLUDE = 'N' \r\n";
-			sql += "  and ISACTIVE = 'Y' \r\n";
-			sql += ")) \r\n";
-		}
+				//=  CUSTOMER_GROUP (in) add wit:29/06/2563
+				if(!Utils.isNull(custGroup).equals("")){
+					sql += "  OR a.MODIFIER_LINE_ID IN ( \n";
+					sql += "     select MODIFIER_LINE_ID \n";
+					sql += "     from m_qualifier \n";
+					sql += "     where QUALIFIER_CONTEXT = 'CUSTOMER_GROUP' \n";
+					sql += "     and QUALIFIER_TYPE = 'Customer Group' \n";
+					sql += "     and QUALIFIER_VALUE = '"+Utils.isNull(custGroup)+"' \n";
+					sql += "     and OPERATOR = '=' \n";
+					sql += "     and ISEXCLUDE = 'N' \n";
+					sql += "     and ISACTIVE = 'Y' \n";
+					sql += "   ) \n";
+				}else{
+					//NOT IN CUSTOMER_GROUP
+					sql += "  AND a.MODIFIER_LINE_ID NOT IN ( \n";
+					sql += "     select MODIFIER_LINE_ID \n";
+					sql += "     from m_qualifier \n";
+					sql += "     where QUALIFIER_CONTEXT = 'CUSTOMER_GROUP' \n";
+					sql += "     and QUALIFIER_TYPE = 'Customer Group' \n";
+					sql += "     and OPERATOR = '=' \n";
+					sql += "     and ISEXCLUDE = 'N' \n";
+					sql += "     and ISACTIVE = 'Y' \n";
+					sql += "     and MODIFIER_LINE_ID is not null \n";
+					sql += "   ) \n";
+				}
+				sql += " ) \n";
+			}
 
 		// exclude
 		if (productId != 0) {
 			sql += "  and a.MODIFIER_LINE_ID not in( \r\n";
-			sql += "	select MODIFIER_LINE_ID from m_modifier_attr \r\n";
-			sql += "  where 1=1 \r\n";
+			sql += "	  select MODIFIER_LINE_ID from m_modifier_attr \r\n";
+			sql += "      where 1=1 \r\n";
 			sql += "	  and product_attribute = '" + BeanParameter.getModifierItemCategory() + "' \r\n";
 			sql += "	  and product_attribute_value = '" + productId + "' \r\n";
 			sql += "	  and isexclude = 'Y' \r\n";
 			sql += "	) \r\n";
 		}
 		
+		
 		return sql;
 	}
-
+	
 	/**
 	 * Get Add Lines
 	 * 
@@ -1326,7 +1411,9 @@ public class ModifierProcess {
 			List<OrderLine> orderLines = new ArrayList<OrderLine>();
 			orderLines.add(new MOrderLine().find("198"));
 
-			new ModifierProcess("").findModifier(orderLines, new MUser().find("2"), conn);
+			User user = new MUser().find("100079103");
+			logger.debug("userType:"+user.getType());
+			new ModifierProcess("").findModifier(orderLines,user , conn,"100");
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

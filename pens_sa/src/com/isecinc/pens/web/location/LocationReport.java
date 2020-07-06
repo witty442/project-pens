@@ -167,7 +167,7 @@ public class LocationReport {
 						logger.debug("name:["+i+"]value:["+c.getChkMonth()[i]+"]");
 						condMonth +="'"+c.getChkMonth()[i]+"',";
 					}
-				}
+				}//
 				
 				if( !Utils.isNull(c.getProvince()).equals("")){
 					province = LocationControlPage.getProvinceName(conn, Utils.isNull(c.getProvince()));

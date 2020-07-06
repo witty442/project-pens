@@ -23,6 +23,8 @@ function addProduct(path,objValue){
 		var vat2 = eval(document.getElementsByName('lines.vat2')[index].value) + eval(objValue.vat2);
 		var taxable = objValue.taxable;
 		var promotion = objValue.promotion;
+		var productNonBme = objValue.productNonBme;
+		var priceAfDiscount = objValue.priceAfDiscount;
 		//alert("uom1:"+objValue.uom1+",uom2:"+objValue.uom2);
 		
 		var qty1Label = addCommas(qty1);
@@ -73,7 +75,8 @@ function addProduct(path,objValue){
 		document.getElementsByName('lines.uomLabel2')[index].value = objValue.uom2;
 		document.getElementsByName('lines.taxable')[index].value = objValue.taxable;
 		document.getElementsByName('lines.promo')[index].value = objValue.promotion;
-		
+		document.getElementsByName('lines.productNonBme')[index].value = objValue.productNonBme;
+		document.getElementsByName('lines.priceAfDiscount')[index].value = objValue.priceAfDiscount;
 		//WIT Edit :09/06/2011 :add method calculatePrice()
 		//alert("addProduct:promotion:"+objValue.promotion);
 		calculatePrice();
@@ -178,6 +181,7 @@ function setValueToProduct(path, objValue){
 	inputLabel+="<input type='hidden' name='lines.fullUom' value='"+objValue.uom1+'/'+objValue.uom2+"'>";
 	inputLabel+="<input type='hidden' name='lines.price1' value='"+objValue.price1+"'>";
 	inputLabel+="<input type='hidden' name='lines.price2' value='"+objValue.price2+"'>";
+	inputLabel+="<input type='hidden' name='lines.priceAfDiscount' value='"+objValue.priceAfDiscount+"'>";
 	inputLabel+="<input type='hidden' name='lines.qty1' value='"+objValue.qty1+"'>";
 	inputLabel+="<input type='hidden' name='lines.qty2' value='"+objValue.qty2+"'>";
 	inputLabel+="<input type='hidden' name='lines.amount1' value='"+objValue.amount1+"'>";
@@ -211,6 +215,8 @@ function setValueToProduct(path, objValue){
 	inputLabel+="<input type='hidden' name='lines.taxable' value='"+objValue.taxable+"'>";              
 	inputLabel+="<input type='hidden' name='lines.sellingPrice' value='0'>";
 	inputLabel+="<input type='hidden' name='lines.modifierLineId' value='0'>";
+	inputLabel+="<input type='hidden' name='lines.productNonBme' value='"+objValue.productNonBme+"'>";  
+	inputLabel+="<input type='hidden' name='lines.priceAfDiscount' value='"+objValue.priceAfDiscount+"'>";  
 	
 	var checkBoxLabel='<input type="checkbox" name="lineids" value="0"/>';
 	
@@ -312,6 +318,8 @@ function createProductList(){
 	
 	var tripnos=document.getElementsByName('lines.tripno');
 	var taxables=document.getElementsByName('lines.taxable');
+	var productNonBme=document.getElementsByName('lines.productNonBme');
+	var priceAfDiscount=document.getElementsByName('lines.priceAfDiscount');
 	
 	var inputLabel="";
 	
@@ -334,6 +342,7 @@ function createProductList(){
 		inputLabel+="<input type='text' name='lines["+i+"].uom2.code' value='"+uomLabels2[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].price1' value='"+prices1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].price2' value='"+prices2[i].value+"'>";
+		inputLabel+="<input type='text' name='lines["+i+"].priceAfDiscount' value='"+priceAfDiscount[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].qty1' value='"+qtys1[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].qty2' value='"+qtys2[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].lineAmount1' value='"+amounts1[i].value+"'>";
@@ -353,6 +362,7 @@ function createProductList(){
 		inputLabel+="<input type='text' name='lines["+i+"].lineNo' value='"+linenos[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].tripNo' value='"+tripnos[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].taxable' value='"+taxables[i].value+"'>";
+		inputLabel+="<input type='text' name='lines["+i+"].productNonBme' value='"+productNonBme[i].value+"'>";
 		inputLabel+="<hr/>";
 		
 		divlines.innerHTML += inputLabel;
@@ -396,11 +406,13 @@ function calculatePrice(){
 	var price = document.getElementsByName("lines.price");
 	var price1 = document.getElementsByName("lines.price1");
 	var price2 = document.getElementsByName("lines.price2");
+	var priceAfDiscount = document.getElementsByName("lines.priceAfDiscount");//Case Non Bme
 	
 	var sellingPrice = document.getElementsByName("lines.sellingPrice");
 	
 	var taxables = document.getElementsByName("lines.taxable");
 	var promotion = document.getElementsByName("lines.promo");
+	var productNonBme = document.getElementsByName("lines.productNonBme");
 	
 	var total_ex_disc=0;
 	var totalAmtSubDis=0,totalAmtSubDis1=0,totalAmtSubDis2=0 ;
@@ -448,8 +460,14 @@ function calculatePrice(){
 			
 			/** calc TotalAmount **/
 			if(promotion[i].value =='N'){
-			   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) - Number(toFixed(discs1[i].value,5));
-			   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) - Number(toFixed(discs2[i].value,5));
+			   if(productNonBme[i] !="Y"){
+			       totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5)) - Number(toFixed(discs1[i].value,5));
+			       totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5)) - Number(toFixed(discs2[i].value,5));
+			   }else{
+				   //Case Non Bme  amount = qty * (price-discount)  calc after promotion c4
+				   totalAmtSubDis1 = Number(toFixed(amounts1[i].value,5));
+				   totalAmtSubDis2 = Number(toFixed(amounts2[i].value,5));
+			   }
 			}else if(promotion[i].value =='S'){
 			  /** discount Line(special ) **/
 			   //alert(promotion[i].value+":"+Number(toFixed(amounts1[i].value,5))+"+"+Number(toFixed(discs1[i].value,5)))
@@ -461,6 +479,8 @@ function calculatePrice(){
 			
 			totalAmtInVat1 = Number(totalAmtSubDis1)+ Number(vatLine1);
 			totalAmtInVat2 = Number(totalAmtSubDis2)+ Number(vatLine2);
+			
+			//alert("afdiscs1:"+convetTxtObjToFloat(afdiscs1[i])+",afdiscs2"+convetTxtObjToFloat(afdiscs2[i]));
 			
 			afdiscs1[i].value = Number(toFixed(totalAmtSubDis1,5)).toFixed(2);
 			afdiscs2[i].value = Number(toFixed(totalAmtSubDis2,5)).toFixed(2);
@@ -474,12 +494,21 @@ function calculatePrice(){
 			/********************************************************************************************/
 			/** sellingPrice = price-(Disc/qty)*/
 			if(promotion[i].value =='N'){
-				var linePriceT = Number(toFixed(price1[i].value,5))+Number(toFixed(price2[i].value,5));
-				var lineDiscT =  Number(toFixed(discs1[i].value,5))+Number(toFixed(discs2[i].value,5));
-				var lineQtyT =   Number(toFixed(qty1[i].value,5))+Number(toFixed(qty2[i].value,5)) ;
-				var sellingPriceT = linePriceT-(lineDiscT/lineQtyT);
-				//alert("linePriceT:"+linePriceT+",lineDiscT:"+lineDiscT+",lineQtyT:"+lineQtyT+",sellingPriceT:"+sellingPriceT);
-				sellingPrice[i].value = Number(toFixed(sellingPriceT,5)).toFixed(2);
+				if(productNonBme[i].value !="Y"){
+					var linePriceT = Number(toFixed(price1[i].value,5))+Number(toFixed(price2[i].value,5));
+					var lineDiscT =  Number(toFixed(discs1[i].value,5))+Number(toFixed(discs2[i].value,5));
+					var lineQtyT =   Number(toFixed(qty1[i].value,5))+Number(toFixed(qty2[i].value,5)) ;
+					var sellingPriceT = linePriceT-(lineDiscT/lineQtyT);
+					//alert("linePriceT:"+linePriceT+",lineDiscT:"+lineDiscT+",lineQtyT:"+lineQtyT+",sellingPriceT:"+sellingPriceT);
+					sellingPrice[i].value = Number(toFixed(sellingPriceT,5)).toFixed(2);
+				}else{
+					//non bme 
+					var linePriceAfDiscount = Number(toFixed(priceAfDiscount[i].value,5));
+					var sellingPriceT = linePriceAfDiscount;
+					
+					//alert("linePriceT:"+linePriceT+",lineDiscT:"+lineDiscT+",lineQtyT:"+lineQtyT+",sellingPriceT:"+sellingPriceT);
+					sellingPrice[i].value = Number(toFixed(sellingPriceT,5)).toFixed(2);
+				}
 			}else{
 				sellingPrice[i].value = 0;
 			}
@@ -492,6 +521,9 @@ function calculatePrice(){
 			
 			//display in table
 			total_ex_disc = totalAmtSubDis1 + totalAmtSubDis2;
+			
+			//alert("afdiscs1:"+convetTxtObjToFloat(afdiscs1[i])+",afdiscs2"+convetTxtObjToFloat(afdiscs2[i]));
+			
 			//after discount >> netAmount
 			tbl.rows[i].cells[8].innerHTML=addCommas(Number(Number(afdiscs1[i].value) + Number(afdiscs2[i].value)).toFixed(5));
 		}

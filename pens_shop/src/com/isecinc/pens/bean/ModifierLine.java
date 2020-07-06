@@ -75,9 +75,10 @@ public class ModifierLine extends I_PO implements Serializable {
 	public String toString() {
 		return "Modifier Line[" + getId() + "] Level[" + getLevels() + "] Type[" + getType() + "] Product Attr["
 				+ attr.getProductAttribute() + "] Product Attr Value[" + attr.getProductAttributeValue()
-				+ "], Precedence[" + getPrecedence() + "] Volume Type[" + getVolumeType() + "] Operator["
-				+ attr.getOperator() + "] UOM[" + attr.getProductUOM().getName() + "] From[" + attr.getValueFrom()
-				+ "] To[" + attr.getValueTo() + "]";
+				+ "], Precedence[" + getPrecedence() + "] Volume Type[" + getVolumeType() + "] Operator[";
+		        //EDIT
+				//+ attr.getOperator() + "] UOM[" + attr.getProductUOM().getName() + "] From[" + attr.getValueFrom()
+				//+ "] To[" + attr.getValueTo() + "]";
 	}
 
 	/** ID */

@@ -96,6 +96,31 @@ public class MCustomer extends I_Model<Customer> {
 			} catch (Exception e2) {}
 		}
 	}
+	public String getCustGroup(int customerId) throws Exception {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		String custGroup = "";
+		try{
+			String sql ="\n select cust_group from m_customer where customer_id="+customerId ;
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				custGroup = Utils.isNull(rst.getString("cust_group"));
+			}
+			return custGroup;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				conn.close();conn=null;
+				rst.close();rst=null;
+				stmt.close();stmt=null;
+			} catch (Exception e2) {}
+		}
+	}
 	/**
 	 * Search
 	 * 

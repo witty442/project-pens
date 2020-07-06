@@ -30,7 +30,7 @@ public class SessionUtils {
 	    		 && mySessionVarName.indexOf(curSessionFormName) == -1	  ){
 	    		  session.removeAttribute(mySessionVarName);
 	    		  
-	    		  //clear DATA Result (formName+RESULT)  stockOnhandForm_RESULT
+	    		  //clear DATA Result (formName+RESULT)  ex stockOnhandForm_RESULT
 	    		  session.removeAttribute(mySessionVarName+"_RESULT");
 	    		  session.removeAttribute(mySessionVarName+"_RESULT_DETAIL");
 	    	      logger.info("Remove Attr SessionName="+mySessionVarName+"_RESULT");

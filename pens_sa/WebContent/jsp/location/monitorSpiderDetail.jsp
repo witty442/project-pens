@@ -91,8 +91,8 @@ function backForm(path){
 					    <!-- ************************Result ***************************************************-->
 						  <%
 						 // System.out.println("Results:"+request.getSession().getAttribute("RESULTS"));
-						  if(request.getSession().getAttribute("RESULTS_DETAIL") != null) {
-						     out.println(request.getSession().getAttribute("RESULTS_DETAIL"));
+						  if(request.getAttribute("RESULTS_DETAIL") != null) {
+						     out.println(request.getAttribute("RESULTS_DETAIL"));
 						  }
 						  %>
 						<!-- ************************Result ***************************************************-->

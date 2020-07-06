@@ -7,9 +7,11 @@ import util.BeanParameter;
 import util.ConvertNullUtil;
 
 import com.isecinc.core.model.I_PO;
+import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MProductCategory;
 import com.isecinc.pens.model.MUOM;
+import com.jcraft.jsch.Logger;
 
 /**
  * ModifierAttr Class
@@ -38,7 +40,12 @@ public class ModifierAttr extends I_PO implements Serializable {
 		setModifierLineId(rst.getInt("MODIFIER_LINE_ID"));
 		setProductAttribute(ConvertNullUtil.convertToString(rst.getString("PRODUCT_ATTRIBUTE")).trim());
 		setProductAttributeValue(ConvertNullUtil.convertToString(rst.getString("PRODUCT_ATTRIBUTE_VALUE")).trim());
-		if (rst.getString("PRODUCT_UOM_ID") != null) {
+		
+		/*System.out.println("PRODUCT_UOM_ID:"+rst.getString("PRODUCT_UOM_ID"));
+		System.out.println("VALUE_FROM:"+rst.getDouble("VALUE_FROM"));
+		System.out.println("VALUE_TO:"+rst.getDouble("VALUE_TO"));*/
+		
+		if ( !Utils.isNull(rst.getString("PRODUCT_UOM_ID")).equals("")) {
 			setProductUOM(new MUOM().find(rst.getString("PRODUCT_UOM_ID")));
 		} else {
 			setProductUOM(null);
@@ -56,12 +63,20 @@ public class ModifierAttr extends I_PO implements Serializable {
 	 */
 	protected void setDisplayLabel() throws Exception {
 		if (getProductAttribute().equalsIgnoreCase(BeanParameter.getModifierItemNumber())) {
-			setProduct(new MProduct().find(getProductAttributeValue()));
-			setAttributeValueLabel(getProduct().getCode() + "-" + getProduct().getName());
+			if( !Utils.isNull(getProductAttributeValue()).equals("")){
+			  setProduct(new MProduct().find(getProductAttributeValue()));
+			  if(getProduct() != null){
+			     setAttributeValueLabel(getProduct().getCode() + "-" + getProduct().getName());
+			  }
+			}
 		}
 		if (getProductAttribute().equalsIgnoreCase(BeanParameter.getModifierItemCategory())) {
-			setProductCategory(new MProductCategory().find(getProductAttributeValue()));
-			setAttributeValueLabel(getProductCategory().getName());
+			if( !Utils.isNull(getProductAttributeValue()).equals("")){
+			  setProductCategory(new MProductCategory().find(getProductAttributeValue()));
+			  if(getProductCategory() != null){
+			    setAttributeValueLabel(getProductCategory().getName());
+			  }
+			}
 		}
 
 	}
@@ -70,9 +85,10 @@ public class ModifierAttr extends I_PO implements Serializable {
 	 * To String
 	 */
 	public String toString() {
-		return String.format("Modifier Attr[%s] Attr[%s] AttrV[%s] UOM[%s] From[%s] To[%s]", getId(),
+		return "";
+	/*	return String.format("Modifier Attr[%s] Attr[%s] AttrV[%s] UOM[%s] From[%s] To[%s]", getId(),
 				getProductAttribute(), getAttributeValueLabel(), getProductUOM().getName(), getValueFrom(),
-				getValueTo());
+				getValueTo());*/
 	}
 
 	/** MODIFIER_ATTR_ID */

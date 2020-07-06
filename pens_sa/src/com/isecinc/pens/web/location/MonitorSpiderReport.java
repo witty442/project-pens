@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -45,6 +48,7 @@ public class MonitorSpiderReport {
 			String MaxNotEqualsTripColor ="";String MinVisitByTripColor="";
 			String prefix_="Credit";
 			int count_cust_all_by_trip = 0;
+			int count_cust_bill_by_trip = 0;
 			int count_visit_cust_by_trip = 0;
 			int count_sale_cust_by_trip= 0;
 			int count_visit_cust_by_real= 0;
@@ -89,6 +93,7 @@ public class MonitorSpiderReport {
 				String mmyyyyB = "/"+mm+"/"+yyyyB;
 				logger.debug("mmyyyyB:"+mmyyyyB);
 				MonitorTime monitorTime = new MonitorTime("Monitor Spider");
+				
 				sql = genSqlMonitorReport(conn, c,mmyyyy);
 				
 				stmt = conn.createStatement();
@@ -131,6 +136,8 @@ public class MonitorSpiderReport {
 					html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+tripDateShow+"</td>");
 					html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.isNull(rst.getString("count_cust_all_by_trip"))+"</td>");
 					count_cust_all_by_trip +=rst.getInt("count_cust_all_by_trip");
+					html.append("<td class='"+tdTextCenterClass+"' width='5%'>"+Utils.isNull(rst.getString("count_cust_bill_by_trip"))+"</td>");
+					count_cust_bill_by_trip +=rst.getInt("count_cust_bill_by_trip");
 					//Rearrang Column
 					html.append("<td class='"+tdTextCenterClass+"' width='5%'>");
 					html.append(Utils.isNull(rst.getString("count_visit_cust_by_real")) );
@@ -184,6 +191,9 @@ public class MonitorSpiderReport {
 					html.append("<td  width='20%' colspan='3'>รวม</td>");
 					html.append("<td  width='5%'>");
 					html.append(    Utils.decimalFormat(count_cust_all_by_trip,Utils.format_current_no_disgit));
+					html.append("</td>");
+					html.append("<td  width='5%'>");
+					html.append(    Utils.decimalFormat(count_cust_bill_by_trip,Utils.format_current_no_disgit));
 					html.append("</td>");
 					//rearrang column
 					html.append("<td  width='5%'>");
@@ -274,6 +284,9 @@ public class MonitorSpiderReport {
                 
 				//count_cust_all_by_trip
 				sql.append(""+genCountCustAllByTrip(conn, c));
+				
+				//count_cust_bill_by_trip
+				sql.append(""+genCountCustBillByTrip(conn, c,salesTypePrefix,salesTypePrefixTo));
 				
 				//count_visit_cust_by_trip
 				sql.append(""+genCountVisitCustByTrip(conn, c,salesTypePrefix,salesTypePrefixTo));
@@ -383,7 +396,7 @@ public class MonitorSpiderReport {
 				//debug log sql
 				if(logger.isDebugEnabled()){
 					//logger.debug("/n"+sql.toString());
-					FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString());
+					FileUtil.writeFile("d:/dev_temp/temp/sql.sql", sql.toString(),"TIS-620");
 				}
 			} catch (Exception e) {
 				throw e;
@@ -415,6 +428,76 @@ public class MonitorSpiderReport {
 		 }
 		return sql;
 	 }
+
+	 //VERSION 2
+	 private static StringBuffer XXXgenCountCustBillByTrip(Connection conn,LocationBean c,String salesTypePrefix,String salesTypePrefixTo){
+		 StringBuffer sql = new StringBuffer();
+		 try {
+			 sql.append("\n ,( ");
+			 sql.append("\n select count(distinct tc_sub.customer_id) from ");
+			 sql.append("\n PENSBI.XXPENS_BI_SALES_ANALYSIS_V tc_sub,");
+			 sql.append("\n apps.xxpens_salesreps_v s_sub");
+			 sql.append("\n where 1=1 "); 
+			 sql.append("\n and tc_sub.salesrep_id = s_sub.salesrep_id ");
+			 sql.append("\n and to_number(to_char(tc_sub.invoice_date,'dd'))  =cs.trip_day");
+			 sql.append("\n and tc_sub.customer_category in('ORDER - VAN SALES','ORDER - CREDIT SALES')");
+			 if( !Utils.isNull(c.getDay()).equals("") && !Utils.isNull(c.getDayTo()).equals("") ){
+			   sql.append("\n and tc_sub.invoice_date >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
+			   sql.append("\n and tc_sub.invoice_date <= TO_TIMESTAMP('"+c.getEndDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')");
+			 }else{
+			   sql.append("\n and tc_sub.invoice_date between to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+			   sql.append("\n and TO_TIMESTAMP('"+c.getStartDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')"); 
+			 }
+				
+			 //join main sql
+			 sql.append("\n and tc_sub.salesrep_id = s.salesrep_id  ");
+			 
+			 //where cond sql
+			 sql.append(""+genWhereCondSql(conn, "_sub", c));
+			 sql.append("\n )as count_cust_bill_by_trip ");
+		 }catch(Exception e){
+			 e.printStackTrace();
+		 }
+		return sql;
+	 }
+	 private static StringBuffer genCountCustBillByTrip(Connection conn,LocationBean c,String salesTypePrefix,String salesTypePrefixTo){
+		 StringBuffer sql = new StringBuffer();
+		 try {
+			 sql.append("\n ,( ");
+			 sql.append("\n select count(distinct cs_sub.cust_account_id) from ");
+			 sql.append("\n xxpens_salesreps_v s_sub, ");
+			 sql.append("\n apps.xxpens_ar_cust_sales_vs cs_sub ");
+				sql.append("\n left outer join( ");
+				sql.append("\n select tc.customer_id as cust_account_id,tc.salesrep_id,tc.sales_order_date");
+				sql.append("\n from PENSBI.XXPENS_BI_SALES_ANALYSIS_V tc");
+				sql.append("\n where tc.customer_category in('ORDER - VAN SALES','ORDER - CREDIT SALES')");
+				if( !Utils.isNull(c.getDay()).equals("") && !Utils.isNull(c.getDayTo()).equals("") ){
+				   sql.append("\n and tc.sales_order_date >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
+				   sql.append("\n and tc.sales_order_date <= TO_TIMESTAMP('"+c.getEndDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')");
+				}else{
+				   sql.append("\n and tc.sales_order_date between to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+				   sql.append("\n and TO_TIMESTAMP('"+c.getStartDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')"); 
+				}
+			 sql.append("\n ) tc_sub on tc_sub.cust_account_id = cs_sub.cust_account_id");
+			 sql.append("\n and tc_sub.salesrep_id =cs_sub.primary_salesrep_id "); 
+			 sql.append("\n where 1=1 "); 
+			 //join main sql
+			 sql.append("\n and cs_sub.primary_salesrep_id = cs.primary_salesrep_id ");
+			 sql.append("\n and cs_sub.code = cs.code ");
+			 sql.append("\n and to_number(to_char(tc_sub.sales_order_date,'dd'))  =cs.trip_day");
+		     
+			 //join sub sql
+			 sql.append("\n and tc_sub.cust_account_id = cs_sub.cust_account_id ");
+			 sql.append("\n and cs_sub.primary_salesrep_id = s_sub.salesrep_id  ");
+			 
+			 //where cond sql
+			 sql.append(""+genWhereCondSql(conn, "_sub", c));
+			 sql.append("\n )as count_cust_bill_by_trip ");
+		 }catch(Exception e){
+			 e.printStackTrace();
+		 }
+		return sql;
+	 }
 	 private static StringBuffer genCountVisitCustByTrip(Connection conn,LocationBean c,String salesTypePrefix,String salesTypePrefixTo){
 		 StringBuffer sql = new StringBuffer();
 		 try {
@@ -424,7 +507,7 @@ public class MonitorSpiderReport {
 			 sql.append("\n apps.xxpens_ar_cust_sales_vs cs_sub ");
 			 sql.append("\n left outer join ");
 				sql.append("\n ( ");
-				sql.append("\n select tc.* from xxpens_om_trip_checkin tc where 1=1");
+				sql.append("\n select tc.* from apps.xxpens_om_trip_checkin tc where 1=1");
 				sql.append("\n and (tc.flag ='N' or tc.flag='Y') ");
 				if( !Utils.isNull(c.getDay()).equals("") && !Utils.isNull(c.getDayTo()).equals("") ){
 				   sql.append("\n and trunc(tc.checkin_date) >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
@@ -480,10 +563,11 @@ public class MonitorSpiderReport {
 				sql.append("\n select tc.* from xxpens_om_trip_checkin tc where 1=1");
 				sql.append("\n and (tc.flag='Y') ");
 				if( !Utils.isNull(c.getDay()).equals("") && !Utils.isNull(c.getDayTo()).equals("") ){
-				   sql.append("\n and trunc(tc.checkin_date) >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
-				   sql.append("\n and trunc(tc.checkin_date) <= to_date('"+c.getEndDate()+"','dd/mm/yyyy')");
+				   sql.append("\n and tc.checkin_date >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
+				   sql.append("\n and tc.checkin_date <= TO_TIMESTAMP('"+c.getEndDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')");
 				}else{
-				   sql.append("\n and trunc(tc.checkin_date) = to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+				   sql.append("\n and tc.checkin_date between to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+				   sql.append("\n and TO_TIMESTAMP('"+c.getStartDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')"); 
 				}
 			 sql.append("\n ) tc_sub  on tc_sub.cust_account_id = cs_sub.cust_account_id ");
 			//filter sales_code
@@ -550,10 +634,11 @@ public class MonitorSpiderReport {
 			 
 			 sql.append("\n and (tc_sub.flag ='N' or tc_sub.flag='Y') ");
 			 if( !Utils.isNull(c.getDay()).equals("") && !Utils.isNull(c.getDayTo()).equals("") ){
-			    sql.append("\n and trunc(tc_sub.checkin_date) >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
-			    sql.append("\n and trunc(tc_sub.checkin_date) <= to_date('"+c.getEndDate()+"','dd/mm/yyyy')");
+			   sql.append("\n and tc_sub.checkin_date >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
+			   sql.append("\n and tc_sub.checkin_date <= TO_TIMESTAMP('"+c.getEndDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')");
 			 }else{
-				sql.append("\n and trunc(tc_sub.checkin_date) = to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+			   sql.append("\n and tc_sub.checkin_date between to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+			   sql.append("\n and TO_TIMESTAMP('"+c.getStartDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')"); 
 			 }
 			 sql.append(""+genWhereCondSql(conn, "_sub", c));
 			 
@@ -591,10 +676,11 @@ public class MonitorSpiderReport {
 			 
 			 sql.append("\n and (tc_sub.flag='Y') ");
 			 if( !Utils.isNull(c.getDay()).equals("") && !Utils.isNull(c.getDayTo()).equals("") ){
-			    sql.append("\n and trunc(tc_sub.checkin_date) >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
-			    sql.append("\n and trunc(tc_sub.checkin_date) <= to_date('"+c.getEndDate()+"','dd/mm/yyyy')");
+			   sql.append("\n and tc_sub.checkin_date >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
+			   sql.append("\n and tc_sub.checkin_date <= TO_TIMESTAMP('"+c.getEndDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')");
 			 }else{
-				sql.append("\n and trunc(tc_sub.checkin_date) = to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+			   sql.append("\n and tc_sub.checkin_date between to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+			   sql.append("\n and TO_TIMESTAMP('"+c.getStartDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')"); 
 			 }
 			 sql.append(""+genWhereCondSql(conn, "_sub", c));
 			 sql.append("\n )as count_sale_cust_by_real ");
@@ -637,12 +723,12 @@ public class MonitorSpiderReport {
 			 sql.append("\n and cs_sub.code = s_sub.code ");
 			 
 			 if( !Utils.isNull(c.getDay()).equals("") && !Utils.isNull(c.getDayTo()).equals("") ){
-			    sql.append("\n and trunc(tc_sub.checkin_date) >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
-			    sql.append("\n and trunc(tc_sub.checkin_date) <= to_date('"+c.getEndDate()+"','dd/mm/yyyy')");
+			   sql.append("\n and tc_sub.checkin_date >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
+			   sql.append("\n and tc_sub.checkin_date <= TO_TIMESTAMP('"+c.getEndDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')");
 			 }else{
-				sql.append("\n and trunc(tc_sub.checkin_date) = to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+			   sql.append("\n and tc_sub.checkin_date between to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+			   sql.append("\n and TO_TIMESTAMP('"+c.getStartDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')"); 
 			 }
-
 			 sql.append(""+genWhereCondSql(conn, "_sub", c));
 			 sql.append("\n )as count_cust_not_equals_trip ");
 		 }catch(Exception e){
@@ -686,10 +772,11 @@ public class MonitorSpiderReport {
 			// check_in.distance > config max distance the not equals master location
 			 sql.append("\n and tc_sub.distance > "+maxDistance);
 			 if( !Utils.isNull(c.getDay()).equals("") && !Utils.isNull(c.getDayTo()).equals("") ){
-			    sql.append("\n and trunc(tc_sub.checkin_date) >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
-			    sql.append("\n and trunc(tc_sub.checkin_date) <= to_date('"+c.getEndDate()+"','dd/mm/yyyy')");
+			    sql.append("\n and tc_sub.checkin_date >= to_date('"+c.getStartDate()+"','dd/mm/yyyy')");
+			    sql.append("\n and tc_sub.checkin_date <= TO_TIMESTAMP('"+c.getEndDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')");
 			 }else{
-				sql.append("\n and trunc(tc_sub.checkin_date) = to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+			    sql.append("\n and tc_sub.checkin_date between to_date('"+c.getStartDate()+"','dd/mm/yyyy')"); 
+			    sql.append("\n and TO_TIMESTAMP('"+c.getStartDate()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')"); 
 			 }
 			 sql.append(""+genWhereCondSql(conn, "_sub", c));
 			 sql.append("\n )as count_cust_not_equal_masloc ");
@@ -767,8 +854,7 @@ public class MonitorSpiderReport {
 				}
 			}else{
 				//CustType
-				 sql.append("\n and (  cs"+schema_name+".customer_class_code ='P' ");
-				 sql.append("\n     or cs"+schema_name+".customer_class_code ='B' ");
+				 sql.append("\n and (  cs"+schema_name+".customer_class_code in('P','C','B','G','E','F','H','D') ");
 			     sql.append("\n     or cs"+schema_name+".customer_class_code ='' ");
 			     sql.append("\n     or cs"+schema_name+".customer_class_code is null ) ");
 				
@@ -822,7 +908,7 @@ public class MonitorSpiderReport {
 			  h.append(" <th nowrap >ชื่อพนักงานขาย</th> \n");
 			  h.append(" <th nowrap >วันที่</th> \n");
 			  h.append(" <th >ฐาน Call ตาม Trip ที่ได้กำหนดไว้</th> \n");
-			  
+			  h.append(" <th >จำนวนร้านที่เปิดบิล จากSales App</th> \n");
 			  h.append(" <th >จำนวนร้านเยี่ยม (ตามบันทึกจริง )</th> \n");
 			  h.append(" <th >จำนวนร้านที่ขาย (ตามบันทึกจริง )</th> \n");
 			  
@@ -955,17 +1041,9 @@ public class MonitorSpiderReport {
 		int no = 0;
 		int tripDay = 0;
 		String width="100%";
-		String salesTypePrefix ="";//
-		String salesTypePrefixTo ="";//
+		String orderNoChkIn = "";
+		List<LocationBean> dataList = new ArrayList<LocationBean>();
 		try {
-			//set salesTypePrefix V=3,S=2
-			if(Utils.isNull(c.getCustCatNo()).equals("S")){
-			    salesTypePrefix = "S";
-			    salesTypePrefixTo ="2";
-			}else{
-			    salesTypePrefix = "V";
-			    salesTypePrefixTo ="3";
-			}
 			if(excel){
 				result.append(ExcelHeader.EXCEL_HEADER);
 			}
@@ -973,11 +1051,6 @@ public class MonitorSpiderReport {
 			 conn = DBConnection.getInstance().getConnectionApps();
 			/** Gen TripDay from Date **/
 			 tripDay = DateUtil.getDayOfDate(DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH));
-			 
-			 //Get Config LimitDistince
-			 String maxDistanceStr = CConstants.getConstants(CConstants.SPIDER_REF_CODE, CConstants.MAX_DISTANCE).getValue();
-			 int maxDistance = Utils.convertToInt(maxDistanceStr);//meter m.
-			 logger.debug("maxDistance:"+maxDistance+" m");
 			 
 			 sql.append("\n select A.* , ");
 			 sql.append("\n (select o.creation_date from apps.xxpens_om_order_headers_temp o ");
@@ -990,11 +1063,11 @@ public class MonitorSpiderReport {
 			 sql.append("\n        else  'S'|| substr(order_number,2,length(order_number) )  end) as order_number_temp ");
 			
 			 sql.append("\n   from ");
-			 sql.append("\n   xxpens_om_trip_checkin tc_sub , ");
+			 sql.append("\n   apps.xxpens_om_trip_checkin tc_sub , ");
 			 sql.append("\n   apps.xxpens_ar_cust_sales_vs cs_sub , ");
-			 sql.append("\n   xxpens_salesreps_v s_sub, ");
-			 sql.append("\n   xxpens_ar_customer_all_v c_sub , ");
-			 sql.append("\n   xxpens_om_trip_cust_loc cl_sub ");
+			 sql.append("\n   apps.xxpens_salesreps_v s_sub, ");
+			 sql.append("\n   apps.xxpens_ar_customer_all_v c_sub , ");
+			 sql.append("\n   apps.xxpens_om_trip_cust_loc cl_sub ");
 			 sql.append("\n   where 1=1 "); 
 			 sql.append("\n   and cs_sub.primary_salesrep_id = "+c.getSalesrepCode()+"");
 			 sql.append("\n   and to_number(to_char(tc_sub.checkin_date,'dd') ) = "+tripDay);
@@ -1004,9 +1077,6 @@ public class MonitorSpiderReport {
 			 sql.append("\n   and tc_sub.account_number = c_sub.account_number ");
 			 sql.append("\n   and tc_sub.cust_account_id = cs_sub.cust_account_id ");
 			 sql.append("\n   and tc_sub.salesrep_id = cl_sub.salesrep_id  ");
-			 
-			//Case Customer change to new sale
-			 //sql.append("\n and cs_sub.primary_salesrep_id = cl_sub.salesrep_id  ");
 			 sql.append("\n   and cs_sub.cust_account_id =  cl_sub.cust_account_id  "); 
 			 
 			 sql.append("\n   and cs_sub.primary_salesrep_id = s_sub.salesrep_id  ");
@@ -1014,7 +1084,8 @@ public class MonitorSpiderReport {
 			 sql.append("\n   and cs_sub.code = s_sub.code ");
 			 
 			 sql.append("\n   and (tc_sub.flag='N' or tc_sub.flag ='Y') ");
-			 sql.append("\n   and trunc(tc_sub.checkin_date) = to_date('"+c.getDay()+"','dd/mm/yyyy')"); 
+			 sql.append("\n   and tc_sub.checkin_date between to_date('"+c.getDay()+"','dd/mm/yyyy')"); 
+			 sql.append("\n        and TO_TIMESTAMP('"+c.getDay()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')"); 
 		
 			 sql.append(""+genWhereCondSql(conn, "_sub", c));
 			 sql.append("\n   order by tc_sub.checkin_date");
@@ -1022,7 +1093,202 @@ public class MonitorSpiderReport {
 			 
 			// logger.debug("sql:"+sql.toString());
 			 if(logger.isDebugEnabled()){
-				 FileUtil.writeFile("D://dev_temp//temp/sql.sql", sql.toString());
+				 FileUtil.writeFile("D://dev_temp//temp/sql.sql", sql.toString(),"TIS-620");
+			 }//if 
+			 ps = conn.prepareStatement(sql.toString());
+			 rs = ps.executeQuery();
+			 while(rs.next()){
+				 //Set for get Customer from salesAnalysis not in
+				 if(!Utils.isNull(rs.getString("order_number")).equals("")){
+				    orderNoChkIn += "'"+rs.getString("order_number")+"',";
+				 }
+				LocationBean item = new LocationBean();
+				item.setCustomerCode(Utils.isNull(rs.getString("account_number")));
+				item.setCustomerName(Utils.isNull(rs.getString("party_name")));
+				item.setCustLat(Utils.isNull(rs.getString("mst_lat")));
+				item.setCustLng(Utils.isNull(rs.getString("mst_lng")));
+				item.setOrderNo(Utils.isNull(rs.getString("order_number")));
+				item.setCheckInDate(rs.getTimestamp("checkin_date"));
+				item.setSalesAppDate(rs.getTimestamp("create_date_order"));
+				item.setMergDate(item.getCheckInDate());
+				if(item.getCheckInDate()==null){
+					item.setMergDate(item.getSalesAppDate());
+				}
+				item.setLat(rs.getString("latitude"));
+				item.setLng(rs.getString("longitude"));
+				item.setDistance(rs.getString("distance"));
+				item.setFileName(rs.getString("file_name"));
+				
+				dataList.add(item);
+			 }//while rs
+			 
+			 /*** Get OrderNumber from SalesAnalysis OrderNo not in CheckIn**/
+			 if(orderNoChkIn.length()>0){
+				 orderNoChkIn = orderNoChkIn.substring(0,orderNoChkIn.length()-1);
+			 }
+			 sql = new StringBuilder();
+			 sql.append("\n select distinct A.* ");
+			 sql.append("\n ,(select o.creation_date from apps.xxpens_om_order_headers_temp o ");
+			 sql.append("\n  where o.order_number = A.order_number_temp ) as create_date_order");
+			 sql.append("\n from( ");
+			 sql.append("\n   select  c_sub.account_number ,c_sub.party_name ,tc_sub.sales_order_no as order_number");
+			 sql.append("\n   , null as checkin_date ,tc_sub.sales_order_date,");
+			 sql.append("\n   0 as mst_lat, 0 as mst_lng ,");
+			 sql.append("\n   0 as latitude , 0 as longitude , 0 as distance , '' as file_name ,");
+			 sql.append("\n   (case when tc_sub.sales_order_no like '3%' THEN 'V'|| substr(tc_sub.sales_order_no,2,length(tc_sub.sales_order_no))");
+			 sql.append("\n        else  'S'|| substr(tc_sub.sales_order_no,2,length(tc_sub.sales_order_no) )  end) as order_number_temp ");
+			 sql.append("\n   from ");
+			 sql.append("\n   apps.XXPENS_BI_SALES_ANALYSIS_V tc_sub , ");
+			 sql.append("\n   apps.xxpens_ar_cust_sales_vs cs_sub , ");
+			 sql.append("\n   apps.xxpens_salesreps_v s_sub, ");
+			 sql.append("\n   apps.xxpens_ar_customer_all_v c_sub  ");
+			 sql.append("\n   where 1=1 "); 
+			 sql.append("\n   and cs_sub.primary_salesrep_id = "+c.getSalesrepCode()+"");
+			 sql.append("\n   and to_number(to_char(tc_sub.sales_order_date,'dd') ) = "+tripDay);
+			 //filter sales_code
+			 sql.append("\n   and tc_sub.salesrep_id  = cs_sub.primary_salesrep_id");
+			 sql.append("\n   and tc_sub.customer_id = c_sub.cust_account_id ");
+			 sql.append("\n   and tc_sub.customer_id = cs_sub.cust_account_id ");
+			 sql.append("\n   and cs_sub.primary_salesrep_id = s_sub.salesrep_id  ");
+			 sql.append("\n   and cs_sub.cust_account_id =  c_sub.cust_account_id  "); 
+			 sql.append("\n   and cs_sub.code = s_sub.code ");
+			 sql.append("\n   and tc_sub.sales_order_date between to_date('"+c.getDay()+"','dd/mm/yyyy')"); 
+			 sql.append("\n      and TO_TIMESTAMP('"+c.getDay()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')"); 
+			 //CustomerCode not in check in
+			 if(!Utils.isNull(orderNoChkIn).equals("")){
+			    sql.append("\n  and tc_sub.sales_order_no not in("+orderNoChkIn+") ");
+			 }
+			 sql.append(""+genWhereCondSql(conn, "_sub", c));
+			 sql.append("\n   order by tc_sub.sales_order_date");
+			 sql.append("\n )A");
+			 
+			// logger.debug("sql:"+sql.toString());
+			 if(logger.isDebugEnabled()){
+				 FileUtil.writeFile("D://dev_temp//temp/sql2.sql", sql.toString(),"TIS-620");
+			 }//if
+			 ps = conn.prepareStatement(sql.toString());
+			 rs = ps.executeQuery();
+			 while(rs.next()){
+				LocationBean item = new LocationBean();
+				item.setCustomerCode(Utils.isNull(rs.getString("account_number")));
+				item.setCustomerName(Utils.isNull(rs.getString("party_name")));
+				item.setCustLat(Utils.isNull(rs.getString("mst_lat")));
+				item.setCustLng(Utils.isNull(rs.getString("mst_lng")));
+				item.setOrderNo(Utils.isNull(rs.getString("order_number")));
+				item.setCheckInDate(rs.getTimestamp("checkin_date"));
+				item.setSalesAppDate(rs.getTimestamp("create_date_order"));
+				item.setMergDate(item.getCheckInDate());
+				if(item.getCheckInDate()==null){
+					item.setMergDate(item.getSalesAppDate());
+				}
+				item.setLat(rs.getString("latitude"));
+				item.setLng(rs.getString("longitude"));
+				item.setDistance(rs.getString("distance"));
+				item.setFileName(rs.getString("file_name"));
+				
+				dataList.add(item);
+			 }
+			 //Sort by checkInDate and SalesAppDate
+			 Collections.sort(dataList, LocationBean.Comparators.CHECKIN_CREATE_DATE_ASC);
+			 
+			 //Gen Display
+			 for(int i=0;i<dataList.size();i++){
+				 LocationBean item = dataList.get(i);
+				 no++;
+				 /** Gen Header Table **/
+				 if(no==1){
+					 result.append("<table id='tblProduct' align='center' border='1' width='"+width+"' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
+					 result.append("<tr> \n");
+					 result.append(" <th nowrap >ลำดับ</th> \n");
+					 result.append(" <th nowrap >รหัสร้านค้า</th> \n");
+					 result.append(" <th nowrap >ชื่อร้านค้า</th> \n");
+					 result.append(" <th >พิกัดหลัก Latitude</th> \n");
+					 result.append(" <th >พิกัดหลัก Longtitude</th> \n");
+					 result.append(" <th >เลขที่เอกสาร</th> \n");
+					 result.append(" <th >วันที่มาร์คจุด</th> \n");
+					 result.append(" <th >วันเวลาที่บันทึก Sales App</th> \n");//
+					 result.append(" <th >พิกัดที่บันทึก Latitude</th> \n");
+					 result.append(" <th >พิกัดที่บันทึก  Longtitude</th> \n");
+					 result.append(" <th >ระยะห่างระหว่าง 2 พิกัด (กม.)</th> \n");
+					 result.append(" <th >File Name</th> \n");
+					 result.append("</tr> \n");
+				 }
+				 result.append("\n <tr>");
+				 result.append("\n <td nowrap class='td_text'>"+no+"</td>");
+				 result.append("\n <td nowrap class='td_text'>"+Utils.isNull(item.getCustomerCode())+"</td>");
+				 result.append("\n <td nowrap class='td_text'>"+Utils.isNull(item.getCustomerName())+"</td>");
+				 result.append("\n <td class='td_text_center'>"+Utils.isNull(item.getCustLat())+"</td>");
+				 result.append("\n <td class='td_text_center'>"+Utils.isNull(item.getCustLng())+"</td>");
+				 result.append("\n <td nowrap class='td_text_center'>"+Utils.isNull(item.getOrderNo())+"</td>");
+				 result.append("\n <td nowrap class='td_text_center'>"+DateUtil.stringValueChkNull(item.getCheckInDate(),DateUtil.DD_MM_YYYY_HH_MM_WITH_SLASH,DateUtil.local_th)+"</td>");
+				 result.append("\n <td nowrap class='td_text_center'>"+DateUtil.stringValueChkNull(item.getSalesAppDate(),DateUtil.DD_MM_YYYY_HH_MM_WITH_SLASH,DateUtil.local_th)+"</td>");
+					
+				 result.append("\n <td class='td_text_center'>"+Utils.isNull(item.getLat())+"</td>");
+				 result.append("\n <td class='td_text_center'>"+Utils.isNull(item.getLng())+"</td>");
+				 result.append("\n <td class='td_text_center'>"+Utils.convMeterToKilometer(item.getDistance(),2)+"</td>");
+				 result.append("\n <td nowrap class='td_text'>"+Utils.isNull(item.getFileName())+"</td>");
+				 result.append("\n </tr>");
+			 }//for
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally { 
+			conn.close();
+			ps.close();
+			rs.close();
+		}
+		return result;
+	}
+    public static StringBuffer searchCustDetailFromSalesAnalysis(Connection conn,LocationBean c,StringBuffer result,String orderNoChkIn,boolean excel,int no) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuilder sql = new StringBuilder();
+		int tripDay = 0;
+		String width="100%";
+		try {
+			
+			/** Gen TripDay from Date **/
+			 tripDay = DateUtil.getDayOfDate(DateUtil.parse(c.getDay(), DateUtil.DD_MM_YYYY_WITH_SLASH));
+			
+			 sql.append("\n select distinct A.* ");
+			 sql.append("\n ,(select o.creation_date from apps.xxpens_om_order_headers_temp o ");
+			 sql.append("\n  where o.order_number = A.order_number_temp ) as create_date_order");
+			 sql.append("\n from( ");
+			 sql.append("\n   select  c_sub.account_number ,c_sub.party_name ,tc_sub.sales_order_no as order_number");
+			 sql.append("\n   , null as checkin_date ,tc_sub.sales_order_date,");
+			 sql.append("\n   0 as mst_lat, 0 as mst_lng ,");
+			 sql.append("\n   0 as latitude , 0 as longitude , 0 as distance , '' as file_name ,");
+			 sql.append("\n   (case when tc_sub.sales_order_no like '3%' THEN 'V'|| substr(tc_sub.sales_order_no,2,length(tc_sub.sales_order_no))");
+			 sql.append("\n        else  'S'|| substr(tc_sub.sales_order_no,2,length(tc_sub.sales_order_no) )  end) as order_number_temp ");
+			 sql.append("\n   from ");
+			 sql.append("\n   apps.XXPENS_BI_SALES_ANALYSIS_V tc_sub , ");
+			 sql.append("\n   apps.xxpens_ar_cust_sales_vs cs_sub , ");
+			 sql.append("\n   apps.xxpens_salesreps_v s_sub, ");
+			 sql.append("\n   apps.xxpens_ar_customer_all_v c_sub  ");
+			 sql.append("\n   where 1=1 "); 
+			 sql.append("\n   and cs_sub.primary_salesrep_id = "+c.getSalesrepCode()+"");
+			 sql.append("\n   and to_number(to_char(tc_sub.sales_order_date,'dd') ) = "+tripDay);
+			 //filter sales_code
+			 sql.append("\n   and tc_sub.salesrep_id  = cs_sub.primary_salesrep_id");
+			 sql.append("\n   and tc_sub.customer_id = c_sub.cust_account_id ");
+			 sql.append("\n   and tc_sub.customer_id = cs_sub.cust_account_id ");
+			 sql.append("\n   and cs_sub.primary_salesrep_id = s_sub.salesrep_id  ");
+			 sql.append("\n   and cs_sub.cust_account_id =  c_sub.cust_account_id  "); 
+			 sql.append("\n   and cs_sub.code = s_sub.code ");
+			 sql.append("\n   and tc_sub.sales_order_date between to_date('"+c.getDay()+"','dd/mm/yyyy')"); 
+			 sql.append("\n      and TO_TIMESTAMP('"+c.getDay()+" 23:59:59','dd/mm/yyyy HH24:MI:SS')"); 
+			 //CustomerCode not in check in
+			 if(!Utils.isNull(orderNoChkIn).equals("")){
+			    sql.append("\n  and tc_sub.sales_order_no not in("+orderNoChkIn+") ");
+			 }
+			 sql.append(""+genWhereCondSql(conn, "_sub", c));
+			 sql.append("\n   order by tc_sub.sales_order_date");
+			 sql.append("\n )A");
+			 
+			// logger.debug("sql:"+sql.toString());
+			 if(logger.isDebugEnabled()){
+				 FileUtil.writeFile("D://dev_temp//temp/sql2.sql", sql.toString(),"TIS-620");
 			 }//if
 			 ps = conn.prepareStatement(sql.toString());
 			 rs = ps.executeQuery();
@@ -1073,7 +1339,6 @@ public class MonitorSpiderReport {
 		}
 		return result;
 	}
-    
     public static StringBuffer searchCustNoEqualsTrip(LocationBean c,boolean excel) throws Exception {
 		Connection conn = null;
 		PreparedStatement ps = null;

@@ -427,6 +427,7 @@ public class Utils {
 		int r = 0;
 		try{
 			if( !"".equalsIgnoreCase(isNull(s))){
+				s = s.replaceAll(",", "");
 				r = Integer.parseInt(s);
 			}
 		}catch(Exception e){

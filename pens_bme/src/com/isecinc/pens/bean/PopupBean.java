@@ -24,6 +24,10 @@ public class PopupBean implements Serializable{
 	private String groupCode;
 	private String key;
 	private String value;
+	private String wholePriceBF;
+	private String retailPriceBF;
+	private String barcode;
+	
 	public PopupBean(){
 		
 	}
@@ -32,6 +36,25 @@ public class PopupBean implements Serializable{
 		this.value = value;
 	}
 	
+	
+	public String getBarcode() {
+		return barcode;
+	}
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
+	}
+	public String getWholePriceBF() {
+		return wholePriceBF;
+	}
+	public void setWholePriceBF(String wholePriceBF) {
+		this.wholePriceBF = wholePriceBF;
+	}
+	public String getRetailPriceBF() {
+		return retailPriceBF;
+	}
+	public void setRetailPriceBF(String retailPriceBF) {
+		this.retailPriceBF = retailPriceBF;
+	}
 	public String getKey() {
 		return key;
 	}

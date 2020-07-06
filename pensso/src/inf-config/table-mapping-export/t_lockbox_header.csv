@@ -1,0 +1,4 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL,Position: Start,Position: End,FillSymbol
+Record_Identifier,N,0,CHAR,,LEFT          ,1,1,Blank
+Lockbox_Number,N,1,CHAR,,LEFT,3,9,Blank
+Origination,N,2,CHAR,,LEFT,10,20,Blank

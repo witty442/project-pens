@@ -12,6 +12,7 @@ import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
+import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MUser;
 import com.isecinc.pens.model.MOrgRule;
 
@@ -49,6 +50,8 @@ public class Order extends I_PO implements Serializable {
 		setOrderType(rst.getString("ORDER_TYPE").trim());
 		setCustomerId(rst.getInt("CUSTOMER_ID"));
 		setCustomerName(rst.getString("CUSTOMER_NAME").trim());
+		//Get custGroup
+		setCustGroup(new MCustomer().getCustGroup(getCustomerId()));
 		setBillAddressId(rst.getInt("BILL_ADDRESS_ID"));
 		setShipAddressId(rst.getInt("SHIP_ADDRESS_ID"));
 		setPriceListId(rst.getInt("PRICELIST_ID"));
@@ -258,8 +261,17 @@ public class Order extends I_PO implements Serializable {
 	private String poNumber;
 	private String vanPaymentMethod;
     private boolean promotionSP;
-	
+	private String custGroup;
    
+	
+	public String getCustGroup() {
+		return custGroup;
+	}
+
+	public void setCustGroup(String custGroup) {
+		this.custGroup = custGroup;
+	}
+
 	public boolean isPromotionSP() {
 		return promotionSP;
 	}

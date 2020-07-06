@@ -29,7 +29,7 @@ public class CopyDB {
 
 			/*****************copy  product to test********************/
 			//processProductionToUAT("pensbi","PENSBME_MST_REFERENCE"," ");
-			//processProductionToUAT("pensbi","PENSBME_MST_REFERENCE"," where Reference_code ='Store' ");
+			//processProductionToUAT("pensbi","PENSBME_MST_REFERENCE"," where Reference_code ='LotusItem' ");
 			
 			//processProductionToUAT("pensbi","PENSBME_STYLE_MAPPING"," ");
 			

@@ -1,0 +1,7 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL
+RECORD_TYPE,N,0,CHAR,,N           
+order_no,N,1,CHAR,,N
+customer_no,N,2,CHAR,,N
+doc_date,N,3,DATE,,N           
+remark,N,4,CHAR,,N
+file_name,N,5,CHAR,,N

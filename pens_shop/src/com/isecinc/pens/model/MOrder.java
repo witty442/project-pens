@@ -347,10 +347,18 @@ public class MOrder extends I_Model<Order> {
 			//get OrderLine 
 			for (OrderLine l : orderlines) {
 				//new BigDecimal("35.3456").setScale(4, RoundingMode.HALF_UP);
-				lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-				lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
-				totalAmountDecIncludeVat = totalAmountDecIncludeVat.add(lineAmount.subtract(lineDiscount) );
-			}
+				
+				if( !Utils.isNull(l.getProductNonBme()).equalsIgnoreCase("Y")){
+				    lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+				    lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+				    totalAmountDecIncludeVat = totalAmountDecIncludeVat.add(lineAmount.subtract(lineDiscount) );
+				}else{
+					//Case Non BME
+					lineAmount = new BigDecimal(l.getLineAmount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+					lineDiscount = new BigDecimal(l.getDiscount()).setScale(2,BigDecimal.ROUND_HALF_UP);
+					totalAmountDecIncludeVat = totalAmountDecIncludeVat.add(lineAmount.subtract(lineDiscount) );
+				}//if
+			}//for
 			logger.debug("totalAmountDecIncludeVat:"+totalAmountDecIncludeVat);
 			
 			//netDec = totalAmountDec(include vat)
@@ -430,31 +438,81 @@ public class MOrder extends I_Model<Order> {
 		}
 		return productGroup;
 	}
-	
+	/**
+	 * calc amount in order line before calc promotion
+	 * @param lines
+	 * @return
+	 * @throws Exception
+	 */
 	public List<OrderLine> reCalculateLineAmountInLinesBeforeCalcPromotion(List<OrderLine> lines) throws Exception {
 		List<OrderLine> newRecallines = new ArrayList<OrderLine>();
 		for (OrderLine l : lines) {
-			//recalc LineAmount
-			l.setLineAmount(l.getPrice()*l.getQty());
-			logger.info("recal :product["+l.getProduct().getCode()+"],qty["+l.getQty()+"]price["+l.getPrice()+"] after LineAmount["+l.getLineAmount()+"]");
+			//Case non bme no calc
+			if( !Utils.isNull(l.getProductNonBme()).equalsIgnoreCase("Y")){
+			   //recalc LineAmount
+			   l.setLineAmount(l.getPrice()*l.getQty());
+			   logger.info("recal :product["+l.getProduct().getCode()+"],qty["+l.getQty()+"]price["+l.getPrice()+"] after LineAmount["+l.getLineAmount()+"]");
+			}else{
+				//Product Non BME
+				double amountExcludeVat = 0;
+				//Case 1 found c4
+				if(l.getPriceAfDiscount() > 0){
+				    amountExcludeVat = l.getPriceAfDiscount()*l.getQty();
+				}else{
+					//Case 1 no c4
+				    amountExcludeVat = l.getPrice() * l.getQty();
+				}
+				double vat = amountExcludeVat *0.07;
+				logger.debug("amountExcludeVat:"+amountExcludeVat+",vat:"+vat+",lineAmount:"+(amountExcludeVat+vat));
+				
+				BigDecimal lineAmount = new BigDecimal(amountExcludeVat+vat);
+				lineAmount= lineAmount.setScale(0,BigDecimal.ROUND_HALF_UP);
+				
+				l.setLineAmount(lineAmount.doubleValue());
+			}
 			newRecallines.add(l);
 		}
 		return newRecallines;
 	}
 	
+	/**
+	 * calc amount in order line after calc promotion
+	 * @param lines
+	 * @return
+	 * @throws Exception
+	 */
 	public List<OrderLine> reCalculateLineAmountInLinesAfterCalcPromotion(List<OrderLine> lines) throws Exception {
 		List<OrderLine> newRecallines = new ArrayList<OrderLine>();
 		for (OrderLine l : lines) {
-			//recalc LineAmount
-			l.setLineAmount(l.getPrice()*l.getQty());
-			l.setTotalAmount(l.getLineAmount()-l.getDiscount());
+			if( !Utils.isNull(l.getProductNonBme()).equalsIgnoreCase("Y")){
+			    l.setLineAmount(l.getPrice()*l.getQty());
+			    l.setTotalAmount(l.getLineAmount()-l.getDiscount());
+			}else{
+				//Product Non BME
+				double amountExcludeVat = 0;
+				//Case 1 found c4
+				if(l.getPriceAfDiscount() > 0){
+				    amountExcludeVat = l.getPriceAfDiscount()*l.getQty();
+				}else{
+					//Case 1 no c4
+				    amountExcludeVat = l.getPrice() * l.getQty();
+				}
+				double vat = amountExcludeVat *0.07;
+				logger.debug("amountExcludeVat:"+amountExcludeVat+",vat:"+vat+",lineAmount:"+(amountExcludeVat+vat));
+				
+				BigDecimal lineAmount = new BigDecimal(amountExcludeVat+vat);
+				lineAmount= lineAmount.setScale(0,BigDecimal.ROUND_HALF_UP);
+				
+				l.setLineAmount(lineAmount.doubleValue());
+				l.setTotalAmount(l.getLineAmount());
+			}
 			
 			logger.info("recal :product["+l.getProduct().getCode()+"]qty["+l.getQty()+"]price["+l.getPrice()+"]LineAmount["+l.getLineAmount()+"]Disc["+l.getDiscount()+"]total["+l.getTotalAmount()+"]");
 			newRecallines.add(l);
-			
 		}
 		return newRecallines;
 	}
+	
 	
 	/**
 	 * LookUp

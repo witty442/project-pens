@@ -31,6 +31,7 @@ public class StockReturnLine extends I_PO implements Serializable{
 	private String conversionRate;
 	private String reason;
 	private String reasonDesc;
+	private String expireDate;
 	private boolean canEdit = false;
 
 	private int no;
@@ -77,6 +78,16 @@ public class StockReturnLine extends I_PO implements Serializable{
 
 	
 	
+	public String getExpireDate() {
+		return expireDate;
+	}
+
+
+	public void setExpireDate(String expireDate) {
+		this.expireDate = expireDate;
+	}
+
+
 	public String getReason() {
 		return reason;
 	}

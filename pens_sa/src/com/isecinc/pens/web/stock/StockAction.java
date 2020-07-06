@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -88,14 +89,25 @@ public class StockAction extends I_Action {
 					sales.setDispLastUpdate("true");
 					
 				}else if (StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){
-					sales.setStartDate(CConstants.getConstants(CConstants.STOCKCREDIT_CODE, CConstants.STOCK_CALLC_CREDIT_START_DATE).getValue());
+					//old
+					//sales.setStartDate(CConstants.getConstants(CConstants.STOCKCREDIT_CODE, CConstants.STOCK_CALLC_CREDIT_START_DATE).getValue());
+					
+					//new back 6 month
+					Calendar c = Calendar.getInstance();
+					Date backDate = DateUtil.getBackDateMonth(new Date(), -6);
+					c.setTime(backDate);
+					c.set(Calendar.DAY_OF_MONTH,1);//default 1/xx/xxxx
+					sales.setStartDate(DateUtil.stringValue(c.getTime(),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+					
 					//Case Sales Login filter show only salesrepCode 
 					if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
 						sales.setSalesrepCode(user.getUserName().toUpperCase());
 					}
-					//test 
-					/*sales.setCustomerCode("00249015");
-					sales.setBrand("101");*/
+					
+					//******** test ********************** 
+					//sales.setCustomerCode("32606001");
+					//sales.setBrand("611");
+					
 				}else if (StockConstants.PAGE_STOCK_CLOSE_VAN.equalsIgnoreCase(pageName)){
 					forward ="stockVanReport";
 					StockControlPage.prepareSearchStockCloseVanReport(request, conn, user,pageName);
@@ -111,6 +123,11 @@ public class StockAction extends I_Action {
 					}
 				}else if (StockConstants.PAGE_STOCK_CR_EXPIRE.equalsIgnoreCase(pageName)){
 					StockControlPage.prepareSearchCreditExpireReport(request, conn, user,pageName);
+					//new back 6 month
+					Calendar c = Calendar.getInstance();
+					c.set(Calendar.DAY_OF_MONTH,1);//default start 1/mm/yyyy
+					sales.setStartDate(DateUtil.stringValue(c.getTime(),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+					sales.setEndDate(DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 					
 				}
 				aForm.setBean(sales);
@@ -141,7 +158,8 @@ public class StockAction extends I_Action {
 		String action = Utils.isNull(request.getParameter("action")); 
 		try {
 			logger.debug("search Head :pageName["+pageName+"]");
-	
+			request.getSession().removeAttribute("stockForm_RESULTS");
+			
 				  //Search Report
 				if(StockConstants.PAGE_STOCK_CREDIT.equalsIgnoreCase(pageName)){
 					if(action.equalsIgnoreCase("sort")){
@@ -161,11 +179,16 @@ public class StockAction extends I_Action {
 					aForm.getBean().setItemsList(stockResult.getItemsList());
 					
 				}else if(StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){
+					String screenWidth = "";
+					if(request.getSession().getAttribute("screenWidth") != null){ 
+						screenWidth = (String)request.getSession().getAttribute("screenWidth");
+					}
+					
 					//search new
 					request.getSession().setAttribute("stockForm_RESULTS",null);
 					aForm.getBean().setItemsList(null);
 						
-					StockBean stockResult = StockCallCardCreditReport.searchReport(request.getContextPath(),aForm.getBean(),user,false);
+					StockBean stockResult = StockCallCardCreditReport.searchReport(screenWidth,request.getContextPath(),aForm.getBean(),user,false);
 					StringBuffer resultHtmlTable = stockResult.getDataStrBuffer();
 					if(resultHtmlTable != null){
 						 request.getSession().setAttribute("stockForm_RESULTS",resultHtmlTable);
@@ -174,6 +197,11 @@ public class StockAction extends I_Action {
 					aForm.getBean().setItemsList(stockResult.getItemsList());
 					
 				}else if(StockConstants.PAGE_STOCK_CR_EXPIRE.equalsIgnoreCase(pageName)){
+					String screenWidth = "";
+					if(request.getSession().getAttribute("screenWidth") != null){ 
+						screenWidth = (String)request.getSession().getAttribute("screenWidth");
+					}
+					
 					if(action.equalsIgnoreCase("sort")){
 						aForm.getBean().setColumnNameSort(Utils.isNull(request.getParameter("columnNameSort")));
 						aForm.getBean().setOrderSortType(Utils.isNull(request.getParameter("orderSortType")));
@@ -182,7 +210,7 @@ public class StockAction extends I_Action {
 						request.getSession().setAttribute("stockForm_RESULTS",null);
 						aForm.getBean().setItemsList(null);
 					}
-					StockBean stockResult = StockCreditExpireReport.searchReport(request.getContextPath(),aForm.getBean(),false,user);
+					StockBean stockResult = StockCreditExpireReport.searchReport(screenWidth,request.getContextPath(),aForm.getBean(),false,user);
 					StringBuffer resultHtmlTable = stockResult.getDataStrBuffer();
 					if(resultHtmlTable != null){
 						 request.getSession().setAttribute("stockForm_RESULTS",resultHtmlTable);
@@ -193,7 +221,7 @@ public class StockAction extends I_Action {
 				
 				if(foundData==false){
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
-				   request.getSession().setAttribute("RESULTS",null);
+				   request.getSession().setAttribute("stockForm_RESULTS",null);
 				   aForm.getBean().setItemsList(null);
 				}
 			
@@ -243,7 +271,12 @@ public class StockAction extends I_Action {
 			    out.flush();
 			    out.close();
 			}else if(StockConstants.PAGE_STOCK_CR_EXPIRE.equalsIgnoreCase(pageName)){
-				StockBean stockResult = StockCreditExpireReport.searchReport(request.getContextPath(),aForm.getBean(),true,user);
+				String screenWidth = "";
+				if(request.getSession().getAttribute("screenWidth") != null){ 
+					screenWidth = (String)request.getSession().getAttribute("screenWidth");
+				}
+				
+				StockBean stockResult = StockCreditExpireReport.searchReport(screenWidth,request.getContextPath(),aForm.getBean(),true,user);
 				resultHtmlTable = stockResult.getDataStrBuffer();
 				
 				java.io.OutputStream out = response.getOutputStream();
@@ -254,11 +287,15 @@ public class StockAction extends I_Action {
 				w.write(resultHtmlTable.toString());
 			    w.flush();
 			    w.close();
-
+                             
 			    out.flush();
 			    out.close();
 			}else if(StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){
-				StockBean stockResult = StockCallCardCreditReport.searchReport(request.getContextPath(),aForm.getBean(),user,true);
+				String screenWidth = "";
+				if(request.getSession().getAttribute("screenWidth") != null){ 
+					screenWidth = (String)request.getSession().getAttribute("screenWidth");
+				}
+				StockBean stockResult = StockCallCardCreditReport.searchReport(screenWidth,request.getContextPath(),aForm.getBean(),user,true);
 				resultHtmlTable = stockResult.getDataStrBuffer();
 				
 				java.io.OutputStream out = response.getOutputStream();

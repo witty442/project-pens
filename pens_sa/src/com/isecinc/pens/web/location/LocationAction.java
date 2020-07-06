@@ -89,12 +89,26 @@ public class LocationAction extends I_Action {
 				    bean.setDispAllOrder("true");
 				    bean.setDispAllVisit("true");
 				    //for test 
-				    /*if(logger.isDebugEnabled()){
-					    bean.setDay("03/07/2561");
+				    if(logger.isDebugEnabled()){
+				    	//For test type day 
+				    	/*bean.setDispType("DATA_SUMMARY");
+				    	 bean.setTypeSearch("DAY");
+					     bean.setDay("19/06/2563");
+					     bean.setCustCatNo("C");
+					   // bean.setSalesChannelNo("2");
+					     bean.setSalesrepCode("100032109");//V105
+*/					    
+				    	//for test Type Month
+					    bean.setDispType("DATA_SUMMARY");
+					    bean.setTypeSearch("MONTH");
+					    String[] monthYearArr = new String[2];
+					    monthYearArr[0] = "202006";
+					    //monthYearArr[1] = "202002";
+					    bean.setChkMonth(monthYearArr);
 					    bean.setCustCatNo("C");
-					    bean.setSalesChannelNo("2");
-					    bean.setSalesrepCode("100021084");//V201
-				    }*/
+					   // bean.setSalesChannelNo("2");
+					    bean.setSalesrepCode("100032109");//V105
+				    }
 				    aForm.setBean(bean);
 				    aForm.setPageName(pageName);
 				    request.getSession().removeAttribute("CUST_LOC_LIST");
@@ -239,7 +253,19 @@ public class LocationAction extends I_Action {
 						request.getSession().setAttribute("locationForm_RESULT", html);
 					    request.setAttribute("Message", "ไม่พบข้อมูล");
 					}
+				}else if("DATA_SUMMARY".equalsIgnoreCase(bean.getDispType())){
+					boolean excel = false;
+					String path = request.getContextPath();
+						
+					StringBuffer html = LocationDataSummaryReport.searchReport(path,bean,excel);
+					if(html.length() >0){
+				       request.getSession().setAttribute("locationForm_RESULT", html);
+					}else{
+						request.getSession().setAttribute("locationForm_RESULT", html);
+					    request.setAttribute("Message", "ไม่พบข้อมูล");
+					}
 				}// oracle
+				
 			}else if("monitorSpider".equalsIgnoreCase(aForm.getPageName())){
 				forwardPage ="monitorSpider";
 				String path = request.getContextPath();
@@ -283,8 +309,12 @@ public class LocationAction extends I_Action {
 		try {	
 			if("spider".equalsIgnoreCase(aForm.getPageName())){
 				boolean excel = true;
-				resultHtmlTable = LocationReport.searchCustomerCheckInDataList(aForm.getBean(),excel);
-			    			
+				
+				if("DATA".equalsIgnoreCase(aForm.getBean().getDispType())){
+				    resultHtmlTable = LocationReport.searchCustomerCheckInDataList(aForm.getBean(),excel);
+				}else if("DATA_SUMMARY".equalsIgnoreCase(aForm.getBean().getDispType())){
+					resultHtmlTable = LocationDataSummaryReport.searchReport(request.getContextPath(),aForm.getBean(),excel);
+				}
 				java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
 				response.setContentType("application/vnd.ms-excel");
@@ -381,7 +411,7 @@ public class LocationAction extends I_Action {
 				result = MonitorSpiderReport.searchCustNoEqualsTrip(bean, false);
 				logger.debug("result size:"+result.length());
 				if(result.length()>0){
-					request.getSession().setAttribute("RESULTS_DETAIL", result);
+					request.setAttribute("RESULTS_DETAIL", result);
 				}else{
 					request.getSession().setAttribute("Message","ไม่พบข้อมูล");
 				}
@@ -389,7 +419,7 @@ public class LocationAction extends I_Action {
 				result = MonitorSpiderReport.searchCustNotEqualMstLocDetail(bean, false);
 				//logger.debug("result size:"+result.length());
 				if(result.length()>0){
-					request.getSession().setAttribute("RESULTS_DETAIL", result);
+					request.setAttribute("RESULTS_DETAIL", result);
 				}else{
 					request.getSession().setAttribute("Message","ไม่พบข้อมูล");
 				}
@@ -397,7 +427,7 @@ public class LocationAction extends I_Action {
 				result = MonitorSpiderReport.searchCustDetail(bean, false);
 				//logger.debug("result size:"+result.length());
 				if(result.length()>0){
-					request.getSession().setAttribute("RESULTS_DETAIL", result);
+					request.setAttribute("RESULTS_DETAIL", result);
 				}else{
 					request.getSession().setAttribute("Message","ไม่พบข้อมูล");
 				}

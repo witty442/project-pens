@@ -36,6 +36,12 @@ public class ProductBarcodeDAO {
 			 
 			 if(  !Utils.isNull(productBarcode.getProductCode()).equals("") ){
 				itemProd = ProductBarcodeDAO.getProductCatalogByProductCode(conn,productBarcode.getProductCode(),priceListId,user);
+	            //logger.debug("itemProd:"+itemProd);
+				
+	            //Case Not found m_product.uom_id <> m_price.uom_id (bme not sell CTN )
+				if(itemProd==null){
+					itemProd = ProductBarcodeDAO.getProductCatalogByProductCodeCaseUOMNotEquals(conn,productBarcode.getProductCode(),priceListId,user);	
+				}
 			    if(itemProd != null){
 			    	System.out.println("found productCode:"+itemProd.getProductCode());
 			 
@@ -47,14 +53,21 @@ public class ProductBarcodeDAO {
 			    	productCatalog.setProductName(itemProd.getProductName());
 			    	productCatalog.setUom1(itemProd.getUom1());
 			    	productCatalog.setUom2(itemProd.getUom2());
+			    	productCatalog.setProductNonBme(itemProd.getProductNonBme());
 			    	
 			    	//productCatalog.setPrice1(itemProd.getPrice1());
 			    	//New Edit 20/11/2018 (price*vat 7%)
 			    	if(itemProd.getPrice1()==0){
 			    	   productCatalog.setPrice1(0);
 			    	}else{
-			    	   //calc price include vat 
-			    	   productCatalog.setPrice1(calePriceIncludeVat(itemProd.getPrice1()));
+			    	   /** Case ProductNonBme not include vat **/
+			    	   if(itemProd.getProductNonBme().equals("N")){
+			    	      //calc price include vat 
+			    	      productCatalog.setPrice1(calePriceIncludeVat(itemProd.getPrice1()));
+			    	   }else{
+			    		  productCatalog.setPrice1(itemProd.getPrice1());
+			    	   }
+			    	   logger.debug("price1:"+productCatalog.getPrice1());
 			    	}
 			    	
 			    	logger.debug("productCode["+productCatalog.getProductCode()+"]price1["+productCatalog.getPrice1()+"]price2["+productCatalog.getPrice2()+"]");
@@ -136,9 +149,9 @@ public class ProductBarcodeDAO {
 			ProductBarcodeBean p = null;
 			StringBuilder sql = new StringBuilder();
 			try {
-				sql.append("\n SELECT * from m_barcode ");
-				sql.append("\n where 1=1 ");
-			    sql.append("\n and barcode ='"+barcode+"' \n");
+				sql.append("\n SELECT b.* ");
+				sql.append("\n from m_barcode b");
+				sql.append("\n where b.barcode ='"+barcode+"' \n");
 				
 				logger.debug("sql:"+sql);
 				stmt = conn.createStatement();
@@ -164,11 +177,14 @@ public class ProductBarcodeDAO {
 		public static ProductCatalog getProductCatalogByProductCode(Connection conn,String productCode,String pricelistId ,User u) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
-			ProductCatalog catalog = new ProductCatalog();
+			ProductCatalog catalog = null;
 			StringBuffer sql = new StringBuffer("");
 			
-			sql.append("\n SELECT A.* FROM( ");
-			sql.append("\n  SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE , pp1.PRICE as PRICE1 , pp1.UOM_ID as UOM1 ,pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 ");
+			sql.append("\n SELECT A.* ");
+			sql.append("\n ,(SELECT N.product_code from m_product_non_bme n where n.product_code=A.product_code) as product_non_bme ");
+			sql.append("\n FROM( ");
+			sql.append("\n  SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE ");
+			sql.append("\n  , pp1.PRICE as PRICE1 , pp1.UOM_ID as UOM1 ,pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 ");
 			sql.append("\n  ,(CASE WHEN st.product_id  <> '' THEN '0' ELSE '1' end )as target_sort ");
 			sql.append("\n  ,(CASE WHEN st.product_id  <> '' THEN 'Y' ELSE '' end )as target ");
 			sql.append("\n  ,pd.taxable ");
@@ -210,7 +226,78 @@ public class ProductBarcodeDAO {
 					catalog.setUom1(rst.getString("UOM1"));
 					catalog.setUom2(ConvertNullUtil.convertToString(rst.getString("UOM2")));
 					catalog.setTaxable(ConvertNullUtil.convertToString(rst.getString("TAXABLE")));
-					
+					catalog.setProductNonBme(!Utils.isNull(rst.getString("product_non_bme")).equals("")?"Y":"N");
+					logger.debug("productname:"+catalog.getProductName());
+				}
+			} catch (Exception e) {
+				throw e;
+			} finally {
+			}
+			return catalog;
+		}
+        /**
+         * //Case Not found m_product.uom_id <> m_price.uom_id
+         *  ex, 883001 ECW50G01WH เจลใสทำความสะอาดมือไม่ใช้น้ำ อมูซองต์	ECW50G01WH เจลใสทำความสะอาดมือไม่ใช้น้ำ อมูซองต์	CTN	Y	233130	Y
+         * @param conn
+         * @param productCode
+         * @param pricelistId
+         * @param u
+         * @return
+         * @throws Exception
+         */
+		public static ProductCatalog getProductCatalogByProductCodeCaseUOMNotEquals(Connection conn,String productCode,String pricelistId ,User u) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			ProductCatalog catalog = new ProductCatalog();
+			StringBuffer sql = new StringBuffer("");
+			
+			sql.append("\n SELECT A.* ");
+			sql.append("\n ,(SELECT N.product_code from m_product_non_bme n where n.product_code=A.product_code) as product_non_bme ");
+			sql.append("\n FROM( ");
+			sql.append("\n  SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE ");
+			sql.append("\n  , pp1.PRICE as PRICE1 , pp1.UOM_ID as UOM1 ,pp1.PRICE as PRICE2 , '' as UOM2 ");
+			sql.append("\n  ,(CASE WHEN st.product_id  <> '' THEN '0' ELSE '1' end )as target_sort ");
+			sql.append("\n  ,(CASE WHEN st.product_id  <> '' THEN 'Y' ELSE '' end )as target ");
+			sql.append("\n  ,pd.taxable ");
+			sql.append("\n  FROM M_Product pd ");
+			sql.append("\n  INNER JOIN M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID ");
+			sql.append("\n  LEFT OUTER JOIN m_sales_target_new st ON  st.Product_ID = pp1.Product_ID AND DATE_FORMAT(st.target_from, '%Y%m') = DATE_FORMAT(NOW(), '%Y%m')");
+			
+			sql.append("\n  WHERE pp1.ISACTIVE = 'Y' AND pd.CODE ='"+productCode+"'");
+			sql.append("\n  AND pp1.PRICELIST_ID = "+pricelistId);
+			sql.append("\n  AND pd.uom_id ='CTN'");//Case product uomId=CTN
+			
+			sql.append("\n  AND ( ");
+			sql.append("\n    pp1.UOM_ID IN ( ");
+			sql.append("\n      SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now() ");
+			sql.append("\n     ) ");
+			sql.append("\n   )");
+			
+	        sql.append("\n   AND pd.CODE NOT IN ( ");
+	        sql.append("\n     SELECT DISTINCT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+u.getRole().getKey()+"'");
+	        sql.append("\n   ) ");
+	        sql.append("\n )A");
+	        sql.append("\n WHERE A.product_id not in(");
+	 	    sql.append("\n   select M.product_id from M_product_center C ,M_product M where M.code = C.code");
+	 	    sql.append("\n ) ");
+	        sql.append("\n ORDER BY A.target_sort,A.PRODUCT_CODE ");
+			
+	        logger.debug("sql:"+sql);
+			try {
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				if(rst.next()){
+					catalog = new ProductCatalog();
+					catalog.setTarget(rst.getString("target"));
+					catalog.setProductId(rst.getInt("PRODUCT_ID"));
+					catalog.setProductName(rst.getString("PRODUCT_NAME"));
+					catalog.setProductCode( rst.getString("PRODUCT_CODE"));
+					catalog.setPrice1(rst.getDouble("PRICE1"));
+					catalog.setPrice2(rst.getDouble("PRICE2"));
+					catalog.setUom1(rst.getString("UOM1"));
+					catalog.setUom2(ConvertNullUtil.convertToString(rst.getString("UOM2")));
+					catalog.setTaxable(ConvertNullUtil.convertToString(rst.getString("TAXABLE")));
+					catalog.setProductNonBme(!Utils.isNull(rst.getString("product_non_bme")).equals("")?"Y":"N");
 					logger.debug("productname:"+catalog.getProductName());
 				}
 			} catch (Exception e) {

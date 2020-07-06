@@ -34,7 +34,9 @@ public class StockReport {
 		COLUMNNAME_MAP.put("ITEM_NO", "SKU");
 		COLUMNNAME_MAP.put("ZONE", "ภาคตามการดูแล");
 		COLUMNNAME_MAP.put("BILL_STORE_COUNT", "จำนวนร้านที่เปิดบิลขาย");
+		COLUMNNAME_MAP.put("ORDER_STORE_COUNT", "จำนวนร้านค้าที่สั่งซื้อ");
 		COLUMNNAME_MAP.put("CHECK_STORE_COUNT", "จำนวนร้านค้าที่นับสต๊อก");
+		
 	}
 	public static StockBean searchReport(String contextPath ,StockBean o,boolean excel,User user){
 	    logger.debug("excel:"+excel);
@@ -63,7 +65,7 @@ public class StockReport {
 		String columnAllGroupBySql = "";
 		List<StockBean> itemList = new ArrayList<StockBean>();
 		double totalPriQty = 0,totalSecQty =0;
-		double totalBillStoreCount = 0,totalCheckStoreCount =0;
+		double totalBillStoreCount = 0,totalOrderStoreCount = 0,totalCheckStoreCount =0;
 		String viewName ="xxpens_om_check_order_v";
 		boolean reportShowColumnInListBox = false; //true show column only in(listBox)
 		try{
@@ -71,7 +73,7 @@ public class StockReport {
 				viewName ="xxpens_om_check_order_vl";
 			}
 			//check display only column in Listbox
-			if(o.getReportType().equalsIgnoreCase("SALES_CODE,BILL_STORE_COUNT,CHECK_STORE_COUNT")){
+			if(o.getReportType().equalsIgnoreCase("SALES_CODE,BILL_STORE_COUNT,ORDER_STORE_COUNT,CHECK_STORE_COUNT")){
 				reportShowColumnInListBox = true;
 			}
 			
@@ -220,6 +222,8 @@ public class StockReport {
 						item.setBrandName(Utils.isNull(rst.getString(columnNameArr[i]+"_NAME")));
 					}else if("BILL_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
 						 item.setBillStoreCount(Utils.decimalFormat(rst.getDouble("BILL_STORE_COUNT"), Utils.format_current_no_disgit));
+					}else if("ORDER_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
+						 item.setOrderStoreCount(Utils.decimalFormat(rst.getDouble("ORDER_STORE_COUNT"), Utils.format_current_no_disgit));
 					}else if("CHECK_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
 						 item.setCheckStoreCount(Utils.decimalFormat(rst.getDouble("CHECK_STORE_COUNT"), Utils.format_current_no_disgit));
 					}
@@ -255,6 +259,7 @@ public class StockReport {
 			  }else{
 				  //Summary ByReportType
 				  totalBillStoreCount +=rst.getDouble("BILL_STORE_COUNT");
+				  totalOrderStoreCount +=rst.getDouble("ORDER_STORE_COUNT");
 				  totalCheckStoreCount +=rst.getDouble("CHECK_STORE_COUNT");
 				  
 			  }
@@ -267,7 +272,7 @@ public class StockReport {
 			if(r>0){
 			  // Get Total
 				if(reportShowColumnInListBox){
-			       html.append(genTotalTableByReportType(o,excel,columnNameArr, totalBillStoreCount,totalCheckStoreCount));
+			       html.append(genTotalTableByReportType(o,excel,columnNameArr,totalBillStoreCount,totalOrderStoreCount,totalCheckStoreCount));
 				}else{
 				   html.append(genTotalTable(o,excel,columnNameArr, totalPriQty,totalSecQty));
 				}
@@ -305,7 +310,7 @@ public class StockReport {
 		String columnAllGroupBySql = "";
 		List<StockBean> itemList = new ArrayList<StockBean>();
 		double totalPriQty = 0 ,totalSecQty =0;
-		double totalBillStoreCount = 0,totalCheckStoreCount =0;
+		double totalBillStoreCount = 0,totalOrderStoreCount = 0,totalCheckStoreCount =0;
 		String viewName ="xxpens_om_check_order_v";
 		boolean reportShowColumnInListBox = false; //true show column only in(listBox)
 		try{
@@ -313,7 +318,7 @@ public class StockReport {
 			conn = DBConnection.getInstance().getConnection();
 			
 			//check display only column in Listbox
-			if(o.getReportType().equalsIgnoreCase("SALES_CODE,BILL_STORE_COUNT,CHECK_STORE_COUNT")){
+			if(o.getReportType().equalsIgnoreCase("SALES_CODE,BILL_STORE_COUNT,ORDER_STORE_COUNT,CHECK_STORE_COUNT")){
 				reportShowColumnInListBox = true;
 			}
 			
@@ -458,6 +463,8 @@ public class StockReport {
 						item.setBrandName(Utils.isNull(rst.getString(columnNameArr[i]+"_NAME")));
 					}else if("BILL_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
 						 item.setBillStoreCount(Utils.decimalFormat(rst.getDouble("BILL_STORE_COUNT"), Utils.format_current_no_disgit));
+					}else if("ORDER_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
+						 item.setOrderStoreCount(Utils.decimalFormat(rst.getDouble("ORDER_STORE_COUNT"), Utils.format_current_no_disgit));
 					}else if("CHECK_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
 						 item.setCheckStoreCount(Utils.decimalFormat(rst.getDouble("CHECK_STORE_COUNT"), Utils.format_current_no_disgit));
 					}
@@ -484,6 +491,7 @@ public class StockReport {
 			  }else{
 				//Summary ByReportType
 				  totalBillStoreCount +=rst.getDouble("BILL_STORE_COUNT");
+				  totalOrderStoreCount +=rst.getDouble("ORDER_STORE_COUNT");
 				  totalCheckStoreCount +=rst.getDouble("CHECK_STORE_COUNT");
 			  }
 			  
@@ -499,7 +507,7 @@ public class StockReport {
 			if(r>0){
 			  // Get Total
 			 if(reportShowColumnInListBox){
-			     html.append(genTotalTableByReportType(o,excel,columnNameArr, totalBillStoreCount,totalCheckStoreCount));
+			     html.append(genTotalTableByReportType(o,excel,columnNameArr,totalBillStoreCount,totalOrderStoreCount,totalCheckStoreCount));
 			 }else{
 				 html.append(genTotalTable(o,excel,columnNameArr, totalPriQty,totalSecQty)); 
 			 }
@@ -528,7 +536,7 @@ public class StockReport {
 		int r = 0;
 		List<StockBean> itemList = o.getItemsList();
 		double totalPriQty = 0,totalSecQty =0;
-		double totalBillStoreCount = 0,totalCheckStoreCount =0;
+		double totalBillStoreCount = 0,totalOrderStoreCount = 0,totalCheckStoreCount =0;
 		boolean reportShowColumnInListBox = false; //true show column only in(listBox)
 		try{
 			logger.debug("searchReportModelCaseSort");
@@ -536,7 +544,7 @@ public class StockReport {
 			logger.debug("orderSortType:"+o.getOrderSortType());
 			
 			//check display only column in Listbox
-			if(o.getReportType().equalsIgnoreCase("SALES_CODE,BILL_STORE_COUNT,CHECK_STORE_COUNT")){
+			if(o.getReportType().equalsIgnoreCase("SALES_CODE,BILL_STORE_COUNT,ORDER_STORE_COUNT,CHECK_STORE_COUNT")){
 				reportShowColumnInListBox = true;
 			}
 			
@@ -613,6 +621,12 @@ public class StockReport {
 				}else{
 					 Collections.sort(itemList, StockBean.Comparators.BILL_STORE_COUNT_ASC);
 				}
+			}else if(Utils.isNull(o.getColumnNameSort()).equalsIgnoreCase("ORDER_STORE_COUNT")){
+				if("DESC".equals(o.getOrderSortType())){
+					 Collections.sort(itemList, StockBean.Comparators.ORDER_STORE_COUNT_DESC);
+				}else{
+					 Collections.sort(itemList, StockBean.Comparators.ORDER_STORE_COUNT_ASC);
+				}
 			}else if(Utils.isNull(o.getColumnNameSort()).equalsIgnoreCase("CHECK_STORE_COUNT")){
 				if("DESC".equals(o.getOrderSortType())){
 					 Collections.sort(itemList, StockBean.Comparators.CHECK_STORE_COUNT_DESC);
@@ -643,6 +657,7 @@ public class StockReport {
 			     totalSecQty +=Utils.convertStrToDouble(item.getSecQty());
 			  }else{
 				 totalBillStoreCount +=Utils.convertStrToDouble(item.getBillStoreCount());
+				 totalOrderStoreCount +=Utils.convertStrToDouble(item.getOrderStoreCount());
 				 totalCheckStoreCount +=Utils.convertStrToDouble(item.getCheckStoreCount());
 			  }
 			}//while
@@ -650,14 +665,14 @@ public class StockReport {
 			//Check Execute Found data
 			if(r>0){
 				// Get Total
-				 if(reportShowColumnInListBox){
-				     html.append(genTotalTableByReportType(o,excel,columnNameArr, totalBillStoreCount,totalCheckStoreCount));
-				 }else{
-					 html.append(genTotalTable(o,excel,columnNameArr, totalPriQty,totalSecQty)); 
-				 }
+				if(reportShowColumnInListBox){
+				   html.append(genTotalTableByReportType(o,excel,columnNameArr,totalBillStoreCount,totalOrderStoreCount,totalCheckStoreCount));
+				}else{
+				   html.append(genTotalTable(o,excel,columnNameArr, totalPriQty,totalSecQty)); 
+				}
 				// gen end Table
 				html.append("</table>");
-			}
+			}//if
 			
 			o.setItemsList(itemList);
 			o.setDataStrBuffer(html);
@@ -698,17 +713,17 @@ public class StockReport {
 				}
 				if( !Utils.isNull(o.getSalesrepCode()).equals("")){
 					sql.append("\n AND V.salesrep_id in(  ");
-					sql.append("\n  select salesrep_id from PENSBI.XXPENS_BI_MST_SALESREP  "); 
-					sql.append("\n  where .salesrep_code = '"+Utils.isNull(o.getSalesrepCode())+"' ");
+					sql.append("\n   select salesrep_id from PENSBI.XXPENS_BI_MST_SALESREP  "); 
+					sql.append("\n   where .salesrep_code = '"+Utils.isNull(o.getSalesrepCode())+"' ");
 					sql.append("\n ) ");
 				}
 				if( !Utils.isNull(o.getBrand()).equals("") && !Utils.isNull(o.getBrand()).equals("ALL")){
 					// Brand 504 must show 503494,503544,503681 (Case Special case )
 					if(Utils.isNull(o.getBrand()).indexOf("504") != -1 ){
-						sql.append("\n and ( V.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")  ");
+						sql.append("\n AND ( V.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")  ");
 						sql.append("\n     or P.inventory_item_codein('503494','503544','503681' ) ) ");
 					}else{
-						sql.append("\n and V.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")  ");
+						sql.append("\n AND V.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")  ");
 					}
 				}
 				if( !Utils.isNull(o.getCustomerCode()).equals("") && !Utils.isNull(o.getCustomerCode()).equals("ALL")){
@@ -780,7 +795,8 @@ public class StockReport {
 			  
 			  columnGroupBy +="\n M.ITEM_NO,";
 			  columnGroupBy +="\n M.ITEM_NAME,";
-		  }else if("BILL_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
+		//OLD CODE
+		  }else if("BILL_STORE_COUNT_XXX".equalsIgnoreCase(columnNameArr[i])){
 			  sql.append("\n (");
 			  sql.append("\n SELECT count(DISTINCT V.customer_id) as c");
 			  sql.append("\n from PENSBI.XXPENS_BI_SALES_ANALYSIS_V V ");
@@ -791,6 +807,7 @@ public class StockReport {
 			  sql.append("\n AND V.customer_id = C.customer_id  ");
 			  sql.append("\n AND V.salesrep_id = S.salesrep_id ");
 			  sql.append("\n AND S.salesrep_code = M.SALES_CODE ");
+			  sql.append("\n AND S.salesrep_code = M.SALES_CODE ");
 			 //TypeSerch Month
 				if(Utils.isNull(o.getTypeSearch()).equals("month")){
 					if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
@@ -800,8 +817,8 @@ public class StockReport {
 						Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MMM_YYYY);
 						String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 						
-						sql.append("\n and V.invoice_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
-						sql.append("\n and V.invoice_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
+						sql.append("\n AND V.invoice_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
+						sql.append("\n AND V.invoice_date <= to_date('"+endDateStr+"','dd/mm/yyyy')");
 					}
 				}else{
 					//TypeSearch Day From To
@@ -812,8 +829,8 @@ public class StockReport {
 						Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 						String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 						
-						sql.append("\n and V.invoice_date e >= to_date('"+startDateStr+"','dd/mm/yyyy')");
-						sql.append("\n and V.invoice_date  <= to_date('"+endDateStr+"','dd/mm/yyyy')");
+						sql.append("\n AND V.invoice_date  >= to_date('"+startDateStr+"','dd/mm/yyyy')");
+						sql.append("\n AND V.invoice_date  <= to_date('"+endDateStr+"','dd/mm/yyyy')");
 					}
 				}
 				//SalesChannel
@@ -833,16 +850,16 @@ public class StockReport {
 				if( !Utils.isNull(o.getSalesrepCode()).equals("")){
 					sql.append("\n AND V.salesrep_id in(  ");
 					sql.append("\n  select salesrep_id from PENSBI.XXPENS_BI_MST_SALESREP  "); 
-					sql.append("\n  where .salesrep_code = '"+Utils.isNull(o.getSalesrepCode())+"' ");
+					sql.append("\n  where salesrep_code = '"+Utils.isNull(o.getSalesrepCode())+"' ");
 					sql.append("\n ) ");
 				}
 				if( !Utils.isNull(o.getBrand()).equals("") && !Utils.isNull(o.getBrand()).equals("ALL")){
 					// Brand 504 must show 503494,503544,503681 (Case Special case )
 					if(Utils.isNull(o.getBrand()).indexOf("504") != -1 ){
-						sql.append("\n and ( V.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")  ");
+						sql.append("\n AND ( V.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")  ");
 						sql.append("\n     or P.inventory_item_codein('503494','503544','503681' ) ) ");
 					}else{
-						sql.append("\n and V.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")  ");
+						sql.append("\n AND V.brand in( "+SQLHelper.converToTextSqlIn(o.getBrand())+")  ");
 					}
 				}
 				if( !Utils.isNull(o.getCustomerCode()).equals("") && !Utils.isNull(o.getCustomerCode()).equals("ALL")){
@@ -852,6 +869,76 @@ public class StockReport {
 					sql.append("\n AND P.inventory_item_code in( "+SQLHelper.converToTextSqlIn(o.getCustomerCode())+") ");
 				}
 				sql.append("\n ) as BILL_STORE_COUNT,");
+				
+		  //NEW EDIT: 09/06/2563
+		  }else if("BILL_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
+			   sql.append("\n ( select count( distinct V.bill_to_customer_id) from apps.ra_customer_trx_all V, apps.ar_payment_schedules_all p");
+			   sql.append("\n   WHERE  V.customer_trx_id = p.customer_trx_id ");
+			   sql.append("\n   and P.class = 'INV'");
+			   sql.append("\n   and V.primary_salesrep_id = M.salesrep_id");
+			   
+			   //TypeSerch Month
+				if(Utils.isNull(o.getTypeSearch()).equals("month")){
+					if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
+						Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MMM_YYYY);
+						logger.debug("startDate:"+startDate);
+						String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MMM_YYYY);
+						String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						
+						sql.append("\n AND V.trx_date  >= to_date('"+startDateStr+"','dd/mm/yyyy')");
+						sql.append("\n AND V.trx_date  <= to_date('"+endDateStr+"','dd/mm/yyyy')");
+					}
+				}else{
+					//TypeSearch Day From To
+					if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
+						Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						logger.debug("startDate:"+startDate);
+						String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						
+						sql.append("\n AND V.trx_date  >= to_date('"+startDateStr+"','dd/mm/yyyy')");
+						sql.append("\n AND V.trx_date  <= to_date('"+endDateStr+"','dd/mm/yyyy')");
+					}
+				}
+			   sql.append("\n GROUP BY V.primary_salesrep_id ");
+			   sql.append("\n ) as BILL_STORE_COUNT,");
+		  }else if("ORDER_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
+			   sql.append("\n ( select count( distinct V.sold_to_org_id) from apps.oe_order_headers_all V");
+			   sql.append("\n   WHERE V.salesrep_id = M.salesrep_id ");
+			   sql.append("\n   and V.order_category_code = 'ORDER'");
+			   sql.append("\n   and V.flow_status_code not in ('ENTERED' , 'CANCELLED')");
+			   //TypeSerch Month
+				if(Utils.isNull(o.getTypeSearch()).equals("month")){
+					if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
+						Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MMM_YYYY);
+						logger.debug("startDate:"+startDate);
+						String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MMM_YYYY);
+						String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						
+						sql.append("\n AND V.ordered_date >= to_date('"+startDateStr+"','dd/mm/yyyy')");
+						sql.append("\n AND V.ordered_date <= to_date('"+endDateStr+"','dd/mm/yyyy')+0.99999");
+					}
+				}else{
+					//TypeSearch Day From To
+					if( !Utils.isNull(o.getStartDate()).equals("") && !Utils.isNull(o.getEndDate()).equals("")){
+						Date startDate = DateUtil.parse(o.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						logger.debug("startDate:"+startDate);
+						String startDateStr = DateUtil.stringValue(startDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						Date endDate = DateUtil.parse(o.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+						String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
+						
+						sql.append("\n AND V.ordered_date  >= to_date('"+startDateStr+"','dd/mm/yyyy')");
+						sql.append("\n AND V.ordered_date  <= to_date('"+endDateStr+"','dd/mm/yyyy')+0.99999");
+					}
+				}
+			   sql.append("\n GROUP BY V.salesrep_id ");
+			   sql.append("\n ) as ORDER_STORE_COUNT,");
+			  
+			   columnGroupBy +="\n M.salesrep_id,";
+			   
 		  }else if("CHECK_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
 			  sql.append("\n (count(distinct M.CUSTOMER_NUMBER)) as CHECK_STORE_COUNT,");
 			  
@@ -893,6 +980,7 @@ public class StockReport {
 		StringBuffer h = new StringBuffer("");
 		if(excel){
 			h.append(ExcelHeader.EXCEL_HEADER);
+			logger.debug("reportShowColumnInListBox:"+reportShowColumnInListBox);
 		}
 		String width="100%";
 		if(columnNameArr.length<2){
@@ -1024,7 +1112,7 @@ public class StockReport {
 				h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('SEC_QTY','DESC') />");
 			 }
 			h.append("</th> \n");
-		}
+		}//if
 		h.append("</tr> \n");
 		return h;
 	}
@@ -1084,6 +1172,8 @@ public class StockReport {
 					h.append("<td class='"+className+"' width='8%'>"+item.getBrand()+"-"+item.getBrandName()+"</td> \n");
 				}else if("BILL_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
 					h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getBillStoreCount()+"</td> \n");
+				}else if("ORDER_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getOrderStoreCount()+"</td> \n");
 				}else if("CHECK_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
 					h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getCheckStoreCount()+"</td> \n");
 				}
@@ -1106,6 +1196,8 @@ public class StockReport {
 					h.append("<td class='"+className+"' width='8%'>"+item.getBrand()+"-"+item.getBrandName()+"</td> \n");
 				}else if("BILL_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
 					h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getBillStoreCount()+"</td> \n");
+				}else if("ORDER_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
+					h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getOrderStoreCount()+"</td> \n");
 				}else if("CHECK_STORE_COUNT".equalsIgnoreCase(columnNameArr[i])){
 					h.append("<td class='"+classNameNumber+"' width='8%'>"+item.getCheckStoreCount()+"</td> \n");
 				}
@@ -1133,7 +1225,7 @@ public class StockReport {
 	}
 	
 	private static StringBuffer genTotalTableByReportType(StockBean head,boolean excel,String[] columnNameArr
-			,double totalBillStoreCount,double totalCheckStoreCount) throws Exception{
+			,double totalBillStoreCount,double totalOrderStoreCount,double totalCheckStoreCount) throws Exception{
 		StringBuffer h = new StringBuffer("");
 		String className ="hilight_text";
 		String classNameNumber = "td_number";
@@ -1150,6 +1242,7 @@ public class StockReport {
 			
 		h.append(" <td class='"+className+"' align='right' colspan="+colspan+">Total</td> \n");
 		h.append("<td class='"+classNameNumber+"'>"+Utils.decimalFormat(totalBillStoreCount, Utils.format_current_no_disgit)+"</td> \n");
+		h.append("<td class='"+classNameNumber+"'>"+Utils.decimalFormat(totalOrderStoreCount, Utils.format_current_no_disgit)+"</td> \n");
 		h.append("<td class='"+classNameNumber+"'>"+Utils.decimalFormat(totalCheckStoreCount, Utils.format_current_no_disgit)+"</td> \n");
 		h.append("</tr> \n");
 		return h;

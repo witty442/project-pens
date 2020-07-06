@@ -21,7 +21,7 @@ try{
 	String tripDay2 = Utils.isNull(request.getParameter("tripDay2"));
 	String tripDay3 = Utils.isNull(request.getParameter("tripDay3"));
 	
-	//Get Old Data fro check
+	//Get Old Data for check
 	LocationBean bean = new LocationBean();
 	bean.setCustomerCode(customerCode);
 	LocationBean beanCheck = TripAction.searchCustomerTripDetail(conn, bean);
@@ -33,6 +33,11 @@ try{
 	bean.setTripDay2(tripDay2);
 	bean.setTripDay3(tripDay3);
 	bean.setCustomerType(customerType);
+	
+	bean.setTripDayDB(beanCheck.getTripDayDB());
+	bean.setTripDayDB2(beanCheck.getTripDayDB2());
+	bean.setTripDayDB3(beanCheck.getTripDayDB3());
+	bean.setCustomerTypeDB(beanCheck.getCustomerTypeDB());
 	
 	//check db data to input screen fro update 
 	/* if( Utils.isNull(bean.getTripDay()).equals("")){

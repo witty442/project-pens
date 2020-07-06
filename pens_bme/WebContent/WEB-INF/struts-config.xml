@@ -107,7 +107,7 @@
 	    <form-bean name="reportAllForm" type="com.isecinc.pens.web.reportall.ReportAllForm" />
 	    <form-bean name="importAllForm" type="com.isecinc.pens.web.importall.ImportAllForm" />
 	    <form-bean name="autoCNHHTempForm" type="com.isecinc.pens.web.autocnhhtemp.AutoCNHHTempForm" />
-	    <form-bean name="pickManualStockForm" type="com.isecinc.pens.web.pick.PickManualStockForm" />
+	    <form-bean name="generalForm" type="com.isecinc.pens.web.general.GeneralForm" />
 	</form-beans>
 	
 	<global-forwards>
@@ -394,13 +394,9 @@
 			<forward name="clear" path="/jsp/pick/barcode.jsp" />
 			<forward name="addRow" path="/jsp/pick/barcode.jsp" />
 			
-			<forward name="manualStock" path="/jsp/pick/manualStock.jsp" />
+			<forward name="manualStock" path="/jsp/pick/barcodeManual.jsp" />
 		</action>
 	
-		<action name="pickManualStockForm" path="/jsp/pickManualStockAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.PickManualStockAction">
-			<forward name="search" path="/jsp/pick/pickManualStock.jsp" />
-		</action>
-		
 		<action name="scanCheckForm" path="/jsp/scanCheckAction" parameter="do" scope="session" type="com.isecinc.pens.web.pick.ScanCheckAction">
 			<forward name="search2" path="/jsp/pick/scanCheckSearch.jsp" />
 			<forward name="prepare2" path="/jsp/pick/scanCheckSearch.jsp" />
@@ -754,6 +750,9 @@
 		</action>
 		<action name="autoCNHHTempForm" path="/jsp/autoCNHHTempAction" parameter="do" scope="session" type="com.isecinc.pens.web.autocnhhtemp.AutoCNHHTempAction">
 			<forward name="import" path="/jsp/autoCNHHTemp/importAutoCNHHTemp.jsp" />
+		</action>
+		<action name="generalForm" path="/jsp/generalAction" parameter="do" scope="session" type="com.isecinc.pens.web.general.GeneralAction">
+			<forward name="prepare" path="/jsp/general/general.jsp" />
 		</action>
 	</action-mappings>
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

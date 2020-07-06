@@ -15,8 +15,14 @@ if(Utils.isNull(pageName).equals("")){
      <jsp:include page="page/projectCReport.jsp" flush="true"/> 
 <%}else if("StockReturn".equalsIgnoreCase(pageName)){ %>
      <jsp:include page="page/stockCreditReturnPage.jsp" flush="true"/>   
+<%
+//despricate cse duplicate report wait for new report modify
+//}else if("StockExpireDetail".equalsIgnoreCase(pageName)){ %>
+    <%--  <jsp:include page="page/stockExpireDetailPage.jsp" flush="true"/>  --%>  
 <%}else if("BoxNoNissinReport".equalsIgnoreCase(pageName)){ %>
      <jsp:include page="page/boxNoNissinReportPage.jsp" flush="true"/>    
+<%}else if("EffectiveSKUReport".equalsIgnoreCase(pageName)){ %>
+     <jsp:include page="page/effectiveSKUReportPage.jsp" flush="true"/>    
 <% } %>
 
 						

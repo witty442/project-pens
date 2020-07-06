@@ -153,6 +153,8 @@ function clearForm(path){
 					   <html:option value="DETAIL">Detail</html:option>
 					   <html:option value="SUMMARY">Summary</html:option>
 					 </html:select>
+					 &nbsp;&nbsp;&nbsp;&nbsp;
+						<html:checkbox property="bean.bmeProductOnly">&nbsp;เฉพาะสินค้า B'me</html:checkbox>
 					</td>
 				  </tr>
 				</table>

@@ -1,9 +1,15 @@
 package com.pens.util;
 
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
 
 public class Test {
 
-	public static void main(String[] args) {
+	public static void main_2(String[] args) {
 		 String ddmmyyyy ="PD : PD บริษัท เอส.อาร์. ซุปเปอร์มาร์ท จำกัด(เพชรบูรณ์)";
          System.out.println("result:"+ddmmyyyy.replaceAll("\\/", ""));
 	}
@@ -22,5 +28,7 @@ public class Test {
 		// mmyyyy = mm+yyyy;
 		 
 	}
+	
+	
 
 }

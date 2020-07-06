@@ -64,7 +64,7 @@ public class StockControlPage {
 			dataList.add(new PopupBean("reportType","ภาคตามสายดูแล,แบรนด์,SKU","ZONE,BRAND,ITEM_NO"));
 			dataList.add(new PopupBean("reportType","ภาคตามสายดูแล,พนักงานขาย,แบรนด์,SKU","ZONE,SALES_CODE,BRAND,ITEM_NO"));
 			
-			dataList.add(new PopupBean("reportType","พนักงานขาย,จำนวนร้านที่เปิดบิลขาย,จำนวนร้านค้าที่นับสต๊อก","SALES_CODE,BILL_STORE_COUNT,CHECK_STORE_COUNT"));
+			dataList.add(new PopupBean("reportType","พนักงานขาย,จำนวนร้านที่เปิดบิลขาย,จำนวนร้านค้าที่สั่งซื้อ,จำนวนร้านค้าที่นับสต๊อก","SALES_CODE,BILL_STORE_COUNT,ORDER_STORE_COUNT,CHECK_STORE_COUNT"));
 			request.getSession().setAttribute("REPORT_TYPE_LIST",dataList);
 			
 			//Cust Cat No List

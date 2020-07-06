@@ -92,7 +92,8 @@
 	  	         pathRedirect = ReplaceAll (pathRedirect , '&', '$');
 	  	     //alert(pathRedirect);
 	  	    
-	  	     <% if("192.168.202.8".equals(currentIP)){ //On Witty%>
+	  	     //192.168.202.8 (witty dev) or pens_bme_ddserver no redirect to (198.162.37.185:8080(product bme))
+	  	     <% if("192.168.202.8".equals(currentIP) || webPath.equalsIgnoreCase("/pens_bme_ddserver")){ //On Witty%>
 	  	    	newUrl = url;
 	  	     <%}else{%>
 	  	        newUrl = "<%=hostProd%><%=contextPathProd%>/login.do?do=loginCrossServer&pathRedirect="+pathRedirect;
@@ -702,12 +703,6 @@
  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.SALE,User.PICK}) ){ no=0;%>
 	<li><a  href="javascript: void(0)" class="parent" ><span>Pick</span></a>
 		<ul>
-		    <li>
-	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/pickManualStockAction.do?do=prepare&action=new');">
-	           <span><%no++;out.print(no);%>.<bean:message key="PickManualStock" bundle="sysprop"/>
-	           </span></a>
-	        </li> 
-		        
 	     <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK}) ){%>
 			<li>
 				<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/jobAction.do?do=prepare2&action=new');">
@@ -979,6 +974,10 @@
 				 <li>
 				  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/itManageAction.do?do=prepareHead&action=new&pageName=ITStock');">
 				  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="ITStock"/></span></a>
+				</li> 
+				<li>
+				  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/generalAction.do?do=prepare&action=new&pageName=GenBarcode');">
+				  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="GenBarcode"/></span></a>
 				</li> 
 			<%} %>
 		</ul>

@@ -524,12 +524,13 @@ public class ExternalFunctionHelper {
 		return id;
 	}
 	
-	/** Case Order Manaul (from Oracle )
+	/** Case Order Manual (from Oracle )
 	 * order_no length == 12 only
 	 * order ที่ขึ้นต้นด้วย 2  ให้ replace เป็น S
        order ที่ขึ้นต้นด้วย 3 ให้ replace เป็น C
-       Case length =13
-       'SN20156050001',
+       Case orderNo length =13
+         2020156050001 to SN20156050001,
+         2040155100001 to SN40155100001
 	 * @param orderNo
 	 * @return
 	 * @throws Exception
@@ -550,6 +551,4 @@ public class ExternalFunctionHelper {
 		}
 		return orderNo;
 	}
-	
-	
 }

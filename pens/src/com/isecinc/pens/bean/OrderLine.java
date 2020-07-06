@@ -169,6 +169,7 @@ public class OrderLine extends I_PO implements Serializable {
 
 	/** Best Discount */
 	private double bestDiscount;
+	private double storeBestDiscount;
 
 	/** NEED_EXPORT */
 	private String needExport;
@@ -196,6 +197,15 @@ public class OrderLine extends I_PO implements Serializable {
 	private String cancelDate;
 	private String taxable;
 	private double sellingPrice;
+
+	
+	public double getStoreBestDiscount() {
+		return storeBestDiscount;
+	}
+
+	public void setStoreBestDiscount(double storeBestDiscount) {
+		this.storeBestDiscount = storeBestDiscount;
+	}
 
 	public double getSellingPrice() {
 		return sellingPrice;

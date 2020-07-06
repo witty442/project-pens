@@ -13,8 +13,9 @@
 
 <table align="center" border="1" cellpadding="1" cellspacing="0" width="100%">
      <tr>
-		<th align="center">Brand</th>
-		<th align="center">Day</th>
+		<th align="center">Item Code</th>
+		<th align="center">SHELF LIFE DAY</th>
+		<th align="center">HALF SHELF LIFE DAY</th>
 	</tr>
 	<%
     List<StockBean> brandSaveZoneList = StockCreditExpireReport.searchBrandSaveZoneList();
@@ -23,8 +24,9 @@
 			StockBean item = brandSaveZoneList.get(i);
     %>
 		<tr>
-			<td align="center"><%=item.getBrand() %></td>
-			<td align="center"><%=item.getBrandSaveZoneDay() %></td>
+			<td align="center"><%=item.getItemCode() %></td>
+			<td align="center"><%=item.getShelfLifeDay() %></td>
+			<td align="center"><%=item.getHalfShelfLifeDay() %></td>
 		</tr>
    <%   }
 	} %>

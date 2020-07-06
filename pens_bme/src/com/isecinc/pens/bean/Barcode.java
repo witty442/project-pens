@@ -58,8 +58,15 @@ public class Barcode implements Serializable{
 	private String storeNo;
 	private List<BoxRef> boxRefItems;
 	private String includeCancel;
+	private String type;
 	
 	
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
 	public String getTotalQtyDisp() {
 		return totalQtyDisp;
 	}

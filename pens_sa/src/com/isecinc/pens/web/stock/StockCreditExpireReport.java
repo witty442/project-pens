@@ -36,15 +36,15 @@ public class StockCreditExpireReport {
 		//COLUMNNAME_MAP.put("ZONE", "ภาคตามการดูแล");
 	}
 	
-	public static StockBean searchReport(String contextPath ,StockBean o,boolean excel,User user){
+	public static StockBean searchReport(String screenWidth,String contextPath ,StockBean o,boolean excel,User user){
 	    logger.debug("excel:"+excel);
 	    
 	    if(o.getTypeSearch().equals("REPORT_PRODUCT_EXPIRE")){
 			if(o.getItemsList() !=null && o.getItemsList().size()>0){
 				logger.debug("itemList:"+o.getItemsList().size());
-				return searchReportStockExpireModelCaseSort(contextPath,o,excel);
+				return searchReportStockExpireModelCaseSort(screenWidth,contextPath,o,excel);
 			}
-			return searchStcokExpireReportLatestModel(contextPath,o,excel,user);
+			return searchStcokExpireReportLatestModel(screenWidth,contextPath,o,excel,user);
 	    }else{
 	    	//REPORT_PRODUCT_NO_CHECK_STOCK
 	    	
@@ -52,7 +52,7 @@ public class StockCreditExpireReport {
 	    return null;
 	}
 	
-	public static StockBean searchStcokExpireReportLatestModel(String contextPath,StockBean o,boolean excel,User user){
+	public static StockBean searchStcokExpireReportLatestModel(String screenWidth,String contextPath,StockBean o,boolean excel,User user){
 		StockBean item = null;
 		Connection conn = null;
 		Statement stmt = null;
@@ -84,20 +84,25 @@ public class StockCreditExpireReport {
 			 
 		    //add request_date
 		    columnAllSql ="M.request_date,"+columnAllSql;
-			columnAllGroupBySql ="M.request_date,"+columnAllGroupBySql;
+			columnAllGroupBySql  ="M.request_date,"+columnAllGroupBySql;
+			columnAllGroupBySql += ",remain_day_request_date,remain_day_sys_date ,HALF_SHELF_LIFE_DAY";
 			 
 			//split disp column arr
 			dispColumnNameArr = "pri_qty,sec_qty".split("\\,");
 			
 			sql.append("\n  SELECT "+columnAllSql);
-			sql.append("\n ,"+genSelectColumnNameDispType(dispColumnNameArr));
-			sql.append("\n ,product_age_day ");
+			sql.append(" ,"+genSelectColumnNameDispType(dispColumnNameArr));
+			sql.append("\n ,remain_day_request_date,remain_day_sys_date ,HALF_SHELF_LIFE_DAY");
 			sql.append("\n  FROM (");
 			sql.append("\n    SELECT A.* FROM (");
 			/*****************************************************/
-			sql.append("\n    SELECT M.* ");
-			sql.append("\n    ,(M.expire_date - M.request_date) as product_age_day");
-			sql.append("\n    ,NVL((select day from PENSBI.M_STOCK_BRAND_SAVEZONE S where S.brand = M.brand),60) as product_savezone_day");
+			sql.append("\n     SELECT M.* ");
+			sql.append("\n     ,(M.expire_date - M.request_date) as remain_day_request_date");
+			sql.append("\n     ,(M.expire_date - trunc(sysdate)) as remain_day_sys_date");
+			sql.append("\n     ,(select S.HALF_SHELF_LIFE_DAY from");
+			sql.append("\n       PENSBI.XXPENS_BI_MST_ITEM_SHELF_LIFE S");
+			sql.append("\n       where S.inventory_item_code = M.item_no");
+			sql.append("\n      ) as HALF_SHELF_LIFE_DAY ");
 			sql.append("\n    FROM ");
 			sql.append("\n      (select max(a.request_date) request_date");
 			sql.append("\n      ,a.cust_account_id");
@@ -159,11 +164,18 @@ public class StockCreditExpireReport {
 			if(user.getRoleCRStock().equalsIgnoreCase(User.STOCKCRSALE)){
 				sql.append("\n   and M.sales_code = '"+user.getUserName().toUpperCase()+"'");
 			}
-			sql.append("\n    )A ");
+			sql.append("\n    )A WHERE 1=1");
 			
-			//Condition product_age_day < product_savezone_day
-			sql.append("\n   WHERE A.product_age_day < A.product_savezone_day ");
-			
+			if(!Utils.isNull(o.getDispExpireSoon()).equals("") && !Utils.isNull(o.getDispExpired()).equals("")){
+				sql.append("\n  AND (A.remain_day_sys_date < A.HALF_SHELF_LIFE_DAY  OR A.remain_day_sys_date < 0 )");
+			}else{
+				if(!Utils.isNull(o.getDispExpireSoon()).equals("")){
+				    sql.append("\n  AND (A.remain_day_sys_date < A.HALF_SHELF_LIFE_DAY  AND A.remain_day_sys_date >0 )");
+				}
+				if(!Utils.isNull(o.getDispExpired()).equals("")){
+					sql.append("\n AND A.remain_day_sys_date < 0 ");
+				}
+			}
 			sql.append("\n )M ");
 			sql.append("\n GROUP BY "+columnAllGroupBySql );
 			sql.append("\n ORDER BY "+columnAllGroupBySql);
@@ -181,7 +193,7 @@ public class StockCreditExpireReport {
 			  if(r==1){
 				 //gen Head Table
 				 html = new StringBuffer("");
-				 html.append(genHeadTable(contextPath,o,excel,columnNameArr));
+				 html.append(genHeadTable(screenWidth,contextPath,o,excel,columnNameArr));
 			  }
 			  
 			  for(int i=0;i<columnNameArr.length;i++){
@@ -211,7 +223,10 @@ public class StockCreditExpireReport {
 			  item.setSecQty(Utils.decimalFormat(rst.getDouble("SEC_QTY"), Utils.format_current_no_disgit)); 
 			  item.setExpireDate(DateUtil.stringValue(rst.getDate("EXPIRE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			  item.setAvgQty(Utils.decimalFormat(rst.getDouble("AVG_QTY"), Utils.format_current_no_disgit)); 
-			  item.setProductExpireDay(Utils.decimalFormat(rst.getDouble("product_age_day"), Utils.format_current_no_disgit));
+			  item.setRemainDayRequestDate(Utils.decimalFormat(rst.getDouble("remain_day_request_date"), Utils.format_current_no_disgit));
+			  item.setRemainDaySysDate(Utils.decimalFormat(rst.getDouble("remain_day_sys_date"), Utils.format_current_no_disgit));
+			  item.setHalfShelfLifeDay(""+rst.getInt("HALF_SHELF_LIFE_DAY")); 
+			  
 			  //add to List
 			  itemList.add(item);
 			  
@@ -245,7 +260,7 @@ public class StockCreditExpireReport {
 		}
 	  return o;
 	}
-	public static StockBean searchReportStockExpireModelCaseSort(String contextPath,StockBean o,boolean excel){
+	public static StockBean searchReportStockExpireModelCaseSort(String screenWidth,String contextPath,StockBean o,boolean excel){
 		StockBean item = null;
 		String[] columnNameArr = null;
 		StringBuffer html = null;
@@ -325,11 +340,17 @@ public class StockCreditExpireReport {
 				}else{
 					 Collections.sort(itemList, StockBean.Comparators.AVG_QTY_ASC);
 				}
-			}else if(Utils.isNull(o.getColumnNameSort()).equalsIgnoreCase("PRODUCT_EXPIRE_DAY")){
+			}else if(Utils.isNull(o.getColumnNameSort()).equalsIgnoreCase("REMAIN_DAY_REQUEST_DATE")){
 				if("DESC".equals(o.getOrderSortType())){
-					 Collections.sort(itemList, StockBean.Comparators.PRODUCT_EXPIRE_DAY_DESC);
+					 Collections.sort(itemList, StockBean.Comparators.REMAIN_DAY_REQUEST_DATE_DESC);
 				}else{
-					 Collections.sort(itemList, StockBean.Comparators.PRODUCT_EXPIRE_DAY_ASC);
+					 Collections.sort(itemList, StockBean.Comparators.REMAIN_DAY_REQUEST_DATE_ASC);
+				}
+			}else if(Utils.isNull(o.getColumnNameSort()).equalsIgnoreCase("REMAIN_DAY_SYS_DATE")){
+				if("DESC".equals(o.getOrderSortType())){
+					 Collections.sort(itemList, StockBean.Comparators.REMAIN_DAY_SYS_DATE_DESC);
+				}else{
+					 Collections.sort(itemList, StockBean.Comparators.REMAIN_DAY_SYS_DATE_ASC);
 				}
 			}
 			
@@ -342,11 +363,18 @@ public class StockCreditExpireReport {
 			  if(r==1){
 				 //gen Head Table
 				 html = new StringBuffer("");
-				 html.append(genHeadTable(contextPath,o,excel,columnNameArr));
+				 html.append(genHeadTable(screenWidth,contextPath,o,excel,columnNameArr));
+				 
+				 html.append("<tbody> \n");
 			  }
 
 			  //Gen Row Table
+			  
 			  html.append(genRowTable(o,excel,columnNameArr,item));
+			  
+			  if(r==itemList.size()-1){
+				  html.append("</tbody> \n");
+			  }
 			  //Summary
 			  totalPriQty +=Utils.convertStrToDouble(item.getPriQty());
 			  totalSecQty +=Utils.convertStrToDouble(item.getSecQty());
@@ -358,6 +386,7 @@ public class StockCreditExpireReport {
 				html.append(genTotalTable(o,excel,columnNameArr, totalPriQty,totalSecQty));
 				// gen end Table
 				html.append("</table>");
+				html.append("</div>");
 			}
 			
 			o.setItemsList(itemList);
@@ -441,21 +470,35 @@ public class StockCreditExpireReport {
 	 * @return
 	 * @throws Exception
 	 */
-	private static StringBuffer genHeadTable(String contextPath,StockBean head,boolean excel,String[] columnNameArr) throws Exception{
+	private static StringBuffer genHeadTable(String screenWidth,String contextPath,StockBean head,boolean excel,String[] columnNameArr) throws Exception{
 		String icoZise=  "width='20px' height='20px'";
 		StringBuffer h = new StringBuffer("");
 		if(excel){
 			h.append(ExcelHeader.EXCEL_HEADER);
+			h.append(" <style>");
+			h.append(" .tr_red { \n");
+			h.append("   background-color: red; \n");
+			h.append("   color:black; \n");
+			h.append(" } \n");
+			h.append(" .tr_negative { \n");
+			h.append("   background-color: #d6d6c2; \n");
+			h.append("   color:black; \n");
+			h.append(" } \n");
+			h.append(" </style>");
 		}
 		String width="100%";
 		if(columnNameArr.length<2){
 			//width="60%";
 		}
-		h.append("<table id='tblProduct' align='center' border='1' width='"+width+"' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
+		h.append("<div style='height:600px;width:"+screenWidth+"px;' \n>");//NEW CODE
+		h.append("<table id='tblProduct' class='table table-condensed table-striped' border='1'> \n");
+		
+		//h.append("<table id='tblProduct' align='center' border='1' width='"+width+"' cellpadding='3' cellspacing='1' class='tableSearchNoWidth'> \n");
+		h.append("<thead> \n");
 		h.append("<tr> \n");
 		//if( !Utils.isNull(head.getDispRequestDate()).equals("")){
 			h.append(" <th rowspan='2' nowrap >");
-			h.append(" วันที่ตรวจนับ");
+			h.append(" วันที่ตรวจนับ <br/>");
 			 if( excel ==false){
 				h.append("  &nbsp;&nbsp;");
 				h.append("  <img style=\"cursor:pointer\"" +icoZise +"src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('REQUEST_DATE','ASC') />");
@@ -490,7 +533,7 @@ public class StockCreditExpireReport {
 		}
 		h.append(" <th colspan='2' rowspan='1' nowrap>ยอดตรวจนับ</th> \n");
 		
-		   h.append(" <th rowspan='2' nowrap>วันที่หมดอายุ");
+		   h.append(" <th rowspan='2' nowrap>วันที่หมดอายุ <br/>");
 		   if( excel ==false){
 			   h.append("  &nbsp;&nbsp;");
 			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('EXPIRE_DATE','ASC') />");
@@ -498,17 +541,24 @@ public class StockCreditExpireReport {
 			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('EXPIRE_DATE','DESC') />");
 		   }
 		   h.append(" </th> \n");
-		   h.append(" <th rowspan='2' nowrap>วันที่เหลือก่อนหมดอายุ");
+		   h.append(" <th rowspan='2' >วันที่เหลือก่อนหมดอายุ (เทียบวันที่ตรวจนับ)<br/>");
 		   if( excel ==false){
 			   h.append("  &nbsp;&nbsp;");
-			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('PRODUCT_EXPIRE_DAY','ASC') />");
+			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('REMAIN_DAY_REQUEST_DATE','ASC') />");
 			   h.append("  &nbsp;&nbsp;");
-			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('PRODUCT_EXPIRE_DAY','DESC') />");
+			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('REMAIN_DAY_REQUEST_DATE','DESC') />");
 		   }
 		   h.append(" </th> \n");
-		
-			h.append(" <th rowspan='2' nowrap >");
-			h.append(" ยอดขายเฉลี่ย 3 เดือน");
+		   h.append(" <th rowspan='2'>วันที่เหลือก่อนหมดอายุ (เทียบวันที่ปัจจุบัน)<br/>");
+		   if( excel ==false){
+			   h.append("  &nbsp;&nbsp;");
+			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('REMAIN_DAY_SYS_DATE','ASC') />");
+			   h.append("  &nbsp;&nbsp;");
+			   h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('REMAIN_DAY_SYS_DATE','DESC') />");
+		   }
+		   h.append(" </th> \n");
+			h.append(" <th rowspan='2' >");
+			h.append(" ยอดขายเฉลี่ย 3 เดือน<br/>");
 			 if( excel ==false){
 				h.append("  &nbsp;&nbsp;");
 				h.append("  <img style=\"cursor:pointer\"" +icoZise +"src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('AVG_QTY','ASC') />");
@@ -519,7 +569,7 @@ public class StockCreditExpireReport {
 		
 		h.append("</tr> \n");
 		h.append("<tr> \n");
-		h.append(" <th nowrap>หีบ");
+		h.append(" <th nowrap>หีบ <br/>");
 		 if( excel ==false){
 			h.append("  &nbsp;&nbsp;");
 			h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('PRI_QTY','ASC') />");
@@ -527,7 +577,7 @@ public class StockCreditExpireReport {
 			h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-desc.png' href='#' onclick=sort('PRI_QTY','DESC') />");
 		 }
 		h.append("</th> \n");
-		h.append(" <th  nowrap>เศษ");
+		h.append(" <th  nowrap>เศษ<br/>");
 		 if( excel ==false){
 			h.append("  &nbsp;&nbsp;");
 			h.append("  <img style=\"cursor:pointer\"" +icoZise +" src='"+contextPath+"/icons/img_sort-asc.png' href='#' onclick=sort('SEC_QTY','ASC') />");
@@ -536,6 +586,7 @@ public class StockCreditExpireReport {
 		 }
 		h.append("</th> \n");
 		h.append("</tr> \n");
+		h.append("</thead> \n");
 		return h;
 	}
 	/**
@@ -549,17 +600,29 @@ public class StockCreditExpireReport {
 	 */
 	private static StringBuffer genRowTable(StockBean head,boolean excel,String[] columnNameArr,StockBean item) throws Exception{
 		StringBuffer h = new StringBuffer("");
-		String className ="";
-		String classNameCenter ="";
+		String className ="td_text";
+		String classNameCenter ="td_text_center";
 		String classNameNumber = "td_number";
+		String trClass = "";
+		logger.debug("getRemainDaySysDate:"+item.getRemainDaySysDate());
+		logger.debug("getHalfShelfLifeDay:"+item.getHalfShelfLifeDay());
+		//display row color
+		//remian_day negative set row color:red
+		if(Utils.convertToInt(item.getRemainDaySysDate()) < 0){
+			trClass = "tr_negative";
+		}else if(Utils.convertToInt(item.getHalfShelfLifeDay()) != 0 && Utils.convertToInt(item.getRemainDaySysDate()) < Utils.convertToInt(item.getHalfShelfLifeDay())){
+		  //remian_day < half_shelf_life set row color:red
+			trClass = "tr_red";
+		}
+		
 		if(excel){
 			className = "text";
 			classNameCenter ="text";
 			classNameNumber = "num_currency";
 		}
 		
-		h.append("<tr> \n");
-		h.append(" <td class='"+className+"' width='5%'>"+item.getRequestDate()+"</td> \n");
+		h.append("<tr class='"+trClass+"'> \n");
+		h.append(" <td class='"+classNameCenter+"' width='5%'>"+item.getRequestDate()+"</td> \n");
 		
 		for(int i=0;i<columnNameArr.length;i++){
 			//logger.debug("columnName["+columnNameArr[i]+"]");
@@ -580,7 +643,7 @@ public class StockCreditExpireReport {
            
 			if( !excel){
 				if("ITEM_NO".equalsIgnoreCase(columnNameArr[i])){
-					h.append("<td class='"+className+"' width='20%'>"+item.getItemCode()+"-"+item.getItemName()+"</td> \n");
+					h.append("<td class='"+className+"' width='20%' title='halfLife:"+item.getHalfShelfLifeDay()+"'>"+item.getItemCode()+"-"+item.getItemName()+"</td> \n");
 				}else if("CUSTOMER_NUMBER".equalsIgnoreCase(columnNameArr[i])){
 					h.append("<td class='"+className+"' width='20%'>"+item.getCustomerCode()+"-"+item.getCustomerName()+"</td> \n");
 				}else if("SALES_CODE".equalsIgnoreCase(columnNameArr[i])){
@@ -590,7 +653,7 @@ public class StockCreditExpireReport {
 				 //split name  
 				if("ITEM_NO".equalsIgnoreCase(columnNameArr[i])){
 					h.append("<td class='"+className+"' width='5%'>"+item.getItemCode()+"</td> \n");
-					h.append("<td class='"+className+"' width='15%'>"+item.getItemName()+"</td> \n");
+					h.append("<td class='"+className+"' width='14%'>"+item.getItemName()+"</td> \n");
 				}else if("CUSTOMER_NUMBER".equalsIgnoreCase(columnNameArr[i])){
 					h.append("<td class='"+className+"' width='4%'>"+item.getCustomerCode()+"</td> \n");
 					h.append("<td class='"+className+"' width='10%'>"+item.getCustomerName()+"</td> \n");
@@ -600,10 +663,11 @@ public class StockCreditExpireReport {
 				}
 			}//if
 		}
-		h.append("<td class='"+classNameNumber+"' width='6%'>"+item.getPriQty()+"</td> \n");
-		h.append("<td class='"+classNameNumber+"' width='6%'>"+item.getSecQty()+"</td> \n");
-	    h.append("<td class='"+classNameCenter+"' width='6%'>"+item.getExpireDate()+"</td> \n");
-	    h.append("<td class='"+classNameCenter+"' width='6%'>"+item.getProductExpireDay()+"</td> \n");
+		h.append("<td class='"+classNameNumber+"' width='5%'>"+item.getPriQty()+"</td> \n");
+		h.append("<td class='"+classNameNumber+"' width='5%'>"+item.getSecQty()+"</td> \n");
+	    h.append("<td class='"+classNameCenter+"' width='5%'>"+item.getExpireDate()+"</td> \n");
+	    h.append("<td class='"+classNameCenter+"' width='8%'>"+item.getRemainDayRequestDate()+"</td> \n");
+	    h.append("<td class='"+classNameCenter+"' width='8%'>"+item.getRemainDaySysDate()+"</td> \n");
 	    h.append("<td class='"+classNameNumber+"' width='6%'>"+item.getAvgQty()+"</td> \n");
 		h.append("</tr> \n");
 		
@@ -640,6 +704,7 @@ public class StockCreditExpireReport {
 		h.append("<td ></td> \n");
 		h.append("<td ></td> \n");
 		h.append("<td ></td> \n");
+		h.append("<td ></td> \n");
 		h.append("</tr> \n");
 		
 		return h;
@@ -652,16 +717,17 @@ public class StockCreditExpireReport {
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
 		try {
-			sql.append("\n SELECT * from PENSBI.M_STOCK_BRAND_SAVEZONE ");
-			sql.append("\n ORDER BY brand");
+			sql.append("\n SELECT * from PENSBI.XXPENS_BI_MST_ITEM_SHELF_LIFE ");
+			sql.append("\n ORDER BY inventory_item_code");
 			logger.debug("sql:"+sql);
 			conn = DBConnection.getInstance().getConnection();
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
 				StockBean item = new StockBean();
-				item.setBrand(rst.getString("brand"));
-				item.setBrandSaveZoneDay(rst.getString("day"));
+				item.setItemCode(rst.getString("inventory_item_code"));
+				item.setShelfLifeDay(rst.getString("SHELF_LIFE_DAY"));
+				item.setHalfShelfLifeDay(rst.getString("HALF_SHELF_LIFE_DAY"));
 				pos.add(item);
 				
 			}//while

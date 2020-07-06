@@ -10,6 +10,7 @@ import util.DateToolsUtil;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MProduct;
+import com.isecinc.pens.model.MProductNonBme;
 import com.isecinc.pens.model.MUOM;
 import com.jcraft.jsch.Logger;
 
@@ -45,6 +46,7 @@ public class OrderLine extends I_PO implements Serializable {
 		setProduct(new MProduct().findOpt(rst.getString("PRODUCT_ID")));
 		setUom(new MUOM().findOpt(rst.getString("UOM_ID")));
 		setPrice(rst.getDouble("PRICE"));
+		setPriceAfDiscount(rst.getDouble("PRICE_AF_DISCOUNT"));//Case Non BME
 		setQty(rst.getDouble("QTY"));
 		setLineAmount(rst.getDouble("LINE_AMOUNT"));
 		setDiscount(rst.getDouble("DISCOUNT"));
@@ -78,6 +80,7 @@ public class OrderLine extends I_PO implements Serializable {
 		try {
 			setOrg(rst.getString("ORG"));
 			setSubInv(rst.getString("SUB_INV"));
+			setProductNonBme(new MProductNonBme().isProductNonBme(getProduct().getCode()));
 		} catch (Exception e) {}
 		
 	}
@@ -118,6 +121,7 @@ public class OrderLine extends I_PO implements Serializable {
 	private double price;
 	private double price1;
 	private double price2;
+	private double priceAfDiscount; //Case non bme (price-discount*c4) *qty
 
 	/** Qty */
 	private double qty;
@@ -197,8 +201,25 @@ public class OrderLine extends I_PO implements Serializable {
 	private String cancelDate;
 	private String taxable;
 	private int modifierLineId;
+	private String productNonBme;
 	
 	
+	public double getPriceAfDiscount() {
+		return priceAfDiscount;
+	}
+
+	public void setPriceAfDiscount(double priceAfDiscount) {
+		this.priceAfDiscount = priceAfDiscount;
+	}
+
+	public String getProductNonBme() {
+		return productNonBme;
+	}
+
+	public void setProductNonBme(String productNonBme) {
+		this.productNonBme = productNonBme;
+	}
+
 	public int getModifierLineId() {
 		return modifierLineId;
 	}

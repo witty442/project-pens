@@ -207,6 +207,7 @@ public class RunScriptDBAction {
 			if( !Utils.isNull(scriptData[0]).equals("")){
 				String resultStr = excUpdate(conn,Utils.isNull(scriptData[0]));
 				logger.info("AllSales scriptData "+prefix+" resultExeSctipt:\n "+resultStr);
+				
 			}
 			
 			// 2> Execute Script BySales
@@ -214,6 +215,78 @@ public class RunScriptDBAction {
 			if( !Utils.isNull(scriptData[1]).equals("")){
 				String resultStr = excUpdate(conn,Utils.isNull(scriptData[1]));
 				logger.info("SalesType scriptData "+prefix+" resultExeSctipt:\n"+resultStr);
+				
+			}
+
+			// 3> Execute Script BySales (PLSQL) split by $
+			logger.debug("PLSQL SalesType scriptData "+prefix+":"+scriptData[2]);
+			if( !Utils.isNull(scriptData[2]).equals("")){
+				String resultStr = excUpdate(conn,Utils.isNull(scriptData[2]),"$");
+				logger.info("PLSQL SalesType scriptData "+prefix+" resultExeSctipt:\n"+resultStr);
+				
+			}
+			
+			// 3> Execute Script BySales
+			logger.debug("BySales["+user.getUserName()+"] scriptData "+prefix+":"+scriptData[3]);
+			if( !Utils.isNull(scriptData[3]).equals("")){
+				String resultStr = excUpdate(conn,Utils.isNull(scriptData[3]));
+				logger.info("BySales["+user.getUserName()+"] scriptData "+prefix+" resultExeSctipt: \n"+resultStr);
+				
+				//Case BySales Move file to inProcess
+				// delete and Create new  File Ftp To In Process
+				ftpManager.deleteFileFTP(env.getProperty("path.manual.BySales")+prefix+"/", "script_"+user.getUserName()+".sql");
+			
+				//rename fileName
+				String fileName = "script_"+user.getUserName()+"_"+Utils.format(new Date(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
+				ftpManager.uploadFileToFTP(env.getProperty("path.manual.BySales")+prefix+"/"+"In-Processed/", fileName, resultStr, "TIS-620");
+			}
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();conn= null;
+				}
+			}catch(Exception e){}
+		}
+	}
+	
+	public static void runManualScriptPLSQLProcess(User user){
+		EnvProperties env = EnvProperties.getInstance();
+		Connection conn = null;
+		String prefix = "before";
+		try{
+			logger.info("Start runManualScriptProcessNew");
+			conn = DBConnection.getInstance().getConnection();
+			
+			//read data from FTP /Manual_script 
+			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			
+			/** Run ManualScript By Sales Type VAN or Credit **/
+			logger.debug("role:"+user.getRole().getKey());
+			String salesType = "van";
+			if("TT".equals(user.getRole().getKey())){
+				salesType  ="credit";
+			}
+			
+			//Get All Manual-script by prefix
+			String[] scriptData = ftpManager.getManualScriptImportExport(prefix,salesType,user.getCode(),"TIS-620");
+			
+			// 1> Execute Script AllSales
+			logger.debug("AllSales scriptData "+prefix+":"+scriptData[0]);
+			if( !Utils.isNull(scriptData[0]).equals("")){
+				String resultStr = excUpdate(conn,Utils.isNull(scriptData[0]));
+				logger.info("AllSales scriptData "+prefix+" resultExeSctipt:\n "+resultStr);
+				
+			}
+			
+			// 2> Execute Script BySales
+			logger.debug("SalesType scriptData "+prefix+":"+scriptData[1]);
+			if( !Utils.isNull(scriptData[1]).equals("")){
+				String resultStr = excUpdate(conn,Utils.isNull(scriptData[1]));
+				logger.info("SalesType scriptData "+prefix+" resultExeSctipt:\n"+resultStr);
+				
 			}
 			
 			// 3> Execute Script BySales
@@ -241,7 +314,6 @@ public class RunScriptDBAction {
 			}catch(Exception e){}
 		}
 	}
-	
 	/**
 	 * 
 	 * @param conn
@@ -644,7 +716,72 @@ public class RunScriptDBAction {
 		}
 		return str.toString();
   }
+	private static String excUpdate(Connection conn,String sql,String splitC) {
+	    PreparedStatement ps =null;
+        StringBuffer str = new StringBuffer("");
+		try{  
+			
+			String[] sqlArr = sql.split("\\"+splitC);
+			if(sqlArr != null && sqlArr.length>0){
+			  //str.append("\n ------ Result ----------------------- ");
+			   for(int i=0;i<sqlArr.length;i++){
+				 
+				 if( !Utils.isNull(sqlArr[i]).equals("")){
+					 try{
+					     ps = conn.prepareStatement(sqlArr[i]);
+					     int recordUpdate = ps.executeUpdate();
+					     //str.append("["+i+"] SQL Execute  :"+sqlArr[i]);
+					     str.append("\n"+sqlArr[i]+"- eff:"+recordUpdate+" ");
+					 }catch(Exception ee){
+						 str.append("\n"+sqlArr[i]+"- err:"+ee.getMessage()+" "); 
+					 }
+			     }
+			   }//for
+			  // str.append("\n ----------------------------------\n");
+			}
+		}catch(Exception e){
+	      logger.error(e.getMessage(),e);
+	      str.append("err: \n"+e.getMessage() +"\n");
+		}finally{
+			try{
+				if(ps != null){
+				   ps.close();ps = null;
+				}
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+		return str.toString();
+  }
 	
+	private static String excUpdateNoSplit(Connection conn,String sql) {
+	    PreparedStatement ps =null;
+        StringBuffer str = new StringBuffer("");
+		try{  
+			 if( !Utils.isNull(sql).equals("")){
+				 try{
+				     ps = conn.prepareStatement(sql);
+				     int recordUpdate = ps.executeUpdate();
+				     //str.append("["+i+"] SQL Execute  :"+sqlArr[i]);
+				     str.append("\n"+sql+"- eff:"+recordUpdate+" ");
+				 }catch(Exception ee){
+					 str.append("\n"+sql+"- err:"+ee.getMessage()+" "); 
+				 }
+		     }
+		}catch(Exception e){
+	      logger.error(e.getMessage(),e);
+	      str.append("err: \n"+e.getMessage() +"\n");
+		}finally{
+			try{
+				if(ps != null){
+				   ps.close();ps = null;
+				}
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+		return str.toString();
+  }
 	private static void dropTableOrClearWrongData(Connection conn) {
 		PreparedStatement ps =null;
 		ResultSet rs = null;

@@ -70,6 +70,7 @@ import com.isecinc.pens.process.order.OrderProcess;
 import com.isecinc.pens.report.listOrderProduct.ListOrderProductReport;
 import com.isecinc.pens.report.listOrderProduct.ListOrderProductReportProcess;
 import com.isecinc.pens.report.taxinvoice.TaxInvoiceReport;
+import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 
 
 /**
@@ -576,10 +577,13 @@ public class OrderAction extends I_Action {
 			
 			//Recalculate lineAmount (qty*price) in Lines
 			orderForm.setLines(new MOrder().reCalculateLineAmountInLinesBeforeCalcPromotion(orderForm.getLines()));
-						
+			
+			//Get custGroup 
+			orderForm.getOrder().setCustGroup(new MCustomer().getCustGroup(orderForm.getOrder().getCustomerId()));
+			
 			// Call Modifier Process
 			ModifierProcess modProcess = new ModifierProcess(ConvertNullUtil.convertToString(customer.getTerritory()).trim());
-			modProcess.findModifier(orderForm.getLines(), userActive, conn);
+			modProcess.findModifier(orderForm.getLines(), userActive, conn,orderForm.getOrder().getCustGroup());
 
 			// Set for web display.
 			logger.debug("****** Start Set Display order ****************************************************");
@@ -1086,6 +1090,13 @@ public class OrderAction extends I_Action {
 			//Clear Prev Step Action -success 
 			ControlOrderPage.setPrevOrderStepAction(request, "");
 			
+			/** 
+			* Process run after this action 
+			* get sql manual script from 'c_after_action_sql' 
+			* and run script by action name 
+			**/
+			ProcessAfterAction.processAfterAction(ProcessAfterAction.SAVE_ORDER,orderForm.getOrder().getOrderNo());
+
 		} catch (Exception e) {
 			orderForm.getOrder().setId(orderId);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
@@ -1881,9 +1892,8 @@ public class OrderAction extends I_Action {
 			}*/
 			
 			//debug
-			/*fileName = "tax_invoice_summary_new_pdf_report";//test
-			fileType ="PDF";//test
-*/			
+			//fileName = "tax_invoice_summary_new_pdf_report";//test
+			//fileType ="PDF";//test
 			
 			logger.info("Report Name:"+fileName);
 			String fileJasper = BeanParameter.getReportPath() + fileName;

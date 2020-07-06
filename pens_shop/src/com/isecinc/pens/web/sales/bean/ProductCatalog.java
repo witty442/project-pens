@@ -9,13 +9,31 @@ public class ProductCatalog implements Comparable{
 	private String uom2;
 	private double price1;
 	private double price2;
+	private double priceAfDiscount;
 	private int qty1;
 	private int qty2;
 	private double lineNetAmt;
     private String taxable;
     private String isPromotionSpecial;
+    private String productNonBme;
     
     
+	public double getPriceAfDiscount() {
+		return priceAfDiscount;
+	}
+
+	public void setPriceAfDiscount(double priceAfDiscount) {
+		this.priceAfDiscount = priceAfDiscount;
+	}
+
+	public String getProductNonBme() {
+		return productNonBme;
+	}
+
+	public void setProductNonBme(String productNonBme) {
+		this.productNonBme = productNonBme;
+	}
+
 	public String getIsPromotionSpecial() {
 		return isPromotionSpecial;
 	}

@@ -232,6 +232,54 @@ public class BarcodeAction extends I_Action {
 		return forward;
 	}
 
+	public ActionForward prepareManualStock(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareManualStock");
+		BarcodeForm aForm = (BarcodeForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			//save old criteria
+			aForm.setJobCriteria(aForm.getJob());
+		
+            String jobId = Utils.isNull(request.getParameter("jobId"));
+            String boxNo = Utils.isNull(request.getParameter("boxNo"));
+            String mode = Utils.isNull(request.getParameter("mode"));
+            
+			if( !"".equals(jobId) && !"".equals(boxNo)){
+				logger.debug("prepare edit jobId:"+jobId +",boxNo:"+boxNo);
+				Barcode c = new Barcode();
+				c.setJobId(jobId);
+				c.setBoxNo(boxNo);
+				
+				Barcode aS = BarcodeDAO.searchManualStock(c);
+				//Validate Can Edit GR NO
+				if( !Utils.isNull(aS.getGrNo()).equals("")){
+				  aS.setCanEditGrNo(BarcodeDAO.canEditGrNo(aS.getGrNo()));
+				}else{
+				  aS.setCanEditGrNo(true);
+				}
+				aForm.setResults(aS.getItems());
+				aForm.setJob(aS);
+				aForm.setMode(mode);//Mode Edit
+			}else{
+				
+				logger.debug("prepare new documentNo");
+				aForm.setResults(new ArrayList<Barcode>());
+				Barcode ad = new Barcode();
+				ad.setCanEdit(true);
+				ad.setCanEditGrNo(true);
+				ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				aForm.setJob(ad);
+				
+				aForm.setMode(mode);//Mode Add new
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			
+		}
+		return mapping.findForward("manualStock");
+	}
 	/**
 	 * Prepare with ID
 	 */
@@ -359,6 +407,93 @@ public class BarcodeAction extends I_Action {
 		return "search";
 	}
 	
+	public ActionForward saveManualStock(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("saveManualStock");
+		BarcodeForm aForm = (BarcodeForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			Barcode h = aForm.getJob();
+			h.setCreateUser(user.getUserName());
+			h.setUpdateUser(user.getUserName());
+			
+			List<Barcode> itemList = new ArrayList<Barcode>();
+			//Set Item
+			String[] barcode = request.getParameterValues("barcode");
+			String[] materialMaster = request.getParameterValues("materialMaster");
+			String[] groupCode = request.getParameterValues("groupCode");
+			String[] pensItem = request.getParameterValues("pensItem");
+			String[] wholePriceBF = request.getParameterValues("wholePriceBF");
+			String[] retailPriceBF = request.getParameterValues("retailPriceBF");
+			String[] qty = request.getParameterValues("qty");
+			String[] status = request.getParameterValues("status");
+			
+			logger.debug("pensItem:"+pensItem.length);
+			
+			//add value to Results
+			if(pensItem != null && pensItem.length > 0){
+				for(int i=0;i<pensItem.length;i++){
+					if( !Utils.isNull(pensItem[i]).equals("") && !Utils.isNull(materialMaster[i]).equals("") 
+							&& !Utils.isNull(status[i]).equals("DELETE")){
+						 Barcode l = new Barcode();
+						 l.setLineId(i+1);
+						 l.setBarcode(Utils.isNull(barcode[i]));
+						 l.setMaterialMaster(Utils.isNull(materialMaster[i]));
+						 l.setGroupCode(Utils.isNull(groupCode[i]));
+						 l.setPensItem(Utils.isNull(pensItem[i]));
+						 l.setWholePriceBF(Utils.isNull(wholePriceBF[i]));
+						 l.setRetailPriceBF(Utils.isNull(retailPriceBF[i]));
+						 l.setQty(Utils.convertStrToInt(qty[i]));
+						 l.setCreateUser(user.getUserName());
+						 l.setUpdateUser(user.getUserName());
+						 itemList.add(l);
+					}
+				}
+			}
+			
+			h.setItems(itemList);
+			
+			//Store in Session
+			aForm.setResults(itemList);
+			
+			//Validate Job in not close
+			Job job = new Job();
+			job.setJobId(aForm.getJob().getJobId());
+			job = JobDAO.searchJobDetail(job);
+			
+			if(job != null && job.getStatus().equals(JobDAO.STATUS_CANCEL)){
+				request.setAttribute("Message", "ไม่สามารถ บันทึกข้อมูลได้  Job["+job.getJobId()+"-"+job.getName()+"] มีสถานะเป็น CANCEL");
+				return mapping.findForward("manualStock");
+			}
+			
+            if(job != null && job.getStatus().equals(JobDAO.STATUS_CLOSE)){
+            	request.setAttribute("Message", "ไม่สามารถ บันทึกข้อมูลได้  Job["+job.getJobId()+"-"+job.getName()+"] มีสถานะเป็น  CLOSE");
+            	return mapping.findForward("manualStock");
+			}
+            
+			//save
+			String boxNo = BarcodeDAO.saveManualStock(h);
+			h.setBoxNo(boxNo);
+			
+			//search
+			h = BarcodeDAO.searchManualStock(h);
+			logger.debug("h:"+h+",items:"+h.getItems().size());
+			
+			aForm.setJob(h);
+			aForm.setResults(h.getItems());
+			
+			request.setAttribute("Message", "บันทึกข้อมูลเรียบร้อยแล้ว");
+			
+			//Set Criteria for search
+			aForm.getJobCriteria().setJobId(h.getJobId());
+		} catch (Exception e) {
+            logger.error(e.getMessage(),e);
+			request.setAttribute("Message","ไม่สามารถบันทึกข้อมูลได้ \n"+ e.getMessage());
+			return mapping.findForward("manualStock");
+		} finally {
+		}
+		return mapping.findForward("manualStock");
+	}
+	
 	public ActionForward saveGrNo(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("saveGrNo");
 		Connection conn = null;
@@ -402,7 +537,26 @@ public class BarcodeAction extends I_Action {
 		}
 		return mapping.findForward("clear");
 	}
-
+	
+	public ActionForward clearManualStock(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("clearManualStock");
+		BarcodeForm aForm = (BarcodeForm) form;
+		try {
+			aForm.setResults(new ArrayList<Barcode>());
+			Barcode ad = new Barcode();
+			ad.setCanEdit(true);
+			ad.setCanEditGrNo(true);
+			ad.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			aForm.setJob(ad);
+			
+			aForm.setMode("add");//Mode Add new
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("manualStock");
+	}
+	
 	public ActionForward newBox(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("newBox");
 		BarcodeForm aForm = (BarcodeForm) form;

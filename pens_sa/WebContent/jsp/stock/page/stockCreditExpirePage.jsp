@@ -43,13 +43,28 @@ PageVisit.processPageVisit(request,pageNameTemp);
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
-
+<style>
+  .tr_red{
+    background-color: #EC7063;
+    color:black;
+  }
+  .tr_negative{
+     background-color: #d6d6c2;
+     color:black;
+  }
+</style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script> --%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+
+<!-- For fix Head and Column Table -->
+ <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script> 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-stickytable-3.0.js"></script>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/jquery-stickytable-3.0.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+
 
 <script>
 /** disable back button alway **/
@@ -182,6 +197,8 @@ function openPopup(path,pageName){
         param +="&salesrepCode="+form.salesrepCode.value;
 	}else if("ItemStock" == pageName){
 		param +="&brand="+form.brand.value;
+	}else if("BrandStock" == pageName){
+		param +="&selectone=false";
 	}
 	url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
 	PopupCenterFullHeight(url,"",600);
@@ -248,11 +265,11 @@ function popupBrandSaveZone(path){
 						<div align="center">
 						  <table align="center" border="0" cellpadding="3" cellspacing="0" >
 					       <tr>
-				                <td align="right"> วันที่<font color="red">*</font></td>
+				                <td align="right"> วันที่ตรวจนับ<font color="red">*</font></td>
 								<td >					
-									 <html:text property="bean.startDate" styleId="startDate" size="20" readonly="true" styleClass=""/>
+									 <html:text property="bean.startDate" styleId="startDate" size="10" readonly="true" styleClass=""/>
 								       -
-									 <html:text property="bean.endDate" styleId="endDate" size="20" readonly="true" styleClass=""/>
+									 <html:text property="bean.endDate" styleId="endDate" size="10" readonly="true" styleClass=""/>
 								</td>
 								<td colspan="2">ประเภทรายงาน:
 								 <font color="red"></font>
@@ -305,6 +322,10 @@ function popupBrandSaveZone(path){
 								   <html:select property="bean.reportType" styleId="reportType">
 										<html:options collection="REPORT_TYPE_LIST" property="reportValue" labelProperty="reportType"/>
 								    </html:select> 
+								    
+								      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+								    <html:checkbox property="bean.dispExpireSoon">&nbsp;แสดงรายเฉพาะรายการใกล้หมดอายุ</html:checkbox>
+								  <%--  <html:checkbox property="bean.dispExpired">&nbsp;แสดงรายเฉพาะรายการที่หมดอายุ</html:checkbox> --%>
 							  </td>
 						    </tr>
 					    </table>
@@ -323,7 +344,7 @@ function popupBrandSaveZone(path){
 									</a>
 									&nbsp;
 									<a href="javascript:popupBrandSaveZone('${pageContext.request.contextPath}')">
-									  <input type="button" value="เช็คตาราง Save Zone ของแต่ละแบรนด์" class="newPosBtnLong">
+									  <input type="button" value="เช็คตาราง Shelf Life ของแต่ละสินค้า" class="newPosBtnLong">
 									</a>			
 								</td>
 							</tr>
@@ -334,17 +355,16 @@ function popupBrandSaveZone(path){
 					  <%
 					 // System.out.println("Results:"+request.getSession().getAttribute("RESULTS"));
 					  if(request.getSession().getAttribute("stockForm_RESULTS") != null) {
-						  if(   StockConstants.PAGE_STOCK_CALLC_CREDIT.equalsIgnoreCase(pageName)){
-					   %>
-							<div id ="scroll" align="center">
-								<% out.println(request.getSession().getAttribute("stockForm_RESULTS")); %>
-							</div>
-					  <% 
-						  }else{
-					          out.println(request.getSession().getAttribute("stockForm_RESULTS"));
-						  }
-					  }
-					  %>
+					     out.println(request.getSession().getAttribute("stockForm_RESULTS"));
+					     %>
+					     <script>
+							//load jquery
+							$(function() {
+								//Load fix column and Head
+								$('#tblProduct').stickyTable({overflowy: true});
+							});
+						</script>
+					 <% }%>
 					<!-- ************************Result ***************************************************-->
 					</html:form>
 					<!-- BODY -->

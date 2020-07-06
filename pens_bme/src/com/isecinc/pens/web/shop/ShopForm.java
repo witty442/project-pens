@@ -72,7 +72,9 @@ public class ShopForm extends I_Form {
 	}
 	@Override
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
-		
+		if(getBean() != null){
+			getBean().setBmeProductOnly("");
+		}
 	}
     
 }

@@ -212,19 +212,21 @@
 %>
 	<li><a href="javascript: void(0)" class="parent" ><span>Credit Sales</span></a>
 		<ul>
-		    <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN, User.STOCKCR,User.STOCKCRSALE})){ %>
+		       <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN, User.STOCKCR,User.STOCKCRSALE})){ %>
 		          <li>
 		               <a href="#" class="parent" 
 		               onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareSearch&pageName=<%=StockConstants.PAGE_STOCK_CREDIT%>&action=new';">
 		               <span><%no++;out.print(no);%>.<bean:message key="ReportStockCredit" bundle="sysprop"/></span>
 		               </a>
 	              </li> 
-	              <li>
-		               <a href="#" class="parent" 
-		               onclick="window.location='${pageContext.request.contextPath}/jsp/promotionAction.do?do=prepareSearch&action=new';">
-		               <span><%no++;out.print(no);%>.<bean:message key="Promotion" bundle="sysprop"/></span>
-		               </a>
-	             </li> 
+	          <%} %>
+	         <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN,User.STOCKCR,User.STOCKCRSALE})){ %>
+                  <li>
+	               <a href="#" class="parent" 
+	               onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareSearch&pageName=<%=StockConstants.PAGE_STOCK_CR_EXPIRE%>&action=new';">
+	               <span><%no++;out.print(no);%>.<bean:message key="<%=StockConstants.PAGE_STOCK_CR_EXPIRE%>" bundle="sysprop"/></span>
+	               </a>
+	             </li>  
              <%} %>
              <%if ( UserUtils.userInRole("ROLE_PRODSHOW",user,new String[]{User.ADMIN, User.PRODSHOW}) ){ %>
 		        <li>
@@ -234,6 +236,22 @@
 	               </a>
 	             </li>
             <%} %> 
+              <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN, User.STOCKCR,User.STOCKCRSALE})){ %>
+	              <li>
+		              <a href="#" class="parent" 
+		              onclick="window.location='${pageContext.request.contextPath}/jsp/promotionAction.do?do=prepareSearch&action=new';">
+		              <span><%no++;out.print(no);%>.<bean:message key="Promotion" bundle="sysprop"/></span>
+		              </a>
+	             </li> 
+             <%} %>
+             <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN,User.STOCKCR,User.STOCKCRSALE})){ %>
+                  <li>
+	               <a href="#" class="parent" 
+	               onclick="window.location='${pageContext.request.contextPath}/jsp/reportAllAction.do?do=prepare&pageName=StockReturn&action=new';">
+	               <span><%no++;out.print(no);%>.<bean:message key="StockReturn" bundle="sysprop"/></span>
+	               </a>
+	             </li> 
+	          <%} %> 
              <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN,User.STOCKCR,User.STOCKCRSALE})){ %>
                  <li>
 	               <a href="#" class="parent" 
@@ -242,11 +260,11 @@
 	               </a>
 	             </li> 
              <%} %>
-              <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN,User.STOCKCR,User.STOCKCRSALE})){ %>
+             <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN,User.STOCKCR})){ %>
                   <li>
 	               <a href="#" class="parent" 
-	               onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=prepareSearch&pageName=<%=StockConstants.PAGE_STOCK_CR_EXPIRE%>&action=new';">
-	               <span><%no++;out.print(no);%>.<bean:message key="<%=StockConstants.PAGE_STOCK_CR_EXPIRE%>" bundle="sysprop"/></span>
+	                 onclick="window.location='${pageContext.request.contextPath}/jsp/reportAllAction.do?do=prepare&pageName=EffectiveSKUReport&action=new';">
+	                 <span><%no++;out.print(no);%>.<bean:message key="EffectiveSKUReport" bundle="sysprop"/></span>
 	               </a>
 	             </li>  
              <%} %>
@@ -257,6 +275,8 @@
 	               <span><%no++;out.print(no);%>.<bean:message key="ProjectC" bundle="sysprop"/></span>
 	               </a>
 	             </li>  
+	          <%} %>
+	         <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN,User.PROJECTC})){ %>
 	             <li>
 	               <a href="#" class="parent" 
 	               onclick="window.location='${pageContext.request.contextPath}/jsp/reportAllAction.do?do=prepare&action=new&pageName=ProjectCReport';">
@@ -264,14 +284,7 @@
 	               </a>
 	             </li>  
              <%} %>
-              <%if ( UserUtils.userInRole("ROLE_CR_STOCK",user,new String[]{User.ADMIN,User.STOCKCR,User.STOCKCRSALE})){ %>
-                  <li>
-	               <a href="#" class="parent" 
-	               onclick="window.location='${pageContext.request.contextPath}/jsp/reportAllAction.do?do=prepare&pageName=StockReturn&action=new';">
-	               <span><%no++;out.print(no);%>.<bean:message key="StockReturn" bundle="sysprop"/></span>
-	               </a>
-	             </li>  
-             <%} %>
+             
 		</ul>
 	</li>  
 <%}%>

@@ -450,25 +450,14 @@ public class OrderAction extends I_Action {
 			// remove promotion line
 			List<OrderLine> promotionLine = new ArrayList<OrderLine>();
 			List<OrderLine> promotionSLine = new ArrayList<OrderLine>();
-			
-			/** debug **/
-			/*for (OrderLine line : orderForm.getLines()) {
-				if (line.getPromotion().equalsIgnoreCase("S") ) {
-					logger.debug("*****Debug Line Special Input from screen***");
-					logger.debug("productCode:"+line.getProduct().getCode());
-					logger.debug("taxable:"+line.getTaxable());
-					logger.debug("qty:"+line.getQty()+","+line.getQty1());
-					logger.debug("price:"+line.getPrice()+","+line.getPrice1());
-					logger.debug("lineAmount:"+line.getLineAmount()+","+line.getLineAmount1());
-					logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1());
-					logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1());
-					logger.debug("*******************************************************");
-				}
-			}*/
+
 			// Set Display To Prepare Save Order Line (no promotion Lines)
 			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request.getSession().getAttribute("memberVIP")));
-            
-			/************************************************************************/
+
+			logger.info("********Debug before calc**********");
+			new OrderProcess().debug(orderForm.getLines());
+			logger.info("***********************************");
+			
 			// Add Promotion Line only From orderFrom to promotionLine
 			for (OrderLine line : orderForm.getLines()) {
 				//logger.debug("promotion:["+line.getPromotion()+"]");
@@ -482,7 +471,7 @@ public class OrderAction extends I_Action {
 				orderForm.getLines().remove(line);
 			}
 			
-			/*********************Promotion Specail****************************/
+			/*********************Promotion Special****************************/
 			// Add Promotion Line(S) only From orderFrom to promotionLine
 			for (OrderLine line : orderForm.getLines()) {
 				//logger.debug("promotion:["+line.getPromotion()+"]");
@@ -506,32 +495,28 @@ public class OrderAction extends I_Action {
 			}
 			//Fill Line 1 to 2 Show on screen
 			promotionSLine =  orderProcess.fillLinesShowPromotion(promotionSLine);
-			//debug
-			/*for (OrderLine line : promotionSLine) {
-				if (line.getPromotion().equalsIgnoreCase("S") ) {
-					logger.debug("*****Debug Line Special After fillLinesShowPromotion***");
-					logger.debug("productCode:"+line.getProduct().getCode());
-					logger.debug("taxable:"+line.getTaxable());
-					logger.debug("qty:"+line.getQty()+","+line.getQty1());
-					logger.debug("price:"+line.getPrice()+","+line.getPrice1());
-					logger.debug("lineAmount:"+line.getLineAmount()+","+line.getLineAmount1());
-					logger.debug("discount:"+line.getDiscount()+","+line.getDiscount1());
-					logger.debug("totalAmount:"+line.getTotalAmount()+","+line.getTotalAmount1());
-					logger.debug("*******************************************************");
-				}
-			}*/
 			
 			//SumQtySameProduct
 			promotionSLine = orderProcess.sumQtyProductPromotionDuplicate(promotionSLine);
-			/*********************Promotion Specail****************************/
+			/*********************Promotion Special****************************/
 			
 			//Recalculate lineAmount (qty*price) in Lines
 			orderForm.setLines(new MOrder().reCalculateLineAmountInLinesBeforeCalcPromotion(orderForm.getLines()));
 						
+
+			logger.info("********Debug after calcLineBeforePromotion**********");
+			new OrderProcess().debug(orderForm.getLines());
+			logger.info("***********************************");
+			
+			
 			// Call Modifier Process
 			ModifierProcess modProcess = new ModifierProcess(ConvertNullUtil.convertToString(customer.getTerritory()).trim());
 			modProcess.findModifier(orderForm.getLines(), userActive, conn);
-
+		
+			logger.info("********Debug after AfterCalcPromotion**********");
+			new OrderProcess().debug(orderForm.getLines());
+			logger.info("***********************************");
+			
 			// Set for web display.
 			logger.debug("****** Start Set Display order ****************************************************");
 	
@@ -541,29 +526,18 @@ public class OrderAction extends I_Action {
 
 			//add Line Blank UOM (1 or 2)
 			odLines = new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),odLines);
-			
-			//logger.info("Debug before promotion");
-			//new OrderProcess().debug(modProcess.getAddLines());
-			
+	
 			//add Promotion to show
 			logger.info("fillLinesShow LINE Promotion");
 			List<OrderLine> promotionLinesCalcNew = null;
 			
 			/** Case Edit New Code Promotion Goods 1 old code 2 new Code **/
-			boolean exeOrderProcessfillLinesShowPromotion = ControlCode.canExecuteMethod("OrderProcess", "fillLinesShowPromotion");
-			logger.info("CalcC4 OrderProcess fillLinesShowPromotion:"+exeOrderProcessfillLinesShowPromotion);
-			
-			if(exeOrderProcessfillLinesShowPromotion){
-				promotionLinesCalcNew = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
-			}else{
-				// default 1 old code
-				promotionLinesCalcNew = orderProcess.fillLinesShow(modProcess.getAddLines());
-			}
+			// default 1 old code
+			//promotionLinesCalcNew = orderProcess.fillLinesShow(modProcess.getAddLines());
+			promotionLinesCalcNew = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
+
 			promotionLinesCalcNew = orderProcess.sumQtyProductPromotionDuplicate(promotionLinesCalcNew);
 	
-			logger.info("Debug after promotion");
-			new OrderProcess().debug(promotionLinesCalcNew);
-			
 			//Sort by product
 			try{
 				Comparator<OrderLine> comparator = new Comparator<OrderLine>() {
@@ -742,6 +716,9 @@ public class OrderAction extends I_Action {
 			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
 					.getSession().getAttribute("memberVIP")));
 	
+			logger.info("Debug Order Lines");
+            new OrderProcess().debug(orderForm.getLines());
+
 			for (OrderLine line : orderForm.getLines()) {
 				line.setLineNo(i++);
 				line.setPayment("N");

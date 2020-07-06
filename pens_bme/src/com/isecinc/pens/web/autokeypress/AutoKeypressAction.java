@@ -23,8 +23,9 @@ public class AutoKeypressAction {
 	
 	/**
 	 * Search
-	 * resultAjax = size|codeSearch|desc|desc2|...
-	 *  not found = -1|codeSerach||
+	 * resultAjax 
+	 *      found = size|codeSearch|desc|desc2|...
+	 *  not found = -1|codeSerach|..|...
 	 */
 	public String search(HttpServletRequest request) throws Exception {
 		String resultAjax = "";
@@ -63,12 +64,14 @@ public class AutoKeypressAction {
 				criBean.setCustGroup(Utils.isNull(request.getParameter("custGroup")));
 				criBean.setPensItem(Utils.isNull(request.getParameter("pensItem")));
 				criBean.setCustGroup(Utils.isNull(request.getParameter("custGroup")));
+				criBean.setMaterialMaster(Utils.isNull(request.getParameter("materialMaster")));
 				
 				PopupBean resultPopupBean = BMEProductDAO.searchBMEProduct(criBean);
 				if(resultPopupBean != null){
-					resultAjax = "3|"+resultPopupBean.getPensItem()+"|"+resultPopupBean.getMaterialMaster()+"|"+resultPopupBean.getGroupCode();
+					resultAjax = "6|"+resultPopupBean.getPensItem()+"|"+resultPopupBean.getMaterialMaster()+"|"+resultPopupBean.getGroupCode();
+					resultAjax += "|"+resultPopupBean.getBarcode()+"|"+resultPopupBean.getWholePriceBF()+"|"+resultPopupBean.getRetailPriceBF();
 				}else{
-					resultAjax = "-1|||";
+					resultAjax = "-1|||||";
 				}
             }else if("StoreOrderRep".equalsIgnoreCase(pageName) ){
 				

@@ -359,7 +359,8 @@ public class GenerateOrderExcel extends InterfaceUtils{
 	        		  if("รหัสคอนเนอร์".equalsIgnoreCase(subTxt)){
 	    	             headerCell1.setCellValue(s.getStoreCorner());
 	        		  }else  if("รหัสร้านค้า".equalsIgnoreCase(subTxt)){
-	        			 headerCell1.setCellValue(Utils.convertStrToDouble(s.getStoreNo()));
+	        			 //headerCell1.setCellValue(Utils.convertStrToDouble(s.getStoreNo()));
+	        			 headerCell1.setCellValue(Utils.isNull(s.getStoreNo()));
                       }else  if("ชื่อร้านค้า".equalsIgnoreCase(subTxt)){
                     	 headerCell1.setCellValue(""); 
 	        		  }
@@ -466,18 +467,24 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			          
 			          headerCell1 = headerRow.createCell(1);
 			          headerCell1.setCellStyle(style.dataLineCenterStyle);
-			         headerCell1.setCellValue(Utils.convertStrToDouble(o.getRetailPriceBF()));
+			          headerCell1.setCellValue(Utils.convertStrToDouble(o.getRetailPriceBF()));
 			           
-			         /** new Case Product (AM1001LGY[9], edit:25102019**/
-				    //productCode ME1M03A3BL
-				     if(mat.length()==10){
-				    	//AM1001XLGY[10]
-				        sizeCode =mat.substring(6,8);
-				        colorCode =mat.substring(8,10);
+			          /** Edit 28/05/2563 : case product none bme no color and size **/
+				     if("Y".equalsIgnoreCase(Utils.isNull(o.getNonBme()))){
+				    	sizeCode ="----";
+				    	colorCode ="---";
 				     }else{
-				    	//AM1001LGY[9]
-				        sizeCode =mat.substring(6,7)+" ";
-				        colorCode =mat.substring(7,9);  
+				         /** new Case Product (AM1001LGY[9], edit:25102019**/
+					    //productCode ME1M03A3BL
+					     if(mat.length()==10){
+					    	//AM1001XLGY[10]
+					        sizeCode =mat.substring(6,8);
+					        colorCode =mat.substring(8,10);
+					     }else{
+					    	//AM1001LGY[9]
+					        sizeCode =mat.substring(6,7)+" ";
+					        colorCode =mat.substring(7,9);  
+					     }
 				     }
 					 logger.debug("mat["+mat+"]sizeCode["+sizeCode+"]colorCode["+colorCode+"]");
 						
@@ -749,13 +756,14 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			Date orderDate = DateUtil.parse(batchParamMap.get(PARAM_TRANS_DATE), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 			sql.append("\n SELECT DISTINCT " );
-			sql.append("\n A.mat ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF ");
+			sql.append("\n A.mat ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF,A.NON_BME ");
 			sql.append("\n FROM( ");
 			sql.append("\n 		SELECT  DISTINCT " );
 			sql.append("\n      ( select max(M.interface_value) from PENSBME_MST_REFERENCE  M");
 			sql.append("\n        WHERE  O.barcode = M.interface_desc     ");
 			sql.append("\n        AND M.reference_code = 'LotusItem' )  as mat ");
 			sql.append("\n      ,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n      ,P.NON_BME ");
 			sql.append("\n 		FROM PENSBME_ORDER O  ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n   		ON  P.group_code = O.group_code  ");
@@ -772,6 +780,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n        WHERE  I.barcode = M.interface_desc     ");
 			sql.append("\n        AND M.reference_code = 'LotusItem' )  as mat ");
 			sql.append("\n      ,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n      ,P.NON_BME ");
 			sql.append("\n 		from PENSBME_STOCK_ISSUE H ,PENSBME_STOCK_ISSUE_ITEM I  ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n 		    ON P.group_code = I.group_code  ");
@@ -789,6 +798,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n 		SELECT DISTINCT" );
 			sql.append("\n       I.material_master as mat ");
 			sql.append("\n      ,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
+			sql.append("\n      ,P.NON_BME ");
 			sql.append("\n 		from PENSBME_PICK_STOCK H ,PENSBME_PICK_STOCK_I I  ");
 			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
 			sql.append("\n 		    ON P.group_code = I.group_code  ");
@@ -819,7 +829,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
                 item.setMaterialMaster(Utils.isNull(rst.getString("mat")));
 				item.setWholePriceBF(Utils.decimalFormat(rst.getDouble("Whole_Price_BF"),Utils.format_current_2_disgit)+" ");
 				item.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("Retail_Price_BF"),Utils.format_current_2_disgit)+" ");
-
+				item.setNonBme(Utils.isNull(rst.getString("non_bme")));
 				int lineQty = 0;
 				//** add Store 
 				//** OrderNo ,qty by StoreCode

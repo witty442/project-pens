@@ -26,6 +26,7 @@ public class ExternalProcess {
 		  logger.info("--- 1.Start Run Script import_before ---");
 		  RunScriptDBAction.runManualScriptProcess("import_before",userLogin);
 		  logger.info("--- 1.End Run Script import_before ---");
+		  
 	}
 	
 	public void processImportAfter(HttpServletRequest request,User userLogin){

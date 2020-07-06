@@ -40,6 +40,7 @@ import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MDistrict;
 import com.isecinc.pens.model.MTrip;
 import com.isecinc.pens.model.MTrxHistory;
+import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 
 /**
  * Customer Action Class
@@ -673,7 +674,6 @@ public class CustomerAction extends I_Action {
 				customer.setPrintHeadBranchDesc("N");
 			}
 			
-			
 			// Save Customer
 			if (!new MCustomer().save(customer, userActive.getId(),userActive.getUserName(), conn)) {
 				// return with duplicate Document no
@@ -760,6 +760,14 @@ public class CustomerAction extends I_Action {
 			
 			// Save Token
 			saveToken(request);
+			
+			/** 
+			* Process run after this action 
+			* get sql manual script from 'c_after_action_sql' 
+			* and run script by action name 
+			**/ 
+			ProcessAfterAction.processAfterAction(ProcessAfterAction.SAVE_CUSTOMER,customerForm.getCustomer().getCode());
+
 		} catch (Exception e) {
 			customerForm.getCustomer().setId(customerId);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
