@@ -18,6 +18,7 @@ public class ControlOrderPage {
 	
 	public static void setPrevOrderStepAction(HttpServletRequest request, String stepOrderAction){
 		request.getSession().setAttribute("PREV_STEP_ORDER_ACTION", stepOrderAction);
+		logger.info(" afterset prevStepOrderAction["+Utils.isNull(request.getSession().getAttribute("PREV_STEP_ORDER_ACTION"))+"]");
 	}
 	
 	public static boolean stepIsValid(HttpServletRequest request,String curStepOrderAction){

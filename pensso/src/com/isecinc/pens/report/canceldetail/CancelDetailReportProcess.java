@@ -221,9 +221,9 @@ public class CancelDetailReportProcess extends I_ReportProcess<CancelDetailRepor
 			int i = 1;
 			while (rst.next()) {
 				OrderLine line = new OrderLine();
-				line.setId(rst.getInt("ORDER_LINE_ID"));
+				line.setId(rst.getLong("ORDER_LINE_ID"));
 				line.setLineNo(rst.getInt("LINE_NO"));
-				line.setOrderId(rst.getInt("ORDER_ID"));
+				line.setOrderId(rst.getLong("ORDER_ID"));
 				line.setProduct(new MProduct().find(rst.getString("PRODUCT_ID")));
 				line.setUom(new MUOM().find(rst.getString("UOM_ID")));
 				line.setPrice(rst.getDouble("PRICE"));

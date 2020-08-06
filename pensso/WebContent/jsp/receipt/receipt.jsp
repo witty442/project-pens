@@ -19,7 +19,7 @@
 	if(action == null){
 		action = "";
 	}
-	List<References> docstatus= InitialReferences.getReferenes().get(InitialReferences.DOC_STATUS);
+	List<References> docstatus= InitialReferences.getReferenesByManual(InitialReferences.DOC_STATUS, "SAVE");
 	pageContext.setAttribute("docstatus",docstatus,PageContext.PAGE_SCOPE);
 	
 	List<References> payment= InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);

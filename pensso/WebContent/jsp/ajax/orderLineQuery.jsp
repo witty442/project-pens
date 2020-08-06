@@ -1,4 +1,6 @@
 
+<%@page import="com.pens.util.Utils"%>
+<%@page import="java.math.BigDecimal"%>
 <%@page import="com.isecinc.pens.model.MOrderLine"%>
 <%@page import="com.isecinc.pens.bean.OrderLine"%>
 <%@page import="com.isecinc.pens.model.MOrder"%>
@@ -19,7 +21,7 @@
 	String selected = request.getParameter("selected");
 	System.out.println("select"+selected);
 	
-	List<OrderLine> lines = new MOrderLine().lookUp(Integer.parseInt(orderId));
+	List<OrderLine> lines = new MOrderLine().lookUp(Utils.convertToLong(orderId));
 	//business for line
 	String[] ss = selected.split(",");
 	//1.remove paid & selected
@@ -30,7 +32,7 @@
 		//remove selected
 		for(String s : ss){
 			if (s.trim().length() > 0) {
-				if(l.getId()==Integer.parseInt(s)){rm.add(l);}
+				if(l.getId()==Utils.convertToLong(s)){rm.add(l);}
 			}
 		}
 	}

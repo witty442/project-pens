@@ -1,15 +1,18 @@
 package com.isecinc.pens.inf.helper;
 
 import java.io.BufferedReader;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -18,6 +21,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
+import com.pens.util.EnvProperties;
 
 public class ExportHelper {
 
@@ -375,6 +379,8 @@ public class ExportHelper {
 	public static String covertToFormatExport(ColumnBean colBean,ResultSet rs) throws Exception{
 		return covertToFormatExportModel(colBean, rs,"");
 	}*/
+	
+
 	/**
 	 * covertDataToExport
 	 * @param colBean
@@ -491,7 +497,128 @@ public class ExportHelper {
 		}
 	   return dataConvertStr;
 	}
+	/**
+	 * covertDataToExport
+	 * @param colBean
+	 * @param rs
+	 * @return
+	 * @throws Exception
+	 * DESC : Convert To String to Export
+	 */
+	public static String covertToFormatExport(Connection conn,ColumnBean colBean,ResultSet rs) throws Exception{
+		String dataConvertStr = "";
+		
+		if(Constants.EXPORT_FILL_SYMBOL_ZERO.equalsIgnoreCase(colBean.getFillSymbol())){
+			dataConvertStr = Constants.EXPORT_STRING_SYMBOL_ZERO_DEFALUE;
+			return dataConvertStr;
+		}else{
+			
+			if(colBean.getColumnName().equalsIgnoreCase("Remittance_Bank_Name")){ //position 0
+				String[] bankFullName = Utils.isNull(rs.getString(colBean.getColumnName())).split("\\|");
+				if(bankFullName != null && bankFullName.length > 0){
+					 return bankFullName[0];
+				}
+			}
+            if(colBean.getColumnName().equalsIgnoreCase("Remittance_Bank_Branch_Name")){ //position 1
+            	String[] bankFullName = Utils.isNull(rs.getString(colBean.getColumnName())).split("\\|");
+				if(bankFullName != null && bankFullName.length > 0){
+					 return bankFullName[1];
+				}
+			}
 
+			if(colBean.getColumnName().equalsIgnoreCase("Destination_Account")){ //position 2
+				String[] bankFullName = Utils.isNull(rs.getString(colBean.getColumnName())).split("\\|");
+				if(bankFullName != null && bankFullName.length > 0){
+					 return Utils.getNumberOnly(bankFullName[2]);
+				}
+			}
+			if(colBean.getColumnName().equalsIgnoreCase("count_receipt_by")){ 
+				return getCountReceiptBy(conn, rs.getString("receipt_id"));
+			}
+			if(colBean.getColumnName().equalsIgnoreCase("WriteOff_Amt") 
+					&& "1".equalsIgnoreCase(rs.getString("item_number"))){ //RowNum==1 (add writeOffAmt to first Row)
+				return getWriteOffAmt(conn, rs.getString("receipt_id"));
+			}
+			/** Case Normal  **/
+			if(colBean.getColumnType().equalsIgnoreCase("DATE")){
+				logger.debug("colBean.getColumnName():"+colBean.getColumnName());
+				
+				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+					   dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), colBean.getDefaultValue());
+					}
+				}else{
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+				       dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), "ddMMyyyy");
+					}
+				}
+			}else if(colBean.getColumnType().equalsIgnoreCase("INT")){
+					logger.debug("colBean.getColumnName():"+colBean.getColumnName());
+					
+					if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+						if(rs.getDouble(colBean.getColumnName()) != 0 && rs.getDouble(colBean.getColumnName()) != 0.0){
+						   dataConvertStr = Utils.decimalFormat(rs.getDouble(colBean.getColumnName()),Utils.format_current_no_disgit);
+						}else{
+						   dataConvertStr = colBean.getDefaultValue();
+						}
+					}else{
+						if(rs.getDouble(colBean.getColumnName()) != 0 && rs.getDouble(colBean.getColumnName()) != 0.0){
+						   dataConvertStr = Utils.decimalFormat(rs.getDouble(colBean.getColumnName()),Utils.format_current_no_disgit);
+						}
+					}
+			}else if(colBean.getColumnType().equalsIgnoreCase("INT_NOCUR")){
+				logger.debug("colBean.getColumnName():"+colBean.getColumnName());
+				
+				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+					if(rs.getDouble(colBean.getColumnName()) != 0 && rs.getDouble(colBean.getColumnName()) != 0.0){
+					   dataConvertStr = Utils.decimalFormat(rs.getDouble(colBean.getColumnName()),Utils.format_num_no_disgit);
+					}else{
+					   dataConvertStr = colBean.getDefaultValue();
+					}
+				}else{
+					if(rs.getDouble(colBean.getColumnName()) != 0 && rs.getDouble(colBean.getColumnName()) != 0.0){
+					   dataConvertStr = Utils.decimalFormat(rs.getDouble(colBean.getColumnName()),Utils.format_num_no_disgit);
+					}
+				}
+			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
+				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+					   dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss");
+					}
+				}else{
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+				      dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss");
+					}
+				}
+			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP_NO_SS")){
+				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+					   dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmm");
+					}
+				}else{
+					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
+				       dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmm");
+					}
+				}
+			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP_LONG_NO_SS")){
+				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
+				}else{
+					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
+				}
+			}else if(colBean.getColumnType().equalsIgnoreCase("LONG_TIMESTAMP_LONG_NO_SS")){
+				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
+					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HHmmss_WITHOUT_SLASH,Locale.US);
+				}else{
+					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HHmmss_WITHOUT_SLASH,Locale.US);
+				}
+			}else{
+				 dataConvertStr = Utils.isNull(rs.getString(Utils.removeStringEnter(colBean.getColumnName())));
+			}
+			
+		}
+	   return dataConvertStr;
+	}
 	
 	public static String covertToFormatExportByFunction(ColumnBean colBean,ResultSet rs,User user) throws Exception{
 		String dataConvertStr = "";
@@ -614,5 +741,52 @@ public class ExportHelper {
 		return tableName;
 	}
 	
+	public static String  getCountReceiptBy(Connection conn,String receiptId) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String sql = "";
+		String countReceiptBy = "";
+		try{
+			sql = " select count(*) as c from (";
+			sql += "  select distinct payment_method,cheque_no from t_receipt_by ";
+			sql += "  where receipt_by_id in("; 
+			sql += "    select receipt_by_id from t_receipt r , t_receipt_match m ";
+			sql += "    where r.receipt_id = m.receipt_id"; 
+			sql += "    and r.receipt_id = "+receiptId; 
+			sql += "  ) and write_off <> 'Y' ";
+			sql += " ) ";
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			if(rs.next()){
+				countReceiptBy = rs.getString("c");
+			}
+			return countReceiptBy;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			ps.close();
+		}
+	}
+	public static String  getWriteOffAmt(Connection conn,String receiptId) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String sql = "";
+		String writeOffAmt = "";
+		try{
+			sql = "  select nvl(sum(receipt_amount),0) as writeOffAmt from pensso.t_receipt_by ";
+			sql += " where receipt_id = "+receiptId; 
+			sql += " and write_off = 'Y' ";
 	
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			if(rs.next()){
+				writeOffAmt = rs.getString("writeOffAmt");
+			}
+			return writeOffAmt;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			ps.close();
+		}
+	}
 }

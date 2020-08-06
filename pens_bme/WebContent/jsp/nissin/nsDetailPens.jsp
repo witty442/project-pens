@@ -310,38 +310,78 @@ function cancelAction(path){
 											   
 		                                      <table align="left" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="50%">
 			                                    <tr>
-			                                      <th colspan="2">CUP 72</th>
-			                                      <th colspan="4">BAG</th>
-			                                      <th colspan="2">POOH 72</th>
+			                                      <th colspan="2" rowspan="2">CUP18 72</th>
+			                                      <th colspan="6">BAG</th>
+			                                      <th colspan="2" rowspan="2">MiniCup 72</th>
+			                                      <th colspan="2" rowspan="2">CUP20 72</th>
+			                                      <th colspan="2" rowspan="2">Kasi 72</th>
 			                                    </tr>
+			                                    <tr>
+			                                        <th colspan="2">BAG6 </th>
+													<th colspan="2">BAG Inter</th>
+													<th colspan="2">BAG Thai</th>
+											    </tr>
 			                                    <tr>
 			                                      <th>CTN</th>
 			                                      <th>CUP</th>
 			                                      
-			                                      <th>BAG 6(CTN)</th>
-			                                      <th>BAG 6(BAG)</th>
+			                                      <th>BAG6 (CTN)</th>
+			                                      <th>BAG6 (BAG)</th>
 			                                      
-			                                      <th>BAG 10(CTN)</th>
-			                                      <th>BAG 10(BAG)</th>
+			                                      <th>BAG INTER (CTN)</th>
+			                                      <th>BAG INTER (BAG)</th>
+			                                      
+			                                      <th>BAG THAI (CTN)</th>
+			                                      <th>BAG THAI (BAG)</th>
 			                                       
+			                                      <th>MiniCup72 (CTN)</th>
+			                                      <th>MiniCup72 (CTN)</th>
+			                                      
 			                                      <th>CTN</th>
 			                                      <th>CUP</th>
+			                                      
+			                                      <th>CTN</th>
+			                                      <th>BAG</th>
 			                                    </tr>
 			                                    <tr>
-			                                       <td><html:text property="bean.cupQty" styleClass="\" autoComplete=\"off" styleId="cupQty" size="10" onkeydown="return inputNum(event);"/> </td>
-			                                       <td><html:text property="bean.cupNQty" styleClass="\" autoComplete=\"off" styleId="cupNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                        <!-- CUP 72 -->
+			                                       <td width="3%"><html:text property="bean.cupQty" styleClass="\" autoComplete=\"off" styleId="cupQty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                       <td width="3%"><html:text property="bean.cupNQty" styleClass="\" autoComplete=\"off" styleId="cupNQty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                    
+			                                       <!-- BAG -->
 			                                       <!-- BAG6(CTN) -->
-			                                       <td><html:text property="bean.pac6CTNQty" styleClass="\" autoComplete=\"off" styleId="pac6CTNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td width="5%"><html:text property="bean.pac6CTNQty" styleClass="\" autoComplete=\"off" styleId="pac6CTNQty" size="5" onkeydown="return inputNum(event);"/> </td>
 			                                       <!-- BAG6(BAG) -->
-			                                       <td><html:text property="bean.pac6Qty" styleClass="\" autoComplete=\"off" styleId="pac6Qty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <td width="5%"><html:text property="bean.pac6Qty" styleClass="\" autoComplete=\"off" styleId="pac6Qty" size="5" onkeydown="return inputNum(event);"/> </td>
 			                                       
-			                                       <!-- BAG10(CTN) -->
-			                                       <td><html:text property="bean.pac10CTNQty" styleClass="\" autoComplete=\"off" styleId="pac10CTNQty" size="10" onkeydown="return inputNum(event);"/> </td>
-			                                       <!-- BAG10(BAG) -->
-			                                       <td><html:text property="bean.pac10Qty" styleClass="\" autoComplete=\"off" styleId="pac10Qty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <!-- BAG INTER (CTN) *(NEW)-->
+			                                       <td width="5%"><html:text property="bean.interCTNQty" styleClass="\" autoComplete=\"off" styleId="pac6CTNQty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                       <!-- BAG INTER (BAG) *(NEW)-->
+			                                       <td width="5%"><html:text property="bean.interBAGQty" styleClass="\" autoComplete=\"off" styleId="pac6Qty" size="5" onkeydown="return inputNum(event);"/> </td>
 			                                       
-			                                       <td><html:text property="bean.poohQty" styleClass="\" autoComplete=\"off" styleId="poohQty" size="10" onkeydown="return inputNum(event);"/> </td>
-			                                       <td><html:text property="bean.poohNQty" styleClass="\" autoComplete=\"off" styleId="poohNQty" size="10" onkeydown="return inputNum(event);"/> </td>
+			                                       <!-- BAG10(CTN) to BAG THAI (CTN)-->
+			                                       <td width="5%"><html:text property="bean.pac10CTNQty" styleClass="\" autoComplete=\"off" styleId="pac10CTNQty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                       <!-- BAG10(BAG) to BAG THAI (BAG)-->
+			                                       <td width="5%"><html:text property="bean.pac10Qty" styleClass="\" autoComplete=\"off" styleId="pac10Qty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                       
+			                                       <!-- MiniCup72 -->
+			                                       <!-- CTN to MiniCup72(CTN)-->
+			                                       <td width="5%"><html:text property="bean.poohQty" styleClass="\" autoComplete=\"off" styleId="poohQty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                       <!-- CUP to MiniCup72(CUP)-->
+			                                       <td width="5%"><html:text property="bean.poohNQty" styleClass="\" autoComplete=\"off" styleId="poohNQty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                      
+			                                       <!-- Cup20 72 -->
+			                                       <!-- CUP20 72 CTN -->
+			                                       <td width="3%"><html:text property="bean.cup20CTNQty" styleClass="\" autoComplete=\"off" styleId="poohQty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                       <!-- CUP20 72 CUP -->
+			                                       <td width="3%"><html:text property="bean.cup20CUPQty" styleClass="\" autoComplete=\"off" styleId="poohNQty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                      
+			                                       <!-- Kasi 72 -->
+			                                       <!-- Kasi 72 CTN -->
+			                                       <td width="3%"><html:text property="bean.kasi72CTNQty" styleClass="\" autoComplete=\"off" styleId="poohQty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                       <!-- Kasi 72 BAG -->
+			                                       <td width="3%"><html:text property="bean.kasi72BAGQty" styleClass="\" autoComplete=\"off" styleId="poohNQty" size="5" onkeydown="return inputNum(event);"/> </td>
+			                                      
 			                                    </tr>
 		                                      </table>
 		                                    </fieldset>

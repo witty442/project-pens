@@ -13,7 +13,54 @@ public class ProductCatalog implements Comparable{
 	private int qty2;
 	private double lineNetAmt;
     private String taxable;
-   
+    private double stockOnhandQty;
+    private int stockOnhandQty1;
+	private int stockOnhandQty2;
+	private String uom1ConvRate;
+	private String uom2ConvRate;
+	
+	
+	public String getUom1ConvRate() {
+		return uom1ConvRate;
+	}
+
+	public void setUom1ConvRate(String uom1ConvRate) {
+		this.uom1ConvRate = uom1ConvRate;
+	}
+
+	public String getUom2ConvRate() {
+		return uom2ConvRate;
+	}
+
+	public void setUom2ConvRate(String uom2ConvRate) {
+		this.uom2ConvRate = uom2ConvRate;
+	}
+
+
+
+	public double getStockOnhandQty() {
+		return stockOnhandQty;
+	}
+
+	public void setStockOnhandQty(double stockOnhandQty) {
+		this.stockOnhandQty = stockOnhandQty;
+	}
+
+	public int getStockOnhandQty1() {
+		return stockOnhandQty1;
+	}
+
+	public void setStockOnhandQty1(int stockOnhandQty1) {
+		this.stockOnhandQty1 = stockOnhandQty1;
+	}
+
+	public int getStockOnhandQty2() {
+		return stockOnhandQty2;
+	}
+
+	public void setStockOnhandQty2(int stockOnhandQty2) {
+		this.stockOnhandQty2 = stockOnhandQty2;
+	}
 
 	public String getTaxable() {
 		return taxable;

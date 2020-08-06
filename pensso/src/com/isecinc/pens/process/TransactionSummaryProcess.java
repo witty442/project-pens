@@ -1,5 +1,6 @@
 package com.isecinc.pens.process;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -9,9 +10,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
+import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.Product;
@@ -19,7 +20,10 @@ import com.isecinc.pens.bean.TransactionSummary;
 import com.isecinc.pens.bean.TransactionSummaryCustomer;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MCustomer;
+import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MProduct;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
 
 /**
  * Transaction Summary Process Class for VISIT/ORDER/PROMOTION
@@ -30,7 +34,7 @@ import com.isecinc.pens.model.MProduct;
  */
 public class TransactionSummaryProcess {
 
-	Logger log = Logger.getLogger("PENS");
+	Logger logger = Logger.getLogger("PENS");
 
 	/**
 	 * Get Summarty
@@ -50,34 +54,32 @@ public class TransactionSummaryProcess {
 			// new InitialReferences().init(conn);
 			String whereCause = "";
 
-			whereCause += "  and customer_id in ";
-			whereCause += "( ";
-			whereCause += "select o.customer_id from t_order o where o.DOC_STATUS = 'SV' and o.order_type = '"
+			whereCause += "\n  and customer_id in ";
+			whereCause += "\n( ";
+			whereCause += "\n select o.customer_id from t_order o where o.DOC_STATUS = '"+I_PO.STATUS_LOADING+"' and o.order_type = '"
 					+ criteria.getOrderType() + "' and o.user_id = " + criteria.getUserId();
 			if (ConvertNullUtil.convertToString(criteria.getDateFrom()).trim().length() > 0)
-				whereCause += "  and o.ORDER_DATE >= '"
-						+ DateToolsUtil.convertToTimeStamp(criteria.getDateFrom().trim()) + "'";
+				whereCause += "  and o.ORDER_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(criteria.getDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n";
 			if (ConvertNullUtil.convertToString(criteria.getDateTo()).trim().length() > 0)
-				whereCause += " and o.ORDER_DATE <= '" + DateToolsUtil.convertToTimeStamp(criteria.getDateTo().trim())
-						+ "' ";
+				whereCause += " and o.ORDER_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(criteria.getDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n";
+						
 			if (ConvertNullUtil.convertToString(criteria.getCustomerId()).trim().length() > 0)
 				whereCause += "  and o.customer_id = " + criteria.getCustomerId().trim();
 
-			whereCause += " union  ";
+			whereCause += "\n union  ";
 
-			whereCause += "select o.customer_id from t_visit o where o.ISACTIVE = 'Y' and o.order_type = '"
+			whereCause += "\nselect o.customer_id from t_visit o where o.ISACTIVE = 'Y' and o.order_type = '"
 					+ criteria.getOrderType() + "' and o.user_id = " + criteria.getUserId();
 			if (ConvertNullUtil.convertToString(criteria.getDateFrom()).trim().length() > 0)
-				whereCause += "  and o.VISIT_DATE >= '"
-						+ DateToolsUtil.convertToTimeStamp(criteria.getDateFrom().trim()) + "'";
+				whereCause += "\n  and o.VISIT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(criteria.getDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n";
 			if (ConvertNullUtil.convertToString(criteria.getDateTo()).trim().length() > 0)
-				whereCause += " and o.VISIT_DATE <= '" + DateToolsUtil.convertToTimeStamp(criteria.getDateTo().trim())
-						+ "' ";
+				whereCause += "\n and o.VISIT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(criteria.getDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n";
 			if (ConvertNullUtil.convertToString(criteria.getCustomerId()).trim().length() > 0)
-				whereCause += "  and o.customer_id = " + criteria.getCustomerId().trim();
+				whereCause += "\n  and o.customer_id = " + criteria.getCustomerId().trim();
 
-			whereCause += ") ";
+			whereCause += "\n) ";
 
+			logger.debug("whereCause:"+whereCause);
 			Customer[] custs = new MCustomer().search(whereCause);
 			List<Address> addrs;
 			if (custs == null) return summaryCustomers;
@@ -89,7 +91,7 @@ public class TransactionSummaryProcess {
 				ba = false;
 				sc = new TransactionSummaryCustomer();
 				sc.setCustomer(c);
-				log.debug(c);
+				logger.debug(c);
 				addrs = new MAddress().lookUp(c.getId());
 				for (Address ad : addrs) {
 					if (ad.getPurpose().equalsIgnoreCase("S")) {
@@ -110,11 +112,11 @@ public class TransactionSummaryProcess {
 				
 				//debug
 				if(sc.getAddress() != null){
-				   log.debug(sc.getAddress().getLineString());
+					logger.debug(sc.getAddress().getLineString());
 				}
 				
 				sql = createSQL(criteria, c.getId());
-				log.debug(sql);
+				logger.debug(sql);
 				rst = stmt.executeQuery(sql);
 				sc.setSummaries(getResult(rst));
 
@@ -145,72 +147,72 @@ public class TransactionSummaryProcess {
 	 * @param customerId
 	 * @return
 	 */
-	private String createSQL(TransactionSummary criteria, int customerId) throws Exception {
+	private String createSQL(TransactionSummary criteria, long customerId) throws Exception {
 		String sql = "";
 
-		sql += "select * from ( ";
+		sql += "select * from ( \n";
 
-		sql += "select v.VISIT_DATE as DATES,p.PRODUCT_ID, p.NAME, vl.UOM_ID as SUBUOM, ";
-		sql += "sum(vl.AMOUNT+vl.AMOUNT2) as QTY,p.UOM_ID as PUOM,\"1_VSIT\" as TYPE ,0 AS PRICELIST_ID ";
-		sql += "from t_visit_line vl, t_visit v , m_product p ";
-		sql += "where 1=1 ";
-		sql += "  and vl.PRODUCT_ID  = p.PRODUCT_ID ";
-		sql += "  and vl.VISIT_ID = v.VISIT_ID ";
-		sql += "  and v.ISACTIVE = 'Y' ";
-		sql += "  and v.order_type = '" + criteria.getOrderType() + "' ";
-		sql += "  and v.USER_ID = " + criteria.getUserId();
+		sql += "select v.VISIT_DATE as DATES,p.PRODUCT_ID, p.NAME, vl.UOM_ID as SUBUOM, \n";
+		sql += "sum(vl.AMOUNT+vl.AMOUNT2) as QTY,p.UOM_ID as PUOM,'1_VSIT' as TYPE ,0 AS PRICELIST_ID \n";
+		sql += "from t_visit_line vl, t_visit v , m_product p \n";
+		sql += "where 1=1 \n";
+		sql += "  and vl.PRODUCT_ID  = p.PRODUCT_ID \n";
+		sql += "  and vl.VISIT_ID = v.VISIT_ID \n";
+		sql += "  and v.ISACTIVE = 'Y' \n";
+		sql += "  and v.order_type = '" + criteria.getOrderType() + "' \n";
+		sql += "  and v.USER_ID = " + criteria.getUserId() +"\n";
 		sql += "  and v.CUSTOMER_ID = " + customerId;
 		if (ConvertNullUtil.convertToString(criteria.getDateFrom()).trim().length() > 0)
-			sql += "  and v.VISIT_DATE >= '" + DateToolsUtil.convertToTimeStamp(criteria.getDateFrom().trim()) + "' ";
+			sql += "  and v.VISIT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(criteria.getDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n";
 		if (ConvertNullUtil.convertToString(criteria.getDateTo()).trim().length() > 0)
-			sql += "  and v.VISIT_DATE <= '" + DateToolsUtil.convertToTimeStamp(criteria.getDateTo().trim()) + "' ";
-		sql += " group by v.VISIT_DATE, p.NAME, vl.UOM_ID, p.UOM_ID ";
+			sql += "  and v.VISIT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(criteria.getDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n";
+		sql += " group by v.VISIT_DATE,p.PRODUCT_ID, p.NAME, vl.UOM_ID, p.UOM_ID \n";
 
-		sql += "UNION ";
+		sql += "UNION \n";
 
-		sql += "select o.ORDER_DATE as DATES,p.PRODUCT_ID, p.NAME, ol.UOM_ID as SUBUOM , ";
-		sql += "sum(ol.QTY) as QTY ,p.UOM_ID as PUOM,\"2_ORDER\" as TYPE ,o.PRICELIST_ID ";
-		sql += "from t_order_line ol ,t_order o , m_product p ";
-		sql += "where ol.promotion = 'N' ";
-		sql += "  and ol.PRODUCT_ID  = p.PRODUCT_ID ";
-		sql += "  and ol.ORDER_ID = o.ORDER_ID ";
+		sql += "select o.ORDER_DATE as DATES,p.PRODUCT_ID, p.NAME, ol.UOM_ID as SUBUOM , \n";
+		sql += "sum(ol.QTY) as QTY ,p.UOM_ID as PUOM,'2_ORDER' as TYPE ,o.PRICELIST_ID \n";
+		sql += "from t_order_line ol ,t_order o , m_product p \n";
+		sql += "where ol.promotion = 'N' \n";
+		sql += "  and ol.PRODUCT_ID  = p.PRODUCT_ID \n";
+		sql += "  and ol.ORDER_ID = o.ORDER_ID \n";
 		// Aneak.t 21/01/2011
-		sql += " and ol.ISCANCEL = 'N' ";
+		sql += " and ol.ISCANCEL = 'N' \n";
 
-		sql += "  and o.DOC_STATUS = 'SV' ";
-		sql += "  and o.order_type = '" + criteria.getOrderType() + "' ";
-		sql += "  and o.USER_ID = " + criteria.getUserId();
-		sql += "  and o.CUSTOMER_ID = " + customerId;
+		sql += "  and o.DOC_STATUS = '"+I_PO.STATUS_LOADING+"' \n";
+		sql += "  and o.order_type = '" + criteria.getOrderType() + "' \n";
+		sql += "  and o.USER_ID = " + criteria.getUserId()+"\n";
+		sql += "  and o.CUSTOMER_ID = " + customerId +"\n";
 		if (ConvertNullUtil.convertToString(criteria.getDateFrom()).trim().length() > 0)
-			sql += "  and o.ORDER_DATE >= '" + DateToolsUtil.convertToTimeStamp(criteria.getDateFrom().trim()) + "' ";
+			sql += "  and o.ORDER_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(criteria.getDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n";
 		if (ConvertNullUtil.convertToString(criteria.getDateTo()).trim().length() > 0)
-			sql += "  and o.ORDER_DATE <= '" + DateToolsUtil.convertToTimeStamp(criteria.getDateTo().trim()) + "' ";
-		sql += " group by o.ORDER_DATE, p.NAME,ol.UOM_ID,p.UOM_ID ";
+			sql += "  and o.ORDER_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(criteria.getDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n";
+		sql += " group by o.ORDER_DATE,p.PRODUCT_ID, p.NAME,ol.UOM_ID,p.UOM_ID,o.PRICELIST_ID  \n";
 
-		sql += "UNION ";
+		sql += "UNION \n";
 
-		sql += "select o.ORDER_DATE as DATES,p.PRODUCT_ID, p.NAME, ol.UOM_ID as SUBUOM, ";
-		sql += "sum(ol.QTY) as QTY ,p.UOM_ID as PUOM,\"3_PROMO\" as TYPE, o.PRICELIST_ID ";
-		sql += "from t_order_line ol ,t_order o , m_product p ";
-		sql += "where ol.promotion = 'Y' ";
-		sql += "  and ol.PRODUCT_ID  = p.PRODUCT_ID ";
-		sql += "  and ol.ORDER_ID = o.ORDER_ID ";
+		sql += "select o.ORDER_DATE as DATES,p.PRODUCT_ID, p.NAME, ol.UOM_ID as SUBUOM, \n";
+		sql += "sum(ol.QTY) as QTY ,p.UOM_ID as PUOM,'3_PROMO' as TYPE, o.PRICELIST_ID \n";
+		sql += "from t_order_line ol ,t_order o , m_product p \n";
+		sql += "where ol.promotion = 'Y' \n";
+		sql += "  and ol.PRODUCT_ID  = p.PRODUCT_ID \n";
+		sql += "  and ol.ORDER_ID = o.ORDER_ID \n";
 		// Aneak.t 21/01/2011
-		sql += " and ol.ISCANCEL = 'N' ";
+		sql += " and ol.ISCANCEL = 'N' \n";
 
-		sql += "  and o.DOC_STATUS = 'SV' ";
-		sql += "  and o.order_type = '" + criteria.getOrderType() + "' ";
-		sql += "  and o.USER_ID = " + criteria.getUserId();
-		sql += "  and o.CUSTOMER_ID = " + customerId;
+		sql += "  and o.DOC_STATUS = '"+I_PO.STATUS_LOADING+"' \n";
+		sql += "  and o.order_type = '" + criteria.getOrderType() + "' \n";
+		sql += "  and o.USER_ID = " + criteria.getUserId()+"\n";
+		sql += "  and o.CUSTOMER_ID = " + customerId +"\n";
 		if (ConvertNullUtil.convertToString(criteria.getDateFrom()).trim().length() > 0)
-			sql += "  and o.ORDER_DATE >= '" + DateToolsUtil.convertToTimeStamp(criteria.getDateFrom().trim()) + "' ";
+			sql += "  and o.ORDER_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(criteria.getDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n";
 		if (ConvertNullUtil.convertToString(criteria.getDateTo()).trim().length() > 0)
-			sql += "  and o.ORDER_DATE <= '" + DateToolsUtil.convertToTimeStamp(criteria.getDateTo().trim()) + "' ";
-		sql += " group by o.ORDER_DATE, p.NAME,ol.UOM_ID,p.UOM_ID ";
+			sql += "  and o.ORDER_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(criteria.getDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n";
+		sql += " group by o.ORDER_DATE,p.PRODUCT_ID, p.NAME,ol.UOM_ID,p.UOM_ID,o.PRICELIST_ID  \n";
 
-		sql += ") a ";
+		sql += ") a \n";
 
-		sql += " order by DATES, NAME, PRODUCT_ID, SUBUOM, TYPE ";
+		sql += " order by DATES, NAME, PRODUCT_ID, SUBUOM, TYPE \n";
 
 		return sql;
 	}

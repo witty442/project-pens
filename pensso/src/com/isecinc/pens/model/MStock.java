@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.NumberToolsUtil;
 
@@ -31,6 +30,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.StockDocumentProcess;
+import com.pens.util.DBCPConnectionProvider;
 
 
 public class MStock {
@@ -252,7 +252,7 @@ public class MStock {
 			ps.setString(++index, model.getUserId());
 			ps.setDate(++index, new java.sql.Date(new Date().getTime()));
 			ps.setString(++index, model.getCreatedBy());
-			ps.setInt(++index, model.getCustomerId());
+			ps.setLong(++index, model.getCustomerId());
 			ps.setInt(++index, Utils.convertStrToInt(model.getBackAvgMonth()));
 			
 			int ch = ps.executeUpdate();
@@ -496,7 +496,7 @@ public class MStock {
 				sql.append("\n  where 1=1 ");
 				sql.append("\n  and  h.user_id ='"+mCriteria.getUserId()+"'");
 				
-				if( mCriteria.getCustomerId() != 0){
+				if( mCriteria.getCustomerId() !=0){
 				    sql.append("\n  and  h.customer_id ='"+mCriteria.getCustomerId()+"'");
 			    }
 			
@@ -581,7 +581,7 @@ public class MStock {
 			
 			while (rst.next()) {
 			  m = mCriteria;
-			  m.setCustomerId(rst.getInt("customer_id"));
+			  m.setCustomerId(rst.getLong("customer_id"));
 			  m.setRequestNumber(rst.getString("request_number"));
 			  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  requestDate = Utils.parse(m.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);

@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import util.BeanParameter;
 import util.ControlCode;
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
 import com.isecinc.core.bean.References;
@@ -40,6 +39,7 @@ import com.isecinc.pens.model.MProductCategory;
 import com.isecinc.pens.model.MProductPrice;
 import com.isecinc.pens.model.MQualifier;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * Modifier Process Class
@@ -90,7 +90,7 @@ public class ModifierProcess {
 	 * @param conn
 	 * @throws Exception
 	 */
-	public void findModifier(List<OrderLine> orderLines, User user, Connection conn,String custGroup) throws Exception {
+	public void findModifier(List<OrderLine> orderLines, User user, Connection conn,String custGroup,String provinceGroup) throws Exception {
 		logger.debug("Find Modifier..");
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -127,12 +127,15 @@ public class ModifierProcess {
 						        , oline.getUom().getId()
 						        , LEVEL_LINE
 						        , user
-						        ,custGroup);
+						        ,custGroup
+						        ,provinceGroup);
 				
 				if(isDebug){
 				  //logger.info("Item Category LINE Modifier >> SQL[\n "+sql+"\n]");
 					if( !Utils.isNull(custGroup).equals("")){
 				       FileUtil.writeFile("d:/dev_temp/temp/c4_cust/GetItemCategory_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
+					}else if( !Utils.isNull(provinceGroup).equals("")){
+					   FileUtil.writeFile("d:/dev_temp/temp/c4_province/GetItemCategory_"+Utils.isNull(provinceGroup)+".sql", sql.toString(), "TIS-620");
 					}else{
 					   FileUtil.writeFile("d:/dev_temp/temp/c4/GetItemCategory_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
 					}
@@ -157,12 +160,15 @@ public class ModifierProcess {
 				        , oline.getUom().getId()
 				        , LEVEL_LINE
 				        , user
-				        ,custGroup);
+				        ,custGroup
+				        ,provinceGroup);
 				
 				if(isDebug){
 				   //logger.info("Item LINE Modifier >>SQL[\n "+sql+"\n]");
 					if( !Utils.isNull(custGroup).equals("")){
 						FileUtil.writeFile("d:/dev_temp/temp/c4_cust/GetItemNumber_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
+					}else if( !Utils.isNull(provinceGroup).equals("")){
+						FileUtil.writeFile("d:/dev_temp/temp/c4_province/GetItemNumber_"+Utils.isNull(provinceGroup)+".sql", sql.toString(), "TIS-620");
 					}else{
 				        FileUtil.writeFile("d:/dev_temp/temp/c4/GetItemNumber_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
 					}
@@ -235,11 +241,14 @@ public class ModifierProcess {
 			    	  , ""
 			    	  ,LEVEL_LINEGROUP
 			    	  , user
-			    	  ,custGroup);
+			    	  ,custGroup
+			    	  ,provinceGroup);
 				if(isDebug){
 				   //logger.info("CateId["+item.getId()+"Loop Cate LINEGROUP>> SQL[\n "+sql+"\n]");
 					if( !Utils.isNull(custGroup).equals("")){
 					    FileUtil.writeFile("d:/dev_temp/temp/c4_cust/GetLineGroup_CatID_"+item.getId()+"_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
+					}else if( !Utils.isNull(provinceGroup).equals("")){
+						FileUtil.writeFile("d:/dev_temp/temp/c4_province/GetLineGroup_CatID_"+item.getId()+"_"+Utils.isNull(provinceGroup)+".sql", sql.toString(), "TIS-620");
 					}else{
 				        FileUtil.writeFile("d:/dev_temp/temp/c4/GetLineGroup_CatID_"+item.getId()+"_"+Utils.isNull(custGroup)+".sql", sql.toString(), "TIS-620");
 					}
@@ -247,7 +256,8 @@ public class ModifierProcess {
 				
 				rst = stmt.executeQuery(sql);
 				
-				processModifierLINEGROUP(rst, orderLines, BeanParameter.getModifierItemCategory(),custGroup);
+				processModifierLINEGROUP(rst, orderLines, BeanParameter.getModifierItemCategory()
+						                ,custGroup,provinceGroup);
 				
 				if(rst != null) { 
 					rst.close();
@@ -292,7 +302,7 @@ public class ModifierProcess {
 		Statement stmt = null;
 		ResultSet rst = null;
 		try {
-			String sql;
+			/*String sql;
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			// ITEM CATEGORY MODIFIER
 			stmt = conn.createStatement();
@@ -307,7 +317,7 @@ public class ModifierProcess {
 			sql = createSQL(BeanParameter.getModifierItemNumber(), String.valueOf(product.getId()), product.getId(),
 					"", "", user,"");
 			rst = stmt.executeQuery(sql);
-			listDesc.addAll(getLineDescription(rst));
+			listDesc.addAll(getLineDescription(rst));*/
 
 		} catch (Exception e) {
 			throw e;
@@ -464,15 +474,14 @@ public class ModifierProcess {
 					shipDate = oline.getShippingDate();
 					requestDate = oline.getRequestDate();
 					
-					//if ( ModifierControl.METHOD_PROMOTION_GOODS_2.equalsIgnoreCase(ModifierControl.getMethodPromotiomGoodsControl()) ){
-					if(ControlCode.canExecuteMethod("ModifierProcess", "promotionalGoodProcessNew")){
-						 //New Code
-						 promotionalGoodProcessNew(oline.getQty());
-					}else{
-					     //default 1 (old code)
-					     promotionalGoodProcess(oline.getQty());
-				    }
+					promotionalGoodProcessNew(oline.getQty());
 				}
+				//Surchart (+)
+				logger.debug("BeanParameter.getModifierSurchart():"+BeanParameter.getModifierSurchart());
+				if (modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierSurchart())) {
+					//surchartProcess(oline.getQty(), oline.getLineAmount(), useLines, false);
+				}
+				
 			} else {
 				if(isDebug){
 				  logger.info("No Promotion..");
@@ -499,7 +508,8 @@ public class ModifierProcess {
 	 * @param oline
 	 * @throws Exception
 	 */
-	private void processModifierLINEGROUP(ResultSet rst, List<OrderLine> orderLines, String attr,String custGroup) throws Exception {
+	private void processModifierLINEGROUP(ResultSet rst, List<OrderLine> orderLines
+			, String attr,String custGroup,String provinceGroup) throws Exception {
     
 		if(isDebug){
 		  logger.info(" ******* Start processModifierLINEGROUP****************************************");
@@ -592,12 +602,18 @@ public class ModifierProcess {
 					}//for 
 					
 					/**  Process Modifier with OrderLines   Process Line is no Exclude**/
-
+                    logger.debug("custGroup["+custGroup+"]provinceGroup["+provinceGroup+"]");
+                    
 					//FIND NOT= (MODIFIER_LINE ) in M_QUALIFIER
 					if( !Utils.isNull(custGroup).equals("")){
-					    canUseModifierLineId = new MQualifier().canUseModifierLineId(custGroup, modifierLine.getId());
+					    canUseModifierLineId = new MQualifier().canUseModifierLineId(custGroup, modifierLine.getId(),"Customer Group");
+					    logger.info("canUseModifierLineId[Customer Group]["+modifierLine.getId()+"]["+canUseModifierLineId+"]");
 					}
-					logger.info("canUseModifierLineId["+modifierLine.getId()+"]["+canUseModifierLineId+"]");
+					
+					if( !Utils.isNull(provinceGroup).equals("")){
+					    canUseModifierLineId = new MQualifier().canUseModifierLineId(provinceGroup, modifierLine.getId(),"Province Group");
+					    logger.info("canUseModifierLineId[Province Group]["+modifierLine.getId()+"]["+canUseModifierLineId+"]");
+					}
 					
 					// Discount
 					if (canUseModifierLineId && modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierDiscount())) {
@@ -610,15 +626,15 @@ public class ModifierProcess {
 					
 					// Promotional Good
 					if (canUseModifierLineId && modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierPromotiongood())) {
-						//if ( ModifierControl.METHOD_PROMOTION_GOODS_2.equalsIgnoreCase(ModifierControl.getMethodPromotiomGoodsControl()) ){
-						 if(ControlCode.canExecuteMethod("ModifierProcess", "promotionalGoodProcessNew")){
-							//New Code
-							promotionalGoodProcessNew(sumQty);
-						}else{
-						     //default (old code)
-							promotionalGoodProcess(sumQty);
-					    }
+						//New Code
+						promotionalGoodProcessNew(sumQty);
 					}//if
+					
+					//Surchart (+)
+					logger.debug("BeanParameter.getModifierSurchart():"+BeanParameter.getModifierSurchart());
+					if (canUseModifierLineId && modifierLine.getType().equalsIgnoreCase(BeanParameter.getModifierSurchart())) {
+						//surchartProcess(sumQty, sumAmount, noExcludeLines, true);
+					}
 				}//if
 			} else {
 				logger.info("No Promotion..");
@@ -750,11 +766,14 @@ public class ModifierProcess {
 				double lineDiscount = 0;
 				if (sumQty >= modifierAttr.getValueFrom()) {
 					discount = new Double(sumQty / modifierAttr.getValueFrom()).intValue();
+					logger.info("1discount["+discount+"]sumQty["+sumQty+"]modifierAttr.getValueFrom()["+modifierAttr.getValueFrom()+"]");
+					logger.info("modifierLine.getValues()["+modifierLine.getValues()+"]");
 					discount *= modifierLine.getValues();
+					logger.info("2discount["+discount+"]");
 					for (OrderLine line : useLines) {
 						lineDiscount = discount * line.getQty() / sumQty;
 						//WIT ADD:29/06/2563 calc bestDiscount more one c4 (add old discount+newDiscount)
-						 
+						logger.info("lineDiscount["+lineDiscount+"]");
 						logger.info("BreakType[RECURRING] :StoreBestDiscount["+line.getStoreBestDiscount()+"]");
 						if(line.getStoreBestDiscount() != 0){
 							if (line.getBestDiscount() == 0) {
@@ -791,6 +810,74 @@ public class ModifierProcess {
 		
 		if(isDebug){
 		  logger.info("---- End  Discount Process---- ");
+		}
+		
+		return 0;
+
+	}
+	
+	private double surchartProcess(double sumQty, double sumAmount, List<OrderLine> useLines, boolean blineGroup)
+			throws Exception {
+		if(isDebug){
+		  logger.info("----Start Surchart Process-----");
+		}
+		boolean isPromotion = false;
+		double addPrice = 0;
+
+		if(isDebug){
+		  logger.info("Qty["+ sumQty+"] to Get Discount.. Attr.valueFrom[" + modifierAttr.getValueFrom()+"]to["+modifierAttr.getValueTo()+"]");
+		}
+		
+		/** Wit Edit 29/08/2012 **/
+		if( modifierAttr.getValueTo() != 0){
+			if (sumQty >= modifierAttr.getValueFrom() && sumQty <=modifierAttr.getValueTo()) {
+				isPromotion = true;
+			}
+		}else{
+			if (sumQty >= modifierAttr.getValueFrom()) {
+				isPromotion = true;
+			}
+		}
+		
+		// Is Promotion
+		if (isPromotion) {
+			if(isDebug){
+			   logger.info("Is Promotion..BreakType["+modifierLine.getBreakType()+"] App Method[" + modifierLine.getApplicationMethod() + "]Value[" + modifierLine.getValues()+"]");
+			}
+
+			// RECURRING
+			if (modifierLine.getBreakType().equalsIgnoreCase(BeanParameter.getBreakTypeRecurring())) {
+				if(isDebug){
+				  logger.info("MLine Break Recurring");
+				}
+				
+				// LUMSUM
+				addPrice = 0;
+				if (sumQty >= modifierAttr.getValueFrom()) {
+					logger.debug("modifierLine.getValues:"+modifierLine.getValues());
+					for (OrderLine line : useLines) {
+						addPrice = modifierLine.getValues() + line.getPrice();
+						logger.debug("addPrice["+addPrice+"]lineQty["+line.getQty()+"]sumQty["+sumQty+"]");
+						 logger.info("Before Surchart BreakType[RECURRING] :lineAmount["+line.getLineAmount()+"]lineAmount1["+line.getLineAmount1()+"]lineAmount2["+line.getLineAmount2()+"]");
+						 
+						line.setPrice(addPrice);
+						line.setLineAmount(addPrice*line.getQty());
+						if(isDebug){
+						  logger.info("after Surchart BreakType[RECURRING] :price["+line.getPrice()+"]price1["+line.getPrice1()+"]price2["+line.getPrice2()+"]");
+						  logger.info("after Surchart BreakType[RECURRING] :lineAmount["+line.getLineAmount()+"]lineAmount1["+line.getLineAmount1()+"]lineAmount2["+line.getLineAmount2()+"]");
+						}
+					}//for
+				}//if
+				
+			}//if
+		} else {
+			if(isDebug){
+			  logger.info("No Promotion..");
+			}
+		}
+		
+		if(isDebug){
+		  logger.info("---- End  Surchart Process---- ");
 		}
 		
 		return 0;
@@ -1277,7 +1364,9 @@ public class ModifierProcess {
 	 * @param uom
 	 * @return SQL String
 	 */
-	private String createSQL(String attr, String attrValue, int productId, String uom, String levelType, User user,String custGroup) {
+	private String createSQL(String attr, String attrValue, 
+			int productId, String uom, String levelType, User user
+			,String custGroup,String provinceGroup) {
 		String sql = "";
 		// Product Category Modifier
 		sql = "select a.MODIFIER_ATTR_ID, a.MODIFIER_LINE_ID, a.MODIFIER_ID \r\n";
@@ -1300,7 +1389,7 @@ public class ModifierProcess {
 
 		// only Line Level
 		if (levelType.length() > 0)
-			sql += "  and a.MODIFIER_LINE_ID in (select rm.MODIFIER_LINE_ID from m_modifier_line rm WHERE LEVEL='"
+			sql += "  and a.MODIFIER_LINE_ID in (select rm.MODIFIER_LINE_ID from m_modifier_line rm WHERE LEVELS='"
 					+ levelType + "' and isactive = 'Y' ) \r\n";
 
 		// join order qualifier
@@ -1322,7 +1411,7 @@ public class ModifierProcess {
 
 		sql += ")\r\n";
 
-	
+		
 			// join customer qualifier
 			if (terriory.length() > 0) {
 	
@@ -1338,8 +1427,8 @@ public class ModifierProcess {
 				sql += "    and QUALIFIER_VALUE = '" + territoryName + "' \n";
 				sql += "    ) \n";
 	
-				// no qualifier
-				sql += "   or a.MODIFIER_LINE_ID NOT IN ( \n";
+				// no qualifier  (edit 14/07/2020 )
+				sql += "   OR a.MODIFIER_LINE_ID NOT IN ( \n";
 				sql += "     select MODIFIER_LINE_ID \n";
 				sql += "     from m_qualifier \n";
 				sql += "     where QUALIFIER_CONTEXT = '" + BeanParameter.getLineQualifierContext() + "' \n";
@@ -1349,25 +1438,40 @@ public class ModifierProcess {
 				sql += "     and ISACTIVE = 'Y' \n";
 				sql += "   ) \n";
 
-				//=  CUSTOMER_GROUP (in) add wit:29/06/2563
-				if(!Utils.isNull(custGroup).equals("")){
-					sql += "  OR a.MODIFIER_LINE_ID IN ( \n";
-					sql += "     select MODIFIER_LINE_ID \n";
-					sql += "     from m_qualifier \n";
-					sql += "     where QUALIFIER_CONTEXT = 'CUSTOMER_GROUP' \n";
-					sql += "     and QUALIFIER_TYPE = 'Customer Group' \n";
-					sql += "     and QUALIFIER_VALUE = '"+Utils.isNull(custGroup)+"' \n";
-					sql += "     and OPERATOR = '=' \n";
-					sql += "     and ISEXCLUDE = 'N' \n";
-					sql += "     and ISACTIVE = 'Y' \n";
-					sql += "   ) \n";
+				//  CUSTOMER_GROUP, (in) add wit:29/06/2563
+				if(!Utils.isNull(custGroup).equals("") || !Utils.isNull(provinceGroup).equals("")){
+					if(!Utils.isNull(custGroup).equals("") ){
+						sql += "  OR a.MODIFIER_LINE_ID IN ( \n";
+						sql += "     select MODIFIER_LINE_ID \n";
+						sql += "     from m_qualifier \n";
+						sql += "     where QUALIFIER_CONTEXT = 'CUSTOMER_GROUP' \n";
+						sql += "     and QUALIFIER_TYPE = 'Customer Group' \n";
+						sql += "     and QUALIFIER_VALUE = '"+Utils.isNull(custGroup)+"' \n";
+						sql += "     and OPERATOR = '=' \n";
+						sql += "     and ISEXCLUDE = 'N' \n";
+						sql += "     and ISACTIVE = 'Y' \n";
+						sql += "   ) \n";
+					}
+					/***  PROVINCE_GROUP, (in) add wit:04/08/2563  *************/
+					if(!Utils.isNull(provinceGroup).equals("")){
+						sql += "  OR a.MODIFIER_LINE_ID IN ( \n";
+						sql += "     select MODIFIER_LINE_ID \n";
+						sql += "     from m_qualifier \n";
+						sql += "     where QUALIFIER_CONTEXT = 'CUSTOMER_GROUP' \n";
+						sql += "     and QUALIFIER_TYPE = 'Province Group' \n";
+						sql += "     and QUALIFIER_VALUE = '"+Utils.isNull(provinceGroup)+"' \n";
+						sql += "     and OPERATOR = '=' \n";
+						sql += "     and ISEXCLUDE = 'N' \n";
+						sql += "     and ISACTIVE = 'Y' \n";
+						sql += "     ) \n";
+					}
 				}else{
-					//NOT IN CUSTOMER_GROUP
+					//NOT IN (CUSTOMER_GROUP ,Province Group )
 					sql += "  AND a.MODIFIER_LINE_ID NOT IN ( \n";
 					sql += "     select MODIFIER_LINE_ID \n";
 					sql += "     from m_qualifier \n";
 					sql += "     where QUALIFIER_CONTEXT = 'CUSTOMER_GROUP' \n";
-					sql += "     and QUALIFIER_TYPE = 'Customer Group' \n";
+					sql += "     and QUALIFIER_TYPE IN('Customer Group' ,'Province Group') \n";
 					sql += "     and OPERATOR = '=' \n";
 					sql += "     and ISEXCLUDE = 'N' \n";
 					sql += "     and ISACTIVE = 'Y' \n";
@@ -1375,8 +1479,39 @@ public class ModifierProcess {
 					sql += "   ) \n";
 				}
 				sql += " ) \n";
-			}
+				
 
+				/** NOT IN Customer Group Current **/
+				if(!Utils.isNull(custGroup).equals("")){
+					sql += "  AND a.MODIFIER_LINE_ID NOT IN ( \n";
+					sql += "     select MODIFIER_LINE_ID \n";
+					sql += "     from m_qualifier \n";
+					sql += "     where QUALIFIER_CONTEXT = 'CUSTOMER_GROUP' \n";
+					sql += "     and QUALIFIER_TYPE IN( 'Customer Group') \n";
+					sql += "     and QUALIFIER_VALUE <> '"+Utils.isNull(custGroup)+"' \n";
+					sql += "     and OPERATOR = '=' \n";
+					sql += "     and ISEXCLUDE = 'N' \n";
+					sql += "     and ISACTIVE = 'Y' \n";
+					sql += "     and MODIFIER_LINE_ID is not null \n";
+					sql += "   ) \n";
+				}
+
+				/** NOT IN ProvinceGroup Current **/
+				if(!Utils.isNull(provinceGroup).equals("")){
+					sql += "  AND a.MODIFIER_LINE_ID NOT IN ( \n";
+					sql += "     select MODIFIER_LINE_ID \n";
+					sql += "     from m_qualifier \n";
+					sql += "     where QUALIFIER_CONTEXT = 'CUSTOMER_GROUP' \n";
+					sql += "     and QUALIFIER_TYPE IN( 'Province Group') \n";
+					sql += "     and QUALIFIER_VALUE <> '"+Utils.isNull(provinceGroup)+"' \n";
+					sql += "     and OPERATOR = '=' \n";
+					sql += "     and ISEXCLUDE = 'N' \n";
+					sql += "     and ISACTIVE = 'Y' \n";
+					sql += "     and MODIFIER_LINE_ID is not null \n";
+					sql += "   ) \n";
+				}
+			}//if
+		
 		// exclude
 		if (productId != 0) {
 			sql += "  and a.MODIFIER_LINE_ID not in( \r\n";
@@ -1387,7 +1522,6 @@ public class ModifierProcess {
 			sql += "	  and isexclude = 'Y' \r\n";
 			sql += "	) \r\n";
 		}
-		
 		
 		return sql;
 	}
@@ -1413,7 +1547,7 @@ public class ModifierProcess {
 
 			User user = new MUser().find("100079103");
 			logger.debug("userType:"+user.getType());
-			new ModifierProcess("").findModifier(orderLines,user , conn,"100");
+			//new ModifierProcess("").findModifier(orderLines,user , conn,"100");
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

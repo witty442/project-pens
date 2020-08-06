@@ -16,10 +16,10 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.pens.util.EnvProperties;
 
 /**
  * @author WITTY

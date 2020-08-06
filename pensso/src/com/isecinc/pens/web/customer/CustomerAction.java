@@ -17,7 +17,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.ExcelHeader;
 
@@ -30,7 +29,6 @@ import com.isecinc.pens.bean.District;
 import com.isecinc.pens.bean.Trip;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
@@ -41,19 +39,22 @@ import com.isecinc.pens.model.MDistrict;
 import com.isecinc.pens.model.MTrip;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.EnvProperties;
 
 /**
  * Customer Action Class
  * 
- * @author Aneak.t
- * @version $Id: ProductAction.java,v 1.0 06/10/2010 00:00:00 aneak.t Exp $
+ * @author Witty
+ * @version 
  * 
- *          atiz.b : edit for customer prefix code
+ *     
  */
 
 public class CustomerAction extends I_Action {
 
-	private int MAX_ROW_PAGE = 50;
+	//private int MAX_ROW_PAGE = 50;
+	public static int pageSize = 50;
 	/**
 	 * Prepare
 	 */
@@ -70,7 +71,7 @@ public class CustomerAction extends I_Action {
 			}
 			
 			if(Utils.isNull(customer.getPrintType()).equals("")){
-				customer.setPrintType("H");//Printype HEAD BRANCH
+				customer.setPrintType("H");//Print type HEAD BRANCH
 			}
 			
 			customerForm.setAddresses(new MAddress().lookUp(customer.getId()));
@@ -158,10 +159,9 @@ public class CustomerAction extends I_Action {
         int currPage = 1;
         int totalRow = 0;
         int totalPage = 0;
-        int start = 0;
-        int end = 50;
-
 		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action:"+action);
 			//clear session
 			request.getSession().removeAttribute("tripPageMap");
 			
@@ -186,8 +186,8 @@ public class CustomerAction extends I_Action {
 					&& !customerForm.getCustomer().getIsActive().equals("")) {
 				whereCause += "\n AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
 			}
-			// WIT EDIT :04/08/2554 
-			if(!User.ADMIN.equals(user.getType())){
+			// WIT EDIT :04/08/2563
+			if(!user.getUserName().equalsIgnoreCase("ADMIN")){
 			   whereCause += "\n AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
 			   whereCause += "\n AND m_customer.USER_ID = " + user.getId();
 			}
@@ -209,11 +209,7 @@ public class CustomerAction extends I_Action {
 			    request.getSession().setAttribute("dispHaveTrip", "Y");
 			}
 			conn = new DBCPConnectionProvider().getConnection(conn);
-			
-			//** get From Session **/
-			//currPage = customerForm.getCurPage();
-			//totalRow = customerForm.getTotalRow();
-			
+	
 			/** Get Case Trip **/
 			if ( Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equalsIgnoreCase("Y")) {
 				
@@ -238,17 +234,38 @@ public class CustomerAction extends I_Action {
 			    }
 			    
 			}else{
-				totalRow = new MCustomer().getTotalRowCustomer(conn, whereCause, user);
-			    if(totalRow > 0){
-			    	double t = new Double(totalRow)/new Double(MAX_ROW_PAGE);
-			    	logger.debug("t:"+t);
-			    	BigDecimal totalPageB = new BigDecimal(t);
-			    	totalPageB = totalPageB.setScale(0,BigDecimal.ROUND_UP);
-			    	
-			    	logger.debug("totalPageB:"+totalPageB);
-			    	
-				    totalPage = totalPageB.intValue();
-			    }
+				
+				if("newsearch".equalsIgnoreCase(action)){
+					//default currPage = 1
+					customerForm.setCurrPage(currPage);
+					
+					//get Total Record
+					customerForm.setTotalRecord(new MCustomer().getTotalRowCustomer(conn, whereCause, user));
+					//calc TotalPage
+					customerForm.setTotalPage(Utils.calcTotalPage(customerForm.getTotalRecord(), pageSize));
+					//calc startRec endRec
+					int startRec = ((currPage-1)*pageSize)+1;
+					int endRec = (currPage * pageSize);
+				    if(endRec > customerForm.getTotalRecord()){
+					   endRec = customerForm.getTotalRecord();
+				    }
+				    customerForm.setStartRec(startRec);
+				    customerForm.setEndRec(endRec);
+				}else{
+					// Goto from Page
+					currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+					logger.debug("currPage:"+currPage);
+					
+					//calc startRec endRec
+					int startRec = ((currPage-1)*pageSize)+1;
+					int endRec = (currPage * pageSize);
+				    if(endRec > customerForm.getTotalRecord()){
+					   endRec = customerForm.getTotalRecord();
+				    }
+				    customerForm.setStartRec(startRec);
+				    customerForm.setEndRec(endRec);
+				}
+			   
 			}
 			logger.debug("showTrip:"+request.getAttribute("dispHaveTrip"));
 			logger.debug("totalRow:"+totalRow);
@@ -261,15 +278,10 @@ public class CustomerAction extends I_Action {
 				String currPageSqlIn = "'"+currPage+"'";
 				results = new MCustomer().searchOptByTrip(conn,whereCause,user,currPageSqlIn,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
 			}else{
-				end = 50;
-				whereCause +="\n limit "+start+","+end;
 				
-				results = new MCustomer().searchOpt(conn,whereCause,user,start,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
+				results = new MCustomer().searchOpt(conn,whereCause,user,currPage,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
 			}
 			customerForm.setResults(results);
-			customerForm.setTotalPage(totalPage);
-			customerForm.setTotalRow(totalRow);
-			customerForm.setCurPage(currPage);
 			
 			Customer customer = customerForm.getCustomer();
 			logger.debug("customer getDistrict:"+customer.getDistrict());
@@ -355,8 +367,8 @@ public class CustomerAction extends I_Action {
 			logger.debug("totalPage:"+totalPage);
 			logger.debug("currPage:"+currPage);
 			
-			start = (currPage-1)*MAX_ROW_PAGE;
-			end =  MAX_ROW_PAGE;
+			start = (currPage-1)*pageSize;
+			end =  pageSize;
 			
 			logger.debug("start["+start+"]end["+end+"]");
 
@@ -599,7 +611,7 @@ public class CustomerAction extends I_Action {
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
 		CustomerForm customerForm = (CustomerForm) form;
-		int customerId = 0;
+		long customerId = 0;
 		EnvProperties env = EnvProperties.getInstance();
 		try {
 			customerId = customerForm.getCustomer().getId();
@@ -624,7 +636,7 @@ public class CustomerAction extends I_Action {
 			conn.setAutoCommit(false);
 
 			District d;
-			if (customerId == 0) {
+			if (customerId ==0) {
 				// Prepare Customer Code Prefix
 				String codePrefix = "";
 				codePrefix += Integer.parseInt(customer.getTerritory());
@@ -683,7 +695,7 @@ public class CustomerAction extends I_Action {
 			}
 			
 			// Save customer to current user's trip.
-			if (customerId == 0) {
+			if (customerId ==0) {
 				Trip trip = new Trip();
 				// A-neak.t 28/12/2010
 				String[] date = null;
@@ -719,7 +731,7 @@ public class CustomerAction extends I_Action {
 			// Trx History
 			TrxHistory trx = new TrxHistory();
 			trx.setTrxModule(TrxHistory.MOD_CUSTOMER);
-			if (customerId == 0) trx.setTrxType(TrxHistory.TYPE_INSERT);
+			if (customerId ==0) trx.setTrxType(TrxHistory.TYPE_INSERT);
 			else trx.setTrxType(TrxHistory.TYPE_UPDATE);
 			trx.setRecordId(customer.getId());
 			trx.setUser(userActive);
@@ -789,7 +801,7 @@ public class CustomerAction extends I_Action {
 			HttpServletResponse response) {
 		Connection conn = null;
 		CustomerForm customerForm = (CustomerForm) form;
-		int customerId = 0;
+		long customerId = 0;
 		EnvProperties env = EnvProperties.getInstance();
 		try {
 			customerId = customerForm.getCustomer().getId();
@@ -902,7 +914,7 @@ public class CustomerAction extends I_Action {
 			HttpServletResponse response) {
 		Connection conn = null;
 		CustomerForm customerForm = (CustomerForm) form;
-		int customerId = 0;
+		long customerId = 0;
 		EnvProperties env = EnvProperties.getInstance();
 		try {
 			customerId = customerForm.getCustomer().getId();

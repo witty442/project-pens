@@ -1,5 +1,5 @@
-<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
-<%@page import="util.SessionGen"%>
+<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.EnvProperties"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.isecinc.pens.model.MUser"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -12,9 +12,9 @@
 
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%
- User userDefault = new MUser().getCurrentUserName();
-String userName = Utils.isNull(userDefault.getUserName());
-String password = Utils.isNull(userDefault.getPassword()); 
+ //User userDefault = new MUser().getCurrentUserName();
+String userName = "";//Utils.isNull(userDefault.getUserName());
+String password = "";//Utils.isNull(userDefault.getPassword()); 
 
 /* String userName ="";
 String password =""; */
@@ -24,15 +24,15 @@ String password =""; */
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css">
 <style type="text/css">
 body {
 	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
 	background-repeat: repeat;
 }
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript">
 <!--
 function MM_swapImgRestore() { //v3.0

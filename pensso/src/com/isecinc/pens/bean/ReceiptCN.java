@@ -1,6 +1,7 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 
 import com.isecinc.core.model.I_PO;
@@ -28,7 +29,7 @@ public class ReceiptCN extends I_PO implements Serializable {
 	 * @throws Exception
 	 */
 	public ReceiptCN(ResultSet rst) throws Exception {
-		setId(rst.getInt("RECEIPT_CN_ID"));
+		setId(rst.getLong("RECEIPT_CN_ID"));
 		setCreditNote(new MCreditNote().find(rst.getString("CREDIT_NOTE_ID")));
 		setReceiptId(rst.getInt("RECEIPT_ID"));
 		setCreditAmount(rst.getDouble("CREDIT_AMOUNT"));
@@ -44,7 +45,7 @@ public class ReceiptCN extends I_PO implements Serializable {
 	protected void setDisplayLabel() throws Exception {}
 
 	/** RECEIPT_CN_ID */
-	private int id;
+	private long id;
 
 	/** CREDIT_NOTE_ID */
 	private CreditNote creditNote = new CreditNote();
@@ -61,11 +62,11 @@ public class ReceiptCN extends I_PO implements Serializable {
 	/** REMAIN_AMOUNT */
 	private double remainAmount;
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

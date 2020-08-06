@@ -3,7 +3,7 @@
     <wb-module deploy-name="pensso">
         <wb-resource deploy-path="/" source-path="/WebContent"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <property name="context-root" value="pens"/>
         <property name="java-output-path"/>
+        <property name="context-root" value="pensso"/>
     </wb-module>
 </project-modules>

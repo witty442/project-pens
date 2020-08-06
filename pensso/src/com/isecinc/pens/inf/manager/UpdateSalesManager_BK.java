@@ -26,13 +26,13 @@ import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
 import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.BatchImportWorker;
 import com.isecinc.pens.inf.manager.process.UpdateSalesProcess;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
+import com.pens.util.EnvProperties;
 
 /**
  * @author WITTY

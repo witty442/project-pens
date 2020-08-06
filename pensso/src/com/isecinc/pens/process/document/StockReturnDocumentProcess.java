@@ -1,13 +1,12 @@
 package com.isecinc.pens.process.document;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Date;
-
-import util.DBCPConnectionProvider;
 
 import com.isecinc.pens.bean.DocSequence;
 import com.isecinc.pens.bean.User;
@@ -17,6 +16,7 @@ import com.isecinc.pens.model.MDocSequence;
 import com.isecinc.pens.model.MMoveOrder;
 import com.isecinc.pens.model.MStock;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * MoveOrderReqDocumentProcess Class

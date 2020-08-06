@@ -545,7 +545,7 @@ public class UpdateSalesManagerHelper {
 			//keyNo = key_no|tableName
 		    String[] keyNoArr = keyNo.split("\\|");
 		   
-			sql.append("\n insert into t_temp_import_trans");
+			sql.append("\n insert into pensso.t_temp_import_trans");
 			sql.append("\n (file_name,table_name,line_str,created,key_no,seq"
 					+ ",error_msg,import_type,amount,receipt_no,doc_status)");
 			sql.append("\n values(?,?,?,?,?,?,?,?,?,?,?)");

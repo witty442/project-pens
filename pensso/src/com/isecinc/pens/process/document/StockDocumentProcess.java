@@ -6,8 +6,6 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Date;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.pens.bean.DocSequence;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialReferences;
@@ -15,6 +13,7 @@ import com.isecinc.pens.model.MDocSequence;
 import com.isecinc.pens.model.MMoveOrder;
 import com.isecinc.pens.model.MStock;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * MoveOrderReqDocumentProcess Class

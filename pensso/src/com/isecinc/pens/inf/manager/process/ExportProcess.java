@@ -19,11 +19,11 @@ import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.ExportHelper;
 import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.ExportManager;
+import com.pens.util.EnvProperties;
 
 public class ExportProcess {
 

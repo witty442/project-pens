@@ -1,21 +1,26 @@
 package com.isecinc.pens.init;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+
+import util.SQLHelper;
 
 import com.isecinc.core.Database;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.init.I_Initial;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.model.MProductCategory;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 /**
  * Initial References
  * 
- * @author Atiz.b
+ * @author witty
  * @version $Id: InitialReferences.java,v 1.0 28/09/2010 00:00:00 atiz.b Exp $
  * 
  */
@@ -75,14 +80,7 @@ public class InitialReferences extends I_Initial {
 		try {
 			StringBuilder sql = new StringBuilder();
 			sql.append("SELECT * FROM c_reference WHERE ISACTIVE = 'Y' and is_load ='Y' \n");
-			
-			//*** WIT Edit 29/07/2554 : not Show BBL InternalBank  *******************************//
-			/*sql.append(" AND REFERENCE_ID NOT IN(  \n");
-			sql.append("	SELECT REFERENCE_ID FROM c_reference WHERE  CODE = 'InternalBank'  and VALUE = '001'   \n");
-			sql.append(" )  \n");*/
-			/*** WIT EDIT 03/04/2562 show all internalBank ***/
-			//*************************************************************************************//
-			
+		
 			List<References> refList = Database.query(sql.toString(), null, References.class, conn);
 			// logger.debug(refList);
 			for (References r : refList) {
@@ -105,7 +103,39 @@ public class InitialReferences extends I_Initial {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public static List<References>  getReferenesByManual(String code,String keyAll) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuilder sql = new StringBuilder();
+		List<References> refList = new ArrayList<References>();
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			
+			sql.append("SELECT * FROM pensso.c_reference \n");
+			sql.append("WHERE ISACTIVE = 'Y' and code ='"+code+"' \n");
+			sql.append("AND value in("+SQLHelper.converToTextSqlIn(keyAll)+") \n");
+			logger.debug("sql:"+sql.toString());
+			
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			while(rs.next()){
+			   References r = new References(Utils.isNull(rs.getString("code")),Utils.isNull(rs.getString("value")),Utils.isNull(rs.getString("name")));
+			   refList.add(r);
+			}
+		} catch (Exception e) {
+			logger.error(e.toString());
+			e.printStackTrace();
+		}finally{
+			try{
+				if(conn !=null){
+					conn.close();
+				}
+			}catch(Exception ee){}
+		}
+		return refList;
+	}
 	public static Hashtable<String, List<References>> getReferenes() {
 		return referenes;
 	}

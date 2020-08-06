@@ -1,3 +1,4 @@
+<%@page import="java.math.BigDecimal"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@page import="com.isecinc.pens.model.MProductCategory"%>
 <%@page import="java.util.Date"%>

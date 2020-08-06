@@ -46,6 +46,15 @@ public class DateToolsUtil {
 	private static final long ONE_HOUR = 60 * 60 * 1000L;
 	private static ResourceBundle bundle = BundleUtil.getBundle("SystemElements", new Locale("th", "TH"));
 
+	public static void main(String[] a){
+		try{
+			Timestamp time= convertToTimeStamp("10/10/2563");
+			System.out.println("time:"+time.toString());
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 	public static String getCurrentDate(String format,Locale locale){
 		String d = "";
 		try{
@@ -506,9 +515,11 @@ public class DateToolsUtil {
 	 * @throws Exception
 	 */
 	public static Timestamp convertToTimeStamp(String date) throws Exception {
+		System.out.println("convertToTimeStamp");
 		Timestamp ts = null;
 		if (date.length() > 0) {
 			Date d = new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).parse(date);
+			System.out.println("d:"+d);
 			ts = new Timestamp(d.getTime());
 		}
 		return ts;
@@ -602,9 +613,7 @@ public class DateToolsUtil {
 		return dateWord;
 	}
 
-	public static void main(String[] args) {
-		System.out.println(isFromToDateCorrect("15/11/2553", "15/11/2553"));
-	}
+	
 
 	/**
 	 * Check dateTo not over dateFrom.

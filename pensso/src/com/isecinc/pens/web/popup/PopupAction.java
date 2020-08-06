@@ -11,12 +11,17 @@ import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.PopupBean;
+import com.isecinc.pens.bean.Transport;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.PopupDAO;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MStockDiscount;
 import com.isecinc.pens.model.MStockReturn;
+import com.isecinc.pens.model.MTransfer;
+import com.isecinc.pens.model.MTransport;
+import com.isecinc.pens.web.buds.page.ConfPickingDAO;
 
 /**
  * Summary Action
@@ -34,12 +39,14 @@ public class PopupAction extends I_Action {
 		String forward = "";
 		PopupForm popupForm = (PopupForm) form;
 		try {
-			 logger.debug("prepare");
+			 logger.debug("prepare page["+request.getParameter("page")+"]");
 			 
 			 if("new".equalsIgnoreCase(request.getParameter("action")) && "BRAND".equalsIgnoreCase(request.getParameter("page"))){
 				 request.setAttribute("BRAND_LIST", null);
-				 popupForm.setCodeSearch("");
-				 popupForm.setDescSearch("");
+				 PopupBean bean = new PopupBean();
+				 bean.setCodeSearch("");
+				 bean.setDescSearch("");
+				 popupForm.setBean(bean);
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
@@ -47,8 +54,10 @@ public class PopupAction extends I_Action {
 				 forward = "searchBrand";
 			 }else  if("new".equalsIgnoreCase(request.getParameter("action")) && "INVOICE".equalsIgnoreCase(request.getParameter("page"))){
 				 request.setAttribute("INVOICE_LIST", null);
-				 popupForm.setCodeSearch("");
-				 popupForm.setDescSearch("");
+				 PopupBean bean = new PopupBean();
+				 bean.setCodeSearch("");
+				 bean.setDescSearch("");
+				 popupForm.setBean(bean);
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
@@ -56,8 +65,10 @@ public class PopupAction extends I_Action {
 				 forward = "searchInvoice";
 			 }else  if("new".equalsIgnoreCase(request.getParameter("action")) && "INVOICE_STOCK_RETURN".equalsIgnoreCase(request.getParameter("page"))){
 				 request.setAttribute("INVOICE_LIST", null);
-				 popupForm.setCodeSearch("");
-				 popupForm.setDescSearch("");
+				 PopupBean bean = new PopupBean();
+				 bean.setCodeSearch("");
+				 bean.setDescSearch("");
+				 popupForm.setBean(bean);
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
@@ -65,13 +76,50 @@ public class PopupAction extends I_Action {
 				 forward = "searchInvoiceStockReturn";
 			 }else  if("new".equalsIgnoreCase(request.getParameter("action")) && "INVOICE_STOCK_DISCOUNT".equalsIgnoreCase(request.getParameter("page"))){
 				 request.setAttribute("INVOICE_LIST", null);
-				 popupForm.setCodeSearch("");
-				 popupForm.setDescSearch("");
+				 PopupBean bean = new PopupBean();
+				 bean.setCodeSearch("");
+				 bean.setDescSearch("");
+				 popupForm.setBean(bean);
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
 				 request.getSession().setAttribute("descs", null);
 				 forward = "searchInvoiceStockDiscount";
+				 
+			 }else  if("new".equalsIgnoreCase(request.getParameter("action")) && "TRANSPORT".equalsIgnoreCase(request.getParameter("page"))){
+				 request.setAttribute("DATA_LIST", null);
+				 PopupBean bean = new PopupBean();
+				 bean.setCodeSearch("");
+				 bean.setDescSearch("");
+				 popupForm.setBean(bean);
+				 
+				 request.getSession().setAttribute("codes", null);
+				 request.getSession().setAttribute("keys", null);
+				 request.getSession().setAttribute("descs", null);
+				 forward = "searchTransport";
+			 }else  if("new".equalsIgnoreCase(request.getParameter("action")) && "PICKING_NO".equalsIgnoreCase(request.getParameter("page"))){
+				 request.setAttribute("DATA_LIST", null);
+				 PopupBean bean = new PopupBean();
+				 bean.setCodeSearch("");
+				 bean.setDescSearch("");
+				 popupForm.setBean(bean);
+				 
+				 request.getSession().setAttribute("codes", null);
+				 request.getSession().setAttribute("keys", null);
+				 request.getSession().setAttribute("descs", null);
+				 forward = "searchPickingNo";
+			 }else  if("new".equalsIgnoreCase(request.getParameter("action")) && "SUBBRAND_STOCK".equalsIgnoreCase(request.getParameter("page"))){
+				 request.setAttribute("DATA_LIST", null);
+				 request.getSession().setAttribute("INIT_SUBBRAND_LIST", PopupDAO.searchSubbrandList());
+				 PopupBean bean = new PopupBean();
+				 bean.setCodeSearch("");
+				 bean.setDescSearch("");
+				 popupForm.setBean(bean);
+				 
+				 request.getSession().setAttribute("codes", null);
+				 request.getSession().setAttribute("keys", null);
+				 request.getSession().setAttribute("descs", null);
+				 forward = "searchSubBrandStock";
 			 }
 			
 		} catch (Exception e) {
@@ -112,11 +160,11 @@ public class PopupAction extends I_Action {
 			logger.debug("StoreType["+storeType+"]");
 			
 			if("BRAND".equalsIgnoreCase(request.getParameter("page"))){
-				 List<PopupForm> results = PopupDAO.searchBrand(popupForm,"");
+				 List<PopupBean> results = PopupDAO.searchBrand(popupForm.getBean(),"");
 				 if(results != null && results.size() >0){
 					 request.setAttribute("BRAND_LIST", results);
 				 }else{
-					 request.setAttribute("Message", "ไม่พบข่อมูล");
+					 request.setAttribute("Message", "ไม่พบข้อมูล");
 				 }
 				 forward = "searchBrand";
 			}else if("INVOICE".equalsIgnoreCase(request.getParameter("page"))){
@@ -124,16 +172,17 @@ public class PopupAction extends I_Action {
 				String userId = Utils.isNull(request.getParameter("userId"));
 				String customerCode = Utils.isNull(request.getParameter("customerCode"));
 				
-				popupForm.setCustomerCode(customerCode);
-				popupForm.setUserId(userId);
-				popupForm.setProductCode(productCode);
+				PopupBean bean = new PopupBean();
+				bean.setCustomerCode(customerCode);
+				bean.setUserId(userId);
+				bean.setProductCode(productCode);
 				
-				 List<PopupForm> results = PopupDAO.searchInvoice(popupForm,"");
+				 List<PopupBean> results = PopupDAO.searchInvoice(bean,"");
 				 
 				 if(results != null && results.size() >0){
 					 request.setAttribute("INVOICE_LIST", results);
 				 }else{
-					 request.setAttribute("Message", "ไม่พบข่อมูล");
+					 request.setAttribute("Message", "ไม่พบข้อมูล");
 				 }
 				 forward = "searchInvoice";
 				 
@@ -143,17 +192,18 @@ public class PopupAction extends I_Action {
 				String customerCode = Utils.isNull(request.getParameter("customerCode"));
 				String requestNumber = Utils.isNull(request.getParameter("requestNumber"));
 				
-				popupForm.setCustomerCode(customerCode);
-				popupForm.setUserId(userId);
-				popupForm.setProductCode(productCode);
-				popupForm.setRequestNumber(requestNumber);
+				PopupBean bean = new PopupBean();
+				bean.setCustomerCode(customerCode);
+				bean.setUserId(userId);
+				bean.setProductCode(productCode);
+				bean.setRequestNumber(requestNumber);
 				
-				 List<PopupForm> results = MStockReturn.searchInvoiceStockReturn(popupForm,"",user);
+				 List<PopupBean> results = MStockReturn.searchInvoiceStockReturn(bean,"",user);
 				 
 				 if(results != null && results.size() >0){
 					 request.setAttribute("INVOICE_LIST", results);
 				 }else{
-					 request.setAttribute("Message", "ไม่พบข่อมูล");
+					 request.setAttribute("Message", "ไม่พบข้อมูล");
 				 }
 				 forward = "searchInvoiceStockReturn";
 				 
@@ -164,20 +214,49 @@ public class PopupAction extends I_Action {
 				String requestNumber = Utils.isNull(request.getParameter("requestNumber"));
 				
 				logger.debug("popup requestNumber:"+requestNumber);
+				PopupBean bean = new PopupBean();
+				bean.setCustomerCode(customerCode);
+				bean.setUserId(userId);
+				bean.setProductCode(productCode);
+				bean.setRequestNumber(requestNumber);
 				
-				popupForm.setCustomerCode(customerCode);
-				popupForm.setUserId(userId);
-				popupForm.setProductCode(productCode);
-				popupForm.setRequestNumber(requestNumber);
-				
-				List<PopupForm> results = MStockDiscount.searchInvoiceStockDiscount(popupForm,"",user);
+				List<PopupForm> results = null;//MStockDiscount.searchInvoiceStockDiscount(bean,"",user);
 				 
 				if(results != null && results.size() >0){
 				   request.setAttribute("INVOICE_LIST", results);
 				}else{
-				   request.setAttribute("Message", "ไม่พบข่อมูล");
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				}
 				forward = "searchInvoiceStockDiscount";
+			}else if("TRANSPORT".equalsIgnoreCase(request.getParameter("page"))){
+		
+			/*	List<Transport> results = MTransport.searchTransport(popupForm,user);
+				 
+				if(results != null && results.size() >0){
+				   request.setAttribute("DATA_LIST", results);
+				}else{
+				   request.setAttribute("Message", "ไม่พบข่อมูล");
+				}
+				forward = "searchTransport";*/
+				 
+			}else if("SUBBRAND_STOCK".equalsIgnoreCase(request.getParameter("page"))){
+				
+				PopupBean c = PopupDAO.searchSubbrandStock(popupForm.getBean(),user);
+				
+				if(c.getDataList() != null && c.getDataList() .size() >0){
+					popupForm.setBean(c);
+				}else{
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				}
+				forward = "searchSubBrandStock";
+           }else if("PICKING_NO".equalsIgnoreCase(request.getParameter("page"))){
+        	   List<PopupBean> results =ConfPickingDAO.searchPickingNoList(popupForm.getBean(),user);
+				if(results != null && results.size() >0){
+				  request.setAttribute("DATA_LIST", results);
+				}else{
+				   request.setAttribute("Message", "ไม่พบข้อมูล");
+				}
+				forward = "searchPickingNo";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

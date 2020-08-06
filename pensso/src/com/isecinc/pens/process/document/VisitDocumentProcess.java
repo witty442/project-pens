@@ -4,8 +4,7 @@ import java.sql.Connection;
 import java.text.DecimalFormat;
 
 import com.isecinc.pens.init.InitialReferences;
-
-import util.DBCPConnectionProvider;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * ReceiptDocumentProcess Class

@@ -9,8 +9,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.DocSequence;
@@ -18,6 +16,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MDocSequence;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * DocSeq Action Class

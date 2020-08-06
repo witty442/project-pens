@@ -74,11 +74,11 @@ public class PDReceiptDAO {
 				
 				while(rst.next()){
 					Receipt m = new Receipt();
-					m.setId(rst.getInt("receipt_id"));
+					m.setId(rst.getLong("receipt_id"));
 					m.setReceiptNo(rst.getString("RECEIPT_NO").trim());
 					m.setReceiptDate(DateToolsUtil.convertToString(rst.getTimestamp("RECEIPT_DATE")));
 					m.setOrderType(rst.getString("ORDER_TYPE").trim());
-					m.setCustomerId(rst.getInt("CUSTOMER_ID"));
+					m.setCustomerId(rst.getLong("CUSTOMER_ID"));
 					m.setCustomerName(rst.getString("CUSTOMER_NAME").trim());
 					m.setPaymentMethod(ConvertNullUtil.convertToString(rst.getString("PD_PAYMENTMETHOD")).trim());
 					m.setBank(ConvertNullUtil.convertToString(rst.getString("BANK")).trim());

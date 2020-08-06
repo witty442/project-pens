@@ -1,6 +1,7 @@
 package com.isecinc.core.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,9 +10,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.Database;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * I_Model Class
@@ -147,13 +147,19 @@ public abstract class I_Model<T> implements Serializable {
 	 * @return
 	 * @throws Exception
 	 */
+	protected boolean save(String tableName, String[] columns, Object[] values, long valueID, Connection conn)
+			throws Exception {
+		//logger.debug("Save " + this.getClass());
+		if (valueID == 0) return saveNew(tableName, columns, values, valueID, conn);
+		else return saveUpdate(tableName, columns, values, valueID, conn);
+	}
+	
 	protected boolean save(String tableName, String[] columns, Object[] values, int valueID, Connection conn)
 			throws Exception {
 		//logger.debug("Save " + this.getClass());
 		if (valueID == 0) return saveNew(tableName, columns, values, valueID, conn);
 		else return saveUpdate(tableName, columns, values, valueID, conn);
 	}
-
 	/**
 	 * Save New
 	 * 
@@ -166,6 +172,42 @@ public abstract class I_Model<T> implements Serializable {
 	 * @return
 	 * @throws Exception
 	 */
+	private boolean saveNew(String tableName, String[] columns, Object[] values, long valueID, Connection conn)
+			throws Exception {
+		PreparedStatement pstmt = null;
+		try {
+			//logger.debug("Save New " + this.getClass());
+			String col = "";
+			String val = "";
+			for (String s : columns) {
+				col += ", " + s;
+				val += ", ?";
+			}
+			//col += ", UPDATED";
+			//val += ", NULL";
+			col = col.substring(1).trim();
+			val = val.substring(1).trim();
+			StringBuilder sql = new StringBuilder();
+			sql.append("INSERT INTO " + tableName);
+			sql.append("(" + col + ") ");
+			sql.append("VALUES(" + val + ") ");
+			//logger.debug(sql.toString());
+			pstmt = conn.prepareStatement(sql.toString());
+			int i = 1;
+			for (Object b : values) {
+				pstmt.setObject(i++, b);
+			}
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				pstmt.close();
+			} catch (Exception e2) {}
+		}
+		return true;
+	}
+	
 	private boolean saveNew(String tableName, String[] columns, Object[] values, int valueID, Connection conn)
 			throws Exception {
 		PreparedStatement pstmt = null;
@@ -202,6 +244,7 @@ public abstract class I_Model<T> implements Serializable {
 		return true;
 	}
 
+
 	/**
 	 * Save Update
 	 * 
@@ -214,6 +257,46 @@ public abstract class I_Model<T> implements Serializable {
 	 * @return
 	 * @throws Exception
 	 */
+	private boolean saveUpdate(String tableName, String[] columns, Object[] values, long valueID, Connection conn)
+			throws Exception {
+		//logger.debug("Save Update " + this.getClass());
+		PreparedStatement pstmt = null;
+		try {
+			StringBuilder sql = new StringBuilder();
+			String col = "";
+			int skipColumn = 0;
+			// skip ID column
+			for (int i = 1; i < columns.length; i++) {
+				if (!columns[i].equalsIgnoreCase("CREATED_BY")) {
+					col += ", " + columns[i] + " = ? ";
+				} else {
+					skipColumn = i;
+				}
+			}
+			col = col.substring(1).trim();
+			sql.append("UPDATE " + tableName);
+			sql.append(" SET " + col);
+			sql.append(",UPDATED = CURRENT_TIMESTAMP ");
+			sql.append(" WHERE " + columns[0] + " = ?");
+			//logger.debug(sql.toString());
+			pstmt = conn.prepareStatement(sql.toString());
+			int j = 1;
+			for (int i = 1; i < values.length; i++) {
+				if (i != skipColumn) pstmt.setObject(j++, values[i]);
+			}
+			// add id value
+			pstmt.setObject(j++, values[0]);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				pstmt.close();
+			} catch (Exception e2) {}
+		}
+		return true;
+	}
+	
 	private boolean saveUpdate(String tableName, String[] columns, Object[] values, int valueID, Connection conn)
 			throws Exception {
 		//logger.debug("Save Update " + this.getClass());
@@ -330,7 +413,7 @@ public abstract class I_Model<T> implements Serializable {
 	 * @throws Exception
 	 */
 	public boolean checkDocumentDuplicate(String tableName, String columnId, String columnDoc, String documentNo,
-			int id, Connection conn) throws Exception {
+			long id, Connection conn) throws Exception {
 		//logger.debug(String.format("Check Duplicate %s[%s] - %s[%s]", tableName, columnId, columnDoc, documentNo));
 		Statement stmt = null;
 		ResultSet rst = null;

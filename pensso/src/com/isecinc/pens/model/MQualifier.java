@@ -53,7 +53,8 @@ public class MQualifier extends I_Model<Qualifier> {
 		return array;
 	}
 	
-	public boolean canUseModifierLineId(String custGroup,int modifierLineId) throws Exception {
+	//For check can use mLine or disable
+	public boolean canUseModifierLineId(String custGroup,int modifierLineId,String qualifierType) throws Exception {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -61,7 +62,7 @@ public class MQualifier extends I_Model<Qualifier> {
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			String  sql ="\n select * from m_qualifier where qualifier_context ='CUSTOMER_GROUP' ";
-					sql+="\n and qualifier_type='Customer Group'";
+					sql+="\n and qualifier_type='"+qualifierType+"'";
 					sql+="\n and qualifier_value='"+custGroup+"'";
 					sql+="\n and modifier_Line_Id="+modifierLineId+"";
 					
@@ -84,4 +85,5 @@ public class MQualifier extends I_Model<Qualifier> {
 			} catch (Exception e2) {}
 		}
 	}
+	
 }

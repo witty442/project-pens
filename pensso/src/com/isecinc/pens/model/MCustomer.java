@@ -2,6 +2,7 @@ package com.isecinc.pens.model;
 
 import static util.ConvertNullUtil.convertToString;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +16,6 @@ import java.util.Map;
 import org.jfree.util.Log;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
 import com.isecinc.core.bean.References;
@@ -25,8 +25,9 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.CustomerDocumentProcess;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * MCustomer Class
@@ -42,7 +43,7 @@ public class MCustomer extends I_Model<Customer> {
 
 	private static final long serialVersionUID = -1170650417151328865L;
 
-	public static String TABLE_NAME = "m_customer";
+	public static String TABLE_NAME = "pensso.m_customer";
 	public static String COLUMN_ID = "Customer_ID";
 
 	// Column Sales Online Side active
@@ -62,7 +63,9 @@ public class MCustomer extends I_Model<Customer> {
 	public Customer find(String id) throws Exception {
 		return super.find(id, TABLE_NAME, COLUMN_ID, Customer.class);
 	}
-
+	public Customer find(Connection conn,String id) throws Exception {
+		return super.find(conn,id, TABLE_NAME, COLUMN_ID, Customer.class);
+	}
 	public Customer findByWhereCond(String whereSql) throws Exception {
 		Connection conn = null;
 		try{
@@ -79,7 +82,7 @@ public class MCustomer extends I_Model<Customer> {
 		ResultSet rst = null;
 		Customer p = null;
 		try{
-			String sql ="\n select * from m_customer "+whereSql ;
+			String sql ="\n select * from pensso.m_customer "+whereSql ;
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
@@ -96,15 +99,28 @@ public class MCustomer extends I_Model<Customer> {
 			} catch (Exception e2) {}
 		}
 	}
-	public String getCustGroup(int customerId) throws Exception {
+	public String getCustGroup(Connection conn,long customerId) throws Exception {
+		return getCustGroupModel(conn, customerId);
+	}
+	public String getCustGroup(long customerId) throws Exception {
 		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getCustGroupModel(conn, customerId);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();conn=null;
+		}
+	}
+	public String getCustGroupModel(Connection conn,long customerId) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		String custGroup = "";
 		try{
 			String sql ="\n select cust_group from m_customer where customer_id="+customerId ;
 			logger.debug("sql:"+sql);
-			conn = DBConnection.getInstance().getConnection();
+			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
 			if(rst.next()){
@@ -115,7 +131,35 @@ public class MCustomer extends I_Model<Customer> {
 			throw e;
 		} finally {
 			try {
-				conn.close();conn=null;
+				rst.close();rst=null;
+				stmt.close();stmt=null;
+			} catch (Exception e2) {}
+		}
+	}
+	
+	public String getProvinceGroupModel(Connection conn,long customerId) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		String provinceGroup = "";
+		try{
+			String sql ="\n select (select group_name from pensso.m_province_group g where g.group_id=p.group_id) as province_group"
+					+"\n from pensso.m_customer m,pensso.m_address a ,pensso.m_province p"
+					+"\n where a.province_id = p.province_id"
+					+"\n and m.customer_id = a.customer_id"
+					+"\n and a.purpose = 'S'"
+					+"\n and m.customer_id="+customerId ;
+			logger.debug("sql:"+sql);
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				provinceGroup = Utils.isNull(rst.getString("province_group"));
+			}
+			return provinceGroup;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
 				rst.close();rst=null;
 				stmt.close();stmt=null;
 			} catch (Exception e2) {}
@@ -143,8 +187,8 @@ public class MCustomer extends I_Model<Customer> {
 		Statement stmt = null;
 		ResultSet rst = null;
 		try{
-			String sql ="\n select count(*) as c from m_customer "+
-			            "\n where customer_id = "+customerId+ " and code in(select code from m_customer_center)" ;
+			String sql ="\n select count(*) as c from pensso.m_customer "+
+			            "\n where customer_id = "+customerId+ " and code in(select code from pensso.m_customer_center)" ;
 			
 			logger.debug("sql:"+sql);
 			
@@ -360,13 +404,14 @@ public class MCustomer extends I_Model<Customer> {
 	 * @throws Exception
 	 * Tunnig Method By Wit
 	 */
-	private Customer[] searchOptModel(Connection conn,String whereCause,User user,int start,String dispTotalInvoice) throws Exception {
+	private Customer[] searchOptModel(Connection conn,String whereCause,User user,int currPage,String dispTotalInvoice) throws Exception {
 		
 		Statement stmt = null;
 		ResultSet rst = null;
 		List<Customer> custList = new ArrayList<Customer>();
 		Customer[] array = null;
 		String creditDateFix = "";
+		String sql = "";
 		try {
 			//Filter display Column
 			String displayActionReceipt ="";
@@ -385,39 +430,38 @@ public class MCustomer extends I_Model<Customer> {
 			   creditDateFix = refConfigCreditDateFix!=null?refConfigCreditDateFix.getKey():"";
 			   logger.debug("creditDateFix:"+creditDateFix);
 			}
-			
-			String sql = "select distinct m_customer.*  \n";
+			   sql +="\n select M.* from (";
+			   sql +="\n select A.* ,rownum as r__ from (";
+			      sql += "select distinct m_customer.*  \n";
 			       sql+=" ,m_address.line1,m_address.line2,m_address.line3,m_address.line4 \n";
-			       
 				   sql+=" ,(select d.name from m_district d where d.district_id = m_address.district_id) as district_name \n";
 				   sql+=" ,m_address.province_name,m_address.postal_code, \n";
-			       sql+=" ad_user.CATEGORY,ad_user.ORGANIZATION,ad_user.START_DATE,ad_user.END_DATE, \n";
-                   sql+=" ad_user.NAME,ad_user.SOURCE_NAME,ad_user.ID_CARD_NO,ad_user.USER_NAME,ad_user.PASSWORD, \n";
-                   sql+=" ad_user.ROLE,ad_user.ISACTIVE,ad_user.CODE,ad_user.UPDATED,ad_user.UPDATED_BY,ad_user.TERRITORY, \n";
+				   
                    sql+= " ( select count(*) as tot from t_order od where od.customer_id = m_customer.customer_id)  as order_amount \n";
-                  // sql+= " ( select sum(o.net_amount) net_amount from t_order o \n where o.doc_status = 'SV'  and o.CUSTOMER_ID = m_customer.CUSTOMER_ID ) as total_order_amt,\n";
-               
-                  // sql+= " ( select sum(r.receipt_amount) receipt_amount from t_receipt r \n where r.doc_status = 'SV' and r.CUSTOMER_ID = m_customer.CUSTOMER_ID) as total_receipt_amt \n";
-                   sql+=",PRINT_TYPE ,PRINT_BRANCH_DESC,PRINT_HEAD_BRANCH_DESC,PRINT_TAX \n";
-                   
-                   sql+= " from m_customer  ,ad_user , \n" ;
+                   sql+= " from m_customer, \n" ;
                    sql +="( \n";
                    sql+="   select distinct customer_id,district_id,line1,line2,line3,line4 ,province_name,postal_code \n";;
                    sql +="  from m_address where purpose ='B'\n";
                    sql +=")m_address \n";
-                   sql+= " where m_customer.user_id = ad_user.user_id \n";
+                   sql+= " where 1=1 \n";
                    sql+= " and m_customer.customer_id = m_address.customer_id \n";
 			       sql+= whereCause;
-			       
+			       sql+= "\n    order by m_customer.code asc ";
+			       sql+= "\n   )A ";
+			       sql+= "\n    WHERE rownum < (("+currPage+" * "+50+") + 1 )  ";
+			       sql+= "\n )M  ";
+			       sql+= "\n  WHERE r__ >= ((("+currPage+"-1) * "+50+") + 1)  ";
+		    
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
+			int start = Utils.calcStartNoInPage(currPage, 50);
 			while(rst.next()){
-				start++;
+				
 				Customer m = new Customer();
 				m.setNo(start);
 				// Mandatory
-				m.setId(rst.getInt("CUSTOMER_ID"));
+				m.setId(rst.getLong("CUSTOMER_ID"));
 				m.setReferencesID(rst.getInt("REFERENCE_ID"));
 				m.setCustomerType(rst.getString("CUSTOMER_TYPE").trim());
 				m.setCode(rst.getString("CODE").trim());
@@ -447,8 +491,8 @@ public class MCustomer extends I_Model<Customer> {
 				m.setTransitName(ConvertNullUtil.convertToString(rst.getString("TRANSIT_NAME")).trim());
 				
 				/** **/
-				User u = new User();
-				u.setId(rst.getInt("USER_ID"));
+				User u = new MUser().find(Utils.isNull(rst.getString("user_id")));
+				/*u.setId(rst.getInt("USER_ID"));
 				u.setCode(rst.getString("CODE").trim());
 				u.setName(rst.getString("NAME").trim());
 				u.setType(convertToString(rst.getString("ROLE")).trim());
@@ -461,12 +505,12 @@ public class MCustomer extends I_Model<Customer> {
 				u.setIdCardNo(convertToString(rst.getString("ID_CARD_NO")).trim());
 				u.setStartDate(convertToString(rst.getString("START_DATE")).trim());
 				u.setEndDate(convertToString(rst.getString("END_DATE")).trim());
-				u.setTerritory(convertToString(rst.getString("TERRITORY")).trim());
+				u.setTerritory(convertToString(rst.getString("TERRITORY")).trim());*/
 
 				// sales online fields
-				u.setUserName(convertToString(rst.getString("USER_NAME")).trim());
+				/*u.setUserName(convertToString(rst.getString("USER_NAME")).trim());
 				u.setPassword(convertToString(rst.getString("PASSWORD")).trim());
-				u.setConfirmPassword(convertToString(rst.getString("PASSWORD")).trim());
+				u.setConfirmPassword(convertToString(rst.getString("PASSWORD")).trim());*/
 				
 				u.activeRoleInfo();
 				m.setSalesRepresent(u);
@@ -490,7 +534,7 @@ public class MCustomer extends I_Model<Customer> {
 				//m.setTotalInvoice(new MReceiptLine().lookCreditAmtBK(conn,m.getId()));
 				if( !Utils.isNull(dispTotalInvoice).equals("")){
 					logger.info("calcTotalInvoice");
-				   m.setTotalInvoice(MReceiptSummary.lookCreditAmtByCustomerId(conn,m.getId(),creditDateFix));
+				   m.setTotalInvoice(MReceiptSummary.lookCreditAmtByCustomerId(conn,u.getId(),m.getId(),creditDateFix));
 				}
 				
 				// Order Amount
@@ -538,6 +582,8 @@ public class MCustomer extends I_Model<Customer> {
 				m.setDisplayActionReceipt(displayActionReceipt);
 				
 				custList.add(m);
+				
+				start++;
 			}
 			
 			//convert to Obj
@@ -605,7 +651,7 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
                    
                    sql+= " from m_customer  ,ad_user , \n" ;
                    sql +="( \n";
-                   sql+="   select distinct customer_id,district_id,line1,line2,line3,line4 ,province_name,postal_code \n";;
+                   sql+="   select distinct customer_id,district_id,line1,line2,line3,line4 ,province_name,postal_code \n";
                    sql +="  from m_address where purpose ='B'\n";
                    sql +=")m_address \n";
                    sql+= " where m_customer.user_id = ad_user.user_id \n";
@@ -621,7 +667,7 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 				no++;
 				m.setNo(no);
 				// Mandatory
-				m.setId(rst.getInt("CUSTOMER_ID"));
+				m.setId(rst.getLong("CUSTOMER_ID"));
 				m.setReferencesID(rst.getInt("REFERENCE_ID"));
 				m.setCustomerType(rst.getString("CUSTOMER_TYPE").trim());
 				m.setCode(rst.getString("CODE").trim());
@@ -688,7 +734,7 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 				
 				if( !Utils.isNull(dispTotalInvoice).equals("")){
 					logger.debug("Calc Total Invoice");
-				    m.setTotalInvoice(MReceiptSummary.lookCreditAmtByCustomerId(conn,m.getId(),creditDateFix));
+				    m.setTotalInvoice(MReceiptSummary.lookCreditAmtByCustomerId(conn,u.getId(),m.getId(),creditDateFix));
 				}
 		
 				// Order Amount
@@ -818,7 +864,7 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 				Customer m = new Customer();
 				m.setNo(start);
 				// Mandatory
-				m.setId(rst.getInt("CUSTOMER_ID"));
+				m.setId(rst.getLong("CUSTOMER_ID"));
 				m.setReferencesID(rst.getInt("REFERENCE_ID"));
 				m.setCustomerType(rst.getString("CUSTOMER_TYPE").trim());
 				m.setCode(rst.getString("CODE").trim());
@@ -951,12 +997,12 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 	 * @return
 	 * @throws Exception
 	 */
-	private int id = 0;
+	private long id = 0;
 
 	public boolean save(Customer customer, int activeUserID,String salesCode, Connection conn) throws Exception {
 
-		if (customer.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+		if (customer.getId() ==0) {
+			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
 			customer.setCode(new CustomerDocumentProcess().getNextDocumentNo(salesCode, activeUserID, conn));
 		} else {
 			id = customer.getId();
@@ -1146,11 +1192,11 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 		return invoiceAmt;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

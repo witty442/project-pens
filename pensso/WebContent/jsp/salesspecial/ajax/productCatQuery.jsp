@@ -40,7 +40,7 @@ try{
 	pageId = Integer.valueOf(pageId_param);
 	
 	MProductCategory mProductCat = new MProductCategory();
-	productCatL = mProductCat.lookUpBrandList(conn,pageId,user,isCustHaveProductSpecial);
+	//productCatL = mProductCat.lookUpBrandList(conn,pageId,user,isCustHaveProductSpecial);
 	
 	no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
 	no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;

@@ -1,5 +1,6 @@
 package com.isecinc.pens.model;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -7,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Address;
@@ -15,7 +15,8 @@ import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.District;
 import com.isecinc.pens.bean.Province;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * MAddress Class
@@ -45,7 +46,9 @@ public class MAddress extends I_Model<Address> {
 	public Address find(String id) throws Exception {
 		return super.find(id, TABLE_NAME, COLUMN_ID, Address.class);
 	}
-
+	public Address find(Connection conn,String id) throws Exception {
+		return super.find(conn,id, TABLE_NAME, COLUMN_ID, Address.class);
+	}
 	/**
 	 * Search
 	 * 
@@ -75,7 +78,7 @@ public class MAddress extends I_Model<Address> {
 	public boolean save(Address address, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (address.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcess.getNextValueInt(TABLE_NAME);
 		} else {
 			id = address.getId();
 		}
@@ -96,7 +99,7 @@ public class MAddress extends I_Model<Address> {
 	/**
 	 * Look Up
 	 */
-	public List<Address> lookUp(int customerId) {
+	public List<Address> lookUp(long customerId) {
 		List<Address> pos = new ArrayList<Address>();
 		try {
 			String whereCause = " AND CUSTOMER_ID = " + customerId + " ORDER BY ADDRESS_ID ";
@@ -125,7 +128,7 @@ public class MAddress extends I_Model<Address> {
 			if(rst.next()){
 				a = new Address();
 				a.setId(rst.getInt("ADDRESS_ID"));
-				a.setCustomerId(rst.getInt("CUSTOMER_ID"));
+				a.setCustomerId(rst.getLong("CUSTOMER_ID"));
 				a.setLine1(rst.getString("Line1").trim());
 				a.setLine2(rst.getString("Line2").trim());
 				a.setLine3(ConvertNullUtil.convertToString(rst.getString("Line3")).trim());
@@ -178,7 +181,7 @@ public class MAddress extends I_Model<Address> {
 			if(rst.next()){
 				a = new Address();
 				a.setId(rst.getInt("ADDRESS_ID"));
-				a.setCustomerId(rst.getInt("CUSTOMER_ID"));
+				a.setCustomerId(rst.getLong("CUSTOMER_ID"));
 				a.setLine1(rst.getString("Line1").trim());
 				a.setLine2(rst.getString("Line2").trim());
 				a.setLine3(ConvertNullUtil.convertToString(rst.getString("Line3")).trim());

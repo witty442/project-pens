@@ -8,9 +8,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.pens.bean.InterfaceSummary;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * Interfaces Process Class

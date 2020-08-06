@@ -206,6 +206,8 @@
 		<form-bean name="transferForm" type="com.isecinc.pens.web.transfer.TransferForm" />
 		<form-bean name="stockReturnForm" type="com.isecinc.pens.web.stockreturn.StockReturnForm" />
 		<form-bean name="stockDiscountForm" type="com.isecinc.pens.web.stockdiscount.StockDiscountForm" />
+		<form-bean name="stockInvForm" type="com.isecinc.pens.web.stockinv.StockInvForm" />
+		<form-bean name="budsAllForm" type="com.isecinc.pens.web.buds.BudsAllForm" />
 	</form-beans>
 
 	<action-mappings>
@@ -228,6 +230,9 @@
 			<forward name="searchInvoice" path="/jsp/pop/searchInvoicePopup.jsp" />
 			<forward name="searchInvoiceStockReturn" path="/jsp/pop/searchInvoiceStockReturnPopup.jsp" />
 			<forward name="searchInvoiceStockDiscount" path="/jsp/pop/searchInvoiceStockDiscountPopup.jsp" />
+			<forward name="searchTransport" path="/jsp/pop/searchTransportPopup.jsp" />
+			<forward name="searchPickingNo" path="/jsp/pop/searchPickingNoPopup.jsp" />
+			<forward name="searchSubBrandStock" path="/jsp/pop/searchSubBrandStockPopup.jsp" />
 		</action>
 		
 		<!-- LOGIN -->
@@ -848,8 +853,17 @@
 		<action name="prodShowForm" path="/jsp/prodShowAction" parameter="do" scope="session" type="com.isecinc.pens.web.prodshow.ProdShowAction" >
 			<forward name="prepare" path="/jsp/prodshow/prodShow.jsp" />
 		</action>
+		<!-- Stock Inv -->
+		<action name="stockInvForm" path="/jsp/stockInvAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockinv.StockInvAction" >
+			<forward name="search" path="/jsp/stockInv/stockInvSearch.jsp" />
+			<forward name="stockInvDetail" path="/jsp/stockInv/stockInitDetail.jsp" />
+		</action>
+		<!-- Picking-->
+		<action name="budsAllForm" path="/jsp/budsAllAction" parameter="do" scope="session" type="com.isecinc.pens.web.buds.BudsAllAction" >
+			<forward name="budsAll" path="/jsp/buds/budsAll.jsp" />
+		</action>
 	</action-mappings>
 
-	<message-resources key="sysprop" parameter="SystemProperties" />
-	<message-resources key="sysele" parameter="SystemElements" />
+	<message-resources key="sysprop" parameter="SystemProperties_th" />
+	<message-resources key="sysele" parameter="SystemElements_th" />
 </struts-config>

@@ -76,22 +76,21 @@ public class LockboxBankTransferProcess {
             orderDBean.setTableName("t_lockbox_header");
             List<ColumnBean> columnList = ExportHelper.initColumn(orderDBean);
              
-			sql = "	select 			\n"+
+			sql = "	select 	\n"+
 			"	'1'	AS	Record_Identifier,	\n"+
-					
 			"	(select b.lockbox_name  from c_reference c ,c_lockbox b \n"+
             "    where c.reference_id = b.reference_id \n"+
             "    and c.code='TransferBank' and c.value ='"+internalBank+"') AS	Lockbox_Number,	\n"+
            
             "	(select b.bank_origination_number  from c_reference c ,c_lockbox b \n"+
             "    where c.reference_id = b.reference_id \n"+
-            "    and c.code='TransferBank' and c.value ='"+internalBank+"') AS	Origination,	\n"+
+            "    and c.code='TransferBank' and c.value ='"+internalBank+"') AS	Origination,\n"+
 			
 			/** Optional **/
 			"   t_receipt.receipt_id     \n"+
-			"	from t_receipt ,m_customer,			\n"+
-            "	(SELECT @rownum:=0) a	\n"+
-			"	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID 			\n"+
+			"	from t_receipt ,m_customer		\n"+
+            //"	,(SELECT @rownum:=0) a	\n"+
+			"	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID \n"+
 			"   and t_receipt.receipt_id = "+receiptId+" 	\n"+
 			"   group by t_receipt.internal_bank \n";
 

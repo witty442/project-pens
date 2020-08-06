@@ -30,7 +30,6 @@ function PopupCenterFullHeight(url, title, w) {
     if(title==''){
     	title ='ค้นหาข้อมูล';
     }
-    w = 700;
     var newWindow = window.open(url, title, 'scrollbars=yes,location=no,resizable=no,titlebar=no, width=' + w + ', height=' + height + ', top=' + top + ', left=' + left);
 
     // Puts focus on the newWindow

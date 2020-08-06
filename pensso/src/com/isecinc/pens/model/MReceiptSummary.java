@@ -9,7 +9,6 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
 import util.NumberToolsUtil;
 
 import com.isecinc.core.bean.References;
@@ -19,13 +18,14 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
+import com.pens.util.DBCPConnectionProvider;
 
 public class MReceiptSummary {
 	/** Logger */
 	public static Logger logger = Logger.getLogger("PENS");
 	public static String amtDebug = "";
 	
-	public static double lookCreditAmtByCustomerId(int customerId) throws Exception {
+	public static double lookCreditAmtByCustomerId(int userId,long customerId) throws Exception {
 		Connection conn = null;
 		String creditDateFix = "";
 		try{
@@ -35,7 +35,7 @@ public class MReceiptSummary {
 			 logger.debug("creditDateFix:"+creditDateFix);
 			 
 		     conn = new DBCPConnectionProvider().getConnection(conn);
-		     return lookCreditAmtByCustomerId(conn,customerId,creditDateFix);
+		     return lookCreditAmtByCustomerId(conn,userId,customerId,creditDateFix);
 		}catch(Exception e){
 			 throw e;
 		} finally {
@@ -45,11 +45,12 @@ public class MReceiptSummary {
 		}
 	}
 	
-	public static double lookCreditAmtByCustomerId(Connection conn,int customerId ,String creditDateFix) throws Exception {
+	public static double lookCreditAmtByCustomerId(Connection conn,int userId,long customerId ,String creditDateFix) throws Exception {
         double totalCreditAmt = 0;
         String orderType  ="CR";
 		try{
-			User user = new MUser().getActiveUserName();
+			User user = new MUser().find(userId+"");
+			user.activeRoleInfo();
 			orderType = Utils.isNull(user.getOrderType().getKey());
 			logger.debug("orderType:"+orderType);
 			
@@ -66,7 +67,7 @@ public class MReceiptSummary {
 		return totalCreditAmt;
 	}
 	
-	private static double lookUpByOrderAR(Connection conn,int customerId, String orderType)
+	private static double lookUpByOrderAR(Connection conn,long customerId, String orderType)
 			throws Exception {
 		double creditAmt = 0;
 		PreparedStatement ps = null;
@@ -84,17 +85,18 @@ public class MReceiptSummary {
 			String dateCheck = "";
 			if( !"".equalsIgnoreCase(creditDateFix)){
 				java.util.Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
+				//dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
 			}
 		
-			String whereCause = " select order_id, round(net_amount,2) as net_amount,ar_invoice_no from t_order where 1=1 \n";
+			String whereCause = " select order_id, round(net_amount,2) as net_amount,ar_invoice_no \n"
+					+ "from t_order where 1=1 \n";
 			whereCause += "  and ar_invoice_no is not null  \n";
 			whereCause += "  and ar_invoice_no <> ''  \n";
 			whereCause += "  and order_type = '" + orderType + "'  \n";
 			whereCause += "  and customer_id = " + customerId +" \n";
 			whereCause += "  and doc_status = 'SV'  \n";
 			/** Wit Edit 02/10/2017 Case Show Order_date< config date **/
-			whereCause += "  and order_date > "+dateCheck +" \n";
+			//whereCause += "  and order_date > "+dateCheck +" \n";
 			
 			//Test
 			//whereCause += "  and ar_invoice_no = '21600101966'  \n";
@@ -107,7 +109,7 @@ public class MReceiptSummary {
 			
 			while(rs.next()){
 				order = new Order();
-				order.setId(rs.getInt("order_id"));
+				order.setId(rs.getLong("order_id"));
 				order.setNetAmount(rs.getDouble("net_amount"));
 				order.setArInvoiceNo(rs.getString("ar_invoice_no"));
 
@@ -140,7 +142,7 @@ public class MReceiptSummary {
 		return creditAmt;
     }
 	
-	private static double lookUpCNForReceipt(Connection conn,int customerId)  {
+	private static double lookUpCNForReceipt(Connection conn,long customerId)  {
 		double creditAmt = 0;
 		double creditAmtTemp = 0;
 		String whereCause = "";

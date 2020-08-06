@@ -14,7 +14,7 @@ public class MUOMConversion extends I_Model<UOMConversion> {
 
 	private static final long serialVersionUID = 3772548485733964501L;
 
-	public static String TABLE_NAME = "m_uom_conversion";
+	public static String TABLE_NAME = "pensso.m_uom_conversion";
 
 	/**
 	 * Get Current Conversion
@@ -28,7 +28,7 @@ public class MUOMConversion extends I_Model<UOMConversion> {
 		String whereCause = "";
 		whereCause += "  and product_id = " + productId;
 		whereCause += "  and uom_id = '" + uomId + "' ";
-		whereCause += "  and (disable_date is null or date_format(disable_date,'%Y%m%d') >= date_format(current_timestamp,'%Y%m%d')) ";
+		whereCause += "  and (disable_date is null or disable_date >= trunc(sysdate)) ";
 		List<UOMConversion> pos = super.search(TABLE_NAME, "", whereCause, UOMConversion.class);
 		if (pos != null) {
 			if (pos.size() > 0) {
@@ -46,7 +46,7 @@ public class MUOMConversion extends I_Model<UOMConversion> {
 		String whereCause = "";
 		whereCause += "  and product_id = " + productId;
 		whereCause += "  and uom_id = '" + uomId + "' ";
-		whereCause += "  and (disable_date is null or date_format(disable_date,'%Y%m%d') >= date_format(current_timestamp,'%Y%m%d')) ";
+		whereCause += "  and (disable_date is null or disable_date >= trunc(sysdate) ) ";
 		List<UOMConversion> pos = super.search(conn,TABLE_NAME, "", whereCause, UOMConversion.class);
 		if (pos != null) {
 			if (pos.size() > 0) {
@@ -64,7 +64,7 @@ public class MUOMConversion extends I_Model<UOMConversion> {
 		String whereCause = "";
 		whereCause += "  and product_id = " + productId;
 		whereCause += "  and uom_id <> '" + uomId + "' ";
-		whereCause += "  and (disable_date is null or date_format(disable_date,'%Y%m%d') >= date_format(current_timestamp,'%Y%m%d')) ";
+		whereCause += "  and (disable_date is null or disable_date >= trunc(sysdate)) ";
 		List<UOMConversion> pos = super.search(TABLE_NAME, "", whereCause, UOMConversion.class);
 		if (pos != null) {
 			if (pos.size() > 0) {

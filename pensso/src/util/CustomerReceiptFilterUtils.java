@@ -1,5 +1,6 @@
 package util;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,7 +30,7 @@ public class CustomerReceiptFilterUtils {
 	 * @return
 	 * :for van 
 	 */
-	public  static String canReceiptCheque(Connection conn,int customerId){
+	public  static String canReceiptCheque(Connection conn,long customerId){
 		String canFlag = "N";
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -64,7 +65,7 @@ public class CustomerReceiptFilterUtils {
 		return canFlag;
 	}
 	
-	public  static String canReceiptCredit(Connection conn,int customerId){
+	public  static String canReceiptCredit(Connection conn,long customerId){
 		String canFlag = "N";
 		PreparedStatement ps = null;
 		ResultSet rs = null;

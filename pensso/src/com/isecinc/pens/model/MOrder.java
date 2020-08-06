@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
+import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Product;
@@ -26,8 +26,9 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.OrderDocumentProcess;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * MOrder Class
@@ -125,20 +126,20 @@ public class MOrder extends I_Model<Order> {
 		try{
 			conn = DBConnection.getInstance().getConnection();
 			String sql ="\n select o.*"
-					  + "\n ,(select count(*) from t_order_line l "
+					  + "\n ,(select count(*) from pensso.t_order_line l "
 					  + "\n where l.order_id = o.order_id and l.promotion ='S') as promotion_s_count"
-					  + "\n from t_order o where 1=1 \n"+whereCause ;
+					  + "\n from pensso.t_order o where 1=1 \n"+whereCause ;
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
 			while(rst.next()){
 				o = new Order();
-				o.setId(rst.getInt("ORDER_ID"));
+				o.setId(rst.getLong("ORDER_ID"));
 				o.setOrderNo(rst.getString("ORDER_NO"));
 				o.setOrderDate(DateToolsUtil.convertToString(rst.getTimestamp("ORDER_DATE")));
 				o.setOrderTime(rst.getString("ORDER_TIME"));
 				o.setOrderType(rst.getString("ORDER_TYPE").trim());
-				o.setCustomerId(rst.getInt("CUSTOMER_ID"));
+				o.setCustomerId(rst.getLong("CUSTOMER_ID"));
 				o.setCustomerName(rst.getString("CUSTOMER_NAME").trim());
 				o.setBillAddressId(rst.getInt("BILL_ADDRESS_ID"));
 				o.setShipAddressId(rst.getInt("SHIP_ADDRESS_ID"));
@@ -146,7 +147,7 @@ public class MOrder extends I_Model<Order> {
 				o.setPaymentTerm(rst.getString("PAYMENT_TERM").trim());
 				o.setVatCode(rst.getString("VAT_CODE").trim());
 				o.setVatRate(rst.getDouble("VAT_RATE"));
-				o.setPaymentMethod(rst.getString("PAYMENT_METHOD").trim());
+				o.setPaymentMethod(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim());
 				o.setShippingDay(ConvertNullUtil.convertToString(rst.getString("SHIPPING_DAY")).trim());
 				o.setShippingTime(ConvertNullUtil.convertToString(rst.getString("SHIPPING_TIME")).trim());
 				o.setTotalAmount(rst.getDouble("TOTAL_AMOUNT"));
@@ -158,7 +159,7 @@ public class MOrder extends I_Model<Order> {
 				o.setSalesOrderNo(ConvertNullUtil.convertToString(rst.getString("SALES_ORDER_NO")).trim());
 				o.setArInvoiceNo(ConvertNullUtil.convertToString(rst.getString("AR_INVOICE_NO")).trim());
 				o.setSalesRepresent(new MUser().find(rst.getString("USER_ID")));
-				o.setDocStatus(rst.getString("DOC_STATUS").trim());
+				o.setDocStatus(ConvertNullUtil.convertToString(rst.getString("DOC_STATUS")).trim());
 				o.setCreated(DateToolsUtil.convertFromTimestamp(rst.getTimestamp("CREATED")));
 				o.setExported(rst.getString("EXPORTED"));
 				o.setIsCash(rst.getString("ISCASH"));
@@ -168,7 +169,7 @@ public class MOrder extends I_Model<Order> {
 				o.setDisplayLabel();
 				
 				//wit 20110804
-				o.setPaymentCashNow("CS".equals(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD").trim()))?true:false);
+				o.setPaymentCashNow("CS".equals(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim())?true:false);
 				
 				// Add Oracle Reference Address ID
 				o.setOraBillAddressID(rst.getInt("ORA_BILL_ADDRESS_ID"));
@@ -220,9 +221,9 @@ public class MOrder extends I_Model<Order> {
 	 * @throws Exception
 	 */
 	public boolean save(Order order, int activeUserID, Connection conn) throws Exception {
-		int id = 0;
+		long id = 0;
 		if (order.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
 			String prefix = "";
 			order.setOrderNo(new OrderDocumentProcess().getNextDocumentNo(order.getSalesRepresent().getCode(), prefix,
 					activeUserID, conn));
@@ -279,9 +280,9 @@ public class MOrder extends I_Model<Order> {
 	 * @throws Exception
 	 */
 	public boolean saveImportOrder2(Order order, int activeUserID, Connection conn) throws Exception {
-		int id = 0;
+		long id = 0;
 		if (order.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
 		} else {
 			id = order.getId();
 		}
@@ -590,13 +591,12 @@ public class MOrder extends I_Model<Order> {
 		List<Order> pos = new ArrayList<Order>();
 		if (operator.equalsIgnoreCase("in") && selected.equalsIgnoreCase("")) return pos;
 		String whereCause = "  and interfaces = 'Y' ";
-		whereCause += "  and ar_invoice_no is not null ";
-		whereCause += "  and ar_invoice_no <> '' ";
+		whereCause += "  and (ar_invoice_no is not null or ar_invoice_no <> '') ";
 		whereCause += "  and order_type = '" + orderType + "' ";
 		//whereCause += "  and user_id = " + userId;
 		whereCause += "  and customer_id = " + customerId;
-		/** Wit:Edit 12/05/2011 Add doc_status <> VO **/
-		whereCause += "  and doc_status <> 'VO' ";
+		/** Wit:Edit 10/07/2020 Add doc_status =FINISH **/
+		whereCause += "  and doc_status = 'FINISH' ";
 		if (selected.length() > 0) whereCause += "  and order_id " + operator + " (" + selected + ") ";
 
 		logger.debug("WhereSql:"+whereCause);
@@ -612,20 +612,20 @@ public class MOrder extends I_Model<Order> {
 		String dateCheck = "";
 		if( !"".equalsIgnoreCase(creditDateFix)){
 			java.util.Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
+			dateCheck = "to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')" ;
 		}
 	
 		List<Order> pos = new ArrayList<Order>();
 		if (operator.equalsIgnoreCase("in") && selected.equalsIgnoreCase("")) return pos;
 		String whereCause = "  and interfaces = 'Y' \n";
-		whereCause += "  and ar_invoice_no is not null  \n";
-		whereCause += "  and ar_invoice_no <> ''  \n";
+		whereCause += "  and (ar_invoice_no is not null or ar_invoice_no <> '' ) \n";
 		whereCause += "  and order_type = '" + orderType + "'  \n";
 		whereCause += "  and customer_id = " + customerId +" \n";
-		/** Wit:Edit 12/05/2011 Add doc_status <> VO **/
-		whereCause += "  and doc_status <> 'VO'  \n";
+		/** Wit:Edit 03/08/2020 Add doc_status LOADING **/
+		whereCause += "  and doc_status = '"+I_PO.STATUS_LOADING+"'  \n";
+		
 		/** Wit Edit 02/10/2017 Case Show Order_date > config date **/
-		whereCause += "  and order_date > "+dateCheck +" \n";
+		//whereCause += "  and order_date > "+dateCheck +" \n";
 		
 		if (selected.length() > 0){
 			whereCause += "  and order_id " + operator + " (" + selected + ")  \n";
@@ -667,7 +667,7 @@ public class MOrder extends I_Model<Order> {
 	 * @return
 	 * @throws Exception
 	 */
-	public int lookUpByCustomer(int customerId) throws Exception {
+	public int lookUpByCustomer(long customerId) throws Exception {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -701,7 +701,7 @@ public class MOrder extends I_Model<Order> {
 	 * @param conn
 	 * @return
 	 */
-	private String getCreated(int orderId, Connection conn) throws Exception {
+	private String getCreated(long orderId, Connection conn) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		String created = "";
@@ -763,7 +763,7 @@ public class MOrder extends I_Model<Order> {
 				// remove selected
 				for (String s : ss) {
 					if (s.trim().length() > 0) {
-						if (l.getId() == Integer.parseInt(s)) {
+						if (l.getId() ==0) {
 							rmLines.add(l);
 						}
 					}
@@ -792,28 +792,18 @@ public class MOrder extends I_Model<Order> {
 	 * @return
 	 * @throws Exception
 	 */
-	public int cancelOrderByID(Connection conn,int orderId,String remark,int userId,String payment) throws Exception {
+	public int cancelOrderByID(Connection conn,long orderId,String remark,int userId,String payment) throws Exception {
 		PreparedStatement ps = null;
 		try {
-			String sql = "UPDATE "+TABLE_NAME+" SET  DOC_STATUS = ? ,REASON = ? ,UPDATED_BY =? ,UPDATED = CURRENT_TIMESTAMP WHERE order_id = ? ";
+			String sql = "UPDATE "+TABLE_NAME+" SET  DOC_STATUS = ? ,UPDATED_BY =? ,UPDATED = CURRENT_TIMESTAMP WHERE order_id = ? ";
 			logger.debug("order_id:"+orderId);
 			logger.debug("SQL:"+sql);
 			int index = 0;
 			ps = conn.prepareStatement(sql);
-			ps.setString(++index,Order.DOC_VOID);
-			ps.setString(++index, remark);
+			ps.setString(++index,Order.STATUS_CANCEL);
+			//ps.setString(++index, remark);
 			ps.setInt(++index, userId);
-			ps.setInt(++index, orderId);
-			
-			//case payment update t_receipt =VO 
-			if("Y".equals(payment)){
-				//find receipt by order_id
-				List  rList = new MReceiptLine().findByCondition(" and order_id = "+orderId);
-				if(rList != null && rList.size() > 0){
-				   ReceiptLine r = (ReceiptLine)rList.get(0);
-				   new MReceipt().cancelReceiptByID(conn,r.getReceiptId(),remark,userId);
-				}
-			}
+			ps.setLong(++index, orderId);
 			
 			return ps.executeUpdate();
 		} catch (Exception ex) {
@@ -869,7 +859,7 @@ public class MOrder extends I_Model<Order> {
 		return orderList;
 	}
 	
-	public int updatePaymentByOrderId(Connection conn,int orderId,String payment) throws Exception {
+	public int updatePaymentByOrderId(Connection conn,long orderId,String payment) throws Exception {
 		PreparedStatement ps = null;
 		try {
 			String sql = "UPDATE "+TABLE_NAME+" SET  PAYMENT = ?  ,UPDATED_BY =? ,UPDATED = CURRENT_TIMESTAMP WHERE order_id = ? ";
@@ -879,7 +869,7 @@ public class MOrder extends I_Model<Order> {
 			ps = conn.prepareStatement(sql);
 			ps.setString(++index,payment);
 			ps.setInt(++index, 9999);
-			ps.setInt(++index, orderId);
+			ps.setLong(++index, orderId);
 			
 			return ps.executeUpdate();
 		} catch (Exception ex) {
@@ -912,7 +902,7 @@ public class MOrder extends I_Model<Order> {
 		  
 		    ps.setBigDecimal(++index, pickDateBig.setScale(6));//updated
 			ps.setInt(++index, order.getPrintCountPick());
-			ps.setInt(++index, order.getId());
+			ps.setLong(++index, order.getId());
 				
 			ps.execute();
 		}catch(Exception e){
@@ -964,7 +954,7 @@ public class MOrder extends I_Model<Order> {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean isOrderHaveVat(Connection conn,int orderId) throws Exception {
+	public boolean isOrderHaveVat(Connection conn,long orderId) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		boolean haveVat = true;

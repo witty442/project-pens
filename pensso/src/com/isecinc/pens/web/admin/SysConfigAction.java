@@ -7,8 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.SystemConfig;
@@ -17,6 +15,7 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.init.InitialSystemConfig;
 import com.isecinc.pens.model.MSysConfig;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * Sysconfig Action Class

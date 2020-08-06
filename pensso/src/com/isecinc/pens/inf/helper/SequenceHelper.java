@@ -6,7 +6,7 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * SequenceProcess Class
@@ -39,24 +39,24 @@ public class SequenceHelper {
 			StringBuilder sql = new StringBuilder();
 			// Get Last Value
 			sql.delete(0, sql.length());
-			sql.append("SELECT NextValue FROM c_sequence ");
+			sql.append("SELECT NextValue FROM pensso.c_sequence ");
 			sql.append("WHERE NAME = '" + tableName + "' ");
 			stmt = conn.createStatement();
-			//logger.debug(sql.toString());
+			logger.debug(sql.toString());
 			rst = stmt.executeQuery(sql.toString());
 			if (rst.next()) {
 				nextValue = rst.getInt("nextValue");
 			} else {
 				sql.delete(0, sql.length());
-				sql.append("INSERT INTO c_sequence(NAME,STARTNO,NEXTVALUE) ");
-				sql.append("VALUES('" + tableName + "',1,1)");
+				sql.append("INSERT INTO pensso.c_sequence(NAME,ACTIVE,STARTNO,NEXTVALUE) ");
+				sql.append("VALUES('" + tableName + "','Y',1,1)");
 				//logger.debug(sql.toString());
 				stmt.execute(sql.toString());
 				nextValue = 1;
 			}
 			// Update Value
 			sql.delete(0, sql.length());
-			sql.append("UPDATE c_sequence SET NextValue = NextValue + 1 ");
+			sql.append("UPDATE pensso.c_sequence SET NextValue = NextValue + 1 ");
 			sql.append("WHERE NAME = '" + tableName + "' ");
 			//logger.debug(sql.toString());
 			stmt.execute(sql.toString());

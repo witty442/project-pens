@@ -38,13 +38,19 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
 function loadMe(){
-	new Epoch('epoch_popup','th',document.getElementById('receiptDate'));
+	new Epoch('epoch_popup','th',document.getElementById('receiptDateFrom'));
+	new Epoch('epoch_popup','th',document.getElementById('receiptDateTo'));
 }
 
 function gotoReport(path){
-	if($('#receiptDate').val()==''){
+	if($('#receiptDateFrom').val()==''){
 		alert('กรุณาใส่เงื่อนไขในการออกรายงาน');
-		$('#receiptDate').focus();
+		$('#receiptDateFrom').focus();
+		return;
+	}
+	if($('#receiptDateTo').val()==''){
+		alert('กรุณาใส่เงื่อนไขในการออกรายงาน');
+		$('#receiptDateTo').focus();
 		return;
 	}
 	if(document.getElementById('msg')!=null){
@@ -100,18 +106,23 @@ function clearForm(path){
 						<!-- CRITERIA -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
-								<td width="40%">&nbsp;</td>
-								<td></td>
+								<td width="45%">&nbsp;</td>
+								<td width="10%"></td>
+								<td width="45%"></td>
 							</tr>
 							<tr>
-								<td align="right"><bean:message key="Date" bundle="sysele"/><font color="red">*</font></td>
+								<td align="right">ตั้งแต่วันที่<font color="red">*</font></td>
 								<td align="left">
-								     <html:text property="invoicePaymentAllReport.receiptDate" styleId="receiptDate" readonly="true" size="15"/>
+								     <html:text property="invoicePaymentAllReport.receiptDateFrom" styleId="receiptDateFrom" readonly="true" size="15"/>
+								</td>
+								<td align="left">
+								     ภึงวันที่<font color="red">*</font>
+								     <html:text property="invoicePaymentAllReport.receiptDateTo" styleId="receiptDateTo" readonly="true" size="15"/>
 								</td>
 							</tr>
 							<tr>
 								<td align="right"><bean:message key="ReportFormat" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
+								<td align="left" colspan="2">
 									<!--<html:radio property="criteria.fileType" value="XLS"/>&nbsp;<bean:message key="Excel" bundle="sysele"/>&nbsp;&nbsp;-->
 									<html:radio property="criteria.fileType" value="PDF"/>&nbsp;<bean:message key="PDF" bundle="sysele"/>&nbsp;&nbsp;
 									<%-- <html:radio property="criteria.fileType" value="PRINTER"/>&nbsp;<bean:message key="Printer" bundle="sysele"/> --%>

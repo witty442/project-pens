@@ -1,6 +1,6 @@
 <%@page import="com.isecinc.pens.model.MCustomer"%>
 <%@page import="com.isecinc.pens.bean.Customer"%>
-<%@page import="com.pens.utils.manual.mergdb.CustMergBean"%>
+<%@page import="com.pens.util.manual.mergdb.CustMergBean"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="java.sql.Blob"%>
 <%@page import="com.isecinc.pens.inf.helper.FileUtil"%>

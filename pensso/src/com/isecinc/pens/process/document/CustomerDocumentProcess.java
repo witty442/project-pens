@@ -5,11 +5,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.pens.bean.CustomerSequence;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MCustomerSequence;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * CustomerDocumentProcess Class

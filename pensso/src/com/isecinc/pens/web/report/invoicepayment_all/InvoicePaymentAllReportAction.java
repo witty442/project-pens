@@ -15,6 +15,7 @@ import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentAllReport;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentAllReportProcess;
+import com.pens.util.DateUtil;
 
 /**
  * InvoicePaymentAllReportAction
@@ -35,8 +36,14 @@ public class InvoicePaymentAllReportAction extends I_ReportAction<InvoicePayment
 		InvoicePaymentAllReportProcess process = new InvoicePaymentAllReportProcess();
 		InvoicePaymentAllReportForm reportForm = (InvoicePaymentAllReportForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		
 		//set Parameter
-		parameterMap.put("receipt_date", DateToolsUtil.dateNumToWord(reportForm.getInvoicePaymentAllReport().getReceiptDate()));
+		//logger.debug("receiptDateFrom:"+reportForm.getInvoicePaymentAllReport().getReceiptDateFrom());
+		//String receiptDateFrom =DateToolsUtil.dateNumToWord(reportForm.getInvoicePaymentAllReport().getReceiptDateFrom());
+		
+		String receiptDate = reportForm.getInvoicePaymentAllReport().getReceiptDateFrom()+" - "+reportForm.getInvoicePaymentAllReport().getReceiptDateTo();
+		
+		parameterMap.put("receipt_date",receiptDate );
 		parameterMap.put("total_customer", process.getCountCustomer(reportForm.getInvoicePaymentAllReport(), user, conn));
 		
 		//set Type

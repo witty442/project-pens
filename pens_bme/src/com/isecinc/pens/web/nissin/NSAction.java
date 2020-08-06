@@ -585,17 +585,26 @@ public class NSAction extends I_Action {
 					h.append("<th>Complete Date</th>\n");
 					h.append("<th>Sale Code</th>\n");
 					
-					h.append("<th>Cup72 (CTN)</th>\n");
-					h.append("<th>Cup72 (CUP)</th>\n");
+					h.append("<th>Cup18 72 (CTN)</th>\n");
+					h.append("<th>Cup18 72 (CUP)</th>\n");
+					//bag
+					h.append("<th>BAG6 (CTN)</th>\n");
+					h.append("<th>BAG6 (BAG)</th>\n");
+					//inter
+					h.append("<th>BAG INTER (CTN)</th>\n");
+					h.append("<th>BAG INTER (BAG)</th>\n");
+					//thai
+					h.append("<th>BAG THAI (CTN)</th>\n");
+					h.append("<th>BAG THAI (BAG)</th>\n");
 					
-					h.append("<th>BAG6(CTN)</th>\n");
-					h.append("<th>BAG6(BAG)</th>\n");
+					h.append("<th>MiniCup72 (CTN)</th>\n");
+					h.append("<th>MiniCup72 (CUP)</th>\n");
 					
-					h.append("<th>BAG10(CTN)</th>\n");
-					h.append("<th>BAG10(BAG)</th>\n");
+					h.append("<th>Cup20 72 (CTN)</th>\n");
+					h.append("<th>Cup20 72 (CUP)</th>\n");
 					
-					h.append("<th>Pooh72 (CTN)</th>\n");
-					h.append("<th>Pooh72 (CUP)</th>\n");
+					h.append("<th>Kasi 72 (CUP)</th>\n");
+					h.append("<th>Kasi 72 (BAG)</th>\n");
 					
 					h.append("<th>Remark1</th>\n");
 					h.append("<th>Pending reason</th>\n");
@@ -622,12 +631,22 @@ public class NSAction extends I_Action {
 					h.append("<td>"+mc.getSaleCode()+"</td>");
 					h.append("<td>"+mc.getCupQty()+"</td>");
 					h.append("<td>"+mc.getCupNQty()+"</td>");
+					
 					h.append("<td>"+mc.getPac6CTNQty()+"</td>");
 					h.append("<td>"+mc.getPac6Qty()+"</td>");
+					h.append("<td>"+mc.getInterCTNQty()+"</td>");
+					h.append("<td>"+mc.getInterBAGQty()+"</td>");
 					h.append("<td>"+mc.getPac10CTNQty()+"</td>");
 					h.append("<td>"+mc.getPac10Qty()+"</td>");
+					
 					h.append("<td>"+mc.getPoohQty()+"</td>"); 
 					h.append("<td>"+mc.getPoohNQty()+"</td>"); 
+					
+					h.append("<td>"+mc.getCup20CTNQty()+"</td>"); 
+					h.append("<td>"+mc.getCup20CUPQty()+"</td>"); 
+					
+					h.append("<td>"+mc.getKasi72CTNQty()+"</td>"); 
+					h.append("<td>"+mc.getKasi72BAGQty()+"</td>"); 
 					
 					h.append("<td class='text'>"+mc.getRemark()+"</td>"); 
 					h.append("<td class='text'>"+mc.getPendingReason()+"</td>"); 
@@ -638,15 +657,27 @@ public class NSAction extends I_Action {
 			    NSBean summary = NSDAO.searchHeadSummary(conn, repoNSForm.getBean());
 			    if(summary !=null){
 			    	h.append("<tr>");
-			    	h.append("<td class='colum_head' colspan='15'>Total</td>");
+			    	h.append("<td class='colum_head' colspan='16'>Total</td>");
 					h.append("<td class='num_currency_bold'>"+summary.getCupQty()+"</td>");
 					h.append("<td class='num_currency_bold'>"+summary.getCupNQty()+"</td>");
+					//inter
 					h.append("<td class='num_currency_bold'>"+summary.getPac6CTNQty()+"</td>");
 					h.append("<td class='num_currency_bold'>"+summary.getPac6Qty()+"</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getInterCTNQty()+"</td>");
+					h.append("<td class='num_currency_bold'>"+summary.getInterBAGQty()+"</td>");
+					//thai
 					h.append("<td class='num_currency_bold'>"+summary.getPac10CTNQty()+"</td>");
 					h.append("<td class='num_currency_bold'>"+summary.getPac10Qty()+"</td>");
+					
 					h.append("<td class='num_currency_bold'>"+summary.getPoohQty()+"</td>"); 
 					h.append("<td class='num_currency_bold'>"+summary.getPoohNQty()+"</td>"); 
+					
+					h.append("<td class='num_currency_bold'>"+summary.getCup20CTNQty()+"</td>"); 
+					h.append("<td class='num_currency_bold'>"+summary.getCup20CUPQty()+"</td>"); 
+					
+					h.append("<td class='num_currency_bold'>"+summary.getKasi72CTNQty()+"</td>"); 
+					h.append("<td class='num_currency_bold'>"+summary.getKasi72BAGQty()+"</td>"); 
+					
 					h.append("<td colspan='2'></td>"); 
 				    h.append("</tr>");
 			    }

@@ -31,7 +31,6 @@ import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
 import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
@@ -43,8 +42,9 @@ import com.isecinc.pens.inf.manager.process.bean.KeyNoImportTransBean;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptHelper;
 import com.isecinc.pens.model.MOrder;
-import com.isecinc.pens.process.SequenceProcess;
-import com.pens.utils.LoggerUtils;
+import com.pens.util.EnvProperties;
+import com.pens.util.LoggerUtils;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * @author WITTY
@@ -200,16 +200,18 @@ public class UpdateSalesManager {
 						
 						/** Loop by KeyNo for Control Transaction **/
 						dataKeyNoList = ftpBean.getKeyNoImportTransList();
+						Savepoint savepoint = null;
 						if(dataKeyNoList != null && dataKeyNoList.size() >0){
 							for(int m=0;m<dataKeyNoList.size();m++){
 								KeyNoImportTransBean keyNoBean = dataKeyNoList.get(m);
 								//debug
-								// logger.debug("keyNoBean:"+keyNoBean.getKeyNo());
-								// logger.debug("keyNoBean LineList Size:"+keyNoBean.getLineList().size());
+								 logger.debug("keyNoBean:"+keyNoBean.getKeyNo());
+								 logger.debug("keyNoBean LineList Size:"+keyNoBean.getLineList().size());
 								
 								//Set RollBack Point
 								conn.setAutoCommit(false);
-								Savepoint savepoint =  conn.setSavepoint(keyNoBean.getKeyNo());
+								//Savepoint savepoint =  conn.setSavepoint(keyNoBean.getKeyNo());
+								savepoint =  conn.setSavepoint();
 								
 								resultImportBean = null;
 								resultImportBean = imtProcess.importToDB(transactionId,connMonitor,conn,initConfigMap,tableBean,keyNoBean,userRequest);
@@ -226,7 +228,7 @@ public class UpdateSalesManager {
 									
 									logger.debug("Transaction Rollback By savepoint["+savepoint+"]");
 									logger.debug("KeyNo["+keyNoBean.getKeyNo()+"]dataCount["+resultImportBean.getAllRow()+"]successCount["+resultImportBean.getSuccessRow()+"]");
-									conn.rollback(savepoint);
+									conn.rollback();
 									
 									if(Constants.TRANSACTION_REUTS_TRANS_TYPE.equalsIgnoreCase(transType)){
 										//Case ReImport Fail: No delete t_temp_import_trans_error

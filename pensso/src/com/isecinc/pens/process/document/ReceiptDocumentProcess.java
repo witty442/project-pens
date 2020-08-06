@@ -6,8 +6,7 @@ import java.text.DecimalFormat;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MUser;
-
-import util.DBCPConnectionProvider;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * ReceiptDocumentProcess Class

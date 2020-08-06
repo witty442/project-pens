@@ -1,5 +1,6 @@
 package com.isecinc.pens.model;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
 import com.isecinc.core.model.I_Model;
@@ -17,7 +17,8 @@ import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * MOrderLine Class
@@ -78,9 +79,9 @@ public class MOrderLine extends I_Model<OrderLine> {
 	 * @throws Exception
 	 */
 	public boolean save(OrderLine line, int activeUserID, Connection conn) throws Exception {
-		int id = 0;
+		long id = 0;
 		if (line.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
 		} else {
 			id = line.getId();
 		}
@@ -107,7 +108,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 	/**
 	 * Look Up
 	 */
-	public List<OrderLine> lookUp(int orderId) {
+	public List<OrderLine> lookUp(long orderId) {
 		List<OrderLine> pos = new ArrayList<OrderLine>();
 		try {
 			String whereCause = " AND ORDER_ID = " + orderId + " AND ISCANCEL='N' ORDER BY TRIP_NO, LINE_NO ";
@@ -118,7 +119,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 		return pos;
 	}
 	
-	public List<OrderLine> lookUp(Connection conn,int orderId) {
+	public List<OrderLine> lookUp(Connection conn,long orderId) {
 		List<OrderLine> pos = new ArrayList<OrderLine>();
 		try {
 			String whereCause = " AND ORDER_ID = " + orderId + " AND ISCANCEL='N' ORDER BY TRIP_NO, LINE_NO ";
@@ -151,7 +152,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean deletePromotion(int orderId, Connection conn) throws Exception {
+	public boolean deletePromotion(long orderId, Connection conn) throws Exception {
 		List<OrderLine> pos = new ArrayList<OrderLine>();
 		String deleteId = "";
 		try {
@@ -170,7 +171,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 	}
 	
 	//Y and S
-	public boolean deletePromotionAll(int orderId, Connection conn) throws Exception {
+	public boolean deletePromotionAll(long orderId, Connection conn) throws Exception {
 		List<OrderLine> pos = new ArrayList<OrderLine>();
 		String deleteId = "";
 		try {
@@ -220,7 +221,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 	 * @param conn
 	 * @throws Exception
 	 */
-	public void reOrgLineNo(int orderId, Connection conn) throws Exception {
+	public void reOrgLineNo(long orderId, Connection conn) throws Exception {
 		Statement stmt = null;
 		PreparedStatement ps = null;
 		ResultSet rst = null;

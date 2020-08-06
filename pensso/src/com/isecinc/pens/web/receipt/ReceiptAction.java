@@ -1,5 +1,6 @@
 package com.isecinc.pens.web.receipt;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +14,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.NumberToolsUtil;
 
@@ -43,6 +43,7 @@ import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MReceiptMatchCN;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * Receipt Action
@@ -65,21 +66,21 @@ public class ReceiptAction extends I_Action {
 		// String action = request.getParameter("action") != null ? (String) request.getParameter("action") : "";
 		try {
 			User user = (User) request.getSession(true).getAttribute("user");
-			int customerId;
+			long customerId = 0;
 			if (request.getParameter("customerId") != null) {
 				// go search
 				forward = "search";
-				customerId = Integer.parseInt(request.getParameter("customerId"));
+				customerId = Utils.convertStrToLong(request.getParameter("customerId"));
 				receiptForm.setReceipt(new Receipt());
 			} else if (request.getParameter("memberId") != null) {
 				// go search
 				forward = "search";
-				customerId = Integer.parseInt(request.getParameter("memberId"));
+				customerId = Utils.convertStrToLong(request.getParameter("memberId"));
 				receiptForm.setReceipt(new Receipt());
 				
 				/* Wit Edit: 1307255 :Edit shortcut From CustomerSerach **/
 			}else if (request.getParameter("shotcut_customerId") != null) {
-				customerId = Integer.parseInt(request.getParameter("shotcut_customerId"));
+				customerId = Utils.convertStrToLong(request.getParameter("shotcut_customerId"));
 				//reset CriteriaSearch
 				receiptForm.setCriteria(new ReceiptCriteria());
 				//set init Object ReceiptForm
@@ -218,7 +219,8 @@ public class ReceiptAction extends I_Action {
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
 		ReceiptForm receiptForm = (ReceiptForm) form;
-		int receiptId = 0;
+		long receiptId = 0;
+		User user = (User) request.getSession().getAttribute("user");
 		try {
 			/** For Test delay process **/
 			/*logger.debug("start Sleep 1 Minute");
@@ -266,7 +268,6 @@ public class ReceiptAction extends I_Action {
 			
 			//Validate User
 			if(Utils.isNull(receipt.getSalesRepresent().getCode()).equals("")){
-				User user = (User) request.getSession().getAttribute("user");
 				receipt.setSalesRepresent(user);
 			}
 			
@@ -316,14 +317,14 @@ public class ReceiptAction extends I_Action {
 			for (ReceiptLine line : receiptForm.getLines()) {
 				line.setLineNo(i++);
 				line.setReceiptId(receipt.getId());
-				if (receiptId == 0){
+				if (receiptId ==0){
 					line.setId(0);
 				}
 				mReceiptLine.save(line, userActive.getId(), conn);
 
 				order = new MOrder().find(String.valueOf(line.getOrder().getId()));
 				/** WIT Edit 11/04/2011 :Add Case Cancel Receipt **/
-				if(receiptForm.getReceipt().getDocStatus().equals(Receipt.DOC_VOID)){
+				if(receiptForm.getReceipt().getDocStatus().equals(Receipt.STATUS_CANCEL)){
 				   order.setPayment("N");	
 				}else{
 				   order.setPayment("Y");
@@ -333,7 +334,7 @@ public class ReceiptAction extends I_Action {
 				olines = new MOrderLine().lookUp(order.getId());
 				for (OrderLine ol : olines) {
 					/** WIT Edit 11/04/2011 :Add Case Cancel Receipt **/
-					if(receiptForm.getReceipt().getDocStatus().equals(Receipt.DOC_VOID)){
+					if(receiptForm.getReceipt().getDocStatus().equals(Receipt.STATUS_CANCEL)){
 					   ol.setPayment("N");
 					}else{
 					   ol.setPayment("Y");
@@ -354,7 +355,7 @@ public class ReceiptAction extends I_Action {
 			receiptCN.deleteByReceiptId(String.valueOf(receipt.getId()), conn);
 			for (ReceiptCN cn : receiptForm.getCns()) {
 				cn.setId(0);
-				cn.setReceiptId(receipt.getId());
+				cn.setReceiptId(new Integer(""+receipt.getId()));
 				receiptCN.save(cn, userActive.getId(), conn);
 			}
 
@@ -378,7 +379,7 @@ public class ReceiptAction extends I_Action {
 			int idx = 0;
 			
 			for (ReceiptBy by : receiptForm.getBys()) {
-				if (receiptId == 0) by.setId(0);
+				if (receiptId ==0) by.setId(0);
 				paidAmount = 0;
 				receiptAmount = by.getReceiptAmount();
 				for (String s : by.getAllPaid().trim().split("\\|")) {
@@ -432,21 +433,25 @@ public class ReceiptAction extends I_Action {
 			// Trx History
 			TrxHistory trx = new TrxHistory();
 			trx.setTrxModule(TrxHistory.MOD_RECEIPT);
-			if (receiptId == 0) trx.setTrxType(TrxHistory.TYPE_INSERT);
+			if (receiptId ==0) trx.setTrxType(TrxHistory.TYPE_INSERT);
 			else trx.setTrxType(TrxHistory.TYPE_UPDATE);
 			trx.setRecordId(receipt.getId());
 			trx.setUser(userActive);
 			new MTrxHistory().save(trx, userActive.getId(), conn);
 			// Trx History --end--
-
+			
 			// Commit Transaction
 			conn.commit();
 			//
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
 
+			//Interfaces TO Oracle Txt (LockBox)
+			InterfaceReceiptProcess.process(user,receiptForm.getReceipt().getId(), receiptForm.getReceipt().getReceiptNo());
+			
 			logger.debug("receiptId1:"+receiptId);
 			// Save Token
 			saveToken(request);
+			
 			
 			logger.debug("receiptId2:"+receipt.getId());
 			// Search Again
@@ -488,7 +493,7 @@ public class ReceiptAction extends I_Action {
 	protected void setNewCriteria(ActionForm form) throws Exception {
 		ReceiptForm receiptForm = (ReceiptForm) form;
 
-		int customerId = receiptForm.getReceipt().getCustomerId();
+		long customerId = receiptForm.getReceipt().getCustomerId();
 		if (!receiptForm.getReceipt().getOrderType().equalsIgnoreCase(Receipt.DIRECT_DELIVERY)) {
 			// TT & VAN
 			// Default from customer

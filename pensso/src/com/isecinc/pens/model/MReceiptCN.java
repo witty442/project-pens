@@ -1,18 +1,18 @@
 package com.isecinc.pens.model;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptCN;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * MAddress Class
@@ -53,9 +53,9 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 	 * @throws Exception
 	 */
 	public boolean save(ReceiptCN receiptCN, int activeUserID, Connection conn) throws Exception {
-		int id = 0;
-		if (receiptCN.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+		long id = 0;
+		if (receiptCN.getId() ==0) {
+			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
 		} else {
 			id = receiptCN.getId();
 		}
@@ -73,7 +73,7 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 	 * @param receiptId
 	 * @return
 	 */
-	public List<ReceiptCN> lookUp(int receiptId) {
+	public List<ReceiptCN> lookUp(long receiptId) {
 		List<ReceiptCN> pos = new ArrayList<ReceiptCN>();
 		try {
 			String whereCause = " AND RECEIPT_ID = " + receiptId + " ORDER BY " + COLUMN_ID;

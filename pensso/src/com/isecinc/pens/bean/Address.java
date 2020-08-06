@@ -1,6 +1,7 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 
 import util.ConvertNullUtil;
@@ -34,9 +35,9 @@ public class Address extends I_PO implements Serializable {
 	 */
 	public Address(ResultSet rst) throws Exception {
 		setId(rst.getInt("ADDRESS_ID"));
-		setCustomerId(rst.getInt("CUSTOMER_ID"));
-		setLine1(rst.getString("Line1").trim());
-		setLine2(rst.getString("Line2").trim());
+		setCustomerId(rst.getLong("CUSTOMER_ID"));
+		setLine1(ConvertNullUtil.convertToString(rst.getString("Line1")).trim());
+		setLine2(ConvertNullUtil.convertToString(rst.getString("Line2")).trim());
 		setLine3(ConvertNullUtil.convertToString(rst.getString("Line3")).trim());
 		setLine4(ConvertNullUtil.convertToString(rst.getString("Line4")).trim());
 		setDistrict(new MDistrict().find(rst.getString("DISTRICT_ID")));
@@ -137,7 +138,7 @@ public class Address extends I_PO implements Serializable {
 	private String isActive;
 
 	/** CUSTOMER ID */
-	private int customerId;
+	private long customerId;
 	
 	/** Reference ID (Oracle Address ID)*/
 	private int referenceId;
@@ -238,11 +239,11 @@ public class Address extends I_PO implements Serializable {
 		this.purposeLabel = purposeLabel;
 	}
 
-	public int getCustomerId() {
+	public long getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
 

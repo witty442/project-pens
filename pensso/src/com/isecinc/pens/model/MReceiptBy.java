@@ -1,5 +1,6 @@
 package com.isecinc.pens.model;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -11,7 +12,7 @@ import util.DateToolsUtil;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * Receipt BY Model
@@ -69,9 +70,9 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 	 * @throws Exception
 	 */
 	public boolean save(ReceiptBy receiptBy, int activeUserID, Connection conn) throws Exception {
-		int id = 0;
-		if (receiptBy.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+		long id = 0;
+		if (receiptBy.getId() ==0) {
+			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
 		} else {
 			id = receiptBy.getId();
 		}
@@ -94,7 +95,7 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 	 * @param receiptId
 	 * @return
 	 */
-	public List<ReceiptBy> lookUp(int receiptId) {
+	public List<ReceiptBy> lookUp(long receiptId) {
 		List<ReceiptBy> pos = new ArrayList<ReceiptBy>();
 		try {
 			String whereCause = " AND RECEIPT_ID = " + receiptId + " ORDER BY " + COLUMN_ID;
@@ -129,7 +130,7 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 	}
 
 	public boolean checkChqueNoDuplicate(String tableName, String columnId,
-			String columnDoc, String documentNo, int id, Connection conn)
+			String columnDoc, String documentNo, long id, Connection conn)
 			throws Exception {
 		logger.debug(String.format("Check Duplicate %s[%s] - %s[%s]", tableName, columnId, columnDoc, documentNo));
 		Statement stmt = null;
@@ -139,7 +140,7 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 			stmt = conn.createStatement();
 			String sql = "SELECT COUNT(*) as TOT FROM " + tableName;
 			sql += " WHERE RECEIPT_ID IN (SELECT RECEIPT_ID FROM T_RECEIPT WHERE DOC_STATUS = 'SV') AND " + columnDoc + "='" + documentNo + "' ";
-			if (id != 0) sql += "  AND " + columnId + "<> '" + id + "' ";
+			if (id !=0) sql += "  AND " + columnId + "<> '" + id + "' ";
 			logger.debug(sql);
 			rst = stmt.executeQuery(sql);
 			if (rst.next()) {

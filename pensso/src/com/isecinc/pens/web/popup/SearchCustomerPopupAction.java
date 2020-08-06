@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.PopupDAO;
 import com.isecinc.pens.inf.helper.Utils;
@@ -35,8 +36,10 @@ public class SearchCustomerPopupAction extends I_Action {
 			 logger.debug("prepare");
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
 				 request.setAttribute("CUSTOMER_LIST", null);
-				 popupForm.setCode("");
-				 popupForm.setDesc("");
+				 PopupBean bean = new PopupBean();
+				 bean.setCode("");
+				 bean.setDesc("");
+				 popupForm.setBean(bean);
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
@@ -142,8 +145,10 @@ public class SearchCustomerPopupAction extends I_Action {
 		try {
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
 				 request.setAttribute("CUSTOMER_LIST", null);
-				 popupForm.setCode("");
-				 popupForm.setDesc("");
+				 PopupBean bean = new PopupBean();
+				 bean.setCode("");
+				 bean.setDesc("");
+				 popupForm.setBean(bean);
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
@@ -164,7 +169,7 @@ public class SearchCustomerPopupAction extends I_Action {
 			String storeType = Utils.isNull(request.getParameter("storeType"));
 			logger.debug("StoreType["+storeType+"]");
 			
-			 List<PopupForm> results = PopupDAO.searchCustomerMaster(popupForm,"");
+			 List<PopupBean> results = PopupDAO.searchCustomerMaster(popupForm.getBean(),"");
 			 if(results != null && results.size() >0){
 				 request.setAttribute("CUSTOMER_LIST", results);
 			 }else{
@@ -199,8 +204,10 @@ public class SearchCustomerPopupAction extends I_Action {
 		try {
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
 				 request.setAttribute("CUSTOMER_LIST", null);
-				 popupForm.setCode("");
-				 popupForm.setDesc("");
+				 PopupBean bean = new PopupBean();
+				 bean.setCode("");
+				 bean.setDesc("");
+				 popupForm.setBean(bean);
 				 
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
@@ -221,7 +228,7 @@ public class SearchCustomerPopupAction extends I_Action {
 			String storeType = Utils.isNull(request.getParameter("storeType"));
 			logger.debug("StoreType["+storeType+"]");
 			
-			 List<PopupForm> results = PopupDAO.searchCustomerMasterAndAddress(popupForm,"",user);
+			 List<PopupBean> results = PopupDAO.searchCustomerMasterAndAddress(popupForm.getBean(),"",user);
 			 if(results != null && results.size() >0){
 				 request.setAttribute("CUSTOMER_LIST", results);
 			 }else{

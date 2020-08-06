@@ -3,11 +3,10 @@ package com.isecinc.pens.process.document;
 import java.sql.Connection;
 import java.text.DecimalFormat;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * OrderDocumentProcess Class

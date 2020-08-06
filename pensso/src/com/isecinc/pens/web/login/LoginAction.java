@@ -13,17 +13,15 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
-import util.SessionGen;
+import util.SIdUtils;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.inf.manager.batchwork.AppversionVerifyWorker;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.login.LoginProcess;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 /**
  * Login Action Class
@@ -52,12 +50,12 @@ public class LoginAction extends DispatchAction {
 		LoginForm loginForm = null;
 		try {
 			//remove session id
-			SessionGen.getInstance().clearInstance();
+			SIdUtils.getInstance().clearInstance();
 			
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
 			User user = null;
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnection.getInstance().getConnection();
 			user = new LoginProcess().login(loginForm.getUserName(), loginForm.getPassword(), conn);
 			if (user == null) {
 				request.setAttribute("errormsg", SystemMessages.getCaption(SystemMessages.INVALID_CREDENTIAL, Locale
@@ -93,6 +91,8 @@ public class LoginAction extends DispatchAction {
 			request.getSession().setAttribute("massageToSales",null);
 			request.getSession().setAttribute("appVersionMassageToSales",null);
 			
+			//after login ImportReceipt BySalesCode (user Login)
+			//new BatchImportReceiptWorker(user,request).run(); 
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -190,7 +190,7 @@ public class LoginAction extends DispatchAction {
 			}
 			
 			//remove session id
-			SessionGen.getInstance().clearInstance();
+			SIdUtils.getInstance().clearInstance();
 			
 			request.getSession().invalidate();
 		} catch (Exception e) {

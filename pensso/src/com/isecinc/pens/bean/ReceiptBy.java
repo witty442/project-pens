@@ -1,5 +1,6 @@
 package com.isecinc.pens.bean;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 
 import util.ConvertNullUtil;
@@ -33,8 +34,8 @@ public class ReceiptBy extends I_PO {
 	 * @param rst
 	 */
 	public ReceiptBy(ResultSet rst) throws Exception {
-		setId(rst.getInt("RECEIPT_BY_ID"));
-		setReceiptId(rst.getInt("RECEIPT_ID"));
+		setId(rst.getLong("RECEIPT_BY_ID"));
+		setReceiptId(rst.getLong("RECEIPT_ID"));
 		setPaymentMethod(rst.getString("PAYMENT_METHOD"));
 		setReceiptAmount(rst.getDouble("RECEIPT_AMOUNT"));
 		setCreditCardType(ConvertNullUtil.convertToString(rst.getString("CREDIT_CARD_TYPE")).trim());
@@ -92,10 +93,10 @@ public class ReceiptBy extends I_PO {
 	}
 
 	/** RECEIPT_BY_ID */
-	private int id;
+	private long id;
 
 	/** RECEIPT_ID */
-	private int receiptId;
+	private long receiptId;
 
 	/** PAYMENT_METHOD */
 	private String paymentMethod;
@@ -162,19 +163,19 @@ public class ReceiptBy extends I_PO {
 		this.receiveCashDate = receiveCashDate;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public int getReceiptId() {
+	public long getReceiptId() {
 		return receiptId;
 	}
 
-	public void setReceiptId(int receiptId) {
+	public void setReceiptId(long receiptId) {
 		this.receiptId = receiptId;
 	}
 

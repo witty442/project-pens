@@ -1,5 +1,6 @@
 package com.isecinc.pens.web.admin;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.List;
@@ -9,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
-import util.DBCPConnectionProvider;
 import util.Debug;
 
 import com.isecinc.core.bean.Messages;
@@ -25,6 +25,8 @@ import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.process.administer.ManageOrderReceiptProcess;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.Utils;
 
 public class ManageOrderReceiptAction extends I_Action {
 
@@ -68,7 +70,7 @@ public class ManageOrderReceiptAction extends I_Action {
 					if (type.equalsIgnoreCase("OM")) {
 						// cancel order
 						Order order = new MOrder().find(id);
-						order.setDocStatus(Order.DOC_VOID);
+						order.setDocStatus(Order.STATUS_CANCEL);
 						new MOrder().save(order, user.getId(), conn);
 						// cancel receipt @ order
 						String sql = "update t_receipt set doc_status = 'VO' where receipt_id in (";
@@ -79,11 +81,11 @@ public class ManageOrderReceiptAction extends I_Action {
 					if (type.equalsIgnoreCase("RR")) {
 						// cancel receipt
 						Receipt receipt = new MReceipt().find(id);
-						receipt.setDocStatus(Order.DOC_VOID);
+						receipt.setDocStatus(Order.STATUS_CANCEL);
 						new MReceipt().saveWOCheckDup(receipt, user.getId(), conn);
 
 						// unpaid to order
-						List<ReceiptLine> lines = new MReceiptLine().lookUp(Integer.parseInt(id));
+						List<ReceiptLine> lines = new MReceiptLine().lookUp(Utils.convertToLong(id));
 						for (ReceiptLine l : lines) {
 							if (l.getOrder() != null) {
 								l.getOrder().setPayment("N");

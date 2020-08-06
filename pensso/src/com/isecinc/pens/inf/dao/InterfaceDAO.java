@@ -85,10 +85,10 @@ public class InterfaceDAO {
 			  
 			logger.debug("SQL:"+sql);
 			if(model.getTransactionId() ==null){
-				   model.setTransactionId(new BigDecimal(SequenceHelper.getNextValue("monitor")));
+				   model.setTransactionId(new BigDecimal(SequenceHelper.getNextValue("monitor.transactionId")));
 			}
 			if(model.getMonitorId() ==null){
-				   model.setMonitorId(new BigDecimal(SequenceHelper.getNextValue("monitor_2")));
+				   model.setMonitorId(new BigDecimal(SequenceHelper.getNextValue("monitor.monitorId")));
 			}
 			logger.debug("id:"+model.getTransactionId());
 
@@ -760,10 +760,10 @@ public class InterfaceDAO {
 			   sql.append(" and monitor.create_user LIKE '%"+mc.getUserName()+"%' \n");
 			}
             if( !Utils.isNull(mc.getSubmitDateFrom()).equals("")){
-            	sql.append(" and date(monitor.submit_date) >= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
+            	sql.append(" and date(monitor.submit_date) >= TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
 			}
             if( !Utils.isNull(mc.getSubmitDateTo()).equals("")){
-            	sql.append(" and date(monitor.submit_date) <= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
+            	sql.append(" and date(monitor.submit_date) <= TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
 			}
             if( !Utils.isNull(mc.getRequestTable()).equals("")){
             	sql.append(" and monitor_item.table_name LIKE '%"+mc.getRequestTable()+"%' \n");
@@ -880,10 +880,10 @@ public class InterfaceDAO {
 			   sql.append(" and monitor.create_user LIKE '%"+mc.getUserName()+"%' \n");
 			}
             if( !Utils.isNull(mc.getSubmitDateFrom()).equals("")){
-            	sql.append(" and date(monitor.submit_date) >= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
+            	sql.append(" and date(monitor.submit_date) >= TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
 			}
             if( !Utils.isNull(mc.getSubmitDateTo()).equals("")){
-            	sql.append(" and date(monitor.submit_date) <= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
+            	sql.append(" and date(monitor.submit_date) <= TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
 			}
             if( !Utils.isNull(mc.getRequestTable()).equals("")){
             	sql.append(" and monitor_item.table_name LIKE '%"+mc.getRequestTable()+"%' \n");

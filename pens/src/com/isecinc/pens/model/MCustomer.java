@@ -1007,7 +1007,7 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 			        "\n ,NAME='"+ConvertNullUtil.convertToString(customer.getName()).trim()+"'"+
 			        "\n ,NAME2='"+ConvertNullUtil.convertToString(customer.getName2()).trim()+"'"+
 			        "\n ,WEBSITE='"+ConvertNullUtil.convertToString(customer.getWebsite()).trim()+"'"+
-			        "\n ,BUSINESS_TYPE='"+ConvertNullUtil.convertToString(customer.getBusinessType()).trim()+"'"+
+			        //"\n ,BUSINESS_TYPE='"+ConvertNullUtil.convertToString(customer.getBusinessType()).trim()+"'"+
 			        "\n ,BIRTHDAY=?"+
 			        "\n ,PARENT_CUSTOMER_ID="+customer.getParentID()+""+
 			        "\n ,business_type='"+ConvertNullUtil.convertToString(customer.getPartyType()).trim()+"',is_change='Y'"+

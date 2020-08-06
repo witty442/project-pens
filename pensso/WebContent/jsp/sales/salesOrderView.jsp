@@ -246,8 +246,13 @@ function stampPrint(){
 								</tr>
 							 <%} %>
 							<tr>
-								<td align="right"></td>
+							<%if(User.TT.equals(user.getType())){%>
+								<td align="right"><!-- สาย Load <font color="red">*</font> --></td>
+								<td align="left"><%-- <html:text property="order.loadNo" size="20" readonly="true" styleClass="disableText"/> --%></td>
+						     <%}else{ %>
+						        <td align="right"></td>
 								<td align="left"></td>
+						     <%} %>
 								<td align="right"><bean:message key="DocumentNo" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
 									<html:hidden property="order.orderNo" />
@@ -259,6 +264,10 @@ function stampPrint(){
 										 if(orderNoTemp.length()==12){
 											orderNo1 =  orderNoTemp.substring(0,8);
 											orderNo2 =  orderNoTemp.substring(8,12);
+										 }else if(orderNoTemp.length()==13){
+											//SB00163070001
+											orderNo1 =  orderNoTemp.substring(0,9);
+											orderNo2 =  orderNoTemp.substring(9,13);
 										 }
 									 }
 									%>
@@ -343,6 +352,13 @@ function stampPrint(){
 											<c:set var="tabclass" value="lineE"/>
 										</c:otherwise>
 									</c:choose>
+									<c:choose>
+										<c:when test="${lines1.rowStyle == 'lineError2'}">
+											<c:set var="tabclass" value="lineError2"/>
+										</c:when>
+										<c:otherwise></c:otherwise>
+									</c:choose>
+									
 									<tr class="${tabclass}">
 										<td>${rows1.index + 1}</td>
 										<td align="left">${lines1.product.code} ${lines1.product.name}</td>

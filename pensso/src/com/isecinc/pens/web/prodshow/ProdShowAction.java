@@ -30,13 +30,13 @@ import com.isecinc.pens.bean.ProdShowBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ProdShowDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MProductCategory;
+import com.pens.util.EnvProperties;
 
 /**
  * Summary Action

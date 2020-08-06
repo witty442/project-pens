@@ -12,12 +12,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.NumberToolsUtil;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Address;
+import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.StockDiscount;
 import com.isecinc.pens.bean.StockDiscountLine;
@@ -29,6 +29,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.StockDiscountDocumentProcess;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBCPConnectionProvider;
 
 
 public class MStockDiscount {
@@ -771,7 +772,7 @@ public class MStockDiscount {
 			List<StockDiscountLine> lineList = new ArrayList<StockDiscountLine>();
 			StringBuilder sql = new StringBuilder();
 			int no = 0;
-			PopupForm popupForm = new PopupForm();
+			PopupBean popupForm = new PopupBean();
 			try {
 				sql.append("\n SELECT A.* FROM ( ");
 				sql.append("\n   SELECT l.* , (select p.code from m_product p where p.product_id = l.inventory_item_id)as code ");
@@ -828,9 +829,9 @@ public class MStockDiscount {
 				  popupForm.setRequestNumber(mCriteria.getRequestNumber());
 				  popupForm.setCodeSearch(m.getArInvoiceNo());//wit:edit 05/05/2563 case display remainPriQty wrong
 				  
-				  List<PopupForm> results = searchInvoiceStockDiscount(popupForm,"",user);
+				  List<PopupBean> results = searchInvoiceStockDiscount(popupForm,"",user);
 				  if(results != null && results.size()>0){ 
-					  PopupForm remain = results.get(0);
+					  PopupBean remain = results.get(0);
 				      m.setRemainPriAllQty(remain.getPriAllQty());
 				      m.setRemainPriQty(remain.getPriQty());
 				      m.setRemainSubQty(remain.getSubQty());
@@ -987,10 +988,10 @@ public class MStockDiscount {
 		}
 	  
 	  /************************* Stock Discount (invoice Qty Popup) ***********************************************/
-	 public static List<PopupForm> searchInvoiceStockDiscount(PopupForm c,String operation,User user) throws Exception {
+	 public static List<PopupBean> searchInvoiceStockDiscount(PopupBean c,String operation,User user) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
-			List<PopupForm> pos = new ArrayList<PopupForm>();
+			List<PopupBean> pos = new ArrayList<PopupBean>();
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
 			String backDate = "";
@@ -1062,7 +1063,7 @@ public class MStockDiscount {
 				int no=0;
 				while (rst.next()) {
 					no++;
-					PopupForm item = new PopupForm();
+					PopupBean item = new PopupBean();
 					item.setNo(no);
 					item.setCode(Utils.isNull(rst.getString("ar_invoice_no")));
 					if(!Utils.isNull(c.getProductCode()).equals("")){
@@ -1113,7 +1114,7 @@ public class MStockDiscount {
 			return pos;
 		}
 		 
-	  public static String getOrderItemPriceByArInvoiceNo(Connection conn,PopupForm c,String backDate,User user,String arInvoiceNo) throws Exception {
+	  public static String getOrderItemPriceByArInvoiceNo(Connection conn,PopupBean c,String backDate,User user,String arInvoiceNo) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();
@@ -1152,7 +1153,7 @@ public class MStockDiscount {
 		}
 	 
 	 public static StockBeanUtils calcStockDiscountPriQtyByArInvoice(Connection conn,String curRequestNumber
-			 ,String arInvoiceNo,String dateStart,PopupForm c,User user) throws Exception {
+			 ,String arInvoiceNo,String dateStart,PopupBean c,User user) throws Exception {
 		    StockBeanUtils bean = new StockBeanUtils();
 		    Statement stmt = null;
 			ResultSet rst = null;
@@ -1301,7 +1302,7 @@ public class MStockDiscount {
 
 	 /** Calc RemainAmount By 1(Arinvoice and product) or 2(arInvoice) **/
 	 public static double calcStockDiscountRemianAmountByInvoice(Connection conn,String curRequestNumber
-			 ,String arInvoiceNo,String productCode,String backDate,PopupForm c,User user) throws Exception {
+			 ,String arInvoiceNo,String productCode,String backDate,PopupBean c,User user) throws Exception {
 		    Statement stmt = null;
 			ResultSet rst = null;
 			StringBuilder sql = new StringBuilder();

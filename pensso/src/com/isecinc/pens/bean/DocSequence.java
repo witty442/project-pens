@@ -1,6 +1,7 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 
 import com.isecinc.core.bean.References;
@@ -39,7 +40,7 @@ public class DocSequence extends I_PO implements Serializable {
 	 * @throws Exception
 	 */
 	public DocSequence(ResultSet rst) throws Exception {
-		setId(rst.getInt("DOCTYPE_SEQUENCE_ID"));
+		setId(rst.getLong("DOCTYPE_SEQUENCE_ID"));
 		setDoctypeID(rst.getInt("DOCTYPE_ID"));
 		setSalesCode(rst.getString("SALES_CODE").trim());
 		setOrderType(rst.getString("ORDER_TYPE").trim());
@@ -50,7 +51,7 @@ public class DocSequence extends I_PO implements Serializable {
 		setActive(rst.getString("ISACTIVE").trim());
 
 		// setDispayLabel
-		setDisplayLabel();
+		//setDisplayLabel();
 	}
 
 	/**
@@ -59,17 +60,17 @@ public class DocSequence extends I_PO implements Serializable {
 	 * @throws Exception
 	 */
 	protected void setDisplayLabel() throws Exception {
-		for (References r : InitialReferences.getReferenes().get(InitialReferences.DOC_RUN)) {
+		/*for (References r : InitialReferences.getReferenes().get(InitialReferences.DOC_RUN)) {
 			if (r.getKey().equalsIgnoreCase(getOrderType())) {
 				setOrderLabel(r.getName());
 				break;
 			}
 		}
-		setDoctypeLabel((new MDocType().find(String.valueOf(getDoctypeID()))).getDescription());
+		setDoctypeLabel((new MDocType().find(String.valueOf(getDoctypeID()))).getDescription());*/
 	}
 
 	/** ID */
-	private int id;
+	private long id;
 
 	/** DOCTYPE_ID */
 	private int doctypeID;
@@ -101,11 +102,11 @@ public class DocSequence extends I_PO implements Serializable {
 	/** DOCTYPE LABEL */
 	private String doctypeLabel;
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

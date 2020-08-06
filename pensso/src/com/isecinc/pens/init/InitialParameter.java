@@ -66,6 +66,7 @@ public class InitialParameter extends I_Initial {
 		BeanParameter.setModifierDiscount(xmlread.doRead("modifier", "type-discount"));
 		BeanParameter.setModifierPricebreakheader(xmlread.doRead("modifier", "type-pricebreakheader"));
 		BeanParameter.setModifierPromotiongood(xmlread.doRead("modifier", "type-promotiongood"));
+		BeanParameter.setModifierSurchart(xmlread.doRead("modifier", "type-surchart"));
 		BeanParameter.setModifierItemCategory(xmlread.doRead("modifier", "attr-itemCategory"));
 		BeanParameter.setModifierItemNumber(xmlread.doRead("modifier", "attr-itemNumber"));
 		BeanParameter.setBreakTypePoint(xmlread.doRead("modifier", "breakType-point"));

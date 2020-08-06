@@ -6,11 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.pens.bean.DocSequence;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MDocSequence;
+import com.pens.util.DBCPConnectionProvider;
 
 public class TestDocSeq {
 	private static SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd", new Locale("th", "TH"));

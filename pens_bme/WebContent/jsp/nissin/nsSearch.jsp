@@ -281,16 +281,26 @@ function openPensEdit(path,orderId){
 							<th >Invoice Date</th>
 							<th >Complete Date</th>
 							<th >Sale Code</th>
-							<th >Cup72 (CTN)</th>
-							<th >Cup72 (CUP)</th>
+							
+							<th >Cup18 72 (CTN)</th>
+							<th >Cup18 72 (CUP)</th>
 							
 							<th >BAG6 (CTN)</th>
 							<th >BAG6 (BAG)</th>
-							<th >BAG10 (CTN)</th>
-							<th >BAG10 (BAG)</th>
+							<th >BAG INTER (CTN)</th>
+							<th >BAG INTER (BAG)</th>
 							
-							<th >Pooh72 (CTN)</th>
-							<th >Pooh72 (CUP)</th>
+							<th >BAG THAI (CTN)</th>
+							<th >BAG THAI (BAG)</th>
+							
+							<th >MiniCup 72 (CTN)</th>
+							<th >MiniCup 72 (CUP)</th>
+							
+							<th >Cup20 72 (CTN)</th>
+							<th >Cup20 72 (CUP)</th>
+							<th >Kasi 72 (CUP)</th>
+							<th >Kasi 72 (BAG)</th>
+							
 							<th >Remark1</th>
 							<th >Pending Reason</th>
 					   </tr>
@@ -364,14 +374,27 @@ function openPensEdit(path,orderId){
 								<td class="td_text" width="5%" nowrap><%=mc.getInvoiceDate()%></td>
 								<td class="td_text" width="5%" nowrap><%=mc.getCompleteDate()%></td> 
 								<td class="td_text" width="5%" nowrap><%=mc.getSaleCode()%></td>
+								
 								<td class="td_text_center" width="4%"><%=mc.getCupQty()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getCupNQty()%></td>
+							    <!-- INTER -->
 								<td class="td_text_center" width="4%"><%=mc.getPac6CTNQty()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getPac6Qty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getInterCTNQty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getInterBAGQty()%></td>
+								<!-- THAI -->
 								<td class="td_text_center" width="4%"><%=mc.getPac10CTNQty()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getPac10Qty()%></td>
+								
 								<td class="td_text_center" width="4%"><%=mc.getPoohQty()%></td>
 								<td class="td_text_center" width="4%"><%=mc.getPoohNQty()%></td>
+								
+								<td class="td_text_center" width="4%"><%=mc.getCup20CTNQty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getCup20CUPQty()%></td>
+								
+								<td class="td_text_center" width="4%"><%=mc.getKasi72CTNQty()%></td>
+								<td class="td_text_center" width="4%"><%=mc.getKasi72BAGQty()%></td>
+								
 								<td class="td_text" width="15%" ><%=mc.getRemark()%></td> 
 								<td class="td_text" width="5%"><%=mc.getPendingReason()%></td> 
 								<!-- 65 -->
@@ -382,13 +405,18 @@ function openPensEdit(path,orderId){
 							NSBean s =  nsForm.getSummary();
 						%>
 						<tr class='hilight_text'>
-							<td class="td_text_right"  colspan="15" align="right">Total</td>
+							<td class="td_text_right"  colspan="17" align="right">Total</td>
 							<td class="td_text_center" width="4%"><%=s.getCupQty()%></td>
 							<td class="td_text_center" width="4%"><%=s.getCupNQty()%></td>
+							
 							<td class="td_text_center" width="4%"><%=s.getPac6CTNQty()%></td>
 							<td class="td_text_center" width="4%"><%=s.getPac6Qty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getInterCTNQty()%></td>
+							<td class="td_text_center" width="4%"><%=s.getInterBAGQty()%></td>
+							
 							<td class="td_text_center" width="4%"><%=s.getPac10CTNQty()%></td>
 							<td class="td_text_center" width="4%"><%=s.getPac10Qty()%></td>
+							
 							<td class="td_text_center" width="4%"><%=s.getPoohQty()%></td>
 							<td class="td_text_center" width="4%"><%=s.getPoohNQty()%></td>
 							<td class="td_text" width="15%" nowrap></td> 

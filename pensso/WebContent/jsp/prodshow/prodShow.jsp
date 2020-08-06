@@ -1,3 +1,4 @@
+<%@page import="java.math.BigDecimal"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@page import="com.isecinc.pens.model.MProductCategory"%>
 <%@page import="java.util.Date"%>
@@ -60,7 +61,7 @@ if("new".equalsIgnoreCase(action)){
 		 if(order!= null){
 			 prodShowBean = new ProdShowBean();
 			 prodShowBean.setOrderNo(orderNo);
-			 prodShowBean.setOrderId(order.getId());
+			 prodShowBean.setOrderId(order.getId());  
 			 
 			 //get Customer Detail
 			 Customer cus = new MCustomer().findByWhereCond(conn, " where customer_id ="+order.getCustomerId());

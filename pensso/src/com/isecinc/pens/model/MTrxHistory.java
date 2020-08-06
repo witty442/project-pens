@@ -8,7 +8,7 @@ import util.ConvertNullUtil;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.TrxHistory;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 public class MTrxHistory extends I_Model<TrxHistory> {
 
@@ -60,7 +60,7 @@ public class MTrxHistory extends I_Model<TrxHistory> {
 	public boolean save(TrxHistory trxHistory, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (trxHistory.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcess.getNextValueInt(TABLE_NAME);
 		} else {
 			id = trxHistory.getId();
 		}
@@ -97,7 +97,7 @@ public class MTrxHistory extends I_Model<TrxHistory> {
 			pstmt.setInt(p++, (Integer) values[0]);
 			pstmt.setString(p++, (String) values[1]);
 			pstmt.setString(p++, (String) values[2]);
-			pstmt.setInt(p++, (Integer) values[3]);
+			pstmt.setLong(p++, (Long) values[3]);
 			pstmt.setInt(p++, (Integer) values[4]);
 
 			pstmt.executeUpdate();

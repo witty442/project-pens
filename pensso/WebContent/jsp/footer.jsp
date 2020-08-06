@@ -1,9 +1,10 @@
-<%@page import="util.SessionGen"%>
-<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
+
+<%@page import="com.pens.util.EnvProperties"%>
+<%@page import="util.SIdUtils"%>
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <%
  String[] msg3 = new String[2];
 if(request.getSession().getAttribute("appVersionCheckMsg") != null){
@@ -52,11 +53,7 @@ function openDBBackupPopup(path){
 			  <font color="red"><%=Utils.isNull(msg3[0]) %></font> </a>|&nbsp;<%=Utils.isNull(msg3[1]) %>
 			  &nbsp;<font color="black">
 			  Config:<%=EnvProperties.getInstance().getProperty("config.type") %>
-			  </font> |
-			  <a href="javascript:openDBBackupPopup('${pageContext.request.contextPath}');">
-			      <font color="green">สำรองข้อมูล</font>
-			       <img src="${pageContext.request.contextPath}/icons/process.gif"></img>
-			   </a>
+			  </font> 
 			   &nbsp;|&nbsp;เบอร์โทรไอที : 087-8016837, 083-3061296
 			  </b>
 		</td>

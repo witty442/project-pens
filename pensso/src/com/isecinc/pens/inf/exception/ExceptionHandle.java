@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
-import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+//import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 
 public class ExceptionHandle {
     public static Map<String,String> ERROR_MAPPING = new HashMap<String,String>();
@@ -56,9 +56,10 @@ public class ExceptionHandle {
 	public static String getExceptionCode(Exception e){
 		String exceptionCode = "";
 		try{
-			if( e instanceof MySQLIntegrityConstraintViolationException){
-				exceptionCode = "MySQLIntegrityConstraintViolationException";
-			}else if( e instanceof FTPException){
+		/*	if( e instanceof MySQLIntegrityConstraintViolationException){
+				exceptionCode = "MySQLIntegrityConstraintViolationException";*/
+			//}else
+			if( e instanceof FTPException){
 				exceptionCode = "FTPException";
 			}else if( e instanceof NullPointerException){
 				exceptionCode = "NullPointerException";

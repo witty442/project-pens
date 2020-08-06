@@ -13,12 +13,23 @@ public abstract class I_PO implements Serializable {
 
 	private static final long serialVersionUID = -842028756977462875L;
 
-	public static String DOC_SAVE = "SV";
-	public static String DOC_VOID = "VO";
+	//OLD STATUS
+	public static String DOC_SAVE = "SV";//OPEN
+	
+	//STEP ORDER
+	public static String STATUS_CANCEL = "CANCEL";//Cancel
+	public static String STATUS_RESERVE = "RESERVE";//Reserve
+	public static String STATUS_UNAVAILABLE = "UNAVAILABLE";//UNAVAILABLE
+	
+	//STEP PICKING ,LOADING
+	public static String STATUS_PICKING = "PICKING";//PICKING (print pick)
+	public static String STATUS_REJECT = "REJECT";// REJECT
+	public static String STATUS_LOADING = "LOADING";//LOADING create Order Oracle 
+	
 
 	private String activeLabel;
 
-	protected abstract void setDisplayLabel() throws Exception;
+	//protected abstract void setDisplayLabel() throws Exception;
 
 	public String getActiveLabel() {
 		return activeLabel;

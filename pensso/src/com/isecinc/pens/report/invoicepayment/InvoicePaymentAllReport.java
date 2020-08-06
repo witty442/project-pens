@@ -30,7 +30,8 @@ public class InvoicePaymentAllReport implements Serializable {
 	private String paymentMethod;
 	private String status;
 	private String isPDPaid;
-	
+	private String receiptDateFrom;
+	private String receiptDateTo;
 	private String writeOff;
 
 	/** For sum all start month to date selected. **/
@@ -44,6 +45,18 @@ public class InvoicePaymentAllReport implements Serializable {
 	private double allVatReceiptAmount;
 	
 	
+	public String getReceiptDateFrom() {
+		return receiptDateFrom;
+	}
+	public void setReceiptDateFrom(String receiptDateFrom) {
+		this.receiptDateFrom = receiptDateFrom;
+	}
+	public String getReceiptDateTo() {
+		return receiptDateTo;
+	}
+	public void setReceiptDateTo(String receiptDateTo) {
+		this.receiptDateTo = receiptDateTo;
+	}
 	public String getStatus() {
 		return status;
 	}

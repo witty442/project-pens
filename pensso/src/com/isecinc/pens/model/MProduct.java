@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import util.ControlCode;
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Product;
@@ -18,10 +18,14 @@ import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.moveorder.MoveOrderProductCatalog;
 import com.isecinc.pens.web.requisitionProduct.RequisitionProductCatalog;
+import com.isecinc.pens.web.sales.CheckStockOnhandProcess;
 import com.isecinc.pens.web.sales.bean.ProductCatalog;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnectionApps;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 /**
  * MProduct Class
@@ -94,54 +98,68 @@ public class MProduct extends I_Model<Product>{
 		return array;
 	}
 	
-	public List<ProductCatalog> getProductCatalogByBrand(String productCatCode,String orderDate,String pricelistId ,User u,boolean isCustHaveProductSpecial) throws Exception {
+	/**
+	 *   Note ** Class ProductCatalog  is encode in class unicode some function display problem thai ?? 
+	 */
+	public  List<ProductCatalog> getProductCatalogByBrand(String productCatCode,String orderDate,String pricelistId ,User u,boolean isCustHaveProductSpecial) throws Exception {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
-		//
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMM", Locale.US);
-		String today = df.format(new Date());
+		String stockArr[] = null;
+		boolean checkStockFlag = false;
 		
 		List<ProductCatalog> productL = new ArrayList<ProductCatalog>();
 		StringBuffer sql = new StringBuffer("");
-		 sql.append("\n SELECT A.* FROM( ");
-		sql.append(" \n SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE , pp1.PRICE as PRICE1 , pp1.UOM_ID as UOM1 ,pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 ");
+		sql.append("\n SELECT A.* FROM( ");
+		sql.append(" \n SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE , pp1.PRICE as PRICE1 ");
+		sql.append(" \n , pp1.UOM_ID as UOM1 ,pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 ");
 		sql.append(" \n ,(CASE WHEN st.product_id  <> '' THEN '0' ELSE '1' end )as target_sort ");
 		sql.append(" \n ,(CASE WHEN st.product_id  <> '' THEN 'Y' ELSE '' end )as target ");
 		sql.append("\n  ,pd.taxable ");
-		sql.append("\n FROM M_Product pd ");
-		sql.append("\n INNER JOIN M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID AND pp1.UOM_ID = pd.UOM_ID ");
-		sql.append("\n LEFT JOIN m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID ");
-		sql.append("\n LEFT OUTER JOIN m_sales_target_new st ON  st.Product_ID = pp1.Product_ID AND DATE_FORMAT(st.target_from, '%Y%m') = DATE_FORMAT(NOW(), '%Y%m')");
+		//sql.append("\n  ,oh.quantity,oh.primary_quantity,oh.second_quantity");
+		sql.append("\n FROM PENSSO.M_Product pd ");
+		sql.append("\n INNER JOIN PENSSO.M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID ");
+		sql.append("\n AND pp1.UOM_ID = pd.UOM_ID ");
+		sql.append("\n LEFT JOIN PENSSO.m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID ");
+		sql.append("\n AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID ");
+		sql.append("\n LEFT OUTER JOIN PENSSO.m_sales_target_new st ON  st.Product_ID = pp1.Product_ID ");
+		sql.append("\n AND TO_CHAR(st.target_from, 'YYYYMM')  = TO_CHAR(sysdate, 'YYYYMM')");
+		
+		/*sql.append("\n LEFT JOIN APPS.xxpens_inv_onhand_z00_v oh ON oh.inventory_item_id = pd.product_id ");
+		sql.append("\n and oh.subinventory_code='Z001'");*/
 		
 		sql.append("\n WHERE pp1.ISACTIVE = 'Y' AND pd.CODE LIKE '"+productCatCode+"%' AND pp1.PRICELIST_ID = "+pricelistId+" ");
 		sql.append("\n AND ( ");
 		sql.append("\n    pp1.UOM_ID IN ( ");
-		sql.append("\n      SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now() ");
+		sql.append("\n      SELECT UOM_ID FROM PENSSO.M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,sysdate) >= sysdate ");
 		sql.append("\n     ) ");
 		sql.append("\n     OR");
 		sql.append("\n     pp2.UOM_ID IN ( ");
-		sql.append("\n        SELECT UOM_ID FROM M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,now()) >= now() ");
+		sql.append("\n        SELECT UOM_ID FROM PENSSO.M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,sysdate) >= sysdate ");
 		sql.append("\n      ) ");
 		sql.append("\n   )");
-		
-        sql.append("\n  AND pd.CODE NOT IN (SELECT DISTINCT CODE FROM M_PRODUCT_UNUSED WHERE type ='"+u.getRole().getKey()+"') ");
+        sql.append("\n  AND pd.CODE NOT IN (SELECT DISTINCT CODE FROM PENSSO.M_PRODUCT_UNUSED WHERE type ='"+u.getRole().getKey()+"') ");
         sql.append("\n )A");
         //Case product Special
         if(isCustHaveProductSpecial){
 	        sql.append("\n WHERE A.product_id in(");
-	        sql.append("\n select M.product_id from M_product_center C ,M_product M where M.code = C.code");
+	        sql.append("\n select M.product_id from PENSSO.M_product_center C ,PENSSO.M_product M where M.code = C.code");
 	        sql.append("\n ) ");
         }else{
         	sql.append("\n WHERE A.product_id not in(");
- 	        sql.append("\n select M.product_id from M_product_center C ,M_product M where M.code = C.code");
+ 	        sql.append("\n select M.product_id from PENSSO.M_product_center C ,PENSSO.M_product M where M.code = C.code");
  	        sql.append("\n ) ");
         }
         sql.append("\n ORDER BY A.target_sort,A.PRODUCT_CODE ");
 		
         logger.debug("sql:"+sql);
         
-		conn = new DBCPConnectionProvider().getConnection(conn);
+        //control code check stock or not
+        if(ControlCode.canExecuteMethod("Stock", "checkStock")){
+        	checkStockFlag = true;
+        }
+        
+		conn = DBConnectionApps.getInstance().getConnection();
 		try {
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
@@ -156,6 +174,161 @@ public class MProduct extends I_Model<Product>{
 				catalog.setUom1(rst.getString("UOM1"));
 				catalog.setUom2(ConvertNullUtil.convertToString(rst.getString("UOM2")));
 				catalog.setTaxable(ConvertNullUtil.convertToString(rst.getString("TAXABLE")));
+				
+				UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), "CTN");//default to CTN
+			    UOMConversion  uc2 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), catalog.getUom2());
+
+			    if(uc1 != null){
+			    	catalog.setUom1ConvRate(Utils.decimalFormat(uc1.getConversionRate(),Utils.format_number_no_disgit));
+			    	//logger.debug("uom1ConRate:"+catalog.getUom1ConvRate());
+			    }
+			    if(uc2 != null){
+			    	catalog.setUom2ConvRate(Utils.decimalFormat(uc2.getConversionRate(),Utils.format_number_no_disgit));
+			    	//logger.debug("uom2ConRate:"+catalog.getUom2ConvRate());
+			    }
+			    // TUB/ no conversion
+			    if(uc1.getConversionRate()==0 && uc2.getConversionRate()==0){
+			    	catalog.setUom2ConvRate("1");//default
+			    }
+			    
+			    //For no or check stock onhand
+			    if(checkStockFlag){
+			    	//OLD METHOD
+					stockArr = CheckStockOnhandProcess.checkStockItemProc(catalog.getProductCode(),catalog.getProductId()+"", catalog.getUom1(), catalog.getUom2());
+					if(stockArr != null ){
+						//logger.debug("stockArr[0]:"+stockArr[0]+",stockArr[1]:"+stockArr[1]);
+						catalog.setStockOnhandQty(Utils.convertStrToDouble(stockArr[0]));
+						catalog.setStockOnhandQty1(Utils.convertStrToInt(stockArr[1]));
+						catalog.setStockOnhandQty2(Utils.convertStrToInt(stockArr[2]));
+					}
+					
+			    	//NEW 
+			    /*	catalog.setStockOnhandQty(rst.getDouble("quantity"));
+			    	catalog.setStockOnhandQty1(rst.getInt("primary_quantity"));
+					catalog.setStockOnhandQty2(rst.getInt("second_quantity"));*/
+			    }
+				productL.add(catalog);
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		
+		return productL;
+	}
+	
+	/**
+	 *   Note ** Class ProductCatalog  is encode in class unicode some function display problem thai ?? 
+	 */
+	public  List<ProductCatalog> getProductCatalogBySubBrand(String subBrandCode,String orderDate,String pricelistId ,User u,boolean isCustHaveProductSpecial) throws Exception {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		String stockArr[] = null;
+		boolean checkStockFlag = false;
+		
+		List<ProductCatalog> productL = new ArrayList<ProductCatalog>();
+		StringBuffer sql = new StringBuffer("");
+		sql.append("\n SELECT A.* FROM( ");
+		sql.append(" \n SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE , pp1.PRICE as PRICE1 ");
+		sql.append(" \n , pp1.UOM_ID as UOM1 ,pp2.PRICE as PRICE2 , pp2.UOM_ID as UOM2 ");
+		sql.append(" \n ,(CASE WHEN st.product_id  <> '' THEN '0' ELSE '1' end )as target_sort ");
+		sql.append(" \n ,(CASE WHEN st.product_id  <> '' THEN 'Y' ELSE '' end )as target ");
+		sql.append("\n  ,pd.taxable ");
+		//sql.append("\n  ,oh.quantity,oh.primary_quantity,oh.second_quantity");
+		sql.append("\n FROM PENSSO.M_Product pd ");
+		sql.append("\n INNER JOIN PENSSO.M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID ");
+		sql.append("\n AND pp1.UOM_ID = pd.UOM_ID ");
+		sql.append("\n LEFT JOIN PENSSO.m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID ");
+		sql.append("\n AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID ");
+		sql.append("\n LEFT OUTER JOIN PENSSO.m_sales_target_new st ON  st.Product_ID = pp1.Product_ID ");
+		sql.append("\n AND TO_CHAR(st.target_from, 'YYYYMM')  = TO_CHAR(sysdate, 'YYYYMM')");
+		
+		/*sql.append("\n LEFT JOIN APPS.xxpens_inv_onhand_z00_v oh ON oh.inventory_item_id = pd.product_id ");
+		sql.append("\n and oh.subinventory_code='Z001'");*/
+		
+		sql.append("\n WHERE pp1.ISACTIVE = 'Y' AND pd.CODE LIKE '"+subBrandCode+"%' AND pp1.PRICELIST_ID = "+pricelistId+" ");
+		sql.append("\n AND ( ");
+		sql.append("\n    pp1.UOM_ID IN ( ");
+		sql.append("\n      SELECT UOM_ID FROM PENSSO.M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,sysdate) >= sysdate ");
+		sql.append("\n     ) ");
+		sql.append("\n     OR");
+		sql.append("\n     pp2.UOM_ID IN ( ");
+		sql.append("\n        SELECT UOM_ID FROM PENSSO.M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND COALESCE(con.DISABLE_DATE,sysdate) >= sysdate ");
+		sql.append("\n      ) ");
+		sql.append("\n   )");
+        sql.append("\n  AND pd.CODE NOT IN (SELECT DISTINCT CODE FROM PENSSO.M_PRODUCT_UNUSED WHERE type ='"+u.getRole().getKey()+"') ");
+        sql.append("\n )A");
+        //Case product Special
+        if(isCustHaveProductSpecial){
+	        sql.append("\n WHERE A.product_id in(");
+	        sql.append("\n select M.product_id from PENSSO.M_product_center C ,PENSSO.M_product M where M.code = C.code");
+	        sql.append("\n ) ");
+        }else{
+        	sql.append("\n WHERE A.product_id not in(");
+ 	        sql.append("\n select M.product_id from PENSSO.M_product_center C ,PENSSO.M_product M where M.code = C.code");
+ 	        sql.append("\n ) ");
+        }
+        sql.append("\n ORDER BY A.target_sort,A.PRODUCT_CODE ");
+		
+        logger.debug("sql:"+sql);
+        
+        //control code check stock or not
+        if(ControlCode.canExecuteMethod("Stock", "checkStock")){
+        	checkStockFlag = true;
+        }
+        
+		conn = DBConnectionApps.getInstance().getConnection();
+		try {
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while(rst.next()){
+				ProductCatalog catalog = new ProductCatalog();
+				catalog.setTarget(rst.getString("target"));
+				catalog.setProductId(rst.getInt("PRODUCT_ID"));
+				catalog.setProductName(rst.getString("PRODUCT_NAME"));
+				catalog.setProductCode( rst.getString("PRODUCT_CODE"));
+				catalog.setPrice1(rst.getDouble("PRICE1"));
+				catalog.setPrice2(rst.getDouble("PRICE2"));
+				catalog.setUom1(rst.getString("UOM1"));
+				catalog.setUom2(ConvertNullUtil.convertToString(rst.getString("UOM2")));
+				catalog.setTaxable(ConvertNullUtil.convertToString(rst.getString("TAXABLE")));
+				
+				UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), "CTN");//default to CTN
+			    UOMConversion  uc2 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), catalog.getUom2());
+
+			    if(uc1 != null){
+			    	catalog.setUom1ConvRate(Utils.decimalFormat(uc1.getConversionRate(),Utils.format_number_no_disgit));
+			    	//logger.debug("uom1ConRate:"+catalog.getUom1ConvRate());
+			    }
+			    if(uc2 != null){
+			    	catalog.setUom2ConvRate(Utils.decimalFormat(uc2.getConversionRate(),Utils.format_number_no_disgit));
+			    	//logger.debug("uom2ConRate:"+catalog.getUom2ConvRate());
+			    }
+			    // TUB/ no conversion
+			    if(uc1.getConversionRate()==0 && uc2.getConversionRate()==0){
+			    	catalog.setUom2ConvRate("1");//default
+			    }
+			    
+			    //For no or check stock onhand
+			    if(checkStockFlag){
+			    	//OLD METHOD
+					stockArr = CheckStockOnhandProcess.checkStockItemProc(catalog.getProductCode(),catalog.getProductId()+"", catalog.getUom1(), catalog.getUom2());
+					if(stockArr != null ){
+						//logger.debug("stockArr[0]:"+stockArr[0]+",stockArr[1]:"+stockArr[1]);
+						catalog.setStockOnhandQty(Utils.convertStrToDouble(stockArr[0]));
+						catalog.setStockOnhandQty1(Utils.convertStrToInt(stockArr[1]));
+						catalog.setStockOnhandQty2(Utils.convertStrToInt(stockArr[2]));
+					}
+					
+			    	//NEW 
+			    /*	catalog.setStockOnhandQty(rst.getDouble("quantity"));
+			    	catalog.setStockOnhandQty1(rst.getInt("primary_quantity"));
+					catalog.setStockOnhandQty2(rst.getInt("second_quantity"));*/
+			    }
 				productL.add(catalog);
 			}
 		} catch (Exception e) {
@@ -440,10 +613,10 @@ public class MProduct extends I_Model<Product>{
 		String conversionRate = "";
 		try{
 			 UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(productId, uom1);
-			 conversionRate = Utils.decimalFormat(uc1.getConversionRate(),Utils.format_num_no_disgit);
+			 conversionRate = Utils.decimalFormat(uc1.getConversionRate(),Utils.format_number_no_disgit);
 			 if( !Utils.isNull(uom2).equals("")){
 				  UOMConversion  uc2 = new MUOMConversion().getCurrentConversion(productId, uom2);
-				  conversionRate += "/"+Utils.decimalFormat(uc2.getConversionRate(),Utils.format_num_no_disgit);
+				  conversionRate += "/"+Utils.decimalFormat(uc2.getConversionRate(),Utils.format_number_no_disgit);
 			 }
 			 return conversionRate;
 		}catch(Exception e){
@@ -503,13 +676,13 @@ public class MProduct extends I_Model<Product>{
 				
 				//uom1 pac
 				UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(catalog.getId(), catalog.getUom1());
-				conversionRate = Utils.decimalFormat(uc1.getConversionRate(),Utils.format_num_no_disgit);
+				conversionRate = Utils.decimalFormat(uc1.getConversionRate(),Utils.format_number_no_disgit);
 				catalog.setUom1Pac(conversionRate);
 				catalog.setUom1ConvRate(uc1.getConversionRate()+"");
 				
 				//uom2 pac
 			    UOMConversion  uc2 = new MUOMConversion().getCurrentConversion(catalog.getId(), catalog.getUom2());
-			    conversionRate = Utils.decimalFormat(uc2.getConversionRate(),Utils.format_num_no_disgit);
+			    conversionRate = Utils.decimalFormat(uc2.getConversionRate(),Utils.format_number_no_disgit);
 			    catalog.setUom2Pac(conversionRate);
 			    catalog.setUom2ConvRate(uc2.getConversionRate()+"");
 			    

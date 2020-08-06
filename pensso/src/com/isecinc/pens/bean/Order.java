@@ -15,6 +15,7 @@ import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MUser;
 import com.isecinc.pens.model.MOrgRule;
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
  * Order
@@ -43,12 +44,12 @@ public class Order extends I_PO implements Serializable {
 	 * @throws Exception
 	 */
 	public Order(ResultSet rst) throws Exception {
-		setId(rst.getInt("ORDER_ID"));
+		setId(rst.getLong("ORDER_ID"));
 		setOrderNo(rst.getString("ORDER_NO"));
 		setOrderDate(DateToolsUtil.convertToString(rst.getTimestamp("ORDER_DATE")));
 		setOrderTime(rst.getString("ORDER_TIME"));
 		setOrderType(rst.getString("ORDER_TYPE").trim());
-		setCustomerId(rst.getInt("CUSTOMER_ID"));
+		setCustomerId(rst.getLong("CUSTOMER_ID"));
 		setCustomerName(rst.getString("CUSTOMER_NAME").trim());
 		//Get custGroup
 		setCustGroup(new MCustomer().getCustGroup(getCustomerId()));
@@ -58,7 +59,7 @@ public class Order extends I_PO implements Serializable {
 		setPaymentTerm(rst.getString("PAYMENT_TERM").trim());
 		setVatCode(rst.getString("VAT_CODE").trim());
 		setVatRate(rst.getDouble("VAT_RATE"));
-		setPaymentMethod(rst.getString("PAYMENT_METHOD").trim());
+		setPaymentMethod(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim());
 		setShippingDay(ConvertNullUtil.convertToString(rst.getString("SHIPPING_DAY")).trim());
 		setShippingTime(ConvertNullUtil.convertToString(rst.getString("SHIPPING_TIME")).trim());
 		setTotalAmount(rst.getDouble("TOTAL_AMOUNT"));
@@ -81,7 +82,7 @@ public class Order extends I_PO implements Serializable {
 		setDisplayLabel();
 		
 		//wit 20110804
-		setPaymentCashNow("CS".equals(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD").trim()))?true:false);
+		setPaymentCashNow("CS".equals(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim())?true:false);
 		
 		// Add Oracle Reference Address ID
 		setOraBillAddressID(rst.getInt("ORA_BILL_ADDRESS_ID"));
@@ -103,8 +104,21 @@ public class Order extends I_PO implements Serializable {
 		
 		setPoNumber(Utils.isNull(rst.getString("po_number")));
 		setVanPaymentMethod(Utils.isNull(rst.getString("van_payment_method")));
+		
+		setPickingNo(Utils.isNull(rst.getString("picking_no")));
+		
+		//can cancel (OPEN,UNVIALBLE,RESERVE,REJECT)
+		setCanCancel(canCancel(getDocStatus()));
+		
 	}
 
+	public boolean canCancel(String status){
+		if(STATUS_UNAVAILABLE.equalsIgnoreCase(status)|| STATUS_RESERVE.equalsIgnoreCase(status) 
+				|| STATUS_REJECT.equalsIgnoreCase(status)){
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * Set display
 	 */
@@ -116,9 +130,9 @@ public class Order extends I_PO implements Serializable {
 			}
 		}
 	}
-
+ 
 	/** ID */
-	private int id;
+	private long id;
 
 	/** Order No */
 	private String orderNo;
@@ -133,8 +147,11 @@ public class Order extends I_PO implements Serializable {
 	private String orderType;
 
 	/** Customer ID */
-	private int customerId;
-
+	private long customerId;
+	
+	/** Customer Code */
+	private String customerCode;
+	
 	/** Customer Name */
 	private String customerName;
 
@@ -251,6 +268,7 @@ public class Order extends I_PO implements Serializable {
 	
 	private double openAmt;
 	
+	
 	//Display Optional no DB
 	private String placeOfBilled;
 	private String org;
@@ -262,8 +280,44 @@ public class Order extends I_PO implements Serializable {
 	private String vanPaymentMethod;
     private boolean promotionSP;
 	private String custGroup;
-   
+	private String pickingNo;
+	private String provinceGroup;
+	private boolean canCancel;
 	
+
+	public String getCustomerCode() {
+		return customerCode;
+	}
+
+	public void setCustomerCode(String customerCode) {
+		this.customerCode = customerCode;
+	}
+
+	public boolean isCanCancel() {
+		return canCancel;
+	}
+
+	public void setCanCancel(boolean canCancel) {
+		this.canCancel = canCancel;
+	}
+
+	public String getProvinceGroup() {
+		return provinceGroup;
+	}
+
+	public void setProvinceGroup(String provinceGroup) {
+		this.provinceGroup = provinceGroup;
+	}
+    
+
+	public String getPickingNo() {
+		return pickingNo;
+	}
+
+	public void setPickingNo(String pickingNo) {
+		this.pickingNo = pickingNo;
+	}
+
 	public String getCustGroup() {
 		return custGroup;
 	}
@@ -402,11 +456,11 @@ public class Order extends I_PO implements Serializable {
 		this.created = created;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -434,11 +488,11 @@ public class Order extends I_PO implements Serializable {
 		this.orderType = orderType;
 	}
 
-	public int getCustomerId() {
+	public long getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
 

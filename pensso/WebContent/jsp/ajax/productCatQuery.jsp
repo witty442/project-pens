@@ -24,7 +24,6 @@ try{
     conn = DBConnection.getInstance().getConnection();
 	User user = ((User)session.getAttribute("user"));
 	String pageId_param = request.getParameter("pageId");
-	
 	String custId = request.getParameter("custId");
 	boolean isCustHaveProductSpecial = new MCustomer().isCustHaveProductSpecial(conn, custId);
 	System.out.println("isCustHaveProductSpecial:"+isCustHaveProductSpecial);
@@ -34,28 +33,30 @@ try{
 		basket = new Basket();	
 	}
 	
-	if(StringUtils.isEmpty(pageId_param))
-		pageId_param = "0";
-	
+	if(StringUtils.isEmpty(pageId_param) || Integer.valueOf(pageId_param) ==0){
+		pageId_param = "1";
+	}
 	pageId = Integer.valueOf(pageId_param);
+	System.out.println("pageId:"+pageId);
 	
 	MProductCategory mProductCat = new MProductCategory();
-	 productCatL = mProductCat.lookUpBrandList(conn,pageId,user,isCustHaveProductSpecial);
+	//Get ProductBrand By PageId
+	productCatL = mProductCat.lookUpBrandListByPage(conn,pageId,user,isCustHaveProductSpecial);
 	
-	 no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
-	 no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
-	 no_of_total_display = no_of_column * no_of_rows;
+	no_of_column = MProductCategory.NO_OF_DISPLAY_COLUMNS;
+	no_of_rows =  MProductCategory.NO_OF_DISPLAY_ROWS;
+	no_of_total_display = no_of_column * no_of_rows;
 	
-	 totalRecord = mProductCat.lookUpBrandList(conn,user,isCustHaveProductSpecial).size();
+	totalRecord = mProductCat.lookUpBrandList(conn,user,isCustHaveProductSpecial).size();
 	
-	// totalPage = totalRecord/(no_of_column * no_of_rows);
-	   totalPage = Utils.calcTotalPage(totalRecord, (no_of_column * no_of_rows));
+	totalPage = Utils.calcTotalPage(totalRecord, (no_of_column * no_of_rows));
 	   
 	//List All Brand
 	List<References> brandAllList = mProductCat.lookUpBrandAllListNew(user);
-
+	
+	System.out.println("productCatL["+productCatL.size()+"]brandAllList["+brandAllList.size()+"]");
     /// Find Total Page
-   //System.out.println("totalRecord[]"+totalRecord+"]totalPage["+totalPage+"]");
+    System.out.println("totalRecord["+totalRecord+"]totalPage["+totalPage+"]");
 
 if(productCatL != null && productCatL.size() > 0){
 %>
@@ -64,7 +65,7 @@ if(productCatL != null && productCatL.size() > 0){
 <td class="paging" colspan="<%=no_of_column%>">หน้าที่
 <%  int id = 1 ;
 	for(int no = 0 ; no < totalPage;no++ ) {  
-		int id_param = id-1;
+		int id_param = id;
 		//System.out.println("id:"+id);
 		String className = "currPageBtn";
 		if(id_param == pageId)

@@ -8,13 +8,12 @@ import javax.servlet.http.HttpServlet;
 import org.apache.log4j.Logger;
 import org.apache.struts.tiles.taglib.GetAttributeTag;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.init.I_Initial;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialParameter;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.init.InitialSystemConfig;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * WebInitialServlet Class for Initial Web Parameter and Configuration

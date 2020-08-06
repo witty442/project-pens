@@ -1,5 +1,6 @@
 package com.isecinc.pens.model;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,7 @@ import util.ConvertNullUtil;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Contact;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * MContact Class
@@ -68,7 +69,7 @@ public class MContact extends I_Model<Contact> {
 	public boolean save(Contact contact, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (contact.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcess.getNextValueInt(TABLE_NAME);
 		} else {
 			id = contact.getId();
 		}
@@ -91,7 +92,7 @@ public class MContact extends I_Model<Contact> {
 	/**
 	 * Look Up
 	 */
-	public List<Contact> lookUp(int customerId) {
+	public List<Contact> lookUp(long customerId) {
 		List<Contact> pos = new ArrayList<Contact>();
 		try {
 			String whereCause = " AND CUSTOMER_ID = " + customerId + " ORDER BY CONTACT_ID ";

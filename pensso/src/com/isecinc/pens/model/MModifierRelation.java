@@ -6,10 +6,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ModifierRelation;
+import com.pens.util.DBCPConnectionProvider;
 
 public class MModifierRelation extends I_Model<ModifierRelation> {
 	private static final long serialVersionUID = 1149816246642304671L;

@@ -45,9 +45,9 @@ import com.isecinc.pens.model.MReceiptCN;
 import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MReceiptMatchCN;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.ReceiptDocumentProcess;
-import com.pens.utils.LoggerUtils;
+import com.pens.util.LoggerUtils;
+import com.pens.util.seq.SequenceProcess;
 import com.sun.org.apache.bcel.internal.generic.ISUB;
 
 /** New Code 08/2561  ***/
@@ -194,7 +194,7 @@ public class ImportReceiptFunction2 {
 				canExc = 1;
 			}else{
 				/** receipt found **/
-				if(receipt != null && receipt.getReceiptId() != 0){
+				if(receipt != null && receipt.getReceiptId() !=0){
 					logger.debug("DocStatus["+docStatus+"]");
 					logger.debug("ReceiptAmountOracle["+totalReceiptAmountOracle+"]:["+receipt.getReceiptAmount()+"]ReceiptAmount(SalesApp)");
 					logger.debug("CountReceiptBy["+receipt.getCountReceiptBy()+"]");
@@ -514,7 +514,8 @@ public class ImportReceiptFunction2 {
 					 logger.debug("ReceiptById:"+receiptHead.getReceiptById());
 					 
 					 //Get Old detail
-					 if(receiptHead != null && receiptHead.getReceiptId() != 0 && receiptHead.getReceiptById()!=0){
+					 if(receiptHead != null && receiptHead.getReceiptId() !=0 
+							 && receiptHead.getReceiptById() !=0){
 						 if(   receiptHead.getCaseType().equalsIgnoreCase("RECEIPT_EQUAL_AMOUNT")
 							|| receiptHead.getCaseType().equalsIgnoreCase("RECEIPT_NOT_EQUAL_AMOUNT")	
 							|| receiptHead.getCaseType().equalsIgnoreCase("RECEIPT_MORE_RECEIPT") 
@@ -688,7 +689,7 @@ public class ImportReceiptFunction2 {
 			
 			//Find ID Exist
 			ReceiptFunctionBean receiptExist = findReceiptMatchCNDetail(conn,receiptHead.getReceiptId(),cnNo);   
-			if(receiptExist !=null && receiptExist.getReceiptById()==0){
+			if(receiptExist !=null && receiptExist.getReceiptById() ==0){
 				receiptExist.setReceiptById(receiptHead.getReceiptById());
 			}
 			logger.debug("*** Start createReceiptLineMatchCN **");
@@ -705,14 +706,14 @@ public class ImportReceiptFunction2 {
 				throw new CnNoNotFoundException("CreditNoteNo["+cnNo+"]not found in master");
 			}
 			
-			if(    receiptExist.getReceiptId() != 0
-				&& receiptExist.getReceiptById() != 0
+			if(    receiptExist.getReceiptId() !=0
+				&& receiptExist.getReceiptById()!=0
 				&& receiptExist.getCreditNoteId() != 0){
 				
 				logger.debug("Insert Receipt CN");
 				ReceiptCN receiptCN = new ReceiptCN();
 				receiptCN.setId(0);
-				receiptCN.setReceiptId(receiptExist.getReceiptId());
+				receiptCN.setReceiptId(new  Integer(""+receiptExist.getReceiptId()));
 				receiptCN.setPaidAmount(amount);
 				receiptCN.setCreditAmount(amount);
 				//set credit Note id
@@ -744,7 +745,7 @@ public class ImportReceiptFunction2 {
 		return canExc;
 	}
 	
-	public ReceiptFunctionBean findReceiptMatchCNDetail(Connection conn,int receiptId,String creditNoteNo) 
+	public ReceiptFunctionBean findReceiptMatchCNDetail(Connection conn, long receiptId,String creditNoteNo) 
 			throws Exception{
 		ReceiptFunctionBean receipt = new ReceiptFunctionBean();
 		PreparedStatement ps =null;
@@ -769,9 +770,9 @@ public class ImportReceiptFunction2 {
 			ps =conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			if(rs.next()){
-				receipt.setReceiptId(rs.getInt("receipt_id"));
+				receipt.setReceiptId(rs.getLong("receipt_id"));
 				receipt.setCreditNoteId(rs.getInt("credit_note_id"));
-				receipt.setReceiptById(rs.getInt("receipt_by_id"));
+				receipt.setReceiptById(rs.getLong("receipt_by_id"));
 			}
 		}catch(Exception e){
 			logger.error(e.getMessage());
@@ -867,7 +868,7 @@ public class ImportReceiptFunction2 {
 			rs = ps.executeQuery();
 			if(rs.next()){
 				receipt = new ReceiptFunctionBean();
-				receipt.setReceiptId(rs.getInt("receipt_id"));
+				receipt.setReceiptId(rs.getLong("receipt_id"));
 				receipt.setReceiptNo(rs.getString("receipt_no"));
 				receipt.setReceiptDate(Utils.stringValue(rs.getDate("receipt_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				receipt.setOrderType(Utils.isNull(rs.getString("order_type")));
@@ -1098,7 +1099,7 @@ public class ImportReceiptFunction2 {
 		int r = 0;
 		try{
 			//Gen new TransId by import
-			long transId = SequenceProcess.getNextValue("TEMP_RECEIPT");
+			BigDecimal transId = SequenceProcess.getNextValue("TEMP_RECEIPT");
 			logger.debug("TransId:"+transId);
 			
 			/* # insert t_receipt_his # */
@@ -1270,7 +1271,7 @@ public class ImportReceiptFunction2 {
 		int r=  0;
 		try{
 			//Gen new TransId by import
-			long transId = SequenceProcess.getNextValue("TEMP_RECEIPT");
+			BigDecimal transId = SequenceProcess.getNextValue("TEMP_RECEIPT");
 			logger.debug("TransId:"+transId);
 			/* # insert t_receipt_line_his # */
 			logger.debug("# insert t_receipt_line_his #");
@@ -1469,7 +1470,7 @@ public class ImportReceiptFunction2 {
 		return r;
 	}
 	
-	public int findLineNoReceiptLine(Connection conn,int receiptId) throws Exception{
+	public int findLineNoReceiptLine(Connection conn,long receiptId) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		StringBuffer sql = new StringBuffer("");
@@ -1541,7 +1542,7 @@ public class ImportReceiptFunction2 {
 			 ps =conn.prepareStatement(sql);
 			 rs = ps.executeQuery();
 			 if(rs.next()){
-				receipt.setReceiptLineId(rs.getInt("receipt_line_id"));
+				receipt.setReceiptLineId(rs.getLong("receipt_line_id"));
 			 }
 		}catch(Exception e){
 			logger.error(e.getMessage());
@@ -1578,7 +1579,7 @@ public class ImportReceiptFunction2 {
 			ps =conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
-				receipt.setReceiptById(rs.getInt("receipt_by_id"));
+				receipt.setReceiptById(rs.getLong("receipt_by_id"));
 				receipt.setPaymentMethod(Utils.isNull(rs.getString("payment_method")));
 				receipt.setChequeNo(rs.getString("cheque_no"));
 				receipt.setChequeDate(Utils.stringValueDefault(rs.getDate("cheque_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th,""));
@@ -1657,7 +1658,7 @@ public class ImportReceiptFunction2 {
 			rs = ps.executeQuery();
 			if(rs.next()){
 				customer = new Customer();
-				customer.setId(rs.getInt("customer_id"));
+				customer.setId(rs.getLong("customer_id"));
 				customer.setName(Utils.isNull(rs.getString("name")));
 			}
 		}catch(Exception e){
@@ -1672,11 +1673,11 @@ public class ImportReceiptFunction2 {
 		}
 		return customer;
 	}
-	public int findOrderId(Connection conn,String arInvoiceNo) throws Exception{
+	public long findOrderId(Connection conn,String arInvoiceNo) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		StringBuffer sql = new StringBuffer("");
-		int orderId =0;
+		long orderId =0;
 		try{
 			sql.append("\n select order_id from t_order where ar_invoice_no ='"+arInvoiceNo+"'");
 			   
@@ -1684,7 +1685,7 @@ public class ImportReceiptFunction2 {
 			ps =conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
-				orderId = rs.getInt("order_id");
+				orderId = rs.getLong("order_id");
 			}
 		}catch(Exception e){
 			logger.error(e.getMessage());
@@ -1699,11 +1700,11 @@ public class ImportReceiptFunction2 {
 		return orderId;
 	}
 	
-	public int findOrderLineId(Connection conn,String arInvoiceNo) throws Exception{
+	public long findOrderLineId(Connection conn,String arInvoiceNo) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		StringBuffer sql = new StringBuffer("");
-		int order_line_id =0;
+		long order_line_id =0;
 		try{
 			sql.append("\n select order_line_id from t_order_line where ar_invoice_no ='"+arInvoiceNo+"'");
 			   
@@ -1711,7 +1712,7 @@ public class ImportReceiptFunction2 {
 			ps =conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			if(rs.next()){
-				order_line_id = rs.getInt("order_line_id");
+				order_line_id = rs.getLong("order_line_id");
 			}
 		}catch(Exception e){
 			logger.error(e.getMessage());
@@ -1726,7 +1727,7 @@ public class ImportReceiptFunction2 {
 		return order_line_id;
 	}
 	
-	public boolean isFoundReciptLineMatch2ReceitpByCaseVO(Connection conn,int receiptId,int receiptById) throws Exception{
+	public boolean isFoundReciptLineMatch2ReceitpByCaseVO(Connection conn,long receiptId,long receiptById) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		StringBuffer sql = new StringBuffer("");
@@ -1756,7 +1757,7 @@ public class ImportReceiptFunction2 {
 	}
 	
 	/** Delete Case VO and ReveiptBy > 1 **/
-	public int deleteReceiptByReceiptByIdCaseVOReceiptByMoreOne(Connection conn,int receiptId,int receiptById) throws Exception{
+	public int deleteReceiptByReceiptByIdCaseVOReceiptByMoreOne(Connection conn,long receiptId,long receiptById) throws Exception{
 		StringBuffer sql = new StringBuffer("");
 		int r=0;
 		try{
@@ -1817,7 +1818,7 @@ public class ImportReceiptFunction2 {
 	}
 	
 	/** Delete Case VO and ReveiptBy > 1 **/
-	public int deleteReceiptByReceiptByIdCaseSVReceiptByMoreOne(Connection conn,int receiptId,int receiptById) throws Exception{
+	public int deleteReceiptByReceiptByIdCaseSVReceiptByMoreOne(Connection conn,long receiptId,long receiptById) throws Exception{
 		StringBuffer sql = new StringBuffer("");
 		int r=0;
 		try{
@@ -1937,7 +1938,7 @@ public class ImportReceiptFunction2 {
 		return customerId;
 	}
 	
-	public ReceiptDataLine calcReceiptLineAmount(Connection conn,int receiptId,int receiptLineId,String arInvoiceNo,double paidAmountOracle,BigDecimal importTransId) throws Exception{
+	public ReceiptDataLine calcReceiptLineAmount(Connection conn,long receiptId,long receiptLineId,String arInvoiceNo,double paidAmountOracle,BigDecimal importTransId) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
 		StringBuffer sql = new StringBuffer("");
@@ -2114,10 +2115,10 @@ public class ImportReceiptFunction2 {
 		
 	}
 	class ReceiptFunctionBean{
-		private int receiptId;
-		private int receiptCNId;
-		private int receiptMatchCNId;
-		private int receiptLineId;
+		private long receiptId;
+		private long receiptCNId;
+		private long receiptMatchCNId;
+		private long receiptLineId;
 		private int creditNoteId;
 		private double receiptAmount;
 		private double paidAmount;
@@ -2129,7 +2130,7 @@ public class ImportReceiptFunction2 {
 		private String receiptDate;
 		private String orderType;
 		private int countReceiptBy;
-		private int receiptById;
+		private long receiptById;
 		private String paymentMethod;
 		private String bank;
 		private String chequeNo;
@@ -2161,10 +2162,10 @@ public class ImportReceiptFunction2 {
 		public void setCountReceiptBy(int countReceiptBy) {
 			this.countReceiptBy = countReceiptBy;
 		}
-		public int getReceiptById() {
+		public long getReceiptById() {
 			return receiptById;
 		}
-		public void setReceiptById(int receiptById) {
+		public void setReceiptById(long receiptById) {
 			this.receiptById = receiptById;
 		}
 		public String getPaymentMethod() {
@@ -2191,28 +2192,28 @@ public class ImportReceiptFunction2 {
 		public void setChequeDate(String chequeDate) {
 			this.chequeDate = chequeDate;
 		}
-		public int getReceiptId() {
+		public long getReceiptId() {
 			return receiptId;
 		}
-		public void setReceiptId(int receiptId) {
+		public void setReceiptId(long receiptId) {
 			this.receiptId = receiptId;
 		}
-		public int getReceiptCNId() {
+		public long getReceiptCNId() {
 			return receiptCNId;
 		}
-		public void setReceiptCNId(int receiptCNId) {
+		public void setReceiptCNId(long receiptCNId) {
 			this.receiptCNId = receiptCNId;
 		}
-		public int getReceiptMatchCNId() {
+		public long getReceiptMatchCNId() {
 			return receiptMatchCNId;
 		}
-		public void setReceiptMatchCNId(int receiptMatchCNId) {
+		public void setReceiptMatchCNId(long receiptMatchCNId) {
 			this.receiptMatchCNId = receiptMatchCNId;
 		}
-		public int getReceiptLineId() {
+		public long getReceiptLineId() {
 			return receiptLineId;
 		}
-		public void setReceiptLineId(int receiptLineId) {
+		public void setReceiptLineId(long receiptLineId) {
 			this.receiptLineId = receiptLineId;
 		}
 		

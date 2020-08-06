@@ -231,13 +231,13 @@ window.onload = function(){
 	</tr>
 	<tr height="21px" class="txt1">
 		<td width="15%" ><b>รหัส</b>  </td>
-		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px"/>
+		<td width="90%" ><html:text property="bean.codeSearch"  size="30" style="height:20px"/>
 		<input type="button" name="search" value="Search" onclick="searchPopup('<%=request.getContextPath()%>','')" />
 		</td>
 	</tr>
 	<tr height="21px" class="txt1">
 		<td ><b>รายละเอียด</b></td>
-		<td ><html:text property="descSearch"  size="60" style="height:20px"/></td>
+		<td ><html:text property="bean.descSearch"  size="60" style="height:20px"/></td>
 	</tr>
 </table>
 

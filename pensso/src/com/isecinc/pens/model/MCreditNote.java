@@ -1,5 +1,6 @@
 package com.isecinc.pens.model;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -180,7 +181,7 @@ public class MCreditNote extends I_Model<CreditNote> {
 		return pos;
 	}
 
-	public List<CreditNote> lookUpByReceiptId(Connection conn, int receiptId)  {
+	public List<CreditNote> lookUpByReceiptId(Connection conn, long receiptId)  {
 		List<CreditNote> pos = new ArrayList<CreditNote>();
 		String whereCause = "";
 		PreparedStatement ps = null;

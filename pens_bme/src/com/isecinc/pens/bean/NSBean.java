@@ -48,9 +48,18 @@ public class NSBean implements Serializable{
 	private String pac6CTNQty;//BAG6(CTN) =PAC_QTY
 	private String pac6Qty;//BAG6 (BAG) = PAC_QTY_N
 	
+	private String interCTNQty;//BAG INTER (CTN)
+	private String interBAGQty;//BAG INTER (BAG)
+	
 	private String pac10CTNQty;//BAG10(CTN) =PAC_QTY_CTN_10
 	private String pac10Qty;// BAG10 (BAG) = PAC_QTY_10
 
+	private String cup20CTNQty;//CUP20 72 CTN 
+	private String cup20CUPQty;//CUP20 72 CUP
+	
+	private String kasi72CTNQty;//Kasi 72 CTN 
+	private String kasi72BAGQty;//Kasi 72 BAG
+	
 	private String status;
 	private String statusDesc;
 
@@ -67,6 +76,54 @@ public class NSBean implements Serializable{
     private NSBean summary;
 	
     
+	public String getCup20CTNQty() {
+		return cup20CTNQty;
+	}
+
+	public void setCup20CTNQty(String cup20ctnQty) {
+		cup20CTNQty = cup20ctnQty;
+	}
+
+	public String getCup20CUPQty() {
+		return cup20CUPQty;
+	}
+
+	public void setCup20CUPQty(String cup20cupQty) {
+		cup20CUPQty = cup20cupQty;
+	}
+
+	public String getKasi72CTNQty() {
+		return kasi72CTNQty;
+	}
+
+	public void setKasi72CTNQty(String kasi72ctnQty) {
+		kasi72CTNQty = kasi72ctnQty;
+	}
+
+	public String getKasi72BAGQty() {
+		return kasi72BAGQty;
+	}
+
+	public void setKasi72BAGQty(String kasi72bagQty) {
+		kasi72BAGQty = kasi72bagQty;
+	}
+
+	public String getInterCTNQty() {
+		return interCTNQty;
+	}
+
+	public void setInterCTNQty(String interCTNQty) {
+		this.interCTNQty = interCTNQty;
+	}
+
+	public String getInterBAGQty() {
+		return interBAGQty;
+	}
+
+	public void setInterBAGQty(String interBAGQty) {
+		this.interBAGQty = interBAGQty;
+	}
+
 	public String getCompleteDate() {
 		return completeDate;
 	}

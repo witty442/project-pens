@@ -23,7 +23,7 @@ public class ReceiptLine extends I_PO {
 	public ReceiptLine() {}
 
 	public ReceiptLine(ResultSet rst) throws Exception {
-		setId(rst.getInt("RECEIPT_LINE_ID"));
+		setId(rst.getLong("RECEIPT_LINE_ID"));
 		setLineNo(rst.getInt("LINE_NO"));
 		setOrder(new MOrder().find(rst.getString("ORDER_ID")));
 		setArInvoiceNo(rst.getString("AR_INVOICE_NO"));
@@ -47,10 +47,10 @@ public class ReceiptLine extends I_PO {
 	}
 
 	/** RECEIPT_LINE_ID */
-	private int id;
+	private long id;
 
 	/** RECEIPT_ID */
-	private int receiptId;
+	private long receiptId;
 
 	/** LINE_NO */
 	private int lineNo;
@@ -95,11 +95,11 @@ public class ReceiptLine extends I_PO {
 		this.importTransId = importTransId;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -167,11 +167,11 @@ public class ReceiptLine extends I_PO {
 		this.order = order;
 	}
 
-	public int getReceiptId() {
+	public long getReceiptId() {
 		return receiptId;
 	}
 
-	public void setReceiptId(int receiptId) {
+	public void setReceiptId(long receiptId) {
 		this.receiptId = receiptId;
 	}
 

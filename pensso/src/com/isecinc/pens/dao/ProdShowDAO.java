@@ -14,7 +14,7 @@ import util.DateToolsUtil;
 
 import com.isecinc.pens.bean.ProdShowBean;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 public class ProdShowDAO {
 	private static Logger logger = Logger.getLogger("PENS");

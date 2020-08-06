@@ -1,6 +1,7 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
 import java.util.Comparator;
@@ -53,7 +54,7 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 	public Customer(ResultSet rst) throws Exception {
 		no++;
 		// Mandatory
-		setId(rst.getInt("CUSTOMER_ID"));
+		setId(rst.getLong("CUSTOMER_ID"));
 		setReferencesID(rst.getInt("REFERENCE_ID"));
 		setCustomerType(rst.getString("CUSTOMER_TYPE").trim());
 		setCode(rst.getString("CODE").trim());
@@ -89,7 +90,7 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		setExported(rst.getString("EXPORTED"));
 
 		// Total Invoice
-		setTotalInvoice( MReceiptSummary.lookCreditAmtByCustomerId(getId()));
+		//setTotalInvoice( MReceiptSummary.lookCreditAmtByCustomerId(getId()));
 		
 		// Order Amount
 		setOrderAmount(new MOrder().lookUpByCustomer(getId()));
@@ -140,7 +141,7 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 
 	private int no;
 	/** ID */
-	private int id;
+	private long id;
 
 	/** Reference from ORCL */
 	private int referencesID;
@@ -210,7 +211,7 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 	private String businessType;
 
 	/** Parent */
-	private int parentID;
+	private long parentID;
 	private String parentCode;
 	private String parentName;
 
@@ -431,11 +432,11 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		this.canActionEditCust2 = canActionEditCust2;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -511,11 +512,11 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		this.businessType = businessType;
 	}
 
-	public int getParentID() {
+	public long getParentID() {
 		return parentID;
 	}
 
-	public void setParentID(int parentID) {
+	public void setParentID(long parentID) {
 		this.parentID = parentID;
 	}
 

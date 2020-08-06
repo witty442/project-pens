@@ -7,7 +7,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.DBCPConnectionProvider;
+import com.pens.util.DBCPConnectionProvider;
 
 public class TestCustomerSeq {
 

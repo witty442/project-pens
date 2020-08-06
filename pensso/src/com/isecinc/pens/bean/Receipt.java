@@ -1,5 +1,6 @@
 package com.isecinc.pens.bean;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.List;
 
@@ -33,11 +34,11 @@ public class Receipt extends I_PO {
 	public Receipt() {}
 
 	public Receipt(ResultSet rst) throws Exception {
-		setId(rst.getInt("RECEIPT_ID"));
+		setId(rst.getLong("RECEIPT_ID"));
 		setReceiptNo(rst.getString("RECEIPT_NO").trim());
 		setReceiptDate(DateToolsUtil.convertToString(rst.getTimestamp("RECEIPT_DATE")));
 		setOrderType(rst.getString("ORDER_TYPE").trim());
-		setCustomerId(rst.getInt("CUSTOMER_ID"));
+		setCustomerId(rst.getLong("CUSTOMER_ID"));
 		setCustomerName(rst.getString("CUSTOMER_NAME").trim());
 		setPaymentMethod(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim());
 		setBank(ConvertNullUtil.convertToString(rst.getString("BANK")).trim());
@@ -101,7 +102,7 @@ public class Receipt extends I_PO {
 	}
 
 	/** RECEIPT_ID */
-	private int id;
+	private long id;
 
 	/** RECEIPT_NO */
 	private String receiptNo;
@@ -113,7 +114,7 @@ public class Receipt extends I_PO {
 	private String orderType;
 
 	/** CUSTOMER_ID */
-	private int customerId;
+	private long customerId;
 
 	/** CUSTOMER_NAME */
 	private String customerName;
@@ -214,11 +215,11 @@ public class Receipt extends I_PO {
 		this.reason = reason;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -246,11 +247,11 @@ public class Receipt extends I_PO {
 		this.orderType = orderType;
 	}
 
-	public int getCustomerId() {
+	public long getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
 

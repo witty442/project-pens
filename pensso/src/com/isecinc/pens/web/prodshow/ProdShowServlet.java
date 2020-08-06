@@ -23,10 +23,10 @@ import com.isecinc.pens.bean.ProdShowBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ProdShowDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.document.ProdShowDocumentProcess;
+import com.pens.util.EnvProperties;
 
 
 public class ProdShowServlet  extends HttpServlet{
@@ -87,7 +87,7 @@ public class ProdShowServlet  extends HttpServlet{
 	            	 }else  if("orderNo".equalsIgnoreCase(fieldName)){
 	            		 headBean.setOrderNo(Utils.isNull(fieldValue));
 	            	 }else  if("orderId".equalsIgnoreCase(fieldName)){
-	            		 headBean.setOrderId(Utils.convertStrToInt(fieldValue));
+	            		 headBean.setOrderId(Utils.convertStrToLong(fieldValue));
 	            	 }else  if("remark".equalsIgnoreCase(fieldName)){ 
 	            		 headBean.setRemark(Utils.isNull(fieldValue));
 		           	 }

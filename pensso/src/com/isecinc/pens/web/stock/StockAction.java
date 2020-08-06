@@ -18,8 +18,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Customer;
@@ -33,6 +31,7 @@ import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MStock;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * Summary Action
@@ -62,7 +61,7 @@ public class StockAction extends I_Action {
 				MStock mDAO = new MStock();
 				Stock mCri = new Stock();
 				mCri.setUserId(user.getId()+"");
-				mCri.setCustomerId(Utils.convertStrToInt(customerId));
+				mCri.setCustomerId(Utils.convertStrToLong(customerId));
 				mCri.setBackAvgMonth(backAvgMonth);
 				
 				List<Stock> stockList = mDAO.searchStockList(mCri,user);

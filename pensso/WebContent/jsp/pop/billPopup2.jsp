@@ -33,6 +33,9 @@ try{
 	double totalCreditNoteAmt = 0; 
 	double totalAdjustAmt = 0; 
 	 
+	
+	System.out.println("ordersAll :"+ordersAll.size());
+	
 	List<Order> orders  = new ArrayList<Order>();
 	MCreditNote creditNote = new MCreditNote();
 	MAdjust adjust = new MAdjust();

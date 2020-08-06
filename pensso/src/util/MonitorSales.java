@@ -19,10 +19,10 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.pens.util.EnvProperties;
 
 public class MonitorSales {
 

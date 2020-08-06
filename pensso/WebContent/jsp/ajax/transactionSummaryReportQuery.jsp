@@ -8,6 +8,8 @@ User user = (User) session.getAttribute("user");
 String dateFrom = (String)request.getParameter("datefrom");
 String dateTo = (String)request.getParameter("dateto");
 String custId = (String)request.getParameter("custId");
+String productCodeFrom = (String)request.getParameter("productCodeFrom");
+String productCodeTo = (String)request.getParameter("productCodeTo");
 
 TransactionSummary ts = new TransactionSummary();
 ts.setOrderType(user.getOrderType().getKey());
@@ -15,6 +17,8 @@ ts.setUserId(user.getId());
 ts.setDateFrom(dateFrom);
 ts.setDateTo(dateTo);
 ts.setCustomerId(custId);
+ts.setProductCodeFrom(productCodeFrom);
+ts.setProductCodeTo(productCodeTo);
 
 List<TransactionSummaryCustomer> ords = new ArrayList<TransactionSummaryCustomer>();
 
@@ -41,7 +45,7 @@ int i=0;
 <%if(ords.size() > 0){%>
 
 <%@page import="com.isecinc.pens.process.TransactionSummaryProcess"%><div align="left" class="recordfound">&nbsp;&nbsp;&nbsp;
-	<bean:message key="RecordsFound" bundle="sysprop" />&nbsp;<span class="searchResult"><%= ords.size()%></span>&nbsp;<bean:message key="Records" bundle="sysprop" />
+<bean:message key="RecordsFound" bundle="sysprop" />&nbsp;<span class="searchResult"><%= ords.size()%></span>&nbsp;<bean:message key="Records" bundle="sysprop" />
 </div>
 <!-- ORDER -->
 <%if(ords.size()>0){ %>

@@ -674,6 +674,7 @@ public class CustomerAction extends I_Action {
 				customer.setPrintHeadBranchDesc("N");
 			}
 			
+			
 			// Save Customer
 			if (!new MCustomer().save(customer, userActive.getId(),userActive.getUserName(), conn)) {
 				// return with duplicate Document no
@@ -809,9 +810,9 @@ public class CustomerAction extends I_Action {
 			String printType = Utils.isNull(customer.getPrintType());
 			String printTax = Utils.isNull(customer.getPrintTax());
 			String printHeadBranchDesc = Utils.isNull(customer.getPrintHeadBranchDesc());
-			
 			String airpayFlag = Utils.isNull(customer.getAirpayFlag());
 			
+			logger.debug("businessType["+customer.getBusinessType()+"]");
 			logger.debug("printType["+printType+"]");
 			logger.debug("printTax["+printTax+"]");
 			logger.debug("printHeadBranchDesc["+printHeadBranchDesc+"]");

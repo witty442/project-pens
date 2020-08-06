@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.PageingGenerate"%>
 <%@page import="com.isecinc.pens.ApplicationVersion"%>
 <%@page import="com.isecinc.pens.inf.manager.batchwork.AppversionVerifyWorker"%>
 <%@page import="util.SessionUtils"%>
@@ -54,7 +55,7 @@ if(custShowTrip != null && custShowTrip.size() >0){
    //System.out.println("custShowTrip:"+(custShowTrip.get(0)).getKey());
    custShowTripFlag = custShowTrip.get(0).getKey();
    if("Y".equalsIgnoreCase(custShowTripFlag)){
-      customerForm.getCustomer().setDispHaveTrip("true");
+      //customerForm.getCustomer().setDispHaveTrip("true");
    }
 }
 
@@ -79,7 +80,7 @@ new AppversionVerifyWorker().start();
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css" />
 
 <style type="text/css">
@@ -146,7 +147,7 @@ function loadDistrict(){
 
 <%if("true".equalsIgnoreCase(request.getParameter("showMsg"))){ %>
 
-$(function() {
+/* $(function() {
 	$("#dialog").dialog({ height: 300,width:600,modal:false });
   });
  
@@ -158,16 +159,30 @@ $(function() {
 	window.location = path+"/jsp/interfaces/interfaces.jsp";
  }
  
- setTimeout(function(){ $("#dialog").dialog('close');},9000);
+ setTimeout(function(){ $("#dialog").dialog('close');},9000); */
  
  <%}else{%>
  
  <%}%>
- function gotoPage(path,page){
+/*  function gotoPage(path,page){
 		document.customerForm.action = path + "/jsp/customerAction.do?do=searchPage&rf=Y";
 		document.getElementsByName('curPage')[0].value = page;
 		document.customerForm.submit();
 		return true;
+	} */
+	
+function search(path){
+	document.customerForm.action = path + "/jsp/customerAction.do?do=search&action=newsearch&rf=Y";
+	document.customerForm.submit();
+	return true;
+}
+
+ function gotoPage(currPage){
+		var form = document.customerForm;
+		var path = document.getElementById("path").value;
+		form.action = path + "/jsp/customerAction.do?do=search&currPage="+currPage;
+	    form.submit();
+	    return true;
 	}
 //change pv
  function changePV(pvid){
@@ -240,8 +255,9 @@ $(function() {
 						<tr>
 							<td colspan="3" align="left">
 								<%if(role.equalsIgnoreCase(User.VAN)){ %>
-								<a href="#" onclick="prepare('${pageContext.request.contextPath}','add')">
-								<img border=0 src="${pageContext.request.contextPath}/icons/user_add.gif" align="absmiddle">&nbsp;<bean:message key="CreateNewRecord" bundle="sysprop"/></a>
+								  <a href="#" onclick="prepare('${pageContext.request.contextPath}','add')">
+								  <img border=0 src="${pageContext.request.contextPath}/icons/user_add.gif" align="absmiddle">
+								  &nbsp;<bean:message key="CreateNewRecord" bundle="sysprop"/></a>
 								<%} %>
 							</td>
 						</tr>
@@ -261,16 +277,13 @@ $(function() {
 								<html:select property="customer.searchProvince" onchange="loadDistrict();">
 								</html:select>
 							</td>
-							
 							<td align="left">
 							     เขต/อำเภอ
 							     <html:select property="customer.district" styleId="district">
 									<%-- <html:options collection="districts" property="id" labelProperty="name"/> --%>
 								</html:select>
 							</td>
-							
 						</tr>
-						
 						<tr>
 							<td align="right"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
 							<td align="left" colspan="2"><html:text property="customer.code"  styleClass="\" autoComplete=\"off" /></td>
@@ -332,19 +345,16 @@ $(function() {
 								 <% } 
 							     } %>
 						    </span>
-					 <%}else{ %>
-							<span class="pagebanner">พบรายการ  ${customerForm.totalRow} รายการ  ,แสดงรายการทั้งหมด </span>
-							 <span class="pagelinks">หน้า
-								<c:forEach var="i" begin="1" end="${customerForm.totalPage}">
-								     <c:if test="${customerForm.curPage != i}">
-									    <a href="javascript:gotoPage('${pageContext.request.contextPath}','${i}')"><c:out value="${i}"/></a>&nbsp;,
-									 </c:if> 
-									 <c:if test="${customerForm.curPage == i}">
-									    &nbsp;<b><c:out value="${i}"/>&nbsp;,</b>
-									 </c:if> 
-							    </c:forEach>
-						    </span>
-					   <%} %>
+					 <%}else{
+					     int totalPage = customerForm.getTotalPage();
+					     int totalRecord = customerForm.getTotalRecord();
+					     int currPage =  customerForm.getCurrPage();
+					     int startRec = customerForm.getStartRec();
+					     int endRec = customerForm.getEndRec();
+					     int no = Utils.calcStartNoInPage(currPage, customerForm.getPageSize());
+					   
+						 out.println(PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no));
+					   } %>
 					    <table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 							<tr >
 								<th class="cust_no">No.</th>
@@ -353,19 +363,19 @@ $(function() {
 								<th class="cust_name2">ที่อยู่</th>
 								<th class="cust_creditLimit">วงเงินสินเชื่อ</th>
 								<th class="cust_totalInvoice">ยอดบิลค้างชำระ</th>
-								<th class="cust_exported" >โอนข้อมูลแล้ว</th>
-								<th class="cust_interfaces">สร้างข้อมูลที่ระบบกลางแล้ว</th>
+								<!-- <th class="cust_exported" >โอนข้อมูลแล้ว</th>
+								<th class="cust_interfaces">สร้างข้อมูลที่ระบบกลางแล้ว</th> -->
 								<th class="cust_status">สถานะ</th>
 								<th class="cust_actionOrder">ทำรายการขาย</th>
 								<% if( role.equalsIgnoreCase(User.TT)){ %>
 								  <th class="cust_actionReceipt">ทำรายการรับเงิน</th>
-								  <th class="cust_actionReceipt">ทำจัดรายการ</th>
+								 <!--  <th class="cust_actionReceipt">ทำจัดรายการ</th> -->
 								<%} %>
 								<%if( role.equalsIgnoreCase(User.VAN)){ %>
 								   <th class="cust_actionEditCust" >แก้ไข ข้อมูลลูกค้า</th>
 								<%}else{ %>
 								  <!--  <th class="cust_actionEditCust" >เปิดบิลพิเศษ</th> -->
-								  <th class="cust_actionEditCust" >ตั้งกองโชว์</th>
+								 <!--  <th class="cust_actionEditCust" >ตั้งกองโชว์</th> -->
 								<%} %>
 								<th class="cust_actionView">แสดง</th>
 								<th class="cust_actionEdit">ทำรายการ</th>
@@ -387,7 +397,7 @@ $(function() {
 								<td class="cust_name2"><c:out value='${item.addressSummary}'/></td>
 								<td class="cust_creditLimit"><fmt:formatNumber pattern="#,##0.00" value="${item.creditLimit}"/></td>
 								<td class="cust_totalInvoice"><fmt:formatNumber pattern="#,##0.00" value="${item.totalInvoice}"/></td>
-								<td class="cust_exported">
+								<%-- <td class="cust_exported">
 								    <c:if test="${item.exported=='Y'}">
 										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 									</c:if>
@@ -396,7 +406,7 @@ $(function() {
 								   <c:if test="${item.interfaces=='Y'}">
 										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 									</c:if>
-								</td>
+								</td> --%>
 								<td class="cust_status"><c:out value='${item.activeLabel}'/></td>
 								<td class="cust_actionOrder">
 			 					    <c:if test="${item.isActive=='Y'}">
@@ -416,14 +426,14 @@ $(function() {
 									    </c:if>
 									 </c:if>
 									</td>
-									<td class="cust_actionReceipt">
+									<%-- <td class="cust_actionReceipt">
 									 <c:if test="${item.isActive=='Y'}">
-									    <a href="#" onclick="toCreateNewReqPromotion('${pageContext.request.contextPath}','${item.id}','customerSearch');">
-									       <%-- <img src="${pageContext.request.contextPath}/images2/b_reqpromotion.png" width="64" height="20" border="0" class="newPicBtn"/> --%>
+									     <a href="#" onclick="toCreateNewReqPromotion('${pageContext.request.contextPath}','${item.id}','customerSearch');">
+									       <img src="${pageContext.request.contextPath}/images2/b_reqpromotion.png" width="64" height="20" border="0" class="newPicBtn"/>
 									     <b>  จัดรายการ</b>
-									    </a>
-									    </c:if>
-									</td>
+									    </a> 
+									   </c:if>
+									</td> --%>
 								<%} %>
 								<% if( role.equalsIgnoreCase(User.VAN)){ %>
 									<td class="cust_actionEditCust">
@@ -463,13 +473,13 @@ $(function() {
 							          </a>  
 							        </c:if>
 								</td> --%>
-								<td class="cust_actionEditCust">
+								<%-- <td class="cust_actionEditCust">
 									 <c:if test="${item.isActive=='Y'}">
 								       <a href="#" onclick="manageProdShowTT('${pageContext.request.contextPath}','${item.code}');">
 							                <b>  ตั้งกองโชว์</b>
 							          </a>  
 							        </c:if>
-								</td>
+								</td> --%>
 							<%} %>
 							
 								<td class="cust_actionView">
@@ -517,6 +527,9 @@ $(function() {
 					<html:hidden property="totalPage"/>
 					<html:hidden property="totalRow"/>
 					
+					<!-- For Paging -->
+				    <html:hidden property="totalRecord" styleId="totalRecord"/> 
+					<input type="hidden" name= "path" id="path" value="${pageContext.request.contextPath}"/>
 					<jsp:include page="../searchCriteria.jsp"></jsp:include>
 					</html:form>
 					<!-- BODY -->

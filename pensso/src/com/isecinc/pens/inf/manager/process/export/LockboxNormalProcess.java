@@ -42,11 +42,11 @@ public class LockboxNormalProcess {
              
 			sql = "	select 			\n"+
 			"	'1'	AS	Record_Identifier,	\n"+
-			"	CONCAT('LCK',SUBSTRING(t_receipt.internal_bank,2,2)) AS	Lockbox_Number,	\n"+
+			"	CONCAT('LCK',SUBSTR(t_receipt.internal_bank,2,2)) AS	Lockbox_Number,	\n"+
 			"	'123'	AS	Origination,	\n"+
 			"   t_receipt.internal_bank     \n"+
-			"	from t_receipt ,m_customer,			\n"+
-            "	(SELECT @rownum:=0) a	\n"+
+			"	from t_receipt ,m_customer		\n"+
+            //"	,(SELECT @rownum:=0) a	\n"+
 			"	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID 			\n"+
 			"   and t_receipt.DOC_STATUS = 'SV' 	\n"+
 			"   and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
@@ -71,15 +71,15 @@ public class LockboxNormalProcess {
 					   // append blank by 
 						dataAppend.append(ExportHelper.appendByLength("",Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition()-(lastPosition+1)));
 						if(colBean.getExternalFunction().equalsIgnoreCase("LEFT")){
-							dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+							dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}else {
-							dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+							dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}
 					}else{
 						if(colBean.getExternalFunction().equalsIgnoreCase("LEFT")){
-						   dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+						   dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}else {
-						   dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+						   dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}
 					}
 					//check Last Position
@@ -137,7 +137,7 @@ public class LockboxNormalProcess {
 			table.setTableName("t_lockbox_batch_header");
             List<ColumnBean> columnList = ExportHelper.initColumn(table);
 
-			sql = "	select 			\n"+
+			sql = "	select 	distinct \n"+
 			"	 '2'  AS	Record_Identifier,		\n"+
 			"	 '"+lockBoxNumber+"' AS	Lockbox_Number,		\n"+ // = Internal_blank
 			"	 t_receipt.receipt_no AS	Batch_Name,		\n"+ //BatchName running + rownum
@@ -153,16 +153,16 @@ public class LockboxNormalProcess {
 			"	t_receipt.receipt_date,	\n"+
 			"	m_customer.CODE	as customer_code,\n"+
 			"   '"+userBean.getCode()+"' as sales_code, \n"+
-			"   receipt_amount, \n"+
-			"   ("+
+			"   receipt_amount \n"+
+		/*	"   ,("+
 			"     select count(distinct payment_method,cheque_no) from t_receipt_by where receipt_by_id in( \n"+
 			"     select receipt_by_id from t_receipt r , t_receipt_match m \n"+
 			"       where r.receipt_id = m.receipt_id \n"+
 			"       and r.receipt_id = t_receipt.receipt_id \n"+
 			"     ) and write_off <> 'Y' \n"+
-			"   ) count_receipt_by \n"+
-			"	from t_receipt ,m_customer,	\n"+
-            "	(SELECT @rownum:=0) a	\n"+
+			"   ) count_receipt_by \n"+*/
+			"	from t_receipt ,m_customer	\n"+
+            //"	,(SELECT @rownum:=0) a	\n"+
 			"	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID \n"+
 			"   and t_receipt.DOC_STATUS = 'SV' \n"+
 			"   and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
@@ -175,9 +175,9 @@ public class LockboxNormalProcess {
 				sql +="   and t_receipt.receipt_id not in("+receiptIdApplyTRAllBatch+")";
 			}
 			
-			sql +="	group by t_receipt.receipt_id,	\n"+
+			/*sql +="	group by t_receipt.receipt_id,	\n"+
 			"	  t_receipt.receipt_date,	\n"+
-			"	  m_customer.CODE	\n";
+			"	  m_customer.CODE	\n";*/
 
             logger.debug("SQL:"+sql); 
             tableBean.setPrepareSqlSelect(sql);
@@ -193,15 +193,15 @@ public class LockboxNormalProcess {
 					   // append blank by 
 						dataAppend.append(ExportHelper.appendByLength("",Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition()-(lastPosition+1)));
 						if(colBean.getExternalFunction().equalsIgnoreCase("LEFT")){
-							dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+							dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}else {
-							dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+							dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}
 					}else{
 						if(colBean.getExternalFunction().equalsIgnoreCase("LEFT")){
-						    dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+						    dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}else {
-						    dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+						    dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}
 					}
 					//check Last Position
@@ -215,7 +215,7 @@ public class LockboxNormalProcess {
 						, rs.getString("Batch_Name"),rs.getInt("receipt_id")+"",receiptByIdTRSql));
 	            
 				/** Set Data For Update Exported Flag **/
-				sqlUpdateExportFlagList.add("update t_receipt set exported = 'Y' WHERE receipt_id="+rs.getString("receipt_id"));
+				sqlUpdateExportFlagList.add("update pensso.t_receipt set exported = 'Y' WHERE receipt_id="+rs.getString("receipt_id"));
 				
 			}//while
 			
@@ -269,14 +269,14 @@ public class LockboxNormalProcess {
             "	(CASE WHEN t_receipt_by.payment_method <> 'CS' THEN  t_receipt_by.CHEQUE_NO \n"+
             "          ELSE t_receipt.receipt_no  \n"+
             "    END ) AS Payment_Number,	\n"+
-            "	ifnull(t_receipt_by.receipt_amount,0) AS Remittance_Amount,	\n"+
+            "	NVL(t_receipt_by.receipt_amount,0) AS Remittance_Amount,	\n"+
             "	t_receipt.receipt_date AS Deposit_Date,	\n"+
             "	'THB' AS Currency_Code,	\n"+
             "	m_customer.code AS Customer_Number,	\n"+
             "	( select max(a.REFERENCE_ID) from m_address a 	\n"+
             "	  where a.customer_id = m_customer.CUSTOMER_ID	\n"+
             "	  and a.PURPOSE ='B' )  AS Billing_Location,	\n"+
-            "	(@rownum:=@rownum+1) AS Item_Number,	\n"+
+            "	rownum AS Item_Number,	\n"+
             "   t_receipt_by.payment_method as payment_method_code, \n"+
             "   (select name from c_reference  where value = t_receipt_by.payment_method and CODE ='PaymentMethod' )as Payment_method ,\n"+
             
@@ -289,16 +289,18 @@ public class LockboxNormalProcess {
             "   t_receipt_by.CHEQUE_NO AS Attribute_2,	\n"+ 
             "   t_receipt_by.CHEQUE_DATE AS Attribute_3,  	\n"+ 
             "   '"+userBean.getCode()+"' AS Attribute_4,  	\n"+ //SALES_CODE
-            "   '-' AS Attribute_5,  	\n"+ //TEMP_INVOICE WAIT
+            "   '-' AS Attribute_5  	\n"+ //TEMP_INVOICE WAIT
             
             // Pasuwat Wang-arrayagul
             // Add Write Off Amount To First Line
-            "     (SELECT SUM(IF(@rownum=1,rb.receipt_amount,0)) FROM T_RECEIPT_BY rb WHERE rb.RECEIPT_ID = "+receiptId+" AND rb.WRITE_OFF = 'Y') as WriteOff_Amt \n "+
-            
+        /*  "  ,(SELECT SUM(IF(@rownum=1,rb.receipt_amount,0)) \n" +
+            "   FROM T_RECEIPT_BY rb WHERE rb.RECEIPT_ID = "+receiptId+ "\n"+
+            "   AND rb.WRITE_OFF = 'Y') as WriteOff_Amt \n "+*/
+            " , t_receipt.receipt_id \n"+
             "	from t_receipt ,	\n"+
             "	m_customer, 	\n"+
-            "	t_receipt_by,	\n"+
-            "   (SELECT @rownum:=0) a	\n"+
+            "	t_receipt_by	\n"+
+          //  "  , (SELECT @rownum:=0) a	\n"+
             "	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID 	\n"+
             "	and t_receipt.RECEIPT_ID = t_receipt_by.RECEIPT_ID	\n"+
             "	and t_receipt.receipt_id = "+receiptId+"	\n"+
@@ -323,15 +325,15 @@ public class LockboxNormalProcess {
 					   // append blank by 
 						dataAppend.append(ExportHelper.appendByLength("",Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition()-(lastPosition+1)));
 						if(colBean.getExternalFunction().equalsIgnoreCase("LEFT")){
-							dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+							dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}else {
-							dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+							dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}
 					}else{
 						if(colBean.getExternalFunction().equalsIgnoreCase("LEFT")){
-						   dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+						   dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}else {
-						   dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+						   dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}
 					}
 					//check Last Position
@@ -403,8 +405,8 @@ public class LockboxNormalProcess {
             "	'"+paymentNumber+"' AS Payment_Number,	\n"+
             "	t_receipt_line.ar_invoice_no AS Invoice,	\n"+
             /** Witty Edit 08032011  Case One Cheque two Invoice **/
-            "	round(ifnull(t_receipt_match.paid_amount,0),2) AS Amount_Applied,	\n"+
-            "	@rownum:=@rownum+1  AS Overflow_Sequence,	\n"+
+            "	round(NVL(t_receipt_match.paid_amount,0),2) AS Amount_Applied,	\n"+
+            "	rownum  AS Overflow_Sequence,	\n"+
             "	'0' AS Overflow_Indicator,	\n"+
             "	'THB' AS Currency_Code,	\n"+
             "	'"+itemNumber+"' AS Item_Number,	\n"+
@@ -412,8 +414,8 @@ public class LockboxNormalProcess {
             "	from 	\n"+
             "	t_receipt_line ,	\n"+
             "	t_receipt_match , \n"+
-            "	t_receipt_by ,  \n"+
-            "   (SELECT @rownum:=0) a	\n"+
+            "	t_receipt_by   \n"+
+            //"   ,(SELECT @rownum:=0) a	\n"+
             "	where 1=1	\n"+
             "   and t_receipt_line.RECEIPT_LINE_ID = t_receipt_match.RECEIPT_LINE_ID 	\n"+
             "   and t_receipt_match.RECEIPT_BY_ID = t_receipt_by.RECEIPT_BY_ID 	\n"+
@@ -435,8 +437,8 @@ public class LockboxNormalProcess {
             "	'"+paymentNumber+"' AS Payment_Number,	\n"+
             "	t_credit_note.credit_note_no AS Invoice,	\n"+
             /** Witty Edit 08032011  Case One Cheque two Invoice **/
-            "	round(ifnull(t_receipt_match_cn.paid_amount,0),2) AS Amount_Applied,	\n"+
-            "	@rownum:=@rownum+1  AS Overflow_Sequence,	\n"+
+            "	round(NVL(t_receipt_match_cn.paid_amount,0),2) AS Amount_Applied,	\n"+
+            "	rownum  AS Overflow_Sequence,	\n"+
             "	'0' AS Overflow_Indicator,	\n"+
             "	'THB' AS Currency_Code,	\n"+
             "	'"+itemNumber+"' AS Item_Number,	\n"+
@@ -445,8 +447,8 @@ public class LockboxNormalProcess {
             "   t_receipt_cn, \n"+
             "	t_credit_note ,	\n"+
             "	t_receipt_match_cn , \n"+
-            "	t_receipt_by ,  \n"+
-            "   (SELECT @rownum:=0) a	\n"+
+            "	t_receipt_by   \n"+
+           // "   ,(SELECT @rownum:=0) a	\n"+
             "	where 1=1	\n"+
             "   and t_receipt_cn.CREDIT_NOTE_ID = t_credit_note.CREDIT_NOTE_ID 	\n"+
             "   and t_receipt_match_cn.receipt_cn_id = t_receipt_cn.receipt_cn_id \n"+
@@ -462,10 +464,9 @@ public class LockboxNormalProcess {
             }
             
             logger.debug("SQL:"+sql); 
-			ps = conn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
 			rs = ps.executeQuery();
 			int lastPosition = 0;
-
 			while(rs.next()){
 				totalRows++;
 				lastPosition = 0;
@@ -481,13 +482,13 @@ public class LockboxNormalProcess {
 								if(colBean.getColumnName().equalsIgnoreCase("Overflow_Indicator")){
 									dataAppend.append(ExportHelper.appendLeft("9",Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}else{
-								    dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+								    dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}
 							}else {
 								if(colBean.getColumnName().equalsIgnoreCase("Overflow_Indicator")){
 									dataAppend.append(ExportHelper.appendRight("9",Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}else{
-								   dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+								   dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}
 							}
 						}else{
@@ -495,13 +496,13 @@ public class LockboxNormalProcess {
 								if(colBean.getColumnName().equalsIgnoreCase("Overflow_Indicator")){
 									dataAppend.append(ExportHelper.appendLeft("9",Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}else{
-								    dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+								    dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}
 							}else {
 								if(colBean.getColumnName().equalsIgnoreCase("Overflow_Indicator")){
 									dataAppend.append(ExportHelper.appendLeft("9",Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}else{
-								    dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+								    dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}							
 							}
 						}
@@ -511,15 +512,15 @@ public class LockboxNormalProcess {
 							   // append blank by 
 								dataAppend.append(ExportHelper.appendByLength("",Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition()-(lastPosition+1)));
 								if(colBean.getExternalFunction().equalsIgnoreCase("LEFT")){
-									dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+									dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}else {
-									dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+									dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}
 							}else{
 								if(colBean.getExternalFunction().equalsIgnoreCase("LEFT")){
-								   dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+								   dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}else {
-								   dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
+								   dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(conn,colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 								}
 							}
 					}

@@ -131,6 +131,7 @@ table#productList tbody td.number{text-align:right;}
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/lock-scroll.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
@@ -160,7 +161,7 @@ function loadProductCat(page){
 	var custId = document.getElementById("order.customerId").value;
 	$(function(){
 		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/productCatQuery.jsp",
+			url: "${pageContext.request.contextPath}/jsp/ajax/productSubBrandQuery.jsp",
 			data : "pageId=" +page+"&custId="+custId,
 			async: false,
 			success: function(getData){
@@ -173,15 +174,15 @@ function loadProductCat(page){
 	});
 }
 
-function loadProducts(brandCode){
+function loadProducts(subBrandCode){
 	var orderDate = document.getElementById("orderDate").value;
 	var pricelistId = document.getElementById("order.priceListId").value;
 	var custId = document.getElementById("order.customerId").value;
 	
 	$(function(){
 		var getData = $.ajax({
-			url: "${pageContext.request.contextPath}/jsp/ajax/productByBrand.jsp",
-			data : "brandCode=" +brandCode+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
+			url: "${pageContext.request.contextPath}/jsp/ajax/productBySubBrand.jsp",
+			data : "subBrandCode=" +subBrandCode+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
 			async: false,
 			success: function(getData){
 				var htmlText = jQuery.trim(getData);
@@ -195,8 +196,8 @@ function loadProducts(brandCode){
 	});
 }
 
-function loadProductsByBrand(brandCode){
-	//alert("brandCode:"+brandCode.value);
+function loadProductsByBrand(subBrandCode){
+	//alert("brandCode:"+subBrandCode.value);
 	if(brandCode.value != ""){
 		var orderDate = document.getElementById("orderDate").value;
 		var pricelistId = document.getElementById("order.priceListId").value;
@@ -204,8 +205,8 @@ function loadProductsByBrand(brandCode){
 		
 		$(function(){
 			var getData = $.ajax({
-				url: "${pageContext.request.contextPath}/jsp/ajax/productByBrand.jsp",
-				data : "brandCode=" +brandCode.value+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
+				url: "${pageContext.request.contextPath}/jsp/ajax/productBySubBrand.jsp",
+				data : "subBrandCode=" +subBrandCode.value+"&orderDate="+orderDate+"&pricelistId="+pricelistId+"&custId=" +custId ,
 				async: false,
 				success: function(getData){
 					var htmlText = jQuery.trim(getData);
@@ -429,7 +430,7 @@ function addProductToBasket(){
 	var custId = document.getElementById("order.customerId").value;
 	var taxables = document.getElementsByName("taxable");
 	
-	var categoryCode = document.getElementById("categoryCode").value;
+	var subBrandCode = document.getElementById("subBrandCode").value;
 	var selected = false;
 
 	for(var i =0;i < lineAmts.length; i++){
@@ -464,10 +465,10 @@ function addProductToBasket(){
 
 	// Set Background 
 	if(selected){
-		$("#"+categoryCode).css('background-color', '#FFFF99');
+		$("#"+subBrandCode).css('background-color', '#FFFF99');
 	}
 	else{
-		$("#"+categoryCode).css('background-color', '');
+		$("#"+subBrandCode).css('background-color', '');
 	}
 
 	$(document).ready(function() {
@@ -557,7 +558,7 @@ function validateVanCreditLimit(){
 						<%if(User.TT.equals(user.getType())){%>
 							<tr>
 								<td width="30%" align="right">ระบุเลขที่ PO ลูกค้า(ถ้ามี) </td>
-								<td width="25%"><html:text property="order.poNumber" size="20"/></td>
+								<td width="25%"><html:text property="order.poNumber" size="20" styleClass="\" autoComplete=\"off"/></td>
 								<td width="15%"></td>
 								<td></td>
 							</tr>
@@ -570,8 +571,13 @@ function validateVanCreditLimit(){
 							</tr>
 						<%} %>
 							<tr>
-								<td align="right"></td>
+							 <%if(User.TT.equals(user.getType())){%>
+								<td align="right"><!-- สาย Load <font color="red">*</font> --></td>
+								<td align="left"><%-- <html:text property="order.loadNo" size="20" styleClass="\" autoComplete=\"off"/> --%></td>
+						     <%}else{ %>
+						        <td align="right"></td>
 								<td align="left"></td>
+						     <%} %>
 								<td align="right"><bean:message key="DocumentNo" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
 									<html:text property="order.orderNo" size="20" readonly="true" styleClass="disableText"/>
@@ -667,6 +673,12 @@ function validateVanCreditLimit(){
 										<c:otherwise>
 											<c:set var="tabclass" value="lineE"/>
 										</c:otherwise>
+									</c:choose>
+									<c:choose>
+										<c:when test="${lines1.rowStyle == 'lineError2'}">
+											<c:set var="tabclass" value="lineError2"/>
+										</c:when>
+										<c:otherwise></c:otherwise>
 									</c:choose>
 									<tr class="${tabclass}">
 										<td>${rows1.index + 1}</td>
@@ -766,18 +778,9 @@ function validateVanCreditLimit(){
 										<td align="right">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.discount}"/>
 										</td>
-									
 										<td align="right">
 											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount - lines1.discount}"/>
 										</td>
-<!--										<td align="right">-->
-<!--											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.vatAmount}"/>-->
-<!--										</td>-->
-<!--										<td align="right">-->
-<!--											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.totalAmount}"/>-->
-<!--										</td>-->
-										
-										
 										<td align="center">${lines1.shippingDate}</td>
 										<td align="center">${lines1.requestDate}</td>
 										<td align="center">
@@ -910,12 +913,19 @@ function validateVanCreditLimit(){
 							<tr>
 								<td align="center">
 									<%if(!user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
-									<input type="button" value="คำนวณโปรโมชั่น" onclick="return presave('${pageContext.request.contextPath}');" class="newPosBtnLong">
+									   <input type="button" value="คำนวณโปรโมชั่น" onclick="return presave('${pageContext.request.contextPath}');" class="newPosBtnLong">
 									<%} %>
-									<%if(user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
-									   <input type="button" value="บันทึก" class="newPosBtn" onclick="return autoReceipt('${pageContext.request.contextPath}','<%=user.getType() %>');">
-									<%} %>
-									<input type="button" value="ยกเลิก" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
+									<input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
+									
+									<%if(!user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
+									   <%if(orderForm.getOrder().isCanCancel()){ %>
+									   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									   <input type="button" value="ยกเลิกรายการขายนี้" class="newPosBtn" onclick="return cancelOrder('${pageContext.request.contextPath}','<%=user.getType() %>');">
+									<% }} %>
+									
 								</td>
 							</tr>
 						</table>
@@ -951,8 +961,6 @@ function validateVanCreditLimit(){
 						<!-- Case Check Item W1,W2 -->
 						<html:hidden property="order.placeOfBilled"/>
 						
-					
-						 
 						<div id="productList" style="display: none;"></div>
 						<div id="ByList" style="display: none;"></div>
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>

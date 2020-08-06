@@ -11,8 +11,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.OrderLine;
@@ -20,6 +18,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.report.salesorder.OrderThreeMonths;
 import com.isecinc.pens.report.salesorder.OrderThreeMonthsProcess;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * Order 3 months Report Action

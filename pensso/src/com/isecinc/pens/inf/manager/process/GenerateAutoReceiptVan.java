@@ -1,5 +1,6 @@
 package com.isecinc.pens.inf.manager.process;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +8,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import util.CustomerReceiptFilterUtils;
-import util.DBCPConnectionProvider;
 
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
@@ -17,6 +17,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.process.order.OrderProcess;
+import com.pens.util.DBCPConnectionProvider;
 
 public class GenerateAutoReceiptVan {
 

@@ -1,5 +1,6 @@
 package com.isecinc.pens.bean;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class Stock {
 	/** Criteria **/
 	private String requestDateFrom;
 	private String requestDateTo;
-	private String  inventoryItemId; 
+	private String inventoryItemId; 
 	private String haveStock;
     
 	/** properties**/
@@ -39,7 +40,7 @@ public class Stock {
 	private String backAvgMonth;
 	
 	/** Customer */
-	private int customerId;
+	private long customerId;
 	private String customerName;
 	private int billAddressId;
 	private int shipAddressId;
@@ -82,12 +83,12 @@ public class Stock {
 	}
 
 
-	public int getCustomerId() {
+	public long getCustomerId() {
 		return customerId;
 	}
 
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
 

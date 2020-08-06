@@ -15,7 +15,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.Debug;
 
@@ -40,6 +39,7 @@ import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.model.MUOMConversion;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * Order Process Class
@@ -764,14 +764,14 @@ public void debug(List<OrderLine> lines) throws Exception {
 		
 		OrderLine lines = new OrderLine();
 		try{
-			String sql = "SELECT um.UOM_ID, pp.PRICE " +
-						" FROM m_product_price pp " +
-						" LEFT JOIN m_uom um ON pp.UOM_ID = um.UOM_ID " +
-						" WHERE pp.PRODUCT_ID = " + pID + 
-						" AND pp.PRICELIST_ID = " + pricelistID +
-						" AND pp.ISACTIVE = 'Y' " +
-						" AND um.ISACTIVE = 'Y' " +
-						" GROUP BY pp.UOM_ID ";
+			String sql = "\nSELECT um.UOM_ID, pp.PRICE " +
+						"\n FROM m_product_price pp " +
+						"\n LEFT JOIN m_uom um ON pp.UOM_ID = um.UOM_ID " +
+						"\n WHERE pp.PRODUCT_ID = " + pID + 
+						"\n AND pp.PRICELIST_ID = " + pricelistID +
+						"\n AND pp.ISACTIVE = 'Y' " +
+						"\n AND um.ISACTIVE = 'Y' " ;
+						//"\n GROUP BY pp.UOM_ID ";
 			
 			debug.debug("UOM sql:"+sql);
 			
@@ -817,9 +817,12 @@ public void debug(List<OrderLine> lines) throws Exception {
 		return lines;
 	}
 
-	public List<OrderLine> fillLinesShowBlankUOM(Connection conn,String pricelistID, List<OrderLine> lines){
+	public List<OrderLine> fillLinesShowBlankUOM(Connection conn,String pricelistID, List<OrderLine> lines,Map<String, String> productErrorMap){
 		List<OrderLine> newLines = new ArrayList<OrderLine>();
 		try{
+			if(productErrorMap != null){
+			   logger.debug("productErrorMap:"+productErrorMap.toString());
+			}
             //debug.debug(" ****Start fillLinesShowBlankUOM****");
 			for(OrderLine l:lines){
 				//debug.debug("uom1["+l.getUom1().getCode()+"]uom2["+Utils.isNull(l.getUom1().getCode())+"]");
@@ -842,12 +845,28 @@ public void debug(List<OrderLine> lines) throws Exception {
   						l.setPrice2(lineUom.getPrice2());
   					  }	
 				   }
-                    l.setFullUom(l.getUom1().getCode()+"/"+l.getUom2().getCode());
+                    l.setFullUom(l.getUom1().getCode()+"/"+l.getUom2().getCode());  
+                    
+                    //display error cannot reserve stock
+                    if(productErrorMap != null){
+	                    logger.debug("productErrorMap["+l.getProduct().getId()+"]["+ productErrorMap.get(l.getProduct().getId()+"")+"]");
+	                    if(productErrorMap.get(l.getProduct().getId()+"") != null){
+	                    	l.setRowStyle("lineError2");
+	                    }
+                    }
 				    newLines.add(l);
 				}else{
+					//display error cannot reserve stock
+					 if(productErrorMap != null){
+	                    logger.debug("productErrorMap["+l.getProduct().getId()+"]["+ productErrorMap.get(l.getProduct().getId()+"")+"]");
+	                    if(productErrorMap.get(l.getProduct().getId()+"") != null){
+	                    	l.setRowStyle("lineError2");
+	                    }
+                    }
 					newLines.add(l);
 				}
-			}
+				
+			}//for 
 			
 			//debug.debug(" **** end fillLinesShowBlankUOM****");
 			

@@ -1,5 +1,6 @@
 package com.isecinc.pens.web.salesspecial;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,7 +21,7 @@ public class OrderSpecialUtils {
 	public static void mian(String[] a){
 		
 	}
-	public static boolean canSaveCreditVan(Connection conn,User user,int customerId){
+	public static boolean canSaveCreditVan(Connection conn,User user,long customerId){
 		if(ControlCode.canExecuteMethod("OrderUtils", "canSaveCreditVan")){
 		   return canSaveCreditVanModel(conn, user, customerId);
 		}
@@ -28,7 +29,7 @@ public class OrderSpecialUtils {
 	}
 	
 	
-	public static boolean canSaveCreditVanModel(Connection conn,User user,int customerId){
+	public static boolean canSaveCreditVanModel(Connection conn,User user,long customerId){
 		boolean canSave = true;
 		PreparedStatement ps = null;
 		ResultSet rs = null;

@@ -26,7 +26,7 @@ if(backPage.equals("")){
 }
 
 List<Address> custAddr = new ArrayList<Address>();
-custAddr = new MAddress().lookUp(stockForm.getBean().getCustomerId());
+custAddr = new MAddress().lookUp(stockForm.getBean().getCustomerId()); 
 
 List<Address> billAddr = new ArrayList<Address>();
 List<Address> shipAddr = new ArrayList<Address>();

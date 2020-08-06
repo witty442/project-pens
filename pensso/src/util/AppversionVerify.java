@@ -26,11 +26,11 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.SystemProperties;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.batchwork.DownloadWorker;
+import com.pens.util.EnvProperties;
 import com.sun.org.apache.bcel.internal.generic.ISTORE;
 
 public class AppversionVerify {
@@ -50,11 +50,11 @@ public class AppversionVerify {
 		if(app ==null){
 		   app = new AppversionVerify();
 		   if(initAllMap==null){
-				initAllMap = getInitAllToMapFromDB();
+				//initAllMap = getInitAllToMapFromDB();
 			}
 		}else{
 			if(initAllMap==null){
-				initAllMap = getInitAllToMapFromDB();
+				//initAllMap = getInitAllToMapFromDB();
 			}
 		}
 		return app;

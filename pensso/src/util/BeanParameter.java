@@ -18,6 +18,7 @@ public class BeanParameter implements Serializable {
 	private static String modifierDiscount;
 	private static String modifierPricebreakheader;
 	private static String modifierPromotiongood;
+	private static String modifierSurchart;
 	// ATTRIBUTE TYPE
 	private static String modifierAllItem;
 	private static String modifierItemCategory;
@@ -48,6 +49,14 @@ public class BeanParameter implements Serializable {
 	
 	public static String getDatabase() {
 		return database;
+	}
+
+	public static String getModifierSurchart() {
+		return modifierSurchart;
+	}
+
+	public static void setModifierSurchart(String modifierSurchart) {
+		BeanParameter.modifierSurchart = modifierSurchart;
 	}
 
 	public static String getModifierAllItem() {

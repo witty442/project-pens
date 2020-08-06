@@ -43,7 +43,7 @@ public class ModifierLine extends I_PO implements Serializable {
 		if (rst.getTimestamp("END_DATE") != null) {
 			setEndDate(DateToolsUtil.convertToString(rst.getTimestamp("END_DATE")));
 		}
-		setLevels(rst.getString("LEVEL").trim());
+		setLevels(rst.getString("LEVELS").trim());
 		setPrecedence(rst.getInt("PRECEDENCE"));
 		setVolumeType(ConvertNullUtil.convertToString(rst.getString("VOLUME_TYPE")).trim());
 		setBreakType(ConvertNullUtil.convertToString(rst.getString("BREAK_TYPE")).trim());

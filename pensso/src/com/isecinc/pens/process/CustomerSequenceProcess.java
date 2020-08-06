@@ -10,10 +10,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.pens.bean.CustomerSequence;
 import com.isecinc.pens.model.MCustomerSequence;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * CustomerSequenceProcess Class

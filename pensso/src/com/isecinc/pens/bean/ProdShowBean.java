@@ -2,6 +2,7 @@ package com.isecinc.pens.bean;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -14,7 +15,7 @@ public class ProdShowBean implements Serializable{
 	/** Criteria **/
 	private String docDate;
 	private String orderNo;
-	private int orderId;
+	private long orderId;
 	private String customerCode;
 	private String customerName;
 	private String remark;
@@ -128,11 +129,11 @@ public class ProdShowBean implements Serializable{
 		this.inputFileNameDBPic3 = inputFileNameDBPic3;
 	}
 
-	public int getOrderId() {
+	public long getOrderId() {
 		return orderId;
 	}
 
-	public void setOrderId(int orderId) {
+	public void setOrderId(long orderId) {
 		this.orderId = orderId;
 	}
 

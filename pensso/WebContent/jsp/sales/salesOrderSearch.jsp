@@ -14,6 +14,7 @@
 <%
 
 User user = (User) request.getSession().getAttribute("user");
+String userName = user.getUserName();
 String role = user.getType();
 List<References> docstatus= InitialReferences.getReferenes().get(InitialReferences.DOC_STATUS);
 pageContext.setAttribute("docstatus",docstatus,PageContext.PAGE_SCOPE);
@@ -112,21 +113,23 @@ body {
 								<td width="12%"></td>
 								<td></td>
 							</tr>
-							<tr>
-								<td align="right">
-								<%if(!((User)session.getAttribute("user")).getType().equalsIgnoreCase(User.DD)){ %>
-								<bean:message key="Customer" bundle="sysele" />&nbsp;&nbsp; <%}else{ %>
-								<bean:message key="Member" bundle="sysele" />&nbsp;&nbsp; <%} %>
-								</td>
-								<td colspan="3"><html:text property="order.customerName"
-									size="65" readonly="true" styleClass="disableText" /> <html:hidden
-									property="order.customerId" /></td>
-							</tr>
+							    
 							<tr>
 								<td align="right"><bean:message key="DocumentNo"
 									bundle="sysele" />&nbsp;&nbsp;</td>
-								<td align="left"><html:text property="order.orderNo" size="20" /></td>
+								<td align="left" colspan="3"><html:text property="order.orderNo" size="20" styleClass="\" autoComplete=\"off"/></td>
 							</tr>
+							<tr>
+							  <td align="right"><bean:message key="Customer.Code" bundle="sysele"/>&nbsp;&nbsp;</td>
+							  <td align="left" colspan="3">
+							  <html:text property="order.customerCode"  styleClass="\" autoComplete=\"off" />
+							  &nbsp;&nbsp;
+							   <bean:message key="Customer.Name" bundle="sysele"/>
+							   <html:text property="order.customerName"  styleClass="\" autoComplete=\"off" />
+						       <html:hidden property="order.customerId" />
+							  </td>
+						    </tr>
+						
 							<tr>
 								<td align="right"><bean:message key="TransactionDate"
 									bundle="sysele" /> <bean:message key="DateFrom" bundle="sysele" />&nbsp;&nbsp;
@@ -141,11 +144,9 @@ body {
 							</tr>
 							<tr>
 								<td align="right"><bean:message key="Order.No"  bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left"><html:text property="order.salesOrderNo"
-									size="20" /></td>
+								<td align="left"><html:text property="order.salesOrderNo" size="20" /></td>
 								<td align="right"><bean:message key="Bill.No"  bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left"><html:text property="order.arInvoiceNo"
-									size="20" /></td>
+								<td align="left"><html:text property="order.arInvoiceNo" styleClass="\" autoComplete=\"off"size="20" /></td>
 							</tr>
 							<tr>
 								<td align="right"><bean:message key="Status" bundle="sysele" />&nbsp;&nbsp;</td>
@@ -229,8 +230,10 @@ body {
 									
 									<!-- OLD CODE  -->
 									<td align="center" width="52px;">
+									<%if( !userName.equalsIgnoreCase("ADMIN")){ %>
 										<c:if test="${results.exported=='N'}">
-											<c:if test="${results.docStatus=='SV'}">
+											<c:if test="${results.docStatus =='OPEN' or results.docStatus =='REJECT'
+											    or results.docStatus =='UNAVAILABLE' or results.docStatus =='RESERVE'}">
 												<c:if test="${results.payment=='N'}">
 												    <c:choose>
 													<c:when test="${results.promotionSP == true}">
@@ -245,6 +248,7 @@ body {
 												</c:if>
 											</c:if>
 										</c:if>
+									<%} %>
 										<%if(role.equals(User.VAN)){ %>
 											<c:if test="${results.exported=='Y'}">
 												<c:if test="${results.docStatus=='SV'}">

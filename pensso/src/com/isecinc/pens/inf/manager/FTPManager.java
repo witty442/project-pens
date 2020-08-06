@@ -36,13 +36,13 @@ import com.isecinc.pens.inf.bean.ImageFileBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.exception.FTPException;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.ExportHelper;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.ImportHelper;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.process.bean.FileImportTransBean;
 import com.isecinc.pens.inf.manager.process.bean.KeyNoImportTransBean;
+import com.pens.util.EnvProperties;
 
 /**
  * @author WITTY
@@ -980,7 +980,7 @@ public class FTPManager {
 	}
 
 	/** Process Work on Window 8(tablet not work V107(tablet) **/
-	private void uploadAllFileToFTP_BY_FILE(String path,TableBean tableBean) throws Exception{
+	public void uploadAllFileToFTP_BY_FILE(String path,TableBean tableBean) throws Exception{
 		FTPClient ftp = null;
 		String reply = "";
 		Writer w = null;

@@ -9,15 +9,17 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
 import util.NumberToolsUtil;
 
+import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.Summary;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
 
 public class MSummary {
 
@@ -85,7 +87,7 @@ public class MSummary {
 				sql.delete(0, sql.length());
 				sql.append("\n  SELECT  distinct pd.product_id,pd.code,pd.name from t_order h,t_order_line l,m_product pd ");
 				sql.append("\n  where h.order_id = l.order_id  ");
-				sql.append("\n  and h.doc_status ='SV' ");
+				sql.append("\n  and h.doc_status ='"+I_PO.STATUS_LOADING+"' ");
 				sql.append("\n  and pd.product_id = l.product_id ");
 
 				if( !Utils.isNull(c.getProductCodeFrom()).equals("")
@@ -97,8 +99,12 @@ public class MSummary {
 				if( !Utils.isNull(c.getOrderDateFrom()).equals("")
 						&&	!Utils.isNull(c.getOrderDateTo()).equals("")	){
 						
-					  sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					 // sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					 // sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  
+					  sql.append("\n  AND h.order_date >= to_date('"+DateUtil.convBuddhistToChristDate(c.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+					  sql.append("\n  AND h.order_date <= to_date('"+DateUtil.convBuddhistToChristDate(c.getOrderDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+					             
 				}
 				sql.append("\n  and h.user_id ="+user.getId());
 				
@@ -157,25 +163,28 @@ public class MSummary {
 				sql.delete(0, sql.length());
 				sql.append("\n  SELECT  distinct h.order_date, pd.product_id,pd.code,pd.name from t_order h,t_order_line l,m_product pd ");
 				sql.append("\n  where h.order_id = l.order_id  ");
-				sql.append("\n  and h.doc_status ='SV' ");
+				sql.append("\n  and h.doc_status ='"+I_PO.STATUS_LOADING+"' ");
 				sql.append("\n  and pd.product_id = l.product_id ");
 
 				if( !Utils.isNull(c.getProductCodeFrom()).equals("")
 						&& !Utils.isNull(c.getProductCodeFrom()).equals("")){
-					sql.append(" and pd.code >='"+c.getProductCodeFrom()+"' \n");
-					sql.append(" and pd.code <='"+c.getProductCodeTo()+"' \n");
+					sql.append("\n and pd.code >='"+c.getProductCodeFrom()+"' \n");
+					sql.append("\n and pd.code <='"+c.getProductCodeTo()+"' \n");
 				}
 				
 				  if( !Utils.isNull(c.getOrderDateFrom()).equals("")
 						&&	!Utils.isNull(c.getOrderDateTo()).equals("")	){
 						
-					sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-				}
-				  sql.append("\n  and h.user_id ="+user.getId());
+					//sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					//sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					sql.append("\n  AND h.order_date  >= to_date('"+DateUtil.convBuddhistToChristDate(c.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ");
+					sql.append("\n  AND h.order_date  <= to_date('"+DateUtil.convBuddhistToChristDate(c.getOrderDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ");
+					           
+				  }
+				  sql.append("\n  and h.user_id ="+user.getId()+"");
 				
 				sql.append("\n  AND l.ISCANCEL='N' ");
-				sql.append("\n  ORDER BY h.order_date, pd.code asc \n");
+				sql.append("\n  ORDER BY h.order_date, pd.code asc ");
 				
 				logger.debug("sql:"+sql);
 				
@@ -223,28 +232,29 @@ public class MSummary {
 			StringBuilder sql = new StringBuilder();
 			try {
 			
-				sql.append("\n  SELECT l.product_id,l.uom_id,sum(l.qty) as qty from t_order h,t_order_line l ,m_product p ,m_uom_conversion uc");
-				sql.append("\n  where h.order_id = l.order_id  ");
-				sql.append("\n  and h.doc_status ='SV' ");
-				sql.append("\n  and l.product_id = p.product_id  ");
-				sql.append("\n  and p.uom_id = uc.uom_id ");
-				sql.append("\n  and p.product_id  = uc.product_id");
+				sql.append("  SELECT l.product_id,l.uom_id,uc.conversion_rate ,sum(l.qty) as qty \n from t_order h,t_order_line l ,m_product p ,m_uom_conversion uc\n");
+				sql.append("  where h.order_id = l.order_id  \n");
+				sql.append("  and h.doc_status ='"+I_PO.STATUS_LOADING+"' \n");
+				sql.append("  and l.product_id = p.product_id  \n");
+				sql.append("  and p.uom_id = uc.uom_id \n");
+				sql.append("  and p.product_id  = uc.product_id\n");
 						 
 				if(!"".equals(orderDate))
-				  sql.append(" and h.order_date = str_to_date('"+orderDate+"','%d/%m/%Y') \n");
+					sql.append("\n  AND h.order_date  = to_date('"+orderDate+"','dd/MM/yyyy') \n ");
 			    sql.append(" and l.product_id ="+productId+" \n");
 			    sql.append(" and l.promotion <> 'Y' \n");
 			    sql.append(" and l.ISCANCEL='N' ");
-			    sql.append(" and h.user_id ="+user.getId());
+			    sql.append(" and h.user_id ="+user.getId()+"\n");
 			    
 			    if( !Utils.isNull(c.getOrderDateFrom()).equals("")
 						&&	!Utils.isNull(c.getOrderDateTo()).equals("")	){
 						
-					  sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+			    	sql.append("  AND h.order_date  >= to_date('"+DateUtil.convBuddhistToChristDate(c.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+					sql.append("  AND h.order_date  <= to_date('"+DateUtil.convBuddhistToChristDate(c.getOrderDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+	
 				}
 			    
-			    sql.append(" group by l.product_id,l.uom_id  \n");
+			    sql.append(" group by l.product_id,l.uom_id,uc.conversion_rate  \n");
 			    sql.append(" order by uc.conversion_rate desc \n");
 			    
 				logger.debug("sql:"+sql);
@@ -302,27 +312,28 @@ public class MSummary {
 			try {
 				
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT l.product_id,l.uom_id,sum(l.qty) as qty from t_order h,t_order_line l,m_product p ,m_uom_conversion uc");
+				sql.append("\n  SELECT l.product_id,l.uom_id,uc.conversion_rate ,sum(l.qty) as qty from t_order h,t_order_line l,m_product p ,m_uom_conversion uc");
 				sql.append("\n  where h.order_id = l.order_id  ");
 				sql.append("\n  and h.doc_status ='SV' ");
 				sql.append("\n  and l.product_id = p.product_id  ");
 				sql.append("\n  and p.uom_id = uc.uom_id ");
 				sql.append("\n  and p.product_id  = uc.product_id ");
 				if(!"".equals(orderDate))
-				  sql.append(" and h.order_date = str_to_date('"+orderDate+"','%d/%m/%Y') \n");
+					sql.append("\n  AND h.order_date = to_date('"+orderDate+"','dd/MM/yyyy') \n ");
 			    sql.append(" and l.product_id ="+productId+" \n");
 			    sql.append(" and l.promotion = 'Y' \n");
 			    sql.append(" and l.ISCANCEL='N' ");
-			    sql.append(" and h.user_id ="+user.getId());
+			    sql.append(" and h.user_id ="+user.getId() +"\n ");
 			    
 			    if( !Utils.isNull(c.getOrderDateFrom()).equals("")
 						&&	!Utils.isNull(c.getOrderDateTo()).equals("")	){
 						
-					  sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+			    	sql.append("\n  AND h.order_date >= to_date('"+DateUtil.convBuddhistToChristDate(c.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			    	sql.append("\n  AND h.order_date <= to_date('"+DateUtil.convBuddhistToChristDate(c.getOrderDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			    	     
 				}
 			    
-			    sql.append(" group by l.product_id,l.uom_id  \n");
+			    sql.append(" group by l.product_id,l.uom_id,uc.conversion_rate \n");
 			    sql.append(" order by uc.conversion_rate desc \n");
 				
 			    logger.debug("sql:"+sql);

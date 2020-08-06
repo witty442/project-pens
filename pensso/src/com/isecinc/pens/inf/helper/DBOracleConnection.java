@@ -9,6 +9,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import com.pens.util.EnvProperties;
+
 public class DBOracleConnection {
    
 	private static Logger logger = Logger.getLogger("PENS");

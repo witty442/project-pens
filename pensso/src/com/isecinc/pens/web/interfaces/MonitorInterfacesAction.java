@@ -22,9 +22,9 @@ import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.EnvProperties;
 
 /**
  * ConversionAction Class

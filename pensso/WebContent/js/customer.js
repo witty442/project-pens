@@ -56,13 +56,6 @@ function prepare(path,type,id){
 	return true;
 }
 
-
-function search(path){
-	document.customerForm.action = path + "/jsp/customerAction.do?do=search&rf=Y";
-	document.customerForm.submit();
-	return true;
-}
-
 function backsearch(path) {
 	var tf = document.getElementsByName('tf')[0].value;
 	

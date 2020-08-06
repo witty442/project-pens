@@ -18,6 +18,7 @@
 		<type-discount>DIS</type-discount>
 		<type-pricebreakheader>PBH</type-pricebreakheader>
 		<type-promotiongood>PRG</type-promotiongood>
+        <type-surchart>SUR</type-surchart>
 
 		<attr-itemCategory>Item Category</attr-itemCategory>
 		<attr-itemNumber>Item Number</attr-itemNumber>

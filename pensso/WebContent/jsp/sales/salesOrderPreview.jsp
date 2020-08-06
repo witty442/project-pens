@@ -242,8 +242,13 @@ $(function(){
 								</tr>
 							 <%} %>
 							<tr>
-								<td align="right"></td>
+							 <%if(User.TT.equals(user.getType())){%>
+								<td align="right"><!-- สาย Load <font color="red">*</font> --></td>
+								<td align="left"><%-- <html:text property="order.loadNo" size="20" styleClass="\" autoComplete=\"off"/> --%></td>
+						     <%}else{ %>
+						        <td align="right"></td>
 								<td align="left"></td>
+						     <%} %>
 								<td align="right"><bean:message key="DocumentNo" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
 									<html:text property="order.orderNo" size="20" readonly="true" styleClass="disableText"/>

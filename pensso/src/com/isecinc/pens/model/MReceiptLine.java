@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.NumberToolsUtil;
 
 import com.isecinc.core.bean.References;
@@ -22,7 +21,8 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * Receipt Line Model
@@ -80,13 +80,13 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 	 * @throws Exception
 	 */
 	public boolean save(ReceiptLine line, int activeUserID, Connection conn) throws Exception {
-		int id = 0;
-		if (line.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+		long id = 0;
+		if (line.getId() ==0) {
+			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
 		} else {
 			id = line.getId();
 		}
-		int lineId = 0;
+		long lineId = 0;
 		if (line.getOrderLine() != null) {
 			lineId = line.getOrderLine().getId();
 		}
@@ -106,13 +106,13 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 		 String[] columnsSaveImport = { COLUMN_ID, "LINE_NO", "RECEIPT_ID", "AR_INVOICE_NO", "SALES_ORDER_NO",
 				"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "ORDER_ID", "CREATED_BY", "UPDATED_BY",
 				"DESCRIPTION", "ORDER_LINE_ID", "IMPORT_TRANS_ID"};
-		int id = 0;
-		if (line.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+		 long id =0;
+		if (line.getId() ==0) {
+			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
 		} else {
 			id = line.getId();
 		}
-		int lineId = 0;
+		long lineId = 0;
 		if (line.getOrderLine() != null) {
 			lineId = line.getOrderLine().getId();
 		}
@@ -134,7 +134,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 	 * @param receiptId
 	 * @return
 	 */
-	public List<ReceiptLine> lookUp(int receiptId) {
+	public List<ReceiptLine> lookUp(long receiptId) {
 		List<ReceiptLine> pos = new ArrayList<ReceiptLine>();
 		try {
 			String whereCause = "\n AND RECEIPT_ID = " + receiptId + "";
@@ -147,7 +147,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 		}
 		return pos;
 	}
-	public List<ReceiptLine> lookUp(Connection conn,int receiptId) {
+	public List<ReceiptLine> lookUp(Connection conn,long receiptId) {
 		List<ReceiptLine> pos = new ArrayList<ReceiptLine>();
 		try {
 			String whereCause = "\n AND RECEIPT_ID = " + receiptId + "";
@@ -309,7 +309,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			String dateCheck = "";
 			if( !"".equalsIgnoreCase(creditDateFix)){
 				java.util.Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
+				dateCheck = "to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')" ;
 			}
 			
 			String sql = "\n select order_id,order_no,sales_order_no,ar_invoice_no, round(net_amount,2) as net_amount ";
@@ -388,8 +388,8 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			ReceiptLine rl;
 			while (rst.next()) {
 				rl = new ReceiptLine();
-				rl.setId(rst.getInt("receipt_line_id"));
-				rl.setReceiptId(rst.getInt("receipt_id"));
+				rl.setId(rst.getLong("receipt_line_id"));
+				rl.setReceiptId(rst.getLong("receipt_id"));
 
 				pos.add(rl);
 			}

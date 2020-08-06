@@ -664,7 +664,12 @@ public class Utils {
 		}
 		return String.valueOf(str);
 	}
-	
+	public static BigDecimal checkNullBig(BigDecimal str) {
+		if (str == null){
+			return new BigDecimal("0");
+		}
+		return str;
+	}
 	public static int convertStrToInt(String str) {
 		if (str ==null || "".equals(str)){
 			return 0;
@@ -710,6 +715,18 @@ public class Utils {
 			return null;
 		}
 		str = str.replaceAll(",", "");
+		return new BigDecimal(str);
+	}
+	
+	public static long convertStrToLong(String str) {
+		if (str ==null || "0".equals(str) || "0.00".equals(str) || isNull(str).equals("")){
+			return 0;
+		}
+		str = str.replaceAll(",", "");
+		return new BigDecimal(str).longValue();
+	}
+	
+	public static BigDecimal convertToBig(long str) {
 		return new BigDecimal(str);
 	}
 	

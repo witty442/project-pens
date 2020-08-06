@@ -9,9 +9,9 @@ import org.apache.log4j.Logger;
 import util.ControlCode;
 
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.pens.util.EnvProperties;
 
 public class TestURLConnection {
    
@@ -130,7 +130,7 @@ public class TestURLConnection {
 		ResultSet rst = null;
 		String status ="";
 		try{
-			String sql ="select *  from pens.c_control_thread ";
+			String sql ="select *  from pensso.c_control_thread ";
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
 			if(rst.next()){
@@ -154,7 +154,7 @@ public class TestURLConnection {
 		Statement stmt = null;
 		int r =0;
 		try{
-			String sql ="insert into pens.c_control_thread(thread_name,status)values('"+threadName+"','"+status+"')";
+			String sql ="insert into pensso.c_control_thread(thread_name,status)values('"+threadName+"','"+status+"')";
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			r = stmt.executeUpdate(sql);
@@ -173,7 +173,7 @@ public class TestURLConnection {
 		Statement stmt = null;
 		int r =0;
 		try{
-			String sql ="update pens.c_control_thread set status ='"+status+"' where thread_name ='"+threadName+"'";
+			String sql ="update pensso.c_control_thread set status ='"+status+"' where thread_name ='"+threadName+"'";
 			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			r = stmt.executeUpdate(sql);

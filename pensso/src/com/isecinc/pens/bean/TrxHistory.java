@@ -1,5 +1,6 @@
 package com.isecinc.pens.bean;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 
 import util.DateToolsUtil;
@@ -42,7 +43,7 @@ public class TrxHistory extends I_PO {
 		setId(rst.getInt("TRX_HIST_ID"));
 		setTrxModule(rst.getString("TRX_MODULE").trim());
 		setTrxType(rst.getString("TRX_TYPE").trim());
-		setRecordId(rst.getInt("RECORD_ID"));
+		setRecordId(rst.getLong("RECORD_ID"));
 		setUser(new MUser().find(rst.getString("USER_ID")));
 		setTrxDate(DateToolsUtil.convertFromTimestamp(rst.getTimestamp("TRX_DATE")));
 	}
@@ -64,7 +65,7 @@ public class TrxHistory extends I_PO {
 	private String trxType;
 
 	/** RECORD_ID */
-	private int recordId;
+	private long recordId;
 
 	/** USER_ID */
 	private User user;
@@ -96,11 +97,11 @@ public class TrxHistory extends I_PO {
 		this.trxType = trxType;
 	}
 
-	public int getRecordId() {
+	public long getRecordId() {
 		return recordId;
 	}
 
-	public void setRecordId(int recordId) {
+	public void setRecordId(long recordId) {
 		this.recordId = recordId;
 	}
 

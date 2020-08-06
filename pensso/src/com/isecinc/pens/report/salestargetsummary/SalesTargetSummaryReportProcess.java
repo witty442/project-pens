@@ -13,6 +13,7 @@ import java.util.Locale;
 import util.DateToolsUtil;
 import util.NumberToolsUtil;
 
+import com.isecinc.core.model.I_PO;
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.bean.UOMConversion;
@@ -100,14 +101,14 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 		salesPeriod.setSalesEndDate(p_dateTo);
 		
 		StringBuffer whereClause = new StringBuffer();
-		whereClause.append(" AND User_ID = "+user.getId());
-		whereClause.append(" AND MONTH(TARGET_FROM) = "+month);
-		whereClause.append(" AND YEAR(TARGET_FROM) = "+year);
+		whereClause.append("\n AND User_ID = "+user.getId());
+		whereClause.append("\n AND TO_NUMBER(TO_CHAR(Target_From,'MM')) = "+month);
+		whereClause.append("\n AND TO_CHAR(TARGET_FROM,'YYYY') = '"+year+"'");
 		if(p_productCodeFrom != null && p_productCodeFrom.length() >0)
-			whereClause.append(" AND ProductCode >= "+p_productCodeFrom);
+			whereClause.append("\n AND ProductCode >= "+p_productCodeFrom);
 		
 		if(p_productCodeTo != null && p_productCodeTo.length() >0 )
-			whereClause.append(" AND ProductCode <= "+p_productCodeTo);
+			whereClause.append("\n AND ProductCode <= "+p_productCodeTo);
 		
 		MSalesTargetNew sales = new MSalesTargetNew();
 		sales.TABLE_NAME = "M_Sales_Target_New_v";
@@ -152,11 +153,18 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 		// Include Order that don't have Sales target
 		StringBuffer sql = new StringBuffer();
 		sql.append("SELECT pd.product_id,pd.code as ProductCode , pd.Name as ProductName ,uom.UOM_ID , uom.Name as UOM_NAME \n")
-			.append(", SUM(IF(pd.UOM_ID=odl.UOM_ID,IF(odl.promotion ='N',odl.Qty,0),0)) as BaseQty \n")
-			.append(", SUM(IF(pd.UOM_ID<>odl.UOM_ID,IF(odl.promotion ='N',odl.Qty,0),0)) as SecondQty \n" )
+			//.append(", SUM(IF(pd.UOM_ID=odl.UOM_ID,IF(odl.promotion ='N',odl.Qty,0),0)) as BaseQty \n")
+			.append(", SUM(CASE WHEN(pd.UOM_ID=odl.UOM_ID AND odl.promotion ='N') THEN odl.Qty ELSE 0 END) as BaseQty \n")
 			
-			.append(", SUM(IF(pd.UOM_ID=odl.UOM_ID,odl.Line_Amount,0)) as BaseLineAmt \n")
-			.append(", SUM(IF(pd.UOM_ID<>odl.UOM_ID,odl.Line_Amount,0)) as SecondLineAmt \n ")
+		    //.append(", SUM(IF(pd.UOM_ID<>odl.UOM_ID,IF(odl.promotion ='N',odl.Qty,0),0)) as SecondQty \n" )
+			.append(", SUM(CASE WHEN(pd.UOM_ID<>odl.UOM_ID AND odl.promotion ='N') THEN odl.Qty ELSE 0 END) as SecondQty \n")
+			
+			//.append(", SUM(IF(pd.UOM_ID=odl.UOM_ID,odl.Line_Amount,0)) as BaseLineAmt \n")
+			.append(", SUM(CASE WHEN(pd.UOM_ID=odl.UOM_ID) THEN odl.Qty ELSE 0 END) as BaseLineAmt \n")
+			
+			//.append(", SUM(IF(pd.UOM_ID<>odl.UOM_ID,odl.Line_Amount,0)) as SecondLineAmt \n ")
+			.append(", SUM(CASE WHEN(pd.UOM_ID<>odl.UOM_ID) THEN odl.Qty ELSE 0 END) as SecondLineAmt \n")
+			
 			.append("FROM T_Order od \n")
 			.append("INNER JOIN T_Order_Line odl ON (od.Order_ID = odl.Order_ID) \n")
 			.append("INNER JOIN M_Product pd ON (pd.Product_Id = odl.Product_ID) \n")
@@ -165,12 +173,14 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 			.append("AND od.order_date >= ? \n")
 			.append("AND od.order_date <= ? \n")
 			.append("AND odl.IsCancel = 'N' \n")// FIXED : Not Include Cancel Line To Calculate
-			.append("AND od.Doc_STATUS = 'SV' \n")// FIXED : Not Include Order was Void To Calculate
+			.append("AND od.Doc_STATUS = '"+I_PO.STATUS_LOADING+"' \n")// FIXED : Not Include Order was Void To Calculate
 			
 			//.append("AND od.ar_invoice_no is not null \n")
 			.append("AND odl.Product_ID NOT IN \n")
-			.append("(SELECT stn.Product_ID FROM M_Sales_Target_New_v stn "
-					+ "WHERE stn.User_ID = ? AND month(stn.Target_From) = ? AND year(stn.Target_From) ="+year+" ) \n");
+			.append("(SELECT stn.Product_ID FROM M_Sales_Target_New_v stn \n"
+					+ "WHERE stn.User_ID = ? \n"
+					+ "AND TO_NUMBER(TO_CHAR(stn.Target_From,'MM')) = '"+((""+month).length()==1?("0"+month):month)+"' \n"
+					+ "AND TO_CHAR(stn.Target_From,'YYYY') ='"+year+"' ) \n");
 
 			if(p_productCodeFrom != null && p_productCodeFrom.length() >0)
 				sql.append(" AND pd.Code >= ? \n");
@@ -178,7 +188,7 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 			if(p_productCodeTo != null && p_productCodeTo.length() > 0)
 				sql.append(" AND pd.Code <= ? \n");
 			
-			sql.append("GROUP BY pd.product_id,pd.code , pd.Name ,pd.UOM_ID \n");
+			sql.append("GROUP BY pd.product_id,pd.code , pd.Name ,uom.UOM_ID ,uom.name \n");
 		
 	    logger.debug("sql:"+sql.toString());
 	    
@@ -188,7 +198,6 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 		ppstmt.setTimestamp(2,DateToolsUtil.convertToTimeStamp(p_dateFrom));
 		ppstmt.setTimestamp(3, DateToolsUtil.convertToTimeStamp(p_dateTo));
 		ppstmt.setInt(4, user.getId());
-		ppstmt.setInt(5, month);
 		
 		int curr_param_idx = 5;
 		if(p_productCodeFrom != null && p_productCodeFrom.length() >0){

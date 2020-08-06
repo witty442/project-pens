@@ -29,7 +29,8 @@ public class TransactionSummary implements Serializable {
 	private String orderType;
 	private String dateFrom;
 	private String dateTo;
-
+	private String productCodeFrom;
+	private String productCodeTo;
 	private int priceListId;
 
 	public String toString() {
@@ -37,6 +38,27 @@ public class TransactionSummary implements Serializable {
 				getTransactionProduct(), getStockMainUOM(), getStockSubUOM(), getOrderMainUOM(), getOrderSubUOM(),
 				getPromoMainUOM(), getPromoSubUOM());
 	}
+
+	
+	public String getProductCodeFrom() {
+		return productCodeFrom;
+	}
+
+
+	public void setProductCodeFrom(String productCodeFrom) {
+		this.productCodeFrom = productCodeFrom;
+	}
+
+
+	public String getProductCodeTo() {
+		return productCodeTo;
+	}
+
+
+	public void setProductCodeTo(String productCodeTo) {
+		this.productCodeTo = productCodeTo;
+	}
+
 
 	public String getTransactionDate() {
 		return transactionDate;

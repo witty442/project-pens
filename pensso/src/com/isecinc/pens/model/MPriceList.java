@@ -4,10 +4,12 @@ import java.util.Calendar;
 import java.util.List;
 
 
+
 import util.DateToolsUtil;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.PriceList;
+import com.isecinc.pens.bean.User;
 
 /**
  * MPriceList Class
@@ -60,10 +62,13 @@ public class MPriceList extends I_Model<PriceList> {
 	 */
 	public PriceList getCurrentPriceList(String priceListType) throws Exception {
 		String whereCause = "and isactive = 'Y' ";
-		whereCause += "  and price_list_type = '" + priceListType + "' ";
+		//whereCause += "  and price_list_type = '" + priceListType + "' ";
 		// whereCause += "  and date_format(effective_date,'%Y%m%d') <= date_format(current_timestamp,'%Y%m%d') ";
 		// whereCause += "  and date_format(effectiveto_date,'%Y%m%d') >= date_format(current_timestamp,'%Y%m%d') ";
 		//whereCause += "  and isactive = 'Y' ";
+		
+		//test 
+		whereCause +=" and pricelist_id =10011";
 		
 		logger.info("xx:"+whereCause);
 		PriceList[] pls = search(whereCause);

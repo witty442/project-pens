@@ -27,7 +27,6 @@ import util.BundleUtil;
 import util.ControlCode;
 import util.ConvertNullUtil;
 import util.CustomerReceiptFilterUtils;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.Debug;
 import util.NumberToolsUtil;
@@ -68,6 +67,7 @@ import com.isecinc.pens.process.modifier.ModifierProcess;
 import com.isecinc.pens.report.listOrderProduct.ListOrderProductReport;
 import com.isecinc.pens.report.listOrderProduct.ListOrderProductReportProcess;
 import com.isecinc.pens.report.taxinvoice.TaxInvoiceReport;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * Order Special Action
@@ -98,21 +98,21 @@ public class OrderSpecialAction extends I_Action {
 			
 			User user = (User) request.getSession(true).getAttribute("user");
 
-			int customerId = 0;
+            long customerId =0;
 			if (request.getParameter("customerId") != null) {
 				// go search
 				forward = "search";
-				customerId = Integer.parseInt(request.getParameter("customerId"));
+				customerId = Utils.convertStrToLong(request.getParameter("customerId"));
 				// orderForm.setOrder(new Order());
 			} else if (request.getParameter("memberId") != null) {
 				// go search
 				forward = "search";
-				customerId = Integer.parseInt(request.getParameter("memberId"));
+				customerId = Utils.convertStrToLong(request.getParameter("memberId"));
 				// orderForm.setOrder(new Order());
 				
 			/* Wit Edit: 13072558 :Edit shortcut From CustomerSerach **/
 			}else if (request.getParameter("shotcut_customerId") != null) {
-				customerId = Integer.parseInt(request.getParameter("shotcut_customerId"));
+				customerId = Utils.convertStrToLong(request.getParameter("shotcut_customerId"));
 				
 				OrderSpecialCriteria criteria = new OrderSpecialCriteria();
 				//criteria.setSearchKey(searchKey)
@@ -600,7 +600,7 @@ public class OrderSpecialAction extends I_Action {
 						
 			// Call Modifier Process
 			ModifierProcess modProcess = new ModifierProcess(ConvertNullUtil.convertToString(customer.getTerritory()).trim());
-			modProcess.findModifier(orderForm.getLines(), userActive, conn,orderForm.getOrder().getCustGroup());
+			modProcess.findModifier(orderForm.getLines(), userActive, conn,orderForm.getOrder().getCustGroup(),"");
 
 			// Set for web display.
 			logger.debug("****** Start Set Display order ****************************************************");
@@ -780,7 +780,7 @@ public class OrderSpecialAction extends I_Action {
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
 		OrderSpecialForm orderForm = (OrderSpecialForm) form;
-		int orderId = 0;
+		long orderId = 0;
 		String msg = InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc();
 		String org = "";
 		String subInv ="";
@@ -824,7 +824,7 @@ public class OrderSpecialAction extends I_Action {
 				order.setOrg(org);
 				logger.debug("org["+org+"]subInv["+subInv+"]");
 				orgRuleBean = new MOrgRule().getOrgRule(org);
-				Map<String, String> itemMap = new MOrgRule().getOrgRuleItemMap(org, subInv) ;
+				Map<String, String> itemMap = new MOrgRule().getOrgRuleItemMap(conn,org, subInv) ;
 				
 				//Check item t_order_line has in W2 item
 				if("Y".equals(orgRuleBean.getCheckItem()) && itemMap != null){
@@ -989,7 +989,7 @@ public class OrderSpecialAction extends I_Action {
 			// Trx History
 			TrxHistory trx = new TrxHistory();
 			trx.setTrxModule(TrxHistory.MOD_ORDER);
-			if (orderId == 0) trx.setTrxType(TrxHistory.TYPE_INSERT);
+			if (orderId ==0) trx.setTrxType(TrxHistory.TYPE_INSERT);
 			else trx.setTrxType(TrxHistory.TYPE_UPDATE);
 			trx.setRecordId(order.getId());
 			trx.setUser(userActive);

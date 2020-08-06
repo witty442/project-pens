@@ -124,6 +124,15 @@ public class NSDAO {
 				   h.setPac10Qty(Utils.isNull(rst.getInt("PAC_QTY_10")));
 				   h.setPoohNQty(Utils.isNull(rst.getInt("POOH_QTY_N")));
 					
+				   h.setInterCTNQty(Utils.isNull(rst.getInt("INTER_CTN_QTY")));
+				   h.setInterBAGQty(Utils.isNull(rst.getInt("INTER_BAG_QTY")));
+				   
+				   h.setCup20CTNQty(Utils.isNull(rst.getInt("CUP20_CTN_QTY")));
+				   h.setCup20CUPQty(Utils.isNull(rst.getInt("CUP20_CUP_QTY")));
+				   
+				   h.setKasi72CTNQty(Utils.isNull(rst.getInt("KASI72_CTN_QTY")));
+				   h.setKasi72BAGQty(Utils.isNull(rst.getInt("KASI72_BAG_QTY")));
+				   
 				   h.setStatus(Utils.isNull(rst.getString("Status")));
 				   h.setStatusDesc(NSConstant.getDesc(h.getStatus()));
 				   h.setRemark(Utils.isNull(rst.getString("remark")));
@@ -223,17 +232,30 @@ public class NSDAO {
 				   }
 				  
 				   h.setCompleteDate(DateUtil.stringValueNull(rst.getDate("update_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				  
+				   //cup72
 				   h.setCupQty(Utils.isNull(rst.getInt("CUP_QTY")));
-				   h.setPac6CTNQty(Utils.isNull(rst.getInt("PAC_QTY")));
-				   h.setPoohQty(Utils.isNull(rst.getInt("POOH_QTY")));
-				   
 				   h.setCupNQty(Utils.isNull(rst.getInt("CUP_QTY_N")));
+				   
+				   //BAG inter
+				   h.setPac6CTNQty(Utils.isNull(rst.getInt("PAC_QTY")));
 				   h.setPac6Qty(Utils.isNull(rst.getInt("PAC_QTY_N")));
+				   h.setInterCTNQty(Utils.isNull(rst.getInt("INTER_CTN_QTY")));
+				   h.setInterBAGQty(Utils.isNull(rst.getInt("INTER_BAG_QTY")));
+				   
+				   //BAG thai
 				   h.setPac10CTNQty(Utils.isNull(rst.getInt("PAC_QTY_CTN_10")));
 				   h.setPac10Qty(Utils.isNull(rst.getInt("PAC_QTY_10")));
+				   
+				   //miniCup72
+				   h.setPoohQty(Utils.isNull(rst.getInt("POOH_QTY")));
 				   h.setPoohNQty(Utils.isNull(rst.getInt("POOH_QTY_N")));
-					
+				   
+				   h.setCup20CTNQty(Utils.isNull(rst.getInt("CUP20_CTN_QTY")));
+				   h.setCup20CUPQty(Utils.isNull(rst.getInt("CUP20_CUP_QTY")));
+				   
+				   h.setKasi72CTNQty(Utils.isNull(rst.getInt("KASI72_CTN_QTY")));
+				   h.setKasi72BAGQty(Utils.isNull(rst.getInt("KASI72_BAG_QTY")));
+				   
 				   h.setStatus(Utils.isNull(rst.getString("Status")));
 				   h.setStatusDesc(NSConstant.getDesc(h.getStatus()));
 				   h.setRemark(Utils.isNull(rst.getString("remark")));
@@ -343,6 +365,16 @@ public class NSDAO {
 			    sql.append("\n ,nvl(sum(pac_qty_10),0) as pac_qty_10 " );
 			    
 			    sql.append("\n ,nvl(sum(pooh_qty_n),0) as pooh_qty_n " );
+			    
+			    sql.append("\n ,nvl(sum(inter_ctn_qty),0) as inter_ctn_qty " );
+			    sql.append("\n ,nvl(sum(inter_bag_qty),0) as inter_bag_qty " );
+			    
+			    sql.append("\n ,nvl(sum(cup20_ctn_qty),0) as cup20_ctn_qty " );
+			    sql.append("\n ,nvl(sum(cup20_cup_qty),0) as cup20_cup_qty " );
+			    
+			    sql.append("\n ,nvl(sum(kasi72_ctn_qty),0) as kasi72_ctn_qty " );
+			    sql.append("\n ,nvl(sum(kasi72_bag_qty),0) as kasi72_bag_qty " );
+			    
 			    sql.append("\n from PENSBI.NISSIN_ORDER h where 1=1 ");
 			    sql.append(genWhereSearchList(o));
 				//sql.append("\n group by");
@@ -365,7 +397,14 @@ public class NSDAO {
 					summary.setPac10CTNQty(Utils.decimalFormat(rst.getInt("pac_qty_ctn_10"),Utils.format_current_no_disgit));
 					summary.setPac10Qty(Utils.decimalFormat(rst.getInt("pac_qty_10"),Utils.format_current_no_disgit));
 					
+					summary.setInterCTNQty(Utils.decimalFormat(rst.getInt("inter_ctn_qty"),Utils.format_current_no_disgit));
+					summary.setInterBAGQty(Utils.decimalFormat(rst.getInt("inter_bag_qty"),Utils.format_current_no_disgit));
 					
+					summary.setCup20CTNQty(Utils.decimalFormat(rst.getInt("cup20_ctn_qty"),Utils.format_current_no_disgit));
+					summary.setCup20CUPQty(Utils.decimalFormat(rst.getInt("cup20_cup_qty"),Utils.format_current_no_disgit));
+					
+					summary.setKasi72CTNQty(Utils.decimalFormat(rst.getInt("kasi72_ctn_qty"),Utils.format_current_no_disgit));
+					summary.setKasi72BAGQty(Utils.decimalFormat(rst.getInt("kasi72_bag_qty"),Utils.format_current_no_disgit));
 				}//while
 			} catch (Exception e) {
 				throw e;
@@ -507,9 +546,17 @@ public class NSDAO {
 		try{
 			
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" UPDATE NISSIN_ORDER SET STATUS =? ,INVOICE_DATE =?, INVOICE_NO =?, CUP_QTY=?,CUP_QTY_N=?" +
-					",PAC_QTY = ?, PAC_QTY_N = ?, PAC_QTY_CTN_10=?, PAC_QTY_10 =?, POOH_QTY =?,POOH_QTY_N =?   \n");
-			sql.append(" ,UPDATE_USER =? ,UPDATE_DATE = ? ,SALE_CODE =? ,CUSTOMER_CODE =? ,PENDING_REASON =?,CUSTOMER_NAME =? ,ADDRESS_LINE1 =?,ADDRESS_LINE2 =? \n");
+			sql.append(" UPDATE NISSIN_ORDER SET STATUS =? ,INVOICE_DATE =?, INVOICE_NO =?");
+			sql.append(", CUP_QTY=?,CUP_QTY_N=?" );//CUP20 72
+			sql.append(", PAC_QTY = ?, PAC_QTY_N = ?");//BAG6
+			sql.append(", INTER_CTN_QTY=? ,INTER_BAG_QTY =?");//BAG INTER
+			sql.append(", PAC_QTY_CTN_10 = ?, PAC_QTY_10 =? "); //BAG THAI
+			sql.append(", POOH_QTY =?,POOH_QTY_N =?   \n");//MiniCUp 72
+			sql.append(", CUP20_CTN_QTY =?,CUP20_CUP_QTY =?   \n");//Cup20 72
+			sql.append(", KASI72_CTN_QTY =?,KASI72_BAG_QTY =?   \n");//Kasi 72
+			sql.append(",UPDATE_USER =? ,UPDATE_DATE = ? ,SALE_CODE =? ");
+			sql.append(",CUSTOMER_CODE =? ,PENDING_REASON =?,CUSTOMER_NAME =? ");
+			sql.append(",ADDRESS_LINE1 =?,ADDRESS_LINE2 =? \n");
 			sql.append(" WHERE ORDER_ID = ?  \n" );
 
 			ps = conn.prepareStatement(sql.toString());
@@ -530,11 +577,22 @@ public class NSDAO {
 			
 			ps.setInt(c++, Utils.convertStrToInt(o.getPac6CTNQty()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getPac6Qty()));
+			
+			ps.setInt(c++, Utils.convertStrToInt(o.getInterCTNQty()));
+			ps.setInt(c++, Utils.convertStrToInt(o.getInterBAGQty()));
+			
 			ps.setInt(c++, Utils.convertStrToInt(o.getPac10CTNQty()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getPac10Qty()));
 			
 			ps.setInt(c++, Utils.convertStrToInt(o.getPoohQty()));
 			ps.setInt(c++, Utils.convertStrToInt(o.getPoohNQty()));
+			
+			ps.setInt(c++, Utils.convertStrToInt(o.getCup20CTNQty()));
+			ps.setInt(c++, Utils.convertStrToInt(o.getCup20CUPQty()));
+			
+			ps.setInt(c++, Utils.convertStrToInt(o.getKasi72CTNQty()));
+			ps.setInt(c++, Utils.convertStrToInt(o.getKasi72BAGQty()));
+			
 			ps.setString(c++, o.getCreateUser());
 			ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(c++, Utils.isNull(o.getSaleCode()));

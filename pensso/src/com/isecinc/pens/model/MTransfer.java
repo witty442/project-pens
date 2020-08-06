@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
 import com.isecinc.pens.bean.MoveOrder;
@@ -20,7 +19,8 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcess;
 
 
 public class MTransfer {
@@ -157,7 +157,7 @@ public class MTransfer {
 			int index = 0;
 			ps = conn.prepareStatement(sql.toString());
 			
-			ps.setInt(++index, SequenceProcess.getNextValue("t_bank_transfer"));
+			ps.setInt(++index, SequenceProcess.getNextValueInt("t_bank_transfer"));
 			ps.setDate(++index, new java.sql.Date(DateToolsUtil.convertToTimeStamp(model.getTransferDate()).getTime()));
 			ps.setString(++index, Utils.isNull(model.getTransferType()));
 			ps.setString(++index, Utils.isNull(model.getTransferBank()));

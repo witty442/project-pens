@@ -1,52 +1,42 @@
 package com.isecinc.pens.dao;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import util.NumberToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Address;
-import com.isecinc.pens.bean.MoveOrderLine;
-import com.isecinc.pens.bean.Product;
-import com.isecinc.pens.bean.UOMConversion;
+import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MAddress;
-import com.isecinc.pens.model.MProduct;
-import com.isecinc.pens.model.MStockDiscount;
-import com.isecinc.pens.model.MStockReturn;
-import com.isecinc.pens.model.MUOMConversion;
-import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DBConnectionApps;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class PopupDAO {
 
 	private static Logger logger = Logger.getLogger("PENS");
 	
    
-	 public static List<PopupForm> searchCustomerMaster(PopupForm c,String operation) throws Exception {
+	 public static List<PopupBean> searchCustomerMaster(PopupBean c,String operation) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
-			List<PopupForm> pos = new ArrayList<PopupForm>();
+			List<PopupBean> pos = new ArrayList<PopupBean>();
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT M.code,m.name \n");
-
+				sql.append("\n  SELECT M.code,m.name ");
 				sql.append("\n  from m_customer M");
-				
 				sql.append("\n  where 1=1 ");
 			
 				if("equals".equalsIgnoreCase(operation)){
@@ -74,7 +64,7 @@ public class PopupDAO {
 				int no=0;
 				while (rst.next()) {
 					no++;
-					PopupForm item = new PopupForm();
+					PopupBean item = new PopupBean();
 					item.setNo(no);
 					item.setCode(Utils.isNull(rst.getString("code")));
 					item.setDesc(Utils.isNull(rst.getString("name")));
@@ -93,10 +83,10 @@ public class PopupDAO {
 			}
 			return pos;
 		}
-	 public static List<PopupForm> searchCustomerMasterAndAddress(PopupForm c,String operation,User user) throws Exception {
+	 public static List<PopupBean> searchCustomerMasterAndAddress(PopupBean c,String operation,User user) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
-			List<PopupForm> pos = new ArrayList<PopupForm>();
+			List<PopupBean> pos = new ArrayList<PopupBean>();
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
 			Address address= null;
@@ -131,7 +121,7 @@ public class PopupDAO {
 				int no=0;
 				while (rst.next()) {
 					no++;
-					PopupForm item = new PopupForm();
+					PopupBean item = new PopupBean();
 					item.setNo(no);
 					item.setCode(Utils.isNull(rst.getString("code")));
 					item.setDesc(Utils.isNull(rst.getString("name")));
@@ -155,10 +145,10 @@ public class PopupDAO {
 			}
 			return pos;
 		}
-	 public static List<PopupForm> searchBrand(PopupForm c,String operation) throws Exception {
+	 public static List<PopupBean> searchBrand(PopupBean c,String operation) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
-			List<PopupForm> pos = new ArrayList<PopupForm>();
+			List<PopupBean> pos = new ArrayList<PopupBean>();
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
 			try {
@@ -191,7 +181,7 @@ public class PopupDAO {
 				int no=0;
 				while (rst.next()) {
 					no++;
-					PopupForm item = new PopupForm();
+					PopupBean item = new PopupBean();
 					item.setNo(no);
 					item.setCode(Utils.isNull(rst.getString("brand_no")));
 					item.setDesc(Utils.isNull(rst.getString("brand_desc")));
@@ -211,10 +201,10 @@ public class PopupDAO {
 			return pos;
 		}
 	 
-	 public static List<PopupForm> searchInvoice(PopupForm c,String operation) throws Exception {
+	 public static List<PopupBean> searchInvoice(PopupBean c,String operation) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
-			List<PopupForm> pos = new ArrayList<PopupForm>();
+			List<PopupBean> pos = new ArrayList<PopupBean>();
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
 			String dateStart = "";
@@ -226,7 +216,7 @@ public class PopupDAO {
 				   curdate.add(Calendar.MONTH, -1*Integer.parseInt(refbackDate.getKey()));
 				   
 				   logger.debug("DateStart:"+curdate.getTime());
-				   dateStart = Utils.stringValue(curdate.getTime(), Utils.DD_MM_YYYY_WITH_SLASH);
+				   dateStart = DateUtil.stringValue(curdate.getTime(), DateUtil.DD_MM_YYYY_WITH_SLASH);
 				   logger.debug("DateStart:"+dateStart);
 				}
 				
@@ -247,7 +237,7 @@ public class PopupDAO {
 				sql.append("\n  select order_line_id from t_receipt_line ");
 				sql.append("\n ) ");*/
 				
-				sql.append("\n and order_date >= STR_TO_DATE('"+dateStart+"', '%d/%m/%Y') ");
+				sql.append("\n and order_date >= TO_DATE('"+dateStart+"', 'dd/mm/yyyy') ");
 				
 				/*sql.append("\n and h.ar_invoice_no not in( ");
 				sql.append("\n select invoice_no from t_req_promotion_line ");
@@ -279,10 +269,10 @@ public class PopupDAO {
 				int no=0;
 				while (rst.next()) {
 					no++;
-					PopupForm item = new PopupForm();
+					PopupBean item = new PopupBean();
 					item.setNo(no);
 					item.setCode(Utils.isNull(rst.getString("ar_invoice_no")));
-					item.setStringDate(Utils.stringValue(rst.getDate("order_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					item.setStringDate(DateUtil.stringValue(rst.getDate("order_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 					item.setDesc(Utils.isNull(rst.getString("qty")));
 					pos.add(item);
 					
@@ -298,6 +288,103 @@ public class PopupDAO {
 				} catch (Exception e) {}
 			}
 			return pos;
+		}
+	 public static List<PopupBean> searchSubbrandList()
+				throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			PopupBean m = null;
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			List<PopupBean> dataList = new ArrayList<PopupBean>();
+			try {
+				conn = DBConnectionApps.getInstance().getConnection();
+
+				sql.append("\n  SELECT distinct m.subbrand_no,m.subbrand_desc");
+				sql.append("\n  from PENSBI.XXPENS_BI_MST_SUBBRAND m");
+				sql.append("\n  where m.subbrand_no like '38%' ");
+				sql.append("\n  ORDER BY m.subbrand_no \n");
+
+				logger.debug("sql:" + sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					m = new PopupBean();
+					m.setSubBrand(Utils.isNull(rst.getString("subbrand_no")));
+					m.setSubBrandDesc(Utils.isNull(rst.getString("subbrand_desc")));
+					dataList.add(m);
+				
+				}// while
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					if (conn != null) {
+						conn.close();
+						conn = null;
+					}
+				} catch (Exception e) {
+				}
+			}
+			return dataList;
+		}
+	 public static PopupBean searchSubbrandStock(PopupBean mCriteria, User user)
+				throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			PopupBean m = null;
+			StringBuilder sql = new StringBuilder();
+			Connection conn = null;
+			List<PopupBean> dataList = new ArrayList<PopupBean>();
+			Map<String, PopupBean> subBrandMap = new HashMap<String, PopupBean>();
+			try {
+				conn = DBConnectionApps.getInstance().getConnection();
+
+				sql.append("\n  SELECT m.subbrand_no,m.subbrand_desc");
+				sql.append("\n  ,p.code ,p.name");
+				sql.append("\n  from PENSBI.XXPENS_BI_MST_SUBBRAND m ,PENSSO.M_PRODUCT p ");
+				sql.append("\n  where m.inventory_item_id = p.product_id");
+				sql.append("\n  and (m.subbrand_no like '381%' or m.subbrand_no like '382%' or m.subbrand_no like '383%')");
+				if( !Utils.isNull(mCriteria.getSubBrand()).equals("")){
+					sql.append("\n  and m.subbrand_no = '"+Utils.isNull(mCriteria.getSubBrand())+"'");
+				}
+				sql.append("\n  ORDER BY m.subbrand_no,p.code  \n");
+
+				logger.debug("sql:" + sql);
+
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+				while (rst.next()) {
+					m = new PopupBean();
+					m.setProductCode(Utils.isNull(rst.getString("code")));
+					m.setProductName(Utils.isNull(rst.getString("name")));
+					m.setSubBrand(Utils.isNull(rst.getString("subbrand_no")));
+					m.setSubBrandDesc(Utils.isNull(rst.getString("subbrand_desc")));
+					dataList.add(m);
+					
+					subBrandMap.put(m.getSubBrand(), m);
+				}// while
+				
+				mCriteria.setDataList(dataList);
+				mCriteria.setData2List(new ArrayList<PopupBean>(subBrandMap.values()));
+				
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					if (conn != null) {
+						conn.close();
+						conn = null;
+					}
+				} catch (Exception e) {
+				}
+			}
+			return mCriteria;
 		}
 	 
 }

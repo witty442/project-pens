@@ -2,7 +2,7 @@ package com.pens.test;
 
 import java.sql.Connection;
 
-import util.DBCPConnectionProvider;
+import com.pens.util.DBCPConnectionProvider;
 
 public class TestConnection {
 

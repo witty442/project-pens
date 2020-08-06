@@ -29,7 +29,7 @@ public class RunScriptDBServlet  extends HttpServlet{
 		logger.info("Start ManualRunScriptDBServlet...");
 		try {
 			 ServletContext sc =  getServletConfig().getServletContext();
-			 RunScriptDBAction.runProcessOnStartSalesApp(sc);
+			// RunScriptDBAction.runProcessOnStartSalesApp(sc);
 		
 		} catch (Exception e) {
 			logger.error(e.getMessage());

@@ -19,7 +19,8 @@ import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.UpdateSalesManagerHelper;
-import com.pens.utils.meter.MonitorTime;
+import com.pens.util.EnvProperties;
+import com.pens.util.meter.MonitorTime;
 
 public class ImportHelper {
 	
@@ -353,8 +354,6 @@ public class ImportHelper {
   public static TableBean genPrepareSQL(TableBean tableBean,User userBean,String transType) throws Exception{
 	  if(Constants.TRANSACTION_UTS_TRANS_TYPE.equals(transType)){
 		   tableBean = genPrepareSQLUTS(tableBean,userBean);
-	  }else  if(Constants.TRANSACTION_WEB_MEMBER_TYPE.equals(transType)){
-		   tableBean = genPrepareWebMemberSQL(tableBean,userBean);
 	  }else { 
 		   tableBean = genPrepareSQL(tableBean,userBean);
 	  }
@@ -390,18 +389,18 @@ public class ImportHelper {
 	    	   
 		    	if(colBean.getColumnType().equalsIgnoreCase("DATE")){
 				      columnInsSql += colBean.getColumnName() +",";
-				      valueInsSQL +=" STR_TO_DATE(?,'%d%m%Y'),";
+				      valueInsSQL +=" TO_DATE(?,'ddMMyyyy'),";
 				      
 				      if(!colBean.getKey().equals("Y") && colBean.getAction().indexOf("U") !=-1){
-				         updateSQL += colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y'),";
+				         updateSQL += colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy'),";
 				      }
 
 		    	}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
 				      columnInsSql += colBean.getColumnName() +",";
-				      valueInsSQL +=" STR_TO_DATE(?,'%d%m%Y %H%i%S'),";
+				      valueInsSQL +=" TO_DATE(?,'ddMMyyyy HH24miss'),";
 				      
 				      if(!colBean.getKey().equals("Y") && colBean.getAction().indexOf("U") !=-1){
-				         updateSQL += colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S'),";
+				         updateSQL += colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy HH24miss'),";
 				      }
 		        }else{
 			           columnInsSql += colBean.getColumnName() +",";
@@ -447,9 +446,9 @@ public class ImportHelper {
 			    for ( int i = 0; i < columnKeyList.size(); i++) {   
 			    	ColumnBean colBean = (ColumnBean)columnKeyList.get(i);
 		    	    if(colBean.getColumnType().equalsIgnoreCase("DATE")){
-				        updateSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y')";
+				        updateSQL += " AND "+colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy')";
 		    	    }else  if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
-				        updateSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S')";
+				        updateSQL += " AND "+colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy HH24miss')";
 		    	    }else{
 					    updateSQL += " AND "+ colBean.getColumnName()+" = ? ";
 			        }
@@ -465,9 +464,9 @@ public class ImportHelper {
 			    	  for ( int i = 0; i < columnDeleteKeyList.size(); i++) {   
 			    		  ColumnBean colBean = (ColumnBean)columnDeleteKeyList.get(i);
 			    		  if(colBean.getColumnType().equalsIgnoreCase("DATE")){
-			    			  deleteSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y')";
+			    			  deleteSQL += " AND "+colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy')";
 				    	    }else  if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
-				    	    	deleteSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S')";
+				    	    	deleteSQL += " AND "+colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy HH24miss')";
 				    	    }else{
 				    	    	deleteSQL += " AND "+ colBean.getColumnName()+" = ? ";
 					        }
@@ -488,124 +487,6 @@ public class ImportHelper {
 		    return tableBean;
 		}catch(Exception e){
 
-			throw e;
-		}finally{
-			
-		}
-	}
-	
-	public static TableBean  genPrepareWebMemberSQL(TableBean tableBean,User userBean) throws Exception{
-	    String columnInsSql = "";
-	    String valueInsSQL = "";
-	    String updateSQL = "";
-	    String deleteSQL = "";
-        List<ColumnBean> orderUpdateList = new ArrayList<ColumnBean>();
-        List<ColumnBean> columnKeyList = new ArrayList<ColumnBean>();
-        List<ColumnBean> columnDeleteKeyList = new ArrayList<ColumnBean>();
-		try{
-			String tableName = tableBean.getTableName();
-			//logger.debug("********GenSQL*********************");
-		    for ( int i = 0; i < tableBean.getColumnBeanList().size(); i++) {   
-		    	ColumnBean colBean = (ColumnBean)tableBean.getColumnBeanList().get(i);
-	    	   
-		    	if(colBean.getColumnType().equalsIgnoreCase("DATE")){
-				      columnInsSql += colBean.getColumnName() +",";
-				      valueInsSQL +=" STR_TO_DATE(?,'%d%m%Y'),";
-				      
-				      if(!colBean.getKey().equals("Y") && colBean.getAction().indexOf("U") !=-1){
-				         updateSQL += colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y'),";
-				      }
-
-		    	}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
-				      columnInsSql += colBean.getColumnName() +",";
-				      valueInsSQL +=" STR_TO_DATE(?,'%d%m%Y %H%i%S'),";
-				      
-				      if(!colBean.getKey().equals("Y") && colBean.getAction().indexOf("U") !=-1){
-				         updateSQL += colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S'),";
-				      }
-		        }else{
-			           columnInsSql += colBean.getColumnName() +",";
-					   valueInsSQL +=" ?,";
-					   if(!colBean.getKey().equals("Y") && colBean.getAction().indexOf("U") !=-1){
-					       updateSQL += colBean.getColumnName()+" = ? ,";
-					   }
-		        }
-		    	/** Column Key Update **/
-		    	if(colBean.getKey().equals("Y")){
-		    		columnKeyList.add(colBean); 	
-		        }
-		    	/*** Column Can be Update **/
-		    	if(!colBean.getKey().equals("Y") && colBean.getAction().indexOf("U") !=-1){
-		    		//logger.debug("Add UpdateList");
-	    	    	orderUpdateList.add(colBean);
-	    	    }
-		    	/** Column Delete key **/
-		    	if(colBean.getKey().equals("Y") && colBean.getAction().indexOf("D") !=-1){
-		    		columnDeleteKeyList.add(colBean); 	
-		        }
-		    	
-		    }//for
-		    
-		    
-		    if( !Utils.isNull(columnInsSql).equals("")){
-		    	columnInsSql = columnInsSql.substring(0,columnInsSql.length()-1);
-		    }
-		    if( !Utils.isNull(valueInsSQL).equals("")){
-		    	valueInsSQL = valueInsSQL.substring(0,valueInsSQL.length()-1);
-		    }
-		    
-		    /** prepare Insert Statement **/
-		    String prepareSqlIns = "INSERT INTO "+tableName+"("+columnInsSql+") VALUES ("+valueInsSQL+")";
-		  
-		    if( !Utils.isNull(updateSQL).equals("")){
-		    	updateSQL = "UPDATE "+tableName+" SET "+updateSQL.substring(0,updateSQL.length()-1) +" WHERE 1=1 ";
-		    }
-		    
-		    /** Add Key Column to Where Update SQL **/ 
-		    if(columnKeyList != null && columnKeyList.size() >0){
-			    for ( int i = 0; i < columnKeyList.size(); i++) {   
-			    	ColumnBean colBean = (ColumnBean)columnKeyList.get(i);
-		    	    if(colBean.getColumnType().equalsIgnoreCase("DATE")){
-				        updateSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y')";
-		    	    }else  if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
-				        updateSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S')";
-		    	    }else{
-					    updateSQL += " AND "+ colBean.getColumnName()+" = ? ";
-			        }
-		    	    orderUpdateList.add(colBean);
-			    }//for 
-		    }//if
-		    
-		    
-		    /** Gen Delete SQL **/
-		    if(Utils.isNull(tableBean.getActionDB()).indexOf("D") != -1){
-			    deleteSQL = "DELETE FROM "+tableBean.getTableName() +" WHERE 1=1";
-			    if(columnDeleteKeyList != null && columnDeleteKeyList.size() >0 ){
-			    	  for ( int i = 0; i < columnDeleteKeyList.size(); i++) {   
-			    		  ColumnBean colBean = (ColumnBean)columnDeleteKeyList.get(i);
-			    		  if(colBean.getColumnType().equalsIgnoreCase("DATE")){
-			    			  deleteSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y')";
-				    	    }else  if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
-				    	    	deleteSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S')";
-				    	    }else{
-				    	    	deleteSQL += " AND "+ colBean.getColumnName()+" = ? ";
-					        }
-			    	  }
-			    }
-		    }
-		    
-		    
-		    tableBean.setPrepareSqlIns(prepareSqlIns);
-		    tableBean.setPrepareSqlUpd(updateSQL);
-		    tableBean.setPrepareSqlDelete(deleteSQL);
-		    
-		    /** Set For Order Update SQL */
-		    tableBean.setColumnBeanOrderUpdateList(orderUpdateList);
-		    /** Set For Order Delete SQL */
-		    tableBean.setColumnBeanDeleteList(columnDeleteKeyList);
-		    
-		    return tableBean;
-		}catch(Exception e){
 			throw e;
 		}finally{
 			
@@ -643,24 +524,24 @@ public class ImportHelper {
 			    	if(colBean.getColumnType().equalsIgnoreCase("DATE")){
 			    		  if(colBean.getAction().indexOf("I") !=-1){
 			    		    columnInsSql += colBean.getColumnName() +",";
-					        valueInsSQL +=" STR_TO_DATE(?,'%d%m%Y'),";
+					        valueInsSQL +=" TO_DATE(?,'ddmmyyyy'),";
 			    		  }
 					      if(!colBean.getKey().equals("Y") && colBean.getAction().indexOf("U") !=-1){
-					         updateSQL += colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y'),";
+					         updateSQL += colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy'),";
 					      }
 					      if(!colBean.getKey().equals("Y") && colBean.getAction().indexOf("S") !=-1){
-						      updateSQLCS += colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y'),";
+						      updateSQLCS += colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy'),";
 						  }
 			    	}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
 			    		  if(colBean.getAction().indexOf("I") !=-1){
 			    		    columnInsSql += colBean.getColumnName() +",";
-					        valueInsSQL +=" STR_TO_DATE(?,'%d%m%Y %H%i%S'),";
+					        valueInsSQL +=" TO_DATE(?,'dd/mm/yyyy HH:ss'),";
 			    		  }
 					      if(!colBean.getKey().equals("Y") && colBean.getAction().indexOf("U") !=-1){
-					         updateSQL += colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S'),";
+					         updateSQL += colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy HH24miss'),";
 					      }
 					      if(!colBean.getKey().equals("Y") && colBean.getAction().indexOf("S") !=-1){
-						     updateSQLCS += colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S'),";
+						     updateSQLCS += colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy HH24miss'),";
 						  }
 			        }else{
 			        	 if(colBean.getAction().indexOf("I") !=-1){
@@ -723,13 +604,13 @@ public class ImportHelper {
 			    for ( int i = 0; i < columnKeyList.size(); i++) {   
 			    	ColumnBean colBean = (ColumnBean)columnKeyList.get(i);
 		    	    if(colBean.getColumnType().equalsIgnoreCase("DATE")){
-				        updateSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y')";
-				        updateSQLCS += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y')";
+				        updateSQL += " AND "+colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy')";
+				        updateSQLCS += " AND "+colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy')";
 				        
 				        
 		    	    }else  if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
-				        updateSQL += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S')";
-				        updateSQLCS += " AND "+colBean.getColumnName()+" = STR_TO_DATE(?,'%d%m%Y %H%i%S')";
+				        updateSQL += " AND "+colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy HH24miss')";
+				        updateSQLCS += " AND "+colBean.getColumnName()+" = TO_DATE(?,'ddMMyyyy HH24miss')";
 
 		    	    }else{
 					    updateSQL += " AND "+ colBean.getColumnName()+" = ? ";
@@ -975,9 +856,9 @@ public class ImportHelper {
 					// logger.debug("Key ColName["+colBean.getColumnName()+"]value["+valueKey+"]type["+colBean.getColumnType()+"]");
 					 
 					 if(colBean.getColumnType().equalsIgnoreCase("DATE")){
-						sqlFindOldValue += " AND "+colBean.getColumnName()+" = STR_TO_DATE('"+valueKey+"','%d%m%Y')";
+						sqlFindOldValue += " AND "+colBean.getColumnName()+" = TO_DATE('"+valueKey+"','dd/mm/yyyy')";
 			    	 }else  if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
-			    		sqlFindOldValue += " AND "+colBean.getColumnName()+" = STR_TO_DATE('"+valueKey+"','%d%m%Y %H%i%S')";   
+			    		sqlFindOldValue += " AND "+colBean.getColumnName()+" = TO_DATE('"+valueKey+"','dd/mm/yyyy HH:ss')";   
 			    	 }else{
 			    		sqlFindOldValue += " AND "+ colBean.getColumnName()+" = '"+valueKey+"' ";   
 				     }

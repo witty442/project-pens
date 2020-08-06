@@ -157,14 +157,26 @@ function setMainCustomer(code, name){
 								<td align="left" width="150px;">
 									<input type="text" id="dateFrom" name="dateFrom" readonly="readonly" size="15"/>
 								</td>
-								<td rowspan="2" align="left">
-									<span id="spnWait" style="display: none;"><img src="${pageContext.request.contextPath}/icons/waiting.gif" align="absmiddle" border="0"/></span>
+								<td align="left" colspan="2">
+								   <bean:message key="DateTo" bundle="sysele"/>
+								   <input type="text" id="dateTo" name="dateTo" readonly="readonly" size="15"/>
+									
 								</td>
 							</tr>
+							<!-- <tr>
+								<td align="right">จากรหัสสินค้า</td>
+								<td align="left" width="150px;">
+									<input type="text" id="productCodeFrom" name="productCodeFrom" size="15"/>
+								</td>
+								<td align="left"  colspan="2">
+								   ถึงรหัสสินค้า
+								   <input type="text" id="productCodeTo" name="productCodeTo" size="15"/>
+								</td>
+							</tr> -->
 							<tr>
-								<td align="right"><bean:message key="DateTo" bundle="sysele"/></td>
-								<td align="left">
-									<input type="text" id="dateTo" name="dateTo" readonly="readonly" size="15"/>
+								<td align="right"></td>
+								<td align="left" colspan="3">
+									<span id="spnWait" style="display: none;"><img src="${pageContext.request.contextPath}/icons/waiting.gif" align="absmiddle" border="0"/></span>
 								</td>
 							</tr>
 						</table>

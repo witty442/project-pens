@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.log4j.Logger;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.OrgRuleBean;
 import com.isecinc.pens.web.sales.bean.ProductCatalog;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * MProduct Class
@@ -30,7 +31,8 @@ import com.isecinc.pens.web.sales.bean.ProductCatalog;
 public class MOrgRule {
 
 	private static final long serialVersionUID = 3881159581550423821L;
-	
+	/** Logger */
+	public static Logger logger = Logger.getLogger("PENS");
 	public static String TABLE_NAME_W1 = "m_org_rule";
 	public static String TABLE_NAME_W2 = "m_org_rule_item";
 	
@@ -95,8 +97,7 @@ public class MOrgRule {
 		return w1List;
 	}
 	
-	public Map<String,String> getOrgRuleItemMap(String org,String subInv) throws Exception {
-		Connection conn = null;
+	public Map<String,String> getOrgRuleItemMap(Connection conn,String org,String subInv) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		Map<String, String> w2Map = new HashMap<String, String>();
@@ -108,9 +109,8 @@ public class MOrgRule {
 		if( !"".equals(ConvertNullUtil.convertToString(subInv))){
 		    sql.append(" and sub_inv = '"+subInv+"'") ;	
 		}
-		System.out.println("sql:"+sql);
+		logger.debug("sql:"+sql);
 		
-		conn = new DBCPConnectionProvider().getConnection(conn);
 		try {
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
@@ -120,9 +120,6 @@ public class MOrgRule {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			try {
-				conn.close();
-			} catch (Exception e2) {}
 		}
 		return w2Map;
 	}

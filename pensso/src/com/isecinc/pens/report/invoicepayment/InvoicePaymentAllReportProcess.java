@@ -11,11 +11,13 @@ import util.Constants;
 import util.ConvertNullUtil;
 import util.DateToolsUtil;
 
+import com.isecinc.core.model.I_PO;
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.model.MSalesTargetNew;
 import com.isecinc.pens.report.performance.PerformanceReport;
+import com.pens.util.DateUtil;
 
 /**
  * Performance Report
@@ -68,7 +70,10 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  WHERE 1=1");
 			//sql.append("\n  AND rcby.WRITE_OFF = 'N'` ");
 			// today receipt, today order
-			sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			//sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			sql.append("\n  AND rc.RECEIPT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			sql.append("\n  AND rc.RECEIPT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			     
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n    SELECT order_id FROM t_order od  ");
 			sql.append("\n    WHERE 1=1 )");
@@ -109,7 +114,10 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  WHERE 1=1");
 			//sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 			// today receipt, today order
-			sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			//sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			sql.append("\n  AND rc.RECEIPT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			sql.append("\n  AND rc.RECEIPT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			     
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n    SELECT order_id FROM t_order od  ");
 			sql.append("\n    WHERE 1=1 )");
@@ -183,8 +191,9 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  FROM t_receipt ");
 			sql.append("\n  LEFT JOIN ad_user ON t_receipt.USER_ID = ad_user.USER_ID ");
 			sql.append("\n  WHERE ad_user.USER_ID = " + user.getId());
-			//sql.append("\n  AND t_receipt.DOC_STATUS = 'SV' ");
-			sql.append("\n  AND t_receipt.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			sql.append("\n  AND t_receipt.DOC_STATUS = '"+I_PO.STATUS_LOADING+"' ");
+			sql.append("\n  AND t_receipt.RECEIPT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			sql.append("\n  AND t_receipt.RECEIPT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
             
 			logger.debug("sql:"+sql.toString());
 			
@@ -224,7 +233,10 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  WHERE 1=1");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 			// today receipt, today order
-			sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			//sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			sql.append("\n  AND rc.RECEIPT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			sql.append("\n  AND rc.RECEIPT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			     
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n      SELECT order_id FROM t_order od  ");
 			sql.append("\n      WHERE 1=1 )");
@@ -245,7 +257,10 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  AND rc.DOC_STATUS = 'VO' ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 			// today receipt, today order
-			sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			//sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			sql.append("\n  AND rc.RECEIPT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			sql.append("\n  AND rc.RECEIPT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
+			     
 			sql.append("\n  AND rcl.ORDER_ID IN ( ");
 			sql.append("\n     SELECT order_id FROM t_order od  ");
 			sql.append("\n     WHERE 1=1 ) ");

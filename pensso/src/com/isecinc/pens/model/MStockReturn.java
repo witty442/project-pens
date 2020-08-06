@@ -12,12 +12,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.NumberToolsUtil;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Address;
+import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.StockReturn;
 import com.isecinc.pens.bean.StockReturnLine;
@@ -31,6 +31,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.StockReturnDocumentProcess;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBCPConnectionProvider;
 import com.sun.org.apache.bcel.internal.classfile.LineNumber;
 
 
@@ -769,7 +770,7 @@ public class MStockReturn {
 			List<StockReturnLine> lineList = new ArrayList<StockReturnLine>();
 			StringBuilder sql = new StringBuilder();
 			int no = 0;
-			PopupForm popupForm = new PopupForm();
+			PopupBean popupForm = new PopupBean();
 			try {
 				sql.append("\n SELECT A.* FROM ( ");
 				sql.append("\n   SELECT l.* , (select p.code from m_product p where p.product_id = l.inventory_item_id)as code ");
@@ -821,9 +822,9 @@ public class MStockReturn {
 				  popupForm.setRequestNumber(mCriteria.getRequestNumber());
 				  popupForm.setCodeSearch(m.getArInvoiceNo());//wit:edit 05/05/2563 case display remainPriQty wrong
 				  
-				  List<PopupForm> results = searchInvoiceStockReturn(popupForm,"",user);
+				  List<PopupBean> results = searchInvoiceStockReturn(popupForm,"",user);
 				  if(results != null && results.size()>0){ 
-					  PopupForm remain = results.get(0);
+					  PopupBean remain = results.get(0);
 				      m.setRemainPriAllQty(remain.getPriAllQty());
 				      m.setRemainPriQty(remain.getPriQty());
 				      m.setRemainSubQty(remain.getSubQty());
@@ -980,10 +981,10 @@ public class MStockReturn {
 		}
 	  
 	 /************************* Stock Return (invoice Qty Popup) ***********************************************/
-	 public static List<PopupForm> searchInvoiceStockReturn(PopupForm c,String operation,User user) throws Exception {
+	 public static List<PopupBean> searchInvoiceStockReturn(PopupBean c,String operation,User user) throws Exception {
 			Statement stmt = null;
 			ResultSet rst = null;
-			List<PopupForm> pos = new ArrayList<PopupForm>();
+			List<PopupBean> pos = new ArrayList<PopupBean>();
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
 			String backDate = "";
@@ -1049,7 +1050,7 @@ public class MStockReturn {
 				int no=0;
 				while (rst.next()) {
 					no++;
-					PopupForm item = new PopupForm();
+					PopupBean item = new PopupBean();
 					item.setNo(no);
 					item.setCode(Utils.isNull(rst.getString("ar_invoice_no")));
 					item.setPrice(getOrderItemPriceByArInvoiceNo(conn, c, backDate, user, Utils.isNull(rst.getString("ar_invoice_no"))));
@@ -1080,7 +1081,7 @@ public class MStockReturn {
 			}
 			return pos;
 		}
- public static String getOrderItemPriceByArInvoiceNo(Connection conn,PopupForm c,String backDate,User user,String arInvoiceNo) throws Exception {
+ public static String getOrderItemPriceByArInvoiceNo(Connection conn,PopupBean c,String backDate,User user,String arInvoiceNo) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -1119,7 +1120,7 @@ public class MStockReturn {
 	}
  
  public static StockBeanUtils calcStockReturnPriQtyByArInvoice(Connection conn,String curRequestNumber
-		 ,String arInvoiceNo,String dateStart,PopupForm c,User user) throws Exception {
+		 ,String arInvoiceNo,String dateStart,PopupBean c,User user) throws Exception {
 	    StockBeanUtils bean = new StockBeanUtils();
 	    Statement stmt = null;
 		ResultSet rst = null;

@@ -1,16 +1,16 @@
 package com.isecinc.pens.model;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.ReceiptMatch;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * Receipt Match Model
@@ -67,9 +67,9 @@ public class MReceiptMatch extends I_Model<ReceiptMatch> {
 	 * @throws Exception
 	 */
 	public boolean save(ReceiptMatch receiptMatch, int activeUserID, Connection conn) throws Exception {
-		int id = 0;
-		if (receiptMatch.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+		long id = 0;
+		if (receiptMatch.getId() ==0) {
+			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
 		} else {
 			id = receiptMatch.getId();
 		}
@@ -147,15 +147,16 @@ public class MReceiptMatch extends I_Model<ReceiptMatch> {
 		String allPaid = "";
 		try {
 			String sql = "select l.order_id,m.paid_amount ";
-			sql += " from t_receipt_match m, t_receipt_line l ";
+			sql += " from pensso.t_receipt_match m, pensso.t_receipt_line l ";
 			sql += " where m.receipt_line_id = l.receipt_line_id ";
 			sql += "   and m.receipt_by_id = " + receiptBy.getId();
+			logger.debug("sql:"+sql);
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
 			while (rst.next()) {
-				allBillId += "," + rst.getString("l.order_id");
-				allPaid += "|" + rst.getString("m.paid_amount");
+				allBillId += "," + rst.getString("order_id");
+				allPaid += "|" + rst.getString("paid_amount");
 			}
 			if (allBillId.length() > 0) allBillId = allBillId.substring(1);
 			if (allPaid.length() > 0) allPaid = allPaid.substring(1);

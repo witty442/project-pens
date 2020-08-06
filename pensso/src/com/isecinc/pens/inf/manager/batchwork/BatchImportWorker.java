@@ -66,53 +66,22 @@ public class BatchImportWorker extends BatchWorker {
 			}
 			
 			/** Import All Transaction  **/ 
-			/** 1.Import Update Sales Transaction **/
-			/** 2.Import Master **/
-			/** 3.Import Transaction (onhand) **/
-			
-			/** Pasuwat Wang-arrayagul
-			 *  ReSequence Import Process
-			 *  1.Import Master 
-			 *  2.Import Transaction (Credit Note)
-			 *  3.Import/Update Sales Transaction 
+			/*  1.Import/Update Sales Transaction 
 			 ** */ 
 			
 			else {
 				
 				/** Process run Script Before Import **/
-				new ExternalProcess().processImportBefore(request, userLogin);
-				
-				logger.debug(" **********Start Import Master Table ******************");
-				MonitorBean monitorModel = new ImportManager().importFileToDB(transactionId,monitorId, transType,userLogin, userRequest, requestTable, request,importAll);
-				logger.debug(" **********Result Import Master Table :"+monitorModel.getStatus()+"******************");
-				
-                startTaskStatus(Constants.TYPE_IMPORT,this.transactionId,this.monitorId);
-                
-				if( !Utils.isNull(monitorModel.getErrorCode()).equalsIgnoreCase("FTPException")){
-					logger.debug(" **********Start Import Transaction Table ******************");
-					monitorModel =(new ImportManager()).importTxtByTransType(transactionId,Constants.TRANSACTION_TRANS_TYPE, userLogin,userRequest, requestTable, request, importAll);
-					logger.debug(" **********Result Import Transaction Table :"+monitorModel.getStatus()+" ******************");
+				//new ExternalProcess().processImportBefore(request, userLogin);
+
+				logger.debug(" **********Start Import Update Transaction Sales ******************");
 					
-					if(monitorModel.getStatus() == Constants.STATUS_SUCCESS){
-						logger.debug(" **********Start Import Update Transaction Sales ******************");
-						
-						monitorModel =(new ImportManager()).importTxtByUpdateSalesType(transactionId,Constants.TRANSACTION_UTS_TRANS_TYPE, userLogin,userRequest, requestTable, request, importAll);
-						logger.debug(" **********Result Import Control Transaction :"+monitorModel.getStatus()+" ******************");
-		                logger.debug("Export Import Update Transaction Sales Result ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
-					}
-					if(ControlCode.canExecuteMethod("BatchImportWorker", "reimportUpdateTrans")){
-					    logger.debug(" **********Start ReImport Update Transaction Sales ******************");
-					    monitorModel =(new ImportManager()).importTxtByUpdateSalesType(transactionId,Constants.TRANSACTION_REUTS_TRANS_TYPE, userLogin,userRequest, requestTable, request, importAll);
-					    logger.debug(" **********Result ReImport Control Transaction :"+monitorModel.getStatus()+" ******************");
-	                    logger.debug("Export Import Update Transaction Sales Result ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
-					
-	       				//Run 1 time and Update Control Code Fore run process =false
-	       				ControlCode.updateControlCode("BatchImportWorker", "reimportUpdateTrans", "N");
-					}
-				}
-				
+				MonitorBean monitorModel =(new ImportManager()).importTxtByUpdateSalesType(transactionId,Constants.TRANSACTION_UTS_TRANS_TYPE, userLogin,userRequest, requestTable, request, importAll);
+				logger.debug(" **********Result Import Control Transaction :"+monitorModel.getStatus()+" ******************");
+	            logger.debug("Export Import Update Transaction Sales Result ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
+	
 				/** Process Run Script After Import **/
-				new ExternalProcess().processImportAfter(request,userLogin);
+				//new ExternalProcess().processImportAfter(request,userLogin);
 				
 				//Stamp task to Success
 				endTaskStatus(Constants.TYPE_IMPORT,this.transactionId,this.monitorId);

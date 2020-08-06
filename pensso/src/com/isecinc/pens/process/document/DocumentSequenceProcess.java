@@ -1,5 +1,6 @@
 package com.isecinc.pens.process.document;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,8 +11,6 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.pens.bean.CustomerSequence;
 import com.isecinc.pens.bean.DocSequence;
 import com.isecinc.pens.bean.User;
@@ -19,7 +18,8 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MCustomerSequence;
 import com.isecinc.pens.model.MDocSequence;
 import com.isecinc.pens.model.MUser;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * DocumentSequenceProcess Class
@@ -1486,12 +1486,12 @@ public abstract class DocumentSequenceProcess {
  * @throws Exception
  * if dup recurrsive method until no dup 
  */
-public int getNexSeqAndChkDuplicate(Connection conn,String tableName,String columnSeqName ,int currSeq) throws Exception {
+public long getNexSeqAndChkDuplicate(Connection conn,String tableName,String columnSeqName ,long currSeq) throws Exception {
 		
 		Statement stmt = null;
 		ResultSet rst = null;
 		try {
-			currSeq = SequenceProcess.getNextValue(tableName);//Add Next Seq
+			currSeq = SequenceProcess.getNextValue(tableName).longValue();//Add Next Seq
 			stmt = conn.createStatement();
 			String sql = "SELECT "+columnSeqName+" FROM "+tableName;
 			sql += " WHERE "+columnSeqName+"=" + currSeq + " ";

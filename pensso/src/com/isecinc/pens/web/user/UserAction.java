@@ -10,8 +10,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.SalesInventory;
@@ -22,6 +20,7 @@ import com.isecinc.pens.model.MPD;
 import com.isecinc.pens.model.MSalesInventory;
 import com.isecinc.pens.model.MSubInventory;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.DBCPConnectionProvider;
  
 /**
  * User Action Class

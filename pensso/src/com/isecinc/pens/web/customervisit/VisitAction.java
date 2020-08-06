@@ -1,5 +1,6 @@
 package com.isecinc.pens.web.customervisit;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 
 import com.isecinc.core.bean.Messages;
@@ -23,6 +23,7 @@ import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.model.MVisit;
 import com.isecinc.pens.model.MVisitLine;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * Visit Action Class
@@ -104,14 +105,14 @@ public class VisitAction extends I_Action {
 			if (!customerId.equals("")) {
 				customer = new MCustomer().find(customerId);
 				visit.setCustomerLabel(customer.getCode() + " " + customer.getName() + " " + customer.getName2());
-				visit.setCustomerId(customer.getId());
+				visit.setCustomerId(new Integer(""+customer.getId()));
 			} else {
 				customerId = String.valueOf(visitForm.getVisit().getCustomerId());
 				customer = new MCustomer().find(customerId);
 				visit.setVisitDate(DateToolsUtil.getCurrentDateTime("dd/MM/yyyy"));
 				visit.setVisitTime(DateToolsUtil.getCurrentDateTime("HH:mm"));
 				visit.setCustomerLabel(customer.getCode() + " " + customer.getName() + " " + customer.getName2());
-				visit.setCustomerId(customer.getId());
+				visit.setCustomerId(new Integer(""+customer.getId()));
 			}
 			visit.setUser(userActive);
 			visitForm.setVisit(visit);
@@ -199,7 +200,7 @@ public class VisitAction extends I_Action {
 				// VAN && TT
 				Customer customer = new MCustomer().find(String.valueOf(visitForm.getVisit().getCustomerId()));
 				visitForm.setVisit(new Visit());
-				visitForm.getVisit().setCustomerId(customer.getId());
+				visitForm.getVisit().setCustomerId(new Integer(""+customer.getId()));
 				visitForm.getVisit().setCustomerLabel(
 						customer.getCode() + " " + customer.getName() + " " + customer.getName2());
 				visitForm.getLines().clear();
@@ -278,7 +279,7 @@ public class VisitAction extends I_Action {
 		Customer customer = new MCustomer().find(String.valueOf(visitForm.getVisit().getCustomerId()));
 		visitForm.setCriteria(new VisitCriteria());
 		visitForm.getCriteria().setFrom(from);
-		visitForm.getVisit().setCustomerId(customer.getId());
+		visitForm.getVisit().setCustomerId(new Integer(""+customer.getId()));
 		visitForm.getVisit()
 				.setCustomerLabel(customer.getCode() + " " + customer.getName() + " " + customer.getName2());
 	}

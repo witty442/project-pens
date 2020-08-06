@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.UserUtils"%>
 <%@page import="util.EncyptUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -15,6 +16,7 @@
  // System.out.println("Role:"+user.getRole().getKey());
 %>
 <ul id="nav">
+ <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.TT}) ){no=0; %>
 	<li><a  href="javascript: void(0)" class="parent"><bean:message key="HomeMenu" bundle="sysprop"/></a>
 	<% no=0; %>
 		<ul>
@@ -31,13 +33,13 @@
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/sysconfig.do';"><span><%no++;out.print(no);%>.<bean:message key="SystemConf" bundle="sysprop"/></span></a>
             </li>
             <%} %>
-            <li>
+          <%--   <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/docseq.do';"><span><%no++;out.print(no);%>.<bean:message key="DocumentSeq" bundle="sysprop"/></span></a>
-            </li>
+            </li> --%>
             <%if(!role.equalsIgnoreCase(User.ADMIN)&&!role.equalsIgnoreCase(User.DD)){ %>
-            <li>
+          <%--   <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/salestargetnew.do';"><span><%no++;out.print(no);%>.<bean:message key="SalesTarget" bundle="sysprop"/></span></a>
-            </li>
+            </li> --%>
             <%} %>
             <%if(role.equalsIgnoreCase(User.VAN)){ %>
 	           <%--  <li>
@@ -64,18 +66,18 @@
 			<%} %>
 			<!-- WIT EDIT  -->
 			<%if(role.equalsIgnoreCase(User.VAN) || role.equalsIgnoreCase(User.TT) || role.equalsIgnoreCase(User.DD)){ %>
-	           	<li>
+	           	<%-- <li>
 					<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/manageOrderReceipt.do';"><span><%no++;out.print(no);%>.<bean:message key="ManageOrderReceipt" bundle="sysprop"/></span></a>
-				</li>
+				</li> --%>
 			<%} %>
 			<%if(role.equalsIgnoreCase(User.VAN)){ %>
-				<li>
+				<%-- <li>
 				  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pdReceipt.do?do=prepare';"><span><%no++;out.print(no);%>.<bean:message key="ManageCreditReceipt" bundle="sysprop"/></span></a>
 				</li>
 				
 	           <li>
 				  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/transferAction.do?do=prepareSearch&action=new';"><span><%no++;out.print(no);%>.<bean:message key="Transfer" bundle="sysprop"/></span></a>
-				</li>
+				</li> --%>
 			<%} %>
 			
 			<%if( role.equalsIgnoreCase(User.ADMIN)){ %>
@@ -92,22 +94,28 @@
 			</li> --%>
 			<%} %>
 			<%if(role.equalsIgnoreCase(User.VAN)){ %>
-	             <li>
+	             <%-- <li>
 	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/controlAllReport.do';"><span><%no++;out.print(no);%>.<bean:message key="ControlAllReport" bundle="sysprop"/></span></a>
-	            </li> 
+	            </li>  --%>
             <%} %>
 		</ul>
 	</li>
-	<!-- WIT Edit :04/08/2554 -->
-	<%if(role.equalsIgnoreCase(User.ADMIN)){ no=0;%>
+  <%} %>
+
+   <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.TT}) ){no=0; %>
        <li>
           <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/customer.do';"><span><bean:message key="Customer" bundle="sysprop"/></span>
           </a>
        </li>
-     <%} %>
+         <li>
+              <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/saleOrderAction.do?do=search&action=new'">
+                                       ค้นหาหาข้อมูลขาย
+             </a>
+         </li>
+   <%} %>
             
-    <%if(!role.equalsIgnoreCase(User.ADMIN)){ no=0;%>
-    <li><a  href="javascript: void(0)" class="parent"><bean:message key="MasterData" bundle="sysprop"/></a>
+   <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.TT}) ){ no=0;%>
+    <%-- <li><a  href="javascript: void(0)" class="parent"><bean:message key="MasterData" bundle="sysprop"/></a>
         <ul>
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/product.do';"><span><%no++;out.print(no);%>.<bean:message key="Product" bundle="sysprop"/></span></a>
@@ -124,30 +132,25 @@
             </li>
             <%} %>
         </ul>
-    </li>
-    <%} %>
-    <%if(!role.equalsIgnoreCase(User.ADMIN)){ %>
-      <%if(!role.equalsIgnoreCase(User.DD)){ no=0;%>
-       <li><div onclick="window.location='${pageContext.request.contextPath}/jsp/customer.do';"><bean:message key="Customer" bundle="sysprop"/></div></li>
-      <%} %>
+    </li> --%>
     <%} %>
     
-    <%if(!role.equalsIgnoreCase(User.ADMIN)){ no=0;%>
+    <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.TT}) ){ no=0; %>
     <li><a  href="javascript: void(0)" class="parent"><bean:message key="Reports" bundle="sysprop"/></a>
     	<ul>
-    		<li>
+    	<%-- 	<li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/orderThreeMonthsReport.do';"><span><%no++;out.print(no);%>.<bean:message key="OrderHistoryReport" bundle="sysprop"/></span></a>
-            </li>
-            <li>
+            </li> --%>
+            <%-- <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/interfacesHistoryReport.do';"><span><%no++;out.print(no);%>.<bean:message key="InterfaceHistoryReport" bundle="sysprop"/></span></a>
-            </li>
+            </li> --%>
             <%if(!role.equalsIgnoreCase(User.DD)){ %>
 	            <li>
 	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/transactionSummaryReport.do';"><span><%no++;out.print(no);%>.<bean:message key="TransactionSummaryReport" bundle="sysprop"/></span></a>
 	            </li>
-	            <li>
+	        <%--     <li>
 	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoiceDetailReport.do';"><span><%no++;out.print(no);%>.<bean:message key="InvoiceDetailReport" bundle="sysprop"/></span></a>
-	            </li>
+	            </li> --%>
             <%} %>
 
     		<%if(role.equalsIgnoreCase(User.VAN)){ %>
@@ -165,17 +168,14 @@
              <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/cancelDetailReport.do';"><span><%no++;out.print(no);%>.<bean:message key="CancelDetailReport" bundle="sysprop"/></span></a>
             </li>
-            <li>
+          <%--   <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/moveOrderReport.do';"><span><%no++;out.print(no);%>.<bean:message key="MoveOrderReport" bundle="sysprop"/></span></a>
-            </li>
+            </li> --%>
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentAllReport.do';"><span><%no++;out.print(no);%>.<bean:message key="InvoicePaymentAllReport" bundle="sysprop"/></span></a>
             </li>
             <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/detailedSalesReport.do';"><span><%no++;out.print(no);%>.<bean:message key="DetailedSalesReport" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/chequeReport.do';"><span><%no++;out.print(no);%>.<bean:message key="ChequeReport" bundle="sysprop"/></span></a>
             </li>
              <li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentReport.do';"><span><%no++;out.print(no);%>.<bean:message key="ReceiptReport" bundle="sysprop"/>(เวอร์ชั่นเก่า)</span></a>
@@ -205,15 +205,15 @@
 	         	</li> --%>
            <%} %>
            <%if(role.equalsIgnoreCase(User.TT)){ %>
-                <li>
+            <%--     <li>
 	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockAction.do?do=stockReport&action=new';"><span><%no++;out.print(no);%>.<bean:message key="StockCreditReport" bundle="sysprop"/></span></a>
-	         	</li>
+	         	</li> --%>
            <%} %>
         </ul>
     </li>
     <%} %>
    
-    <li class="parent"><a  href="javascript: void(0)" class="parent"><bean:message key="Interfaces" bundle="sysprop"/></a>
+  <%--   <li class="parent"><a  href="javascript: void(0)" class="parent"><bean:message key="Interfaces" bundle="sysprop"/></a>
    		<%no=0; %>
    		<ul>
            	<li>
@@ -228,29 +228,18 @@
              	</li>
            	<%} %>
        </ul>
-   </li>
-   <%if(role.equalsIgnoreCase(User.ADMIN)){ no=0;%>
-    <li><a  href="javascript: void(0)" class="parent"><bean:message key="Interim" bundle="sysprop"/></a>
-    	<ul>
-    		<li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/autoCreateReceipt.do?do=prepare';"><span><%no++;out.print(no);%>.<bean:message key="Interim.AutoCreateReceipt" bundle="sysprop"/></span></a>
-            </li>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/autoCreateReceipt.do?do=preparePD';"><span><%no++;out.print(no);%>.<bean:message key="Interim.PDReceiptAuto" bundle="sysprop"/></span></a>
-            </li>
-         </ul>
-      </li>
-     <%} %>
-     
+   </li> --%>
+  
+   <%--   
      <li><a  href="javascript: void(0)" class="parent">ค้นหาข้อมูล</a><%no=0; %>
         <ul>
     		<li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/summaryAction.do?do=prepare&action=new';"><span><%no++;out.print(no);%>.รายงานการขาย By Item</span></a>
             </li>
 	     </ul>
-     </li>
+     </li> --%>
 
-    <li><a  href="javascript: void(0)" class="parent">รายการทั่วไป</a><%no=0; %>
+   <%--  <li><a  href="javascript: void(0)" class="parent">รายการทั่วไป</a><%no=0; %>
     	<ul>
     	   <%if(role.equalsIgnoreCase(User.TT)){ %>
     		  <li>
@@ -272,9 +261,8 @@
 	              </li> 
              <%} %>
          </ul>
-      </li>
+      </li> --%>
     
-
     <!-- TEST -->
 	 <%if(role.equalsIgnoreCase(User.VAN)){ no=0;%>
 	     <li><a  href="javascript: void(0)" class="parent">รายการ เบิก/คืน</a>
@@ -303,6 +291,36 @@
 		     </ul>
 	     </li>
 	 <%} %>
+	 
+	 <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.STOCK}) ){ %>
+		   <li><a  href="javascript: void(0)" class="parent">Stock สินค้าของ PENS</a><%no=0; %>
+	        <ul>
+	    		<li>
+	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/stockInvAction.do?do=prepareSearch&action=new';">
+	            	<span><%no++;out.print(no);%>.<bean:message key="StockInv" bundle="sysprop"/></span></a>
+	            </li>
+		     </ul>
+	     </li> 
+     <%} %>
+     
+   <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.PICKING}) ){ %>
+	    <li><a href="javascript: void(0)" class="parent">Picking</a><%no=0; %>
+        <ul>
+            <li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/budsAllAction.do?do=prepareSearchHead&action=new&pageName=ConfPickingSearch&subPageName=ConfPicking';">
+            	<span><%no++;out.print(no);%>.<bean:message key="ConfPickingSearch" bundle="sysprop"/></span></a>
+            </li>
+            <li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/budsAllAction.do?do=prepareSearchHead&action=new&pageName=ConfPickingSearch&subPageName=BudsConfPicking';">
+            	<span><%no++;out.print(no);%>.<bean:message key="BudsConfPicking" bundle="sysprop"/></span></a>
+            </li>
+             <li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/budsAllAction.do?do=prepareSearchHead&action=new&pageName=ControlPickingSearch&subPageName=ControlPicking';">
+            	<span><%no++;out.print(no);%>.<bean:message key="ControlPicking" bundle="sysprop"/></span></a>
+            </li>
+	     </ul>
+     </li>  
+   <%} %>
 </ul>
 
   

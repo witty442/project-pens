@@ -28,7 +28,6 @@ import util.BundleUtil;
 import util.ControlCode;
 import util.ConvertNullUtil;
 import util.CustomerReceiptFilterUtils;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.Debug;
 import util.NumberToolsUtil;
@@ -71,18 +70,13 @@ import com.isecinc.pens.report.listOrderProduct.ListOrderProductReport;
 import com.isecinc.pens.report.listOrderProduct.ListOrderProductReportProcess;
 import com.isecinc.pens.report.taxinvoice.TaxInvoiceReport;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
 
 
 /**
  * Order Action
- * 
- * @author atiz.b
- * @version $Id: OrderAction.java,v 1.0 14/10/2010 00:00:00 atiz.b Exp $
- * 
- *          Modifier : A-neak.t Add : method addDate, calShippingDate, calWeekByRoundtrip, generateLine Edit: method
- *          save
- * 
- *          atiz.b : set current sales reps
+ * Wittaya 13/07/2020
  */
 public class OrderAction extends I_Action {
 
@@ -97,32 +91,28 @@ public class OrderAction extends I_Action {
 		String action = request.getParameter("action") != null ? (String) request.getParameter("action") : "";
 		logger.debug("prepare 0");
 		Connection conn = null;
+		User user = (User) request.getSession(true).getAttribute("user");
 		try {
 			//Set Debug Mode
 			logger.debug("debug.isDebugEnable():"+debug.isDebugEnable());
 			request.getSession().setAttribute("debug_mode", debug.isDebugEnable());
-			
-			User user = (User) request.getSession(true).getAttribute("user");
-		//	int orderId = orderForm.getOrder().getId();
-
-			int customerId = 0;
+		
+			long customerId = 0;
 			if (request.getParameter("customerId") != null) {
 				// go search
 				forward = "search";
-				customerId = Integer.parseInt(request.getParameter("customerId"));
-				// orderForm.setOrder(new Order());
+				customerId = Utils.convertStrToLong(request.getParameter("customerId"));
+		
 			} else if (request.getParameter("memberId") != null) {
 				// go search
 				forward = "search";
-				customerId = Integer.parseInt(request.getParameter("memberId"));
-				// orderForm.setOrder(new Order());
+				customerId = Utils.convertStrToLong(request.getParameter("memberId"));
 				
 			/* Wit Edit: 13072558 :Edit shortcut From CustomerSerach **/
 			}else if (request.getParameter("shotcut_customerId") != null) {
-				customerId = Integer.parseInt(request.getParameter("shotcut_customerId"));
+				customerId = Utils.convertStrToLong(request.getParameter("shotcut_customerId"));
 				
 				OrderCriteria criteria = new OrderCriteria();
-				//criteria.setSearchKey(searchKey)
 				orderForm.setCriteria(criteria);
 			} else {
 				// go add for customer/member
@@ -130,8 +120,10 @@ public class OrderAction extends I_Action {
 			}
 			//prepare Connection 
 			conn = new DBCPConnectionProvider().getConnection(conn);
+			
 			// get Customer Info
-			Customer customer = new MCustomer().find(String.valueOf(customerId));
+			Customer customer = new MCustomer().findByWhereCond("where customer_id ="+customerId);
+			
 			//Check Case VanSale Old order(PayCredit) No Pay disable Pay Credit ALL
 			boolean canSaveCasePayPrevBill = true;
 			if(User.VAN.equals(user.getType())){
@@ -237,6 +229,7 @@ public class OrderAction extends I_Action {
 			if (!user.getCustomerType().getKey().equalsIgnoreCase(Customer.DIREC_DELIVERY)) {
 				// TT & VAN
 				// Default from customer
+				orderForm.getOrder().setId(0);
 				orderForm.getOrder().setCustomerId(customer.getId());
 				orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
 				orderForm.getOrder().setPaymentTerm(customer.getPaymentTerm());
@@ -257,8 +250,7 @@ public class OrderAction extends I_Action {
 
 			// No Pricelist msg
 			if (orderForm.getOrder().getPriceListId() == 0) {
-				orderForm.getOrder().setPricelistLabel(
-						InitialMessages.getMessages().get(Messages.NO_PRICELIST).getDesc());
+				orderForm.getOrder().setPricelistLabel(InitialMessages.getMessages().get(Messages.NO_PRICELIST).getDesc());
 			}
 			
 			//Set Prev Step Action
@@ -305,7 +297,7 @@ public class OrderAction extends I_Action {
 			
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			//add Line Blank UOM (1 or 2)
-			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
+			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines(),null));
 
 			order.setRoundTrip(roundTrip);
 			orderForm.setOrder(order);
@@ -349,6 +341,7 @@ public class OrderAction extends I_Action {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 				return mapping.findForward("prepare");
 			}
+			logger.debug("canCancel:"+order.isCanCancel());
 			
 			List<OrderLine> lstLines = new MOrderLine().lookUp(order.getId());
 			List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
@@ -418,12 +411,18 @@ public class OrderAction extends I_Action {
 			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
 
 			//add Line Blank UOM (1 or 2)
-			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
+			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines(),null));
 
 			/** Manage Mode (add,edit,view) **/
 			orderForm.setMode("edit");
 			
+			//Set Prev Step Action
+			ControlOrderPage.setPrevOrderStepAction(request, ControlOrderPage.STEP_ORDER_1);
+			
+			// save token
+			saveToken(request);
 		} catch (Exception e) {
+			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			return mapping.findForward("prepare");
@@ -438,8 +437,112 @@ public class OrderAction extends I_Action {
 		}
 		return mapping.findForward("prepareEditOrder");
 	}
-
 	
+	
+
+	/**
+	 * prepareEditOrderCaseCannotReserve
+	 * For user edit order 
+	 */
+	public OrderForm prepareEditOrderCaseCannotReserve(OrderForm orderForm,User user,Map<String,String> productErrorMap) {
+		Connection conn = null;
+		Order order = null;
+		int roundTrip = 0;
+		debug.info("prepareEditOrderCaseCannotReserve orderId["+orderForm.getOrder().getId()+"]");
+		try {
+			//Find Order by order_id
+			String id = String.valueOf(orderForm.getOrder().getId());
+			roundTrip = orderForm.getOrder().getRoundTrip();
+			order = new MOrder().find(id);
+			
+			
+			List<OrderLine> lstLines = new MOrderLine().lookUp(order.getId());
+			List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
+			orderForm.setLines(lines);
+			
+			order.setRoundTrip(roundTrip);
+			orderForm.setOrder(order);
+			orderForm.setAutoReceipt(new Receipt());
+			orderForm.setAutoReceiptFlag("N");
+
+			//Filter Check Van Can Receipt Cheque Or Credit
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			
+			if(User.VAN.equals(user.getType())){
+				boolean canSaveCasePayPrevBill = OrderUtils.canSaveCreditVan(conn,user, order.getCustomerId());
+				String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,orderForm.getOrder().getCustomerId());
+				String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,orderForm.getOrder().getCustomerId());
+				
+				logger.debug("canSaveCasePayPrevBill:"+canSaveCasePayPrevBill);
+				logger.debug("canReceiptChequeFlag:"+canReceiptChequeFlag+",canReceiptCreditFlag:"+canReceiptCreditFlag);
+				
+				if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag)){
+					//Check Prev bill is pay
+					if(canSaveCasePayPrevBill==false){
+				       orderForm.setReceiptCreditFlag("-1");//no pay prev bill
+					}else{
+					   orderForm.setReceiptCreditFlag("1");//Can pay Credit
+					}
+				}else{
+				   orderForm.setReceiptCreditFlag("0");//cannot pay credit
+				}
+				
+				// get Customer Info
+				Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
+				//set creditLimit from customer
+				orderForm.setCustCreditLimit(customer.getCreditLimit());
+				 
+			}//if van
+			
+			// Prepare order line to Edit
+			/** Promotion Process add add to Lines */
+			// remove promotion line
+			List<OrderLine> promotionLine = new ArrayList<OrderLine>();
+			for (OrderLine line : orderForm.getLines()) {
+				if (line.getPromotion().equalsIgnoreCase("Y")) {
+					promotionLine.add(line);
+				}
+			}
+			for (OrderLine line : promotionLine) {
+				orderForm.getLines().remove(line);
+			}
+			
+			// Save Lines
+			int i = 1;
+			for (OrderLine line : orderForm.getLines()) {
+				// Clear Discount
+				line.setLineNo(i++);
+				line.setDiscount(0);
+				line.setProduct(new MProduct().find(String.valueOf(line.getProduct().getId())));
+				line.setTotalAmount(line.getLineAmount());
+			}
+            
+			//Split 2 Line
+			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), user, ""));
+			
+			//Merge to 1 Line show
+			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
+
+			//add Line Blank UOM (1 or 2)
+			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines(),productErrorMap));
+
+			/** Manage Mode (add,edit,view) **/
+			orderForm.setMode("edit");
+			
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try{
+				if(conn != null){
+			       conn.close();conn=null;
+				}
+			}catch(Exception e){
+				
+			}
+		}
+		return orderForm;
+	}
 	/**
 	 * Prepare to Edit receipt
 	 */
@@ -468,7 +571,7 @@ public class OrderAction extends I_Action {
 			
 			//add Line Blank UOM (1 or 2)
 			conn = new DBCPConnectionProvider().getConnection(conn);
-			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
+			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines(),null));
 			
 			order.setRoundTrip(roundTrip);
 			orderForm.setOrder(order);
@@ -537,6 +640,8 @@ public class OrderAction extends I_Action {
 		Connection conn = null;
 		OrderProcess orderProcess = new OrderProcess();
 		try {
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			
 			//Validate Step Order 
 			if( !ControlOrderPage.stepIsValid(request, ControlOrderPage.STEP_ORDER_2)){
 				request.setAttribute("Message", "ไม่สามารถทำรายการต่อได้  เนื่องจากมีการกดปุ่ม Back อาจทำให้ข้อมูลเสียหายได้  กรุณาไปที่ หน้าจัดการข้อมูลลูกค้า อีกครั้ง");
@@ -544,9 +649,8 @@ public class OrderAction extends I_Action {
 			}
 			
 			OrderForm orderForm = (OrderForm) form;
-			conn = new DBCPConnectionProvider().getConnection(conn);
 			User userActive = (User) request.getSession().getAttribute("user");
-			Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
+			Customer customer = new MCustomer().find(conn,String.valueOf(orderForm.getOrder().getCustomerId()));
 			
 			/** Case User back action init new OrderDate to CurrentDate*/
 			if(orderForm.getOrder().getId() == 0){
@@ -579,12 +683,18 @@ public class OrderAction extends I_Action {
 			orderForm.setLines(new MOrder().reCalculateLineAmountInLinesBeforeCalcPromotion(orderForm.getLines()));
 			
 			//Get custGroup 
-			orderForm.getOrder().setCustGroup(new MCustomer().getCustGroup(orderForm.getOrder().getCustomerId()));
+			orderForm.getOrder().setCustGroup(new MCustomer().getCustGroup(conn,orderForm.getOrder().getCustomerId()));
+			//Get ProvinceGroup
+			orderForm.getOrder().setProvinceGroup(new MCustomer().getProvinceGroupModel(conn,orderForm.getOrder().getCustomerId()));
 			
-			// Call Modifier Process
+			// Call Modifier Process (Promotion)
 			ModifierProcess modProcess = new ModifierProcess(ConvertNullUtil.convertToString(customer.getTerritory()).trim());
-			modProcess.findModifier(orderForm.getLines(), userActive, conn,orderForm.getOrder().getCustGroup());
-
+			modProcess.findModifier(orderForm.getLines(), userActive, conn,orderForm.getOrder().getCustGroup(),orderForm.getOrder().getProvinceGroup());
+			
+			/*************DEBUG *********************************/
+			logger.info("Debug after promotion");
+			new OrderProcess().debug(orderForm.getLines());
+			
 			// Set for web display.
 			logger.debug("****** Start Set Display order ****************************************************");
 	
@@ -593,35 +703,22 @@ public class OrderAction extends I_Action {
 			List<OrderLine> odLines = orderProcess.fillLinesShow(orderForm.getLines());
 
 			//add Line Blank UOM (1 or 2)
-			odLines = new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),odLines);
+			odLines = new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),odLines,null);
 			
+			/*************DEBUG *********************************/
 			//logger.info("Debug before promotion");
 			//new OrderProcess().debug(modProcess.getAddLines());
 			
 			//add Promotion to show
 			logger.info("fillLinesShow LINE Promotion");
-			List<OrderLine> promotionLines = null;
-			
-			/** Case Edit New Code Promotion Goods 1 old code 2 new Code **/
-			boolean exeOrderProcessfillLinesShowPromotion = ControlCode.canExecuteMethod("OrderProcess", "fillLinesShowPromotion");
-			logger.info("CalcC4 OrderProcess fillLinesShowPromotion:"+exeOrderProcessfillLinesShowPromotion);
-			
-			if(exeOrderProcessfillLinesShowPromotion){
-				promotionLines = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
-			}else{
-				  // default 1
-		        promotionLines = orderProcess.fillLinesShow(modProcess.getAddLines());
-			}
+			List<OrderLine> promotionLines = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
 			
 			/** sum(qty1,qty2) Duplicate product promotion **/
-		//	if(ControlCode.canExecuteMethod("OrderProcess", "fillLinesShowPromotion")){//CurrentVersion
-		//	if(ControlCode.canExecuteMethod("OrderProcess", "sumQtyProductPromotionDuplicate")){
-			   //Pass 
-			   promotionLines = orderProcess.sumQtyProductPromotionDuplicate(promotionLines);
-		//	}
-			
-			logger.info("Debug after promotion");
-			new OrderProcess().debug(promotionLines);
+	        promotionLines = orderProcess.sumQtyProductPromotionDuplicate(promotionLines);
+	        
+	        /*************DEBUG *********************************/
+			//logger.info("Debug after promotion");
+			//new OrderProcess().debug(promotionLines);
 			
 			//Sort by product
 			try{
@@ -766,16 +863,22 @@ public class OrderAction extends I_Action {
 	/**
 	 * Save
 	 */
+	
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
 		OrderForm orderForm = (OrderForm) form;
-		int orderId = 0;
+		long orderId = 0;
 		String msg = InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc();
 		String org = "";
 		String subInv ="";
 		OrgRuleBean orgRuleBean;
 		User user = (User) request.getSession(true).getAttribute("user");
+		Map<String, String> productErrorMap = null;
 		try {
+			logger.debug("save action");
+			
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			
 			//Validate Step Order 
 			if( !ControlOrderPage.stepIsValid(request, ControlOrderPage.STEP_ORDER_3)){
 				request.setAttribute("Message", "ไม่สามารถทำรายการต่อได้  เนื่องจากมีการกดปุ่ม Back อาจทำให้ข้อมูลเสียหายได้  กรุณาไปที่ หน้าจัดการข้อมูลลูกค้า อีกครั้ง");
@@ -791,7 +894,7 @@ public class OrderAction extends I_Action {
 			if (!isTokenValid(request)) {
 			
 				// VAN && TT
-				Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
+				Customer customer = new MCustomer().find(conn,String.valueOf(orderForm.getOrder().getCustomerId()));
 				orderForm.setOrder(new Order());
 				orderForm.getOrder().setCustomerId(customer.getId());
 				orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
@@ -819,7 +922,7 @@ public class OrderAction extends I_Action {
 				order.setOrg(org);
 				logger.debug("org["+org+"]subInv["+subInv+"]");
 				orgRuleBean = new MOrgRule().getOrgRule(org);
-				Map<String, String> itemMap = new MOrgRule().getOrgRuleItemMap(org, subInv) ;
+				Map<String, String> itemMap = new MOrgRule().getOrgRuleItemMap(conn,org, subInv) ;
 				
 				//Check item t_order_line has in W2 item
 				if("Y".equals(orgRuleBean.getCheckItem()) && itemMap != null){
@@ -861,17 +964,17 @@ public class OrderAction extends I_Action {
 			// set interfaces & payment & docstatus
 			order.setInterfaces("N");
 			order.setPayment("N");
-			// order.setDocStatus(Order.DOC_SAVE);
+			order.setDocStatus(Order.STATUS_RESERVE);
 			
-			Address billAddr = new MAddress().find(""+order.getBillAddressId());
+			Address billAddr = new MAddress().find(conn,""+order.getBillAddressId());
 			if(billAddr!=null)
 				order.setOraBillAddressID(billAddr.getReferenceId());
 			
-			Address shipAddr = new MAddress().find(""+order.getShipAddressId());
+			Address shipAddr = new MAddress().find(conn,""+order.getShipAddressId());
 			if(shipAddr!=null)
 				order.setOraShipAddressID(shipAddr.getReferenceId());
 
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			
 			// Begin Transaction
 			conn.setAutoCommit(false);
 
@@ -881,11 +984,7 @@ public class OrderAction extends I_Action {
 				orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
 						.getSession().getAttribute("memberVIP")));
 			}
-			if (((String) request.getSession().getAttribute("memberVIP")).equalsIgnoreCase("Y")) {
-				orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
-						.getSession().getAttribute("memberVIP")));
-			}
-
+		
 			for (OrderLine line : orderForm.getLines()) {
 				line.setLineNo(i++);
 				line.setPayment("N");
@@ -917,6 +1016,19 @@ public class OrderAction extends I_Action {
 			// Delete Line
 			if (ConvertNullUtil.convertToString(orderForm.getDeletedId()).trim().length() > 0){
 				new MOrderLine().delete(orderForm.getDeletedId().substring(1).trim(), conn);
+			}
+			
+			//control code 
+			if(ControlCode.canExecuteMethod("Stock", "checkStock")){
+				//before reserver stock clear old reserve stock
+				List<OrderLine> dbLines = new MOrderLine().lookUp(order.getId());
+				//case status ='RESERVE' in LINE  delete reservation in stock onhand
+				for (OrderLine line : dbLines) {
+					if(line.getReservationId() != 0){
+					  logger.info("delete reserve Stock By ReservationId:"+line.getReservationId());
+					  InterfaceOrderProcess.deleteStockReservation(line.getReservationId());
+					}//if
+				}//for
 			}
 			
 			// Save Lines all new
@@ -1069,11 +1181,35 @@ public class OrderAction extends I_Action {
 			
 			// Commit Transaction
 			conn.commit();
-			// set msg save success
-			request.setAttribute("Message",msg );
+			
+			//control code 
+			if(ControlCode.canExecuteMethod("Stock", "checkStock")){
+				
+				//Generate Interfaces Order To Oracle Temp
+				//return productErrorMap cannot reserve order to display sales
+				productErrorMap = InterfaceOrderProcess.reserveStock(user,orderForm.getOrder().getId(),orderForm.getOrder().getOrderNo());
+				
+				if(productErrorMap != null && !productErrorMap.isEmpty()){
+				     orderForm.getOrder().setDocStatus(Order.STATUS_UNAVAILABLE);
+				     request.setAttribute("Message","ไม่สามารถจองสินค้าได้ โปรดตรวจสอบสต๊อกสินค้าอีกครั้ง  จากนั้น แก้ไขออเดอร์ให้ถูกต้อง " );
+					
+				     orderForm = prepareEditOrderCaseCannotReserve(orderForm, user,productErrorMap);
+				     
+				 	 //Set Prev Step Action :set to StepOrder1 (for edit order)
+					 ControlOrderPage.setPrevOrderStepAction(request, ControlOrderPage.STEP_ORDER_1);
+					
+				     return "prepareEditOrder";//gotoPage SalesOrder.jsp for edit 
+				}else{
+				   // set msg save success
+				   request.setAttribute("Message",msg );
+				}
+			}else{
+				 // set msg save success
+				 request.setAttribute("Message",msg );
+			}
 			
 			//add Line Blank UOM (1 or 2)
-			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
+			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines(),productErrorMap));
 			
 			/********* WIT EDIT:20110804 :case not auto receipt cash  -> popup page AutoPay *****/
 			if(userActive.getRole().getKey().equals(User.VAN) &&  !orderForm.getOrder().isPaymentCashNow()){
@@ -1223,10 +1359,107 @@ public class OrderAction extends I_Action {
 		return mapping.findForward("view");
 	}
 
+
 	/**
 	 * Search
 	 */
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		OrderForm orderForm = (OrderForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String action = Utils.isNull(request.getParameter("action"));
+		Customer custByUserId = null;
+		try {
+			logger.debug("action:"+action);
+			if( "new".equalsIgnoreCase(action)){
+				if(orderForm.getOrder().getCustomerId() !=0){
+				   custByUserId = new MCustomer().findByWhereCond(" where user_id = "+user.getId());// Integer.parseInt(CUSTOMER_ID_MEYA_FIXED);
+				}
+				
+				OrderCriteria criteria = new OrderCriteria();
+				//criteria.setSearchKey(searchKey)
+				orderForm.setCriteria(criteria);
+				Order order = new Order();
+				order.setOrderDateFrom(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				// get Customer Info
+				if(custByUserId != null){
+					Customer customer = new MCustomer().find(String.valueOf(custByUserId.getId()));
+					order.setCustomerId(custByUserId.getId());
+					order.setCustomerName(customer.getCode()+"-"+customer.getName());
+				}
+				orderForm.setOrder(order);
+			}else{
+				request.getSession().removeAttribute("isAdd");
+	           
+				OrderCriteria criteria = getSearchCriteria(request, orderForm.getCriteria(), this.getClass().toString());
+				orderForm.setCriteria(criteria);
+				
+				Order order = orderForm.getOrder();
+				String whereCause = "";
+				if ( !Utils.isNull(order.getOrderNo()).equals("")) {
+					whereCause += " AND ORDER_NO LIKE '%"
+							+ order.getOrderNo().trim().replace("\'", "\\\'").replace("\"", "\\\"") + "%' \n";
+				}
+				if ( !Utils.isNull(order.getSalesOrderNo()).equals("")) {
+					whereCause += " AND SALES_ORDER_NO LIKE '%"
+							+ order.getSalesOrderNo().trim().replace("\'", "\\\'").replace("\"", "\\\"")
+							+ "%' \n";
+				}
+				if ( !Utils.isNull(order.getArInvoiceNo()).equals("")) {
+					whereCause += " AND AR_INVOICE_NO LIKE '%"
+							+ order.getArInvoiceNo().trim().replace("\'", "\\\'").replace("\"", "\\\"")
+							+ "%' \n";
+				}
+				if ( !Utils.isNull(order.getDocStatus()).equals("")) {
+					whereCause += " AND DOC_STATUS = '" + order.getDocStatus() + "' \n";
+				}
+	
+				if ( !Utils.isNull(order.getOrderDateFrom()).equals("") && !Utils.isNull(order.getOrderDateTo()).equals("")) {
+					whereCause += "AND order_date  >= to_date('"+DateUtil.convBuddhistToChristDate(order.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ";
+					whereCause += "AND order_date  <= to_date('"+DateUtil.convBuddhistToChristDate(order.getOrderDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ";
+					
+				}else if ( !Utils.isNull(order.getOrderDateFrom()).equals("") && Utils.isNull(order.getOrderDateTo()).equals("")) {
+					whereCause += "AND order_date  = to_date('"+DateUtil.convBuddhistToChristDate(order.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ";
+				}
+				if( !user.getCode().equalsIgnoreCase("ADMIN")){
+				   whereCause += " AND ORDER_TYPE = '" + user.getOrderType().getKey() + "' \n";
+				   whereCause += " AND USER_ID = " + user.getId() +" \n";
+				}
+				if(order.getCustomerId() !=0){
+				   whereCause += " AND CUSTOMER_ID = " + order.getCustomerId() + " \n";
+				}
+				if( !Utils.isNull(order.getCustomerCode()).equals("") || !Utils.isNull(order.getCustomerName()).equals("") ){
+					 whereCause += " AND CUSTOMER_ID IN ( \n";
+					 whereCause += "  select customer_id from pensso.m_customer where 1=1 \n";
+					 if( !Utils.isNull(order.getCustomerCode()).equals("")){
+					    whereCause += " and code like '%"+Utils.isNull(order.getCustomerCode())+"%'\n";
+				     }
+					 if( !Utils.isNull(order.getCustomerName()).equals("")){
+						whereCause += " and name like '%"+Utils.isNull(order.getCustomerName())+"%'\n";
+					 }
+					 whereCause += " )\n";
+				}
+			
+				whereCause += " ORDER BY ORDER_DATE DESC,ORDER_NO DESC \n";
+				Order[] results = new MOrder().searchOpt(whereCause);
+	
+				orderForm.setResults(results);
+				if (results != null) {
+					orderForm.getCriteria().setSearchResult(results.length);
+				} else {
+					request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
+				}
+			}
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+			throw e;
+		}
+		return "search";
+	}
+	/**
+	 * Search
+	 */
+	protected String search_BK(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		OrderForm orderForm = (OrderForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
@@ -2105,23 +2338,71 @@ public class OrderAction extends I_Action {
 			new MOrder().cancelOrderByID(conn,orderForm.getOrder().getId(),orderForm.getOrder().getReason(),user.getId(),orderForm.getOrder().getPayment());
             
 			conn.commit();
-            
-			//set actionCancelOrder
-			request.setAttribute("actionCancelOrder", "success");
+           
+			//display order detail
+			Order order = new MOrder().find(orderForm.getOrder().getId()+"");
+			List<OrderLine> lstLines = new MOrderLine().lookUp(order.getId());
 			
-            request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
+			//case status ='RESRVE' in LINE  delete reservation in stock
+			for (OrderLine line : lstLines) {
+				if(line.getReservationId() != 0){
+				  logger.info("delete reserve Stock By ReservationId:"+line.getReservationId());
+				  InterfaceOrderProcess.deleteStockReservation(line.getReservationId());
+				}
+			}
+			
+			
+			List<OrderLine> lines = new OrderProcess().fillLinesShow(lstLines);
+			orderForm.setLines(lines);
+			orderForm.setOrder(order);
+			orderForm.setAutoReceipt(new Receipt());
+			orderForm.setAutoReceiptFlag("N");
+
+			// Prepare order line to Edit
+			/** Promotion Process add add to Lines */
+			// remove promotion line
+			List<OrderLine> promotionLine = new ArrayList<OrderLine>();
+			for (OrderLine line : orderForm.getLines()) {
+				if (line.getPromotion().equalsIgnoreCase("Y")) {
+					promotionLine.add(line);
+				}
+			}
+			for (OrderLine line : promotionLine) {
+				orderForm.getLines().remove(line);
+			}
+			
+			// Save Lines
+			int i = 1;
+			for (OrderLine line : orderForm.getLines()) {
+				// Clear Discount
+				line.setLineNo(i++);
+				line.setDiscount(0);
+				line.setProduct(new MProduct().find(String.valueOf(line.getProduct().getId())));
+				line.setTotalAmount(line.getLineAmount());
+			}
+            
+			//Split 2 Line
+			orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), user, (String) request.getSession().getAttribute("memberVIP")));
+			
+			//Merge to 1 Line show
+			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
+
+			//add Line Blank UOM (1 or 2)
+			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines(),null));
+
+            request.setAttribute("Message", "ยกเลิกรายการขายเรียบร้อบแล้ว");
 		} catch (Exception e) {
 			try{
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 						+ e.getMessage());
 				conn.rollback();
 			 }catch(Exception ee){}
-			 return mapping.findForward("cancelOrderPopup");
+			 return mapping.findForward("view");
 		} finally {
 			try {
 				conn.close();
 			} catch (Exception e2) {}
 		}
-		return mapping.findForward("cancelOrderPopup");
+		return mapping.findForward("view");
 	}
 }

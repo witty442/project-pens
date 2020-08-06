@@ -18,12 +18,12 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
-import com.pens.utils.manual.cleardb.ClearDB;
-import com.pens.utils.manual.cleardb.ClearDupDB;
+import com.pens.util.EnvProperties;
+import com.pens.util.manual.cleardb.ClearDB;
+import com.pens.util.manual.cleardb.ClearDupDB;
 
 /**
  * Member Receipt Action

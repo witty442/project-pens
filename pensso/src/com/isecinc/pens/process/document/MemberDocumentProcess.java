@@ -2,9 +2,8 @@ package com.isecinc.pens.process.document;
 
 import java.sql.Connection;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.pens.init.InitialReferences;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * MemberDocumentProcess Class

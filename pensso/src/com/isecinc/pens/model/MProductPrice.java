@@ -9,12 +9,11 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.Database;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.ProductPrice;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * MProductPrice Class

@@ -27,7 +27,10 @@ public class User extends I_PO implements Serializable {
 	public static final String VAN = "VAN";
 	public static final String DD = "DD";
 	public static final String NB = "NB";
-
+	public static final String PICKING = "PICKING";
+	public static final String STOCK = "STOCK";
+	public static final String BUD_ADMIN = "BUDADMIN";
+	
 	private static final long serialVersionUID = 2247823086169174428L;
 
 	/**
@@ -47,6 +50,7 @@ public class User extends I_PO implements Serializable {
 		setCode(rst.getString("CODE").trim());
 		setName(rst.getString("NAME").trim());
 		setType(convertToString(rst.getString("ROLE")).trim());
+		setRoleAccess(convertToString(rst.getString("ROLE")).trim());
 		setActive(rst.getString("ISACTIVE").trim());
 
 		// oracle fields
@@ -100,11 +104,7 @@ public class User extends I_PO implements Serializable {
 			ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_TT);
 		} else if (getType().equalsIgnoreCase(VAN)) {
 			ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_VAN);
-		} else if (getType().equalsIgnoreCase(DD)) {
-			ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_DD);
-		} else if (getType().equalsIgnoreCase(NB)) {
-			ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_DD);
-		}
+		} 
 		
 		for (References r : ref) {
 			if (r.getName().equalsIgnoreCase(InitialReferences.CUSTOMER_TYPE)) {
@@ -183,6 +183,7 @@ public class User extends I_PO implements Serializable {
 
 	/** ROLE */
 	private References role;
+	private String roleAccess;
 
 	/** VAN NO */
 	private String vanNo;
@@ -199,6 +200,14 @@ public class User extends I_PO implements Serializable {
     private String moneyToPens;
     
     
+	public String getRoleAccess() {
+		return roleAccess;
+	}
+
+	public void setRoleAccess(String roleAccess) {
+		this.roleAccess = roleAccess;
+	}
+
 	public String getMoneyToPens() {
 		return moneyToPens;
 	}

@@ -66,10 +66,11 @@ public class MProvince extends I_Model<Province> {
 	public List<Province> lookUp(int territory) {
 		List<Province> pos = new ArrayList<Province>();
 		try {
-			String whereCause = "   and province_id in (";
-			whereCause += " select m.province_id from m_map_province m,c_reference r ";
-			whereCause += " where m.reference_id = r.reference_id and r.value = " + territory + ") ";
-			whereCause += "  ORDER BY NAME ";
+			String whereCause = "\n   and province_id in (";
+			whereCause += "\n     select m.province_id from m_map_province m,c_reference r ";
+			whereCause += "\n     where m.reference_id = r.reference_id ";
+			whereCause += "\n     and r.value = '" + territory + "') ";
+			whereCause += " \n ORDER BY NAME ";
 			
 			logger.debug("whereClause :"+whereCause);
 			

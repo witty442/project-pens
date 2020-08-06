@@ -6,10 +6,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.DBCPConnectionProvider;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.SalesTarget;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * MSalesTarget Class

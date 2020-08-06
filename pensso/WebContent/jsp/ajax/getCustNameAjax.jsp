@@ -1,4 +1,5 @@
 
+<%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.dao.PopupDAO"%>
 <%@page import="java.sql.Connection"%>
@@ -16,12 +17,12 @@ try{
 	
 	if( !"".equals(Utils.isNull(custCode)) ){
 		//condCode = new String(condCode.getBytes("ISO8859_1"), "UTF-8");
-		PopupForm c = new PopupForm();
+		PopupBean c = new PopupBean();
 		c.setCodeSearch(custCode);
 		
-	    List<PopupForm> result = PopupDAO.searchCustomerMaster(c, "equals");
+	    List<PopupBean> result = PopupDAO.searchCustomerMaster(c, "equals");
 		if(result != null && result.size() >0){
-			PopupForm r = result.get(0);
+			PopupBean r = result.get(0);
 		    outputText = r.getDesc();
 		}else{
 		   outputText ="";

@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ProductCategory;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.Utils;
 
 /**
  * MProductCategory Class
@@ -139,7 +140,7 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		StringBuffer sql = new StringBuffer("");
 		try {
 			sql.append("\n select A.* from (");
-			sql.append("\n select DISTINCT TRIM(SUBSTRING_INDEX(name,'-',1)) as brand ,seg_value1 as brand_code ");
+			sql.append("\n select DISTINCT TRIM(substr( name,0, INSTR(name,'-')-1 )) as brand  ,seg_value1 as brand_code ");
 			sql.append("\n from "+TABLE_NAME+" where NAME NOT IN('Default','ว่าง')");
 			sql.append("\n AND ISACTIVE = 'Y'"); 
 			sql.append("\n AND PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ");
@@ -206,7 +207,12 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		StringBuffer sql = new StringBuffer("");
 		try {
 			sql.append("\n select A.* from (");
-			sql.append("\n select DISTINCT TRIM(SUBSTRING_INDEX(name,'-',1)) as brand ,seg_value1 as brand_code ");
+			sql.append("\n select DISTINCT  ");
+			sql.append("\n ( case when INSTR(name,'-') =0 then name ");
+			sql.append("\n   when INSTR(name,'-') <> 0 then TRIM(substr( name,0, INSTR(name,'-')-1 ))");
+			sql.append("\n   end"); 
+			sql.append("\n ) as brand");  
+			sql.append("\n ,seg_value1 as brand_code ");
 			sql.append("\n from "+TABLE_NAME+" where NAME NOT IN('Default','ว่าง')");
 			sql.append("\n AND ISACTIVE = 'Y'"); 
 			sql.append("\n AND PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ");
@@ -219,10 +225,15 @@ public class MProductCategory extends I_Model<ProductCategory> {
 			   sql.append("\n  WHERE p1.code = p3.code  and p3.type ='"+u.getRole().getKey()+"'");
 			   sql.append("\n  AND p1.PRODUCT_CATEGORY_ID = p2.PRODUCT_CATEGORY_ID  )  ");
 			}
+			
 			sql.append("\n )A ");
-			sql.append("\n WHERE A.brand <> '' and A.brand is not null ");
+			sql.append("\n where A.brand is not null ");
+			//FOR BUD ONLY
+			sql.append("\n and A.brand_code in('381','382','383') "); 
+		
 			sql.append("\n ORDER BY A.brand_code asc  ");
-			logger.info("sql:\n"+sql.toString());
+			
+			logger.debug("sql:\n"+sql.toString());
 			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
@@ -265,7 +276,11 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		StringBuffer sql = new StringBuffer("");
 		try {
 			sql.append("\n select A.* from (");
-			sql.append("\n select DISTINCT TRIM(SUBSTRING_INDEX(name,'-',1)) as brand ");
+			sql.append("\n select DISTINCT ");
+			sql.append("\n ( case when INSTR(name,'-') =0 then name ");
+			sql.append("\n   when INSTR(name,'-') <> 0 then TRIM(substr( name,0, INSTR(name,'-')-1 ))");
+			sql.append("\n   end"); 
+			sql.append("\n ) as brand ,seg_value1 as brand_code ");  
 			sql.append("\n from "+TABLE_NAME+" where NAME NOT IN('Default','ว่าง')");
 			sql.append("\n AND ISACTIVE = 'Y'"); 
 			sql.append("\n AND PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ");
@@ -287,14 +302,15 @@ public class MProductCategory extends I_Model<ProductCategory> {
 			   }
 			}
 			sql.append("\n )A ");
-			sql.append("\n WHERE A.brand <> '' and A.brand is not null ");
-			logger.info("sql:\n"+sql.toString());
+			//FOR BUD ONLY
+			sql.append("\n WHERE A.brand_code in('381','382','383') "); 
+			//logger.info("sql:\n"+sql.toString());
 			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
-				References r = new References(rst.getString("brand"),rst.getString("brand"),rst.getString("brand"));
-				pos.add(r);
+				References r = new References(Utils.isNull(rst.getString("brand")),Utils.isNull(rst.getString("brand")),Utils.isNull(rst.getString("brand")));
+			    pos.add(r);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -315,16 +331,23 @@ public class MProductCategory extends I_Model<ProductCategory> {
 	public static int NO_OF_DISPLAY_ROWS = 3;
 	public static int NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE = NO_OF_DISPLAY_COLUMNS * NO_OF_DISPLAY_ROWS ;
 	
-	public List<References> lookUpBrandList(Connection conn ,int pageId,User u,boolean isCustHaveProductSpecial) throws Exception {
+	public List<References> lookUpBrandListByPage(Connection conn ,int pageId,User u,boolean isCustHaveProductSpecial) throws Exception {
 		List<References> pos = new ArrayList<References>();
 		Statement stmt = null;
 		ResultSet rst = null;
 		StringBuffer sql = new StringBuffer("");
-		int startFromRow = pageId*NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE;
 		try {
-			sql.append("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
-			sql.append("\n FROM M_PRODUCT_CATEGORY pdc ");
-		    sql.append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ");
+			sql.append("\n select M.* from (");
+			sql.append("\n select A.* ,rownum as r__ from (");
+			sql.append("\n select AA.* from (");
+			sql.append("\n SELECT distinct pdc.seg_value1 as brand_code ");
+			sql.append("\n ,( case when INSTR(name,'-') =0 then name ");
+			sql.append("\n   when INSTR(name,'-') <> 0 then TRIM(substr( name,0, INSTR(name,'-')-1 ))");
+			sql.append("\n   end"); 
+			sql.append("\n ) as brand");  
+			sql.append("\n ,nvl(cat.SEQ,9999) as seq ");
+			sql.append("\n FROM PENSSO.M_PRODUCT_CATEGORY pdc ");
+		    sql.append("\n LEFT JOIN PENSSO.M_CATALOG cat ON cat.CODE =pdc.seg_value1 ");
 		    sql.append("\n WHERE pdc.ISACTIVE = 'Y' ");
 		    sql.append("\n AND pdc.PRODUCT_CATEGORY_ID IN (SELECT DISTINCT PRODUCT_CATEGORY_ID FROM M_PRODUCT WHERE ISACTIVE = 'Y') ");
 		    sql.append("\n AND pdc.seg_value1 <> '000' ") ;//Except DefaultValue
@@ -343,16 +366,22 @@ public class MProductCategory extends I_Model<ProductCategory> {
 			   sql.append("\n    )  ");
 			   sql.append("\n ) ");
 		    }*/
-		    sql.append("\n ORDER BY COALESCE(cat.SEQ,9999), pdc.seg_value1 ");
-		    sql.append("\n LIMIT "+ startFromRow+ ","+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE );
-					
+		    sql.append("\n   )AA ");
+		    //FOR BUD ONLY
+			sql.append("\n WHERE AA.brand_code in('381','382','383') "); 
+		    sql.append("\n ORDER BY AA.seq, AA.brand_code ");
+		    sql.append("\n   )A ");
+		    sql.append("\n    WHERE rownum < (("+pageId+" * "+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE+") + 1 )  ");
+		    sql.append("\n )M  ");
+		    sql.append("\n  WHERE r__ >= ((("+pageId+"-1) * "+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE+") + 1)  ");
+		    	
 			logger.debug("sql:\n"+sql.toString());
 
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {
-				References r = new References(rst.getString("brand_code"),rst.getString("brand_code"),rst.getString("brand_name"));
-				pos.add(r);
+			    References r = new References(rst.getString("brand_code"),rst.getString("brand_code"),Utils.isNull(rst.getString("brand")));
+			    pos.add(r);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -382,7 +411,7 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		try {
 			int startFromRow = pageId*NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE;
 			
-			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
+			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(substr( name,0, INSTR(name,'-')-1 )) as brand_name ");
 					sql.append("\n FROM M_PRODUCT_CATEGORY pdc ")
 					   .append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ")
 					   .append("\n WHERE pdc.ISACTIVE = 'Y' ")
@@ -433,7 +462,7 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		ResultSet rst = null;
 		try {
 			
-			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
+			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(substr( name,0, INSTR(name,'-')-1 )) as brand_name ");
 					sql.append("\n FROM M_PRODUCT_CATEGORY pdc ")
 					   .append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ")
 					   .append("\n WHERE pdc.ISACTIVE = 'Y' ")
@@ -491,7 +520,7 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		try {
 			int startFromRow = pageId*NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE;
 			
-			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
+			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(substr( name,0, INSTR(name,'-')-1 )) as brand_name ");
 					sql.append("\n FROM M_PRODUCT_CATEGORY pdc ")
 					   .append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ")
 					   .append("\n WHERE pdc.ISACTIVE = 'Y' ")
@@ -550,7 +579,7 @@ public class MProductCategory extends I_Model<ProductCategory> {
 		try {
 			int startFromRow = pageId*NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE;
 			
-			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(SUBSTRING_INDEX(name,'-',1)) as brand_name ");
+			StringBuffer sql = new StringBuffer("\n SELECT distinct pdc.seg_value1 as brand_code , TRIM(substr( name,0, INSTR(name,'-')-1 )) as brand_name ");
 					sql.append("\n FROM M_PRODUCT_CATEGORY pdc ")
 					   .append("\n LEFT JOIN M_CATALOG cat ON cat.CODE =pdc.seg_value1 ")
 					   .append("\n WHERE pdc.ISACTIVE = 'Y' ")

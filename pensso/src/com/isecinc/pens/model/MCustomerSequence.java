@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.CustomerSequence;
-import com.isecinc.pens.process.SequenceProcess;
+import com.pens.util.seq.SequenceProcess;
 
 /**
  * Customer Sequence Process
@@ -65,7 +65,7 @@ public class MCustomerSequence extends I_Model<CustomerSequence> {
 	public boolean save(CustomerSequence customerSequence, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (customerSequence.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcess.getNextValueInt(TABLE_NAME);
 		} else {
 			id = customerSequence.getId();
 		}

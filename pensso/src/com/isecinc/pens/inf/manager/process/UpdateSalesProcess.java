@@ -34,7 +34,7 @@ import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction2;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
-import com.pens.utils.LoggerUtils;
+import com.pens.util.LoggerUtils;
 
 public class UpdateSalesProcess {
   

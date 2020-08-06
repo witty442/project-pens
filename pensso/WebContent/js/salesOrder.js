@@ -191,6 +191,11 @@ function presave(path) {
 		alert('ไม่มีที่อยู่แบบ Bill to ไม่สามารถบันทึกข้อมูลได้');
 		return false;
 	}
+	/*if(document.getElementsByName('order.loadNo')[0].value==''){
+		alert('กรุณาระบุ สาย Load ');
+		document.getElementsByName('order.loadNo')[0].focus();
+		return false;
+	}*/
     //Validate Van Payment method
 	if( !validateVanPaymentMethod()){return false;}
 	
@@ -209,7 +214,13 @@ function presave(path) {
 	document.orderForm.submit();
 	return true;
 }
-
+function cancelOrder(path) {
+	if(confirm("ยืนยันยกเลิกรายการขายนี้")){
+		document.orderForm.action = path + "/jsp/saleOrderAction.do?do=cancelOrder";
+		document.orderForm.submit();
+		return true;
+	}return false;
+}
 function backadd(path) {
 	if(!createProductList()){return false;}
 	document.orderForm.action = path + "/jsp/saleOrderAction.do?do=backToAdd";
@@ -273,6 +284,12 @@ function save(path,role) {
 	if( !validateVanCreditLimit()){return false;}
 	
 	if(!createProductList()){return false;}
+	
+	/*if(document.getElementsByName('order.loadNo')[0].value==''){
+		alert('กรุณาระบุ สาย Load ');
+		document.getElementsByName('order.loadNo')[0].focus();
+		return false;
+	}*/
 	
 	/**Control Save Lock Screen **/
     startControlSaveLockScreen();

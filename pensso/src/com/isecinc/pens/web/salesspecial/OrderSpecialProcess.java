@@ -15,7 +15,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import util.ConvertNullUtil;
-import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.Debug;
 
@@ -40,6 +39,7 @@ import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.model.MUOMConversion;
+import com.pens.util.DBCPConnectionProvider;
 
 /**
  * Order Special Process Class
@@ -913,7 +913,7 @@ public void debug(List<OrderLine> lines) throws Exception {
 		receipt.setSalesRepresent(user);
 		// Status
 		receipt.setInterfaces("N");
-		receipt.setDocStatus(Receipt.DOC_SAVE);
+		//receipt.setDocStatus(Receipt.STATUS_OPEN);
 		// Prepaid Flag
 		receipt.setPrepaid("Y");
 
