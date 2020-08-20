@@ -4,11 +4,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.init.InitialReferences;
+import com.pens.util.ConvertNullUtil;
 
 /**
  * Contact

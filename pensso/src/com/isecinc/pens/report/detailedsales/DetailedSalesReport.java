@@ -2,7 +2,7 @@ package com.isecinc.pens.report.detailedsales;
 
 import java.io.Serializable;
 
-import util.ConvertNullUtil;
+import com.pens.util.ConvertNullUtil;
 
 /**
  * Detailed Sales Report

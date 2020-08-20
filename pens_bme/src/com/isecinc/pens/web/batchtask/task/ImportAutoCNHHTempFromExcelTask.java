@@ -259,6 +259,9 @@ public class ImportAutoCNHHTempFromExcelTask extends BatchTask implements BatchT
 			sql.append("INSERT INTO PENSBI.BME_AUTOCN_HH_TEMP_INV(ID,INVOICE_NO)VALUES(?,?) \n");
 			psInv = conn.prepareStatement(sql.toString());
 			
+			logger.debug("ID:"+id);
+			
+			
 		    /** Loop Row Inv **/
 			String invoiceNo= "";
 			String invoiceNoAll ="";

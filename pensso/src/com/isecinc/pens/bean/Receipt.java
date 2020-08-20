@@ -4,9 +4,6 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.List;
 
-import util.ConvertNullUtil;
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.init.InitialReferences;
@@ -14,6 +11,8 @@ import com.isecinc.pens.model.MReceiptBy;
 import com.isecinc.pens.model.MReceiptCN;
 import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.ConvertNullUtil;
+import com.pens.util.DateToolsUtil;
 
 /**
  * Receipt Class
@@ -77,7 +76,7 @@ public class Receipt extends I_PO {
 	 * Set display
 	 */
 	protected void setDisplayLabel() throws Exception {
-		for (References r : InitialReferences.getReferenes().get(InitialReferences.DOC_STATUS)) {
+		for (References r : InitialReferences.getReferenesByManual(InitialReferences.RECEIPT_DOC_STATUS, "SV,VO")) {
 			if (r.getKey().equalsIgnoreCase(getDocStatus())) {
 				setDocStatusLabel(r.getName());
 				break;

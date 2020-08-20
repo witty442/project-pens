@@ -5,10 +5,9 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Contact;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.seq.SequenceProcess;
 
 /**

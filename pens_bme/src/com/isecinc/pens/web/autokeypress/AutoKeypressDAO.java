@@ -13,12 +13,13 @@ import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.DBConnection;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 public class AutoKeypressDAO {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	public static PopupForm searchSalesrepSalesDetail(PopupForm c) throws Exception {
+	public static PopupForm searchSalesrepSalesDetail(PopupForm c,String zoneAll) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
 		PopupForm item = null;;
@@ -28,7 +29,9 @@ public class AutoKeypressDAO {
 			sql.append("\n SELECT distinct code ,salesrep_full_name ,Z.zone ,Z.zone_name" );
 			sql.append("\n from apps.xxpens_salesreps_v M ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n where M.salesrep_id =Z.salesrep_id ");
-			sql.append("\n and z.zone in('0','1','2','3','4') ");
+			if(!Utils.isNull(zoneAll).equals("")){
+				sql.append("\n and z.zone in("+SQLHelper.converToTextSqlIn(zoneAll)+") ");
+			}
 			if( !Utils.isNull(c.getCodeSearch()).equals("")){
 				sql.append("\n and M.code ='"+c.getCodeSearch()+"' ");
 			}

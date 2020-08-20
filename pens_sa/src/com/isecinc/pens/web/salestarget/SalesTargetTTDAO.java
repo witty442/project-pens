@@ -339,7 +339,6 @@ public class SalesTargetTTDAO {
 			   h.setSalesZoneDesc(rst.getString("zone_name"));
 			   h.setBrand(rst.getString("brand"));  
 			   h.setBrandName(rst.getString("brand_name"));
-			   
 			  
 			   h.setRejectReason(Utils.isNull(rst.getString("reject_reason")));
 			   h.setTargetQty(Utils.decimalFormat(rst.getDouble("TOTAL_TARGET_QTY"), Utils.format_current_no_disgit,""));
@@ -376,6 +375,7 @@ public class SalesTargetTTDAO {
 			o.setTotalTargetQty(Utils.decimalFormat(totalTargetQty, Utils.format_current_no_disgit));
 			o.setTotalTargetAmount(Utils.decimalFormat(totalTargetAmount, Utils.format_current_2_disgit));
 		
+			
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -887,7 +887,7 @@ public class SalesTargetTTDAO {
 			sql.append("\n  ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ");
 			sql.append("\n  where D.id = M.id ");
 			sql.append("\n  and M.salesrep_code = Z.salesrep_code ");
-			sql.append("\n  and M.DIVISION ='B' ");//Van and Credit only
+			sql.append("\n  and M.division in('B','I') ");//Van And Credit ,ICe cream
 			if( !Utils.isNull(cri.getCustCatNo()).equals(""))
 				sql.append("\n  and M.CUSTOMER_CATEGORY = '"+cri.getCustCatNo()+"'");
 			
@@ -1225,7 +1225,7 @@ public class SalesTargetTTDAO {
 			sql.append("\n  select M.id from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
 			sql.append("\n  ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n  where M.salesrep_id = Z.salesrep_id");
-			sql.append("\n  and M.division ='B'");//van and credit
+			sql.append("\n  and M.division in('B','I') ");//Van And Credit ,ICe cream
 			sql.append("\n  and M.target_month = '"+Utils.isNull(cri.getTargetMonth())+"'");
 			sql.append("\n  and M.target_quarter = '"+Utils.isNull(cri.getTargetQuarter())+"'");
 			sql.append("\n  and M.target_year = '"+Utils.isNull(cri.getTargetYear())+"'");
@@ -1665,7 +1665,7 @@ public class SalesTargetTTDAO {
 			sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z"); 
 			sql.append("\n where 1=1  ");
 			sql.append("\n and M.salesrep_id = Z.salesrep_id  ");
-			sql.append("\n and M.division ='B' ");// Van And Credit
+			sql.append("\n and M.division in('B','I') ");//Van And Credit ,ICe cream
 			sql.append("\n and M.period = '"+Utils.isNull(o.getPeriod())+"'");
 			sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
 			sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
@@ -1795,7 +1795,7 @@ public class SalesTargetTTDAO {
 				sql.append(" UPDATE XXPENS_BI_SALES_TARGET_TEMP M SET  \n");
 				sql.append(" STATUS = ? ,UPDATE_USER =? ,UPDATE_DATE = ?   \n");
 				sql.append(" WHERE 1=1  \n" );
-				sql.append("\n and M.division ='B' ");//Van And Credit
+				sql.append("\n and M.division in('B','I') ");//Van And Credit ,ICe cream
 				sql.append("\n and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
 				sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
 				sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
@@ -1883,7 +1883,7 @@ public class SalesTargetTTDAO {
 				sql.append(" WHERE ID IN( \n" );
 				sql.append("    SELECT ID FROM  XXPENS_BI_SALES_TARGET_TEMP M \n");
 				sql.append("    WHERE 1=1  " );
-				sql.append("\n  and M.division ='B' ");//Van And Credit
+				sql.append("\n  and M.division in('B','I') ");//Van And Credit ,ICe cream
 				sql.append("\n  and M.target_month = '"+Utils.isNull(o.getTargetMonth())+"'");
 				sql.append("\n  and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
 				sql.append("\n  and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");

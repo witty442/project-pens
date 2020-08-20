@@ -37,7 +37,17 @@ public class AutoKeypressAction {
 				//set criteria
 				criteriaForm.setCodeSearch(Utils.isNull(request.getParameter("salesrepCode")));
 				
-				PopupForm popupForm = AutoKeypressDAO.searchSalesrepSalesDetail(criteriaForm);
+				PopupForm popupForm = AutoKeypressDAO.searchSalesrepSalesDetail(criteriaForm,null);
+				if(popupForm != null){
+					resultAjax = "4|"+popupForm.getCode()+"|"+popupForm.getDesc()+"|"+popupForm.getDesc2()+"|"+popupForm.getDesc3();
+				}else{
+					resultAjax = "-1|||";
+				}
+			}else if("SalesrepSalesAll".equalsIgnoreCase(pageName) ){
+				//set criteria
+				criteriaForm.setCodeSearch(Utils.isNull(request.getParameter("salesrepCode")));
+				
+				PopupForm popupForm = AutoKeypressDAO.searchSalesrepSalesDetail(criteriaForm,null);
 				if(popupForm != null){
 					resultAjax = "4|"+popupForm.getCode()+"|"+popupForm.getDesc()+"|"+popupForm.getDesc2()+"|"+popupForm.getDesc3();
 				}else{

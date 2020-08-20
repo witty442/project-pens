@@ -12,8 +12,6 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
@@ -21,6 +19,7 @@ import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MUOMConversion;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.sales.bean.ProductCatalog;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBConnection;
 import com.pens.util.DBConnectionApps;
 import com.pens.util.Utils;

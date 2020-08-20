@@ -1,5 +1,5 @@
 <%@page import="com.isecinc.pens.web.stockinv.StockInvBean"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>

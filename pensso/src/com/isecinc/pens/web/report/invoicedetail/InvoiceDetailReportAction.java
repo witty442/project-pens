@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
-import util.DateToolsUtil;
-
 import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
@@ -18,6 +16,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.report.invoicedetail.InvoiceDetailReport;
 import com.isecinc.pens.report.invoicedetail.InvoiceDetailReportProcess;
+import com.pens.util.DateToolsUtil;
 
 /**
  * InvoiceDetailReportAction

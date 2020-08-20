@@ -9,12 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
-import util.DateToolsUtil;
-
 import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentAllReport;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentAllReportProcess;
+import com.pens.util.DateToolsUtil;
 import com.pens.util.DateUtil;
 
 /**

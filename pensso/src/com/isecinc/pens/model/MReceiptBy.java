@@ -7,11 +7,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.DateToolsUtil;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DateToolsUtil;
 import com.pens.util.seq.SequenceProcess;
 
 /**
@@ -25,7 +24,7 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 
 	private static final long serialVersionUID = -8532039857520296789L;
 
-	public static String TABLE_NAME = "t_receipt_by";
+	public static String TABLE_NAME = "pensso.t_receipt_by";
 	public static String COLUMN_ID = "RECEIPT_BY_ID";
 
 	private String[] columns = { COLUMN_ID, "PAYMENT_METHOD", "BANK", "CHEQUE_NO", "CHEQUE_DATE", "RECEIPT_AMOUNT",
@@ -72,7 +71,7 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 	public boolean save(ReceiptBy receiptBy, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (receiptBy.getId() ==0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
+			id = SequenceProcess.getNextValue("t_receipt_by").longValue();
 		} else {
 			id = receiptBy.getId();
 		}

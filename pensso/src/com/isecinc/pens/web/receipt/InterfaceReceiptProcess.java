@@ -8,9 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.ControlCode;
-import util.SQLHelper;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
@@ -27,7 +24,9 @@ import com.isecinc.pens.inf.manager.process.export.LockboxProcess;
 import com.isecinc.pens.model.MUser;
 import com.isecinc.pens.web.batchtask.BatchTaskConstants;
 import com.isecinc.pens.web.batchtask.BatchTaskManualAction;
+import com.pens.util.ControlCode;
 import com.pens.util.EnvProperties;
+import com.pens.util.SQLHelper;
 
 public class InterfaceReceiptProcess {
 
@@ -87,6 +86,50 @@ public class InterfaceReceiptProcess {
 			
 			tableBean.setFileFtpNameFull(ExportHelper.genFileName(tableBean,user));
 			tableBean.setExportPath(EnvProperties.getInstance().getProperty("path.transaction.sales.out"));
+			tableBean = new LockboxProcess().exportSalesReceiptLockBoxProcess(conn, tableBean,user);	
+			
+			//Upload by step by one file
+			ftpManager.uploadAllFileToFTP_BY_FILE("",tableBean);	
+        	
+			//update Exported =Y
+			logger.debug("***** -Start  Update Exported=Y  Flag ALL TABLE*************");
+		    int updateRecord = exProcess.updateExportFlag(conn, user,tableBean.getSqlUpdateExportFlagList());
+		    logger.debug("***** -Result Update Exported=Y  Flag ALL TABLE TotalRec:"+updateRecord+" *************");
+			
+			logger.info("--End Export t_receipt(lockbox) --");
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();conn=null;
+			}
+		}
+		return r;
+	}
+	public static boolean process(User user) throws Exception{
+		boolean r = true;
+		Connection conn = null;
+		FTPManager ftpManager = null;
+		EnvProperties env = EnvProperties.getInstance();
+		ExportProcess exProcess = new ExportProcess();
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			//initial FTP Manager
+			ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+			
+			logger.info("--Start Export t_receipt(lockbox) --");
+			TableBean tableBean = new TableBean();
+			tableBean.setTableName("t_receipt");
+			tableBean.setFileFtpName("SALESRECEIPT");
+			tableBean.setSource("SALES");
+			tableBean.setDestination("ORACLE");
+			tableBean.setTransactionType("TRANSACTION");
+			tableBean.setAuthen("AD|TT|VAN");
+			
+			tableBean.setFileFtpNameFull(ExportHelper.genFileName(tableBean,user));
+			tableBean.setExportPath(EnvProperties.getInstance().getProperty("path.transaction.sales.out"));
+			
 			tableBean = new LockboxProcess().exportSalesReceiptLockBoxProcess(conn, tableBean,user);	
 			
 			//Upload by step by one file

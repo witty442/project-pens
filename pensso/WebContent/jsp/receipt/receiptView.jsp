@@ -1,4 +1,4 @@
-<%@page import="util.SessionGen"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -14,7 +14,7 @@
 	if(action == null){
 		action = "";
 	}
-	List<References> docstatus= InitialReferences.getReferenes().get(InitialReferences.DOC_STATUS);
+	List<References> docstatus= InitialReferences.getReferenesByManual(InitialReferences.RECEIPT_DOC_STATUS, "SV,VO");
 	pageContext.setAttribute("docstatus",docstatus,PageContext.PAGE_SCOPE);
 	
 	List<References> payment= InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
@@ -37,8 +37,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <style type="text/css">
 <!--
 body {
@@ -48,10 +48,10 @@ body {
 .style1 {color: #004a80}
 -->
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/receipt.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/receipt.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript">
@@ -153,49 +153,7 @@ function loadMe(){
 									<html:hidden property="receipt.customerId"/>
 								</td>
 							</tr>
-							<!--
-							<tr>
-								<td align="right"><bean:message key="Profile.PaymentMethod" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:select property="receipt.paymentMethod" disabled="true" styleClass="disableText" onchange="change_payment(this.value);">
-										<html:options collection="payment" property="key" labelProperty="name"/>
-									</html:select>
-								</td>
-								<td align="right"><bean:message key="AmountReceived" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left"><html:text property="receipt.receiptAmount" styleId="receiptAmount" readonly="true" styleClass="disableText" size="10" style="text-align: right;" /></td>
-							</tr>
-							<tr id="div_cheque1">
-								<td align="right"><bean:message key="Bank" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:select property="receipt.bank" styleId="bank" disabled="true" styleClass="disableText">
-										<html:option value=""></html:option>
-										<html:options collection="banks" property="key" labelProperty="name"/>
-									</html:select> 
-								</td>
-								<td align="right"><bean:message key="Check.No" bundle="sysele"/>/<bean:message key="CreditCardNo" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text property="receipt.chequeNo" size="25" readonly="true" styleClass="disableText"/>
-								</td>
-							</tr>
-							<tr id="div_cheque2">
-								<td align="right"><bean:message key="Check.Date" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text  property="receipt.chequeDate" styleId="chequeDate" maxlength="10" size="15" readonly="true" styleClass="disableText"/>
-								</td>
-								<td></td><td></td>
-							</tr>
-							<tr id="div_cheque3">
-								<td align="right"><bean:message key="CreditCardType" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:select property="receipt.creditCardType" disabled="true" styleId="creditCardType" styleClass="disableText">
-										<html:option value=""></html:option>
-										<html:option value="VISA">VISA</html:option>
-										<html:option value="MASTERCARD">Master Card</html:option>
-									</html:select>
-								</td>
-								<td></td><td></td>
-							</tr>
-							-->
+							
 							<tr>
 								<td align="right">
 									<bean:message key="InternalBank" bundle="sysele"/>&nbsp;&nbsp;

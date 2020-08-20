@@ -1,11 +1,10 @@
+
 package com.isecinc.pens.web.stockinv;
 
-import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,13 +12,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.SQLHelper;
-
+import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.StockUtilsDAO;
 import com.pens.util.DBConnection;
+import com.pens.util.DBConnectionApps;
 import com.pens.util.DateUtil;
-import com.pens.util.FileUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 import com.pens.util.seq.SequenceProcess;
 
 public class StockInvDAO{
@@ -93,6 +93,7 @@ public class StockInvDAO{
 			   h.setHeaderId(rst.getLong("header_id"));
 			   h.setTransactionDate(DateUtil.stringValue(rst.getDate("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   h.setTransType(Utils.isNull(rst.getString("type"))); 
+			   h.setRemark(Utils.isNull(rst.getString("remark"))); 
 			   h.setTransTypeDesc(Utils.isNull(rst.getString("type")).equalsIgnoreCase("IN")?"เข้าคลัง":"ออกจากคลัง"); 
 			   h.setProductId(Utils.isNull(rst.getString("inventory_item_id")));
 			   h.setProductCode(Utils.isNull(rst.getString("product_code"))); 
@@ -155,6 +156,7 @@ public class StockInvDAO{
 		int totalQty1=0,totalQty2 =0;
 		boolean canEdit = false;
 		boolean canConfirm = false;
+		String remark ="";
 		try {
 			sql.append("\n select t.* ,m.code as product_code ,m.name as product_name ,sysdate ");
 			sql.append("\n from pensso.so_initial_stock t ,pensso.m_product m \n");
@@ -242,11 +244,14 @@ public class StockInvDAO{
 			   //sum
 			   totalQty1 +=rst.getDouble("PRI_QTY");
 			   totalQty2 +=rst.getDouble("SEC_QTY");
+			   
+			   remark = Utils.isNull(rst.getString("remark"));
 			}//while
 			
 			o.setCanEdit(canEdit);
 			o.setCanConfirm(canConfirm);
             o.setItems(items);
+            o.setRemark(remark);
             o.setQty1(Utils.decimalFormat(totalQty1,Utils.format_current_no_disgit,""));
 			o.setQty2(Utils.decimalFormat(totalQty2,Utils.format_current_no_disgit,""));
 		} catch (Exception e) {
@@ -282,6 +287,97 @@ public class StockInvDAO{
 			} catch (Exception e) {}
 		}
 		return sql;
+	}
+	public static StringBuffer genExportStockInitDetail(StockInvBean o,User user) throws Exception{
+		StringBuffer h = new StringBuffer("");
+		String width="100%",border="1";
+	    Connection conn = null;
+		try{
+			conn = DBConnectionApps.getInstance().getConnection();
+			
+			h.append(ExcelHeader.EXCEL_HEADER);
+			h.append("<table id='tblProduct' align='center' border='"+border+"' width='"+width+"' cellpadding='3' cellspacing='1' class=''> \n");
+			h.append("<tr><td colspan='6' align='center'><b> <font size='2'>เอกสารการเบิกสินค้า เข้า / ออก จากคลัง</font></b></td> </tr>\n");
+			h.append("<tr><td align='right'><b> ประเภทเอกสาร:&nbsp;</b><td colspan='5' class='text'>"+o.getTransTypeDesc()+"</td> </tr>\n");
+			h.append("<tr><td align='right'><b> วันที่ทำรายการ:&nbsp;</b><td colspan='5' class='text'>"+o.getTransactionDate()+"</td></tr>\n");
+			h.append("<tr><td align='right'><b> เลขที่เอกสาร:&nbsp;</b><td colspan='5' class='text'>"+o.getHeaderId()+"</td></tr>\n");
+			h.append("<tr><td align='right'><b> หมายเหตุ:&nbsp;</b><td colspan='5' class='text'>"+o.getRemark()+"</td></tr>\n");
+			h.append("</table>\n");
+			
+			h.append("<table id='tblProduct' align='center' border='"+border+"' width='"+width+"' cellpadding='3' cellspacing='1' class=''> \n");
+			h.append("<tr> \n");
+			h.append("<th>รหัสสินค้า</th> \n");
+			h.append("<th>ชื่อสินค้า</th> \n");
+			h.append("<th>หน่วยนับ</th> \n");
+			h.append("<th>สถานะ</th> \n");
+			h.append("<th>จำนวน(เต็ม)</th> \n");
+			h.append("<th>จำนวน(เศษ)</th> \n");
+			h.append("</tr> \n");
+			
+			StockInvBean r = searchInitDetailList(conn, o);
+			if(r.getItems() != null && r.getItems().size() >0){
+				for(int i=0;i<r.getItems().size();i++){
+					StockInvBean item = r.getItems().get(i);
+					h.append("<tr> \n");
+					h.append("<td class='text_center'>"+item.getProductCode()+"</td> \n");
+					h.append("<td class='text'>"+item.getProductName()+"</td> \n");
+					h.append("<td class='text_center'>"+item.getUom()+"</td> \n");
+					h.append("<td class='text_center'>"+item.getStatus()+"</td> \n");
+					h.append("<td class='num'>"+item.getQty1()+"</td> \n");
+					h.append("<td class='num'>"+item.getQty2()+"</td> \n");
+					h.append("</tr> \n");
+				}
+				
+				h.append("<tr> \n");
+				h.append("<td class='text_center'></td> \n");
+				h.append("<td class='text'></td> \n");
+				h.append("<td class='text_center'></td> \n");
+				h.append("<td class='colum_head'>รวม</td> \n");
+				h.append("<td class='num_bold'>"+r.getQty1()+"</td> \n");
+				h.append("<td class='num_bold'>"+r.getQty2()+"</td> \n");
+				h.append("</tr> \n");
+				h.append("</table> \n");
+				
+				h.append("<table id='tblProduct' align='center' border='0' width='"+width+"' cellpadding='3' cellspacing='1' class=''> \n");
+				h.append("<tr> \n");
+				h.append("<td></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("</tr> \n");
+				h.append("<tr> \n");
+				h.append("<td></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("</tr> \n");
+				h.append("<tr> \n");
+				h.append("<td></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("<td ></td> \n");
+				h.append("</tr> \n");
+				
+				h.append("<tr> \n");
+				h.append("<td colspan='2'>พิมพ์วันที่ :"+DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,DateUtil.local_th)+"</td> \n");
+				h.append("<td></td> \n");
+				h.append("<td colspan='3' align='right'>พิมพ์โดย : "+user.getName()+"</td> \n");
+				h.append("</tr> \n");
+				h.append("</table> \n");
+			}
+			return h;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();
+		}
+		
 	}
 	public static long saveInitStock(Connection conn,StockInvBean h) throws Exception{
 		try{
@@ -326,6 +422,7 @@ public class StockInvDAO{
  				   l.setHeaderId(id);
  				   l.setTransactionDate(h.getTransactionDate());
  				   l.setTransType(h.getTransType());
+ 				   l.setRemark(h.getRemark());
  				   //convert to Stock Qty (qty 1,qty2 10) to (1.8)
  				   if( !Utils.isNull(l.getQty2()).equals("")){
  				       //String subQty = StockUtilsDAO.convertStockQty(conn, l.getProductId(), l.getUom2(), l.getUom1(), l.getQty2());
@@ -399,8 +496,8 @@ public class StockInvDAO{
 				sql.append(" INSERT INTO pensso.so_initial_stock \n");
 				sql.append(" (header_ID,line_id, TRANSACTION_DATE,TYPE,inventory_item_id,  \n");
 				sql.append("  transaction_qty,transaction_uom,sec_uom, \n");
-				sql.append("  pri_qty,sec_qty, CREATION_DATE, CREATED_BY )  \n");
-			    sql.append("  VALUES (?, ?, ?, ?, ?, ?,?,?,?,?,?,?) \n");
+				sql.append("  pri_qty,sec_qty, CREATION_DATE, CREATED_BY ,remark )  \n");
+			    sql.append("  VALUES (?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?) \n");
 				ps = conn.prepareStatement(sql.toString());
 					
 				Date transDate = DateUtil.parse( o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
@@ -419,6 +516,7 @@ public class StockInvDAO{
 				ps.setDouble(c++, Utils.convertStrToDouble(o.getQty2()));
 				ps.setTimestamp(c++, new java.sql.Timestamp(new Date().getTime()));
 				ps.setString(c++, o.getCreateUser());
+				ps.setString(c++, Utils.isNull(o.getRemark()));
 				ps.executeUpdate();
 				
 			}catch(Exception e){
@@ -437,7 +535,8 @@ public class StockInvDAO{
 				sql.append(" update pensso.so_initial_stock \n");
 				sql.append(" set transaction_qty = "+Utils.convertStrToDouble(o.getQty())+" ,transaction_uom ='"+o.getUom1()+"' \n");
 				sql.append(" ,pri_qty ="+Utils.convertStrToDouble(o.getQty1())+",sec_qty="+Utils.convertStrToDouble(o.getQty2())+"\n");
-			    sql.append(" where header_Id="+o.getHeaderId() +"\n");
+				sql.append(" ,remark ='"+Utils.isNull(o.getRemark())+"'");
+				sql.append(" where header_Id="+o.getHeaderId() +"\n");
 			    sql.append(" and line_Id="+o.getLineId() +"\n");
 			    logger.debug("sql:"+sql.toString());
 			    

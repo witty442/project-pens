@@ -25,7 +25,7 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 
 	private static final long serialVersionUID = -4119649113903274964L;
 
-	public static String TABLE_NAME = "t_receipt_cn";
+	public static String TABLE_NAME = "pensso.t_receipt_cn";
 	public static String COLUMN_ID = "RECEIPT_CN_ID";
 
 	// Column Sales Online Side active
@@ -55,7 +55,7 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 	public boolean save(ReceiptCN receiptCN, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (receiptCN.getId() ==0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
+			id = SequenceProcess.getNextValue("t_receipt_cn").longValue();
 		} else {
 			id = receiptCN.getId();
 		}

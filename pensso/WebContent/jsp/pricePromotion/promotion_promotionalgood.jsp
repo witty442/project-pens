@@ -1,4 +1,4 @@
-<%@page import="util.SessionGen"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -20,8 +20,8 @@ pageContext.setAttribute("linesRelate",line.getRelatedModifier(),PageContext.PAG
 <%@page import="com.isecinc.pens.bean.ModifierLine"%><head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/default.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/newstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/default.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css">
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/newstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css">
 </head>
 <body topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
 <br>

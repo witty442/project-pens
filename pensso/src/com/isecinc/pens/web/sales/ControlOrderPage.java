@@ -4,9 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.ControlCode;
-
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.ControlCode;
 
 public class ControlOrderPage {
 	

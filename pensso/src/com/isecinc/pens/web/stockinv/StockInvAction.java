@@ -1,5 +1,8 @@
 package com.isecinc.pens.web.stockinv;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -554,7 +557,34 @@ public class StockInvAction extends I_Action {
 		}
 		return mapping.findForward("stockInvDetail");
 	}
-	
+	public ActionForward export(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("export");
+		StockInvForm aForm = (StockInvForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			StringBuffer dataOut = StockInvDAO.genExportStockInitDetail(aForm.getBean(),user);
+			if(dataOut != null){
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(dataOut.toString());
+			    w.flush();
+			    w.close();
+
+			    out.flush();
+			    out.close();
+			}else{
+				request.setAttribute("Message", "ไม่พบข้อมูล");
+			}
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("stockInvDetail");
+	}
 	public ActionForward clear(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("clear");
 		StockInvForm aForm = (StockInvForm) form;

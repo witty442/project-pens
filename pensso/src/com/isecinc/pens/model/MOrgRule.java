@@ -11,13 +11,12 @@ import java.util.Map;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.OrgRuleBean;
 import com.isecinc.pens.web.sales.bean.ProductCatalog;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
 
 /**

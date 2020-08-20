@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.ControlCode;
-
 import com.isecinc.pens.SystemProperties;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
@@ -23,6 +21,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.pens.util.ControlCode;
 import com.pens.util.EnvProperties;
 
 public class ClearImportTempAction {

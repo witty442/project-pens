@@ -37,7 +37,7 @@
 		<td align="center">
 			${results.arInvoiceNo}
 			<input type="hidden" name='bill.id' value='${results.id}'>
-			<input type='hidden' name='bill.orderId' value='${results.order.id}' >
+			<input type='hidden' name='bill.invoiceId' value='${results.order.invoiceId}' >
 			<input type='hidden' name='bill.invoiceNo' value='${results.arInvoiceNo}'>
 			<input type='hidden' name='bill.salesOrderNo' value='${results.salesOrderNo}'>
 			<input type='hidden' name='bill.netAmt' value='${results.invoiceAmount}'>

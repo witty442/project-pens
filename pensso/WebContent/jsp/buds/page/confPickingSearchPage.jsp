@@ -1,7 +1,7 @@
 <%@page import="com.isecinc.pens.web.buds.BudsAllForm"%>
 <%@page import="com.isecinc.core.model.I_PO"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.ConfPickingBean"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="com.pens.util.*"%>
@@ -94,20 +94,22 @@ function clearForm(path){
 	form.submit();
 	return true;
 }
-function openPopupPage(page){
+function openPopupPage(pageName){
 	var form = document.budsAllForm;
 	var path = document.getElementById("path").value;
-    var param = "&page="+page;
-	var url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
+    var param = "&pageName="+pageName+"&selectone=true&hideAll=true";
+	var url = path + "/jsp/popupAction.do?do=prepareAll&action=new"+param;
 	
 	PopupCenterFullHeight(url,"",700);
 }
 
-function setMainValue(page,data){
-	if("PICKING_NO"==page){
-	   document.getElementById("pickingNo").value = data;
+function setDataPopupValue(code,desc,pageName){
+	if("PICKING_NO"==pageName){
+	   document.getElementById("pickingNo").value = code;
+	}else if("PICKING_NO_PRINT"==pageName){
+	   document.getElementById("pickingNo").value = code;
 	}else if("TRANSPORT"==page){
-	   document.getElementById("amphurCri").value = data;
+	   document.getElementById("amphurCri").value = code;
 	}
 } 
 </script>
@@ -162,8 +164,13 @@ function setMainValue(page,data){
 								<td>
 								    <html:text property="bean.confPickingBean.pickingNo" 
 								    styleClass="\" autoComplete=\"off" styleId="pickingNo"></html:text>
-								    <input type="button" name="btTransport" value="..." 
-								    onclick="openPopupPage('PICKING_NO')" class="newPosBtnLong"/>
+								    <%if("ConfPicking".equalsIgnoreCase(subPageName)){ %>
+									    <input type="button" name="btTransport" value="..." 
+									    onclick="openPopupPage('PICKING_NO')" class="newPosBtnLong"/>
+								    <%}else if("BudsConfPicking".equalsIgnoreCase(subPageName)){ %>
+								       <input type="button" name="btTransport" value="..." 
+									    onclick="openPopupPage('PICKING_NO_PRINT')" class="newPosBtnLong"/>
+								    <%} %>
 								     &nbsp;Transaction Date 
 								    <html:text property="bean.confPickingBean.transactionDate" styleId="transactionDate" size="10" readonly="true" styleClass=""/> 
 								  
@@ -212,6 +219,7 @@ function setMainValue(page,data){
 						       <tr>
 						            <th >Picking No</th>
 									<th >Tranasction Date</th>
+									<th >  “¬¢π Ëß </th>
 									<th >Amount (Exc.vat)</th>
 									<th >Vat Amount</th>
 									<th >Amount (inc.vat)</th>
@@ -235,6 +243,7 @@ function setMainValue(page,data){
 									<tr class="<%=tabclass%>">
 										<td class="td_text_center" width="5%"><%=mc.getPickingNo() %></td>
 										<td class="td_text_center" width="10%"><%=mc.getTransactionDate()%></td>
+										<td class="td_text_center" width="10%"><%=mc.getRegionCri()%></td>
 										<td class="td_text_right" width="10%"><%=mc.getTotalAmount()%></td>
 									 	<td class="td_text_right" width="10%"><%=mc.getVatAmount()%></td>
 									    <td class="td_text_right" width="10%"><%=mc.getNetAmount()%></td>

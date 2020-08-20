@@ -12,9 +12,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
-import util.ConvertNullUtil;
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Customer;
@@ -30,6 +27,8 @@ import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.interim.bean.IOrderToReceipt;
 import com.isecinc.pens.process.document.ReceiptDocumentProcess;
 import com.isecinc.pens.web.pd.PDReceiptForm;
+import com.pens.util.ConvertNullUtil;
+import com.pens.util.DateToolsUtil;
 import com.pens.util.seq.SequenceProcess;
 
 /**
@@ -43,7 +42,7 @@ public class MReceipt extends I_Model<Receipt> {
 
 	private static final long serialVersionUID = -8532039857520296789L;
 
-	public static String TABLE_NAME = "t_receipt";
+	public static String TABLE_NAME = "pensso.t_receipt";
 	public static String COLUMN_ID = "RECEIPT_ID";
 
 	private String[] columns = { COLUMN_ID, "RECEIPT_NO", "RECEIPT_DATE", "ORDER_TYPE", "CUSTOMER_ID", "CUSTOMER_NAME",
@@ -204,7 +203,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	public boolean save(Receipt receipt, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (receipt.getId() ==0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
+			id = SequenceProcess.getNextValue("t_receipt").longValue();
 			String prefix = "";
 			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
 				receipt.setReceiptNo("R"

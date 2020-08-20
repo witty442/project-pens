@@ -6,10 +6,9 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
-import util.DateToolsUtil;
-
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DateToolsUtil;
 
 public class MSalesTargetPeriod {
 	/** Logger */

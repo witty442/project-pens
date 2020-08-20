@@ -458,7 +458,7 @@ public class BatchTaskDAO {
 			conn = DBConnectionApps.getInstance().getConnection();
 			 
 			/** Step 1 Check Task is run concurrent or no */
-			sql.append(" select name,IS_CONCURRENT from PENSSO.BATCH_TASK_CONTROL where name ='"+action+"' \n");
+			sql.append(" select name,IS_CONCURRENT from PENSBI.BATCH_TASK_CONTROL where name ='"+action+"' \n");
 			logger.debug("SQL checkTaskISConcurrent:"+sql.toString());
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();

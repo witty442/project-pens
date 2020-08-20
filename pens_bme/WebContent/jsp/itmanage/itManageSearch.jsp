@@ -97,7 +97,7 @@ function printReport(path,docNo){
 function openPopup(path,pageName){
 	var form = document.itManageForm;
 	var param = "&hideAll=true&pageName="+pageName;
-	 if("SalesrepSales" == pageName){
+	 if("SalesrepSalesAll" == pageName){
 		param += "&selectone=true";
 	}
 	url = path + "/jsp/popupAction.do?do=prepareAll&action=new"+param;
@@ -105,7 +105,7 @@ function openPopup(path,pageName){
 }
 function setDataPopupValue(code,desc,desc2,desc3,pageName){
 	var form = document.itManageForm;
-	if('SalesrepSales' == pageName){
+	if('SalesrepSalesAll' == pageName){
 		form.salesrepCode.value = code;
 		form.salesrepFullName.value = desc;
 		form.zone.value = desc2;

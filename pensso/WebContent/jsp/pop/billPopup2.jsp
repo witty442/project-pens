@@ -1,7 +1,8 @@
-<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+
+<%@page import="com.pens.util.DBConnectionApps"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.model.MAdjust"%>
-<%@page import="util.SessionGen"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -27,20 +28,20 @@ User user = (User) session.getAttribute("user");
 Connection conn = null;
 try{
 	//init Connection 
-	conn = DBConnection.getInstance().getConnection();
+	conn = DBConnectionApps.getInstance().getConnection();
 	
-	List<Order> ordersAll = new MOrder().lookUpByOrderAR(conn,user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in",selected);
+	List<Order> invoicesAll = new MOrder().lookUpByOrderAR(conn,user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in",selected);
 	double totalCreditNoteAmt = 0; 
 	double totalAdjustAmt = 0; 
 	 
 	
-	System.out.println("ordersAll :"+ordersAll.size());
+	System.out.println("invoicesAll :"+invoicesAll.size());
 	
 	List<Order> orders  = new ArrayList<Order>();
 	MCreditNote creditNote = new MCreditNote();
 	MAdjust adjust = new MAdjust();
 	
-	for(Order r : ordersAll){
+	for(Order r : invoicesAll){
 		r.setCreditAmount(new MReceiptLine().calculateCreditAmount(conn,r));
 		
 		totalCreditNoteAmt = creditNote.getTotalCreditNoteAmt(conn,r.getArInvoiceNo());
@@ -71,16 +72,16 @@ try{
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <style type="text/css">
 <!--
 .style1 {color: #004a80}
 -->
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript">
@@ -102,7 +103,7 @@ try{
 			if (objchk[c].checked) {
 				bill = new Object();
 				bill.rows=0;
-				bill.orderId = document.getElementsByName('orderId')[c].value;
+				bill.invoiceId = document.getElementsByName('invoiceId')[c].value;
 				bill.invoiceNo = document.getElementsByName('arInvoiceNo')[c].value;
 				bill.salesOrderNo = document.getElementsByName('salesOrderNo')[c].value;
 				bill.netAmount = document.getElementsByName('netAmount')[c].value;
@@ -161,7 +162,7 @@ try{
 					<td>
 						${results.arInvoiceNo}
 						<input type="hidden" name="arInvoiceNo" value="${results.arInvoiceNo}">
-						<input type="hidden" name="orderId" value="${results.id}">
+						<input type="hidden" name="invoiceId" value="${results.invoiceId}">
 					</td>
 					<td>
 						${results.salesOrderNo}

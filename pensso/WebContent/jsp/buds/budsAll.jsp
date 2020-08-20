@@ -1,4 +1,4 @@
-<%@page import="util.SessionUtils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -6,7 +6,7 @@
 <%
 /*clear session form other page */
 SessionUtils.clearSessionUnusedForm(request, "budsAllForm");
-
+ 
 String pageName = Utils.isNull(request.getParameter("pageName"));
 
 if(Utils.isNull(pageName).equals("")){
@@ -20,6 +20,8 @@ if(Utils.isNull(pageName).equals("")){
      <jsp:include page="page/confPickingPage.jsp" flush="true"/>  
 <%}else if("ControlPickingSearch".equalsIgnoreCase(pageName)){%>
      <jsp:include page="page/controlPickingSearchPage.jsp" flush="true"/>  
+<%}else if("StockOnhandSearch".equalsIgnoreCase(pageName)){%>
+     <jsp:include page="page/stockOnhandSearchPage.jsp" flush="true"/>  
 <%}else if("OrderEDI".equalsIgnoreCase(pageName)){%>
      <jsp:include page="page/orderEDIPage.jsp" flush="true"/>   
 <% } %>

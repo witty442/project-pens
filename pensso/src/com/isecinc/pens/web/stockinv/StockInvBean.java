@@ -34,6 +34,7 @@ public class StockInvBean implements Serializable{
 	private String qty2Style;
 	private String qty2Readonly;
 	private String deleteLineIds;
+	private String remark;
 
 	
 	//optional
@@ -42,6 +43,12 @@ public class StockInvBean implements Serializable{
 	private boolean canConfirm = false;
 	
 	
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 	public String getDeleteLineIds() {
 		return deleteLineIds;
 	}

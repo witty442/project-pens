@@ -18,8 +18,17 @@ public class ProductCatalog implements Comparable{
 	private int stockOnhandQty2;
 	private String uom1ConvRate;
 	private String uom2ConvRate;
+	private String checkInputHalf;
 	
 	
+	public String getCheckInputHalf() {
+		return checkInputHalf;
+	}
+
+	public void setCheckInputHalf(String checkInputHalf) {
+		this.checkInputHalf = checkInputHalf;
+	}
+
 	public String getUom1ConvRate() {
 		return uom1ConvRate;
 	}
@@ -35,8 +44,6 @@ public class ProductCatalog implements Comparable{
 	public void setUom2ConvRate(String uom2ConvRate) {
 		this.uom2ConvRate = uom2ConvRate;
 	}
-
-
 
 	public double getStockOnhandQty() {
 		return stockOnhandQty;

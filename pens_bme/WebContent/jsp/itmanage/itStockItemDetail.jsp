@@ -92,11 +92,11 @@ function save(path){
 		docType[0].focus();
 		return false;
 	}
-	if( $('#salesrepCode').val()==""){
+	/* if( $('#salesrepCode').val()==""){
 		alert("กรุณาระบุ พนักงานขาย");
 		$('#salesrepCode').focus();
 		return false;
-	}
+	} */
 	
 	if( !validateData()){
 		alert("กรุณากรอกข้อมูลให้ครบถ้วน");
@@ -173,7 +173,7 @@ function printReport(path){
 function openPopup(path,pageName){
 	var form = document.itManageForm;
 	var param = "&hideAll=true&pageName="+pageName;
-	 if("SalesrepSales" == pageName){
+	 if("SalesrepSalesAll" == pageName){
 		param += "&selectone=true";
 	}
 	url = path + "/jsp/popupAction.do?do=prepareAll&action=new"+param;
@@ -181,7 +181,7 @@ function openPopup(path,pageName){
 }
 function setDataPopupValue(code,desc,desc2,desc3,pageName){
 	var form = document.itManageForm;
-	if('SalesrepSales' == pageName){
+	if('SalesrepSalesAll' == pageName){
 		form.salesrepCode.value = code;
 		form.salesrepFullName.value = desc;
 		form.zone.value = desc2;
@@ -191,7 +191,7 @@ function setDataPopupValue(code,desc,desc2,desc3,pageName){
 function getAutoOnblur(e,obj,pageName){
 	var form = document.itManageForm;
 	if(obj.value ==''){
-		if("SalesrepSales" == pageName){
+		if("SalesrepSalesAll" == pageName){
 			form.salesrepCode.value = '';
 			form.salesrepFullName.value = "";
 			form.zone.value = "";
@@ -205,7 +205,7 @@ function getAutoKeypress(e,obj,pageName){
 	var form = document.itManageForm;
 	if(e != null && e.keyCode == 13){
 		if(obj.value ==''){
-			if("SalesrepSales" == pageName){
+			if("SalesrepSalesAll" == pageName){
 				form.salesrepCode.value = '';
 				form.salesrepFullName.value = "";
 				form.zone.value = "";
@@ -222,7 +222,7 @@ function getAutoDetail(obj,pageName){
 	
 	//prepare parameter
 	var param = "";
-	if("SalesrepSales"==pageName){
+	if("SalesrepSalesAll"==pageName){
 		param  ="pageName="+pageName;
 		param +="&salesrepCode="+obj.value;
 	}
@@ -236,7 +236,7 @@ function getAutoDetail(obj,pageName){
 			}
 		}).responseText;
 	
-	if("SalesrepSales" == pageName){
+	if("SalesrepSalesAll" == pageName){
 		var retArr = returnString.split("|");
 		if(retArr[0] !=-1){
 			form.salesrepCode.value = retArr[1];
@@ -244,12 +244,14 @@ function getAutoDetail(obj,pageName){
 			form.zone.value = retArr[3];
 			form.zoneName.value = retArr[4];
 		}else{
-			alert("ไม่พบข้อมูล");
-			form.salesrepCode.focus();
+			//alert("ไม่พบข้อมูล");
+			form.salesrepFullName.focus();
+			
+			/* form.salesrepCode.focus();
 			form.salesrepCode.value = '';
 			form.salesrepFullName.value = "";
 			form.zone.value = "";
-			form.zoneName.value = "";
+			form.zoneName.value = ""; */
 		}
 	}
 }
@@ -303,13 +305,13 @@ function getAutoDetail(obj,pageName){
 								</td>
 							 </tr>	
 						      <tr>
-					            <td align="right">พนักงานขาย <font color="red">*</font></td>
+					            <td align="right">พนักงานขาย <font color="red"></font></td>
 								<td>
 									<html:text property="bean.salesrepCode" styleId="salesrepCode" size="10" 
 								    styleClass="\" autoComplete=\"off" 
-								    onkeypress="getAutoKeypress(event,this,'SalesrepSales')"
-								    onblur="getAutoOnblur(event,this,'SalesrepSales')"/>
-								     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','SalesrepSales')"/>   
+								    onkeypress="getAutoKeypress(event,this,'SalesrepSalesAll')"
+								    onblur="getAutoOnblur(event,this,'SalesrepSalesAll')"/>
+								     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','SalesrepSalesAll')"/>   
 								     <html:text property="bean.salesrepFullName" styleId="salesrepFullName" styleClass="\" autoComplete=\"off" size="40"/>
 								   &nbsp;&nbsp;&nbsp;
 								  วันที่ทำรายการ 

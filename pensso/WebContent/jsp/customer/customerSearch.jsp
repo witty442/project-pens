@@ -1,16 +1,15 @@
+<%@page import="com.pens.util.AppversionVerify"%>
 <%@page import="com.pens.util.PageingGenerate"%>
 <%@page import="com.isecinc.pens.ApplicationVersion"%>
 <%@page import="com.isecinc.pens.inf.manager.batchwork.AppversionVerifyWorker"%>
-<%@page import="util.SessionUtils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.Customer"%>
 <%@page import="java.util.Iterator"%>
-<%@page import="util.GoogleMapJavaScriptAPI"%>
-<%@page import="util.SessionGen"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.isecinc.pens.bean.District"%>
 <%@page import="com.isecinc.pens.model.MDistrict"%>
-<%@page import="util.AppversionVerify"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -78,9 +77,9 @@ new AppversionVerifyWorker().start();
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css" />
 
 <style type="text/css">
@@ -93,13 +92,13 @@ body {
 -->
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/customerTransaction.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/customer.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/customerTransaction.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=GoogleMapJavaScriptAPI.getInstance().getAPIKey() %>" type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -314,13 +313,13 @@ function search(path){
 								<input type="button" value="ค้นหา" class="newPosBtn" onclick="search('${pageContext.request.contextPath}')">
 								<input type="button" value="Clear" class="newNegBtn" onclick="clearForm('${pageContext.request.contextPath}')">
 								
-								  <a href="#" onclick="return MarkLocationMap('${pageContext.request.contextPath}');">
+								  <%-- <a href="#" onclick="return MarkLocationMap('${pageContext.request.contextPath}');">
 									<input type="button" value="แสดงร้านค้าทั้งหมดบน แผนที่" class="newPosBtn">
-								</a> 
+								</a>  --%>
 								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								<a href="#" onclick="return exportToExcel('${pageContext.request.contextPath}');">
+								<%-- <a href="#" onclick="return exportToExcel('${pageContext.request.contextPath}');">
 								 <b>....</b>
-								</a> 
+								</a>  --%>
 							</td>
 						</tr>
 					</table>				

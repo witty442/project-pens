@@ -23,7 +23,7 @@ public class MReceiptMatchCN extends I_Model<ReceiptMatchCN> {
 
 	private static final long serialVersionUID = -8532039857520296789L;
 
-	public static String TABLE_NAME = "t_receipt_match_cn";
+	public static String TABLE_NAME = "pensso.t_receipt_match_cn";
 	public static String COLUMN_ID = "RECEIPT_MATCH_CN_ID";
 
 	private String[] columns = { COLUMN_ID, "RECEIPT_BY_ID", "RECEIPT_CN_ID", "PAID_AMOUNT", "CREATED_BY",
@@ -69,7 +69,7 @@ public class MReceiptMatchCN extends I_Model<ReceiptMatchCN> {
 	public boolean save(ReceiptMatchCN receiptMatchCN, int activeUserID, Connection conn) throws Exception {
 		long id =0;
 		if (receiptMatchCN.getId() ==0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
+			id = SequenceProcess.getNextValue("t_receipt_match_cn").longValue();
 		} else {
 			id = receiptMatchCN.getId();
 		}

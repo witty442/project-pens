@@ -14,9 +14,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import util.DateToolsUtil;
-import util.NumberToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.MoveOrder;
 import com.isecinc.pens.bean.MoveOrderLine;
@@ -31,6 +28,8 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.StockDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateToolsUtil;
+import com.pens.util.NumberToolsUtil;
 
 
 public class MStock {

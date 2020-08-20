@@ -4,14 +4,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.AppversionVerify;
-import util.ControlCode;
-
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.db.backup.DBBackUpManager;
 import com.isecinc.pens.inf.manager.batchwork.DownloadSalesAppWorker;
 import com.isecinc.pens.inf.manager.batchwork.UploadDatabaseBackupWorker;
 import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
+import com.pens.util.AppversionVerify;
+import com.pens.util.ControlCode;
 import com.pens.util.manual.cleardb.ClearDupDB;
 
 public class ExternalProcess {

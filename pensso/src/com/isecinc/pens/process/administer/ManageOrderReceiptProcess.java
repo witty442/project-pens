@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import util.DateToolsUtil;
-
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MReceipt;
+import com.pens.util.DateToolsUtil;
 
 public class ManageOrderReceiptProcess {
 

@@ -1,6 +1,6 @@
 <%@page import="com.isecinc.pens.web.buds.BudsAllForm"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.ConfPickingBean"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="com.pens.util.*"%>
@@ -95,9 +95,10 @@ function searchPickingNoKeypress(e,obj){
 		}
 	}
 }
-function exportExcel(path){
+function exportExcel(reportName){
 	var form = document.budsAllForm;
-	form.action = path + "/jsp/budsAllAction.do?do=export";
+	var path =document.getElementById("path").value 
+	form.action = path + "/jsp/budsAllAction.do?do=export&reportType=excel&reportName="+reportName;
 	form.submit();
 	return true;
 }
@@ -105,8 +106,8 @@ function exportExcel(path){
 function printReport(reportName){
 	var form = document.budsAllForm;
 	var path =document.getElementById("path").value 
-	//form.action = path + "/jsp/budsAllAction.do?do=printReport&reportName="+reportName;
-	//form.submit();
+	form.action = path + "/jsp/budsAllAction.do?do=printReport&reportType=pdf&reportName="+reportName;
+	form.submit();
 }
 function clearForm(path){
 	var form = document.budsAllForm;
@@ -264,24 +265,31 @@ function setMainAddOrderPickingManual(orderNoAll){
 				    	
 				    	   <%if("ConfPicking".equals(subPageName)){ %>
 						        <tr>
-					                <td valign="bottom"> ระบุสายขนส่ง/จังหวัดที่ต้องการจัดสินค้า <font color="red">*</font></td>
-									<td>
+					                <td valign="top"> ระบุสายขนส่ง/จังหวัดที่ต้องการจัดสินค้า <font color="red">*</font></td>
+									<td valign="top">
 									    <html:textarea property="bean.confPickingBean.regionCri" styleId="regionCri" rows="3" cols="20"/>
-									    จังหวัด
+									</td>
+									 <td valign="top">  จังหวัด</td>
+									  <td valign="top">
 									    <html:textarea property="bean.confPickingBean.provinceCri" styleId="provinceCri" rows="3" cols="30">
 									    </html:textarea>
-									   อำเภอ/เขต
+									  </td>
+									    <td valign="top">อำเภอ/เขต </td>
+									   <td valign="top">
 									    <html:textarea property="bean.confPickingBean.amphurCri" styleId="amphurCri" rows="3" cols="30"/>
 									    <input type="button" name="btTransport" value="...." 
 									    onclick="openPopupPage('TRANSPORT')" class="newPosBtnLong"/>
-									  
 								    </td>
 								 </tr>
 								  <tr>
-								     <td colspan="2">
-										เลขที่ Picking No:
-										<html:text property="bean.confPickingBean.pickingNo" styleId="pickingNo" size="15" readonly="true" styleClass="disableText"/>
-								        &nbsp;Transaction Date <html:text property="bean.confPickingBean.transactionDate" styleId="transactionDate" size="10" readonly="true" styleClass="disableText"/> 
+								     <td colspan="6">
+										<b><font size="2">เลขที่ Picking No:</font></b>
+										<html:text property="bean.confPickingBean.pickingNo" styleId="pickingNo" size="10" readonly="true" styleClass="disableTextBigBold"/>
+								       &nbsp;&nbsp;&nbsp;&nbsp;
+								        Transaction Date &nbsp;
+								        <html:text property="bean.confPickingBean.transactionDate" styleId="transactionDate" size="10" readonly="true" styleClass="disableText"/> 
+								           &nbsp; สถานะ &nbsp;
+								        <html:text property="bean.confPickingBean.status" size="10" readonly="true" styleClass="disableText"/> 
 								        &nbsp;&nbsp;&nbsp;&nbsp;
 								        <%if(Utils.isNull(budsAllForm.getBean().getConfPickingBean().getPickingNo()).equals("")){ %>
 										   	<a href="javascript:search()">
@@ -292,14 +300,16 @@ function setMainAddOrderPickingManual(orderNoAll){
 								 </tr>
 							 <%}else if("BudsConfPicking".equals(subPageName)){  %>
 							    <tr>
-							      <td> เลขที่ Picking No:</td>
+							      <td><b><font size="2">เลขที่ Picking No:</font></b></td>
 								  <td>	
-									<html:text property="bean.confPickingBean.pickingNo" styleClass="disableText" 
-									styleId="pickingNo" size="15" readonly="true"></html:text>
+									<html:text property="bean.confPickingBean.pickingNo" styleClass="disableTextBigBold" 
+									styleId="pickingNo" size="10" readonly="true"></html:text>
 								 
-								    &nbsp;Transaction Date 
+								    &nbsp;&nbsp;&nbsp;&nbsp;
+								    Transaction Date &nbsp;
 								    <html:text property="bean.confPickingBean.transactionDate" styleId="transactionDate" size="10" readonly="true" styleClass="disableText"/> 
-								  
+								    &nbsp; สถานะ &nbsp;
+								    <html:text property="bean.confPickingBean.status" size="10" readonly="true" styleClass="disableText"/> 
 							      </td>
 							    </tr>
 							    
@@ -336,7 +346,7 @@ function setMainAddOrderPickingManual(orderNoAll){
 						<tr>
 							<td align="center" width="100%">
 							<%if("ConfPicking".equals(subPageName)){ %>
-								<%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.PICKING})
+								<%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.BUD_ADMIN})
 										&& bean.isCanConfirm()){ %>
 								    &nbsp;&nbsp;&nbsp;&nbsp;
 									<a href="javascript:confirmPicking('${pageContext.request.contextPath}')">
@@ -345,7 +355,7 @@ function setMainAddOrderPickingManual(orderNoAll){
 									
 								<%} %>
 								
-								<%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.PICKING})
+								<%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.BUD_ADMIN})
 										&& bean.isCanAddOrderManual()){ %> 
 									 &nbsp;&nbsp;
 									<a href="javascript:addOrderPickingManual('${pageContext.request.contextPath}')">
@@ -362,21 +372,34 @@ function setMainAddOrderPickingManual(orderNoAll){
 								  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
 								</a>
 								
-								 <%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.PICKING}) 
+								 <%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.BUD_ADMIN}) 
 										&& bean.isCanReject()){ %>
 								    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									<a href="javascript:rejectOrder('${pageContext.request.contextPath}')">
 									  <input type="button" value="Reject Order" class="newPosBtnLong">
 									</a>
 								 <%} %> 
-								  <%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.PICKING})
+								  <%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.BUD_ADMIN})
 										&& bean.isCanPrintPicking()){ %>
 									 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 									 <a href="javascript:printReport('PickingReport')">
 									   <input type="button" value="พิมพ์ใบ Picking List" class="newPosBtnLong">
-									 </a>
+									 </a> &nbsp;
+									  <a href="javascript:exportExcel('SalesReport')">
+									   <input type="button" value="Export ไฟล์สั่งขาย" class="newPosBtnLong">
+									 </a>&nbsp;
+									  <a href="javascript:exportExcel('SalesDetailReport')">
+									   <input type="button" value="Export รายละเอียดใบขาย" class="newPosBtnLong">
+									 </a> 
 								  <%} %> 
+								   <%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.BUD_ADMIN})
+										&& bean.isCanPrintLoading()){ %>
+										&nbsp;
+									   <a href="javascript:exportExcel('PickingReport')">
+											  <input type="button" value="Export Picking (ใบโหลด)" class="newPosBtnLong">
+									   </a>
+								   <%} %> 
 								<%}else if("BudsConfPicking".equals(subPageName)) {%>
 								
 									<%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.BUD_ADMIN})
@@ -386,22 +409,21 @@ function setMainAddOrderPickingManual(orderNoAll){
 										  <input type="button" value="ยืนยันให้ทำการ Gen Invoice" class="newPosBtnLong">
 										</a>
 									<%} %> 
-									    &nbsp;
-									     <a href="javascript:exportExcel('${pageContext.request.contextPath}')">
-									        <input type="button" value="Export To Excel" class="newPosBtnLong">
-									     </a> 
 									     &nbsp;&nbsp;&nbsp;&nbsp;
 											<a href="javascript:backToMainPage('${pageContext.request.contextPath}')">
 											  <input type="button" value=" ปิดหน้าจอ  " class="newPosBtnLong">
 											</a>
-									     <%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.PICKING})
+									    <%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.BUD_ADMIN})
 											&& bean.isCanPrintLoading()){ %>
 										    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 										    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-										<!-- 	<a href="javascript:printReport('LoadingReport')">
-											  <input type="button" value="พิมพ์ใบ Load สินค้าขึ้นรถ" class="newPosBtnLong">
-											</a> -->
-									    <%} %> 
+										 	<a href="javascript:printReport('PickingReport')">
+											  <input type="button" value="พิมพ์ใบ Picking List" class="newPosBtnLong">
+											</a>
+											<a href="javascript:exportExcel('PickingReport')">
+											  <input type="button" value="Export Picking (ใบโหลด)" class="newPosBtnLong">
+											</a>
+									   <%} %> 
 								 <%} %> 
 							</td>
 							 <td align="right" width="40%" nowrap></td>

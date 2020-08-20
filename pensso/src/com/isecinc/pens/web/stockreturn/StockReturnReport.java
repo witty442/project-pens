@@ -3,19 +3,16 @@ package com.isecinc.pens.web.stockreturn;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import util.DateToolsUtil;
-import util.ExcelHeader;
-
-import com.isecinc.pens.bean.Stock;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DateToolsUtil;
+import com.pens.util.excel.ExcelHeader;
 
 public class StockReturnReport {
 

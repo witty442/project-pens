@@ -8,9 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
-import util.ConvertNullUtil;
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Customer;
@@ -23,7 +20,9 @@ import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.model.MVisit;
 import com.isecinc.pens.model.MVisitLine;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateToolsUtil;
 
 /**
  * Visit Action Class

@@ -1,7 +1,7 @@
 <%@page import="com.isecinc.pens.web.buds.BudsAllForm"%>
 <%@page import="com.isecinc.core.model.I_PO"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.ConfPickingBean"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="com.pens.util.*"%>
@@ -52,8 +52,9 @@ String role = ((User)session.getAttribute("user")).getType();
 function loadMe(){
 	new Epoch('epoch_popup', 'th', document.getElementById('transactionDate'));
 }
-function search(path){
+function search(){
 	var form = document.budsAllForm;
+	var path =document.getElementById("path").value 
 	form.action = path + "/jsp/budsAllAction.do?do=searchHead&action=newsearch";
 	form.submit();
 	return true;
@@ -65,10 +66,12 @@ function printReport(pickingNo){
 	form.submit();
 	return true;
 }
-function exportExcel(path){
+function exportExcel(pickingNo,summaryType){
 	var form = document.budsAllForm;
-	
-	form.action = path + "/jsp/budsAllAction.do?do=export";
+	var path =document.getElementById("path").value 
+	var param = "&reportName=controlPickingReport&pickingNo="+pickingNo;
+	    param +="&summaryType="+summaryType;
+	form.action = path + "/jsp/budsAllAction.do?do=export"+param;
 	form.submit();
 	return true;
 }
@@ -85,20 +88,19 @@ function clearForm(path){
 	form.submit();
 	return true;
 }
-function openPopupPage(page){
+function openPopupPage(pageName){
 	var form = document.budsAllForm;
 	var path = document.getElementById("path").value;
-    var param = "&page="+page;
-	var url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
+    var param = "&pageName="+pageName+"&selectone=true&hideAll=true";
+	var url = path + "/jsp/popupAction.do?do=prepareAll&action=new"+param;
 	
 	PopupCenterFullHeight(url,"",700);
 }
 
-function setMainValue(page,data){
-	if("PICKING_NO"==page){
-	   document.getElementById("pickingNo").value = data;
-	}else if("TRANSPORT"==page){
-	   document.getElementById("amphurCri").value = data;
+function setDataPopupValue(code,desc,pageName){
+	if("PICKING_NO_INVOICE"==pageName){
+	   document.getElementById("pickingNo").value = code;
+	   document.getElementById("transactionDate").value = desc;
 	}
 } 
 </script>
@@ -154,10 +156,14 @@ function setMainValue(page,data){
 								    <html:text property="bean.confPickingBean.pickingNo" 
 								    styleClass="\" autoComplete=\"off" styleId="pickingNo"></html:text>
 								    <input type="button" name="btTransport" value="..." 
-								    onclick="openPopupPage('PICKING_NO')" class="newPosBtnLong"/>
+								    onclick="openPopupPage('PICKING_NO_INVOICE')" class="newPosBtnLong"/>
 								     &nbsp;Transaction Date 
 								    <html:text property="bean.confPickingBean.transactionDate" styleId="transactionDate" size="10" readonly="true" styleClass=""/> 
-								  
+								  <%--  &nbsp;Summary Type
+								   <html:select property="bean.confPickingBean.summaryType">
+								     <html:option value="SUMMARY">Summary</html:option>
+								     <html:option value="DETAIL">Detail</html:option>
+								   </html:select> --%>
 							    </td>
 							 </tr>
 						</table>
@@ -166,14 +172,9 @@ function setMainValue(page,data){
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 						<tr>
 							<td align="center" width="100%">
-								<a href="javascript:search('${pageContext.request.contextPath}')">
+								<a href="javascript:search()">
 								  <input type="button" value="  ค้นหา  " class="newPosBtnLong">
-								</a>&nbsp;
-								<%if("ConfPicking".equalsIgnoreCase(subPageName)){ %>
-									<a href="javascript:openEdit('add','')">
-									  <input type="button" value="เพิ่มรายการใหม่ " class="newPosBtnLong">
-									</a>
-								<%} %>
+								</a>
 								&nbsp;
 								<a href="javascript:clearForm('${pageContext.request.contextPath}')">
 								  <input type="button" value=" Clear  " class="newPosBtnLong">
@@ -207,7 +208,8 @@ function setMainValue(page,data){
 									<th >Vat Amount</th>
 									<th >Amount (inc.vat)</th>
 									<th >สถานะ</th>
-									<th >พิมพ์</th>
+									<th >Export Summary</th>
+									<th >Export Detail</th>
 							   </tr>
 							<% 
 							String tabclass ="lineE";
@@ -227,12 +229,17 @@ function setMainValue(page,data){
 									    <td class="td_text_right" width="10%"><%=mc.getNetAmount()%></td>
 									    <td class="td_text_center" width="5%"><%=mc.getStatus()%></td>
 										<td class="td_text_center" width="10%"><font size="2">
-										    <a href="javascript:printReport('<%=mc.getPickingNo()%>')">
-											      พิมพ์รายงาน
+										    <a href="javascript:exportExcel('<%=mc.getPickingNo()%>','Summary')">
+											      Export
 											 </a>
 										</font>
 										</td>
-										
+										<td class="td_text_center" width="10%"><font size="2">
+										    <a href="javascript:exportExcel('<%=mc.getPickingNo()%>','Detail')">
+											      Export
+											 </a>
+										</font>
+										</td>
 									</tr>
 							<%} %>
 							 

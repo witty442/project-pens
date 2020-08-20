@@ -1,5 +1,5 @@
 
-<%@page import="util.SessionGen"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="net.sf.jasperreports.view.JRViewer"%>
 <%@page import="java.awt.BorderLayout"%>
 <%@page import="java.io.InputStream"%>
@@ -26,12 +26,10 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="com.isecinc.pens.SystemElements"%>
-<%@page import="util.DBCPConnectionProvider"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="java.sql.Connection"%>
-<%@page import="util.BeanParameter"%>
 <%@page import="java.util.List"%>
-<%@page import="util.ReportUtilServlet"%>
-<%@page import="util.ConvertNullUtil"%><%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<%@page import="com.pens.util.ConvertNullUtil"%><%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
@@ -46,7 +44,7 @@ body{ background-color:#FFFFFF; background-image:none; color:#000000 }
 #contentarea{ width:100%;}
 }
 </style>
-<link rel="stylesheet" type="text/css" media="print" href="print.css?v=<%=SessionGen.getInstance().getIdSession()%>">
+<link rel="stylesheet" type="text/css" media="print" href="print.css?v=<%=SIdUtils.getInstance().getIdSession()%>">
 <body leftmargin="0" topmargin="0" bottommargin="0" rightmargin="0" onload="print();window.close();">
 <%
 String reqDate = ConvertNullUtil.convertToString(request.getParameter("reqDate"));

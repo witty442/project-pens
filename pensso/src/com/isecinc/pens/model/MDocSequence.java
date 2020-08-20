@@ -24,7 +24,7 @@ public class MDocSequence extends I_Model<DocSequence> {
 
 	private static final long serialVersionUID = 1640780528117076239L;
 
-	public static String TABLE_NAME = "c_doctype_sequence";
+	public static String TABLE_NAME = "pensso.c_doctype_sequence";
 	public static String COLUMN_ID = "DOCTYPE_SEQUENCE_ID";
 
 	// Column Sales Online Side active
@@ -195,7 +195,7 @@ public class MDocSequence extends I_Model<DocSequence> {
 
 	
 	public boolean saveNew(DocSequence docSequence, int activeUserID, Connection conn) throws Exception {
-		docSequence.setId(SequenceProcess.getNextValue(TABLE_NAME).longValue());
+		docSequence.setId(SequenceProcess.getNextValue("c_doctype_sequence").longValue());
 		Object[] values = { docSequence.getId(),docSequence.getDoctypeID(),docSequence.getSalesCode(),docSequence.getOrderType(),
 				            docSequence.getStartNo(),docSequence.getCurrentNext(),
 				            docSequence.getCurrentYear(),docSequence.getCurrentMonth(), docSequence.getActive() ,activeUserID };

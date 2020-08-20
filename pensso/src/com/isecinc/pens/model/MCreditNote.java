@@ -7,12 +7,11 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.DateToolsUtil;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DateToolsUtil;
 
 /**
  * Credit Note Model
@@ -104,16 +103,17 @@ public class MCreditNote extends I_Model<CreditNote> {
 			whereCause += "\n  ,AR_INVOICE_NO , ACTIVE";
 			whereCause += "\n  , (  COALESCE(c.TOTAL_AMOUNT,0) ";
 			//New code cn = cn +adjust 
-			whereCause += "\n     + COALESCE((SELECT sum(adjust_amount) from t_adjust ad ";
+			whereCause += "\n     + COALESCE((SELECT sum(adjust_amount) from pensso.t_adjust ad ";
 			whereCause += "\n                 where ad.ar_invoice_no = c.credit_note_no),0) ";
 			whereCause += "\n    ) as TOTAL_AMOUNT ";
-			whereCause += "\n  FROM T_CREDIT_NOTE c WHERE 1=1";
+			whereCause += "\n  FROM pensso.T_CREDIT_NOTE c WHERE 1=1";
 			whereCause += "\n  AND USER_ID = " + userId;
 			whereCause += "\n  AND ACTIVE = 'Y' ";
 			whereCause += "\n  AND DOC_STATUS = 'SV' ";
-			whereCause += "\n  AND CREDIT_NOTE_ID NOT IN(SELECT CREDIT_NOTE_ID FROM t_receipt_cn rcn, t_receipt rc ";
-			whereCause += "\n  WHERE rc.receipt_id = rcn.receipt_id AND rc.Doc_Status = 'SV') ";
-			whereCause += "\n AND (AR_Invoice_No Is Null OR TRIM(AR_INVOICE_NO) = '' ) "; 
+			whereCause += "\n  AND CREDIT_NOTE_ID NOT IN("
+					+ "          SELECT CREDIT_NOTE_ID FROM pensso.t_receipt_cn rcn, pensso.t_receipt rc ";
+			whereCause += "\n    WHERE rc.receipt_id = rcn.receipt_id AND rc.Doc_Status = 'SV') ";
+			whereCause += "\n    AND (AR_Invoice_No Is Null OR TRIM(AR_INVOICE_NO) = '' ) "; 
 			
 			/** Wit Edit 16/03/2011 :Filter Credit Note by User **/
 			if( customerId != 0){
@@ -299,10 +299,10 @@ public class MCreditNote extends I_Model<CreditNote> {
 			whereCause += "\n from(";
 			whereCause += "\n  SELECT  ar_invoice_no,credit_note_no ";
 			whereCause += "\n  , COALESCE(sum(total_amount),0) as cn_amount ";
-			whereCause += "\n  ,(COALESCE((SELECT SUM(adjust_amount) from t_adjust aj ";
+			whereCause += "\n  ,(COALESCE((SELECT SUM(adjust_amount) from PENSSO.t_adjust aj ";
 			whereCause += "\n                 where aj.ar_invoice_no = c.credit_note_no),0) ";
 			whereCause += "\n    ) as ADJUST_AMOUNT ";
-			whereCause += "\n  FROM T_CREDIT_NOTE c WHERE 1=1";
+			whereCause += "\n  FROM PENSSO.T_CREDIT_NOTE c WHERE 1=1";
 			whereCause += "\n  AND ACTIVE='Y' ";
 			whereCause += "\n  AND DOC_STATUS ='SV' ";
 			whereCause += "\n  AND AR_INVOICE_NO ='"+arInvoiceNo+"'";

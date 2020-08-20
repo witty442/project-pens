@@ -97,7 +97,7 @@ function open_bill(path, rowNo) {
 	
 	// get selected id
 	var selected="";
-	var objtxt = document.getElementsByName('bill.orderId');
+	var objtxt = document.getElementsByName('bill.invoiceId');
 	for(var i=0;i<objtxt.length;i++)
 	{
 		selected+=','+objtxt[i].value;
@@ -107,17 +107,13 @@ function open_bill(path, rowNo) {
 	
 	var customerId = document.getElementsByName('receipt.customerId')[0].value;
 	
-	if (rowNo == null)
-// window.open(path + "/jsp/pop/billPopup.jsp?selected="+selected, "Bill",
-// "width=650,height=400,location=No,resizable=No");
+	if (rowNo == null){
 		window.open(path + "/jsp/pop/billPopup2.jsp?selected="+selected+"&cust="+customerId, "Bill",
 			"width="+screen_width+",height=400,location=0");
-	else
-// window.open(path + "/jsp/pop/billPopup.jsp?row=" +
-// rowNo+"&selected="+selected, "Bill",
-// "width=650,height=400,location=No,resizable=No");
+	}else{
 		window.open(path + "/jsp/pop/billPopup2.jsp?row=" + rowNo+"&selected="+selected+"&cust="+customerId, "Bill",
 			"width="+screen_width+",height=400,location=0");
+	}
 	return;
 }
 
@@ -154,7 +150,7 @@ function deleteBill(path){
 	var tbl = document.getElementById('tblBill');
 	var chk = document.getElementsByName("billids");
 	var delId = document.getElementsByName('deletedId')[0];
-	var billIds = document.getElementsByName('bill.orderId');
+	var billIds = document.getElementsByName('bill.invoiceId');
 	var drow;
 	var bcheck=false;
 	var applyId = document.getElementsByName('pb.allBillId');
@@ -329,7 +325,7 @@ function setValueToBill(path, arrayVal) {
 
 		inputLabel="";
 		inputLabel+="<input type='hidden' name='bill.id' value='0'>";
-		inputLabel+="<input type='hidden' name='bill.orderId' value='"+arrayVal[i].orderId+"'>";
+		inputLabel+="<input type='hidden' name='bill.invoiceId' value='"+arrayVal[i].invoiceId+"'>";
 		inputLabel+="<input type='hidden' name='bill.invoiceNo' value='"+arrayVal[i].invoiceNo+"'>";
 		inputLabel+="<input type='hidden' name='bill.salesOrderNo' value='"+arrayVal[i].salesOrderNo+"'>";
 		inputLabel+="<input type='hidden' name='bill.netAmt' value='"+arrayVal[i].netAmount+"'>";
@@ -358,7 +354,7 @@ function setValueToBill(path, arrayVal) {
 function createBillList(){
 	var divlines = document.getElementById('BillList');
 	var ids=document.getElementsByName('bill.id');
-	var orderIds=document.getElementsByName('bill.orderId');
+	var invoiceIds=document.getElementsByName('bill.invoiceId');
 	var invoices=document.getElementsByName('bill.invoiceNo');
 	var orders=document.getElementsByName('bill.salesOrderNo');
 	var netamts=document.getElementsByName('bill.netAmt');
@@ -380,7 +376,7 @@ function createBillList(){
 	for(var i=0;i<ids.length;i++){
 		inputLabel="";
 		inputLabel+="<input type='text' name='lines["+i+"].id' value='"+ids[i].value+"'>";
-		inputLabel+="<input type='text' name='lines["+i+"].order.id' value='"+orderIds[i].value+"'>";
+		inputLabel+="<input type='text' name='lines["+i+"].order.invoiceId' value='"+invoiceIds[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].arInvoiceNo' value='"+invoices[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].salesOrderNo' value='"+orders[i].value+"'>";
 		inputLabel+="<input type='text' name='lines["+i+"].invoiceAmount' value='"+netamts[i].value+"'>";
@@ -654,7 +650,7 @@ function calculateAll(){
 
 function updatePaidToBill(){
 	// update paid to Bill
-	var orders = document.getElementsByName('bill.orderId');
+	var invoices = document.getElementsByName('bill.invoiceId');
 	var allBill = document.getElementsByName('pb.allBillId');
 	var allPaid = document.getElementsByName('pb.allPaid');
 	var bill;
@@ -664,15 +660,15 @@ function updatePaidToBill(){
 	
 	var tbl = document.getElementById('tblBill');
 	
-	for(var i=0;i<orders.length;i++){
+	for(var i=0;i<invoices.length;i++){
 		paid=0;
 		remain=0;
 		for(var j=0;j<allBill.length;j++){
 			var bill = allBill[j].value.split(','); 
 			for(var b=0;b<bill.length;b++){
-				if(bill[b]==orders[i].value){
-					// alert(bill[b]);
-					// alert(allPaid[j].value.split('||')[b]);
+				if(bill[b]==invoices[i].value){
+					 //alert(bill[b]);
+					 //alert(allPaid[j].value.split('||')[b]);
 					paid+=Number(allPaid[j].value.split('|')[b]);
 				}
 			}
@@ -697,8 +693,7 @@ function updatePaidToBill(){
 		if(document.getElementsByName('bill.remainAmt')[i])
 			document.getElementsByName('bill.remainAmt')[i].value=remain;
 		
-		if(document.getElementsByName('receipt.orderType')[0].value=='DD')
-		{
+		if(document.getElementsByName('receipt.orderType')[0].value=='DD'){
 		//
 		}else{
 			tbl.rows[i+1].cells[6].innerHTML = addCommas(Number(paid).toFixed(2));
@@ -748,7 +743,7 @@ function applyBill(path, rowNo, type , recAmount, seedId) {
 	// get selected id
 	var screen_width = $(window).width()-10;
 	var selected="";
-	var objtxt = document.getElementsByName('bill.orderId');
+	var objtxt = document.getElementsByName('bill.invoiceId');
 	for(var i=0;i<objtxt.length;i++)
 	{
 		selected+=','+objtxt[i].value;
@@ -803,9 +798,11 @@ function fillApply(seed,allbill,allpaid){
 			if(allpaid.length>0){allpaid=allpaid.substring(1,allpaid.length);}
 			document.getElementsByName('pb.allBillId')[i].value = allbill;
 			document.getElementsByName('pb.allPaid')[i].value = allpaid;
+			//alert(document.getElementsByName('pb.allBillId')[i].value+":"+document.getElementsByName('pb.allPaid')[i].value);
 			break;
 		}
 	}
+	
 	
 	calculateAll();
 }
@@ -924,7 +921,7 @@ function createBysList(){
 function applyBillView(path, rowNo, type , recAmount, seedId) {
 	// get selected id
 	var selected="";
-	var objtxt = document.getElementsByName('bill.orderId');
+	var objtxt = document.getElementsByName('bill.invoiceId');
 	for(var i=0;i<objtxt.length;i++)
 	{
 		selected+=','+objtxt[i].value;

@@ -198,6 +198,7 @@ public class SalesTargetTTAction  {
 	                    }//if
 	        		}//for 2
 	        	    
+	        	    logger.debug("XX:h.getSalesZone:"+salesrepBean.getSalesZone());
 	        	   //set header property
         	    	h = new SalesTargetBean();
         	    	h.setStartDate(bean.getStartDate());
@@ -208,7 +209,11 @@ public class SalesTargetTTAction  {
         	    	h.setId(salesrepBean.getId());
 	        	    h.setSalesrepCode(salesrepBean.getSalesrepCode());
 	        	    h.setSalesrepId(salesrepBean.getSalesrepId());
-	        	    h.setSalesChannelNo(salesrepBean.getSalesChannelNo());
+	        	   
+	        	    //h.setSalesChannelNo(salesrepBean.getSalesChannelNo());
+	        	    //WIT Edit 17/08/2563 get from screen
+	        	    h.setSalesChannelNo(bean.getSalesZone());//salesChannel =salesZone
+	        	    
 	        	    h.setDivision(SalesTargetTTUtils.getDivision(conn,h.getSalesChannelNo()));
 	    			//set productList to salesrepCode
 	        	    h.setItems(productDataSaveListBySalesrep);

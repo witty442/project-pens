@@ -1,4 +1,4 @@
-<%@page import="util.GoogleMapJavaScriptAPI"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>

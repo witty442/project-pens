@@ -6,4 +6,5 @@ public class BatchTaskConstants {
  public static String DATA_FILE  ="DATA_FILE";
 	
  public static String IMPORT_RECEIPT = "ImportReceipt";
+ public static String EXPORT_RECEIPT = "ExportReceipt";
 }

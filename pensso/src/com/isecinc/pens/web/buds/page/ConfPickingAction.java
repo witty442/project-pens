@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-
-import util.BeanParameter;
-import util.ReportUtilServlet;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
@@ -33,10 +31,14 @@ import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MStockReturn;
 import com.isecinc.pens.web.buds.BudsAllBean;
 import com.isecinc.pens.web.buds.BudsAllForm;
+import com.isecinc.pens.web.buds.page.export.ConfPickingExport;
 import com.isecinc.pens.web.stockreturn.StockReturnForm;
+import com.pens.util.BeanParameter;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DBConnection;
 import com.pens.util.DBConnectionApps;
+import com.pens.util.DateUtil;
+import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 
 /**
@@ -128,6 +130,7 @@ public class ConfPickingAction extends I_Action {
 		int currPage = 1;
 		boolean allRec = false;
 		Connection conn = null;
+		String subPageName = aForm.getSubPageName();
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
 			logger.debug("action:"+action);
@@ -143,7 +146,7 @@ public class ConfPickingAction extends I_Action {
 				aForm.setPageSize(pageSize);
 				
 				//get Total Record
-				aForm.setTotalRecord(ConfPickingDAO.searchTotalHead(conn,aForm.getBean().getConfPickingBean()));
+				aForm.setTotalRecord(ConfPickingDAO.searchTotalHead(conn,subPageName,aForm.getBean().getConfPickingBean()));
 				//calc TotalPage
 				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
 				//calc startRec endRec
@@ -156,7 +159,7 @@ public class ConfPickingAction extends I_Action {
 			    aForm.setEndRec(endRec);
 			    
 				//get Items Show by Page Size
-				ConfPickingBean confPickingBean = ConfPickingDAO.searchHead(conn,aForm.getBean().getConfPickingBean(),false,allRec,currPage,pageSize);
+				ConfPickingBean confPickingBean = ConfPickingDAO.searchHead(conn,subPageName,aForm.getBean().getConfPickingBean(),false,allRec,currPage,pageSize);
 				if(confPickingBean.getItemsList().size() <=0){
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				}
@@ -176,7 +179,7 @@ public class ConfPickingAction extends I_Action {
 			    aForm.setEndRec(endRec);
 			    
 				//get Items Show by Page Size
-			    ConfPickingBean confPickingBean = ConfPickingDAO.searchHead(conn,aForm.getBean().getConfPickingBean(),false,allRec,currPage,pageSize);
+			    ConfPickingBean confPickingBean = ConfPickingDAO.searchHead(conn,subPageName,aForm.getBean().getConfPickingBean(),false,allRec,currPage,pageSize);
 				if(confPickingBean.getItemsList().size() <=0){
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				}
@@ -420,15 +423,14 @@ public class ConfPickingAction extends I_Action {
 		return mapping.findForward("budsAll");
 	}
 	
-	public ActionForward export(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("export");
+	public ActionForward exportPickingList(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("exportPickingList");
 		BudsAllForm budsAllForm = (BudsAllForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		String pageName = budsAllForm.getPageName();
 		String subPageName = budsAllForm.getSubPageName();
 		StringBuffer dataExcel = new StringBuffer();
 		try {
-			
 			//set for display by page
 			request.getSession().setAttribute("summary" ,null);
 			budsAllForm.getBean().getConfPickingBean().setDataStrBuffer(null);
@@ -461,13 +463,135 @@ public class ConfPickingAction extends I_Action {
 		return mapping.findForward("budsAll");
 	}
 	
+	public ActionForward exportPickingListReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("exportPickingListReport");
+		BudsAllForm budsAllForm = (BudsAllForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		String pageName = budsAllForm.getPageName();
+		String subPageName = budsAllForm.getSubPageName();
+		StringBuffer dataExcel = new StringBuffer();
+		try {
+			//set for display by page
+			request.getSession().setAttribute("summary" ,null);
+			budsAllForm.getBean().getConfPickingBean().setDataStrBuffer(null);
+			budsAllForm.getBean().getConfPickingBean().setItemsList(null);
+			
+			List<ConfPickingBean> resultList = ConfPickingDAO.searchPickingReport(budsAllForm.getBean().getConfPickingBean(), user);
+			ConfPickingBean confPickingBean = budsAllForm.getBean().getConfPickingBean();
+			confPickingBean.setItemsList(resultList);
+			
+			logger.debug("resultList :"+resultList.size());
+			//GenExcel Table
+			dataExcel = ConfPickingExport.genPickingListReport(confPickingBean, true);
+			
+			if(dataExcel != null){
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(dataExcel.toString());
+			    w.flush();
+			    w.close();
+
+			    out.flush();
+			    out.close();
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("budsAll");
+	}
+	
+	public ActionForward exportSalesReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("exportSalesReport");
+		BudsAllForm budsAllForm = (BudsAllForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		StringBuffer dataExcel = new StringBuffer();
+		try {
+			//set for display by page
+			request.getSession().setAttribute("summary" ,null);
+			budsAllForm.getBean().getConfPickingBean().setDataStrBuffer(null);
+			budsAllForm.getBean().getConfPickingBean().setItemsList(null);
+			
+			ConfPickingBean confPickingBean = ConfPickingExport.searchSalesReport(budsAllForm.getBean().getConfPickingBean(), true, user);
+			
+			if(confPickingBean != null && confPickingBean.getDataStrBuffer() != null){
+				dataExcel.append(confPickingBean.getDataStrBuffer());
+				//dataExcel.append(confPickingBean.getRowTotalStrBuffer());
+				
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(dataExcel.toString());
+			    w.flush();
+			    w.close();
+
+			    out.flush();
+			    out.close();
+			}else{
+				request.setAttribute("Message", "ไม่พบข้อมูล");
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("budsAll");
+	}
+	public ActionForward exportSalesDetailReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("exportSalesDetailReport");
+		BudsAllForm budsAllForm = (BudsAllForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		StringBuffer dataExcel = new StringBuffer();
+		try {
+			//set for display by page
+			request.getSession().setAttribute("summary" ,null);
+			budsAllForm.getBean().getConfPickingBean().setDataStrBuffer(null);
+			budsAllForm.getBean().getConfPickingBean().setItemsList(null);
+			
+			ConfPickingBean confPickingBean = ConfPickingExport.searchSalesDetailReport(budsAllForm.getBean().getConfPickingBean(), true, user);
+			
+			if(confPickingBean != null && confPickingBean.getDataStrBuffer() != null){
+				dataExcel.append(confPickingBean.getDataStrBuffer());
+				//dataExcel.append(confPickingBean.getRowTotalStrBuffer());
+				
+				java.io.OutputStream out = response.getOutputStream();
+				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
+				response.setContentType("application/vnd.ms-excel");
+				
+				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
+				w.write(dataExcel.toString());
+			    w.flush();
+			    w.close();
+
+			    out.flush();
+			    out.close();
+			}else{
+				request.setAttribute("Message", "ไม่พบข้อมูล");
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("budsAll");
+	}
+  //PickingList = Loading Report
   public ActionForward printPickingReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("printReport");
 		BudsAllForm aForm = (BudsAllForm) form;
 		User user = (User) request.getSession().getAttribute("user");
 		Connection conn = null;
 		String fileNameExport  = "PickingReport.pdf";
+		String fileType = SystemElements.PDF;
 		try { 
+			String reportType = Utils.isNull(request.getParameter("reportType"));
+			if("excel".equalsIgnoreCase(reportType)){
+				fileNameExport  = "PickingReport.xls";
+				fileType = SystemElements.EXCEL;
+			}
 			ReportUtilServlet reportServlet = new ReportUtilServlet();
 			HashMap<String,Object> parameterMap = new HashMap<String,Object>();
 			ServletContext context = request.getSession().getServletContext();
@@ -478,10 +602,6 @@ public class ConfPickingAction extends I_Action {
             //init connection 
 			conn = DBConnectionApps.getInstance().getConnection();
 			
-			//head
-			/*String logopath =   context.getRealPath("/images/pens_logo_fit.jpg");
-			logger.debug("reportType:"+Utils.isNull(request.getParameter("reportType")));*/
-		
             //detail
 			List<ConfPickingBean> resultList = ConfPickingDAO.searchPickingReport(aForm.getBean().getConfPickingBean(), user);
 			logger.debug("resultList :"+resultList.size());
@@ -490,8 +610,9 @@ public class ConfPickingAction extends I_Action {
             parameterMap.put("pickingNo",aForm.getBean().getConfPickingBean().getPickingNo());
             parameterMap.put("transactionDate",aForm.getBean().getConfPickingBean().getTransactionDate());
             parameterMap.put("userPrint",user.getName());
-          
-            reportServlet.runReport(request, response, conn, fileJasper, SystemElements.PDF, parameterMap, fileName,resultList ,fileNameExport);
+            parameterMap.put("printDate",DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,DateUtil.local_th));
+            
+            reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName,resultList ,fileNameExport);
 		
             //update print picking count
             ConfPickingDAO.updatePrintCountPickingTrans(conn, aForm.getBean().getConfPickingBean(),"PrintPicking");

@@ -11,10 +11,9 @@ import javax.servlet.http.HttpServlet;
 
 import org.apache.log4j.Logger;
 
-import util.ControlCode;
-
 import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.ControlCode;
 
 
 public class RunUpdateSalesAppAutoServlet  extends HttpServlet{

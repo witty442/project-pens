@@ -4,13 +4,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MDistrict;
 import com.isecinc.pens.model.MProvince;
+import com.pens.util.ConvertNullUtil;
+import com.pens.util.Utils;
 
 /**
  * Address
@@ -45,7 +45,7 @@ public class Address extends I_PO implements Serializable {
 		setPostalCode(rst.getString("POSTAL_CODE").trim());
 		setPurpose(rst.getString("PURPOSE").trim());
 		setIsActive(rst.getString("ISACTIVE").trim());
-
+		setAlternateName(Utils.isNull(rst.getString("alternate_name")));
 		/** Display */
 		setDisplayLabel();
 		
@@ -80,6 +80,9 @@ public class Address extends I_PO implements Serializable {
 	public String getLineString() {
 		String lineString;
 		lineString = "";
+		if( !Utils.isNull(getAlternateName()).equals("")){
+		   lineString = "("+Utils.isNull(getAlternateName())+") ";
+		}
 		lineString += getLine1() + " ";
 		lineString += getLine2() + " ";
 		if ("กรุงเทพฯ".equalsIgnoreCase(getProvince().getName())
@@ -142,6 +145,16 @@ public class Address extends I_PO implements Serializable {
 	
 	/** Reference ID (Oracle Address ID)*/
 	private int referenceId;
+    private String alternateName;
+    
+    
+	public String getAlternateName() {
+		return alternateName;
+	}
+
+	public void setAlternateName(String alternateName) {
+		this.alternateName = alternateName;
+	}
 
 	public int getId() {
 		return id;

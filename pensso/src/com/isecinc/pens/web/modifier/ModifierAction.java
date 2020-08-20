@@ -5,9 +5,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
-import util.BeanParameter;
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Modifier;
@@ -15,6 +12,8 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MModifier;
 import com.isecinc.pens.model.MModifierLine;
+import com.pens.util.BeanParameter;
+import com.pens.util.DateToolsUtil;
 
 /**
  * Modifier Action Class

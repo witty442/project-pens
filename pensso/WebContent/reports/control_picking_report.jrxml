@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.13.0.final using JasperReports Library version 3.7.2  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="control_picking_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="585" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5">
 	<property name="ireport.zoom" value="2.0"/>
-	<property name="ireport.x" value="622"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="userPrint" class="java.lang.String"/>
 	<parameter name="pickingNo" class="java.lang.String"/>
@@ -17,18 +16,18 @@
 	<field name="customerName" class="java.lang.String"/>
 	<field name="amphur" class="java.lang.String"/>
 	<field name="mobile" class="java.lang.String"/>
-	<field name="totalAmount" class="java.lang.Double"/>
-	<field name="vatAmount" class="java.lang.Double"/>
-	<field name="netAmount" class="java.lang.Double"/>
+	<field name="totalAmountD" class="java.lang.Double"/>
+	<field name="vatAmountD" class="java.lang.Double"/>
+	<field name="netAmountD" class="java.lang.Double"/>
 	<variable name="sumTotalInvBySales" class="java.lang.Integer" resetType="Group" resetGroup="salesGroup" incrementType="Group" incrementGroup="salesGroup" calculation="Count"/>
 	<variable name="sumTotalAmountBySales" class="java.lang.Double" resetType="Group" resetGroup="salesGroup" calculation="Sum">
-		<variableExpression><![CDATA[$F{totalAmount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{totalAmountD}]]></variableExpression>
 	</variable>
 	<variable name="sumVatAmountBySales" class="java.lang.Double" resetType="Group" resetGroup="salesGroup" calculation="Sum">
-		<variableExpression><![CDATA[$F{vatAmount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{vatAmountD}]]></variableExpression>
 	</variable>
 	<variable name="sumNetAmountBySales" class="java.lang.Double" resetType="Group" resetGroup="salesGroup" calculation="Sum">
-		<variableExpression><![CDATA[$F{netAmount}]]></variableExpression>
+		<variableExpression><![CDATA[$F{netAmountD}]]></variableExpression>
 	</variable>
 	<group name="salesGroup">
 		<groupExpression><![CDATA[$F{salesrepCode}]]></groupExpression>
@@ -60,7 +59,7 @@
 					</textElement>
 					<textFieldExpression class="java.lang.Double"><![CDATA[$V{sumTotalInvBySales}]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField pattern="###0.00">
 					<reportElement x="350" y="0" width="50" height="20"/>
 					<box bottomPadding="0" rightPadding="0">
 						<topPen lineWidth="0.1"/>
@@ -71,9 +70,9 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle" lineSpacing="Single">
 						<font fontName="Angsana New" size="14" isBold="true"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$V{sumTotalAmountBySales}]]></textFieldExpression>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{sumTotalAmountBySales}]]></textFieldExpression>
 				</textField>
-				<textField pattern="###0">
+				<textField pattern="###0.00">
 					<reportElement x="420" y="0" width="49" height="20"/>
 					<box bottomPadding="0" rightPadding="0">
 						<topPen lineWidth="0.1"/>
@@ -84,10 +83,10 @@
 					<textElement textAlignment="Right" verticalAlignment="Middle" lineSpacing="Single">
 						<font fontName="Angsana New" size="14" isBold="true"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$V{sumVatAmountBySales}]]></textFieldExpression>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{sumVatAmountBySales}]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="480" y="0" width="59" height="20"/>
+				<textField pattern="###0.00">
+					<reportElement x="488" y="0" width="59" height="20"/>
 					<box bottomPadding="0" rightPadding="0">
 						<topPen lineWidth="0.1"/>
 						<leftPen lineWidth="0.0"/>
@@ -97,7 +96,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle" lineSpacing="Single">
 						<font fontName="Angsana New" size="14" isBold="true"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$V{sumNetAmountBySales}]]></textFieldExpression>
+					<textFieldExpression class="java.lang.Double"><![CDATA[$V{sumNetAmountBySales}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="282" y="0" width="68" height="20"/>
@@ -152,7 +151,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA["Picking No: " + $P{pickingNo}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="60" width="60" height="40"/>
+				<reportElement x="0" y="65" width="60" height="40"/>
 				<box bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.1" lineStyle="Solid"/>
 					<leftPen lineWidth="0.1"/>
@@ -172,7 +171,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA["วันที่: " + $P{transactionDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="183" y="60" width="47" height="40"/>
+				<reportElement x="183" y="65" width="47" height="40"/>
 				<box bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.1" lineStyle="Solid"/>
 					<leftPen lineWidth="0.1"/>
@@ -185,7 +184,7 @@
 				<text><![CDATA[พนักงาน ขาย]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="120" y="60" width="63" height="40"/>
+				<reportElement x="120" y="65" width="63" height="40"/>
 				<box bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.1" lineStyle="Solid"/>
 					<leftPen lineWidth="0.1"/>
@@ -198,7 +197,7 @@
 				<text><![CDATA[เลขที่ Order]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="230" y="60" width="54" height="40"/>
+				<reportElement x="230" y="65" width="54" height="40"/>
 				<box bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.1" lineStyle="Solid"/>
 					<leftPen lineWidth="0.1"/>
@@ -211,7 +210,7 @@
 				<text><![CDATA[รหัสร้านค้า]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="284" y="60" width="116" height="40"/>
+				<reportElement x="284" y="65" width="116" height="40"/>
 				<box bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.1" lineStyle="Solid"/>
 					<leftPen lineWidth="0.1"/>
@@ -224,7 +223,7 @@
 				<text><![CDATA[ชื่อร้านค้า]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="400" y="60" width="100" height="40"/>
+				<reportElement x="400" y="65" width="100" height="40"/>
 				<box bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.1" lineStyle="Solid"/>
 					<leftPen lineWidth="0.1"/>
@@ -251,7 +250,7 @@
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="60" y="60" width="60" height="40"/>
+				<reportElement x="60" y="65" width="60" height="40"/>
 				<box bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.1" lineStyle="Solid"/>
 					<leftPen lineWidth="0.1"/>
@@ -264,7 +263,7 @@
 				<text><![CDATA[Invoice Date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="500" y="60" width="82" height="40"/>
+				<reportElement x="500" y="65" width="82" height="40"/>
 				<box bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.1" lineStyle="Solid"/>
 					<leftPen lineWidth="0.1"/>
@@ -279,7 +278,7 @@
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="25" splitType="Stretch">
+		<band height="20" splitType="Stretch">
 			<textField>
 				<reportElement x="0" y="0" width="60" height="20"/>
 				<box leftPadding="3" rightPadding="3">
@@ -372,7 +371,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{customerCode}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="503" y="0" width="78" height="20"/>
+				<reportElement x="500" y="0" width="82" height="20"/>
 				<box leftPadding="3" rightPadding="3">
 					<topPen lineWidth="0.1"/>
 					<leftPen lineWidth="0.1"/>

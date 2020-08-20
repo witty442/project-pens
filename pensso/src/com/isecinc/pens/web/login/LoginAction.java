@@ -12,15 +12,15 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import util.ConvertNullUtil;
-import util.SIdUtils;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.login.LoginProcess;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBConnection;
+import com.pens.util.SIdUtils;
+import com.pens.util.UserUtils;
 import com.pens.util.Utils;
 
 /**
@@ -48,6 +48,7 @@ public class LoginAction extends DispatchAction {
 			HttpServletResponse response) {
 		Connection conn = null;
 		LoginForm loginForm = null;
+		String forward ="pass"; //to CustomerSearch
 		try {
 			//remove session id
 			SIdUtils.getInstance().clearInstance();
@@ -67,6 +68,17 @@ public class LoginAction extends DispatchAction {
 						.getDesc());
 				return mapping.findForward("fail");
 			}
+			
+			//check redirect to main page
+			if ( user.getUserName().equalsIgnoreCase("admin") 
+				||
+				(    !user.getType().equalsIgnoreCase(User.VAN) 
+				  && !user.getType().equalsIgnoreCase(User.TT))
+			){
+				forward = "passRoleNoSales";
+			}
+			logger.debug("forward:"+forward);
+			
 			request.getSession(true).setAttribute("user", user);
 			
 			String screenWidth = Utils.isNull(request.getParameter("screenWidth"));
@@ -103,8 +115,9 @@ public class LoginAction extends DispatchAction {
 				conn.close();
 			} catch (Exception e2) {}
 		}
-		return mapping.findForward("pass");
+		return mapping.findForward(forward);
 	}
+	
 	public ActionForward loginCrossServer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		Connection conn = null;
@@ -132,7 +145,7 @@ public class LoginAction extends DispatchAction {
 			String userName = Utils.isNull(request.getParameter("userName"));
 			String password = Utils.isNull(request.getParameter("password"));
 			//decode
-			password = util.EncyptUtils.base64decode(password);
+			password = com.pens.util.EncyptUtils.base64decode(password);
 			
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;

@@ -1,13 +1,13 @@
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.isecinc.pens.web.popup.PopupForm"%>
 <%@page import="com.isecinc.pens.model.MTransport"%>
 <%@page import="com.isecinc.pens.bean.Transport"%>
 <%@page import="java.util.List"%>
-<%@page import="util.SessionGen"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -91,7 +91,7 @@ function setProductChkBySubBrand(subBrandChk){
 		<td width="90%" >
 		 <html:select property="bean.subBrand">
 		      <html:option value=""></html:option>
-			<html:options collection="subBrandList" property="subBrand" labelProperty="subBrandDesc"/>
+			<html:options collection="subBrandList" property="code" labelProperty="desc"/>
 		 </html:select>
 		 <input type="button" name="search" value="ค้นข้อมูล" onclick="searchPopup('${pageContext.request.contextPath}')" 
 		 class="newPosBtnLong"/>

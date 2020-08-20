@@ -12,8 +12,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Order;
@@ -29,6 +27,7 @@ import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.isecinc.pens.web.sales.OrderForm;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateToolsUtil;
 /**
  * Receipt Action
  * 

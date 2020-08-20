@@ -14,8 +14,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import util.ControlCode;
-
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.FTPFileBean;
@@ -34,6 +32,7 @@ import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction2;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
+import com.pens.util.ControlCode;
 import com.pens.util.LoggerUtils;
 
 public class UpdateSalesProcess {

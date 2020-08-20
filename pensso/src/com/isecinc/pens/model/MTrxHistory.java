@@ -4,17 +4,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.TrxHistory;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.seq.SequenceProcess;
 
 public class MTrxHistory extends I_Model<TrxHistory> {
 
 	private static final long serialVersionUID = 6445753642997787687L;
 
-	public static String TABLE_NAME = "c_trx_history";
+	public static String TABLE_NAME = "pensso.c_trx_history";
 	public static String COLUMN_ID = "TRX_HIST_ID";
 
 	// Column Trip
@@ -60,7 +59,7 @@ public class MTrxHistory extends I_Model<TrxHistory> {
 	public boolean save(TrxHistory trxHistory, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (trxHistory.getId() == 0) {
-			id = SequenceProcess.getNextValueInt(TABLE_NAME);
+			id = SequenceProcess.getNextValueInt("c_trx_history");
 		} else {
 			id = trxHistory.getId();
 		}

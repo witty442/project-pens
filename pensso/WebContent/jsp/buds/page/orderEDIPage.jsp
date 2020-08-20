@@ -1,6 +1,6 @@
 <%@page import="com.isecinc.pens.web.buds.BudsAllForm"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.bean.ConfPickingBean"%>
 <%@page import="com.isecinc.pens.bean.PopupBean"%>
 <%@page import="com.pens.util.*"%>
@@ -170,7 +170,7 @@ function finishPicking(path){
 									</a>
 								<%} %>
 								
-								<%if(role.equalsIgnoreCase(User.PICKING)){ %>
+								<%if(role.equalsIgnoreCase(User.BUD_ADMIN)){ %>
 								    &nbsp;&nbsp;&nbsp;&nbsp;
 									<a href="javascript:rejectPicking('${pageContext.request.contextPath}')">
 									  <input type="button" value="Reject Picking" class="newPosBtnLong">

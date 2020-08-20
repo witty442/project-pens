@@ -87,7 +87,7 @@ public class ManageOrderReceiptByUserAction extends I_Action {
 								l.getOrder().setPayment("N");
 								l.getOrder().setIsCash("N");
 								new MOrder().save(l.getOrder(), user.getId(), conn);
-								if (l.getOrderLine() == null) {
+								/*if (l.getOrderLine() == null) {
 									List<OrderLine> orliLines = new MOrderLine().lookUp(l.getOrder().getId());
 									for (OrderLine orliLine : orliLines) {
 										orliLine.setPayment("N");
@@ -98,7 +98,7 @@ public class ManageOrderReceiptByUserAction extends I_Action {
 										l.getOrderLine().setPayment("N");
 										new MOrderLine().save(l.getOrderLine(), user.getId(), conn);
 									}
-								}
+								}*/
 							}
 						}
 					}

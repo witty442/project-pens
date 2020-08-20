@@ -6,10 +6,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.NumtoWord;
-
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.User;
+import com.pens.util.NumtoWord;
 
 /**
  * Receipt Temporary Report Process

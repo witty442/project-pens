@@ -3,14 +3,13 @@ package com.isecinc.pens.bean;
 import java.io.Serializable;
 import java.sql.ResultSet;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MProductCategory;
 import com.isecinc.pens.model.MUOM;
+import com.pens.util.ConvertNullUtil;
 
 /**
  * Product

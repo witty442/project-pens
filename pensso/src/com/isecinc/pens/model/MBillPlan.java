@@ -15,9 +15,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import util.DateToolsUtil;
-import util.NumberToolsUtil;
-
 import com.isecinc.pens.bean.BillPlan;
 import com.isecinc.pens.bean.MoveOrder;
 import com.isecinc.pens.bean.MoveOrderLine;
@@ -31,6 +28,8 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.document.MoveOrderReqDocumentProcess;
 import com.isecinc.pens.process.document.MoveOrderReturnDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateToolsUtil;
+import com.pens.util.NumberToolsUtil;
 
 public class MBillPlan {
 

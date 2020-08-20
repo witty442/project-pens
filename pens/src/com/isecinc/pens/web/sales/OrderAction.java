@@ -581,6 +581,7 @@ public class OrderAction extends I_Action {
 			//Get custGroup 
 			orderForm.getOrder().setCustGroup(new MCustomer().getCustGroup(orderForm.getOrder().getCustomerId()));
 			
+			logger.debug("custGroup:"+orderForm.getOrder().getCustGroup());
 			// Call Modifier Process
 			ModifierProcess modProcess = new ModifierProcess(ConvertNullUtil.convertToString(customer.getTerritory()).trim());
 			modProcess.findModifier(orderForm.getLines(), userActive, conn,orderForm.getOrder().getCustGroup());
@@ -602,24 +603,13 @@ public class OrderAction extends I_Action {
 			logger.info("fillLinesShow LINE Promotion");
 			List<OrderLine> promotionLines = null;
 			
-			/** Case Edit New Code Promotion Goods 1 old code 2 new Code **/
-			boolean exeOrderProcessfillLinesShowPromotion = ControlCode.canExecuteMethod("OrderProcess", "fillLinesShowPromotion");
-			logger.info("CalcC4 OrderProcess fillLinesShowPromotion:"+exeOrderProcessfillLinesShowPromotion);
-			
-			if(exeOrderProcessfillLinesShowPromotion){
-				promotionLines = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
-			}else{
-				  // default 1
-		        promotionLines = orderProcess.fillLinesShow(modProcess.getAddLines());
-			}
-			
-			/** sum(qty1,qty2) Duplicate product promotion **/
-		//	if(ControlCode.canExecuteMethod("OrderProcess", "fillLinesShowPromotion")){//CurrentVersion
-		//	if(ControlCode.canExecuteMethod("OrderProcess", "sumQtyProductPromotionDuplicate")){
-			   //Pass 
-			   promotionLines = orderProcess.sumQtyProductPromotionDuplicate(promotionLines);
-		//	}
-			
+			//old
+	        //promotionLines = orderProcess.fillLinesShow(modProcess.getAddLines());
+	        //new code
+			promotionLines = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
+            
+			promotionLines = orderProcess.sumQtyProductPromotionDuplicate(promotionLines);
+	
 			logger.info("Debug after promotion");
 			new OrderProcess().debug(promotionLines);
 			

@@ -1,4 +1,4 @@
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.pens.util.Constants"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.Locale"%>
@@ -47,6 +47,12 @@ function loadMe(){
 function clearForm(path){
 	var form = document.stockInvForm;
 	form.action = path + "/jsp/stockInvAction.do?do=clearInitStock";
+	form.submit();
+	return true;
+}
+function exportToExcel(path){
+	var form = document.stockInvForm;
+	form.action = path + "/jsp/stockInvAction.do?do=export";
 	form.submit();
 	return true;
 }
@@ -420,8 +426,8 @@ function setMainValue(page,data){
 									</td>
 								</tr>
 								 <tr>
-                                    <td>  ประเภทเอกสาร:</td>
-									<td>
+                                    <td valign="bottom">  ประเภทเอกสาร:</td>
+									<td valign="bottom">
 									  <b><font size="2">			
 									  <html:hidden property="bean.transType" disabled="true"/>
 										<u>
@@ -433,9 +439,11 @@ function setMainValue(page,data){
 										%>
 										</font></u></b>	
 									</td>
-									
+									<td align="right" valign="bottom"> หมายเหตุ</td>
+									<td>					
+										 <html:textarea property="bean.remark" styleId="remark" cols="40" rows="3"></html:textarea>
+									</td>
 								</tr>
-								
 						   </table>
 				 <!-- Table Data -->
 				<c:if test="${stockInvForm.results != null}">
@@ -520,6 +528,9 @@ function setMainValue(page,data){
 					   <table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
 								<td align="left">
+								   <a href="javascript:exportToExcel('${pageContext.request.contextPath}')"> 
+								       <input type="button" value="Export To Excel " class="newPosBtnLong"/>
+								     </a>&nbsp;&nbsp;&nbsp;
 									 <c:if test="${stockInvForm.bean.canEdit == true}">
 										<a href="javascript:save('${pageContext.request.contextPath}')"> 
 										  <%if(stockInvForm.getBean().getTransType().equals("IN")) { %>
@@ -538,10 +549,7 @@ function setMainValue(page,data){
 										<%}%>
 										</a>
 									 </c:if>
-									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-									  <input type="button" value="   Clear   " class="newPosBtnLong">
-									</a>	
-														
+								    &nbsp;			
 									<a href="javascript:back('${pageContext.request.contextPath}','','add')">
 									  <input type="button" value="   ปิดหน้าจอ   " class="newPosBtnLong">
 									</a>	

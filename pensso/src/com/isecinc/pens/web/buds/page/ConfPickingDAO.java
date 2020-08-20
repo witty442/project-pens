@@ -1,6 +1,7 @@
 package com.isecinc.pens.web.buds.page;
 
 import java.math.BigDecimal;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,33 +14,28 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import util.ExcelHeader;
-import util.SQLHelper;
-
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.bean.ConfPickingBean;
 import com.isecinc.pens.bean.PopupBean;
-import com.isecinc.pens.bean.Transport;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.StockUtilsDAO;
 import com.isecinc.pens.model.MUOMConversion;
 import com.isecinc.pens.web.autokeypress.AutoKeypressDAO;
-import com.isecinc.pens.web.popup.PopupForm;
-import com.isecinc.pens.web.sales.InterfaceOrderProcess;
 import com.pens.util.DBCPConnectionProvider;
-import com.pens.util.DBConnection;
 import com.pens.util.DBConnectionApps;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
+import com.pens.util.excel.ExcelHeader;
 import com.pens.util.seq.SequenceProcessAll;
 
 public class ConfPickingDAO {
 	/** Logger */
 	public static Logger logger = Logger.getLogger("PENS");
 
-	public static int searchTotalHead(Connection conn,ConfPickingBean o ) throws Exception {
+	public static int searchTotalHead(Connection conn,String subPageName,ConfPickingBean o ) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -54,6 +50,9 @@ public class ConfPickingDAO {
 			}
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
 				sql.append("\n and t.transaction_date = to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+			}
+			if(subPageName.equalsIgnoreCase("BudsConfPicking")){
+				sql.append("\n and t.print_picking_count >=1 ");
 			}
 			sql.append("\n   group by t.picking_no ");
 			sql.append("\n   order by t.picking_no desc ");
@@ -75,7 +74,7 @@ public class ConfPickingDAO {
 		return totalRec;
 	}
 	
-	public static ConfPickingBean searchHead(Connection conn,ConfPickingBean o ,boolean getTrans,boolean allRec ,int currPage,int pageSize) throws Exception {
+	public static ConfPickingBean searchHead(Connection conn,String subPageName,ConfPickingBean o ,boolean getTrans,boolean allRec ,int currPage,int pageSize) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -85,7 +84,7 @@ public class ConfPickingDAO {
 		try {
 			sql.append("\n select M.* from (");
 			sql.append("\n select A.* ,rownum as r__ from (");
-			sql.append("\n    SELECT t.picking_no ,t.transaction_date ,t.status");
+			sql.append("\n    SELECT t.picking_no ,t.transaction_date ,t.status,t.region");
 			sql.append("\n    FROM pensso.t_picking_trans t");
 			sql.append("\n    WHERE 1=1 ");
 			if( !Utils.isNull(o.getPickingNo()).equals("")){
@@ -93,6 +92,9 @@ public class ConfPickingDAO {
 			}
 			if( !Utils.isNull(o.getTransactionDate()).equals("")){
 				sql.append("\n and t.transaction_date = to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+			}
+			if(subPageName.equalsIgnoreCase("BudsConfPicking")){
+				sql.append("\n and t.print_picking_count >=1 ");
 			}
 			sql.append("\n   order by t.picking_no desc ");
             sql.append("\n  )A ");
@@ -113,7 +115,7 @@ public class ConfPickingDAO {
 			   h.setPickingNo(Utils.isNull(rst.getString("picking_no")));
 			   h.setStatus(Utils.isNull(rst.getString("status")));
 			   h.setTransactionDate(DateUtil.stringValue(rst.getDate("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
-			  
+			   h.setRegionCri(Utils.isNull(rst.getString("region")));
 			   h = searchPickingSummary(conn, h,rst.getString("status"));
 			   
 			   items.add(h);
@@ -232,6 +234,7 @@ public class ConfPickingDAO {
 			ps = conn.prepareStatement(sql.toString());
 			ps.executeUpdate();
 			
+			conn.commit();
 		}catch(Exception e){
 			conn.rollback();
 			throw e;
@@ -268,6 +271,7 @@ public class ConfPickingDAO {
 			ps = conn.prepareStatement(sql.toString());
 			ps.executeUpdate();*/
 			
+			conn.commit();
 		}catch(Exception e){
 			conn.rollback();
 			throw e;
@@ -307,10 +311,12 @@ public class ConfPickingDAO {
 			logger.debug("update picking transaction");
 			o.setStatus(I_PO.STATUS_LOADING);//default
 			updatePickingTrans(conn, o);
+
+			conn.commit();
 			
-			//Insert to Order Temp
-			//InterfaceOrderProcess.createOrderTemp(user);
-			
+			//Call Proc Oracle Insert Order
+			callProcInsertOrderTemp(o.getPickingNo());
+
 		}catch(Exception e){
 			conn.rollback();
 			throw e;
@@ -321,14 +327,38 @@ public class ConfPickingDAO {
 			} catch (Exception e) {}
 		}
 	}
-	// Format : YYMMxxxx เช่น 63070001
+	public static boolean callProcInsertOrderTemp(String pickingNo) throws Exception{
+		Connection conn = null;
+		boolean r = true;
+		CallableStatement  cs = null;
+		StringBuffer sql = new StringBuffer("");
+		logger.debug("callProcInsertOrderTemp PickingNo:"+pickingNo);
+		try{
+			conn = DBConnectionApps.getInstance().getConnection();
+			
+			sql.append("{ call  xxpens_om_sales_online_pkg.process_order(?) }");
+			cs = conn.prepareCall(sql.toString());
+			cs.setString(1, pickingNo);
+			int u = cs.executeUpdate();
+			logger.info("U:"+u);
+			
+			return r;
+		}catch(Exception e){
+			e.printStackTrace();
+			throw e;
+		}finally{
+			cs.close();
+			conn.close();
+		}
+	}
+	// Format : YYMMxxxx เช่น P63070001
 	private static String genPickingNo(Date dateObj) throws Exception{
 		String today = DateUtil.stringValue(dateObj, DateUtil.YYYY_MM_DD_WITH_SLASH,DateUtil.local_th);
 		String[] d1 = today.split("/");
 		String curYear = d1[0].substring(2,4);
 		String curMonth = d1[1];
 		BigDecimal nextVal = new SequenceProcessAll().getNextValue("PICKING_NO", dateObj);
-		String pickingNo = curYear+curMonth+Utils.decimalFormat(nextVal.doubleValue(),"0000");
+		String pickingNo = "P"+curYear+curMonth+Utils.decimalFormat(nextVal.doubleValue(),"0000");
 		return pickingNo;
 	}
 	
@@ -415,7 +445,7 @@ public class ConfPickingDAO {
 					   o.setCanReject(true);
 					   o.setCanAddOrderManual(true);
 					}else if(r>0 && I_PO.STATUS_LOADING.equalsIgnoreCase(status)){
-					   o.setCanPrintPicking(true);
+					   o.setCanPrintPicking(false);
 					   o.setCanPrintLoading(true);
 					}
 				}else{
@@ -435,6 +465,7 @@ public class ConfPickingDAO {
 
 		  //o.setItemsList(itemList);
 		  o.setDataStrBuffer(html);
+		  o.setStatus(status);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 			//e.printStackTrace();
@@ -447,6 +478,8 @@ public class ConfPickingDAO {
 		}
 	  return o;
 	}
+	
+	
 	public static ConfPickingBean searchPickingSummary(Connection conn,ConfPickingBean o,String status){
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -469,7 +502,7 @@ public class ConfPickingDAO {
 			sql.append("\n    ,(select subbrand_no from PENSBI.XXPENS_BI_MST_SUBBRAND ad where ad.inventory_item_id = l.product_id) as subbrand");
 			sql.append("\n    ,(select subbrand_desc from PENSBI.XXPENS_BI_MST_SUBBRAND ad where ad.inventory_item_id = l.product_id) as subbrand_desc");
 			sql.append("\n    ,p.name as product_name ,p.code as product_code ,l.uom_id ,l.qty");
-			sql.append("\n    ,t.total_amount ,t.vat_amount,(t.total_amount+t.vat_amount)as NET_AMOUNT");
+			sql.append("\n    ,l.total_amount ,l.vat_amount,(l.total_amount+l.vat_amount)as NET_AMOUNT");
 			sql.append("\n    FROM pensso.t_order t ,pensso.t_order_line l");
 			sql.append("\n    ,pensso.m_customer c,pensso.m_address a");
 			sql.append("\n    ,pensso.m_product p ");
@@ -477,9 +510,10 @@ public class ConfPickingDAO {
 			sql.append("\n    AND t.customer_id = c.customer_id ");
 			sql.append("\n    AND c.customer_id = a.customer_id ");
 			sql.append("\n    AND l.product_id = p.product_id ");
+			sql.append("\n    AND t.ship_address_id = a.address_id ");
 			sql.append("\n    AND a.purpose = 'S' ");
 			sql.append("\n    AND t.doc_status in('"+status+"')" );
-			
+			sql.append("\n    AND t.picking_no ='"+o.getPickingNo()+"'" );
 			sql.append("\n    UNION ALL ");
 			
 			sql.append("\n    /** EDI **/ ");
@@ -499,8 +533,10 @@ public class ConfPickingDAO {
 			sql.append("\n    AND t.customer_id = c.customer_id ");
 			sql.append("\n    AND c.customer_id = a.customer_id ");
 			sql.append("\n    AND l.inventory_item_id = p.product_id ");
+			sql.append("\n    AND t.ship_to_site_use_id = a.address_id ");
 			sql.append("\n    AND a.purpose = 'S' ");
 			sql.append("\n    AND t.doc_status in('"+status+"')" );
+			sql.append("\n    AND t.picking_no ='"+o.getPickingNo()+"'" );
 			sql.append("\n )M ");
 			sql.append("\n where M.PICKING_NO ='"+o.getPickingNo()+"'");
 			sql.append("\n group by M.picking_no ");
@@ -565,6 +601,7 @@ public class ConfPickingDAO {
 			  item.setOrderNo(Utils.isNull(rst.getString("order_no")));
 			  item.setCustomerCode(Utils.isNull(rst.getString("customer_number")));
 			  item.setCustomerName(Utils.isNull(rst.getString("customer_name")));
+			  item.setAlternateName(Utils.isNull(rst.getString("alternate_name")));
 			  item.setAmphur(Utils.isNull(rst.getString("amphur"))+"/"+Utils.isNull(rst.getString("province")));
 			 // item.setSalesrepCode(Utils.isNull(rst.getString("salesrep_code")));
 			  if("".equals(Utils.isNull(rst.getString("subbrand"))) ){
@@ -575,7 +612,7 @@ public class ConfPickingDAO {
 			    item.setSubBrandName(Utils.isNull(rst.getString("subbrand_desc")));
 			  }
 			  item.setProductCode(Utils.isNull(rst.getString("product_code")));
-			  item.setProductName(Utils.isNull(rst.getString("product_name"))+"-"+Utils.isNull(rst.getString("product_code")));
+			  item.setProductName(Utils.isNull(rst.getString("product_code"))+"-"+Utils.isNull(rst.getString("product_name")));
 			
 			  //main input
 			  item.setUom(Utils.isNull(rst.getString("uom_id")));
@@ -593,23 +630,46 @@ public class ConfPickingDAO {
 				 uc1 = new MUOMConversion().getCurrentConversion(conn,Utils.convertStrToInt(product.getProductId()), product.getUom1());//default to CTN
 				 uc2 = new MUOMConversion().getCurrentConversion(conn,Utils.convertStrToInt(product.getProductId()), product.getUom2());
 
-				//calc contain
-			    if(uc1 != null && uc2 != null){
-			    	item.setUom2Contain(String.valueOf(1*uc1.getConversionRate()));
-			    	item.setSubQty(item.getQtyInt()*uc1.getConversionRate());
-			    	if(item.getUom().equals(item.getUom1())){
-			    		item.setPriQty(item.getQtyInt());
-			    	}else{
-			    		//calc pri qty uom2 to uom1
-			    		item.setPriQty(Utils.convertStrToDouble(StockUtilsDAO.convertSecQtyToPriQty(conn, product.getProductId(), item.getUom1(), item.getUom2(), ""+item.getQtyInt())));
-			    	}
-			    }else{
-			        // TUB/ no conversion
-			    	item.setUom2Contain(String.valueOf(item.getQtyInt()*1));
-			    	item.setSubQty(item.getQtyInt()*1);
-			    	item.setUom2(item.getUom1());
-			    	item.setPriQty(item.getQtyInt());
-			    }
+				 //check line uom is uom1 or uom2
+				 if(item.getUom().equalsIgnoreCase(item.getUom1())){//main uom
+					//calc contain
+				    if(    (uc1 != null && uc1.getConversionRate() >0) 
+				    	&& (uc2 != null && uc2.getConversionRate() >0) ){
+				    	item.setUom2Contain(Utils.decimalFormat(new Double(1*uc1.getConversionRate()),Utils.format_current_no_disgit));
+				    	item.setSubQty(item.getQtyInt()*uc1.getConversionRate());
+				    	if(item.getUom().equals(item.getUom1())){
+				    		item.setPriQty(item.getQtyInt());
+				    	}else{
+				    		//calc pri qty uom2 to uom1
+				    		item.setPriQty(Utils.convertStrToDouble(StockUtilsDAO.convertSecQtyToPriQty(conn, product.getProductId(), item.getUom1(), item.getUom2(), ""+item.getQtyInt())));
+				    	}
+				    }else{
+				        // TUB/ no conversion
+				    	item.setUom2Contain(Utils.decimalFormat(new Double(item.getQtyInt()*1),Utils.format_current_no_disgit));
+				    	item.setSubQty(item.getQtyInt()*1);
+				    	item.setUom2(item.getUom1());
+				    	item.setPriQty(item.getQtyInt());
+				    }
+				 }else{
+					 //uom = uom2 (sub uom)
+					 if(    (uc1 != null && uc1.getConversionRate() >0) 
+				    	&& (uc2 != null && uc2.getConversionRate() >0) ){
+				    	item.setUom2Contain(Utils.decimalFormat(new Double(1*uc1.getConversionRate()),Utils.format_current_no_disgit));
+				    	item.setSubQty(item.getQtyInt());
+				    	if(item.getUom().equals(item.getUom1())){
+				    		item.setPriQty(item.getQtyInt());
+				    	}else{
+				    		//calc pri qty uom2 to uom1
+				    		item.setPriQty(Utils.convertStrToDouble(StockUtilsDAO.convertSecQtyToPriQty(conn, product.getProductId(), item.getUom1(), item.getUom2(), ""+item.getQtyInt())));
+				    	}
+				     }else{
+				        // TUB/ no conversion
+				    	item.setUom2Contain(Utils.decimalFormat(new Double(item.getQtyInt()*1),Utils.format_current_no_disgit));
+				    	item.setSubQty(item.getQtyInt()*1);
+				    	item.setUom2(item.getUom1());
+				    	item.setPriQty(item.getQtyInt());
+				    }
+				 }
 			  }//if
 			  logger.debug("productCode["+item.getProductCode()+"]subbrand["+item.getSubBrand()+"]");
 			  logger.debug("uom2Contain["+item.getUom2Contain()+"]");
@@ -644,14 +704,15 @@ public class ConfPickingDAO {
 		sql.append("\n    ,(select name from pensso.m_province ad where ad.province_id = a.province_id) as province");
 		sql.append("\n    ,(select code from pensso.ad_user ad where ad.user_id = t.user_id) as salesrep_code");
 		sql.append("\n    ,p.name as product_name ,p.code as product_code ,l.uom_id ,l.qty");
-		sql.append("\n    ,t.total_amount ,t.vat_amount,(t.total_amount+t.vat_amount)as NET_AMOUNT");
+		sql.append("\n    ,l.total_amount ,l.vat_amount,(l.total_amount+l.vat_amount)as NET_AMOUNT");
 		sql.append("\n    FROM pensso.t_order t ,pensso.t_order_line l");
-		sql.append("\n    ,pensso.m_customer c,pensso.m_address a");
-		sql.append("\n    ,pensso.m_product p ");
+		sql.append("\n    ,pensso.m_customer c,pensso.m_product p ");
+		sql.append("\n    ,pensso.m_address a ");
 		sql.append("\n    WHERE t.order_id = l.order_id ");
 		sql.append("\n    AND t.customer_id = c.customer_id ");
 		sql.append("\n    AND c.customer_id = a.customer_id ");
 		sql.append("\n    AND l.product_id = p.product_id ");
+		sql.append("\n    AND t.ship_address_id = a.address_id ");
 		sql.append("\n    AND a.purpose = 'S' ");
 		if( !"view".equalsIgnoreCase(mode)){
 			if( !Utils.isNull(o.getPickingNo()).equals("")){
@@ -682,6 +743,7 @@ public class ConfPickingDAO {
 		sql.append("\n    AND t.customer_id = c.customer_id ");
 		sql.append("\n    AND c.customer_id = a.customer_id ");
 		sql.append("\n    AND l.inventory_item_id = p.product_id ");
+		 sql.append("\n    AND t.ship_to_site_use_id = a.address_id ");
 		sql.append("\n    AND a.purpose = 'S' ");
 		if( !"view".equalsIgnoreCase(mode)){
 			if( !Utils.isNull(o.getPickingNo()).equals("")){
@@ -721,6 +783,8 @@ public class ConfPickingDAO {
 		
 		return sql;
 	}
+	
+	
 	private static StringBuffer genSQLPickingAddOrderManaual(String mode,ConfPickingBean o) throws Exception{
 		StringBuffer sql = new StringBuffer();
 		sql.append("\n SELECT M.order_no,M.order_date,status");
@@ -736,7 +800,7 @@ public class ConfPickingDAO {
 		sql.append("\n    ,(select name from pensso.m_province ad where ad.province_id = a.province_id) as province");
 		sql.append("\n    ,(select code from pensso.ad_user ad where ad.user_id = t.user_id) as salesrep_code");
 		sql.append("\n    ,p.name as product_name ,p.code as product_code ,l.uom_id ,l.qty");
-		sql.append("\n    ,t.total_amount ,t.vat_amount,(t.total_amount+t.vat_amount)as NET_AMOUNT");
+		sql.append("\n    ,l.total_amount ,l.vat_amount,(l.total_amount+l.vat_amount)as NET_AMOUNT");
 		sql.append("\n    FROM pensso.t_order t ,pensso.t_order_line l");
 		sql.append("\n    ,pensso.m_customer c,pensso.m_address a");
 		sql.append("\n    ,pensso.m_product p ");
@@ -744,8 +808,9 @@ public class ConfPickingDAO {
 		sql.append("\n    AND t.customer_id = c.customer_id ");
 		sql.append("\n    AND c.customer_id = a.customer_id ");
 		sql.append("\n    AND l.product_id = p.product_id ");
+		sql.append("\n    AND t.ship_address_id = a.address_id ");
 		sql.append("\n    AND a.purpose = 'S' ");
-		sql.append("\n    AND t.doc_status in('"+I_PO.STATUS_RESERVE+"')" );
+		sql.append("\n    AND t.doc_status in('"+I_PO.STATUS_RESERVE+"','"+I_PO.STATUS_REJECT+"')" );
 		sql.append("\n    AND (t.picking_no is null or t.picking_no ='')" );
 		sql.append("\n    UNION ALL ");
 		
@@ -764,6 +829,7 @@ public class ConfPickingDAO {
 		sql.append("\n    AND t.customer_id = c.customer_id ");
 		sql.append("\n    AND c.customer_id = a.customer_id ");
 		sql.append("\n    AND l.inventory_item_id = p.product_id ");
+		sql.append("\n    AND t.ship_to_site_use_id = a.address_id ");
 		sql.append("\n    AND a.purpose = 'S' ");
 		sql.append("\n    AND (t.doc_status is null ");
 		sql.append("\n        OR t.doc_status in('"+I_PO.STATUS_RESERVE+"','"+I_PO.STATUS_REJECT+"')" );
@@ -796,7 +862,7 @@ public class ConfPickingDAO {
 		sql.append("\n    ,(select code from pensso.ad_user ad where ad.user_id = t.user_id) as salesrep_code");
 		sql.append("\n    ,(select subbrand_no from PENSBI.XXPENS_BI_MST_SUBBRAND ad where ad.inventory_item_id = l.product_id) as subbrand");
 		sql.append("\n    ,(select subbrand_desc from PENSBI.XXPENS_BI_MST_SUBBRAND ad where ad.inventory_item_id = l.product_id) as subbrand_desc");
-		sql.append("\n    ,p.name as product_name ,p.code as product_code ,l.uom_id ,l.qty");
+		sql.append("\n    ,p.name as product_name ,p.code as product_code ,l.uom_id ,l.qty ,a.alternate_name");
 		sql.append("\n    FROM pensso.t_order t ,pensso.t_order_line l");
 		sql.append("\n    ,pensso.m_customer c,pensso.m_address a");
 		sql.append("\n    ,pensso.m_product p ");
@@ -804,8 +870,8 @@ public class ConfPickingDAO {
 		sql.append("\n    AND t.customer_id = c.customer_id ");
 		sql.append("\n    AND c.customer_id = a.customer_id ");
 		sql.append("\n    AND l.product_id = p.product_id ");
+		sql.append("\n    AND t.ship_address_id = a.address_id ");
 		sql.append("\n    AND a.purpose = 'S' ");
-		//sql.append("\n    AND t.doc_status in('"+I_PO.STATUS_PICKING+"')" );
 		sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
 		
 		sql.append("\n    UNION ALL ");
@@ -818,7 +884,7 @@ public class ConfPickingDAO {
 		sql.append("\n    ,(select code from apps.xxpens_salesreps_v ad where ad.salesrep_id = t.salesrep_id) as salesrep_code");
 		sql.append("\n    ,(select subbrand_no from PENSBI.XXPENS_BI_MST_SUBBRAND ad where ad.inventory_item_id = l.inventory_item_id) as subbrand");
 		sql.append("\n    ,(select subbrand_desc from PENSBI.XXPENS_BI_MST_SUBBRAND ad where ad.inventory_item_id = l.inventory_item_id) as subbrand_desc");
-		sql.append("\n    ,p.name as product_name ,p.code as product_code ,l.ORDER_QUANTITY_UOM as uom_id ,l.ORDERED_QUANTITY as qty");
+		sql.append("\n    ,p.name as product_name ,p.code as product_code ,l.ORDER_QUANTITY_UOM as uom_id ,l.ORDERED_QUANTITY as qty,a.alternate_name");
 		sql.append("\n    FROM pensso.T_EDI t ,pensso.T_EDI_LINE l");
 		sql.append("\n    ,pensso.m_customer c,pensso.m_address a");
 		sql.append("\n    ,pensso.m_product p ");
@@ -826,13 +892,13 @@ public class ConfPickingDAO {
 		sql.append("\n    AND t.customer_id = c.customer_id ");
 		sql.append("\n    AND c.customer_id = a.customer_id ");
 		sql.append("\n    AND l.inventory_item_id = p.product_id ");
+		sql.append("\n    AND t.ship_to_site_use_id = a.address_id ");
 		sql.append("\n    AND a.purpose = 'S' ");
-		//sql.append("\n    AND t.doc_status in('"+I_PO.STATUS_PICKING+"')" );
 		sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
 		sql.append("\n )M ");
 		sql.append("\n where 1=1");
 		sql.append("\n and M.PICKING_NO ='"+o.getPickingNo()+"'");
-		sql.append("\n ORDER BY M.order_no,M.order_date,M.product_code ");
+		sql.append("\n ORDER BY M.subbrand,M.product_code ");
 		
 		return sql;
 	}
@@ -847,7 +913,7 @@ public class ConfPickingDAO {
 		sql.append("\n    ,(select name from pensso.m_province ad where ad.province_id = a.province_id) as province");
 		sql.append("\n    ,(select code from pensso.ad_user ad where ad.user_id = t.user_id) as salesrep_code");
 		sql.append("\n    ,p.name as product_name ,p.code as product_code ,l.uom_id ,l.qty");
-		sql.append("\n    ,t.total_amount ,t.vat_amount,(t.total_amount+t.vat_amount)as NET_AMOUNT");
+		sql.append("\n    ,l.total_amount ,l.vat_amount,(l.total_amount+l.vat_amount)as NET_AMOUNT");
 		sql.append("\n    FROM pensso.t_order t ,pensso.t_order_line l");
 		sql.append("\n    ,pensso.m_customer c,pensso.m_address a");
 		sql.append("\n    ,pensso.m_product p ");
@@ -855,6 +921,7 @@ public class ConfPickingDAO {
 		sql.append("\n    AND t.customer_id = c.customer_id ");
 		sql.append("\n    AND c.customer_id = a.customer_id ");
 		sql.append("\n    AND l.product_id = p.product_id ");
+		sql.append("\n    AND t.ship_address_id = a.address_id ");
 		sql.append("\n    AND a.purpose = 'S' ");
 		sql.append("\n    AND t.doc_status in('"+I_PO.STATUS_PICKING+"','"+I_PO.STATUS_LOADING+"')");
 		if( !Utils.isNull(o.getPickingNo()).equals("")){
@@ -925,7 +992,6 @@ public class ConfPickingDAO {
 	 */
 	private static StringBuffer genRowTable(String subPageName,ConfPickingBean head,boolean excel,ConfPickingBean item,int lineNo) throws Exception{
 		StringBuffer h = new StringBuffer("");
-		char singleQuote ='"';
 		String trClass =lineNo%2==0?"lineE":"lineO";
 		String className ="";
 		String classNameCenter ="td_text_center";
@@ -1022,7 +1088,7 @@ public class ConfPickingDAO {
 		return h;
 	}
 	
-	public static List<PopupBean> searchPickingNoList(PopupBean mCriteria, User user)
+	public static List<PopupBean> searchPickingNoList(PopupBean mCriteria)
 			throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -1038,7 +1104,7 @@ public class ConfPickingDAO {
 			if( !Utils.isNull(mCriteria.getCodeSearch()).equals("")){
 				sql.append("\n and t.picking_no like '%"+Utils.isNull(mCriteria.getCodeSearch())+"%'");
 			}
-			sql.append("\n  ORDER BY t.picking_no ");
+			sql.append("\n  ORDER BY t.picking_no desc"); 
 			logger.debug("sql:" + sql);
 
 			stmt = conn.createStatement();
@@ -1121,9 +1187,9 @@ public class ConfPickingDAO {
 		try{
 			sql.append("\n update pensso.t_picking_trans ");
 			if("PrintPicking".equalsIgnoreCase(printType)){
-			   sql.append("\n set print_picking_count=(print_picking_count+1)");
+			   sql.append("\n set print_picking_count=(nvl(print_picking_count,0)+1)");
 			}else{
-			   sql.append("\n set print_loading_count=(print_loading_count+1)");
+			   sql.append("\n set print_loading_count=(nvl(print_loading_count,0)+1)");
 			}
 			sql.append("\n ,update_date=?,update_user=?");
 			sql.append("\n where picking_no =? ");

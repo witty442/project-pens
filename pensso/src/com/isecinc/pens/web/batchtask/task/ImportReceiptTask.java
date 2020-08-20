@@ -96,7 +96,7 @@ public class ImportReceiptTask extends BatchTask implements BatchTaskInterface{
 			/** insert to monitor_item **/
 			logger.debug("Insert Monitor Item ImportB2BMakroFromExcelTask ");
 			MonitorItemBean modelItem = prepareMonitorItemBean(monitorModel);
-			monitorModel.setTransactionType(Constants.TRANSACTION_B2B_TYPE);
+			monitorModel.setTransactionType(Constants.TRANSACTION_TYPE);
 			
 			/** Start process **/ 
 			//String dataType =Utils.isNull(monitorModel.getBatchParamMap().get(PARAM_DATA_TYPE)) ;

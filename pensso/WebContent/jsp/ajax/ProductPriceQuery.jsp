@@ -3,7 +3,7 @@
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.model.MProductPrice"%>
 <%@page import="com.isecinc.pens.bean.ProductPrice"%>
-<%@page import="util.DBCPConnectionProvider"%>
+<%@page import="com.pens.util.DBCPConnectionProvider"%>
 <%
 String pID = (String)request.getParameter("pId");
 String uomID = (String)request.getParameter("uomId");

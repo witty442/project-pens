@@ -1,6 +1,6 @@
 package com.isecinc.pens.model;
 
-import static util.ConvertNullUtil.convertToString;
+import static com.pens.util.ConvertNullUtil.convertToString;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -15,9 +15,6 @@ import java.util.Map;
 
 import org.jfree.util.Log;
 
-import util.ConvertNullUtil;
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Customer;
@@ -26,7 +23,9 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.CustomerDocumentProcess;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateToolsUtil;
 import com.pens.util.seq.SequenceProcess;
 
 /**
@@ -491,6 +490,7 @@ public class MCustomer extends I_Model<Customer> {
 				m.setTransitName(ConvertNullUtil.convertToString(rst.getString("TRANSIT_NAME")).trim());
 				
 				/** **/
+				logger.debug("user_id:"+Utils.isNull(rst.getString("user_id")));
 				User u = new MUser().find(Utils.isNull(rst.getString("user_id")));
 				/*u.setId(rst.getInt("USER_ID"));
 				u.setCode(rst.getString("CODE").trim());
@@ -512,7 +512,10 @@ public class MCustomer extends I_Model<Customer> {
 				u.setPassword(convertToString(rst.getString("PASSWORD")).trim());
 				u.setConfirmPassword(convertToString(rst.getString("PASSWORD")).trim());*/
 				
-				u.activeRoleInfo();
+				logger.debug("User:"+u);
+				if(u != null){
+				  u.activeRoleInfo();
+				}
 				m.setSalesRepresent(u);
 				/** **/
 				

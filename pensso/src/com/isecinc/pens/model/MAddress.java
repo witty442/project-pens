@@ -7,14 +7,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.District;
 import com.isecinc.pens.bean.Province;
 import com.isecinc.pens.bean.User;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.seq.SequenceProcess;
 

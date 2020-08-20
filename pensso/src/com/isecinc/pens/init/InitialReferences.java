@@ -7,14 +7,13 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import util.SQLHelper;
-
 import com.isecinc.core.Database;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.init.I_Initial;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.model.MProductCategory;
 import com.pens.util.DBConnection;
+import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
 /**
@@ -49,6 +48,7 @@ public class InitialReferences extends I_Initial {
 	public static final String ROUND_DELIVER = "RoundDeliver";
 	public static final String DOC_RUN = "DocRun";
 	public static final String DOC_STATUS = "DocStatus";
+	public static final String RECEIPT_DOC_STATUS = "ReceiptDocStatus";
 	public static final String BANK = "Bank";
 	public static final String DELIVERY_GROUP = "DeliveryGroup";
 	public static final String INTERNAL_BANK = "InternalBank";

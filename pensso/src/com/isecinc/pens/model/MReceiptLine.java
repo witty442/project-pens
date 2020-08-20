@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import util.ConvertNullUtil;
-import util.NumberToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.CreditNote;
@@ -21,7 +18,9 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.NumberToolsUtil;
 import com.pens.util.seq.SequenceProcess;
 
 /**
@@ -34,12 +33,12 @@ import com.pens.util.seq.SequenceProcess;
 public class MReceiptLine extends I_Model<ReceiptLine> {
 
 	private static final long serialVersionUID = -5576062597577498894L;
-	public static String TABLE_NAME = "t_receipt_line";
+	public static String TABLE_NAME = "pensso.t_receipt_line";
 	public static String COLUMN_ID = "RECEIPT_LINE_ID";
 
 	private String[] columns = { COLUMN_ID, "LINE_NO", "RECEIPT_ID", "AR_INVOICE_NO", "SALES_ORDER_NO",
-			"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "ORDER_ID", "CREATED_BY", "UPDATED_BY",
-			"DESCRIPTION", "ORDER_LINE_ID", /** "COMPLETE" **/
+			"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "INVOICE_ID", "CREATED_BY", "UPDATED_BY",
+			"DESCRIPTION"
 	};
 
 	/**
@@ -82,18 +81,15 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 	public boolean save(ReceiptLine line, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (line.getId() ==0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
+			id = SequenceProcess.getNextValue("t_receipt_line").longValue();
 		} else {
 			id = line.getId();
 		}
-		long lineId = 0;
-		if (line.getOrderLine() != null) {
-			lineId = line.getOrderLine().getId();
-		}
+		
 		Object[] values = { id, line.getLineNo(), line.getReceiptId(), line.getArInvoiceNo(), line.getSalesOrderNo(),
 				line.getInvoiceAmount(), line.getCreditAmount(), line.getPaidAmount(), line.getRemainAmount(),
-				line.getOrder().getId(), activeUserID, activeUserID,
-				ConvertNullUtil.convertToString(line.getDescription()).trim(), lineId == 0 ? null : lineId,
+				line.getOrder().getInvoiceId(), activeUserID, activeUserID,
+				ConvertNullUtil.convertToString(line.getDescription()).trim(),
 		/** line.getComplete() **/
 		};
 		if (super.save(TABLE_NAME, columns, values, line.getId(), conn)) {
@@ -104,22 +100,19 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 
 	public boolean saveCaseImportReceipt(ReceiptLine line, int activeUserID, Connection conn) throws Exception {
 		 String[] columnsSaveImport = { COLUMN_ID, "LINE_NO", "RECEIPT_ID", "AR_INVOICE_NO", "SALES_ORDER_NO",
-				"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "ORDER_ID", "CREATED_BY", "UPDATED_BY",
-				"DESCRIPTION", "ORDER_LINE_ID", "IMPORT_TRANS_ID"};
+				"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "INVOICE_ID", "CREATED_BY", "UPDATED_BY",
+				"DESCRIPTION", "IMPORT_TRANS_ID"};
 		 long id =0;
 		if (line.getId() ==0) {
 			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
 		} else {
 			id = line.getId();
 		}
-		long lineId = 0;
-		if (line.getOrderLine() != null) {
-			lineId = line.getOrderLine().getId();
-		}
+		
 		Object[] values = { id, line.getLineNo(), line.getReceiptId(), line.getArInvoiceNo(), line.getSalesOrderNo(),
 				line.getInvoiceAmount(), line.getCreditAmount(), line.getPaidAmount(), line.getRemainAmount(),
 				line.getOrder().getId(), activeUserID, activeUserID,
-				ConvertNullUtil.convertToString(line.getDescription()).trim(), lineId == 0 ? null : lineId,
+				ConvertNullUtil.convertToString(line.getDescription()).trim(),
 		        line.getImportTransId()
 		};
 		if (super.save(TABLE_NAME, columnsSaveImport, values, line.getId(), conn)) {
@@ -189,17 +182,16 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 		//logger.debug("Start creditAmt :"+creditAmt+", ar_invoice_no:"+order.getArInvoiceNo());
 		try {
 			String sql = "\n select COALESCE(SUM(rl.PAID_AMOUNT),0) as PAID_AMOUNT ";
-			sql += "\n  from t_receipt_line rl, t_order o ";
+			sql += "\n  from pensso.t_receipt_line rl, pensso.t_invoice o ";
 			
-			sql += "\n  where rl.order_id = " + order.getId();
-			sql += "\n  and rl.ORDER_ID = o.ORDER_ID ";
-			sql += "\n  and o.DOC_STATUS = '" + Order.DOC_SAVE + "' ";
-			sql += "\n  and rl.receipt_id in (select receipt_id "
-					+ " from " + MReceipt.TABLE_NAME 
-					+"  where doc_status = '"
-					+   Receipt.DOC_SAVE + "' ) ";
+			sql += "\n  where rl.invoice_id = " + order.getInvoiceId();
+			sql += "\n  and rl.INVOICE_ID = o.INVOICE_ID ";
+			sql += "\n  and rl.receipt_id in ("
+					+ "   select receipt_id "
+					+ "   from " + MReceipt.TABLE_NAME 
+					+"    where doc_status = '"+Receipt.DOC_SAVE + "' ) ";
 
-			//logger.debug("sql:\n"+sql);
+			logger.debug("sql:\n"+sql);
 			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);

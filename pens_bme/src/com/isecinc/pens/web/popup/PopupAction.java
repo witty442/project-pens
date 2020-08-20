@@ -216,7 +216,15 @@ public class PopupAction extends I_Action {
 			 request.getSession().setAttribute("DATA_LIST", null);
 			 
 			if("SalesrepSales".equalsIgnoreCase(popupForm.getPageName()) ){
-				 List<PopupForm> results = PopupDAO.searchSalesrepSalesList(popupForm);
+				 List<PopupForm> results = PopupDAO.searchSalesrepSalesList(popupForm,"0,1,2,3,4,92");//van credit ICe cream
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+				 
+			}else if("SalesrepSalesAll".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupForm> results = PopupDAO.searchSalesrepSalesList(popupForm,null);
 				 if(results != null && results.size() >0){
 					 request.getSession().setAttribute("DATA_LIST", results);
 				 }else{

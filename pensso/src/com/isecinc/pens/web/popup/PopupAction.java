@@ -1,6 +1,8 @@
 package com.isecinc.pens.web.popup;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -110,12 +112,12 @@ public class PopupAction extends I_Action {
 				 forward = "searchPickingNo";
 			 }else  if("new".equalsIgnoreCase(request.getParameter("action")) && "SUBBRAND_STOCK".equalsIgnoreCase(request.getParameter("page"))){
 				 request.setAttribute("DATA_LIST", null);
-				 request.getSession().setAttribute("INIT_SUBBRAND_LIST", PopupDAO.searchSubbrandList());
 				 PopupBean bean = new PopupBean();
 				 bean.setCodeSearch("");
 				 bean.setDescSearch("");
 				 popupForm.setBean(bean);
-				 
+				 request.getSession().setAttribute("INIT_SUBBRAND_LIST", PopupDAO.searchSubbrandList(popupForm,false));
+			
 				 request.getSession().setAttribute("codes", null);
 				 request.getSession().setAttribute("keys", null);
 				 request.getSession().setAttribute("descs", null);
@@ -159,15 +161,7 @@ public class PopupAction extends I_Action {
 			logger.debug("Page["+request.getParameter("page")+"]");
 			logger.debug("StoreType["+storeType+"]");
 			
-			if("BRAND".equalsIgnoreCase(request.getParameter("page"))){
-				 List<PopupBean> results = PopupDAO.searchBrand(popupForm.getBean(),"");
-				 if(results != null && results.size() >0){
-					 request.setAttribute("BRAND_LIST", results);
-				 }else{
-					 request.setAttribute("Message", "ไม่พบข้อมูล");
-				 }
-				 forward = "searchBrand";
-			}else if("INVOICE".equalsIgnoreCase(request.getParameter("page"))){
+			if("INVOICE".equalsIgnoreCase(request.getParameter("page"))){
 				String productCode = Utils.isNull(request.getParameter("productCode"));
 				String userId = Utils.isNull(request.getParameter("userId"));
 				String customerCode = Utils.isNull(request.getParameter("customerCode"));
@@ -241,7 +235,7 @@ public class PopupAction extends I_Action {
 				 
 			}else if("SUBBRAND_STOCK".equalsIgnoreCase(request.getParameter("page"))){
 				
-				PopupBean c = PopupDAO.searchSubbrandStock(popupForm.getBean(),user);
+				PopupBean c = PopupDAO.searchProductStockBySubbrand(popupForm.getBean(),user);
 				
 				if(c.getDataList() != null && c.getDataList() .size() >0){
 					popupForm.setBean(c);
@@ -250,7 +244,7 @@ public class PopupAction extends I_Action {
 				}
 				forward = "searchSubBrandStock";
            }else if("PICKING_NO".equalsIgnoreCase(request.getParameter("page"))){
-        	   List<PopupBean> results =ConfPickingDAO.searchPickingNoList(popupForm.getBean(),user);
+        	   List<PopupBean> results =PopupDAO.searchPickingNoList(popupForm,"PICKING_NO");
 				if(results != null && results.size() >0){
 				  request.setAttribute("DATA_LIST", results);
 				}else{
@@ -267,6 +261,120 @@ public class PopupAction extends I_Action {
 		return forward;
 	}
 	
+	public ActionForward prepareAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareAll");
+		PopupForm popupForm = (PopupForm) form;
+		String forward = "popupAll";
+		String pageName  =Utils.isNull(request.getParameter("pageName"));
+		String action  =Utils.isNull(request.getParameter("action"));
+		try {
+			logger.debug("prepare action:"+action+",pageName["+pageName+"]");
+			 
+			 if("new".equalsIgnoreCase(action) ){
+				 request.getSession().setAttribute("search_submit", null);
+				 request.getSession().setAttribute("DATA_LIST", null);
+				 popupForm.setBean(new PopupBean());
+				 popupForm.setPageName(pageName);
+				 popupForm.setCriteriaMap(null);
+				 
+				 //set Criteria From Main Page
+				 String[] queryStr = request.getQueryString().split("\\&");
+				 logger.debug("queryStr:"+queryStr);
+				 if(queryStr != null && queryStr.length>0){
+					 Map<String, String> criteriaMap = new HashMap<String, String>();
+					 String paramName = "";
+					 String paramValue = "";
+					 String[] paramNameAll = null;
+					 for(int i=0;i<queryStr.length;i++){
+						
+						 if( !queryStr[i].startsWith("do") && !queryStr[i].startsWith("action") 
+							&& !queryStr[i].startsWith("pageName")){
+							 
+							logger.debug("queryStr[i]:"+queryStr[i]);
+							 
+						    paramNameAll = queryStr[i].split("\\=");
+						    paramName = paramNameAll[0];
+						    if(paramNameAll.length >1){
+						       paramValue = paramNameAll[1];
+						    }else{
+						       paramValue ="";
+						    }
+						    logger.debug(paramName+":"+paramValue);
+						    criteriaMap.put(paramName, paramValue);
+						 }//if
+					 }
+					 popupForm.setCriteriaMap(criteriaMap);
+				 }
+				 
+				 request.getSession().setAttribute("codes", null);
+				 request.getSession().setAttribute("descs", null);
+				 request.getSession().setAttribute("descs2", null);
+				 request.getSession().setAttribute("descs3", null);
+			 }
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward(forward);
+	}
+	/** NEW CODE **/
+	public ActionForward searchAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("searchAll");
+		PopupForm popupForm = (PopupForm) form;
+		String forward = "popupAll";
+		try {
+			 request.getSession().setAttribute("DATA_LIST", null);
+			 
+			if("BRAND".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupBean> results = PopupDAO.searchBrand(popupForm,false);
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+			 }else if("SUB_BRAND".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupBean> results = PopupDAO.searchSubbrandList(popupForm,false);
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+			 }else if("PRODUCT_INFO".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupBean> results = PopupDAO.searchProductInfoList(popupForm,false);
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+			 }else if("PICKING_NO".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupBean> results = PopupDAO.searchPickingNoList(popupForm,popupForm.getPageName());
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+			 }else if("PICKING_NO_PRINT".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupBean> results = PopupDAO.searchPickingNoList(popupForm,popupForm.getPageName());
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+		     }else if("PICKING_NO_INVOICE".equalsIgnoreCase(popupForm.getPageName()) ){
+				 List<PopupBean> results = PopupDAO.searchPickingNoList(popupForm,popupForm.getPageName());
+				 if(results != null && results.size() >0){
+					 request.getSession().setAttribute("DATA_LIST", results);
+				 }else{
+					 request.setAttribute("Message", "ไม่พบข่อมูล");
+				 }
+		   }
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward(forward);
+	}
 	/**
 	 * Save
 	 */

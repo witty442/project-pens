@@ -1,4 +1,5 @@
-<%@page import="util.ControlCode"%>
+
+<%@page import="com.pens.util.ControlCode"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
 <%@page import="com.isecinc.pens.model.MCustomer"%>

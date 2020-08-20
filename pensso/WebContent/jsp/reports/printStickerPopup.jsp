@@ -9,7 +9,7 @@
 String reqDate = ConvertNullUtil.convertToString(request.getParameter("reqDate"));
 %>
 
-<%@page import="util.ConvertNullUtil"%>
+<%@page import="com.pens.util.ConvertNullUtil"%>
 <logic:match header="user-agent" value="MSIE">
 <object id="printControls" classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" width="85" height="38"
    codebase="http://java.sun.com/update/1.5.0/jinstall-1_5_0_06-windows-i586.cab#Version=1,5,0,06" onclick="javascript:window.close();">

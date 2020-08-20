@@ -11,11 +11,6 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import util.BeanParameter;
-import util.ControlCode;
-import util.ConvertNullUtil;
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.Modifier;
 import com.isecinc.pens.bean.ModifierAttr;
@@ -39,7 +34,11 @@ import com.isecinc.pens.model.MProductCategory;
 import com.isecinc.pens.model.MProductPrice;
 import com.isecinc.pens.model.MQualifier;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.BeanParameter;
+import com.pens.util.ControlCode;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateToolsUtil;
 
 /**
  * Modifier Process Class

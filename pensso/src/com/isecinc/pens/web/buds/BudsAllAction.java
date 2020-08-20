@@ -13,6 +13,7 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.buds.page.ConfPickingAction;
 import com.isecinc.pens.web.buds.page.ControlPickingAction;
 import com.isecinc.pens.web.buds.page.OrderEDIAction;
+import com.isecinc.pens.web.buds.page.StockOnhandAction;
 import com.pens.util.Utils;
 
 /**
@@ -31,6 +32,8 @@ public class BudsAllAction extends I_Action {
 				 return new ConfPickingAction().prepareSearchHead(mapping, budsAllForm, request, response);
 			 }else if("ControlPickingSearch".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				 return new ControlPickingAction().prepareSearchHead(mapping, budsAllForm, request, response);
+			 }else if("StockOnhandSearch".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new StockOnhandAction().prepareSearchHead(mapping, budsAllForm, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -123,6 +126,8 @@ public class BudsAllAction extends I_Action {
 				return new ConfPickingAction().search(form, request, response);
 			 }else if("OrderEDI".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				 return new OrderEDIAction().search(form, request, response);
+			 }else if("StockOnhandSearch".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				return new StockOnhandAction().search(aForm, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -134,9 +139,19 @@ public class BudsAllAction extends I_Action {
 	public ActionForward export(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		BudsAllForm aForm = (BudsAllForm) form;
 		try {
-			logger.debug("PageAction:"+request.getParameter("page"));
-			 if("ConfPicking".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
-				 return new ConfPickingAction().export(mapping, aForm, request, response);
+			logger.debug("reportName:"+request.getParameter("reportName"));
+			 if("PickingList".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				return new ConfPickingAction().exportPickingList(mapping, aForm, request, response);
+			 }else if("PickingReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
+				return new ConfPickingAction().exportPickingListReport(mapping, form, request, response);
+			 }else if("SalesReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
+				return new ConfPickingAction().exportSalesReport(mapping, aForm, request, response);
+			 }else if("SalesDetailReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
+					return new ConfPickingAction().exportSalesDetailReport(mapping, aForm, request, response);
+			 }else if("ControlPickingReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
+				return new ControlPickingAction().exportControlPicking(mapping, aForm, request, response);
+			 }else if("StockOnhandReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
+				return new StockOnhandAction().exportStockOnhandReport(mapping, aForm, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

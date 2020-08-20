@@ -12,8 +12,7 @@ import org.apache.struts.upload.FormFile;
 import com.isecinc.pens.interim.bean.IOrderToReceipt;
 import com.isecinc.pens.interim.bean.MOrderToReceipt;
 import com.isecinc.pens.model.MReceipt;
-
-import util.UploadXLSUtil;
+import com.pens.util.UploadXLSUtil;
 
 public class AutoCreateReceiptProcess {
 	public static Logger logger = Logger.getLogger("PENS");

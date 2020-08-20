@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.NumberToolsUtil;
-
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Product;
@@ -20,6 +18,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Utils;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateUtil;
+import com.pens.util.NumberToolsUtil;
 
 public class MSummary {
 

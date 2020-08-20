@@ -574,6 +574,7 @@ function sumTotalByCurCol(obj,curCol){
                            <html:hidden property="bean.salesrepId" styleId="salesrepId"/>
                            <html:hidden property="bean.period" styleId="period"/>
                            <html:hidden property="bean.priceListId" styleId="priceListId"/>
+                        
                            <input type="hidden" name="maxColumns" id="maxColumns" value="<%=productMKTList!=null?productMKTList.size():0%>"/>
                            <input type="hidden" name="maxRows" id="maxRows" value="<%=salesrepList!=null?salesrepList.size():0%>"/>
                            	<!-- hidden field -->

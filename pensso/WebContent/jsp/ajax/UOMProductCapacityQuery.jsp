@@ -5,7 +5,7 @@
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.Statement"%>
 <%@page import="com.isecinc.pens.model.MProduct"%>
-<%@page import="util.DBCPConnectionProvider"%>
+<%@page import="com.pens.util.DBCPConnectionProvider"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.bean.UOM"%>

@@ -356,6 +356,7 @@ public class SalesTargetTTControlPage {
 			sales.setCustCatNo(custCatNo);
 			sales.setBrand(brand);
 			sales.setBrandName(brandName);
+			
 			//BRAND_GROUP
 			//DIVISION
 			//SALES_CHANNEL

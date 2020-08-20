@@ -10,8 +10,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DateToolsUtil;
-
 import com.isecinc.pens.bean.MoveOrder;
 import com.isecinc.pens.bean.Stock;
 import com.isecinc.pens.bean.TransferBean;
@@ -20,6 +18,7 @@ import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateToolsUtil;
 import com.pens.util.seq.SequenceProcess;
 
 

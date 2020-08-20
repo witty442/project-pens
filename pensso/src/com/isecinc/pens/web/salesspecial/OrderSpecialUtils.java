@@ -7,13 +7,12 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 
-import util.ControlCode;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
+import com.pens.util.ControlCode;
 
 public class OrderSpecialUtils {
 	public static Logger logger = Logger.getLogger("PENS");

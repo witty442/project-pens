@@ -1,4 +1,7 @@
-<%@page import="util.SessionGen"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.isecinc.pens.model.MDistrict"%>
+<%@page import="com.isecinc.pens.bean.District"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620"
 	pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -21,6 +24,20 @@ pageContext.setAttribute("docstatus",docstatus,PageContext.PAGE_SCOPE);
 
 String isAdd = request.getSession(true).getAttribute("isAdd") != null ? (String)request.getSession(true).getAttribute("isAdd") : "Y";
 //System.out.println(isAdd);
+
+List<District> districtsAll = new ArrayList<District>();
+District dBlank = new District();
+dBlank.setId(0);
+dBlank.setName("");
+districtsAll.add(dBlank);
+
+List<District> districts = new MDistrict().lookUp();
+districtsAll.addAll(districts);
+pageContext.setAttribute("districts", districtsAll, PageContext.PAGE_SCOPE);
+
+List<References> territorys = InitialReferences.getReferenes().get(InitialReferences.TERRITORY);
+pageContext.setAttribute("territorys", territorys, PageContext.PAGE_SCOPE);
+
 %>
 
 <%@page import="java.util.List"%>
@@ -29,8 +46,8 @@ String isAdd = request.getSession(true).getAttribute("isAdd") != null ? (String)
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>" /></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession() %>" type="text/css" />
 <style type="text/css">
 <!--
 body {
@@ -44,14 +61,53 @@ body {
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript">
 	function loadMe() {
 		new Epoch('epoch_popup', 'th', document.getElementById('orderDateFrom'));
 		new Epoch('epoch_popup', 'th', document.getElementById('orderDateTo'));
+		
+		loadProvince();
+		
+		document.getElementsByName('order.searchProvince')[0].value = ${orderForm.order.searchProvince};
+		
+		loadDistrict(); 
+		<%if( !"".equals(orderForm.getOrder().getDistrict())){ %>
+		  document.getElementsByName('order.customer.district')[0].value = <%=orderForm.getOrder().getDistrict()%>;
+		<% } %>
+	}
+	function loadProvince(){
+		var cboProvince = document.getElementsByName('order.searchProvince')[0];
+		$(function(){
+			var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/ajax/ProvinceTerritory.jsp",
+				data : "refId=" + document.getElementsByName('order.territory')[0].value,
+				async: false,
+				success: function(getData){
+					var returnString = jQuery.trim(getData);
+					cboProvince.innerHTML=returnString;
+				}
+			}).responseText;
+		});
+	}
+
+	function loadDistrict(){
+		var cboDistrict = document.getElementsByName('order.district')[0];
+		$(function(){
+			var getData = $.ajax({
+				url: "${pageContext.request.contextPath}/jsp/ajax/DistrictAjax.jsp",
+				data : "refId=" + document.getElementsByName('order.searchProvince')[0].value,
+				async: false,
+				success: function(getData){
+					var returnString = jQuery.trim(getData);
+					cboDistrict.innerHTML=returnString;
+				}
+			}).responseText;
+		});
 	}
 </script>
 </head>
@@ -113,7 +169,28 @@ body {
 								<td width="12%"></td>
 								<td></td>
 							</tr>
-							    
+							 <tr>
+							<td width="35%" align="right"><bean:message key="Customer.Territory" bundle="sysele"/>&nbsp;&nbsp;</td>
+							<td align="left" colspan="2">
+								<html:select property="order.territory" onchange="loadProvince();">
+									<html:option value=""></html:option>
+									<html:options collection="territorys" property="key" labelProperty="name"/>
+								</html:select>
+							</td>
+							
+						</tr>
+						<tr>
+						    <td align="right"><bean:message key="Address.Province" bundle="sysele"/>&nbsp;&nbsp;</td>
+							<td align="left" colspan="3">
+								<html:select property="order.searchProvince" onchange="loadDistrict();">
+								</html:select>
+							&nbsp;&nbsp;
+							     เขต/อำเภอ
+							     <html:select property="order.district" styleId="district">
+									<%-- <html:options collection="districts" property="id" labelProperty="name"/> --%>
+								</html:select>
+							</td>
+						</tr>
 							<tr>
 								<td align="right"><bean:message key="DocumentNo"
 									bundle="sysele" />&nbsp;&nbsp;</td>
@@ -134,20 +211,21 @@ body {
 								<td align="right"><bean:message key="TransactionDate"
 									bundle="sysele" /> <bean:message key="DateFrom" bundle="sysele" />&nbsp;&nbsp;
 								</td>
-								<td align="left"><html:text property="order.orderDateFrom"
+								<td align="left" colspan="3">
+								    <html:text property="order.orderDateFrom"
 									maxlength="10" size="15" readonly="true" styleId="orderDateFrom" />
-								</td>
-								<td align="right"><bean:message key="DateTo" bundle="sysele" />&nbsp;&nbsp;</td>
-								<td align="left"><html:text property="order.orderDateTo"
+									&nbsp;&nbsp;&nbsp;&nbsp;
+								    <bean:message key="DateTo" bundle="sysele" />&nbsp;&nbsp;
+								    <html:text property="order.orderDateTo"
 									maxlength="10" size="15" readonly="true" styleId="orderDateTo" />
 								</td>
 							</tr>
-							<tr>
+							<%-- <tr>
 								<td align="right"><bean:message key="Order.No"  bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left"><html:text property="order.salesOrderNo" size="20" /></td>
 								<td align="right"><bean:message key="Bill.No"  bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left"><html:text property="order.arInvoiceNo" styleClass="\" autoComplete=\"off"size="20" /></td>
-							</tr>
+							</tr> --%>
 							<tr>
 								<td align="right"><bean:message key="Status" bundle="sysele" />&nbsp;&nbsp;</td>
 								<td align="left"><html:select property="order.docStatus">
@@ -178,13 +256,10 @@ body {
 									<th class="code"><bean:message key="DocumentNo" bundle="sysele" /></th>
 									<th class="code"><bean:message key="TransactionDate" bundle="sysele" /></th>
 									<th class="costprice"><bean:message key="TotalAmount" bundle="sysele" /></th>
-									<th class="status"><bean:message key="Exported" bundle="sysele"/></th>
-									<th class="status"><bean:message key="Interfaces" bundle="sysele"/></th>
-									<th class="status"><bean:message key="Order.Paid" bundle="sysele"/></th>
-									<th class="code"><bean:message key="Order.No"  bundle="sysele"/></th>
-									<th class="code"><bean:message key="Bill.No"  bundle="sysele"/></th>
+									<th class="status">รหัสร้านค้า</th>
+									<th class="status">ชื่อร้านค้า</th>
+									<th class="status">ที่อยู่ส่ง</th>
 									<th class="status"><bean:message key="Status" bundle="sysele" /></th>
-									<th class="status"><bean:message key="Order.Search.CreditNote" bundle="sysprop" /></th>
 									<th class="status">ทำรายการ</th>
 									<th class="status"><bean:message key="View" bundle="sysprop" /></th>
 								</tr>
@@ -198,38 +273,17 @@ body {
 									</c:otherwise>
 								</c:choose>
 								<tr class="<c:out value='${tabclass}'/>">
-									<td width="36px;"><c:out value='${rows.index+1}' /></td>
-									<td align="center" width="88px;">${results.orderNo}</td>
-									<td align="center" width="88px;">${results.orderDate}</td>
-									<td align="right" width="62px;"><fmt:formatNumber pattern="#,#00.00"
+									<td width="2%"><c:out value='${rows.index+1}' /></td>
+									<td align="center" width="7%">${results.orderNo}</td>
+									<td align="center" width="7%">${results.orderDate}</td>
+									<td align="right" width="7%"><fmt:formatNumber pattern="#,#00.00"
 										value="${results.netAmount}"></fmt:formatNumber></td>
-									<td align="center" width="52px;">
-										<c:if test="${results.exported=='Y'}">
-											<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-										</c:if>
-									</td>
-									<td align="center" width="52px;">
-										<c:if test="${results.interfaces=='Y'}">
-											<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-										</c:if>
-									</td>
-									<td align="center" width="50px;">
-										<c:if test="${results.payment=='Y'}">
-										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-										</c:if>
-									</td>
-									<td align="center" width="88px;">${results.salesOrderNo}</td>
-									<td align="center" width="75px;">${results.arInvoiceNo}</td>
-									<td align="center" width="50px;">${results.docStatusLabel}</td>
-									<td align="center">
-										<c:if test="${results.hasCreditNote}">
-											<a href="#" onclick="javascript:creditNoteList('${pageContext.request.contextPath}','${results.arInvoiceNo}');">
-											<img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
-										</c:if>
-									</td>
-									
+									<td align="center" width="5%">${results.customerCode}</td>
+									<td align="left" width="15%">${results.customerName}</td>
+									<td align="left" width="30%">${results.addressSummary}</td>
+									<td align="center" width="8%">${results.docStatusLabel}</td>
 									<!-- OLD CODE  -->
-									<td align="center" width="52px;">
+									<td align="center" width="8%">
 									<%if( !userName.equalsIgnoreCase("ADMIN")){ %>
 										<c:if test="${results.exported=='N'}">
 											<c:if test="${results.docStatus =='OPEN' or results.docStatus =='REJECT'

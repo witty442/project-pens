@@ -2,6 +2,7 @@ package com.isecinc.pens.web.popup;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.struts.action.ActionForm;
 
@@ -22,6 +23,15 @@ public class PopupForm extends ActionForm implements Serializable{
 	
 	private PopupBean bean;
 	private String pageName;
+	private Map<String, String> criteriaMap; 
+	
+	
+	public Map<String, String> getCriteriaMap() {
+		return criteriaMap;
+	}
+	public void setCriteriaMap(Map<String, String> criteriaMap) {
+		this.criteriaMap = criteriaMap;
+	}
 	public PopupBean getBean() {
 		return bean;
 	}

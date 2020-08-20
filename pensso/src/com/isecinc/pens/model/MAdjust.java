@@ -63,7 +63,7 @@ public class MAdjust extends I_Model<Adjust> {
 		ResultSet rs = null;
 		try {
 			whereCause += "\n  SELECT COALESCE(SUM(ADJUST_AMOUNT),0) as ADJUST_AMOUNT ";
-			whereCause += "\n  FROM T_ADJUST c WHERE 1=1";
+			whereCause += "\n  FROM PENSSO.T_ADJUST c WHERE 1=1";
 			whereCause += "\n AND AR_INVOICE_NO ='"+arInvoiceNo+"'";
 			//logger.debug("whereCause:"+whereCause);
 			ps = conn.prepareStatement(whereCause);

@@ -1,10 +1,8 @@
 package com.isecinc.pens.web.receipt;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,10 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-
-import util.ConvertNullUtil;
-import util.DateToolsUtil;
-import util.NumberToolsUtil;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
@@ -43,7 +37,11 @@ import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MReceiptMatchCN;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnectionApps;
+import com.pens.util.DateToolsUtil;
+import com.pens.util.NumberToolsUtil;
 
 /**
  * Receipt Action
@@ -222,11 +220,6 @@ public class ReceiptAction extends I_Action {
 		long receiptId = 0;
 		User user = (User) request.getSession().getAttribute("user");
 		try {
-			/** For Test delay process **/
-			/*logger.debug("start Sleep 1 Minute");
-			TimeUnit.MINUTES.sleep(1);
-			logger.debug("End Sleep 1 Minute");*/
-			
 			// User user = (User) request.getSession().getAttribute("user");
 			receiptId = receiptForm.getReceipt().getId();
 
@@ -248,9 +241,8 @@ public class ReceiptAction extends I_Action {
 
 			// set interfaces & payment & docstatus
 			receipt.setInterfaces("N");
-			// order.setDocStatus(Order.DOC_SAVE);
 
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnectionApps.getInstance().getConnection();
 			// Begin Transaction
 			conn.setAutoCommit(false);
 
@@ -272,19 +264,19 @@ public class ReceiptAction extends I_Action {
 			}
 			
 			// Save Receipt
-			if (!new MReceipt().save(receipt, userActive.getId(), conn)) {
+			/*if (!new MReceipt().save(receipt, userActive.getId(), conn)) {
 				// return with duplicate Document no
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.DUPLICATE).getDesc());
 				conn.rollback();
 				return "prepare";
-			}
+			}*/
 
 			// Delete Receipt Line,update order, Before Create new 
 			if (ConvertNullUtil.convertToString(receiptForm.getDeletedId()).trim().length() > 0) {
 				// reverse payment flag to line
 				String[] ids = receiptForm.getDeletedId().substring(1).trim().split(",");
 				ReceiptLine line;
-				List<OrderLine> olines;
+				/*List<OrderLine> olines;
 				Order order;
 				MOrderLine mOrderLine = new MOrderLine();
 				for (String id : ids) {
@@ -299,21 +291,20 @@ public class ReceiptAction extends I_Action {
 						mOrderLine.save(ol, userActive.getId(), conn);
 					}//for 2
 				}//for 1
+                */		
 				
 				/** Delete Match Line by receipt_line_id :WIT Edit 07/04/2011**/
 				new MReceiptMatch().deleteByReceiptLineId(receiptForm.getDeletedId().substring(1).trim(), conn);
 				
 				/** Delete t_receipt_line by receipt_line_id **/
 				new MReceiptLine().delete(receiptForm.getDeletedId().substring(1).trim(), conn);
-			}
+			}//for
 
 			// Save Lines ,Update Order Flag
 			Order order;
 			i = 1;
 			MReceiptLine mReceiptLine = new MReceiptLine();
 			MOrder mOrder = new MOrder();
-			MOrderLine mOrderLine = new MOrderLine();
-			List<OrderLine> olines;
 			for (ReceiptLine line : receiptForm.getLines()) {
 				line.setLineNo(i++);
 				line.setReceiptId(receipt.getId());
@@ -322,28 +313,15 @@ public class ReceiptAction extends I_Action {
 				}
 				mReceiptLine.save(line, userActive.getId(), conn);
 
-				order = new MOrder().find(String.valueOf(line.getOrder().getId()));
-				/** WIT Edit 11/04/2011 :Add Case Cancel Receipt **/
+				/*order = new MOrder().find(String.valueOf(line.getOrder().getId()));
+				*//** WIT Edit 11/04/2011 :Add Case Cancel Receipt **//*
 				if(receiptForm.getReceipt().getDocStatus().equals(Receipt.STATUS_CANCEL)){
 				   order.setPayment("N");	
 				}else{
 				   order.setPayment("Y");
 				}
 				mOrder.save(order, userActive.getId(), conn);
-
-				olines = new MOrderLine().lookUp(order.getId());
-				for (OrderLine ol : olines) {
-					/** WIT Edit 11/04/2011 :Add Case Cancel Receipt **/
-					if(receiptForm.getReceipt().getDocStatus().equals(Receipt.STATUS_CANCEL)){
-					   ol.setPayment("N");
-					}else{
-					   ol.setPayment("Y");
-					}
-					ol.setExported("N");
-					ol.setNeedExport("N");
-					ol.setInterfaces("N");
-					mOrderLine.save(ol, userActive.getId(), conn);
-				}//for
+               */
 			}//while
 
 			// Delete Match CN
@@ -357,17 +335,17 @@ public class ReceiptAction extends I_Action {
 				cn.setId(0);
 				cn.setReceiptId(new Integer(""+receipt.getId()));
 				receiptCN.save(cn, userActive.getId(), conn);
-			}
+			}//for
 
 			MReceiptMatch mReceiptMatch = new MReceiptMatch();
 			// Delete Match
 			mReceiptMatch.deleteByReceiptId(String.valueOf(receipt.getId()), conn);
 
 			// Delete BY
-			if (ConvertNullUtil.convertToString(receiptForm.getDeletedRecpById()).trim().length() > 0)
+			if (ConvertNullUtil.convertToString(receiptForm.getDeletedRecpById()).trim().length() > 0){
 				new MReceiptBy().delete(receiptForm.getDeletedRecpById().substring(1).trim(), conn);
+			}
 
-		
 			// Receipt By
 			MReceiptBy mReceiptBy = new MReceiptBy();
 			double receiptAmount = 0;
@@ -398,7 +376,7 @@ public class ReceiptAction extends I_Action {
 				idx = 0;
 				for (String s : by.getAllBillId().split(",")) {
 					for (ReceiptLine line : receiptForm.getLines()) {
-						if (s.equalsIgnoreCase(String.valueOf(line.getOrder().getId()))) {
+						if (s.equalsIgnoreCase(String.valueOf(line.getOrder().getInvoiceId()))) {
 							match = new ReceiptMatch();
 							match.setReceiptLineId(line.getId());
 							match.setReceiptById(by.getId());
@@ -442,18 +420,15 @@ public class ReceiptAction extends I_Action {
 			
 			// Commit Transaction
 			conn.commit();
-			//
+			
+			//Display MSG
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
 
-			//Interfaces TO Oracle Txt (LockBox)
-			InterfaceReceiptProcess.process(user,receiptForm.getReceipt().getId(), receiptForm.getReceipt().getReceiptNo());
 			
-			logger.debug("receiptId1:"+receiptId);
+			logger.debug("receiptId:"+receiptId);
 			// Save Token
 			saveToken(request);
 			
-			
-			logger.debug("receiptId2:"+receipt.getId());
 			// Search Again
 			prepare(String.valueOf(receipt.getId()), receiptForm, request, response);
 			

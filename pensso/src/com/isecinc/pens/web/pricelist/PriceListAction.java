@@ -7,8 +7,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.PriceList;
@@ -17,6 +15,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MProductPrice;
+import com.pens.util.DateToolsUtil;
 
 /**
  * Price List Action Class

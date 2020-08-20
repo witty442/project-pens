@@ -9,8 +9,6 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import util.NumberToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Order;
@@ -19,6 +17,7 @@ import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.NumberToolsUtil;
 
 public class MReceiptSummary {
 	/** Logger */

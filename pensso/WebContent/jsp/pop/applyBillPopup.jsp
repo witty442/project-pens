@@ -1,4 +1,15 @@
-<%@page import="util.SessionGen"%>
+<%@page import="com.pens.util.SIdUtils"%>
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.pens.bean.Order"%>
+<%@page import="com.isecinc.pens.model.MOrder"%>
+<%@page import="com.isecinc.pens.model.MReceiptLine"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.text.DecimalFormat"%>
+<%@page import="com.isecinc.pens.model.MCreditNote"%>
+<%@page import="com.isecinc.pens.bean.CreditNote"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -22,9 +33,9 @@ String writeOff = request.getParameter("writeOff");
 User user = (User) session.getAttribute("user");
 
 List<Order> zero = new ArrayList<Order>();
-
-List<Order> orders = new MOrder().lookUp(user.getId(),Integer.parseInt(custId),user.getOrderType().getKey(),"in",selected);
-for(Order r : orders){
+ 
+List<Order> invoices = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId),user.getOrderType().getKey(),"in",selected);
+for(Order r : invoices){
 	r.setCreditAmount(new MReceiptLine().calculateCreditAmount(r)); 
 	if(r.getCreditAmount()==0)
 		zero.add(r);
@@ -34,7 +45,7 @@ for(Order r : zero){
 	//orders.remove(r);
 }
 
-pageContext.setAttribute("orders",orders,PageContext.PAGE_SCOPE);
+pageContext.setAttribute("invoices",invoices,PageContext.PAGE_SCOPE);
 pageContext.setAttribute("seed",seed,PageContext.PAGE_SCOPE);
 
 //CreditNote...
@@ -43,31 +54,20 @@ List<CreditNote> creditNotes = new MCreditNote().lookUpForPaid(cns,custId);
 pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 
 %>
-<%@page import="java.util.Locale"%>
-<%@page import="com.isecinc.pens.SystemProperties"%>
-
-<%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="java.util.List"%>
-<%@page import="com.isecinc.pens.bean.Order"%>
-<%@page import="com.isecinc.pens.model.MOrder"%>
-<%@page import="com.isecinc.pens.model.MReceiptLine"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="java.text.DecimalFormat"%>
-<%@page import="com.isecinc.pens.model.MCreditNote"%>
-<%@page import="com.isecinc.pens.bean.CreditNote"%><html>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <style type="text/css">
 <!--
 .style1 {color: #004a80}
 -->
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript">
@@ -82,7 +82,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		//alert("prepaid:"+prepaid);
 
 		//get paid at opener
-		var orders = window.opener.document.getElementsByName('bill.orderId');
+		var invoices = window.opener.document.getElementsByName('bill.invoiceId');
 		var netamts=window.opener.document.getElementsByName('bill.netAmt');
 		var creditamts=window.opener.document.getElementsByName('bill.creditAmt');
 		var paidamts = window.opener.document.getElementsByName('bill.paidAmt');
@@ -93,18 +93,18 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 
 		//local variable
 		var tbl =document.getElementById('tblBillToApply');
-		var bills = document.getElementsByName('orderId');
+		var bills = document.getElementsByName('invoiceId');
 		var nets = document.getElementsByName('netAmount');
 		var crds = document.getElementsByName('creditAmount');
 		var paids2 = document.getElementsByName('paidAmount');
 		var remains = document.getElementsByName('remainAmount');
 		var chk = document.getElementsByName('chkReceipts');
 
-		for(i=0;i<orders.length;i++){
-			//alert(orders[i].value);
+		for(i=0;i<invoices.length;i++){
+			//alert(invoices[i].value);
 			//alert(paids[i].value);
 			for(j=0;j<bills.length;j++){
-				if(orders[i].value==bills[j].value){
+				if(invoices[i].value==bills[j].value){
 					//crds[j].value = Number(nets[j].value)-Number(paids[i].value);
 					crds[j].value = Number(creditamts[i].value) - Number(paidamts[i].value);
 					crds[j].value =(Number(crds[j].value).toFixed(2));
@@ -151,7 +151,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		var cnchk = document.getElementsByName('chkCNs');
 
 		for(i=0;i<cns.length;i++){
-			//alert(orders[i].value);
+			//alert(invoices[i].value);
 			//alert(paids[i].value);
 			for(j=0;j<cnbills.length;j++){
 				if(cns[i].value==cnbills[j].value){
@@ -327,7 +327,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 					return false;
 				}
 
-				allBillId+=','+document.getElementsByName('orderId')[i].value;
+				allBillId+=','+document.getElementsByName('invoiceId')[i].value;
 				allPaid+='|'+document.getElementsByName('paidAmount')[i].value;
 				totalPaid= eval(Number(totalPaid)+Number(document.getElementsByName('paidAmount')[i].value));
 			}
@@ -476,7 +476,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		<th><bean:message key="Amount" bundle="sysele"/></th>
 		<th><bean:message key="Product.Balance" bundle="sysele"/></th>
 	</tr>
-	<c:forEach var="results" items="${orders}" varStatus="rows">
+	<c:forEach var="results" items="${invoices}" varStatus="rows">
 		<c:choose>
 			<c:when test="${rows.index %2 == 0}">
 				<c:set var="tabclass" value="lineO"/>
@@ -489,7 +489,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 			<td>
 				${results.arInvoiceNo}
 				<input type="hidden" name="arInvoiceNo" value="${results.arInvoiceNo}">
-				<input type="hidden" name="orderId" value="${results.id}">
+				<input type="hidden" name="invoiceId" value="${results.invoiceId}">
 				<input type="hidden" name="salesOrderNo" value="${results.salesOrderNo}">
 				<input type="hidden" name="netAmount" value="${results.netAmount}">
 				<input type="hidden" name="creditAmount" value="${results.creditAmount}">

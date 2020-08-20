@@ -10,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
-import util.Debug;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Order;
@@ -26,6 +24,7 @@ import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.process.administer.ManageOrderReceiptProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.Debug;
 import com.pens.util.Utils;
 
 public class ManageOrderReceiptAction extends I_Action {
@@ -85,7 +84,7 @@ public class ManageOrderReceiptAction extends I_Action {
 						new MReceipt().saveWOCheckDup(receipt, user.getId(), conn);
 
 						// unpaid to order
-						List<ReceiptLine> lines = new MReceiptLine().lookUp(Utils.convertToLong(id));
+						/*List<ReceiptLine> lines = new MReceiptLine().lookUp(Utils.convertToLong(id));
 						for (ReceiptLine l : lines) {
 							if (l.getOrder() != null) {
 								l.getOrder().setPayment("N");
@@ -104,7 +103,7 @@ public class ManageOrderReceiptAction extends I_Action {
 									}
 								}
 							}
-						}
+						}*///for
 					}
 				}
 				conn.commit();

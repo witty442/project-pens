@@ -14,7 +14,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
-import util.ConvertNullUtil;
 
 import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Customer;
@@ -46,6 +45,7 @@ import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MReceiptMatchCN;
 import com.isecinc.pens.process.document.ReceiptDocumentProcess;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.LoggerUtils;
 import com.pens.util.seq.SequenceProcess;
 import com.sun.org.apache.bcel.internal.generic.ISUB;

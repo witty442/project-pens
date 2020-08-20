@@ -1,4 +1,4 @@
-<%@page import="util.GoogleMapJavaScriptAPI"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.Customer"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.model.MCustomer"%>

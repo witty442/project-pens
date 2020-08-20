@@ -12,7 +12,7 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import util.Debug;
+import com.pens.util.Debug;
 
 public class Database {
 

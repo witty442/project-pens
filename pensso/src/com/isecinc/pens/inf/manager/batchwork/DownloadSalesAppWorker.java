@@ -1,6 +1,6 @@
 package com.isecinc.pens.inf.manager.batchwork;
 
-import util.AppversionVerify;
+import com.pens.util.AppversionVerify;
 
 public class DownloadSalesAppWorker extends Thread{
 

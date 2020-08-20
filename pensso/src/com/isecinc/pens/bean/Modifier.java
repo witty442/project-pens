@@ -3,12 +3,11 @@ package com.isecinc.pens.bean;
 import java.io.Serializable;
 import java.sql.ResultSet;
 
-import util.ConvertNullUtil;
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.init.InitialReferences;
+import com.pens.util.ConvertNullUtil;
+import com.pens.util.DateToolsUtil;
 
 /**
  * Modifier Class

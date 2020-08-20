@@ -6,10 +6,9 @@ import java.sql.Connection;
 
 import org.apache.log4j.Logger;
 
-import util.MonitorSales;
-
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.MonitorSales;
 
 /**
  * 

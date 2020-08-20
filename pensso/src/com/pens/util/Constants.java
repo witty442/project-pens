@@ -21,7 +21,7 @@ public class Constants {
 	public static final String COLUMN_BLANK = "BLANK";
 	public static final String INSERT_STR_DEFAULT_BLANK = " ";
 	
-	public static final String TRANSACTION_B2B_TYPE = "B2B";
+	public static final String TRANSACTION_TYPE = "Transction";
 	
 	public static final String TYPE_IMPORT = "IMPORT";
 	public static final String TYPE_EXPORT = "EXPORT";
@@ -73,5 +73,7 @@ public class Constants {
 	public static final int LINE_PER_PAGE = 20; //10
 	public static final int CACHE_PAGE_SIZE = 500; //5
 	
-	
+	// DOC_STATUS THAI
+	public static final String DOC_STATUS_SV_MSG ="\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01";
+	public static final String DOC_STATUS_VO_MSG = "\u0E22\u0E01\u0E40\u0E25\u0E34\u0E01";
 }

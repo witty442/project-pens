@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<%@page import="util.SessionGen"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.web.sales.OrderForm"%>
-<%@page import="util.CustomerReceiptFilterUtils"%>
+<%@page import="com.pens.util.CustomerReceiptFilterUtils"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -55,8 +55,7 @@ List<Address> billAddr = new ArrayList<Address>();
 List<Address> shipAddr = new ArrayList<Address>();
 
 for(Address address:custAddr){
-	if("Y".equals(address.getIsActive()))
-	{
+	if("Y".equals(address.getIsActive())){
 		if("B".equalsIgnoreCase(address.getPurpose()))
 			billAddr.add(address);
 		else if("S".equalsIgnoreCase(address.getPurpose()))
@@ -101,8 +100,8 @@ System.out.println("debugMode:"+debugMode);
 <meta http-equiv="Pragma" content="no-cache" /> 
 <meta http-equiv="Expires" content="0" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
@@ -129,12 +128,12 @@ table#productList tbody td.number{text-align:right;}
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/lock-scroll.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/lock-scroll.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
 
@@ -432,26 +431,28 @@ function addProductToBasket(){
 	
 	var subBrandCode = document.getElementById("subBrandCode").value;
 	var selected = false;
-
+    var param = "";
 	for(var i =0;i < lineAmts.length; i++){
 		if(!selected && Number(lineAmts[i].value) > 0 )
 			selected = true;
 		
+		param = "custId=" +custId
+		  +"&pId="+productIds[i].value
+		  +"&pCode="+productCodes[i].value 
+		  +"&pName="+escapeParameter(productNames[i].value)
+		  +"&uom1="+uom1s[i].value
+		  +"&uom2="+uom2s[i].value
+		  +"&price1="+price1s[i].value
+		  +"&price2="+price2s[i].value
+		  +"&qty1="+qty1s[i].value
+		  +"&qty2="+qty2s[i].value
+		  +"&lineAmt="+lineAmts[i].value
+		  +"&taxable="+taxables[i].value;
+		
 		$(function(){
 			var getData = $.ajax({
 				url: "${pageContext.request.contextPath}/jsp/ajax/addProductToBasket.jsp",
-				data : "custId=" +custId
-					  +"&pId="+productIds[i].value
-					  +"&pCode="+productCodes[i].value 
-					  +"&pName="+escapeParameter(productNames[i].value)
-					  +"&uom1="+uom1s[i].value
-					  +"&uom2="+uom2s[i].value
-					  +"&price1="+price1s[i].value
-					  +"&price2="+price2s[i].value
-					  +"&qty1="+qty1s[i].value
-					  +"&qty2="+qty2s[i].value
-					  +"&lineAmt="+lineAmts[i].value
-					  +"&taxable="+taxables[i].value,
+				data : param,
 				async: false,
 				success: function(getData){
 					var status = jQuery.trim(getData);
@@ -475,9 +476,11 @@ function addProductToBasket(){
 	    $("#selectProduct").dialog("close");
 	}); 	
 }
-
+/** escape some charector cannot display ajax % ,# **/
 function escapeParameter(param){
-	return param.replace("%","%25");
+	param = param.replace("%","%25");
+	param = param.replace("#","%23");
+	return param;
 }
 function validateVanPaymentMethod(){
 	var r = true;
@@ -600,7 +603,9 @@ function validateVanCreditLimit(){
 								</td>
 							</tr>
 							<tr>
-								<td align="right"><bean:message key="Order.DeliveryAddress" bundle="sysele"/><font color="red">*</font></td>
+								<td align="right">
+								 <font color="blue"><b><bean:message key="Order.DeliveryAddress" bundle="sysele"/></b></font>
+								<font color="red">*</font></td>
 								<td align="left" colspan="3">
 									<html:select property="order.shipAddressId" style="width:80%">
 										<html:options collection="shipAddr" property="id" labelProperty="lineString"/>

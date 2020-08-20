@@ -17,9 +17,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.BeanParameter;
-import util.ReportUtilServlet;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
@@ -33,10 +30,13 @@ import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MStockReturn;
 import com.isecinc.pens.web.buds.BudsAllBean;
 import com.isecinc.pens.web.buds.BudsAllForm;
+import com.isecinc.pens.web.buds.page.export.ControlPickingExport;
 import com.isecinc.pens.web.stockreturn.StockReturnForm;
+import com.pens.util.BeanParameter;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DBConnection;
 import com.pens.util.DBConnectionApps;
+import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 
 /**
@@ -207,37 +207,40 @@ public class ControlPickingAction extends I_Action {
 		return "budsAll";
 	}
 	
-	public ActionForward export(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
-		logger.debug("export");
+	public ActionForward exportControlPicking(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("exportControlPicking");
 		BudsAllForm budsAllForm = (BudsAllForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		String pageName = budsAllForm.getPageName();
-		String subPageName = budsAllForm.getSubPageName();
-		StringBuffer dataExcel = new StringBuffer();
+		ConfPickingBean bean = null;
 		try {
-			
-			//set for display by page
-			request.getSession().setAttribute("summary" ,null);
+			logger.debug("pickingNo:"+Utils.isNull(request.getParameter("pickingNo")));
+			logger.debug("summaryType:"+Utils.isNull(request.getParameter("summaryType")));
+			//set parameter
+			budsAllForm.getBean().getConfPickingBean().setPickingNo(Utils.isNull(request.getParameter("pickingNo")));
 			budsAllForm.getBean().getConfPickingBean().setDataStrBuffer(null);
-			budsAllForm.getBean().getConfPickingBean().setItemsList(null);
 			
-			ConfPickingBean confPickingBean = ConfPickingDAO.searchPickingDetail("view",subPageName, budsAllForm.getBean().getConfPickingBean(), true, user);
+			//search and export
+			if(Utils.isNull(request.getParameter("summaryType")).equalsIgnoreCase("summary")){
+			    bean = ControlPickingExport.searchControlPickingReportTypeSummary(budsAllForm.getBean().getConfPickingBean(), true, user);
+			}else{
+				bean = ControlPickingExport.searchControlPickingReportTypeDetail(budsAllForm.getBean().getConfPickingBean(), true, user);
+			}
 			
-			if(confPickingBean != null && confPickingBean.getDataStrBuffer() != null){
-				dataExcel.append(confPickingBean.getDataStrBuffer());
-				dataExcel.append(confPickingBean.getRowTotalStrBuffer());
+			if(bean.getDataStrBuffer() != null &&  bean.getDataStrBuffer().length() >0){
 				
 				java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
 				response.setContentType("application/vnd.ms-excel");
 				
 				Writer w = new BufferedWriter(new OutputStreamWriter(out,"UTF-8")); 
-				w.write(dataExcel.toString());
+				w.write(bean.getDataStrBuffer().toString());
 			    w.flush();
 			    w.close();
 
 			    out.flush();
 			    out.close();
+			    
+			    budsAllForm.getBean().getConfPickingBean().setDataStrBuffer(null);
 			}else{
 				request.setAttribute("Message", "ไม่พบข้อมูล");
 			}

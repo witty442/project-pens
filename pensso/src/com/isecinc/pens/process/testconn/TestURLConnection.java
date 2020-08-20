@@ -6,11 +6,10 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
-import util.ControlCode;
-
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.pens.util.ControlCode;
 import com.pens.util.EnvProperties;
 
 public class TestURLConnection {

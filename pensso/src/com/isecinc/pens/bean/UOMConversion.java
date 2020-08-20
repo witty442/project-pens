@@ -2,9 +2,8 @@ package com.isecinc.pens.bean;
 
 import java.sql.ResultSet;
 
-import util.DateToolsUtil;
-
 import com.isecinc.core.model.I_PO;
+import com.pens.util.DateToolsUtil;
 
 /**
  * UOM Conversion

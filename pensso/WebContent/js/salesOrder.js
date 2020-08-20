@@ -376,14 +376,18 @@ function addProduct(path,objValue){
 		//tbl.rows[index+1].cells[5].innerHTML = addCommas(qty1) + '/' + addCommas(qty2);//price
 		tbl.rows[index+1].cells[6].innerHTML = addCommas((amt1 + amt2).toFixed(2)); //total amount
 		tbl.rows[index+1].cells[7].innerHTML = addCommas((disc1 + disc2).toFixed(2));//total discount
+		//cells[8] //netAmount
+		//cells[9] //shippingDate
+		//cells[10] //requestDate
 		
 		//taxable
 		//alert(objValue.taxable);
 		if(objValue.taxable =='Y'){
-		  tbl.rows[index+1].cells[10].innerHTML ="<img border=0 src='"+path+"/icons/check.gif'/>";
+		  tbl.rows[index+1].cells[11].innerHTML ="<img border=0 src='"+path+"/icons/check.gif'/>";
 		}else{
-		  tbl.rows[index+1].cells[10].innerHTML = "";	
+		  tbl.rows[index+1].cells[11].innerHTML = "";	
 		}
+		//cells[12] //Promotion
 		
 		document.getElementsByName('lines.qty1')[index].value = qty1;
 		document.getElementsByName('lines.qty2')[index].value = qty2;
@@ -423,19 +427,19 @@ function addProduct2(path,objValue){
         objValue.row=n;
        
         var tds = '<tr class='+className+'>';
-        tds += '<td align="center"></td>';
-        tds += '<td align="center"></td>';
-        tds += '<td align="left"></td>';
-        tds += '<td align="center"></td>';
-        tds += '<td align="right"></td>';
-        tds += '<td align="right"></td>';
-        tds += '<td align="right"></td>';
-        tds += '<td align="right"></td>';
-        tds += '<td align="right"></td>';
-        tds += '<td align="center"></td>';
-        tds += '<td align="center"></td>';
-        tds += '<td align="center"></td>';
-        tds += '<td align="center"></td>';
+        tds += '<td align="center"></td>';//no 0
+        tds += '<td align="center"></td>';//chk 1
+        tds += '<td align="left"></td>';//productName 2
+        tds += '<td align="center"></td>';//uom 3
+        tds += '<td align="right"></td>';//qty 4
+        tds += '<td align="right"></td>';//price 5
+        tds += '<td align="right"></td>';//lineAmount 6
+        tds += '<td align="right"></td>';//discount 7
+        tds += '<td align="right"></td>';//netAmount 8
+        tds += '<td align="center"></td>';//shippingDate 9
+        tds += '<td align="center"></td>';//requestDate 10
+        tds += '<td align="center"></td>';//tax 11
+        tds += '<td align="center"></td>';//promotion 12
         tds += '</tr>';
         if($('tbody', this).length > 0){
             $('tbody', this).append(tds);

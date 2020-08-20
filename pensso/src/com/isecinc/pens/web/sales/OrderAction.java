@@ -18,21 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.hssf.record.formula.ControlPtg;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-
-import util.BeanParameter;
-import util.BundleUtil;
-import util.ControlCode;
-import util.ConvertNullUtil;
-import util.CustomerReceiptFilterUtils;
-import util.DateToolsUtil;
-import util.Debug;
-import util.NumberToolsUtil;
-import util.ReportHelper;
-import util.ReportUtilServlet;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
@@ -70,8 +58,18 @@ import com.isecinc.pens.report.listOrderProduct.ListOrderProductReport;
 import com.isecinc.pens.report.listOrderProduct.ListOrderProductReportProcess;
 import com.isecinc.pens.report.taxinvoice.TaxInvoiceReport;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
+import com.pens.util.BeanParameter;
+import com.pens.util.BundleUtil;
+import com.pens.util.ControlCode;
+import com.pens.util.ConvertNullUtil;
+import com.pens.util.CustomerReceiptFilterUtils;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateToolsUtil;
 import com.pens.util.DateUtil;
+import com.pens.util.Debug;
+import com.pens.util.NumberToolsUtil;
+import com.pens.util.ReportHelper;
+import com.pens.util.ReportUtilServlet;
 
 
 /**
@@ -170,6 +168,8 @@ public class OrderAction extends I_Action {
 
 			orderForm.getOrder().setOrderType(user.getOrderType().getKey());
 			// default prepare forward
+			
+			logger.debug("1:order.customerName:"+orderForm.getOrder().getCustomerName());
 
 			// Product from C4
 			if (orderForm.getProductIds() != null) {
@@ -231,7 +231,7 @@ public class OrderAction extends I_Action {
 				// Default from customer
 				orderForm.getOrder().setId(0);
 				orderForm.getOrder().setCustomerId(customer.getId());
-				orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
+				orderForm.getOrder().setCustomerName(Utils.isNull(customer.getName()));
 				orderForm.getOrder().setPaymentTerm(customer.getPaymentTerm());
 				orderForm.getOrder().setPaymentMethod(customer.getPaymentMethod());
 				orderForm.getOrder().setVatCode(customer.getVatCode());
@@ -255,6 +255,8 @@ public class OrderAction extends I_Action {
 			
 			//Set Prev Step Action
 			ControlOrderPage.setPrevOrderStepAction(request, ControlOrderPage.STEP_ORDER_1);
+			
+			logger.debug("2:order.customerName:"+orderForm.getOrder().getCustomerName());
 			
 			// save token
 			saveToken(request);
@@ -1369,12 +1371,11 @@ public class OrderAction extends I_Action {
 		String action = Utils.isNull(request.getParameter("action"));
 		Customer custByUserId = null;
 		try {
-			logger.debug("action:"+action);
+			logger.debug("action:"+action +"customerId:"+ orderForm.getOrder().getCustomerId());
 			if( "new".equalsIgnoreCase(action)){
-				if(orderForm.getOrder().getCustomerId() !=0){
+				if( orderForm.getOrder().getCustomerId()!=0){
 				   custByUserId = new MCustomer().findByWhereCond(" where user_id = "+user.getId());// Integer.parseInt(CUSTOMER_ID_MEYA_FIXED);
 				}
-				
 				OrderCriteria criteria = new OrderCriteria();
 				//criteria.setSearchKey(searchKey)
 				orderForm.setCriteria(criteria);
@@ -1388,47 +1389,51 @@ public class OrderAction extends I_Action {
 				}
 				orderForm.setOrder(order);
 			}else{
+				
 				request.getSession().removeAttribute("isAdd");
 	           
 				OrderCriteria criteria = getSearchCriteria(request, orderForm.getCriteria(), this.getClass().toString());
 				orderForm.setCriteria(criteria);
 				
 				Order order = orderForm.getOrder();
+				//logger.debug("Teritery:"+order.getTerritory());
+				
 				String whereCause = "";
 				if ( !Utils.isNull(order.getOrderNo()).equals("")) {
-					whereCause += " AND ORDER_NO LIKE '%"
+					whereCause += " AND o.ORDER_NO LIKE '%"
 							+ order.getOrderNo().trim().replace("\'", "\\\'").replace("\"", "\\\"") + "%' \n";
 				}
 				if ( !Utils.isNull(order.getSalesOrderNo()).equals("")) {
-					whereCause += " AND SALES_ORDER_NO LIKE '%"
+					whereCause += " AND o.SALES_ORDER_NO LIKE '%"
 							+ order.getSalesOrderNo().trim().replace("\'", "\\\'").replace("\"", "\\\"")
 							+ "%' \n";
 				}
 				if ( !Utils.isNull(order.getArInvoiceNo()).equals("")) {
-					whereCause += " AND AR_INVOICE_NO LIKE '%"
+					whereCause += " AND o.AR_INVOICE_NO LIKE '%"
 							+ order.getArInvoiceNo().trim().replace("\'", "\\\'").replace("\"", "\\\"")
 							+ "%' \n";
 				}
 				if ( !Utils.isNull(order.getDocStatus()).equals("")) {
-					whereCause += " AND DOC_STATUS = '" + order.getDocStatus() + "' \n";
+					whereCause += " AND o.DOC_STATUS = '" + order.getDocStatus() + "' \n";
 				}
 	
 				if ( !Utils.isNull(order.getOrderDateFrom()).equals("") && !Utils.isNull(order.getOrderDateTo()).equals("")) {
-					whereCause += "AND order_date  >= to_date('"+DateUtil.convBuddhistToChristDate(order.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ";
-					whereCause += "AND order_date  <= to_date('"+DateUtil.convBuddhistToChristDate(order.getOrderDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ";
+					whereCause += "AND o.order_date  >= to_date('"+DateUtil.convBuddhistToChristDate(order.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ";
+					whereCause += "AND o.order_date  <= to_date('"+DateUtil.convBuddhistToChristDate(order.getOrderDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ";
 					
 				}else if ( !Utils.isNull(order.getOrderDateFrom()).equals("") && Utils.isNull(order.getOrderDateTo()).equals("")) {
-					whereCause += "AND order_date  = to_date('"+DateUtil.convBuddhistToChristDate(order.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ";
+					whereCause += "AND o.order_date  = to_date('"+DateUtil.convBuddhistToChristDate(order.getOrderDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy')  ";
 				}
 				if( !user.getCode().equalsIgnoreCase("ADMIN")){
-				   whereCause += " AND ORDER_TYPE = '" + user.getOrderType().getKey() + "' \n";
-				   whereCause += " AND USER_ID = " + user.getId() +" \n";
+				   whereCause += " AND o.ORDER_TYPE = '" + user.getOrderType().getKey() + "' \n";
+				   whereCause += " AND o.USER_ID = " + user.getId() +" \n";
 				}
 				if(order.getCustomerId() !=0){
-				   whereCause += " AND CUSTOMER_ID = " + order.getCustomerId() + " \n";
+				   whereCause += " AND o.CUSTOMER_ID = " + order.getCustomerId() + " \n";
 				}
-				if( !Utils.isNull(order.getCustomerCode()).equals("") || !Utils.isNull(order.getCustomerName()).equals("") ){
-					 whereCause += " AND CUSTOMER_ID IN ( \n";
+				if( !Utils.isNull(order.getCustomerCode()).equals("") || !Utils.isNull(order.getCustomerName()).equals("") 
+					|| !"".equals(Utils.isNull(order.getTerritory()))){
+					 whereCause += " AND o.CUSTOMER_ID IN ( \n";
 					 whereCause += "  select customer_id from pensso.m_customer where 1=1 \n";
 					 if( !Utils.isNull(order.getCustomerCode()).equals("")){
 					    whereCause += " and code like '%"+Utils.isNull(order.getCustomerCode())+"%'\n";
@@ -1436,10 +1441,19 @@ public class OrderAction extends I_Action {
 					 if( !Utils.isNull(order.getCustomerName()).equals("")){
 						whereCause += " and name like '%"+Utils.isNull(order.getCustomerName())+"%'\n";
 					 }
+					 if ( !"".equals(Utils.isNull(order.getTerritory())) ){
+						whereCause += "\n AND TERRITORY = '" + Utils.isNull(order.getTerritory()) + "'";
+					 }
 					 whereCause += " )\n";
 				}
-			
-				whereCause += " ORDER BY ORDER_DATE DESC,ORDER_NO DESC \n";
+				
+				if ( order.getSearchProvince() != 0) {
+					whereCause += "\n AND a.province_id = " + order.getSearchProvince();
+				}
+				if ( !"".equals(Utils.isNull(order.getDistrict())) && !"0".equals(Utils.isNull(order.getDistrict())) ){
+					whereCause += "\n AND a.district_id = " + order.getDistrict() + "";
+				}
+				whereCause += "\n ORDER BY o.ORDER_DATE DESC,o.ORDER_NO DESC ";
 				Order[] results = new MOrder().searchOpt(whereCause);
 	
 				orderForm.setResults(results);

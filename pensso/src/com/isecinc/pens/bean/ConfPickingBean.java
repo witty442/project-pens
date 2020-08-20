@@ -1,9 +1,10 @@
 package com.isecinc.pens.bean;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.List;
 
-public class ConfPickingBean implements Serializable {
+public class ConfPickingBean implements Serializable ,Comparable<ConfPickingBean> {
 	
     /**
 	 * 
@@ -30,14 +31,28 @@ public class ConfPickingBean implements Serializable {
 	private String productName;
 	private String uom;
 	private String qty;
+	private String qty1;
+	private String qty2;
 	private String totalAmount;
 	private String vatAmount;
 	private String netAmount;
+	private double totalAmountD;
+	private double vatAmountD;
+	private double netAmountD;
+	private String invoiceNo;
+	private String invoiceDate;
+	private String invoiceType;
+	private String invoiceRef;
+	private String addressShipTo;
+	private String addressBillTo;
+	private String mobile;
 	private StringBuffer dataStrBuffer;
 	private StringBuffer rowTotalStrBuffer;
 	private String selectedOrderNo;
 	private List<ConfPickingBean> itemsList;
 	private String userName;
+	private String poNumber;
+	private String alternateName;
 	private boolean canFinish;
 	private boolean canConfirm;
 	private boolean canReject;
@@ -54,8 +69,113 @@ public class ConfPickingBean implements Serializable {
 	private String uom2Contain;
 	private double subQty;
 	private double priQty;
+	private String summaryType;
+	private String unitStandardPrice;
+	private String unitSellingPrice;
 	
 	
+	public String getQty1() {
+		return qty1;
+	}
+	public void setQty1(String qty1) {
+		this.qty1 = qty1;
+	}
+	public String getQty2() {
+		return qty2;
+	}
+	public void setQty2(String qty2) {
+		this.qty2 = qty2;
+	}
+	public String getUnitStandardPrice() {
+		return unitStandardPrice;
+	}
+	public void setUnitStandardPrice(String unitStandardPrice) {
+		this.unitStandardPrice = unitStandardPrice;
+	}
+	public String getUnitSellingPrice() {
+		return unitSellingPrice;
+	}
+	public void setUnitSellingPrice(String unitSellingPrice) {
+		this.unitSellingPrice = unitSellingPrice;
+	}
+	public String getInvoiceType() {
+		return invoiceType;
+	}
+	public void setInvoiceType(String invoiceType) {
+		this.invoiceType = invoiceType;
+	}
+	public String getInvoiceRef() {
+		return invoiceRef;
+	}
+	public void setInvoiceRef(String invoiceRef) {
+		this.invoiceRef = invoiceRef;
+	}
+	public String getAddressShipTo() {
+		return addressShipTo;
+	}
+	public void setAddressShipTo(String addressShipTo) {
+		this.addressShipTo = addressShipTo;
+	}
+	public String getAddressBillTo() {
+		return addressBillTo;
+	}
+	public void setAddressBillTo(String addressBillTo) {
+		this.addressBillTo = addressBillTo;
+	}
+	public String getSummaryType() {
+		return summaryType;
+	}
+	public void setSummaryType(String summaryType) {
+		this.summaryType = summaryType;
+	}
+	public String getAlternateName() {
+		return alternateName;
+	}
+	public void setAlternateName(String alternateName) {
+		this.alternateName = alternateName;
+	}
+	public String getPoNumber() {
+		return poNumber;
+	}
+	public void setPoNumber(String poNumber) {
+		this.poNumber = poNumber;
+	}
+	public double getTotalAmountD() {
+		return totalAmountD;
+	}
+	public void setTotalAmountD(double totalAmountD) {
+		this.totalAmountD = totalAmountD;
+	}
+	public double getVatAmountD() {
+		return vatAmountD;
+	}
+	public void setVatAmountD(double vatAmountD) {
+		this.vatAmountD = vatAmountD;
+	}
+	public double getNetAmountD() {
+		return netAmountD;
+	}
+	public void setNetAmountD(double netAmountD) {
+		this.netAmountD = netAmountD;
+	}
+	public String getMobile() {
+		return mobile;
+	}
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+	public String getInvoiceDate() {
+		return invoiceDate;
+	}
+	public void setInvoiceDate(String invoiceDate) {
+		this.invoiceDate = invoiceDate;
+	}
+	public String getInvoiceNo() {
+		return invoiceNo;
+	}
+	public void setInvoiceNo(String invoiceNo) {
+		this.invoiceNo = invoiceNo;
+	}
 	public boolean isCanAddOrderManual() {
 		return canAddOrderManual;
 	}
@@ -313,6 +433,24 @@ public class ConfPickingBean implements Serializable {
 	public void setNetAmount(String netAmount) {
 		this.netAmount = netAmount;
 	}
-	
+	 @Override
+	 public int compareTo(ConfPickingBean o) {
+	     return Comparators.PRODUCT_CODE_ASC.compare(this, o);
+	  }
+	 
+	  public static class Comparators {
+		  public static Comparator<ConfPickingBean> PRODUCT_CODE_ASC = new Comparator<ConfPickingBean>() {
+	            @Override
+	            public int compare(ConfPickingBean o1, ConfPickingBean o2) {
+	            	 return o1.getProductCode().compareTo(o2.getProductCode());
+	            }
+	        };
+	        public static Comparator<ConfPickingBean> PRODUCT_CODE_DESC = new Comparator<ConfPickingBean>() {
+	            @Override
+	            public int compare(ConfPickingBean o1, ConfPickingBean o2) {
+	            	 return o2.getProductCode().compareTo(o1.getProductCode());
+	            }
+	        };
+	  }
 	
 }

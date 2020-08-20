@@ -8,16 +8,15 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.ConvertNullUtil;
-import util.DateToolsUtil;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateToolsUtil;
 import com.pens.util.seq.SequenceProcess;
 
 /**
@@ -81,7 +80,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 	public boolean save(OrderLine line, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (line.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
+			id = SequenceProcess.getNextValue("t_order_line").longValue();
 		} else {
 			id = line.getId();
 		}

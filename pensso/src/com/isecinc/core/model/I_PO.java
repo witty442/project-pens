@@ -13,8 +13,9 @@ public abstract class I_PO implements Serializable {
 
 	private static final long serialVersionUID = -842028756977462875L;
 
-	//OLD STATUS
+	//RECEIPT STATUS
 	public static String DOC_SAVE = "SV";//OPEN
+	public static String DOC_VO = "VO";//CANCEL
 	
 	//STEP ORDER
 	public static String STATUS_CANCEL = "CANCEL";//Cancel

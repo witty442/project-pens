@@ -44,7 +44,8 @@ public class PopupHelper {
 		 	headName = "ร้านค้า เครดิต(Credit Sales)";
 		 	codeSearchTxtName = "Customer Code";
 		 	descSearchTxtName = "Customer Name";
-	    }else  if("SalesrepSales".equalsIgnoreCase(pageName)){
+	    }else  if("SalesrepSales".equalsIgnoreCase(pageName) 
+	    	|| "SalesrepSalesAll".equalsIgnoreCase(pageName)){
 		 	headName = "พนักงานขาย";
 		 	codeSearchTxtName = "รหัสพนักงานขาย";
 		 	descSearchTxtName = "ชื่อพนักงานขาย";

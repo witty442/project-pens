@@ -5,7 +5,7 @@
 <%@page import="com.isecinc.pens.model.MTrip"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.Statement"%>
-<%@page import="util.DBCPConnectionProvider"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.Trip"%>
 <%@page import="java.sql.Connection"%>
 <%

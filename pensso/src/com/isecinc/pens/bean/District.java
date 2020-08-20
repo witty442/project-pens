@@ -3,7 +3,7 @@ package com.isecinc.pens.bean;
 import java.io.Serializable;
 import java.sql.ResultSet;
 
-import util.ConvertNullUtil;
+import com.pens.util.ConvertNullUtil;
 
 /**
  * District Class

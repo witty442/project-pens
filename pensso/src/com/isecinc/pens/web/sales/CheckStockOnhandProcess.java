@@ -21,7 +21,7 @@ public class CheckStockOnhandProcess {
 			conn = DBConnectionApps.getInstance().getConnection();
 			//381
 			//754189	381092
-			checkStockItemProc(conn,"381038","754185","CTN","CUP");
+			checkStockOnhandItemProc(conn,"381038","754185","CTN","CUP");
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
@@ -34,59 +34,70 @@ public class CheckStockOnhandProcess {
 	}
 	
 
-	public static String[] checkStockItemProc(String productCode,String productId,String uomFrom,String uomTo) throws Exception{
+	public static String[] checkStockOnhandItemProc(String productCode,String productId,String uomFrom,String uomTo) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnectionApps();
-			return checkStockItemProc(conn,productCode, productId, uomFrom, uomTo);
+			return checkStockOnhandItemProc(conn,productCode, productId, uomFrom, uomTo);
 		}catch(Exception e){
 			throw e;
 		}finally{
 			conn.close();
 		}
 	}
-	public static String[] checkStockItemProc(Connection conn,String productCode,String productId,String uomFrom,String uomTo) throws Exception{
-		PreparedStatement  ps = null;
-		ResultSet rs = null;
+	public static String[] checkStockOnhandItemProc(Connection conn,String productCode,String productId,String uomFrom,String uomTo) throws Exception{
+		CallableStatement  cs = null;
 		String qty ="";
 		String ctnQtyIn = "";
 		String subQtyIn = "";
 		String[] qtyArr = new String[3];
 		StringBuffer sql = new StringBuffer("");
 		try{
-			//clear_quantity_cache_proc(conn);
-			
+		
 			sql = new StringBuffer("");
-			sql.append("select xxpens_om_sales_online_pkg.check_onhand(?) as qty from dual");
-			ps = conn.prepareStatement(sql.toString());
-			ps.setInt(1,Utils.convertStrToInt(productId));
-			rs = ps.executeQuery();
-			if(rs.next()){
-				qty = String.valueOf(rs.getDouble("qty"));
-				qtyArr[0] = qty;//1.8 input
-				if(qty.indexOf(".") != -1){
-				   ctnQtyIn = qty.substring(0,qty.indexOf("."));
-				   subQtyIn = qty.substring(qty.indexOf("."),qty.length());
-				}else{
-				   ctnQtyIn = qty;
-				}
-				qtyArr[1] = ctnQtyIn;
-				qtyArr[2] = "";
-				if( !Utils.isNull(uomTo).equals("")){
-				  //convert to Uom2
-				   subQtyIn = convertToSubQty(conn,productId,uomFrom,uomTo,subQtyIn);
-				   qtyArr[2] = subQtyIn;
-				}
-				logger.debug("productCode["+productCode+"]productId["+productId+"]qty:"+qty+",ctnQtyIn:"+ctnQtyIn+",subQtyIn:"+subQtyIn);
+			/**
+			 *   xxpens_om_sales_online_pkg.check_onhand(p_organization_id => 226,
+                                          p_subinventory    => 'Z001',
+                                          p_item_id         => 815171,
+                                          x_qoh             => x_qoh, --quantity on-hand
+                                          x_qr              => x_qr, --quantity reserved
+                                          x_atr             => x_atr); --available to reserve
+			 */
+			sql.append("{ call  xxpens_om_sales_online_pkg.check_onhand(?,?,?,?,?,?) }");
+			cs = conn.prepareCall(sql.toString());
+			cs.setInt(1,226);
+			cs.setString(2, "Z001");
+			cs.setInt(3,Utils.convertStrToInt(productId));
+			cs.registerOutParameter(4, java.sql.Types.NUMERIC);
+            cs.registerOutParameter(5, java.sql.Types.NUMERIC);
+            cs.registerOutParameter(6, java.sql.Types.NUMERIC);
+            
+			cs.executeUpdate();
+			qty = String.valueOf(cs.getDouble(6));
+			qtyArr[0] = qty;//1.8 input
+			if(qty.indexOf(".") != -1){
+			   ctnQtyIn = qty.substring(0,qty.indexOf("."));
+			   subQtyIn = qty.substring(qty.indexOf("."),qty.length());
+			}else{
+			   ctnQtyIn = qty;
 			}
-			//conn.commit();
+			qtyArr[1] = ctnQtyIn;
+			qtyArr[2] = "";
+			if( !Utils.isNull(uomTo).equals("")){
+			  //convert to Uom2
+			   subQtyIn = convertToSubQty(conn,productId,uomFrom,uomTo,subQtyIn);
+			   qtyArr[2] = subQtyIn;
+			}
+			logger.debug("productCode["+productCode+"]productId["+productId+"]qty:"+qty+",ctnQtyIn:"+ctnQtyIn+",subQtyIn:"+subQtyIn);
+
 			return qtyArr;
 		}catch(Exception e){
 			throw e;
 		}finally{
-			if(ps != null){
-				ps.close();ps=null;
+			if(cs != null){
+				cs.close();cs=null;
 			}
+			
 		}
 	}
 	public static String[] checkStockItemProc_NEW(Connection conn,String productCode,String productId,String uomFrom,String uomTo) throws Exception{

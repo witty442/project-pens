@@ -1,9 +1,8 @@
 <%@page import="com.isecinc.pens.web.buds.page.ConfPickingDAO"%>
 <%@page import="com.isecinc.pens.bean.ConfPickingBean"%>
-<%@page import="util.SIdUtils"%>
+<%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.List"%>
-<%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

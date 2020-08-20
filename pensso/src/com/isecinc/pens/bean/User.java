@@ -1,6 +1,6 @@
 package com.isecinc.pens.bean;
 
-import static util.ConvertNullUtil.convertToString;
+import static com.pens.util.ConvertNullUtil.convertToString;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
@@ -27,7 +27,6 @@ public class User extends I_PO implements Serializable {
 	public static final String VAN = "VAN";
 	public static final String DD = "DD";
 	public static final String NB = "NB";
-	public static final String PICKING = "PICKING";
 	public static final String STOCK = "STOCK";
 	public static final String BUD_ADMIN = "BUDADMIN";
 	
@@ -95,33 +94,39 @@ public class User extends I_PO implements Serializable {
 	 * Active Role Info
 	 */
 	public void activeRoleInfo() {
-		
-		List<References> ref = new ArrayList<References>();
-		// customer type, sales group, order type
-		if (getType().equalsIgnoreCase(ADMIN)) {
-			// No Role Info
-		} else if (getType().equalsIgnoreCase(TT)) {
-			ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_TT);
-		} else if (getType().equalsIgnoreCase(VAN)) {
-			ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_VAN);
-		} 
-		
-		for (References r : ref) {
-			if (r.getName().equalsIgnoreCase(InitialReferences.CUSTOMER_TYPE)) {
-				setCustomerType(r);
-			} else if (r.getName().equalsIgnoreCase(InitialReferences.SALES_GROUP)) {
-				setSalesGroup(r);
-			} else if (r.getName().equalsIgnoreCase(InitialReferences.ORDER_TYPE)) {
-				setOrderType(r);
+		try{
+			List<References> ref = new ArrayList<References>();
+			// customer type, sales group, order type
+			if ( !getType().equalsIgnoreCase(TT) && !getType().equalsIgnoreCase(VAN)) {
+				// No Role Info
+			} else if (getType().equalsIgnoreCase(TT)) {
+				ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_TT);
+			} else if (getType().equalsIgnoreCase(VAN)) {
+				ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_VAN);
+			} 
+			
+			for (References r : ref) {
+				if (r.getName().equalsIgnoreCase(InitialReferences.CUSTOMER_TYPE)) {
+					setCustomerType(r);
+				} else if (r.getName().equalsIgnoreCase(InitialReferences.SALES_GROUP)) {
+					setSalesGroup(r);
+				} else if (r.getName().equalsIgnoreCase(InitialReferences.ORDER_TYPE)) {
+					setOrderType(r);
+				}
 			}
-		}
-		//System.out.println("activeRoleInfo:type{"+getType()+"}ref{"+ref+"}orderType{"+getOrderType()+"}");
-		
-		for (References r : InitialReferences.getReferenes().get(InitialReferences.ROLE)) {
-			if (r.getKey().equalsIgnoreCase(getType())) {
-				setRole(r);
-				break;
+			//System.out.println("activeRoleInfo:type{"+getType()+"}ref{"+ref+"}orderType{"+getOrderType()+"}");
+			if ( getType().equalsIgnoreCase(TT) || getType().equalsIgnoreCase(VAN)) {
+				for (References r : InitialReferences.getReferenes().get(InitialReferences.ROLE)) {
+					if (r.getKey().equalsIgnoreCase(getType())) {
+						setRole(r);
+						break;
+					}
+				}
+			}else{
+				setRole( new References("admin", "admin"));
 			}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 

@@ -69,7 +69,7 @@ function openCopy(path,id){
 function openPopup(path,pageName){
 	var form = document.itManageForm;
 	var param = "&hideAll=true&pageName="+pageName;
-	 if("SalesrepSales" == pageName){
+	 if("SalesrepSalesAll" == pageName){
 		param += "&selectone=true";
 	}
 	url = path + "/jsp/popupAction.do?do=prepareAll&action=new"+param;
@@ -77,7 +77,7 @@ function openPopup(path,pageName){
 }
 function setDataPopupValue(code,desc,desc2,desc3,pageName){
 	var form = document.itManageForm;
-	if('SalesrepSales' == pageName){
+	if('SalesrepSalesAll' == pageName){
 		form.salesrepCode.value = code;
 		form.salesrepFullName.value = desc;
 		form.zone.value = desc2;
@@ -87,7 +87,7 @@ function setDataPopupValue(code,desc,desc2,desc3,pageName){
 function getAutoOnblur(e,obj,pageName){
 	var form = document.itManageForm;
 	if(obj.value ==''){
-		if("SalesrepSales" == pageName){
+		if("SalesrepSalesAll" == pageName){
 			form.salesrepCode.value = '';
 			form.salesrepFullName.value = "";
 			form.zone.value = "";
@@ -101,7 +101,7 @@ function getAutoKeypress(e,obj,pageName){
 	var form = document.itManageForm;
 	if(e != null && e.keyCode == 13){
 		if(obj.value ==''){
-			if("SalesrepSales" == pageName){
+			if("SalesrepSalesAll" == pageName){
 				form.salesrepCode.value = '';
 				form.salesrepFullName.value = "";
 				form.zone.value = "";
@@ -119,7 +119,7 @@ function getAutoDetail(obj,pageName){
 	
 	//prepare parameter
 	var param = "";
-	if("SalesrepSales"==pageName){
+	if("SalesrepSalesAll"==pageName){
 		param  ="pageName="+pageName;
 		param +="&salesrepCode="+obj.value;
 	}
@@ -133,7 +133,7 @@ function getAutoDetail(obj,pageName){
 			}
 		}).responseText;
 	
-	if("SalesrepSales" == pageName){
+	if("SalesrepSalesAll" == pageName){
 		var retArr = returnString.split("|");
 		if(retArr[0] !=-1){
 			form.salesrepCode.value = retArr[1];
@@ -164,9 +164,9 @@ function editItemMaster(path) {
 				<td>
 				    <html:text property="bean.salesrepCode" styleId="salesrepCode" size="10" 
 				    styleClass="\" autoComplete=\"off" 
-				    onkeypress="getAutoKeypress(event,this,'SalesrepSales')"
-				    onblur="getAutoOnblur(event,this,'SalesrepSales')"/>
-				     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','SalesrepSales')"/>   
+				    onkeypress="getAutoKeypress(event,this,'SalesrepSalesAll')"
+				    onblur="getAutoOnblur(event,this,'SalesrepSalesAll')"/>
+				     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','SalesrepSalesAll')"/>   
 				     <html:text property="bean.salesrepFullName" styleId="salesrepFullName" styleClass="disableText" readonly="true" size="40"/>
 						&nbsp;&nbsp;&nbsp;
 					วันที่ทำรายการ 

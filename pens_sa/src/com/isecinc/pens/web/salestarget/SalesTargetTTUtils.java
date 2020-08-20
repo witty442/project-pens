@@ -722,7 +722,7 @@ public class SalesTargetTTUtils {
 		}
 	  return salesChannelDesc;
 	}
-	
+	//salesChannelNo  =salesZone
 	public static String getDivision(Connection conn,String salesChannelNo){
 		String salesChannelDesc = "";
 		Statement stmt = null;
@@ -939,7 +939,7 @@ public class SalesTargetTTUtils {
 			if( !Utils.isNull(salesZone).equals("")){
 			  sql.append("\n  and m.zone ='"+salesZone+"'");
 			}
-			 sql.append("\n  and m.zone in(0,1,2,3,4 )");
+			 sql.append("\n  and m.zone in(0,1,2,3,4,92)");
 			//Filter By User Case Role TTSUPER,TTMGR : MKT(ALL)
 			if ( !"admin".equalsIgnoreCase(user.getUserName()) && !UserUtils.userInRoleSalesTarget(user, new String[]{User.MKT})
 					&& UserUtils.userInRoleSalesTarget(user,new String[]{User.TTSUPER,User.TTMGR}) ){

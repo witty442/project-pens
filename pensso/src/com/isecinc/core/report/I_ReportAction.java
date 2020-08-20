@@ -14,12 +14,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import util.BeanParameter;
-import util.ReportUtilServlet;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.BeanParameter;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.ReportUtilServlet;
 
 /**
  * I_ReportAction Class

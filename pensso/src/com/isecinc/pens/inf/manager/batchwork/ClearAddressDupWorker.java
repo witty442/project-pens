@@ -1,8 +1,7 @@
 package com.isecinc.pens.inf.manager.batchwork;
 
 import com.isecinc.pens.bean.User;
-
-import util.AppversionVerify;
+import com.pens.util.AppversionVerify;
 
 public class ClearAddressDupWorker extends Thread{
 	private User user;

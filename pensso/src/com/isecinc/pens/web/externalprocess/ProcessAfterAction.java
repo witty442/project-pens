@@ -3,15 +3,12 @@ package com.isecinc.pens.web.externalprocess;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 
 import org.apache.log4j.Logger;
 
-import util.ExcelHeader;
-import util.SQLHelper;
-
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.SQLHelper;
 
 public class ProcessAfterAction {
 	/** Logger */

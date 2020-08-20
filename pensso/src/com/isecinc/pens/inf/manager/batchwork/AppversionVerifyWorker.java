@@ -2,7 +2,7 @@ package com.isecinc.pens.inf.manager.batchwork;
 
 import java.util.Date;
 
-import util.AppversionVerify;
+import com.pens.util.AppversionVerify;
 
 public class AppversionVerifyWorker extends Thread{
 	

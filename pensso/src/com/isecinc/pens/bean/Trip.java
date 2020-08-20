@@ -4,11 +4,10 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MUser;
+import com.pens.util.ConvertNullUtil;
 
 /**
  * Trip

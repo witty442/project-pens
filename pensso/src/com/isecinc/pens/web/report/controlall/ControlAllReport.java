@@ -3,7 +3,7 @@ package com.isecinc.pens.web.report.controlall;
 import java.io.Serializable;
 import java.util.List;
 
-import util.ConvertNullUtil;
+import com.pens.util.ConvertNullUtil;
 
 /**
  * Detailed Sales Report

@@ -87,14 +87,14 @@ function selectMultiple(){
 	//alert("idx:"+idx);
 	if(idx ==1){
 		//alert(retCode+":"+retKey+":"+retDesc);
-		if(pageName=="SalesrepSales"){
+		if(pageName=="SalesrepSales" || pageName=="SalesrepSalesAll"){
 			 window.opener.setDataPopupValue(retCode,retDesc,retDesc2,pageName);
 		}else{
 		     window.opener.setDataPopupValue(retCode,retDesc,pageName);
 		}
 	}else{
 		//alert(pageName+":"+retCode+":"+retDesc+":"+retDesc2);
-		if(pageName=="SalesrepSales"){
+		if(pageName=="SalesrepSales" || pageName=="SalesrepSalesAll"){
 			window.opener.setDataPopupValue(retCode,retDesc,retDesc2,retDesc3,pageName);
 		}else if(pageName=="CustomerAutoSub"){
 		    window.opener.setDataPopupValue(retCode,retDesc,retDesc2,retDesc3,pageName);

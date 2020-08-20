@@ -12,13 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
 
-import util.BeanParameter;
-import util.DateToolsUtil;
-
 import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentReport;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentReportProcess;
+import com.pens.util.BeanParameter;
+import com.pens.util.DateToolsUtil;
 
 /**
  * Invoice Payment Report Action

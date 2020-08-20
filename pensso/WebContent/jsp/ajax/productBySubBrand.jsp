@@ -1,5 +1,5 @@
+<%@page import="com.pens.util.ControlCode"%>
 <%@page import="com.pens.util.DBConnectionApps"%>
-<%@page import="util.ControlCode"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
 <%@page import="com.isecinc.pens.model.MCustomer"%>
@@ -19,12 +19,12 @@ try{
 	if(ControlCode.canExecuteMethod("Stock", "checkStock")){
 		checkStockStep = true;
 	}
-conn = DBConnectionApps.getInstance().getConnection();
+//conn = DBConnectionApps.getInstance().getConnection();
 User user = ((User)session.getAttribute("user"));
 String custId = request.getParameter("custId");
 Basket basket = (Basket)session.getAttribute(custId);
 //System.out.println("basket session:"+basket);
-boolean isCustHaveProductSpecial = new MCustomer().isCustHaveProductSpecial(conn, custId);
+boolean isCustHaveProductSpecial = false;//new MCustomer().isCustHaveProductSpecial(conn, custId);
 	
 if(basket == null ){
 	basket = new Basket();	
@@ -142,6 +142,7 @@ for(ProductCatalog catalog:catalogs) {
 		<input name="productCode" type="hidden" value="<%=catalog.getProductCode()%>" />
 		<input name="productId" type="hidden" value="<%=catalog.getProductId()%>" />
 		<input name="taxable" type="hidden" value="<%=catalog.getTaxable()%>" />
+		<input name="checkInputHalf" type="hidden" value="<%=catalog.getCheckInputHalf()%>" />
 		
 		<!-- ConvRate: -->
 		<input name="uom1ConvRate" type="hidden" size="2"  value="<%=catalog.getUom1ConvRate()%>"/>:
@@ -185,18 +186,25 @@ function linePrice(rowNo,price1,price2){
 	totalAmt.value = (amt.toFixed(5));	
 	totalAmtText.innerHTML = addCommas(amt.toFixed(2));
 	
+	
 	var uom1ConvRate = document.getElementsByName("uom1ConvRate")[rowNo];
 	var uom2ConvRate = document.getElementsByName("uom2ConvRate")[rowNo]; 
+	
+	var checkInputHalf= document.getElementsByName("checkInputHalf")[rowNo];
+	//alert(checkInputHalf.value);
+	
 	//validate key half ctn
-	var allQty = convetTxtObjToFloat(uom2ConvRate)*convetTxtObjToFloat(uom1ConvRate);
-	var halfQty = allQty/2;
-	if(qty2 != ''){
-		if(qty2%halfQty != 0){
-			alert("คีย์ได้ ครึ่งหีบ หรือเต็มหีบ เท่านั้น ");
-			document.getElementsByName("qty2")[rowNo].value ="";
-			document.getElementsByName("qty2")[rowNo].focus();
+	if(checkInputHalf.value =="Y"){
+		var allQty = convetTxtObjToFloat(uom2ConvRate)*convetTxtObjToFloat(uom1ConvRate);
+		var halfQty = allQty/2;
+		if(qty2 != ''){
+			if(qty2%halfQty != 0){
+				alert("คีย์ได้ ครึ่งหีบ หรือเต็มหีบ เท่านั้น ");
+				document.getElementsByName("qty2")[rowNo].value ="";
+				document.getElementsByName("qty2")[rowNo].focus();
+			}//if
 		}//if
-	}//if
+     }//if check input half 
 	
 	//Step validate Stock onhand
 	<%if(checkStockStep) {%>

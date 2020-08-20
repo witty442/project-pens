@@ -11,8 +11,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.DateToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.RequestPromotion;
 import com.isecinc.pens.bean.RequestPromotionCost;
@@ -23,6 +21,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.ReqPromotionDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateToolsUtil;
 
 public class MRequestPromotion {
 

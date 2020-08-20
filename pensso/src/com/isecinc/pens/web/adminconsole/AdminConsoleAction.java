@@ -12,8 +12,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import util.SQLHelper;
-
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
@@ -22,6 +20,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
 import com.pens.util.EnvProperties;
+import com.pens.util.SQLHelper;
 import com.pens.util.manual.cleardb.ClearDB;
 import com.pens.util.manual.cleardb.ClearDupDB;
 

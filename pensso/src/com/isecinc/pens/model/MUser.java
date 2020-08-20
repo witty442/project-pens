@@ -5,12 +5,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
 
-import util.ConvertNullUtil;
-
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.ConvertNullUtil;
 
 /**
  * I_Model Class

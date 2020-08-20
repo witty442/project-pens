@@ -2,10 +2,9 @@ package com.isecinc.pens.bean;
 
 import java.sql.ResultSet;
 
-import util.ConvertNullUtil;
-import util.DateToolsUtil;
-
 import com.isecinc.core.model.I_PO;
+import com.pens.util.ConvertNullUtil;
+import com.pens.util.DateToolsUtil;
 
 /**
  * Qualifier Class

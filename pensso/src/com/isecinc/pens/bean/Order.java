@@ -4,10 +4,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 
-import util.ConvertNullUtil;
-import util.DateToolsUtil;
-import util.NumberToolsUtil;
-
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.inf.helper.Utils;
@@ -15,6 +11,10 @@ import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MUser;
 import com.isecinc.pens.model.MOrgRule;
+import com.pens.util.ConvertNullUtil;
+import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.NumberToolsUtil;
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
@@ -96,7 +96,7 @@ public class Order extends I_PO implements Serializable {
 		//System.out.println("print_datetime_pick:"+rst.getBigDecimal("print_datetime_pick"));
 		//System.out.println("print_datetime_rcp:"+rst.getBigDecimal("print_datetime_rcp"));
 		
-		setPrintDateTimePick(Utils.stringValueSpecial2(rst.getLong("print_datetime_pick"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
+		setPrintDateTimePick(DateUtil.stringValue(rst.getDate("print_datetime_pick"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
 		setPrintCountPick(rst.getInt("print_count_pick"));
 		
 		setPrintDateTimeRcp(Utils.stringValueSpecial2(rst.getLong("print_datetime_rcp"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
@@ -133,6 +133,7 @@ public class Order extends I_PO implements Serializable {
  
 	/** ID */
 	private long id;
+	private long invoiceId;
 
 	/** Order No */
 	private String orderNo;
@@ -154,7 +155,9 @@ public class Order extends I_PO implements Serializable {
 	
 	/** Customer Name */
 	private String customerName;
-
+	
+	private String addressSummary;
+	
 	/** Bill Address */
 	private int billAddressId;
 
@@ -284,6 +287,59 @@ public class Order extends I_PO implements Serializable {
 	private String provinceGroup;
 	private boolean canCancel;
 	
+	private String territory;
+	private int searchProvince;
+	private int searchDistrict;
+	private String district;
+	
+	
+	public String getDistrict() {
+		return district;
+	}
+
+	public void setDistrict(String district) {
+		this.district = district;
+	}
+
+	public String getTerritory() {
+		return territory;
+	}
+
+	public void setTerritory(String territory) {
+		this.territory = territory;
+	}
+
+	public int getSearchProvince() {
+		return searchProvince;
+	}
+
+	public void setSearchProvince(int searchProvince) {
+		this.searchProvince = searchProvince;
+	}
+
+	public int getSearchDistrict() {
+		return searchDistrict;
+	}
+
+	public void setSearchDistrict(int searchDistrict) {
+		this.searchDistrict = searchDistrict;
+	}
+
+	public long getInvoiceId() {
+		return invoiceId;
+	}
+
+	public void setInvoiceId(long invoiceId) {
+		this.invoiceId = invoiceId;
+	}
+
+	public String getAddressSummary() {
+		return addressSummary;
+	}
+
+	public void setAddressSummary(String addressSummary) {
+		this.addressSummary = addressSummary;
+	}
 
 	public String getCustomerCode() {
 		return customerCode;

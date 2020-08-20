@@ -7,8 +7,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import util.CustomerReceiptFilterUtils;
-
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Receipt;
@@ -17,6 +15,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.process.order.OrderProcess;
+import com.pens.util.CustomerReceiptFilterUtils;
 import com.pens.util.DBCPConnectionProvider;
 
 public class GenerateAutoReceiptVan {
