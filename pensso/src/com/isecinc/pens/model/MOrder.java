@@ -2,33 +2,26 @@ package com.isecinc.pens.model;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Product;
-import com.isecinc.pens.bean.ReceiptLine;
-import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.OrderDocumentProcess;
 import com.pens.util.ConvertNullUtil;
-import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DBConnectionApps;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MOrder Class
@@ -42,7 +35,7 @@ public class MOrder extends I_Model<Order> {
 
 	private static final long serialVersionUID = -1170650417151328865L;
 
-	public static String TABLE_NAME = "t_order";
+	public static String TABLE_NAME = "pensso.t_order";
 	public static String COLUMN_ID = "ORDER_ID";
 
 	// Column Sales Online Side active
@@ -124,7 +117,7 @@ public class MOrder extends I_Model<Order> {
 		List<Order> pos = new ArrayList<Order>();
 		Order o = null;
 		try{
-			conn = DBConnection.getInstance().getConnection();
+			conn = DBConnectionApps.getInstance().getConnection();
 			String sql ="\n select o.*"
 					  +"\n ,(select count(*) from pensso.t_order_line l "
 					  +"\n   where l.order_id = o.order_id and l.promotion ='S') as promotion_s_count"
@@ -168,7 +161,7 @@ public class MOrder extends I_Model<Order> {
 				o.setTotalAmountNonVat(rst.getDouble("TOTAL_AMOUNT_NON_VAT"));
 				o.setVatAmount(rst.getDouble("VAT_AMOUNT"));
 				o.setNetAmount(rst.getDouble("NET_AMOUNT"));
-				o.setInterfaces(rst.getString("INTERFACES").trim());
+				o.setInterfaces(Utils.isNull(rst.getString("INTERFACES")));
 				o.setPayment(rst.getString("PAYMENT").trim());
 				o.setSalesOrderNo(ConvertNullUtil.convertToString(rst.getString("SALES_ORDER_NO")).trim());
 				o.setArInvoiceNo(ConvertNullUtil.convertToString(rst.getString("AR_INVOICE_NO")).trim());
@@ -194,27 +187,17 @@ public class MOrder extends I_Model<Order> {
 				if( !"".equals(ConvertNullUtil.convertToString(o.getOrg()))){
 					o.setPlaceOfBilled(new MOrgRule().getOrgRule(o.getOrg()).getName());
 				}
-				//System.out.println("print_datetime_pick:"+rst.getBigDecimal("print_datetime_pick"));
-				//System.out.println("print_datetime_rcp:"+rst.getBigDecimal("print_datetime_rcp"));
-				
-				//o.setPrintDateTimePick(Utils.stringValueSpecial2(rst.getLong("print_datetime_pick"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
-				//o.setPrintCountPick(rst.getInt("print_count_pick"));
-				
-				//o.setPrintDateTimeRcp(Utils.stringValueSpecial2(rst.getLong("print_datetime_rcp"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
-				//o.setPrintCountRcp(rst.getInt("print_count_rcp"));
-				
 				o.setPoNumber(Utils.isNull(rst.getString("po_number")));
 				o.setVanPaymentMethod(Utils.isNull(rst.getString("van_payment_method")));
 				
 				//Case found special promotion
-				if(rst.getInt("promotion_s_count") >0){
-					o.setPromotionSP(true);
-				}
+				o.setPromotionSP(rst.getInt("promotion_s_count") >0?true:false);
 				
 				String addressSummary  = Utils.isNull(rst.getString("line1"))+" "+Utils.isNull(rst.getString("line2"))+" "+Utils.isNull(rst.getString("line3"));
-			       addressSummary += " "+Utils.isNull(rst.getString("line4"))+" "+Utils.isNull(rst.getString("province_name"))+" "+Utils.isNull(rst.getString("postal_code"));
+			           addressSummary += " "+Utils.isNull(rst.getString("line4"))+" "+Utils.isNull(rst.getString("province_name"))+" "+Utils.isNull(rst.getString("postal_code"));
 			    o.setAddressSummary(addressSummary);
 			    
+			    o.setPickingNo(rst.getString("PICKING_NO"));
 				pos.add(o);
 			}
 			Order[] array = new Order[pos.size()];
@@ -242,7 +225,7 @@ public class MOrder extends I_Model<Order> {
 	public boolean save(Order order, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (order.getId() == 0) {
-			id = SequenceProcess.getNextValue("t_order").longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_order").longValue();
 			String prefix = "";
 			order.setOrderNo(new OrderDocumentProcess().getNextDocumentNo(order.getSalesRepresent().getCode(), prefix,
 					activeUserID, conn));
@@ -268,8 +251,9 @@ public class MOrder extends I_Model<Order> {
 				ConvertNullUtil.convertToString(order.getShippingDay()).trim(),
 				ConvertNullUtil.convertToString(order.getShippingTime()).trim(), order.getTotalAmount(),
 				order.getVatAmount(), order.getNetAmount(), order.getInterfaces(), order.getPayment(),
-				ConvertNullUtil.convertToString(order.getSalesOrderNo()),
-				ConvertNullUtil.convertToString(order.getArInvoiceNo()), order.getSalesRepresent().getId(),
+				null,//ConvertNullUtil.convertToString(order.getSalesOrderNo()),
+				null,//ConvertNullUtil.convertToString(order.getArInvoiceNo()),
+				order.getSalesRepresent().getId(),
 				order.getDocStatus(), activeUserID, activeUserID,
 				ConvertNullUtil.convertToString(order.getIsCash()).length() > 0 ? order.getIsCash() : "N",
 				ConvertNullUtil.convertToString(order.getOrderTime()),
@@ -298,40 +282,14 @@ public class MOrder extends I_Model<Order> {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean saveImportOrder2(Order order, int activeUserID, Connection conn) throws Exception {
-		long id = 0;
-		if (order.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
-		} else {
-			id = order.getId();
-		}
+	public boolean updatePaymentOrder(Order order, int activeUserID, Connection conn) throws Exception {
+		long id = order.getId();
+		String[] columnsUpdate = { COLUMN_ID, "ORDER_NO", "PAYMENT"};
 
-		// check duplicate
-		if (!checkDocumentDuplicate(TABLE_NAME, COLUMN_ID, "ORDER_NO", order.getOrderNo(), id, conn)) return false;
-
-		if (order.getVatCode() != null && !order.getVatCode().equals("")) {
-			order.setVatRate(new Double(order.getVatCode()));
-		}
-
-		Object[] values = { id, ConvertNullUtil.convertToString(order.getOrderNo()).trim(),
-				DateToolsUtil.convertToTimeStamp(order.getOrderDate()),
-				ConvertNullUtil.convertToString(order.getOrderType()).trim(), order.getCustomerId(),
-				ConvertNullUtil.convertToString(order.getCustomerName()).trim(), order.getBillAddressId(),
-				order.getShipAddressId(), order.getPriceListId(),
-				ConvertNullUtil.convertToString(order.getPaymentTerm()).trim(),
-				ConvertNullUtil.convertToString(order.getVatCode()).trim(), order.getVatRate(),
-				ConvertNullUtil.convertToString(order.getPaymentMethod()).trim(),
-				ConvertNullUtil.convertToString(order.getShippingDay()).trim(),
-				ConvertNullUtil.convertToString(order.getShippingTime()).trim(), order.getTotalAmount(),
-				order.getVatAmount(), order.getNetAmount(), order.getInterfaces(), order.getPayment(),
-				ConvertNullUtil.convertToString(order.getSalesOrderNo()),
-				ConvertNullUtil.convertToString(order.getArInvoiceNo()), order.getSalesRepresent().getId(),
-				order.getDocStatus(), activeUserID, activeUserID,
-				ConvertNullUtil.convertToString(order.getIsCash()).length() > 0 ? order.getIsCash() : "N",
-				ConvertNullUtil.convertToString(order.getOrderTime()),
-				ConvertNullUtil.convertToString(order.getRemark()).trim(),
-				ConvertNullUtil.convertToString(order.getCallBeforeSend())};
-		if (super.save(TABLE_NAME, columns, values, order.getId(), conn)) {
+		Object[] values = { id,
+				 ConvertNullUtil.convertToString(order.getOrderNo()).trim(),
+				 order.getPayment()};
+		if (super.save(TABLE_NAME, columnsUpdate, values, order.getId(), conn)) {
 			order.setId(id);
 			order.setCreated(getCreated(order.getId(), conn));
 		}
@@ -598,11 +556,12 @@ public class MOrder extends I_Model<Order> {
 	}
 	
 
-	public List<Order> lookUpByOrderAR(int userId, int customerId, String orderType, String operator, String selected) throws Exception{
+	public List<Order> lookUpByOrderAR(int userId, int customerId,int billToAddressId,
+			String orderType, String operator, String selected) throws Exception{
 		Connection conn = null;
 		try{
 			conn = DBConnectionApps.getInstance().getConnection();
-			return lookUpByOrderAR(conn, userId, customerId, orderType, operator, selected);
+			return lookUpByOrderAR(conn, userId, customerId,billToAddressId, orderType, operator, selected);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -613,7 +572,9 @@ public class MOrder extends I_Model<Order> {
 	}
 	/** Get invoice have Invoice to Show in ReceiptCR        **/
 	/** t_invoice ,t.receipt.order_id = t_invoice.invoice_id **/
-	public List<Order> lookUpByOrderAR(Connection conn,int userId, int customerId, String orderType, String operator, String selected)
+	public List<Order> lookUpByOrderAR(Connection conn
+			,int userId, int customerId,int billToAddressId
+			, String orderType, String operator, String selected)
 			throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -624,23 +585,25 @@ public class MOrder extends I_Model<Order> {
 			if (operator.equalsIgnoreCase("in") && selected.equalsIgnoreCase("")) {
 				return pos;
 			}
-			sql.append(" select o.* \n");
-			sql.append(" ,inv.INVOICE_ID ,inv.invoice_no,INV.REF_ORDER ,INV.CT_REFERENCE \n");
+			sql.append(" select  \n");
+			sql.append("  inv.INVOICE_ID ,inv.invoice_no,INV.REF_ORDER ,INV.CT_REFERENCE \n");
 			sql.append(" ,inv.BILL_TO_SITE_USE_ID ,inv.SHIP_TO_SITE_USE_ID \n");
 			sql.append(" ,inv.total_amount as inv_total_amount \n");
 			sql.append(" ,inv.vat_amount as inv_vat_amount \n");
 			sql.append(" ,inv.net_amount as inv_net_amount \n");
 			sql.append(" ,(inv.total_amount-inv.vat_amount) as inv_TOTAL_AMOUNT_NON_VAT \n");
-			sql.append(" from pensso.t_invoice inv ,pensso.t_order o  \n");
-			sql.append(" where o.order_no = inv.ref_order \n");
-			sql.append(" and o.order_type = '" + orderType + "'  \n");
-			sql.append(" and o.customer_id = " + customerId +" \n");
-			sql.append(" and o.doc_status = '"+I_PO.STATUS_LOADING+"'  \n");
+			sql.append(" from pensso.t_invoice inv \n");
+			sql.append(" where 1=1 \n");
+			sql.append(" and inv.order_type = '" + orderType + "'  \n");
+			sql.append(" and inv.bill_to_customer_id = " + customerId +" \n");
+			
+			//wait next process
+			//sql.append(" and inv.BILL_TO_SITE_USE_ID = " + billToAddressId +" \n");
 			
 			if (selected.length() > 0){
 				sql.append("  and inv.invoice_id " + operator + " (" + selected + ")  \n ");
 			}
-			sql.append("  order by Ar_invoice_no asc  \n");
+			sql.append("  order by invoice_no asc  \n");
 			
 			logger.debug("sql lookUpByOrderAR \n "+sql.toString());
 			
@@ -662,7 +625,7 @@ public class MOrder extends I_Model<Order> {
 				invoice.setOraShipAddressID(rst.getInt("SHIP_TO_SITE_USE_ID"));
 				
 				/** Order **/
-				invoice.setId(rst.getLong("ORDER_ID"));
+				/*invoice.setId(rst.getLong("ORDER_ID"));
 				invoice.setOrderDate(DateToolsUtil.convertToString(rst.getTimestamp("ORDER_DATE")));
 				invoice.setOrderType(rst.getString("ORDER_TYPE").trim());
 				invoice.setCustomerId(rst.getLong("CUSTOMER_ID"));
@@ -680,7 +643,7 @@ public class MOrder extends I_Model<Order> {
 				invoice.setRemark(ConvertNullUtil.convertToString(rst.getString("remark")).trim());
 			
 				//wit 20110804
-				invoice.setPaymentCashNow("CS".equals(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim())?true:false);
+				invoice.setPaymentCashNow("CS".equals(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim())?true:false);*/
 				
 			    pos.add(invoice);
 			}
@@ -697,7 +660,15 @@ public class MOrder extends I_Model<Order> {
 		}
     }
 	
-	public Order findInvoice(int invoiceId)
+	public Order findInvoice(long invoiceId)
+			throws Exception {
+		return findInvoiceModel(invoiceId, "");
+	}
+	public Order findInvoice(String invoiceNo)
+			throws Exception {
+		return findInvoiceModel(0, invoiceNo);
+	}
+	public Order findInvoiceModel(long invoiceId,String invoiceNo)
 			throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -705,19 +676,28 @@ public class MOrder extends I_Model<Order> {
 		Order invoice = null;
 		Connection conn = null;
 		try{
+			if(invoiceId==0 && Utils.isNull(invoiceNo).equalsIgnoreCase("")){
+				return null;
+			}
 			conn = DBConnectionApps.getInstance().getConnection();
 			
-			sql.append(" select o.* \n");
-			sql.append(" ,inv.INVOICE_ID ,inv.invoice_no,INV.REF_ORDER ,INV.CT_REFERENCE \n");
+			sql.append(" select \n");
+			sql.append("  inv.INVOICE_ID ,inv.invoice_no,INV.REF_ORDER ,INV.CT_REFERENCE \n");
 			sql.append(" ,inv.BILL_TO_SITE_USE_ID ,inv.SHIP_TO_SITE_USE_ID \n");
 			sql.append(" ,inv.total_amount as inv_total_amount \n");
 			sql.append(" ,inv.vat_amount as inv_vat_amount \n");
 			sql.append(" ,inv.net_amount as inv_net_amount \n");
 			sql.append(" ,(inv.total_amount-inv.vat_amount) as inv_TOTAL_AMOUNT_NON_VAT \n");
-			sql.append(" from pensso.t_invoice inv ,pensso.t_order o  \n");
-			sql.append(" where o.order_no = inv.ref_order \n");
-			sql.append(" and inv.invoice_id  = " + invoiceId + "  \n");
-			sql.append(" order by Ar_invoice_no asc  \n");
+			sql.append(" from pensso.t_invoice inv  \n");
+			sql.append(" where 1=1 \n");
+			if(invoiceId !=0 ){
+			    sql.append(" and inv.invoice_id  = " + invoiceId + "  \n");
+			}
+			if( !Utils.isNull(invoiceNo).equalsIgnoreCase("")){
+				sql.append(" and inv.invoice_no  = " + invoiceNo + "  \n");
+			}
+			
+			sql.append(" order by invoice_no asc  \n");
 			
 			logger.debug("sql findInvoice \n "+sql.toString());
 			
@@ -726,7 +706,79 @@ public class MOrder extends I_Model<Order> {
 			while(rst.next()){
 				invoice = new Order();
 				/** INVOICE **/
-				invoice.setId(rst.getLong("INVOICE_ID"));
+				invoice.setInvoiceId(rst.getLong("INVOICE_ID"));
+				invoice.setArInvoiceNo(rst.getString("INVOICE_NO"));
+				invoice.setOrderNo(rst.getString("REF_ORDER"));
+				invoice.setTotalAmount(rst.getDouble("INV_TOTAL_AMOUNT"));
+				invoice.setTotalAmountNonVat(rst.getDouble("INV_TOTAL_AMOUNT_NON_VAT"));
+				invoice.setVatAmount(rst.getDouble("INV_VAT_AMOUNT"));
+				invoice.setNetAmount(rst.getDouble("INV_NET_AMOUNT"));
+				invoice.setSalesOrderNo(ConvertNullUtil.convertToString(rst.getString("CT_REFERENCE")).trim());
+				// Add Oracle Reference Address ID
+				invoice.setOraBillAddressID(rst.getInt("BILL_TO_SITE_USE_ID"));
+				invoice.setOraShipAddressID(rst.getInt("SHIP_TO_SITE_USE_ID"));
+				
+		
+			}
+			return invoice;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e2) {}
+		}
+    }
+	
+	public Order findOrderByInvoice(long invoiceId)
+			throws Exception {
+		return findOrderByInvoiceIdModel(invoiceId, "");
+	}
+	public Order findOrderByInvoice(String invoiceNo)
+			throws Exception {
+		return findOrderByInvoiceIdModel(0, invoiceNo);
+	}
+	public Order findOrderByInvoiceIdModel(long invoiceId,String invoiceNo)
+			throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuffer sql = new StringBuffer();
+		Order invoice = null;
+		Connection conn = null;
+		try{
+			if(invoiceId==0 && Utils.isNull(invoiceNo).equalsIgnoreCase("")){
+				return null;
+			}
+			conn = DBConnectionApps.getInstance().getConnection();
+			
+			sql.append(" select o.*  \n");
+			sql.append(" ,inv.INVOICE_ID ,inv.invoice_no,INV.REF_ORDER ,INV.CT_REFERENCE \n");
+			sql.append(" ,inv.BILL_TO_SITE_USE_ID ,inv.SHIP_TO_SITE_USE_ID \n");
+			sql.append(" ,inv.total_amount as inv_total_amount \n");
+			sql.append(" ,inv.vat_amount as inv_vat_amount \n");
+			sql.append(" ,inv.net_amount as inv_net_amount \n");
+			sql.append(" ,(inv.total_amount-inv.vat_amount) as inv_TOTAL_AMOUNT_NON_VAT \n");
+			sql.append(" from pensso.t_invoice inv ,pensso.t_order o  \n");
+			sql.append(" where inv.ref_order = o.order_no \n");
+			if(invoiceId !=0 ){
+			    sql.append(" and inv.invoice_id  = " + invoiceId + "  \n");
+			}
+			if( !Utils.isNull(invoiceNo).equalsIgnoreCase("")){
+				sql.append(" and inv.invoice_no  = " + invoiceNo + "  \n");
+			}
+			
+			sql.append(" order by invoice_no asc  \n");
+			
+			logger.debug("sql findInvoice \n "+sql.toString());
+			
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while(rst.next()){
+				invoice = new Order();
+				/** INVOICE **/
+				invoice.setInvoiceId(rst.getLong("INVOICE_ID"));
 				invoice.setArInvoiceNo(rst.getString("INVOICE_NO"));
 				invoice.setOrderNo(rst.getString("REF_ORDER"));
 				invoice.setTotalAmount(rst.getDouble("INV_TOTAL_AMOUNT"));
@@ -739,6 +791,7 @@ public class MOrder extends I_Model<Order> {
 				invoice.setOraShipAddressID(rst.getInt("SHIP_TO_SITE_USE_ID"));
 				
 				/** Order **/
+				invoice.setId(rst.getLong("order_ID"));
 				invoice.setOrderDate(DateToolsUtil.convertToString(rst.getTimestamp("ORDER_DATE")));
 				invoice.setOrderType(rst.getString("ORDER_TYPE").trim());
 				invoice.setCustomerId(rst.getLong("CUSTOMER_ID"));
@@ -838,7 +891,7 @@ public class MOrder extends I_Model<Order> {
 		ResultSet rst = null;
 		String created = "";
 		try {
-			String sql = "select created from t_order where order_id = " + orderId;
+			String sql = "select created from pensso.t_order where order_id = " + orderId;
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
 			if (rst.next()) created = DateToolsUtil.convertFromTimestamp(rst.getTimestamp("created"));

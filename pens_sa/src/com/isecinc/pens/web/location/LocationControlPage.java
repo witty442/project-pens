@@ -186,7 +186,7 @@ public class LocationControlPage {
 		}
 	 return pos;
 	}
-	public static List<PopupBean> searchSalesZoneListModel(Connection conn){
+	public static List<PopupBean> searchSalesZoneListModel(Connection conn,String zoneAll){
 		List<PopupBean> pos = new ArrayList<PopupBean>();
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -194,7 +194,7 @@ public class LocationControlPage {
 		try{
 			sql.append("\n  SELECT distinct S.zone,S.zone_name from PENSBI.XXPENS_BI_MST_SALES_ZONE S ");
 			sql.append("\n  where 1=1  ");
-			sql.append("\n  and zone in('0','1','2','3','4') ");
+			sql.append("\n  and zone in("+zoneAll+") ");
 			sql.append("\n  ORDER BY S.zone asc \n");
 			logger.debug("sql:"+sql);
 			

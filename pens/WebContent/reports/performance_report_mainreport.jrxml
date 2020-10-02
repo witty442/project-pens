@@ -370,7 +370,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<text><![CDATA[เลขที่เช็ค/ แอร์เพย์]]></text>
+				<text><![CDATA[เลขที่เช็ค/ วอลเล็ท]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="278" y="1" width="50" height="38"/>
@@ -383,7 +383,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<text><![CDATA[แอร์เพย์]]></text>
+				<text><![CDATA[วอลเล็ท]]></text>
 			</staticText>
 		</band>
 	</columnHeader>

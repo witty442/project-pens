@@ -10,6 +10,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
+import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
@@ -26,15 +27,9 @@ public class MReceiptSummary {
 	
 	public static double lookCreditAmtByCustomerId(int userId,long customerId) throws Exception {
 		Connection conn = null;
-		String creditDateFix = "";
 		try{
-			 //Get CreditDateFix FROM C_REFERENCE
-			 References refConfigCreditDateFix = InitialReferences.getReferenesByOne(InitialReferences.CREDIT_DATE_FIX,InitialReferences.CREDIT_DATE_FIX);
-			 creditDateFix = refConfigCreditDateFix!=null?refConfigCreditDateFix.getKey():"";
-			 logger.debug("creditDateFix:"+creditDateFix);
-			 
 		     conn = new DBCPConnectionProvider().getConnection(conn);
-		     return lookCreditAmtByCustomerId(conn,userId,customerId,creditDateFix);
+		     return lookCreditAmtByCustomerId(conn,userId,customerId);
 		}catch(Exception e){
 			 throw e;
 		} finally {
@@ -44,7 +39,7 @@ public class MReceiptSummary {
 		}
 	}
 	
-	public static double lookCreditAmtByCustomerId(Connection conn,int userId,long customerId ,String creditDateFix) throws Exception {
+	public static double lookCreditAmtByCustomerId(Connection conn,int userId,long customerId ) throws Exception {
         double totalCreditAmt = 0;
         String orderType  ="CR";
 		try{
@@ -55,7 +50,8 @@ public class MReceiptSummary {
 			
 			// CrediAmount order and receipt line
 			totalCreditAmt = lookUpByOrderAR(conn,customerId ,orderType);
-			//sum CN
+			
+			//sum Receipt CN
 			totalCreditAmt += lookUpCNForReceipt(conn,customerId); 
 			
 			//FileUtil.writeFile("d:/temp/temp2.csv", amtDebug);
@@ -77,29 +73,17 @@ public class MReceiptSummary {
 		double creditAmtTemp = 0;
 		double cnAmt = 0;
 		double adjustInvoiceAmt = 0;
+		String whereCause = "";
 		try{
-			References refConfigCreditDateFix = InitialReferences.getReferenesByOne(InitialReferences.CREDIT_DATE_FIX,InitialReferences.CREDIT_DATE_FIX);
-			String  creditDateFix = refConfigCreditDateFix!=null?refConfigCreditDateFix.getKey():"";
-			logger.debug("creditDateFix:"+creditDateFix);
-			String dateCheck = "";
-			if( !"".equalsIgnoreCase(creditDateFix)){
-				java.util.Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				//dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
-			}
-		
-			String whereCause = " select order_id, round(net_amount,2) as net_amount,ar_invoice_no \n"
-					+ "from t_order where 1=1 \n";
-			whereCause += "  and ar_invoice_no is not null  \n";
-			whereCause += "  and ar_invoice_no <> ''  \n";
-			whereCause += "  and order_type = '" + orderType + "'  \n";
-			whereCause += "  and customer_id = " + customerId +" \n";
-			whereCause += "  and doc_status = 'SV'  \n";
-			/** Wit Edit 02/10/2017 Case Show Order_date< config date **/
-			//whereCause += "  and order_date > "+dateCheck +" \n";
+			whereCause  = "  select inv.invoice_id,inv.invoice_no,round(inv.net_amount,2) as net_amount \n";
+			whereCause += "  from pensso.t_invoice inv \n";
+			whereCause += "  where 1=1 \n";
+			whereCause += "  and inv.order_type = '" + orderType + "'  \n";
+			whereCause += "  and inv.bill_to_customer_id = " + customerId +" \n";
 			
 			//Test
-			//whereCause += "  and ar_invoice_no = '21600101966'  \n";
-			whereCause += "  order by Ar_invoice_no asc  \n";
+			//whereCause += "  and inv.invoice_no = '21600101966'  \n";
+			whereCause += "  order by inv.invoice_no asc  \n";
 			
 			logger.debug("sql lookUpByOrderAR \n "+whereCause);
 			
@@ -108,9 +92,9 @@ public class MReceiptSummary {
 			
 			while(rs.next()){
 				order = new Order();
-				order.setId(rs.getLong("order_id"));
+				order.setInvoiceId(rs.getLong("invoice_id"));
 				order.setNetAmount(rs.getDouble("net_amount"));
-				order.setArInvoiceNo(rs.getString("ar_invoice_no"));
+				order.setArInvoiceNo(rs.getString("invoice_no"));
 
 				cnAmt = creditNote.getTotalCreditNoteAmt(conn,order.getArInvoiceNo());
 				adjustInvoiceAmt = adjust.getTotalAdjustAmtInvoice(conn,order.getArInvoiceNo());  
@@ -119,14 +103,19 @@ public class MReceiptSummary {
 				logger.debug("cnAmt:"+cnAmt);
 				logger.debug("adjustInvoiceAmt:"+adjustInvoiceAmt);
 				
-				creditAmtTemp  = new MReceiptLine().calculateCreditAmount(conn,order)+cnAmt+adjustInvoiceAmt;
+				double receiptAmount =  new MReceiptLine().calculateCreditAmount(conn,order);
+				
+				logger.debug("receiptAmount:"+receiptAmount);
+				
+				creditAmtTemp  =receiptAmount + cnAmt + adjustInvoiceAmt;
+				
 				creditAmtTemp = NumberToolsUtil.round(creditAmtTemp,2,BigDecimal.ROUND_HALF_UP);
 
 				//debug
 			
 				if(creditAmtTemp != 0.01 && creditAmtTemp != 0 && creditAmtTemp != -0.01){
 					logger.debug("creditAmtTemp:"+creditAmtTemp);
-				    amtDebug += "INVOICE,"+rs.getString("ar_invoice_no")+","+order.getOpenAmt()+"\n";
+				    amtDebug += "INVOICE,"+rs.getString("invoice_no")+","+order.getOpenAmt()+"\n";
 				}
 				
 				creditAmt += creditAmtTemp;
@@ -153,15 +142,17 @@ public class MReceiptSummary {
 			whereCause += "\n  ,AR_INVOICE_NO , ACTIVE";
 			whereCause += "\n  , (  COALESCE(c.TOTAL_AMOUNT,0) ";
 			//New code cn = cn +adjust 
-			whereCause += "\n     + COALESCE((SELECT sum(adjust_amount) from t_adjust ad ";
+			whereCause += "\n     + COALESCE((SELECT sum(adjust_amount) from PENSSO.t_adjust ad ";
 			whereCause += "\n                 where ad.ar_invoice_no = c.credit_note_no),0) ";
 			whereCause += "\n    ) as TOTAL_AMOUNT ";
-			whereCause += "\n  FROM T_CREDIT_NOTE c WHERE 1=1";
+			whereCause += "\n  FROM PENSSO.T_CREDIT_NOTE c WHERE 1=1";
 			whereCause += "\n  AND ACTIVE = 'Y' ";
 			whereCause += "\n  AND DOC_STATUS = 'SV' ";
-			whereCause += "\n  AND CREDIT_NOTE_ID NOT IN(SELECT CREDIT_NOTE_ID FROM t_receipt_cn rcn, t_receipt rc ";
-			whereCause += "\n  WHERE rc.receipt_id = rcn.receipt_id AND rc.Doc_Status = 'SV') ";
-			whereCause += "\n AND (AR_Invoice_No Is Null OR TRIM(AR_INVOICE_NO) = '' ) "; 
+			whereCause += "\n  AND CREDIT_NOTE_ID NOT IN("
+					+ "\n             SELECT CREDIT_NOTE_ID FROM PENSSO.t_receipt_cn rcn, PENSSO.t_receipt rc ";
+			whereCause += "\n       WHERE rc.receipt_id = rcn.receipt_id AND rc.Doc_Status = 'SV' ";
+			whereCause += "\n  ) ";
+			whereCause += "\n  AND (AR_Invoice_No Is Null OR TRIM(AR_INVOICE_NO) = '' ) "; 
 			whereCause += "\n  AND CUSTOMER_ID ="+customerId+" ";
 		    
 			//debug

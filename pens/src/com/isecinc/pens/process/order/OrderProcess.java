@@ -19,6 +19,7 @@ import util.DBCPConnectionProvider;
 import util.DateToolsUtil;
 import util.Debug;
 
+import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Product;
@@ -40,6 +41,7 @@ import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.model.MUOMConversion;
+import com.isecinc.pens.web.sales.OrderForm;
 
 /**
  * Order Process Class
@@ -1152,4 +1154,136 @@ public void debug(List<OrderLine> lines) throws Exception {
 		return true;
 	}
 
+	/**
+	 * Case Van PaymentMethod ='CS,CH,LOVE ) and Create Receipt 
+	 * @param user
+	 * @param orderForm
+	 * @param order
+	 * @return
+	 * @throws Exception
+	 */
+	public String createVanReceipt(Connection conn,User user,OrderForm orderForm,Order order) throws Exception{
+		String msg = "";
+		try{
+			logger.debug("VanPaymentMethod:"+orderForm.getOrder().getVanPaymentMethod());
+	
+			if ("CASH".equalsIgnoreCase(orderForm.getOrder().getVanPaymentMethod()) ) {
+				 logger.debug("CreateAutoReceipt Case Van pay Cash");
+				 
+				 orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
+				 orderForm.getAutoReceipt().setReceiptAmount(order.getNetAmount());
+				 
+				 logger.debug("PDPAID ="+user.isPDPaid());
+				 //case PDPAID =Y use default bank 002
+				 if(user.isPDPaid()){
+				    orderForm.getAutoReceipt().setInternalBank("002");//SCB- “¢“ “∏ÿª√–¥‘…∞Ï 068-2-81805-7
+			     }else{
+			    	//PD_PAID =N use internal_bank from t_bank_transfer (internal_bank not found ->no export t_receipt)
+			    	orderForm.getAutoReceipt().setInternalBank("");
+			     }
+				 orderForm.getAutoReceipt().setReceiptDate(orderForm.getOrder().getOrderDate());
+				 
+				 /** Set ReceiptBy Manual **/
+				 List<ReceiptBy> receiptByList = new ArrayList<ReceiptBy>();
+				 ReceiptBy receiptBy = new ReceiptBy();
+				 receiptBy.setId(0);
+				 receiptBy.setPaymentMethod("CS");
+				 receiptBy.setCreditCardType("");
+				 receiptBy.setBank("");
+				 receiptBy.setChequeNo("");
+				 receiptBy.setChequeDate("");
+				 receiptBy.setReceiptAmount(order.getNetAmount());
+				 receiptBy.setSeedId("");
+				 receiptBy.setAllBillId(String.valueOf(order.getId()));
+				 receiptBy.setAllPaid(String.valueOf(order.getNetAmount()));
+				 receiptByList.add(receiptBy);
+				 //process auto receipt cash
+				 
+				 order.setIsCash("Y");
+				 
+				 new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, user, conn);
+				 //set msg 
+				 msg = SystemMessages.getCaption("SaveSucess", Utils.local_th);
+				 
+		    /** Wallet Name:LOVE **/
+			}else if ("LOV".equalsIgnoreCase(orderForm.getOrder().getVanPaymentMethod()) ) {
+				 logger.debug("CreateAutoReceipt Case Van pay LoveLove Payment GateWay");
+				 
+				 orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
+				 orderForm.getAutoReceipt().setReceiptAmount(order.getNetAmount());
+				 orderForm.getAutoReceipt().setInternalBank("002");//SCB- “¢“ “∏ÿª√–¥‘…∞Ï 068-2-81805-7
+			   
+				 orderForm.getAutoReceipt().setReceiptDate(orderForm.getOrder().getOrderDate());
+				 
+				 /** Set ReceiptBy Manual **/
+				 List<ReceiptBy> receiptByList = new ArrayList<ReceiptBy>();
+				 ReceiptBy receiptBy = new ReceiptBy();
+				 receiptBy.setId(0);
+				 receiptBy.setPaymentMethod("LOV");//Payment LoveLove
+				 receiptBy.setCreditCardType("");
+				 receiptBy.setBank("");
+				 receiptBy.setChequeNo("");
+				 receiptBy.setChequeDate("");
+				 receiptBy.setReceiptAmount(order.getNetAmount());
+				 receiptBy.setSeedId("");
+				 receiptBy.setAllBillId(String.valueOf(order.getId()));
+				 receiptBy.setAllPaid(String.valueOf(order.getNetAmount()));
+				 receiptByList.add(receiptBy);
+				 //process auto receipt cash
+				 
+				 order.setIsCash("Y");
+				 
+				 new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, user, conn);
+				 //set msg 
+				 msg = SystemMessages.getCaption("SaveSucess", Utils.local_th);
+			}else if (user.isPDPaid() && "CREDIT".equalsIgnoreCase(orderForm.getOrder().getVanPaymentMethod())) {
+				
+				logger.debug("CreateAutoReceipt(PD_PAID =Y) Case Van pay Credit ");
+				
+				//Case Sale set PDPAID =Y -> Pay Credit set receipt ispdpaid =N
+				 orderForm.getAutoReceipt().setIsPDPaid("N");
+				 
+				//set receipt 
+				 orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
+				 orderForm.getAutoReceipt().setReceiptAmount(order.getNetAmount());
+				 orderForm.getAutoReceipt().setInternalBank("002");//SCB- “¢“ “∏ÿª√–¥‘…∞Ï 068-2-81805-7
+				 orderForm.getAutoReceipt().setReceiptDate(orderForm.getOrder().getOrderDate());
+				 
+				 /** Set ReceiptBy Manual **/
+				 List<ReceiptBy> receiptByList = new ArrayList<ReceiptBy>();
+				 ReceiptBy receiptBy = new ReceiptBy();
+				 receiptBy.setId(0);
+				 receiptBy.setPaymentMethod("CS");
+				 receiptBy.setCreditCardType("");
+				 receiptBy.setBank("");
+				 receiptBy.setChequeNo("");
+				 receiptBy.setChequeDate("");
+				 receiptBy.setReceiptAmount(order.getNetAmount());
+				 receiptBy.setSeedId("");
+				 receiptBy.setAllBillId(String.valueOf(order.getId()));
+				 receiptBy.setAllPaid(String.valueOf(order.getNetAmount()));
+				 receiptByList.add(receiptBy);
+				 //process auto receipt 
+				 
+				 //Case Money_to_pens ='Y'  set exported='Z' no export
+				 if("Y".equalsIgnoreCase(user.getMoneyToPens())){
+				     new OrderProcess().createAutoReceipt_PDPAID_MONEYTOPENS(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, user, conn);
+				 }else{
+					 //Case Money_to_pens ='N'  set exported ='N' export normal
+					 new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, user, conn); 
+				 }
+				 //set msg 
+				 msg = SystemMessages.getCaption("SaveSucess", Utils.local_th);
+				
+			}else{
+				//Case Van PD_PAID=N ->Don't create Receipt
+				if(user.getRole().getKey().equals(User.VAN)){
+				    msg  = SystemMessages.getCaption("SaveSucess", Utils.local_th);
+				}
+			}
+			return msg;
+		}catch(Exception e){
+			throw e;
+		}
+	}
 }

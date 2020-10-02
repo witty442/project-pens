@@ -42,10 +42,10 @@ public class ExportReceiptTask extends BatchTask implements BatchTaskInterface{
 		return param;
 	}
 	public String getButtonName(){
-		return "Export ข้อมูล Receipt";
+		return "Export ข้อมูลรับชำระเงิน";
 	}
 	public String getDescription(){
-		return "Export Receipt(Lockbox)";
+		return "Export ข้อมูลรับชำระเงิน  Receipt(Lockbox)";
 	}
 	public String getDevInfo(){
 		return "PENSSO.T_RECEIPT ";
@@ -96,12 +96,14 @@ public class ExportReceiptTask extends BatchTask implements BatchTaskInterface{
 			monitorTime  = new MonitorTime(monitorModel.getName());   
 			
 			/** insert to monitor_item **/
-			logger.debug("Insert Monitor Item ImportB2BMakroFromExcelTask ");
+			logger.debug("Insert Monitor Item ExportReceiptTask ");
 			MonitorItemBean modelItem = prepareMonitorItemBean(monitorModel);
 			monitorModel.setTransactionType(Constants.TRANSACTION_TYPE);
 			
 			/** Start process **/ 
+			/** Get Parameter **/
 			//String dataType =Utils.isNull(monitorModel.getBatchParamMap().get(PARAM_DATA_TYPE)) ;
+			
 			modelItem = runProcess(connMonitor,conn,monitorModel,modelItem);
 
 			/**debug TimeUse **/
@@ -123,6 +125,7 @@ public class ExportReceiptTask extends BatchTask implements BatchTaskInterface{
             monitorModel.setErrorCode(modelItem.getErrorCode());
 			monitorModel.setStatus(modelItem.getStatus());
 			monitorModel.setFileCount(modelItem.getSuccessCount()>0?1:0);
+			monitorModel.setThName("Export ข้อมูลรับชำระเงิน ");
 			
 			logger.debug("errorMsg:"+monitorModel.getErrorMsg());
 			/** Update Status Monitor **/
@@ -144,7 +147,7 @@ public class ExportReceiptTask extends BatchTask implements BatchTaskInterface{
 				dao.updateControlMonitor(new BigDecimal(0),monitorModel.getName());
 				
 				if(conn != null){
-				   logger.debug("Transaction Rolback");
+				   logger.debug("Transaction Rollback");
 				   conn.rollback();
 				}
 			}catch(Exception ee){}
@@ -179,6 +182,7 @@ public class ExportReceiptTask extends BatchTask implements BatchTaskInterface{
 			try{
 				//Interfaces TO Oracle Txt (LockBox)
 				InterfaceReceiptProcess.process(monitorModel.getUser());
+				successCount++;
 				
 				logger.debug("result foundError:"+foundError);
 				if(foundError ==false){

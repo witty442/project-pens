@@ -172,7 +172,7 @@ public class LocationInitial extends LocationControlPage {
 			item.setSalesZoneDesc("");
 			salesZoneList.add(item);
 
-			List<PopupBean> salesZoneList_s = searchSalesZoneListModel(conn);
+			List<PopupBean> salesZoneList_s = searchSalesZoneListModel(conn,"'0','1','2','3','4'");
 			salesZoneList.addAll(salesZoneList_s);
 			session.setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){
@@ -267,7 +267,7 @@ public class LocationInitial extends LocationControlPage {
 			item.setSalesZoneDesc("");
 			salesZoneList.add(item);
 
-			List<PopupBean> salesZoneList_s = searchSalesZoneListModel(conn);
+			List<PopupBean> salesZoneList_s = searchSalesZoneListModel(conn,"'0','1','2','3','4'");
 			salesZoneList.addAll(salesZoneList_s);
 			session.setAttribute("SALES_ZONE_LIST",salesZoneList);
 		}catch(Exception e){
@@ -360,7 +360,7 @@ public class LocationInitial extends LocationControlPage {
 			item.setSalesZoneDesc("");
 			salesZoneList.add(item);
 
-			List<PopupBean> salesZoneList_s = searchSalesZoneListModel(conn);
+			List<PopupBean> salesZoneList_s = searchSalesZoneListModel(conn,"'0','1','2','3','4','92'");
 			salesZoneList.addAll(salesZoneList_s);
 			session.setAttribute("SALES_ZONE_LIST",salesZoneList);
 			

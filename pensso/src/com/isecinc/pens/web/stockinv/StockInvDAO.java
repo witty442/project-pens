@@ -20,7 +20,7 @@ import com.pens.util.DateUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class StockInvDAO{
 
@@ -407,7 +407,7 @@ public class StockInvDAO{
 			logger.debug("headerId:"+h.getHeaderId());
 			logger.debug("h.getItems():"+h.getItems().size());
             if(h.getHeaderId()==0){
-            	id = SequenceProcess.getNextValueBySeq("pensso.so_initial_stock_s.nextval").longValue();
+            	id = SequenceProcessAll.getIns().getNextValueBySeq("pensso.so_initial_stock_s.nextval").longValue();
                 h.setHeaderId(id);
                 
             }else{
@@ -447,7 +447,7 @@ public class StockInvDAO{
  				   logger.debug("created_by:"+l.getCreateUser());*/
  				   
  				   if(l.getLineId()==0){
-	 				   l.setLineId(SequenceProcess.getNextValueBySeq("pensso.so_initial_stock_s.nextval").longValue());
+	 				   l.setLineId(SequenceProcessAll.getIns().getNextValueBySeq("pensso.so_initial_stock_s.nextval").longValue());
 	 				   l.setStatus("NEW");
 	 				   
 	 				   insertStockInitModel(conn, l);

@@ -31,6 +31,8 @@ public class ReceiptLine extends I_PO {
 		setCreditAmount(rst.getDouble("CREDIT_AMOUNT"));
 		setPaidAmount(rst.getDouble("PAID_AMOUNT"));
 		setRemainAmount(rst.getDouble("REMAIN_AMOUNT"));
+		
+		System.out.println("REMAIN_AMOUNT:"+rst.getDouble("REMAIN_AMOUNT"));
 		setDescription(ConvertNullUtil.convertToString(rst.getString("DESCRIPTION")).trim());
 		
 		setDisplayLabel();

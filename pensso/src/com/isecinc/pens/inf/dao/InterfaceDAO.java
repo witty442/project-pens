@@ -13,10 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
@@ -26,8 +24,8 @@ import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.SequenceHelper;
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * @author WITTY
@@ -44,6 +42,24 @@ public class InterfaceDAO {
 
 	}
 	
+	public void updateTaskStatus(BigDecimal transactionId,BigDecimal monitorId,String status) {
+    	Connection conn = null;
+    	try {
+           InterfaceDAO dao = new InterfaceDAO();
+           conn = DBConnection.getInstance().getConnection();
+           dao.updateControlStatusMonitor(conn,transactionId,monitorId,status);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }finally{
+        	try{
+	        	if(conn != null){
+	        	   conn.close();conn=null;
+	        	}
+        	}catch(Exception e){
+        		e.printStackTrace();
+        	}
+        }
+    }
 	 /** c_monitor **/
     public void updateControlMonitor(BigDecimal transactionId,String type) {
     	Connection conn = null;
@@ -68,7 +84,7 @@ public class InterfaceDAO {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			String sql = "INSERT INTO monitor(" +
+			String sql = "INSERT INTO PENSSO.monitor(" +
 			" transaction_id," +
 			" monitor_id," +
 			" name ," +
@@ -85,10 +101,10 @@ public class InterfaceDAO {
 			  
 			logger.debug("SQL:"+sql);
 			if(model.getTransactionId() ==null){
-				   model.setTransactionId(new BigDecimal(SequenceHelper.getNextValue("monitor.transactionId")));
+			   model.setTransactionId(SequenceProcessAll.getIns().getNextValue("monitor.transaction_id"));
 			}
 			if(model.getMonitorId() ==null){
-				   model.setMonitorId(new BigDecimal(SequenceHelper.getNextValue("monitor.monitorId")));
+			   model.setMonitorId(SequenceProcessAll.getIns().getNextValue("monitor.monitor_id"));
 			}
 			logger.debug("id:"+model.getTransactionId());
 
@@ -125,7 +141,7 @@ public class InterfaceDAO {
 		boolean result = false;
 		PreparedStatement ps = null;
 		try {
-			String sql = "INSERT INTO monitor_item(" +
+			String sql = "INSERT INTO PENSSO.monitor_item(" +
 			" id,"+
 			" monitor_id ,"+
 			" source ," +
@@ -145,7 +161,7 @@ public class InterfaceDAO {
 			//logger.debug("SQL:"+sql);
 			//logger.debug("SucessCound:"+model.getSuccessCount());
 			if(model.getId() ==null){
-				 model.setId(new BigDecimal(SequenceHelper.getNextValue("monitor_item")));
+				 model.setId(SequenceProcessAll.getIns().getNextValue("monitor_item.id"));
 			}
 			
 			int index = 0;
@@ -188,7 +204,7 @@ public class InterfaceDAO {
 		try {
 			logger.debug("*** insertMonitorItemDetail **********");
 			
-			String sql = "INSERT INTO monitor_item_detail(" +
+			String sql = "INSERT INTO PENSSO.monitor_item_detail(" +
 			" MONITOR_ITEM_ID," +
 			" customer_code ," +
 			" customer_name ," +
@@ -376,7 +392,7 @@ public class InterfaceDAO {
 		BigDecimal monitorId = null;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select max(monitor_id) as monitor_id from monitor \n");
+			sql.append(" select max(monitor_id) as monitor_id from PENSSO.monitor \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 		    
@@ -413,8 +429,8 @@ public class InterfaceDAO {
 		String status = "";
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select channel as batch_task_status from monitor \n");
-			sql.append("where MONITOR_ID = (select min(monitor_id) from monitor where transaction_id ="+id+") \n");
+			sql.append(" select channel as batch_task_status from PENSSO.monitor \n");
+			sql.append("where MONITOR_ID = (select min(monitor_id) from PENSSO.monitor where transaction_id ="+id+") \n");
 			
 		    //logger.info("SQL:"+sql.toString());
 		    
@@ -444,7 +460,7 @@ public class InterfaceDAO {
 		Connection conn = null;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from c_monitor where action ='"+action+"' \n");
+			sql.append(" select * from PENSSO.c_monitor where action ='"+action+"' \n");
 			
 		    logger.debug("SQL:"+sql.toString());
 		    conn = DBConnection.getInstance().getConnection();
@@ -483,7 +499,7 @@ public class InterfaceDAO {
 		PreparedStatement ps = null;
 		try {
 			logger.info("update Endtask status:"+status);
-			String sql = "UPDATE monitor SET  channel = ? WHERE MONITOR_ID = ? and transaction_id = ?";
+			String sql = "UPDATE PENSSO.monitor SET  channel = ? WHERE MONITOR_ID = ? and transaction_id = ?";
 			
 			logger.debug("SQL:"+sql);
 			int index = 0;
@@ -506,7 +522,7 @@ public class InterfaceDAO {
 	public void updateControlMonitor(Connection conn,BigDecimal transactionId,String type) throws Exception {
 		PreparedStatement ps = null;
 		try {
-			String sql = "UPDATE c_monitor SET  transaction_id = ? WHERE action = ?";
+			String sql = "UPDATE PENSSO.c_monitor SET  transaction_id = ? WHERE action = ?";
 			//logger.info("SQL:"+sql);
 			int index = 0;
 			ps = conn.prepareStatement(sql);
@@ -516,7 +532,7 @@ public class InterfaceDAO {
 			int r = ps.executeUpdate();
 			if(r==0){
 				//insert 
-				sql = "insert into c_monitor(action,transaction_id)values(?,?)";
+				sql = "insert into PENSSO.c_monitor(action,transaction_id)values(?,?)";
 				index = 0;
 				ps = conn.prepareStatement(sql);
 				ps.setString(++index,type);
@@ -541,7 +557,7 @@ public class InterfaceDAO {
 		String status = "";
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select monitor_id,transaction_type,type ,status,error_code , \n (select count(*) from monitor where transaction_id ="+id+" ) as transaction_count  \n  from monitor where transaction_id ="+id+" order by monitor_id desc  \n");
+			sql.append(" select monitor_id,transaction_type,type ,status,error_code , \n (select count(*) from PENSSO.monitor where transaction_id ="+id+" ) as transaction_count  \n  from PENSSO.monitor where transaction_id ="+id+" order by monitor_id desc  \n");
 			
 			logger.debug("transaction_count:"+transaction_count);
 		    logger.debug("SQL:"+sql.toString());
@@ -609,7 +625,7 @@ public class InterfaceDAO {
 		MonitorBean  m = null;
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from monitor where 1=1  and monitor_id ="+monitorId+"\n");
+			sql.append(" select * from PENSSO.monitor where 1=1  and monitor_id ="+monitorId+"\n");
 	
 		    logger.debug("SQL:"+sql.toString());
 		    conn = DBConnection.getInstance().getConnection();
@@ -662,12 +678,12 @@ public class InterfaceDAO {
 		try{
 			StringBuffer sql = new StringBuffer("");
 			sql.append(" select monitor.*  \n");
-			sql.append(" , (select count(*) from monitor_item where monitor_item.monitor_id = monitor.monitor_id and status = "+Constants.STATUS_SUCCESS+" )  as success_count  \n");
-			sql.append(" , (select error_msg from monitor_error_mapping where monitor_error_mapping.error_code = monitor.error_code) as error_disp \n");
-			sql.append(" from monitor  \n");
+			sql.append(" , (select count(*) from PENSSO.monitor_item where monitor_item.monitor_id = monitor.monitor_id and status = "+Constants.STATUS_SUCCESS+" )  as success_count  \n");
+			sql.append(" , (select error_msg from PENSSO.monitor_error_mapping where monitor_error_mapping.error_code = monitor.error_code) as error_disp \n");
+			sql.append(" from PENSSO.monitor  \n");
 			sql.append(" inner join  \n");
 			sql.append(" ( select max(transaction_id) as transaction_id  \n");
-			sql.append("   from monitor  \n");
+			sql.append("   from PENSSO.monitor  \n");
 			sql.append("   where create_user like '%"+user.getUserName()+"%' \n");
 			sql.append("  ) s  \n");
 			sql.append("  on  monitor.transaction_id = s.transaction_id \n");
@@ -737,7 +753,83 @@ public class InterfaceDAO {
 		return monitorBean;
 	} 
 	
+	public  MonitorBean[] findMonitorList(BigDecimal transactionId) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		Connection conn = null;
+		MonitorBean[] monitorBean = null;
+		List<MonitorBean> monitorList = new ArrayList<MonitorBean> ();
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select monitor.*  \n");
+			sql.append(" , (select count(*) from PENSSO.monitor_item where monitor_item.monitor_id = monitor.monitor_id and status = "+Constants.STATUS_SUCCESS+" )  as success_count  \n");
+			sql.append(" , (select error_msg from PENSSO.monitor_error_mapping where monitor_error_mapping.error_code = monitor.error_code) as error_disp \n");
+			sql.append(" from PENSSO.monitor  \n");
+			sql.append(" where transaction_id ="+transactionId+" \n");
 	
+		    logger.debug("SQL:"+sql.toString());
+		    conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			while(rs.next()){
+				MonitorBean m = new MonitorBean();
+				m.setTransactionId(rs.getBigDecimal("transaction_id"));
+				m.setTransactionType(rs.getString("TRANSACTION_TYPE"));
+				m.setMonitorId(rs.getBigDecimal("monitor_id"));
+				m.setName(rs.getString("name"));
+				m.setType(rs.getString("type"));
+				m.setStatus(rs.getInt("status"));
+				m.setCreateUser(rs.getString("create_user"));
+				m.setCreateDate(rs.getDate("create_date"));
+				m.setSubmitDate(rs.getTimestamp("submit_date"));
+	            m.setFileCount(rs.getInt("file_count"));
+	            m.setSuccessCount(rs.getInt("success_count"));
+	            m.setErrorMsg(rs.getString("error_disp"));
+	            
+	            //Case status = success UPDATE-TRANS-SALES Check fileCount=successCount
+	            if(Constants.TRANSACTION_UTS_TRANS_TYPE.equalsIgnoreCase(m.getTransactionType())){
+	            	if( m.getFileCount()==m.getSuccessCount()){
+	            		m.setStatus(Constants.STATUS_SUCCESS);
+	            	}else{
+	            		m.setStatus(Constants.STATUS_FAIL);
+	            	}
+	            }
+	            
+	            if(Constants.TRANSACTION_UTS_TRANS_TYPE.equalsIgnoreCase(m.getTransactionType())){
+	            	//Show Log from table t_temp_import_trans
+	            	
+	            }else{
+		            if(Utils.isNull(m.getErrorMsg()).equals("")){
+		            	logger.debug("errorCode:"+rs.getString("error_code"));
+		            	String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_code")));
+		            	logger.debug("errorMsg:"+errorMsg);
+		            	 if( !Utils.isNull(errorMsg).equals("")){
+		            	    ExceptionHandle.insertErrorCode(rs.getString("error_code"),errorMsg );
+		            	    m.setErrorMsg(errorMsg);
+		            	 }
+		            }
+	            }
+				monitorList.add(m);
+			}
+			
+			monitorBean = new MonitorBean[monitorList.size()];
+			monitorBean = monitorList.toArray(monitorBean);
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+		return monitorBean;
+	} 
 	public  MonitorBean[] findMonitorDetailList(User user ,MonitorBean mc,String orderBy) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -750,8 +842,8 @@ public class InterfaceDAO {
 			sql.append(" , monitor.name, monitor.type \n");
 			sql.append(" , monitor.create_user, monitor.create_date \n");
 			sql.append(" , monitor.submit_date,monitor_item.* \n");
-			sql.append(" , (select error_msg from monitor_error_mapping where monitor_error_mapping.error_code = monitor_item.error_code) as error_disp \n");
-			sql.append(" from monitor ,monitor_item where monitor.monitor_id = monitor_item.monitor_id  \n");
+			sql.append(" , (select error_msg from PENSSO.monitor_error_mapping where monitor_error_mapping.error_code = monitor_item.error_code) as error_disp \n");
+			sql.append(" from PENSSO.monitor ,PENSSO.monitor_item where monitor.monitor_id = monitor_item.monitor_id  \n");
 			
 			if(mc.getMonitorId() != null){
 			   sql.append(" and monitor.monitor_id ="+mc.getMonitorId() +"\n");
@@ -858,6 +950,91 @@ public class InterfaceDAO {
 		return monitorBean;
 	} 
 	
+	public  MonitorBean[] findMonitorDetailList(User user ,BigDecimal transactionId,String orderBy) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		Connection conn = null;
+		MonitorBean[] monitorBean = null;
+		List<MonitorBean> monitorList = new ArrayList<MonitorBean> ();
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select monitor.transaction_id,monitor.TRANSACTION_TYPE, monitor.monitor_id \n");
+			sql.append(" , monitor.name, monitor.type \n");
+			sql.append(" , monitor.create_user, monitor.create_date \n");
+			sql.append(" , monitor.submit_date,monitor_item.* \n");
+			sql.append(" , (select error_msg from PENSSO.monitor_error_mapping where monitor_error_mapping.error_code = monitor_item.error_code) as error_disp \n");
+			sql.append(" from PENSSO.monitor ,PENSSO.monitor_item where monitor.monitor_id = monitor_item.monitor_id  \n");
+		    sql.append(" and monitor.transaction_id ="+transactionId +"\n");
+
+			if(Utils.isNull(orderBy).equals("")){
+			   sql.append(" order by monitor.monitor_id ,monitor_item.id \n");
+			}else{
+			   sql.append(" order by "+orderBy+" \n");
+			}
+		    logger.debug("SQL:"+sql.toString());
+		    conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			while(rs.next()){
+				MonitorBean m = new MonitorBean();
+				m.setTransactionId(rs.getBigDecimal("transaction_id"));
+				m.setTransactionType(rs.getString("TRANSACTION_TYPE"));
+				m.setMonitorId(rs.getBigDecimal("monitor_id"));
+				m.setName(rs.getString("name"));
+				m.setType(rs.getString("type"));
+				m.setCreateUser(rs.getString("create_user"));
+				m.setCreateDate(rs.getDate("create_date"));
+				m.setSubmitDate(rs.getTimestamp("submit_date"));
+
+				MonitorItemBean item = new  MonitorItemBean();
+				item.setId(rs.getBigDecimal("id"));
+				item.setTableName(rs.getString("table_name"));
+				item.setFileName(rs.getString("file_name"));
+				item.setSource(rs.getString("source"));
+				item.setDestination(rs.getString("destination"));
+				item.setStatus(rs.getInt("status"));
+				item.setDataCount(rs.getInt("data_count"));
+				item.setSuccessCount(rs.getInt("success_count"));
+                item.setFileSize(rs.getString("file_size"));
+				item.setErrorMsg(rs.getString("error_disp"));
+				item.setErrorCode(rs.getString("error_code"));
+				
+				//Case Update Transaction Get Log From t_temp_import_trans
+				if(Constants.TRANSACTION_UTS_TRANS_TYPE.equalsIgnoreCase(m.getTransactionType())){
+					 
+				}else{
+					if( !Utils.isNull(item.getErrorCode()).equals("") && Utils.isNull(item.getErrorMsg()).equals("")){
+		            	logger.debug("errorCode:"+rs.getString("error_code"));
+		            	String errorMsg = Utils.isNull(ExceptionHandle.ERROR_MAPPING.get(rs.getString("error_code")));
+		            	logger.debug("errorMsg:"+errorMsg);
+		            	ExceptionHandle.insertErrorCode(conn,rs.getString("error_code"),errorMsg );
+		            	item.setErrorMsg(errorMsg);
+		            }
+				}
+				m.setMonitorItemBean(item);
+				
+				monitorList.add(m);
+			}
+			
+			monitorBean = new MonitorBean[monitorList.size()];
+			monitorBean = monitorList.toArray(monitorBean);
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+		return monitorBean;
+	} 
+	
 	public  List findMonitorDetailListTEST(User user ,MonitorBean mc,String orderBy) throws Exception{
 		PreparedStatement ps =null;
 		ResultSet rs = null;
@@ -870,8 +1047,8 @@ public class InterfaceDAO {
 			sql.append(" , monitor.name, monitor.type \n");
 			sql.append(" , monitor.create_user, monitor.create_date \n");
 			sql.append(" , monitor.submit_date,monitor_item.* \n");
-			sql.append(" , (select error_msg from monitor_error_mapping where monitor_error_mapping.error_code = monitor_item.error_code) as error_disp \n");
-			sql.append(" from monitor ,monitor_item where monitor.monitor_id = monitor_item.monitor_id  \n");
+			sql.append(" , (select error_msg from PENSSO.monitor_error_mapping where monitor_error_mapping.error_code = monitor_item.error_code) as error_disp \n");
+			sql.append(" from PENSSO.monitor ,PENSSO.monitor_item where monitor.monitor_id = monitor_item.monitor_id  \n");
 			
 			if(mc.getMonitorId() != null){
 			   sql.append(" and monitor.monitor_id ="+mc.getMonitorId() +"\n");
@@ -974,7 +1151,7 @@ public class InterfaceDAO {
 		List<MonitorItemDetailBean> itemList = new ArrayList<MonitorItemDetailBean> ();
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from monitor_item_detail where 1=1  and monitor_item_id ="+monitorItemId+"\n");
+			sql.append(" select * from PENSSO.monitor_item_detail where 1=1  and monitor_item_id ="+monitorItemId+"\n");
 	
 		    logger.debug("SQL:"+sql.toString());
 		    conn = DBConnection.getInstance().getConnection();
@@ -1020,7 +1197,7 @@ public class InterfaceDAO {
 		StringBuffer logs = new StringBuffer();
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select * from t_temp_import_trans_err where file_name ='"+fileName+"' \n");
+			sql.append(" select * from PENSSO.t_temp_import_trans_err where file_name ='"+fileName+"' \n");
 	
 		    logger.debug("SQL:"+sql.toString());
 		    conn = DBConnection.getInstance().getConnection();
@@ -1053,7 +1230,7 @@ public class InterfaceDAO {
 		PreparedStatement ps = null;
 
 		try {
-			String sql = "UPDATE monitor SET " +
+			String sql = "UPDATE PENSSO.monitor SET " +
 			" status = ? ,file_count =? ,error_code = ? ,error_msg =?"+
 			" WHERE MONITOR_ID = ? and transaction_id =?";
 			
@@ -1089,7 +1266,7 @@ public class InterfaceDAO {
 		PreparedStatement ps = null;
 
 		try {
-			String sql = "UPDATE monitor SET " +
+			String sql = "UPDATE PENSSO.monitor SET " +
 			" status = ? ,channel = ? ,file_count =? ,error_code = ? ,error_msg =?"+
 			" WHERE MONITOR_ID = ? and transaction_id =?";
 			
@@ -1126,7 +1303,7 @@ public class InterfaceDAO {
 		PreparedStatement ps = null;
 
 		try {
-			String sql = "UPDATE monitor_item SET " +
+			String sql = "UPDATE PENSSO.monitor_item SET " +
 			"  status = ? ,error_msg = ? "+
 			" WHERE ID = ?";
 			
@@ -1165,8 +1342,8 @@ public class InterfaceDAO {
 		PreparedStatement ps = null;
 		PreparedStatement ps2 = null;
 		try {
-			String sql = "UPDATE monitor SET  status = "+Constants.STATUS_REGEN+"  WHERE  transaction_id ="+model.getTransactionId();
-			String sql2 = "UPDATE monitor_item SET  status = "+Constants.STATUS_REGEN+"    WHERE monitor_id in(select monitor_id from monitor where  transaction_id ="+model.getTransactionId()+")";
+			String sql = "UPDATE PENSSO.monitor SET  status = "+Constants.STATUS_REGEN+"  WHERE  transaction_id ="+model.getTransactionId();
+			String sql2 = "UPDATE PENSSO.monitor_item SET  status = "+Constants.STATUS_REGEN+"    WHERE monitor_id in(select monitor_id from monitor where  transaction_id ="+model.getTransactionId()+")";
 			
 			logger.debug("SQL:"+sql);
 			logger.debug("SQL2:"+sql2);
@@ -1206,9 +1383,9 @@ public class InterfaceDAO {
 		sql.append(" select monitor_item.id, \n");
 		sql.append(" monitor_item.file_name, \n");
 		sql.append(" monitor_item.table_name  \n");
-		sql.append(" from monitor_item \n");
+		sql.append(" from PENSSO.monitor_item \n");
 		sql.append(" inner join   \n");
-		sql.append("   ( select max(monitor_item.id) as id,monitor_item.table_name from monitor ,monitor_item \n");
+		sql.append("   ( select max(monitor_item.id) as id,monitor_item.table_name from PENSSO.monitor ,PENSSO.monitor_item \n");
 		sql.append("    where monitor.status <> "+Constants.STATUS_FAIL+" \n");
 		sql.append("    and monitor_item.status <> "+Constants.STATUS_FAIL+" \n");
 		sql.append("    and monitor.monitor_id = monitor_item.monitor_id \n");
@@ -1230,9 +1407,9 @@ public class InterfaceDAO {
 		sql.append(" select monitor_item.id, \n");
 		sql.append(" monitor_item.file_name, \n");
 		sql.append(" monitor_item.table_name  \n");
-		sql.append(" from monitor_item \n");
+		sql.append(" from PENSSO.monitor_item \n");
 		sql.append(" inner join   \n");
-		sql.append("  ( select max(monitor_item.id) as id,monitor_item.table_name from monitor ,monitor_item \n");
+		sql.append("  ( select max(monitor_item.id) as id,monitor_item.table_name from PENSSO.monitor ,PENSSO.monitor_item \n");
 		sql.append("    where 1=1 \n"); 
 		sql.append("    and monitor_item.status <> "+Constants.STATUS_FAIL+" \n");
 		sql.append("    and monitor.monitor_id = monitor_item.monitor_id \n");
@@ -1282,120 +1459,7 @@ public class InterfaceDAO {
 	return configMap;
 } 
  
- /**
-  * 
-  * @param configMap
-  * @return
-  * @throws Exception
-  */
- public  TableBean getSunInvNameMap(Connection conn,TableBean tableBean ,User userBean) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-
-        Map subInvMap = new HashMap();
-        Map userCodeMap = new HashMap();
-		try{
-			
-			StringBuffer sql = new StringBuffer("");
-			sql.append(" select '1' as t ,s.name as sub_inv from m_sub_inventory s where 1=1 and s.sub_inventory_id in (select sub_inventory_id from m_sales_inventory where user_id ="+userBean.getId()+") \n");
-			sql.append(" union all \n");
-			sql.append(" select '1' as t ,s.name as sub_inv from m_sub_inventory s where 1=1 and s.name ='"+userBean.getCode()+"' \n");
-			sql.append(" union all \n");
-			sql.append(" select '2' as t, s.code as sub_inv from ad_user s where s.user_id ="+userBean.getId() +"\n");
-		    logger.debug("SQL:"+sql.toString());
-		    
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			
-			while(rs.next()){
-				if(rs.getString("t").equals("1")){
-				   subInvMap.put(rs.getString("sub_inv"),rs.getString("sub_inv"));
-				}else{
-				   userCodeMap.put(rs.getString("sub_inv"),rs.getString("sub_inv"));
-				}
-				
-			}
-			
-			tableBean.setSubInvMap(subInvMap);
-			tableBean.setUserCodeMap(userCodeMap);
-			
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-		}
-		return tableBean;
-	} 
  
- 
- /**
-  * 
-  * @param userBean
-  * @return
-  * a.	ã¹¡Ã³Õ·Õèà»ç¹ VAN ãËéãªéÃËÑÊ Sales ã¹¡ÒÃä»¤é¹ËÒª×èÍ sub Inbventory
-  * b.	ã¹¡Ã³Õ·Õèà»ç¹ TT áºè§ÍÍ¡à»ç¹ 2 ¡Ã³Õ
-      i.	¶éÒ Item ã´ ÁÕ Item Category (Sales) Segment ·Õè 3 à»ç¹ ?ÊÔ¹¤éÒ¤§¤ÅÑ§? ãËéÃÐºØ Sub Inventory à»ç¹ ?G001?
-      ii.	¶éÒ Item ã´ ÁÕ Item Category (Sales) Segment·Õè 3 à»ç¹ ?ÊÔ¹¤éÒ¾ÃÕàÁÕèÂÁ? ãËéÃÐºØ Sub Inventory à»ç¹ ?G001-PRM? 
-
-  */
- /**
-  * 
-  * @param configMap
-  * @return
-  *  * a.	ã¹¡Ã³Õ·ï¿½ï¿½ï¿½ï¿½ VAN ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Sales ã¹¡ï¿½ï¿½ä»¤ï¿½ï¿½Òªï¿½ï¿½ï¿½ sub Inbventory
-     * b.	ã¹¡Ã³Õ·ï¿½ï¿½ï¿½ï¿½ TT ï¿½ï¿½ï¿½Í¡ï¿½ï¿½ 2 ï¿½Ã³ï¿½
-        i.	ï¿½ï¿½ï¿½ Item ï¿½ ï¿½ï¿½ Item Category (Sales) Segment ï¿½ï¿½ï¿½ 3 ï¿½ï¿½ ï¿½ï¿½Ô¹ï¿½ï¿½Ò¤ï¿½ï¿½ï¿½Ñ§ï¿½ ï¿½ï¿½ï¿½ï¿½Ðºï¿½ Sub Inventory ï¿½ï¿½ ï¿½G001ï¿½
-        ii.	ï¿½ï¿½ï¿½ Item ï¿½ ï¿½ï¿½ Item Category (Sales) Segmentï¿½ï¿½ï¿½ 3 ï¿½ï¿½ ï¿½ï¿½Ô¹ï¿½ï¿½Ò¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ðºï¿½ Sub Inventory ï¿½ï¿½ ï¿½G001-PRMï¿½ 
-  * @throws Exception
-  */
- public  String getSunInventory2(Connection conn,User userBean) throws Exception{
-		PreparedStatement ps =null;
-		ResultSet rs = null;
-		String subInventory ="";
-		try{
-			StringBuffer sql = new StringBuffer("");
-			if(User.VAN.equalsIgnoreCase(userBean.getType())){
-			   // sql.append(" select '1' as t ,s.name as sub_inv from m_sub_inventory s where s.type in ('ï¿½ï¿½','"+userBean.getRole().getKey()+"') \n");
-			   return userBean.getCode();
-			}else if(User.TT.equalsIgnoreCase(userBean.getType())){
-				sql.append(" select m.PRODUCT_CATEGORY_ID ,c.SEG_ID3 ,c.SEG_VALUE3 \n");
-				sql.append(" from t_order t ,m_customer m ,m_product_category c \n");
-				sql.append(" where t.CUSTOMER_ID = m.CUSTOMER_ID \n");
-				sql.append(" and m.PRODUCT_CATEGORY_ID = c.PRODUCT_CATEGORY_ID \n");
-			}
-			
-		    logger.debug("SQL:"+sql.toString());
-			ps = conn.prepareStatement(sql.toString());
-			rs = ps.executeQuery();
-			
-			if(rs.next()){
-				if(Utils.isNull(rs.getString("SEG_VALUE3")).equalsIgnoreCase("ï¿½Ô¹ï¿½ï¿½Ò¤ï¿½ï¿½ï¿½Ñ§")){
-					subInventory = "G001";
-				}else if(Utils.isNull(rs.getString("SEG_VALUE3")).equalsIgnoreCase("ï¿½Ô¹ï¿½ï¿½Ò¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")){
-					subInventory = "G001-PRM";
-				}
-			}
-			
-		}catch(Exception e){
-	      throw e;
-		}finally{
-			if(ps != null){
-			   ps.close();ps = null;
-			}
-			if(rs != null){
-			   rs.close();rs = null;
-			}
-		}
-		return subInventory;
-	} 
- 
-
  /**
   * 
   * @param conn
@@ -1409,7 +1473,7 @@ public class InterfaceDAO {
 	    List<String> orderList = new ArrayList<String>();
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select order_id from t_order where 1=1 and order_no in("+orderNoInStr+") \n");
+			sql.append(" select order_id from PENSSO.t_order where 1=1 and order_no in("+orderNoInStr+") \n");
 		    logger.debug("SQL:"+sql.toString());
 		    
 			ps = conn.prepareStatement(sql.toString());
@@ -1443,7 +1507,7 @@ public class InterfaceDAO {
 	    boolean caseCancelOneFlag = false; 
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select count(payment) as c from t_order_line where order_id ="+orderId+" and iscancel ='Y' \n");
+			sql.append(" select count(payment) as c from PENSSO.t_order_line where order_id ="+orderId+" and iscancel ='Y' \n");
 		    logger.debug("SQL:"+sql.toString());
 		    
 			ps = conn.prepareStatement(sql.toString());
@@ -1479,7 +1543,7 @@ public class InterfaceDAO {
 	    boolean isCancelAll = true; 
 		try{
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" select count(payment) as c from t_order_line where order_id ="+orderId+" and iscancel ='N' \n");
+			sql.append(" select count(payment) as c from PENSSO.t_order_line where order_id ="+orderId+" and iscancel ='N' \n");
 		    logger.debug("SQL:"+sql.toString());
 		    
 			ps = conn.prepareStatement(sql.toString());

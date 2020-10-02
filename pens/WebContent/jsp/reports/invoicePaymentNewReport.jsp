@@ -1,4 +1,12 @@
+<%@page import="com.isecinc.pens.report.invoicepayment.InvoicePaymentReport"%>
+<%@page import="com.isecinc.pens.web.report.invoicepayment.InvoicePaymentReportForm"%>
+<%@page import="java.util.Date"%>
+<%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="util.SessionGen"%>
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.isecinc.core.bean.References"%>
+<%@page import="com.isecinc.pens.init.InitialReferences"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -6,13 +14,7 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="invoicePaymentReportForm" class="com.isecinc.pens.web.report.invoicepayment.InvoicePaymentReportForm" scope="request" />
-<%
 
-%>
-<%@page import="java.util.Locale"%>
-<%@page import="com.isecinc.pens.SystemProperties"%>
-<%@page import="com.isecinc.core.bean.References"%>
-<%@page import="com.isecinc.pens.init.InitialReferences"%>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
@@ -38,6 +40,10 @@ body {
 <script type="text/javascript">
 function loadMe(){
 	new Epoch('epoch_popup','th',document.getElementById('receiptDate'));
+	
+	<%if(Utils.isNull(invoicePaymentReportForm.getInvoicePaymentReport().getReceiptDate()).equals("")){ %>
+	  $('#receiptDate').val('<%=Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)%>')
+   <%}%>
 }
 
 function gotoReport(path){
@@ -171,5 +177,6 @@ function clearForm(path){
     	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
   	</tr>
 </table>
+
 </body>
 </html>

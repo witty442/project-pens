@@ -723,7 +723,7 @@ public class SalesTargetTTUtils {
 	  return salesChannelDesc;
 	}
 	//salesChannelNo  =salesZone
-	public static String getDivision(Connection conn,String salesChannelNo){
+	public static String getDivision(Connection conn,String salesZone){
 		String salesChannelDesc = "";
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -731,9 +731,9 @@ public class SalesTargetTTUtils {
 		try{
 			sql.delete(0, sql.length());
 			sql.append("\n  SELECT division from XXPENS_BI_MST_SALES_CHANNEL M  ");
-			sql.append("\n  where  sales_channel_no ='"+salesChannelNo+"' \n");
+			sql.append("\n  where  sales_channel_no ='"+salesZone+"' \n");
 
-			//logger.debug("sql:"+sql);
+			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			if (rst.next()) {

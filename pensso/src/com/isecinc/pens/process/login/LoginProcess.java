@@ -24,7 +24,7 @@ public class LoginProcess {
 		logger.debug(String.format("User Login %s", userName));
 		User user = null;
 		try {
-			String sql = "SELECT * FROM ad_user WHERE ISACTIVE = 'Y' AND USER_NAME = ? AND PASSWORD = ?";
+			String sql = "SELECT * FROM pensso.ad_user WHERE ISACTIVE = 'Y' AND USER_NAME = ? AND PASSWORD = ?";
 			List<User> users = Database.query(sql, new Object[] { userName, password }, User.class, conn);
 			if (users.size() > 0) user = users.get(0);
 		} catch (Exception e) {

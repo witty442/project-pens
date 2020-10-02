@@ -15,6 +15,8 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:useBean id="stockInvForm" class="com.isecinc.pens.web.stockinv.StockInvForm" scope="session" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "stockInvForm");
 %>
 <html>
 <head>

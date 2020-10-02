@@ -50,16 +50,9 @@
 		<servlet-name>ProdShowServlet</servlet-name>
 		<servlet-class>com.isecinc.pens.web.prodshow.ProdShowServlet</servlet-class>
 	</servlet>
-	<!-- Run Update SalesApp -->
-  <!--   <servlet>
-		<display-name>Run Update SalesApp Auto</display-name>
-		<servlet-name>RunUpdateSalesAppAuto</servlet-name>
-		<servlet-class>com.isecinc.pens.web.RunUpdateSalesAppAutoServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet> -->
 	
 	<!-- Quartz -->
-     <!-- <context-param>
+     <context-param>
          <param-name>quartz:config-file</param-name>
          <param-value>quartz.properties</param-value>
      </context-param>
@@ -89,7 +82,12 @@
 		    <param-value>true</param-value>
 		  </init-param>
 		  <load-on-startup>2</load-on-startup>
-	 </servlet>   -->
+	 </servlet>   
+	  <listener>
+            <listener-class>
+                org.quartz.ee.servlet.QuartzInitializerListener
+            </listener-class>
+        </listener>
     <!-- Quartz -->
      
 	<!-- Servlet -->

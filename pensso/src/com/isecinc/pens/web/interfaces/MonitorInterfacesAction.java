@@ -139,9 +139,6 @@ public class MonitorInterfacesAction extends I_Action {
 		return returnText;
 	}
 
-	
-	
-	
 	/**
 	 * 
 	 * @param mapping

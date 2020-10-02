@@ -25,8 +25,9 @@ public class BudsAllForm extends I_Form {
 	private String pageName;
 	private String subPageName;
 	private String mode;
-   
+  
     
+  
 	public String getSubPageName() {
 		return subPageName;
 	}
@@ -91,11 +92,10 @@ public class BudsAllForm extends I_Form {
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
 		// reset properties
 		if(getBean() != null){
-		   //getBean().setDispZeroStock("");
-		   //getBean().setDispHaveQty("");
-			/*if(getBean().getStockBean() != null){
-			   getBean().getStockBean().setDispExpireSoon("");
-			}*/
+		   
+			if(getBean().getInvoiceReportBean() != null){
+			   getBean().getInvoiceReportBean().setDispHaveRemain("");
+			}
 		}
 		
 	}

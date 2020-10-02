@@ -53,13 +53,21 @@ function search(path){
 	return true;
 }
 
+//default back page to ReceiptSearch.jsp
 function backsearch(path,customerId) {
-	if (document.getElementsByName("criteria.searchKey")[0].value != '') {
-		document.receiptForm.action = path + "/jsp/receiptAction.do?do=search";
-	} else {
-		document.receiptForm.action = path + "/jsp/receiptAction.do?do=prepare&customerId="+customerId;
+	var fromPage = document.getElementById("fromPage").value;
+	//Case fromPage (manageOrdeReceipt back to Page )
+	if(fromPage ==''){
+		if (document.getElementsByName("criteria.searchKey")[0].value != '') {
+			document.receiptForm.action = path + "/jsp/receiptAction.do?do=search";
+		} else {
+			document.receiptForm.action = path + "/jsp/receiptAction.do?do=prepare&customerId="+customerId;
+		}
+		document.receiptForm.submit();
+	}else{
+		document.receiptForm.action = path+"/jsp/manageOrderReceipt.do";
+		document.receiptForm.submit();
 	}
-	document.receiptForm.submit();
 	return true;
 }
 
@@ -88,6 +96,7 @@ function add_bill(path, id) {
 	return;
 }
 
+/** open choose invoice for apply **/
 function open_bill(path, rowNo) {
 	
 	//alert('openBill');
@@ -98,20 +107,20 @@ function open_bill(path, rowNo) {
 	// get selected id
 	var selected="";
 	var objtxt = document.getElementsByName('bill.invoiceId');
-	for(var i=0;i<objtxt.length;i++)
-	{
+	for(var i=0;i<objtxt.length;i++){
 		selected+=','+objtxt[i].value;
 	}
 	if(selected.length>0)
 		selected = selected.substring(1, selected.length);
 	
 	var customerId = document.getElementsByName('receipt.customerId')[0].value;
+	var billToAddressId = document.getElementsByName('receipt.billToAddressId')[0].value;
 	
 	if (rowNo == null){
-		window.open(path + "/jsp/pop/billPopup2.jsp?selected="+selected+"&cust="+customerId, "Bill",
+		window.open(path + "/jsp/pop/billPopup2.jsp?selected="+selected+"&cust="+customerId+"&billToAddressId="+billToAddressId, "Bill",
 			"width="+screen_width+",height=400,location=0");
 	}else{
-		window.open(path + "/jsp/pop/billPopup2.jsp?row=" + rowNo+"&selected="+selected+"&cust="+customerId, "Bill",
+		window.open(path + "/jsp/pop/billPopup2.jsp?row=" + rowNo+"&selected="+selected+"&cust="+customerId+"&billToAddressId="+billToAddressId, "Bill",
 			"width="+screen_width+",height=400,location=0");
 	}
 	return;
@@ -188,13 +197,9 @@ function deleteBill(path){
 		tbl.rows[i+1].cells[8].innerHTML = iconLabel;
 	}
 }
-var countSave = 0;
+
 function save(path,type) {
-	/** Validate Press Save duplicate */
-    if(countSave > 0){
-    	return false;
-    }
-	countSave++;
+	
 	if(document.getElementsByName('receipt.internalBank')[0].value==''){
 		alert('ใส่ข้อมูลการฝากเงินเข้าบัญชี');
 		document.getElementsByName('receipt.internalBank')[0].focus();
@@ -228,7 +233,9 @@ function save(path,type) {
 		return false;
 	}
 
-	
+	/**Control Save Lock Screen **/
+    startControlSaveLockScreen();
+    
 	document.receiptForm.action = path + "/jsp/receiptAction.do?do=save";
 	document.receiptForm.submit();
 	return true;
@@ -752,6 +759,7 @@ function applyBill(path, rowNo, type , recAmount, seedId) {
 		selected = selected.substring(1, selected.length);
 	
 	var customerId = document.getElementsByName('receipt.customerId')[0].value;
+	var billToAddressId = document.getElementsByName('receipt.billToAddressId')[0].value;
 	
 	// Credit Note..
 	var cns="";
@@ -780,13 +788,21 @@ function applyBill(path, rowNo, type , recAmount, seedId) {
 			}
 		}
 	}
-	
-	if (rowNo == null)
-		window.open(path + "/jsp/pop/applyBillPopup.jsp?selected="+selected+"&rec="+recAmount+"&type="+type+"&seed="+seedId+"&cust="+customerId+"&cns="+cns+"&writeOff="+value, "ApplyBill",
+	var param = "";
+	if (rowNo == null){
+		param  = "selected="+selected+"&rec="+recAmount+"&type="+type;
+	    param +="&seed="+seedId+"&cust="+customerId+"&cns="+cns+"&writeOff="+value;
+	    param +="&billToAddressId="+billToAddressId;
+		window.open(path + "/jsp/pop/applyBillPopup.jsp?"+param, "ApplyBill",
 			"width="+screen_width+",height=400,location=No,resizable=No");
-	else
-		window.open(path + "/jsp/pop/applyBillPopup.jsp?row=" + rowNo+"&selected="+selected+"&rec="+recAmount+"&type="+type+"&seed="+seedId+"&cust="+customerId+"&cns="+cns+"&writeOff="+value, "ApplyBill",
+	}else{
+		param  ="row=" + rowNo+"&selected="+selected+"&rec="+recAmount+"&type="+type;
+		param +="&seed="+seedId+"&cust="+customerId+"&cns="+cns+"&writeOff="+value;
+		param +="&billToAddressId="+billToAddressId;
+		
+		window.open(path + "/jsp/pop/applyBillPopup.jsp?"+param, "ApplyBill",
 			"width="+screen_width+",height=400,location=No,resizable=No");
+	}
 	return;
 }
 
@@ -931,6 +947,7 @@ function applyBillView(path, rowNo, type , recAmount, seedId) {
 	
 	var customerId = document.getElementsByName('receipt.customerId')[0].value;
 	var prepaid = document.getElementsByName('receipt.prepaid')[0].value;
+	var billToAddressId = document.getElementsByName('receipt.billToAddressId')[0].value;
 	
 	// Credit Note..
 	var cns="";
@@ -941,12 +958,20 @@ function applyBillView(path, rowNo, type , recAmount, seedId) {
 	if(cns.length>0)
 		cns = cns.substring(1, cns.length);
 	
-	if (rowNo == null)
-		window.open(path + "/jsp/pop/applyBillViewPopup.jsp?selected="+selected+"&rec="+recAmount+"&type="+type+"&cust="+customerId+"&prepaid="+prepaid+"&seed="+seedId+"&cns="+cns, "ApplyBill",
+	var param = "";
+	if (rowNo == null){
+		param = "selected="+selected+"&rec="+recAmount+"&type="+type+"&cust="+customerId+"&prepaid="+prepaid+"&seed="+seedId+"&cns="+cns;
+		param +="&billToAddressId="+billToAddressId;
+		
+		window.open(path + "/jsp/pop/applyBillViewPopup.jsp?"+param, "ApplyBill",
 			"width=939,height=400,location=No,resizable=No");
-	else
-		window.open(path + "/jsp/pop/applyBillViewPopup.jsp?row=" + rowNo+"&selected="+selected+"&rec="+recAmount+"&type="+type+"&cust="+customerId+"&prepaid="+prepaid+"&seed="+seedId+"&cns="+cns, "ApplyBill",
+	}else{
+		param = "row=" + rowNo+"&selected="+selected+"&rec="+recAmount+"&type="+type+"&cust="+customerId+"&prepaid="+prepaid+"&seed="+seedId+"&cns="+cns;
+		param +="&billToAddressId="+billToAddressId;
+		
+		window.open(path + "/jsp/pop/applyBillViewPopup.jsp?"+param, "ApplyBill",
 			"width=939,height=400,location=No,resizable=No");
+	}
 	return;
 }
 

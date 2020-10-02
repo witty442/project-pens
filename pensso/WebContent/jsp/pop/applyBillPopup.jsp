@@ -27,14 +27,16 @@ type= new String(type.getBytes("ISO8859_1"), "TIS-620");
 String seed = request.getParameter("seed");
 String row = request.getParameter("row");
 String custId = request.getParameter("cust");
-
+String billToAddressId = request.getParameter("billToAddressId");
 String writeOff = request.getParameter("writeOff");
 
 User user = (User) session.getAttribute("user");
 
 List<Order> zero = new ArrayList<Order>();
  
-List<Order> invoices = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId),user.getOrderType().getKey(),"in",selected);
+List<Order> invoices = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId),Integer.parseInt(billToAddressId)
+		,user.getOrderType().getKey(),"in",selected);
+
 for(Order r : invoices){
 	r.setCreditAmount(new MReceiptLine().calculateCreditAmount(r)); 
 	if(r.getCreditAmount()==0)
@@ -249,6 +251,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 				allPaid+=Number(objtxt[i].value);
 				if(Number(objtxt[i].value)>Number(objcdr[i].value)){
 					alert("จำนวนเงินไม่ถูกต้อง จำนวนเงินรับชำระมากกว่า จำนวนเงินค้างชำระ");
+					objtxt[i].value = objcdr[i].value;
 					objtxt[i].focus();
 					return;
 				}
@@ -264,8 +267,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		for (i = 0; i < objtxtCN.length; i++) {
 			if (objtxtCN[i].value != '') {
 				allCNPaid+=Number(objtxtCN[i].value);
-				if(Number(objcdrCN[i].value)<0)
-				{
+				if(Number(objcdrCN[i].value)<0){
 					//neg value
 					if(Number(objtxtCN[i].value)>0){
 						alert("ห้ามใส่จำนวนเงินมากกว่า 0");
@@ -274,6 +276,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 					}
 					if(Number(objtxtCN[i].value)<Number(objcdrCN[i].value)){
 						alert("จำนวนเงินไม่ถูกต้อง จำนวนเงินรับชำระมากกว่า จำนวนเงินค้างชำระ");
+						objtxtCN[i].value = objcdrCN[i].value;
 						objtxtCN[i].focus();
 						return;
 					}
@@ -284,8 +287,9 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 						objtxtCN[i].focus();
 						return;
 					}
-					if(Number(objtxtCN[i].value)>Number(objcdrCN[i].value)){
+					if(Number(objtxtCN[i].value)> Number(objcdrCN[i].value)){
 						alert("จำนวนเงินไม่ถูกต้อง จำนวนเงินรับชำระมากกว่า จำนวนเงินค้างชำระ");
+						objtxtCN[i].value = objcdrCN[i].value;
 						objtxtCN[i].focus();
 						return;
 					}

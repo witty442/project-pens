@@ -1,6 +1,5 @@
 package com.isecinc.pens.process.document;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,15 +10,13 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.CustomerSequence;
 import com.isecinc.pens.bean.DocSequence;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.model.MCustomerSequence;
 import com.isecinc.pens.model.MDocSequence;
 import com.isecinc.pens.model.MUser;
 import com.pens.util.DBCPConnectionProvider;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * DocumentSequenceProcess Class
@@ -1491,7 +1488,7 @@ public long getNexSeqAndChkDuplicate(Connection conn,String tableName,String col
 		Statement stmt = null;
 		ResultSet rst = null;
 		try {
-			currSeq = SequenceProcess.getNextValue(tableName).longValue();//Add Next Seq
+			currSeq = SequenceProcessAll.getIns().getNextValue(tableName).longValue();//Add Next Seq
 			stmt = conn.createStatement();
 			String sql = "SELECT "+columnSeqName+" FROM "+tableName;
 			sql += " WHERE "+columnSeqName+"=" + currSeq + " ";

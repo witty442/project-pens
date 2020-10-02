@@ -2,27 +2,18 @@ package com.isecinc.pens.scheduler.manager;
 
 
 import java.sql.Connection;
-import java.util.Date;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.CronTrigger;
-import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.SchedulerMetaData;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdSchedulerFactory;
 
 import com.isecinc.pens.scheduler.manager.objectGen.ObjectIdGenerator;
-import com.isecinc.pens.scheduler.utils.CronExpressionUtil;
-import com.isecinc.pens.scheduler.utils.DateUtil;
-import com.pens.util.Utils;
 
 public class ScheduleServiceManager {
 	
@@ -251,7 +242,7 @@ public class ScheduleServiceManager {
 			        scheduleVO.setNextRunDate(scheduleBean.getCronTrigger().getNextFireTime());
 			        scheduleVO.setCrontriggerExp(scheduleBean.getCronTrigger().getCronExpression());
 			        
-			        /** Update TCB_MONITOR_SCHEDULE(TAB) */
+			        /** Update MONITOR_SCHEDULE(TAB) */
 			        updateBatchTaskSchedule(conn, scheduleVO);
 			        
 		    	}else{ /** Case Not found in Quartz  */ 
@@ -266,7 +257,7 @@ public class ScheduleServiceManager {
 			        scheduleVO.setNextRunDate(scheduleBean.getCronTrigger().getNextFireTime());
 			        scheduleVO.setCrontriggerExp(scheduleBean.getCronTrigger().getCronExpression());
 			        
-			        /** Update TCB_MONITOR_SCHEDULE(TAB) */
+			        /** Update MONITOR_SCHEDULE(TAB) */
 			        updateBatchTaskSchedule(conn, scheduleVO);
 		    	}
 	        	
@@ -288,7 +279,7 @@ public class ScheduleServiceManager {
 			        scheduleVO.setNextRunDate(scheduleBean.getCronTrigger().getNextFireTime());
 			        scheduleVO.setCrontriggerExp(scheduleBean.getCronTrigger().getCronExpression());
 	
-			        /** Create New TCB_MONITOR_SCHEDULE(TAB) */
+			        /** Create New MONITOR_SCHEDULE(TAB) */
 			        createBatchTask(conn, scheduleVO);
 			        
 		    	}else{ /** Case Not found in Quartz And not found in TCB_MONITOR_SCHEDULE */ 

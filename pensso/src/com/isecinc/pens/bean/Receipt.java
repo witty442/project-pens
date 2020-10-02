@@ -57,7 +57,8 @@ public class Receipt extends I_PO {
 		setExported(rst.getString("EXPORTED"));
 
 		setInternalBank(ConvertNullUtil.convertToString(rst.getString("INTERNAL_BANK")));
-
+        setBillToAddressId(rst.getInt("bill_to_address_id"));
+		
 		// Lookup Lines
 		setReceiptLines(new MReceiptLine().lookUp(getId()));
 
@@ -195,8 +196,16 @@ public class Receipt extends I_PO {
 	private String pdPaymentMethod;
 	
 	private String paymentType;
+	private int billToAddressId;
 	
-	
+    
+	public int getBillToAddressId() {
+		return billToAddressId;
+	}
+
+	public void setBillToAddressId(int billToAddressId) {
+		this.billToAddressId = billToAddressId;
+	}
 
 	public String getPaymentType() {
 		return paymentType;

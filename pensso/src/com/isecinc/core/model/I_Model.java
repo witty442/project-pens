@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.core.Database;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 
 /**
  * I_Model Class
@@ -92,7 +93,7 @@ public abstract class I_Model<T> implements Serializable {
 		// logger.debug("Search " + this.getClass());
 		Connection conn = null;
 		try {
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnection.getInstance().getConnection();
 			String sql = "SELECT * FROM " + tableName + " WHERE 1 = 1 " + (whereCause.length() > 0 ? whereCause : "");
 			//logger.debug("sql:"+sql);
 			List<T> ts = Database.query(sql, null, classes, conn);

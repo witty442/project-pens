@@ -273,7 +273,8 @@ public class ImportSalesOutBigCFromTextTask extends BatchTask implements BatchTa
 						}
 					}else if(lineTemp.startsWith("D")){
 						logger.debug("lineTemp "+lineTemp);
-						lineTempArry = lineTemp.split("\\|");
+						lineTempArry = lineTemp.split("\\|",-1);
+						logger.debug("lineTempArry size:"+lineTempArry.length);
 						
 						lineStrArry = new String[11];
 						lineStrArry[0] = Utils.isNull(lineHead[0]);//VENDOR
@@ -337,7 +338,7 @@ public class ImportSalesOutBigCFromTextTask extends BatchTask implements BatchTa
 						   ps.setString(index++, Utils.isNull( lineHead[4]));//STORE_NAME
 						   ps.setDate(index++, new java.sql.Date(DateUtil.parse(lineStrArry[6],DateUtil.YYYY_MM_DD_WITHOUT_SLASH).getTime()));//SALES_DATE
 						   ps.setDouble(index++, Utils.convertStrToDouble(lineStrArry[7]));//GP_PERCENT
-						   ps.setInt(index++, Utils.convertStrToInt(lineStrArry[8]));//QTY
+						   ps.setInt(index++, Utils.convertStrToInt(lineStrArry[8],0));//QTY ,default 0
 						   ps.setDouble(index++, Utils.convertStrToDouble(lineStrArry[9]));//WHOLE_PRICE_BF
 						   ps.setDouble(index++, Utils.convertStrToDouble(lineStrArry[10]));//RETAIL_PRICE_BF
 						   ps.setTimestamp(index++, new java.sql.Timestamp(new java.util.Date().getTime())); //CREATE_DATE

@@ -78,10 +78,6 @@ public class ImportHelper {
 							tableBean.setPostFunction(Utils.isNull(p[10]));
 							tableBean.setCheckDupFile(Utils.isNull(p[11]));
 							
-							//** case Transaction set file_ftp_name =user_id **/
-							if(tableBean.getTableName().equals("m_inventory_onhand")){
-								tableBean = dao.getSunInvNameMap(conn,tableBean, userBean);
-							}
 	
 							/** add  by Type  **/
 							boolean canAccess = isCanAccess(userBean, tableBean);
@@ -130,7 +126,81 @@ public class ImportHelper {
 			FileUtil.close(br);
 		}
 	}
+	public static  int initImportConfigBudsSales(String path,String controlFileName,LinkedHashMap<String,TableBean> tableMap,Connection conn,String pathImport,String transType,User userBean ,String requestTable,boolean importAll) throws Exception {
+		BufferedReader br = FileUtil.getBufferReaderFromClassLoader(path+controlFileName); // Seq, Procedure, Source, Destination
+		EnvProperties env = EnvProperties.getInstance();
+		InterfaceDAO dao = new InterfaceDAO();
+		try {
+			MonitorTime monitorTime = new MonitorTime("initImportConfigBudsSales>>read import config");
+			logger.debug("initImportConfigBudsSales Get Download from FTP");
+			String lineStr = null;
+			while ((lineStr = br.readLine()) != null) {
+				if (!Utils.isBlank(lineStr)) { // exclude blank line
+					String[] cs = lineStr.split("\t");
+					if (!cs[0].startsWith("Seq") && !cs[0].startsWith("#")) { // exclude header, comment
+						TableBean tableBean = new TableBean();
+						try {
+							String[] p = ((String)cs[0]).split(",");
+							tableBean.setTableName(Utils.isNull(p[1].toLowerCase()));
+							tableBean.setFileFtpName(Utils.isNull(p[2]));
+							tableBean.setSource(Utils.isNull(p[3]));
+							tableBean.setDestination(Utils.isNull(p[4]));
+							tableBean.setTransactionType(Utils.isNull(p[5]));
+							tableBean.setAuthen(Utils.isNull(p[6]));
+							tableBean.setChildTable(Utils.isNull(p[7]));
+							tableBean.setActionDB(Utils.isNull(p[8]));
+							tableBean.setPreFunction(Utils.isNull(p[9]));
+							tableBean.setPostFunction(Utils.isNull(p[10]));
+							tableBean.setCheckDupFile(Utils.isNull(p[11]));
+							
+							
+							/** add  by Type  **/
+							boolean canAccess = isCanAccess(userBean, tableBean);
+							
+							/*logger.debug("tableName["+tableBean.getTableName()+":"+requestTable+"]");
+							logger.debug("transType:"+transType+":"+tableBean.getTransactionType());
+							logger.debug("userRole:"+userBean.getType()+",CanAccess:"+canAccess);*/
+							
+							if( ( Utils.isNull(requestTable).equals(tableBean.getTableName()) || Utils.isNull(requestTable).equals(""))
+									&& canAccess && transType.equalsIgnoreCase(tableBean.getTransactionType())){
+		
+								/** init table properties  */
+								tableBean = initColumn(path,tableBean);
+								/** Gen SQL Insert And Update***/
+								tableBean = genPrepareSQL(tableBean,userBean ,transType);
+
+								/** Store Data To Map **/
+						        tableMap.put(tableBean.getTableName(),tableBean);
+							}
+						} catch (Exception e) {
+							logger.info("TabelName Error:"+tableBean.getTableName());
+							throw e;
+						}
+					}//if 2
+				}//if 1
+			}//while
 	
+			monitorTime.debugUsedTime();
+			
+		    monitorTime = new MonitorTime("initImportConfig>>Select Table Last import:[mapFileNameLastImportToTableMap]");
+			/** Map Table and last File Name Import **/
+			tableMap = dao.mapFileNameLastImportToTableMap(conn,tableMap,userBean,importAll);
+			monitorTime.debugUsedTime();
+			
+			monitorTime = new MonitorTime("initImportConfig>>Download file from Ftp Server");
+			/** Load File From FTP Server To Table Map By Table**/
+		    FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
+		    int countFileMap = ftpManager.downloadFileMappingToTableBudsSales(userBean,tableMap,pathImport,userBean,transType,importAll);
+	        
+	        monitorTime.debugUsedTime();
+	        return countFileMap;
+		  
+		}catch(Exception e){
+			throw e;
+		} finally {
+			FileUtil.close(br);
+		}
+	}
 	public static  int initImportConfigCaseReImportError(String path,String controlFileName,LinkedHashMap<String,TableBean> tableMap,Connection conn,String pathImport,String transType,User userBean ,String requestTable,boolean importAll) throws Exception {
 		BufferedReader br = FileUtil.getBufferReaderFromClassLoader(path+controlFileName); // Seq, Procedure, Source, Destination
 		//EnvProperties env = EnvProperties.getInstance();
@@ -159,10 +229,6 @@ public class ImportHelper {
 							tableBean.setPostFunction(Utils.isNull(p[10]));
 							tableBean.setCheckDupFile(Utils.isNull(p[11]));
 							
-							//** case Transaction set file_ftp_name =user_id **/
-							if(tableBean.getTableName().equals("m_inventory_onhand")){
-								tableBean = dao.getSunInvNameMap(conn,tableBean, userBean);
-							}
 	
 							/** add  by Type  **/
 							boolean canAccess = isCanAccess(userBean, tableBean);
@@ -261,9 +327,9 @@ public class ImportHelper {
 	 */
 	public static boolean isCanAccess(User userBean,TableBean tableBean){
 		boolean canAccess = false;
-		//logger.debug("User Role:"+Utils.isNull(userBean.getRole().getKey()));
+		logger.debug("User Name:"+userBean.getUserName());
 
-		if(Utils.isNull(userBean.getType()).equals(User.ADMIN)){ //ADMIN Access ALL
+		if(Utils.isNull(userBean.getUserName()).equalsIgnoreCase("admin")){ //ADMIN Access ALL
 			if(tableBean.getAuthen().indexOf(User.ADMIN) != -1){
         		canAccess = true;  
             }
@@ -1210,6 +1276,21 @@ public class ImportHelper {
 		return canGetFtpFile;
 	}
 	
+	public static boolean canGetFtpFileBudsSales(User user,TableBean tableBean,String fileFtpFullName,boolean importAll) {
+		boolean canGetFtpFile = false;
+		try{
+			if( fileFtpFullName.indexOf(tableBean.getFileFtpName()) != -1 ){
+				if(ImportHelper.isCanGetFtpFileBudsSales(user, tableBean, fileFtpFullName,importAll)){
+					canGetFtpFile = true;
+				}else{
+					canGetFtpFile = false;
+				}
+			}
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return canGetFtpFile;
+	}
 	/**
 	 * 
 	 * @param lastDateFileImport
@@ -1370,6 +1451,53 @@ public class ImportHelper {
 		return map;
 	}
 	
+	/**
+	 * 
+	 * @param lastDateFileImport
+	 * @param tableName
+	 * @param ftpFileFullName
+	 * @return
+	 * @throws Exception
+	 * lastDateFileImport :for check read ftp file
+	 * tableName : for mapping ftp file
+	 * ftpFileFullName : file name full in FTP Server ex, -> Case 1) 201010311010-100040-RECEIPT.txt ,Case 2).201010311010-100040-RECEIPT-ALL.txt
+	 */
+	public static boolean isCanGetFtpFileBudsSales(User user,TableBean tableBean,String ftpFileFullName,boolean importAll) {
+		//logger.debug("isCanGetFtpFileReceiptAll");
+		boolean map = false;
+		try{
+			long ftpFileVesrionInt1 = 0;
+			long salesFileLastVersionInt = 0;
+			String salesFileNameLastImport = tableBean.getFileNameLastImport(); //for checkDate
+			String salesFileMappingName = tableBean.getFileNameMapping();
+			if( !Utils.isNull(salesFileNameLastImport).equals("")){
+				salesFileLastVersionInt = Long.parseLong(salesFileNameLastImport.split("\\-")[0]); //201010311010
+			}
+			
+			/**202009080109-SB402-RECEIPT.txt */
+			String[] ftpFileFullNameArr = ftpFileFullName.split("\\-");
+			ftpFileVesrionInt1 = Long.parseLong(ftpFileFullNameArr[0]);//202009080109
+			String salesCodeFileName2 = ftpFileFullNameArr[1];
+			String ftpFileTableName3 = ftpFileFullNameArr.length>=3?ftpFileFullNameArr[2]:"";//RECEIPT tableName
+			if(ftpFileTableName3.indexOf(".") != -1){
+				ftpFileTableName3 = ftpFileTableName3.substring(0,ftpFileTableName3.indexOf("."));
+			}
+		
+			logger.debug("*******Compare File Get FTP FIle Name*******************");
+			logger.debug("lastImportTableName:"+salesFileMappingName+":"+ftpFileTableName3);
+			logger.debug("********************************************************");
+			
+			//No Check DateTime more than latest import
+			if(salesCodeFileName2.startsWith("SB") &&
+				salesFileMappingName.equalsIgnoreCase(ftpFileTableName3) ){
+				map = true;
+			}
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return map;
+	}
 	/**
 	 * 
 	 * @param user

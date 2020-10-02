@@ -67,14 +67,17 @@ public class SalesTargetNew extends I_PO implements Serializable {
 
 	public void calculateTargetAmount() throws Exception {
 		try{
-		User u = new MUser().find(String.valueOf(getUserId()));
-		PriceList priceList = new MPriceList().getPriceList(u.getOrderType().getKey(), getTargetFrom(), getTargetTo());
-		ProductPrice pp = new MProductPrice().lookUp(getProduct().getId(), priceList.getId(), getUom().getId());
-		
-		if (pp != null) setTargetAmount(pp.getPrice() * getTargetQty());
-		else setTargetAmount(0);
-				
-		setPriceList(priceList);
+			User u = new MUser().find(String.valueOf(getUserId()));
+			PriceList priceList = new MPriceList().getPriceList(u.getOrderType().getKey(), getTargetFrom(), getTargetTo());
+			ProductPrice pp = new MProductPrice().lookUp(getProduct().getId(), priceList.getId(), getUom().getId());
+			
+			if (pp != null){ 
+				setTargetAmount(pp.getPrice() * getTargetQty());
+			}else{
+				setTargetAmount(0);
+			}
+					
+			setPriceList(priceList);
 		}catch(Exception e){
 			
 		}

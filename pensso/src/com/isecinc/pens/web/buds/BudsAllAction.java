@@ -12,6 +12,7 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.buds.page.ConfPickingAction;
 import com.isecinc.pens.web.buds.page.ControlPickingAction;
+import com.isecinc.pens.web.buds.page.InvoiceReportAction;
 import com.isecinc.pens.web.buds.page.OrderEDIAction;
 import com.isecinc.pens.web.buds.page.StockOnhandAction;
 import com.pens.util.Utils;
@@ -34,6 +35,10 @@ public class BudsAllAction extends I_Action {
 				 return new ControlPickingAction().prepareSearchHead(mapping, budsAllForm, request, response);
 			 }else if("StockOnhandSearch".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				 return new StockOnhandAction().prepareSearchHead(mapping, budsAllForm, request, response);
+			 }else if("OrderEDISearch".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new OrderEDIAction().prepareSearchHead(mapping, budsAllForm, request, response);
+			 }else if("InvoiceReport".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new InvoiceReportAction().prepareSearchHead(mapping, budsAllForm, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -49,6 +54,8 @@ public class BudsAllAction extends I_Action {
 				 return new ConfPickingAction().searchHead(mapping, aForm, request, response);
 			 }else if("ControlPickingSearch".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
 				 return new ControlPickingAction().searchHead(mapping, aForm, request, response);
+			 }else if("OrderEDISearch".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
+				 return new OrderEDIAction().searchHead(mapping, aForm, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -64,6 +71,8 @@ public class BudsAllAction extends I_Action {
 			logger.debug("subPageName:"+request.getParameter("subPageName"));
 			 if("ConfPicking".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				 return new ConfPickingAction().viewDetail(mapping, aForm, request, response);
+			 }else  if("OrderEDIDetail".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new OrderEDIAction().viewDetail(mapping, aForm, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -147,11 +156,13 @@ public class BudsAllAction extends I_Action {
 			 }else if("SalesReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
 				return new ConfPickingAction().exportSalesReport(mapping, aForm, request, response);
 			 }else if("SalesDetailReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
-					return new ConfPickingAction().exportSalesDetailReport(mapping, aForm, request, response);
+				return new ConfPickingAction().exportSalesDetailReport(mapping, aForm, request, response);
 			 }else if("ControlPickingReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
 				return new ControlPickingAction().exportControlPicking(mapping, aForm, request, response);
 			 }else if("StockOnhandReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
 				return new StockOnhandAction().exportStockOnhandReport(mapping, aForm, request, response);
+			 }else if("InvoiceReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
+				return new InvoiceReportAction().exportInvoiceReport(mapping, aForm, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -170,7 +181,9 @@ public class BudsAllAction extends I_Action {
 			   return new ConfPickingAction().printPickingReport(mapping, form, request, response);
 		    }else if("ControlPickingReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
 			   return new ControlPickingAction().printControlPickingReport(mapping, form, request, response);
-			}
+		    }else if("InvoiceReport".equalsIgnoreCase(Utils.isNull(request.getParameter("reportName"))) ){
+				return new InvoiceReportAction().printInvoiceReport(mapping, aForm, request, response);
+		    }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
@@ -231,16 +244,37 @@ public class BudsAllAction extends I_Action {
 		}
 		return mapping.findForward("");
 	}
+	
+	public ActionForward saveAction(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		BudsAllForm aForm = (BudsAllForm) form;
+		try {
+			 String method = Utils.isNull(request.getParameter("method"));
+			 logger.debug("method:"+method);
+			 if("OrderEDIDetail".equalsIgnoreCase(aForm.getPageName()) && "saveOrderEDI".equalsIgnoreCase(method)){
+				 return new OrderEDIAction().saveOrderEDI(mapping, aForm, request, response);
+			 }else if("OrderEDIDetail".equalsIgnoreCase(aForm.getPageName()) && "confirmOrderEDI".equalsIgnoreCase(method)){
+				 return new OrderEDIAction().confirmOrderEDI(mapping, aForm, request, response);
+			 }else if("OrderEDIDetail".equalsIgnoreCase(aForm.getPageName()) && "cancelOrderEDI".equalsIgnoreCase(method)){
+				 return new OrderEDIAction().cancelOrderEDI(mapping, aForm, request, response);
+			 }
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward("");
+	}
+	
 	/**
 	 * Save
 	 */
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		BudsAllForm aForm = (BudsAllForm) form;
 		try {
+			
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_FAIL).getDesc()
 					+ e.getMessage());
 			try {
-				
 			} catch (Exception e2) {}
 			return "prepare";
 		} finally {

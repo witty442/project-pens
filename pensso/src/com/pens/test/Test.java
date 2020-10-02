@@ -1,11 +1,13 @@
 package com.pens.test;
 
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Types;
 
 import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.NumberToolsUtil;
 
 public class Test {
 
@@ -14,7 +16,10 @@ public class Test {
 	 */
 	public static void main(String[] args) {
 		try{
-		testCallProc();
+		   //testCallProc();
+			
+			System.out.println(NumberToolsUtil.round(new Double(".99"), 2, BigDecimal.ROUND_HALF_UP));
+			
 		}catch(Exception e){
 			e.printStackTrace();
 		}

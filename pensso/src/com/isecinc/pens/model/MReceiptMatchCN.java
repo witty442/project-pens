@@ -1,6 +1,5 @@
 package com.isecinc.pens.model;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -10,7 +9,7 @@ import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.ReceiptMatchCN;
 import com.pens.util.DBCPConnectionProvider;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * Receipt Match CN Model
@@ -69,7 +68,7 @@ public class MReceiptMatchCN extends I_Model<ReceiptMatchCN> {
 	public boolean save(ReceiptMatchCN receiptMatchCN, int activeUserID, Connection conn) throws Exception {
 		long id =0;
 		if (receiptMatchCN.getId() ==0) {
-			id = SequenceProcess.getNextValue("t_receipt_match_cn").longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt_match_cn").longValue();
 		} else {
 			id = receiptMatchCN.getId();
 		}

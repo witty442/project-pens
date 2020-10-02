@@ -37,10 +37,24 @@ public class ControlPickingDAO {
 			if( !Utils.isNull(o.getPickingNo()).equals("")){
 				sql.append("\n and t.picking_no = '"+Utils.isNull(o.getPickingNo())+"'");
 			}
-			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				sql.append("\n and t.transaction_date = to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+			if( !Utils.isNull(o.getTransactionDateFrom()).equals("") && !Utils.isNull(o.getTransactionDateTo()).equals("")){
+				sql.append("\n and t.transaction_date >= to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+				sql.append("\n and t.transaction_date <= to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
 			}
-			sql.append("\n   order by t.picking_no desc ");
+			sql.append("\n    UNION ");
+			
+			sql.append("\n    SELECT distinct t.picking_no ,t.status");
+			sql.append("\n    FROM pensso.t_picking_trans t ,pensso.t_edi o,pensso.t_invoice inv");
+			sql.append("\n    WHERE t.status ='"+I_PO.STATUS_LOADING+"'");
+			sql.append("\n    and t.picking_no = o.picking_no ");
+			sql.append("\n    and to_char(o.header_id) = inv.ref_order ");
+			if( !Utils.isNull(o.getPickingNo()).equals("")){
+				sql.append("\n and t.picking_no = '"+Utils.isNull(o.getPickingNo())+"'");
+			}
+			if( !Utils.isNull(o.getTransactionDateFrom()).equals("") && !Utils.isNull(o.getTransactionDateTo()).equals("")){
+				sql.append("\n and t.transaction_date >= to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+				sql.append("\n and t.transaction_date <= to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+			}
             sql.append("\n )A ");
 			logger.debug("sql:"+sql);
 			ps = conn.prepareStatement(sql.toString());
@@ -69,7 +83,12 @@ public class ControlPickingDAO {
 		try {
 			sql.append("\n select M.* from (");
 			sql.append("\n select A.* ,rownum as r__ from (");
-			sql.append("\n    SELECT distinct t.picking_no ,t.transaction_date ,t.status");
+			sql.append("\n  select ");
+			sql.append("\n  AA.picking_no ,AA.transaction_date ,AA.status");
+			sql.append("\n  ,sum(AA.total_amount) as total_amount ,sum(AA.vat_amount) as vat_amount ,sum(AA.net_amount) as net_amount ");
+			sql.append("\n  FROM (");
+			sql.append("\n    SELECT t.picking_no ,t.transaction_date ,t.status");
+			sql.append("\n    ,inv.total_amount ,inv.vat_amount ,inv.net_amount ");
 			sql.append("\n    FROM pensso.t_picking_trans t ,pensso.t_order o,pensso.t_invoice inv");
 			sql.append("\n    WHERE t.status ='"+I_PO.STATUS_LOADING+"'");
 			sql.append("\n    and t.picking_no = o.picking_no ");
@@ -77,10 +96,28 @@ public class ControlPickingDAO {
 			if( !Utils.isNull(o.getPickingNo()).equals("")){
 				sql.append("\n and t.picking_no = '"+Utils.isNull(o.getPickingNo())+"'");
 			}
-			if( !Utils.isNull(o.getTransactionDate()).equals("")){
-				sql.append("\n and t.transaction_date = to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDate(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+			if( !Utils.isNull(o.getTransactionDateFrom()).equals("") && !Utils.isNull(o.getTransactionDateTo()).equals("")){
+				sql.append("\n and t.transaction_date >= to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+				sql.append("\n and t.transaction_date <= to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
 			}
-			sql.append("\n   order by t.picking_no desc ");
+			sql.append("\n  UNION ALL ");
+			
+			sql.append("\n    SELECT t.picking_no ,t.transaction_date ,t.status");
+			sql.append("\n    ,inv.total_amount ,inv.vat_amount ,inv.net_amount ");
+			sql.append("\n    FROM pensso.t_picking_trans t ,pensso.t_edi o,pensso.t_invoice inv");
+			sql.append("\n    WHERE t.status ='"+I_PO.STATUS_LOADING+"'");
+			sql.append("\n    and t.picking_no = o.picking_no ");
+			sql.append("\n    and to_char(o.header_id) = inv.ref_order ");
+			if( !Utils.isNull(o.getPickingNo()).equals("")){
+				sql.append("\n and t.picking_no = '"+Utils.isNull(o.getPickingNo())+"'");
+			}
+			if( !Utils.isNull(o.getTransactionDateFrom()).equals("") && !Utils.isNull(o.getTransactionDateTo()).equals("")){
+				sql.append("\n and t.transaction_date >= to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+				sql.append("\n and t.transaction_date <= to_date('"+DateUtil.convBuddhistToChristDate(o.getTransactionDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/mm/yyyy')");
+			}
+			sql.append("\n  )AA ");
+			sql.append("\n   GROUP BY AA.picking_no ,AA.transaction_date ,AA.status");
+			sql.append("\n   order by AA.picking_no desc ");
             sql.append("\n  )A ");
         	// get record start to end 
             if( !allRec){
@@ -100,8 +137,11 @@ public class ControlPickingDAO {
 			   h.setStatus(Utils.isNull(rst.getString("status")));
 			   h.setTransactionDate(DateUtil.stringValue(rst.getDate("transaction_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			  
-			   h = searchPickingSummary(conn, h,rst.getString("status"));
-			   
+			   //h = searchPickingSummary(conn, h,rst.getString("status"));
+			   h.setTotalAmount(Utils.decimalFormat(rst.getDouble("total_amount"),Utils.format_current_2_disgit));
+			   h.setVatAmount(Utils.decimalFormat(rst.getDouble("vat_amount"),Utils.format_current_2_disgit));
+			   h.setNetAmount(Utils.decimalFormat(rst.getDouble("net_amount"),Utils.format_current_2_disgit));
+				
 			   items.add(h);
 			   r++;
 			}//while
@@ -270,7 +310,7 @@ public class ControlPickingDAO {
 	
 	private static StringBuffer genSQLControlPicking(ConfPickingBean o) throws Exception{
 		StringBuffer sql = new StringBuffer();
-		sql.append("\n  SELECT M.*");
+		sql.append("\n SELECT M.*");
 		sql.append("\n  FROM (");
 		sql.append("\n    /** SALES_APP **/ ");
 		sql.append("\n    SELECT t.picking_no, t.ORDER_NO ,t.ORDER_DATE ,t.doc_status as status");

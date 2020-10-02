@@ -97,7 +97,7 @@ public class ExportReceipt {
             orderDBean.setTableName("t_receipt_line");
             List colOrderList = ExportHelper.initColumn(orderDBean);
    
-         // Pasuwat Wang-arrayagul 
+            /** CN **/
 			// Create Credit Note Line Sent To Oracle
             String sql ="	Select 		\n"+
             "	   'D'	AS	RECORD_TYPE	,	\n"+
@@ -113,12 +113,17 @@ public class ExportReceipt {
             "	    (select max(value) from c_reference where code ='OrgID') AS ORG_ID, 		\n"+
             "	    null as order_number, \n"+
             
-            "	    IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),t_receipt_by.PAYMENT_METHOD)  AS PAYMENT_METHOD ,\n"+
+    	    /** WIT :14/09/2020 :add new payment (LoveLove (LV)) **/  
+		    "	(CASE WHEN t_receipt_by.payment_method ='LOV' THEN 'LOV' \n"+
+		    "     ELSE \n "+
+            "      (IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),t_receipt_by.PAYMENT_METHOD)) "+
+            "     END ) AS PAYMENT_METHOD ,\n"+
             
             "       /* CASE WHEN t_receipt_by.PAYMENT_METHOD ='CS' THEN 'N' ELSE '' END AS CASH_FLAG, */ \n"+
             "       t_receipt_by.WRITE_OFF AS WRITE_OFF, \n"+ 
             /******** new Requirement ************************************/
             "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.bank)	AS	BANK, \n"+	
+            
             "       ''	AS	BANK_BRANCH, \n"+	
             "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.cheque_no)	AS	CHEQUE_NO, \n"+	
             "       IF(AD_USER.PD_PAID='Y',null,t_receipt_by.cheque_date)	AS	CHEQUE_DATE, \n"+	
@@ -169,6 +174,7 @@ public class ExportReceipt {
 				
 			}//while
 			
+			/** NORMAL ***/
             sql ="	Select 		\n"+
             "	   'D'	AS	RECORD_TYPE	,	\n"+
             "		@rownum:=@rownum+1  	AS	LINE_NO ,	\n"+
@@ -196,7 +202,11 @@ public class ExportReceipt {
 		     *  }
 		     * 
 		     * **/
-            "	    IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),IF(t_receipt_by.PAYMENT_METHOD='AP','CS',t_receipt_by.PAYMENT_METHOD))  AS PAYMENT_METHOD ,\n"+
+		    /** WIT :14/09/2020 :add new payment (LoveLove (LV)) **/  
+		    "	(CASE WHEN t_receipt_by.payment_method ='LOV' THEN 'LOV' \n"+
+		    "     ELSE \n "+
+            "	    IF(AD_USER.PD_PAID='Y', IF(T_RECEIPT.ISPDPAID IS NULL ,'PD','PD_CR'),IF(t_receipt_by.PAYMENT_METHOD='AP','CS',t_receipt_by.PAYMENT_METHOD)) \n"+
+            "	  END ) AS PAYMENT_METHOD ,\n"+
             
             "       /* CASE WHEN t_receipt_by.PAYMENT_METHOD ='CS' THEN 'N' ELSE '' END AS CASH_FLAG, */ \n"+
             "       t_receipt_by.WRITE_OFF AS WRITE_OFF, \n"+ 

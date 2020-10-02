@@ -65,7 +65,7 @@ function loadMe(_path){
 	   String reportType = request.getParameter("reportType");
 	   String orderNo = Utils.isNull(request.getParameter("orderNo"));
 	   String statusOrder = Utils.isNull(request.getParameter("statusOrder"));
-	   
+	   String printReportPDF = Utils.isNull(request.getParameter("printReportPDF"));
 	   /* Case Van Order credit Check is Receipt Before print bill  */
 	   boolean vanCanPrintBill = OrderUtils.canPrintBillCreditCaseVan(user,orderNo);
 	   System.out.println("Check OrderNo["+orderNo+"]vanCanPrintBill["+vanCanPrintBill+"]");
@@ -75,6 +75,7 @@ function loadMe(_path){
   %> 
              var param ="&orderId=<%=orderId%>&fileType=PRINTER&reportType=<%=reportType%>";
                  param +="&statusOrder=<%=statusOrder%>";
+                 param +="&printReportPDF=<%=printReportPDF%>";
              document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printReportSummary"+param;
 	         document.orderForm.submit();
 
@@ -88,6 +89,7 @@ function loadMe(_path){
 	      //Other Report No check
 	      var param ="&orderId=<%=orderId%>&fileType=PRINTER&reportType=<%=reportType%>";
 	          param +="&statusOrder=<%=statusOrder%>";
+	          param +="&printReportPDF=<%=printReportPDF%>";
 	      document.orderForm.action = _path + "/jsp/saleOrderAction.do?do=printReportSummary"+param;
           document.orderForm.submit();
 	  <%}%>

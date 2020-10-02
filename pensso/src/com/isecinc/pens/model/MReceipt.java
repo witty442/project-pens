@@ -29,7 +29,7 @@ import com.isecinc.pens.process.document.ReceiptDocumentProcess;
 import com.isecinc.pens.web.pd.PDReceiptForm;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * Receipt Model
@@ -48,7 +48,7 @@ public class MReceipt extends I_Model<Receipt> {
 	private String[] columns = { COLUMN_ID, "RECEIPT_NO", "RECEIPT_DATE", "ORDER_TYPE", "CUSTOMER_ID", "CUSTOMER_NAME",
 			"PAYMENT_METHOD", "BANK", "CHEQUE_NO", "CHEQUE_DATE", "RECEIPT_AMOUNT", "INTERFACES", "DOC_STATUS",
 			"USER_ID", "CREATED_BY", "UPDATED_BY", "CREDIT_CARD_TYPE", "DESCRIPTION", "PREPAID", "APPLY_AMOUNT",
-			"INTERNAL_BANK" ,"ISPDPAID","PDPAID_DATE","PD_PAYMENTMETHOD","EXPORTED"};
+			"INTERNAL_BANK" ,"ISPDPAID","PDPAID_DATE","PD_PAYMENTMETHOD","EXPORTED","BILL_TO_ADDRESS_ID"};
 
 	/**
 	 * Find
@@ -203,7 +203,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	public boolean save(Receipt receipt, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (receipt.getId() ==0) {
-			id = SequenceProcess.getNextValue("t_receipt").longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt").longValue();
 			String prefix = "";
 			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
 				receipt.setReceiptNo("R"
@@ -217,16 +217,34 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 		if (!checkDocumentDuplicate(TABLE_NAME, COLUMN_ID, "RECEIPT_NO", receipt.getReceiptNo(), id, conn))
 			return false;
 
-		Object[] values = { id, ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim(),
-				DateToolsUtil.convertToTimeStamp(receipt.getReceiptDate()),
-				ConvertNullUtil.convertToString(receipt.getOrderType()).trim(), receipt.getCustomerId(),
-				ConvertNullUtil.convertToString(receipt.getCustomerName()).trim(), null, null, null, null,
-				receipt.getReceiptAmount(), receipt.getInterfaces(), receipt.getDocStatus(),
-				receipt.getSalesRepresent().getId(), activeUserID, activeUserID, null,
-				ConvertNullUtil.convertToString(receipt.getDescription()).trim(), receipt.getPrepaid(),
-				receipt.getApplyAmount(), ConvertNullUtil.convertToString(receipt.getInternalBank()) , 
-				receipt.getIsPDPaid(),DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(receipt.getPdPaidDate())),
-				receipt.getPdPaymentMethod(),Utils.isNull(receipt.getExported())};
+		Object[] values = { id,//COLUMN_ID
+				ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim(),//RECEIPT_NO
+				DateToolsUtil.convertToTimeStamp(receipt.getReceiptDate()),//RECEIPT_DATE
+				ConvertNullUtil.convertToString(receipt.getOrderType()).trim(), //ORDER_TYPE
+				receipt.getCustomerId(),//CUSTOMER_ID
+				ConvertNullUtil.convertToString(receipt.getCustomerName()).trim(),//CUSTOMER_NAME
+				null,//PAYMENT_METHOD
+				null,//BANK
+				null,//CHEQUE_NO
+				null,//CHEQUE_DATE
+				receipt.getReceiptAmount(),//RECEIPT_AMOUNT
+				receipt.getInterfaces(),//INTERFACES
+				receipt.getDocStatus(),//DOC_STATUS
+				receipt.getSalesRepresent().getId(),//USER_ID
+				activeUserID, //CREATED_BY
+				activeUserID,//UPDATED_BY
+				null,//CREDIT_CARD_TYPE
+				ConvertNullUtil.convertToString(receipt.getDescription()).trim(),//DESCRIPTION
+				receipt.getPrepaid(),//PREPAID
+				receipt.getApplyAmount(), //APPLY_AMOUNT
+				ConvertNullUtil.convertToString(receipt.getInternalBank()) , //INTERNAL_BANK
+				receipt.getIsPDPaid(),//ISPDPAID
+				DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(receipt.getPdPaidDate())),//PDPAID_DATE
+				receipt.getPdPaymentMethod(),//PD_PAYMENTMETHOD
+				Utils.isNull(receipt.getExported()),//EXPORTED
+				receipt.getBillToAddressId()//bill_to_address_id
+				};
+		
 		if (super.save(TABLE_NAME, columns, values, receipt.getId(), conn)) {
 			receipt.setId(id);
 		}
@@ -246,7 +264,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	public boolean saveWOCheckDup(Receipt receipt, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (receipt.getId() ==0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt").longValue();
 			String prefix = "";
 			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
 				receipt.setReceiptNo("R"
@@ -265,7 +283,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 				ConvertNullUtil.convertToString(receipt.getDescription()).trim(), receipt.getPrepaid(),
 				receipt.getApplyAmount(), ConvertNullUtil.convertToString(receipt.getInternalBank()) , 
 				receipt.getIsPDPaid() , DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(receipt.getPdPaidDate())) 
-			  , receipt.getPdPaymentMethod(),""};
+			  , receipt.getPdPaymentMethod(),"N",0};
 		if (super.save(TABLE_NAME, columns, values, receipt.getId(), conn)) {
 			receipt.setId(id);
 		}
@@ -276,7 +294,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	public boolean saveWOCheckDup_PDPAID(Receipt receipt, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (receipt.getId() ==0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt").longValue();
 			String prefix = "";
 			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
 				receipt.setReceiptNo("R"
@@ -304,7 +322,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	public boolean updateReceiptFromPDReceipt(Receipt receipt, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (receipt.getId()==0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt").longValue();
 			String prefix = "";
 			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
 				receipt.setReceiptNo("R"

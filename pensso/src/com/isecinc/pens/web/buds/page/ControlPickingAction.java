@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import com.pens.util.BeanParameter;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DBConnection;
 import com.pens.util.DBConnectionApps;
+import com.pens.util.DateUtil;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 
@@ -56,7 +58,10 @@ public class ControlPickingAction extends I_Action {
 		BudsAllBean bean = new BudsAllBean();
 		try {
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
-				bean.setConfPickingBean(new ConfPickingBean());
+				ConfPickingBean confPickingBean = new ConfPickingBean();
+				confPickingBean.setTransactionDateFrom(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+				confPickingBean.setTransactionDateTo(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+				bean.setConfPickingBean(confPickingBean);
 				aForm.setBean(bean);
 			 }
 			 aForm.setPageName(Utils.isNull(request.getParameter("pageName")));
@@ -128,7 +133,6 @@ public class ControlPickingAction extends I_Action {
 				   request.setAttribute("Message", "ไม่พบข้อมูล");
 				}
 				aForm.getBean().setConfPickingBean(confPickingBean);
-				
 			}
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
@@ -240,7 +244,8 @@ public class ControlPickingAction extends I_Action {
 			    out.flush();
 			    out.close();
 			    
-			    budsAllForm.getBean().getConfPickingBean().setDataStrBuffer(null);
+			    //clear memory
+			    bean.setDataStrBuffer(null);
 			}else{
 				request.setAttribute("Message", "ไม่พบข้อมูล");
 			}

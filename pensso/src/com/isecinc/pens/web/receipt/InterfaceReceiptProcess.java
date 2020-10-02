@@ -2,7 +2,6 @@ package com.isecinc.pens.web.receipt;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,21 +11,15 @@ import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.TableBean;
-import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.ExportHelper;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.inf.manager.ImportManager;
+import com.isecinc.pens.inf.manager.ImportTransReceiptBudsSalesManager;
 import com.isecinc.pens.inf.manager.UpdateSalesManager;
 import com.isecinc.pens.inf.manager.process.ExportProcess;
 import com.isecinc.pens.inf.manager.process.export.LockboxProcess;
-import com.isecinc.pens.model.MUser;
-import com.isecinc.pens.web.batchtask.BatchTaskConstants;
-import com.isecinc.pens.web.batchtask.BatchTaskManualAction;
-import com.pens.util.ControlCode;
 import com.pens.util.EnvProperties;
-import com.pens.util.SQLHelper;
 
 public class InterfaceReceiptProcess {
 
@@ -48,23 +41,26 @@ public class InterfaceReceiptProcess {
 		}
 	}
 
-	public static void processImportReceipt(User user,HttpServletRequest request) throws Exception{
+	public static void processImportReceiptBySales(User user,HttpServletRequest request) throws Exception{
 		try{
-			//Wait for next Process (new)
-			//new BatchTaskManualAction().runBatchTask(user, BatchTaskConstants.IMPORT_RECEIPT);
-			
-			//OldCode
-			//t_receipt|UPDATE-TRANS-SALES
-			//new ImportManager().importByRequestTable(user,user, "t_receipt", request,false,"UPDATE-TRANS-SALES");
-			
-			MonitorBean m = new ImportManager().importMain(user,user,"",request,false,"UPDATE-TRANS-SALES");
+			MonitorBean m = new UpdateSalesManager().importMain(user, user, "", request, false);
 			logger.debug("Monitor.Transaction["+m.getTransactionId()+"]status["+m.getStatus()+"]");
 		}catch(Exception e){
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}
 	}
-	
-	public static boolean process(User user,long receiptId,String orderNo) throws Exception{
+	public static BigDecimal processImportReceiptAllSales(User user) throws Exception{
+		try{
+			logger.info("start processImportReceiptAllSales");
+			MonitorBean m = new ImportTransReceiptBudsSalesManager().initImport(user,false);
+			logger.debug("Monitor.Transaction["+m.getTransactionId()+"]status["+m.getStatus()+"]");
+			
+			return m.getTransactionId();
+		}catch(Exception e){
+			throw e;
+		}
+	}
+	public static boolean processExportReceiptLockBox(User user,long receiptId,String orderNo) throws Exception{
 		boolean r = true;
 		Connection conn = null;
 		FTPManager ftpManager = null;

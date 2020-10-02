@@ -40,8 +40,15 @@ public class BatchTaskDTO implements Serializable{
     private String fileName;
     private String message;
     private String paramRegen;
-	
+	private BigDecimal transactionId;
     
+	
+	public BigDecimal getTransactionId() {
+		return transactionId;
+	}
+	public void setTransactionId(BigDecimal transactionId) {
+		this.transactionId = transactionId;
+	}
 	public String getParamRegen() {
 		return paramRegen;
 	}

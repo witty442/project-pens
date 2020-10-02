@@ -19,6 +19,7 @@
 		<th> ชื่อ Process(TH)</th>
 		<th> ประเภทข้อมูล</th>
 		<th> ผู้สร้าง</th>
+		<th>จำนวนไฟล์</th>
 		<th> สถานะ</th>
 		<th> วันที่เริ่ม</th>
 		<th> วันที่ทำสำเร็จ</th>
@@ -33,10 +34,11 @@
 		       
                 <td width="3%"> <%=(i+1)%></td>
                 <td width="5%"> <%=item.getTransactionId() %></td>
-				<td width="10%"> <%=item.getName() %></td>
-				<td width="20%"> <%=Utils.isNull(item.getThName()) %></td>
+				<td width="10%"><%=item.getName() %></td>
+				<td width="20%"><%=Utils.isNull(item.getThName()) %></td>
 				<td width="5%"> <%=Utils.isNull(item.getTransactionType()) %></td>
 				<td width="5%"> <%=item.getCreateUser() %></td>
+				<td width="2%"> <%=item.getFileCount() %></td>
 				<td width="3%"> 
 				   <%if(item.getStatus()==1){ %>
 				     <font color='green'><b> Success</b></font>

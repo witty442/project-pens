@@ -69,6 +69,14 @@ function save(path){
 		alert("กรุณาระบุข้อมูลให้ถูกต้อง");
 		return false;
 	} */
+	<%if (stockInvForm.getBean().getTransType().equals("OUT")) {%>
+	   var remark = document.getElementById("remark");
+	   if(remark.value ==""){
+		   alert("กรุณา ระบุหมายเหตุ ");
+		   remark.focus();
+		   return false;
+	   }
+	<%}%>
 	/**Control Save Lock Screen **/
 	startControlSaveLockScreen();
 	
@@ -78,6 +86,15 @@ function save(path){
 }
 function confirmInitStock(path){ 
 	var form = document.stockInvForm;
+	
+	<%if (stockInvForm.getBean().getTransType().equals("OUT")) {%>
+	   var remark = document.getElementById("remark");
+	   if(remark.value ==""){
+		   alert("กรุณา ระบุหมายเหตุ ");
+		   remark.focus();
+		   return false;
+	   }
+	<%}%>
 	
 	/**Control Save Lock Screen **/
 	startControlSaveLockScreen();
@@ -106,7 +123,7 @@ function addRow(focus){
 	    tabIndex++;
 	    rowData += "<td class='td_text_center' width='10%'> "+
 	    "   <input type='text'"+
-	    "   onkeypress=getAutoKeypress(event,this,"+lineId+",'Product','') "+
+	    "   onkeypress=getAutoKeypress(event,this,"+lineId+",'ProductStockOnhand','') "+
 	    "   name='productCode' size='10' autoComplete='off' tabindex="+tabIndex+"/>"+
 	    "   <input type='hidden' tabindex ='-1' name='productId' autoComplete='off' />"+
 	    "</td>";
@@ -183,7 +200,7 @@ function getAutoDetail(obj,lineId,pageName,criteriaType){
 	
 	//prepare parameter
 	var param = "";
-	if("Product"==pageName){
+	if("ProductStockOnhand"==pageName){
 		param  ="pageName="+pageName;
 		param +="&productCode="+obj.value;
 	}
@@ -197,7 +214,7 @@ function getAutoDetail(obj,lineId,pageName,criteriaType){
 			}
 		}).responseText;
 	 
-	if("Product" == pageName){
+	if("ProductStockOnhand" == pageName){
 		var retArr = returnString.split("|");
 		if(retArr[0] !=-1){
 			document.getElementsByName("productCode")[lineId-1].value = retArr[1];;
@@ -432,9 +449,9 @@ function setMainValue(page,data){
 									  <html:hidden property="bean.transType" disabled="true"/>
 										<u>
 											<%if(stockInvForm.getBean().getTransType().equals("IN")) {
-												out.print("บันทึกสินค้า เข้าคลัง");
+												out.print("บันทึกสินค้า <font size='3' color='blue'> เข้าคลัง</font>");
 											}else{
-												out.print("บันทึกสินค้า ออกจากคลัง");
+												out.print("บันทึกสินค้า <font size='3' color='red'>ออกจากคลัง</font>");
 											}
 										%>
 										</font></u></b>	
@@ -483,7 +500,7 @@ function setMainValue(page,data){
 										  <input type="hidden" name="lineId" value="${results.lineId}" />
 										</td>
 										<td class="td_text_center" width="10%">
-										   <input onkeypress="getAutoKeypress(event,this,${results.no},'Product')"
+										   <input onkeypress="getAutoKeypress(event,this,${results.no},'ProductStockOnhand')"
 										   type="text" name="productCode" value ="${results.productCode}" size="10" readonly class="disableText"/>
 										   <input type="hidden" name="productId" value="${results.productId}"  autoComplete='off'/>
 										</td>

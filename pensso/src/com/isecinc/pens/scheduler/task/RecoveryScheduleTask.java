@@ -10,7 +10,7 @@ import org.quartz.JobExecutionContext;
 import com.isecinc.pens.scheduler.manager.ScheduleServiceManager;
 import com.isecinc.pens.scheduler.manager.ScheduleVO;
 import com.isecinc.pens.scheduler.manager.SchedulerConstant;
-import com.isecinc.pens.scheduler.taskaction.RecoveryScheduleAction;
+import com.isecinc.pens.scheduler.taskaction.RecoveryScheduleTaskAction;
 import com.pens.util.DBConnection;
 
 public class RecoveryScheduleTask implements org.quartz.Job{
@@ -25,7 +25,7 @@ public class RecoveryScheduleTask implements org.quartz.Job{
 		    conn = DBConnection.getInstance().getConnection();
 		  
 		    logger.debug("RecoveryScheduleTask Process Task ...AT:"+new Date());
-		    RecoveryScheduleAction action = new RecoveryScheduleAction();
+		    RecoveryScheduleTaskAction action = new RecoveryScheduleTaskAction();
 		    
 		    /** action job */
 		    param = action.execute(conn,param);

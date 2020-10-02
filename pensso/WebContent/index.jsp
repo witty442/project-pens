@@ -160,7 +160,7 @@ function login(path){
 		            	<td colspan="2" nowrap><b>
 		            		Application Version
 		            		<font color="red"><bean:message bundle="sysprop" key="AppVersion"/>
-		            		(<%=EnvProperties.getInstance().getProperty("config.type") %>)
+		            		(<%=EnvProperties.getInstance().getProperty("product.type") %>)
 		            		</font>
 		            		</b>
 		            	</td>

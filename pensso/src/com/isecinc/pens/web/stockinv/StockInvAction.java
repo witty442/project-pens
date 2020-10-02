@@ -526,7 +526,7 @@ public class StockInvAction extends I_Action {
 						//set criteria
 						PopupBean criteriaForm = new PopupBean();
 						criteriaForm.setCodeSearch(Utils.isNull(productCodeSelect[i]));
-						PopupBean p = AutoKeypressDAO.searchProduct(criteriaForm);
+						PopupBean p = AutoKeypressDAO.searchProductStockOnhand(criteriaForm,0);
 						if(p != null){
 							newLine.setNo(index);
 							newLine.setProductId(Utils.isNull(p.getProductId()));

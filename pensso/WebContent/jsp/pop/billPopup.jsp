@@ -8,6 +8,8 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%
+/** Despricate **/
+
 String selected = request.getParameter("selected");
 if(selected==null)selected="";
 String custId = request.getParameter("cust");
@@ -16,7 +18,7 @@ User user = (User) session.getAttribute("user");
 
 List<Order> zero = new ArrayList<Order>();
 
-List<Order> orders = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in" ,selected);
+List<Order> orders = null;//new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in" ,selected);
 for(Order r : orders){
 	r.setCreditAmount(new MReceiptLine().calculateCreditAmount(r));
 	if(r.getCreditAmount()==0)

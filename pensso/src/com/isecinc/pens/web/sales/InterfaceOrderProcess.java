@@ -11,17 +11,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
-import com.pens.util.DBConnection;
 import com.pens.util.DBConnectionApps;
 import com.pens.util.Utils;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 public class InterfaceOrderProcess extends I_PO{
 	/**
@@ -36,28 +33,29 @@ public class InterfaceOrderProcess extends I_PO{
 		   
 			//canOrderAvaliable(new BigDecimal("68"));
 			
-			reserveStock(null,29,"");
+			reserveOrderCredit(null,29,"");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
 
-	//OLD Function
-	public static Map<String,String> reserveStock(User user, long orderId,String orderNo) throws Exception{
+	//Reserve Order (Credit)
+	public static Map<String,String> reserveOrderCredit(User user, long orderId,String orderNo) throws Exception{
 		Map<String,String> productErrorMap = null;
 		try{
-			logger.info("---Start checkStockAvaliable---");
+			logger.info("---Start reserveOrderCredit---");
 			
 			//clear interface flag for new  run
-			clearInterfaceFlagOrder(orderId);
+			clearInterfaceFlagOrderCredit(orderId);
 			
-			//Check Ordre in Stock Onhand
-			canOrderAvaliable(orderId);
+			//Check can Order in Stock Onhand
+			canOrderCreditAvaliable(orderId);
 			
 			//check order line is can Reserve
 			//case error :return productErrorList
-			productErrorMap = checkStatusOrderReserve(orderId);
-			logger.info("---end checkStockAvaliable---");
+			productErrorMap = checkStatusOrderCreditReserve(orderId);
+			
+			logger.info("---end reserveOrderCredit---");
 			
 		}catch(Exception e){
 			throw e;
@@ -66,7 +64,34 @@ public class InterfaceOrderProcess extends I_PO{
 		}
 		return productErrorMap;
 	}
-	public static boolean clearInterfaceFlagOrder(long orderId) throws Exception{
+	
+	//Reserve Order EDI (MT)
+	public static Map<String,String> reserveOrderEDI(User user, long headerId,String orderNo) throws Exception{
+		Map<String,String> productErrorMap = null;
+		try{
+			logger.info("---Start reserveOrderEDI---");
+			
+			//clear interface flag for new  run
+			clearInterfaceFlagOrderEDI(headerId);
+			
+			//Check Order EDI in Stock Onhand
+			canOrderEDIAvaliable(headerId);
+			
+			//check order line is can Reserve
+			//case error :return productErrorList
+			productErrorMap = checkStatusOrderEDIReserve(headerId);
+			
+			logger.info("---end reserveOrderEDI---");
+			
+		}catch(Exception e){
+			throw e;
+		}finally{
+			
+		}
+		return productErrorMap;
+	}
+		
+	public static boolean clearInterfaceFlagOrderCredit(long orderId) throws Exception{
 		Connection conn = null;
 		PreparedStatement ps = null;
 		try{
@@ -75,6 +100,25 @@ public class InterfaceOrderProcess extends I_PO{
 			ps.execute();
 			
 			ps = conn.prepareStatement("update pensso.t_order_line set check_available =null ,updated=sysdate  where order_id="+orderId+"");
+			ps.execute();
+			
+			return true;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			ps.close();
+			conn.close();
+		}
+	}
+	public static boolean clearInterfaceFlagOrderEDI(long headerId) throws Exception{
+		Connection conn = null;
+		PreparedStatement ps = null;
+		try{
+			conn = DBConnectionApps.getInstance().getConnection();
+			ps = conn.prepareStatement("update pensso.t_edi set check_available =null where header_id="+headerId+"");
+			ps.execute();
+			
+			ps = conn.prepareStatement("update pensso.t_edi_line set check_available =null  where header_id="+headerId+"");
 			ps.execute();
 			
 			return true;
@@ -103,7 +147,7 @@ public class InterfaceOrderProcess extends I_PO{
 			if(orderLoadingList != null){
 				for(Order o:orderLoadingList){
 			      //Get Seq 
-			      headerId = SequenceProcess.getNextValueBySeq("pensso.so_order_headers_s.nextval");
+			      headerId = SequenceProcessAll.getIns().getNextValueBySeq("pensso.so_order_headers_s.nextval");
 			
 				  //insert order head temp
 				  insertOrderHeadTemp(conn,headerId, o.getId(),o.getOrderType());
@@ -161,7 +205,7 @@ public class InterfaceOrderProcess extends I_PO{
 		}
 	}
 	
-	public static boolean canOrderAvaliable(long orderId) throws Exception{
+	public static boolean canOrderCreditAvaliable(long orderId) throws Exception{
 		boolean r = true;
 		CallableStatement  cs = null;
 		Connection conn = null;
@@ -181,6 +225,27 @@ public class InterfaceOrderProcess extends I_PO{
 			conn.close();
 		}
 	}
+	public static boolean canOrderEDIAvaliable(long headerId) throws Exception{
+		boolean r = true;
+		CallableStatement  cs = null;
+		Connection conn = null;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			conn = DBConnectionApps.getInstance().getConnection();
+			sql.append("{ call xxpens_om_sales_online_pkg.check_edi_available(?) }");
+			cs = conn.prepareCall(sql.toString());
+			cs.setLong(1, headerId);
+			cs.execute();
+			
+			return r;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			cs.close();
+			conn.close();
+		}
+	}
+	
 	public static boolean deleteStockReservation(long reserveId) throws Exception{
 		boolean r = true;
 		CallableStatement  cs = null;
@@ -201,7 +266,7 @@ public class InterfaceOrderProcess extends I_PO{
 			conn.close();
 		}
 	}
-	public static Map<String,String> checkStatusOrderReserve(long orderId) throws Exception {
+	public static Map<String,String> checkStatusOrderCreditReserve(long orderId) throws Exception {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -211,7 +276,7 @@ public class InterfaceOrderProcess extends I_PO{
 		try{
 			conn = DBConnectionApps.getInstance().getConnection();
 			String sql ="\n select order_id,check_available,order_no from "
-					+ "\n pensso.t_order where order_id="+orderId +" and check_available ='E'" ;
+					+ "\n pensso.t_order where order_id="+orderId +"" ;
 			logger.debug("sql:"+sql);
 			ps = conn.prepareStatement(sql);
 			rst = ps.executeQuery(sql);
@@ -226,15 +291,15 @@ public class InterfaceOrderProcess extends I_PO{
 			//can reserve stock 
 			if("S".equalsIgnoreCase(statusOrderReserve)){
 				//update order status = RESERVE
-				updateStatusOrder(conn, orderNo, STATUS_RESERVE);
+				updateStatusOrderCredit(conn, orderNo, STATUS_RESERVE);
 				logger.debug(" result success");
 			//error cannot reserve
 			}else if("E".equalsIgnoreCase(statusOrderReserve)){
 				//update order status = UNAVAILABLE
-				updateStatusOrder(conn, orderNo, STATUS_UNAVAILABLE);
+				updateStatusOrderCredit(conn, orderNo, STATUS_UNAVAILABLE);
 				
 				//cannot reserver stock  ,display error to sales
-				productErrorMap = getOrderLineTempErrorList(conn, orderId);
+				productErrorMap = getOrderCreditLineTempErrorList(conn, orderId);
 				
 				logger.debug(" result error productErrorMap:"+productErrorMap!=null?productErrorMap.toString():"NULL");
 			}
@@ -248,10 +313,69 @@ public class InterfaceOrderProcess extends I_PO{
 			} catch (Exception e2) {}
 		}
 	}
-	public static boolean updateStatusOrder(Connection conn,String orderNo,String status) throws Exception{
+	public static Map<String,String> checkStatusOrderEDIReserve(long headerId) throws Exception {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		String statusOrderReserve = "";
+		String orderNo = "";
+		Map<String,String> productErrorMap = null;
+		try{
+			conn = DBConnectionApps.getInstance().getConnection();
+			String sql ="\n select header_id,check_available,cust_po_number as order_no from "
+					+ "\n pensso.t_edi where header_id="+headerId +"" ;
+			logger.debug("sql:"+sql);
+			ps = conn.prepareStatement(sql);
+			rst = ps.executeQuery(sql);
+			if(rst.next()){
+				statusOrderReserve = Utils.isNull(rst.getString("check_available"));
+				orderNo = Utils.isNull(rst.getString("order_no"));;
+			}
+			
+			//for test 
+			//statusOrderReserve ="E";
+			
+			//can reserve stock 
+			if("S".equalsIgnoreCase(statusOrderReserve)){
+				//update order status = RESERVE
+				updateStatusOrderEDI(conn, orderNo, STATUS_RESERVE);
+				logger.debug(" result success");
+			//error cannot reserve
+			}else if("E".equalsIgnoreCase(statusOrderReserve)){
+				//update order status = UNAVAILABLE
+				updateStatusOrderEDI(conn, orderNo, STATUS_UNAVAILABLE);
+				
+				//cannot reserver stock  ,display error to sales
+				productErrorMap = getOrderEDILineTempErrorList(conn, headerId);
+				
+				logger.debug(" result error productErrorMap:"+productErrorMap!=null?productErrorMap.toString():"NULL");
+			}
+			return productErrorMap;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e2) {}
+		}
+	}
+	public static boolean updateStatusOrderCredit(Connection conn,String orderNo,String status) throws Exception{
 		PreparedStatement ps = null;
 		try{
 			ps = conn.prepareStatement("update pensso.t_order set doc_status ='"+status+"' where order_no='"+orderNo+"'");
+			ps.execute();
+			return true;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			ps.close();
+		}
+	}
+	public static boolean updateStatusOrderEDI(Connection conn,String orderNo,String status) throws Exception{
+		PreparedStatement ps = null;
+		try{
+			ps = conn.prepareStatement("update pensso.t_edi set doc_status ='"+status+"' where cust_po_number='"+orderNo+"'");
 			ps.execute();
 			return true;
 		}catch(Exception e){
@@ -279,13 +403,14 @@ public class InterfaceOrderProcess extends I_PO{
 			ps.close();
 		}
 	}
-	public static Map<String,String> getOrderLineTempErrorList(Connection conn,long orderId) throws Exception{
+	public static Map<String,String> getOrderCreditLineTempErrorList(Connection conn,long orderId) throws Exception{
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String sql = "";
 		Map<String,String> productErrorMap = new HashMap<String, String>();
 		try{
 			sql = " select product_id from pensso.t_order_line where order_id ="+orderId;
+			sql += "and check_available ='E' ";
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while(rs.next()){
@@ -299,6 +424,26 @@ public class InterfaceOrderProcess extends I_PO{
 		}
 	}
 	
+	public static Map<String,String> getOrderEDILineTempErrorList(Connection conn,long headerId) throws Exception{
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String sql = "";
+		Map<String,String> productErrorMap = new HashMap<String, String>();
+		try{
+			sql = " select inventory_item_id from pensso.t_edi_line where header_id ="+headerId;
+			sql += "and check_available ='E' ";
+			ps = conn.prepareStatement(sql);
+			rs = ps.executeQuery();
+			while(rs.next()){
+				productErrorMap.put(rs.getString("inventory_item_id"),rs.getString("inventory_item_id"));
+			}
+			return productErrorMap;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			ps.close();
+		}
+	}
 	public static boolean insertOrderHeadTemp(Connection conn,BigDecimal headerId,long orderId,String orderType) throws Exception{
 		boolean r= true;
 		String str = "";
@@ -469,7 +614,7 @@ public class InterfaceOrderProcess extends I_PO{
 			rs = ps.executeQuery();
 			while(rs.next()){
 				//gen Next seq
-				lineId = SequenceProcess.getNextValueBySeq("pensso.so_order_lines_s.nextval");
+				lineId = SequenceProcessAll.getIns().getNextValueBySeq("pensso.so_order_lines_s.nextval");
 				
 				psIns.setBigDecimal(index++, headerId);
 				psIns.setBigDecimal(index++, lineId);

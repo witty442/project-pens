@@ -3,6 +3,7 @@ package com.isecinc.pens.web.imports.sub;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -182,7 +183,7 @@ public class ImportOnhandPensShop {
 				         oh.setBarcode(Utils.isNull(barcode));
 				         oh.setMaterialMaster(Utils.isNull(materialMaster));
 				         //Find pens_item **/
-				         pensItem = importDAO.getItemByBarcode(conn,Constants.STORE_TYPE_7CATALOG_ITEM, oh.getBarcode());//
+				         pensItem = getItemByBarcodeByPensShop(conn, oh.getBarcode());//
 				         oh.setPensItem(Utils.isNull(pensItem));
 				         
 				         s.setOnhandSummary(oh);
@@ -192,7 +193,7 @@ public class ImportOnhandPensShop {
 				         if(onhandQtyValid.compareTo(bigZero) != 0 ){
 				         
 					         /** Validate Barcode **/
-					         MasterBean mb = importDAO.getMasterBeanByBarcode(conn,Constants.STORE_TYPE_7CATALOG_ITEM, barcode);
+					         MasterBean mb = getMasterBeanByBarcodeByPensShop(conn, barcode);
 					         String itemCodeValid = mb!=null?mb.getItem():"";
 					         groupItem = mb!=null?mb.getGroup():"";
 					         
@@ -257,7 +258,7 @@ public class ImportOnhandPensShop {
 					         
 				         }else{//if onhand qty != 0
 				        	 //Case QTY =0  no validate item
-				        	 MasterBean mb = importDAO.getMasterBeanByBarcode(conn,Constants.STORE_TYPE_7CATALOG_ITEM, barcode);
+				        	 MasterBean mb = getMasterBeanByBarcodeByPensShop(conn, barcode);
 					         groupItem = mb!=null?mb.getGroup():"";
 					         
 				         }
@@ -359,5 +360,83 @@ public class ImportOnhandPensShop {
 		    }
 		return mapping.findForward("success");
 	}
-
+	
+	//For PensShop Only
+	public String getItemByBarcodeByPensShop(Connection conn ,String barcode) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		String item = "";
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select pens_value  from PENSBME_MST_REFERENCE ");
+			sql.append(" WHERE reference_code ='7CItem' and pens_desc6 = 'MAYA' ");
+			sql.append(" and interface_desc ='"+barcode+"' \n");
+			sql.append(" union ");
+			sql.append(" select pens_value  from PENSBME_MST_REFERENCE ");
+			sql.append(" WHERE reference_code ='LotusItem' and pens_desc6 = 'TM21' ");
+			sql.append(" and interface_desc ='"+barcode+"' \n");
+			
+		    //logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()){
+				item = Utils.isNull(rs.getString("pens_value"));
+			}else{
+				logger.debug("Not found SQL:"+sql.toString());
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			
+		}
+		return item;
+	} 
+	//For PensShop Only
+	public MasterBean getMasterBeanByBarcodeByPensShop(Connection conn ,String barcode) throws Exception{
+		PreparedStatement ps =null;
+		ResultSet rs = null;
+		MasterBean item = null;
+		try{
+			StringBuffer sql = new StringBuffer("");
+			sql.append(" select interface_desc,pens_value,pens_desc,pens_desc2 " );
+			sql.append(" from PENSBME_MST_REFERENCE WHERE reference_code ='7CItem' ");
+			sql.append(" and pens_desc6 = 'MAYA' and interface_desc ='"+barcode+"' \n");
+			sql.append(" union ");
+			sql.append(" select interface_desc,pens_value,pens_desc,pens_desc2 " );
+			sql.append(" from PENSBME_MST_REFERENCE WHERE reference_code ='LotusItem' ");
+			sql.append(" and pens_desc6 = 'TM21' and interface_desc ='"+barcode+"' \n");
+			
+		   // logger.debug("SQL:"+sql.toString());
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			if(rs.next()){
+				item = new MasterBean();
+				item.setItem(Utils.isNull(rs.getString("pens_value")));
+				item.setBarcode(Utils.isNull(rs.getString("interface_desc")));
+				item.setGroup(Utils.isNull(rs.getString("pens_desc2")));
+			}else{
+				logger.debug("Not found SQL:"+sql.toString());
+			}
+		
+		}catch(Exception e){
+	      throw e;
+		}finally{
+			if(ps != null){
+			   ps.close();ps = null;
+			}
+			if(rs != null){
+			   rs.close();rs = null;
+			}
+			
+		}
+		return item;
+	} 
 }

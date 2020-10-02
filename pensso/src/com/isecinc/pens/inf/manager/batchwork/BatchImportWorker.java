@@ -28,17 +28,15 @@ public class BatchImportWorker extends BatchWorker {
 	private User userLogin;
 	private User userRequest;
     private String requestTable;
-    private HttpServletRequest request;
     private boolean importAll;
     
-	public BatchImportWorker(BigDecimal transactionId,BigDecimal monitorId,String transType,User userLogin,User userRequest,String requestTable,HttpServletRequest request,boolean importAll) {
+	public BatchImportWorker(BigDecimal transactionId,BigDecimal monitorId,String transType,User userLogin,User userRequest,String requestTable,boolean importAll) {
 	   this.setTransactionId(transactionId);
 	   this.setMonitorId(monitorId);
 	   this.setTransType(transType);
 	   this.setUserLogin(userLogin);
 	   this.setUserRequest(userRequest);
 	   this.setRequestTable(requestTable);
-	   this.setRequest(request);
 	   this.setImportAll(importAll);
 	}
 	
@@ -52,11 +50,11 @@ public class BatchImportWorker extends BatchWorker {
 				
 				if(Constants.TRANSACTION_UTS_TRANS_TYPE.equals(this.transType)){
 					logger.debug(" **********Start Import Update Transaction Sales By Request Table ******************");
-					MonitorBean monitorModel =(new UpdateSalesManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, request, importAll);
+					MonitorBean monitorModel =(new UpdateSalesManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, importAll);
 					logger.debug(" **********Result Import Control Transaction  By Request Table :"+monitorModel.getStatus()+" ******************");
 				}else{
 					logger.debug(" **********Start Import Master ,Tranasaction  By Request Table ******************");
-					MonitorBean monitorModel =(new ImportManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, request, importAll);
+					MonitorBean monitorModel =(new ImportManager()).importFileToDB(transactionId,monitorId,transType, userLogin,userRequest, requestTable, importAll);
 					logger.debug(" **********Result Import Master ,Tranasaction  By Request Table :"+monitorModel.getStatus()+" ******************");
 				}	
 			
@@ -75,7 +73,7 @@ public class BatchImportWorker extends BatchWorker {
 
 				logger.debug(" **********Start Import Update Transaction Sales ******************");
 					
-				MonitorBean monitorModel =(new ImportManager()).importTxtByUpdateSalesType(transactionId,Constants.TRANSACTION_UTS_TRANS_TYPE, userLogin,userRequest, requestTable, request, importAll);
+				MonitorBean monitorModel =(new ImportManager()).importTxtByUpdateSalesType(transactionId,Constants.TRANSACTION_UTS_TRANS_TYPE, userLogin,userRequest, requestTable, importAll);
 				logger.debug(" **********Result Import Control Transaction :"+monitorModel.getStatus()+" ******************");
 	            logger.debug("Export Import Update Transaction Sales Result ErrorCode:"+Utils.isNull(monitorModel.getErrorCode()));
 	
@@ -124,8 +122,6 @@ public class BatchImportWorker extends BatchWorker {
 		this.monitorId = monitorId;
 	}
 
-	
-
 	public BigDecimal getTransactionId() {
 		return transactionId;
 	}
@@ -134,31 +130,21 @@ public class BatchImportWorker extends BatchWorker {
 		this.transactionId = transactionId;
 	}
 
-	
-    
 	public User getUserLogin() {
 		return userLogin;
 	}
-
-
 
 	public void setUserLogin(User userLogin) {
 		this.userLogin = userLogin;
 	}
 
-
-
 	public User getUserRequest() {
 		return userRequest;
 	}
 
-
-
 	public void setUserRequest(User userRequest) {
 		this.userRequest = userRequest;
 	}
-
-
 
 	public String getRequestTable() {
 		return requestTable;
@@ -168,14 +154,4 @@ public class BatchImportWorker extends BatchWorker {
 		this.requestTable = requestTable;
 	}
 
-	public HttpServletRequest getRequest() {
-		return request;
-	}
-
-	public void setRequest(HttpServletRequest request) {
-		this.request = request;
-	}
-
-	
-	
 }

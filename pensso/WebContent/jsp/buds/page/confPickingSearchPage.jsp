@@ -50,7 +50,8 @@ String role = ((User)session.getAttribute("user")).getType();
 
 <script type="text/javascript">
 function loadMe(){
-	new Epoch('epoch_popup', 'th', document.getElementById('transactionDate'));
+	new Epoch('epoch_popup', 'th', document.getElementById('transactionDateFrom'));
+	new Epoch('epoch_popup', 'th', document.getElementById('transactionDateTo'));
 }
 function search(path){
 	var form = document.budsAllForm;
@@ -171,10 +172,15 @@ function setDataPopupValue(code,desc,pageName){
 								       <input type="button" name="btTransport" value="..." 
 									    onclick="openPopupPage('PICKING_NO_PRINT')" class="newPosBtnLong"/>
 								    <%} %>
-								     &nbsp;Transaction Date 
-								    <html:text property="bean.confPickingBean.transactionDate" styleId="transactionDate" size="10" readonly="true" styleClass=""/> 
-								  
 							    </td>
+							 </tr>
+							 <tr>
+				                <td> Transaction Date From</td>
+								<td>
+								 <html:text property="bean.confPickingBean.transactionDateFrom" styleId="transactionDateFrom" size="10" readonly="true" styleClass=""/> 
+								 &nbsp;&nbsp;To&nbsp;&nbsp;
+								  <html:text property="bean.confPickingBean.transactionDateTo" styleId="transactionDateTo" size="10" readonly="true" styleClass=""/> 
+								</td>
 							 </tr>
 						</table>
 					<br>
@@ -224,6 +230,7 @@ function setDataPopupValue(code,desc,pageName){
 									<th >Vat Amount</th>
 									<th >Amount (inc.vat)</th>
 									<th >สถานะ</th>
+									<th >Invoice</th>
 									<%if( !"BudsConfPicking".equalsIgnoreCase(subPageName)){%>
 									  <th >แก้ไข/View</th>
 									<%}else{%>
@@ -248,6 +255,11 @@ function setDataPopupValue(code,desc,pageName){
 									 	<td class="td_text_right" width="10%"><%=mc.getVatAmount()%></td>
 									    <td class="td_text_right" width="10%"><%=mc.getNetAmount()%></td>
 									    <td class="td_text_center" width="5%"><%=mc.getStatus()%></td>
+									    <td class="td_text_center" width="5%">
+									      <%if(mc.getInvoiceFlag().equalsIgnoreCase("Y")){ %>
+									        <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+									      <%} %>
+									    </td>
 										<td class="td_text_center" width="10%"><font size="2">
 											<%if( !"BudsConfPicking".equalsIgnoreCase(subPageName) && !mc.getStatus().equals(I_PO.STATUS_LOADING)){ %>
 												 <a href="javascript:openEdit('edit','<%=mc.getPickingNo()%>')">

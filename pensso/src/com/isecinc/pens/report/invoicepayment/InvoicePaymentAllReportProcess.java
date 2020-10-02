@@ -48,43 +48,25 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  rc.ISPDPAID , ");
 			sql.append("\n  (rcby.RECEIPT_AMOUNT) AS RECEIPT_AMT, ");
 			sql.append("\n  rc.receipt_no,rcby.PAYMENT_METHOD ");
-			/*sql.append("\n  (SELECT SUM(rcby.RECEIPT_AMOUNT) FROM t_receipt ");
-			sql.append("\n    INNER JOIN t_receipt_line ON t_receipt_line.RECEIPT_ID = t_receipt.RECEIPT_ID ");
-			sql.append("\n    INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
-			sql.append("\n    INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-			sql.append("\n    WHERE rcby.PAYMENT_METHOD = 'CS' ");
-			// Wit Edit 18/05/2011
-			sql.append("\n    AND t_receipt.user_id = "+user.getId());
-			sql.append("\n    AND t_receipt.RECEIPT_DATE = rc.RECEIPT_DATE ");
-			sql.append("\n    AND t_receipt.DOC_STATUS = rc.DOC_STATUS ");
-			sql.append("\n    AND t_receipt_line.ORDER_ID =  rcl.ORDER_ID ");
-			sql.append("\n  ) AS CASH_WRITEOFF FROM t_receipt rc ");*/
-			sql.append("\n  FROM t_receipt rc ");
-			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
-			sql.append("\n  INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
-			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-			//sql.append("\n  INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ");
-			sql.append("\n  INNER JOIN m_customer cus ON rc.CUSTOMER_ID = cus.CUSTOMER_ID ");
-			sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
-			sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
+			sql.append("\n  FROM pensso.t_receipt rc ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
+			sql.append("\n  INNER JOIN pensso.m_customer cus ON rc.CUSTOMER_ID = cus.CUSTOMER_ID ");
+			sql.append("\n  INNER JOIN pensso.ad_user us ON rc.USER_ID = us.USER_ID ");
+			sql.append("\n  LEFT JOIN pensso.m_sub_inventory inv ON inv.NAME = us.CODE ");
 			sql.append("\n  WHERE 1=1");
-			//sql.append("\n  AND rcby.WRITE_OFF = 'N'` ");
-			// today receipt, today order
-			//sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
 			sql.append("\n  AND rc.RECEIPT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
 			sql.append("\n  AND rc.RECEIPT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
-			     
-			sql.append("\n  AND rcl.ORDER_ID IN ( ");
-			sql.append("\n    SELECT order_id FROM t_order od  ");
-			sql.append("\n    WHERE 1=1 )");
-			// order doc_status may be not equals receipt 
-			//sql.append("\n  AND od.DOC_STATUS = rc.DOC_STATUS ");
-			//sql.append("\n    AND od.ORDER_DATE = rc.RECEIPT_DATE) ");
-			// Wit Edit 18/05/2011
+			sql.append("\n  AND rcl.INVOICE_ID IN ( ");
+			sql.append("\n    SELECT invoice_id FROM pensso.t_invoice  ");
+			sql.append("\n   )");
 			sql.append("\n  AND rc.user_id = "+user.getId());
-			sql.append("\n    AND rcby.PAYMENT_METHOD = 'CS'");
+			sql.append("\n  AND rcby.PAYMENT_METHOD = 'CS'");
+			
 			// Art Edit 14/09/2011
-			sql.append("\n    union all");
+			sql.append("\n  UNION ALL");
+			
 			sql.append("\n  SELECT DISTINCT inv.NAME AS INV_NAME, inv.DESCRIPTION, ");
 			sql.append("\n  rc.RECEIPT_DATE, us.CODE, us.NAME, cus.NAME AS CUSTOMER_NAME, ");
 			sql.append("\n  cus.CODE AS CUSTOMER_CODE,rcby.WRITE_OFF, ");
@@ -92,42 +74,24 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  rc.ISPDPAID , ");
 			sql.append("\n  (rcby.RECEIPT_AMOUNT) AS RECEIPT_AMT, ");
 			sql.append("\n  rc.receipt_no,rcby.PAYMENT_METHOD ");
-			/*sql.append("\n  (SELECT SUM(rcby.RECEIPT_AMOUNT) FROM t_receipt ");
-			sql.append("\n    INNER JOIN t_receipt_line ON t_receipt_line.RECEIPT_ID = t_receipt.RECEIPT_ID ");
-			sql.append("\n    INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
-			sql.append("\n    INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-			sql.append("\n    WHERE rcby.PAYMENT_METHOD = 'CS' ");
-			// Wit Edit 18/05/2011
-			sql.append("\n    AND t_receipt.user_id = "+user.getId());
-			sql.append("\n    AND t_receipt.RECEIPT_DATE = rc.RECEIPT_DATE ");
-			sql.append("\n    AND t_receipt.DOC_STATUS = rc.DOC_STATUS ");
-			sql.append("\n    AND t_receipt_line.ORDER_ID =  rcl.ORDER_ID ");
-			sql.append("\n  ) AS CASH_WRITEOFF " +*/
-			sql.append("\n	FROM t_receipt rc ");
-			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
-			sql.append("\n  INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
-			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-			//sql.append("\n  INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ");
-			sql.append("\n  INNER JOIN m_customer cus ON rc.CUSTOMER_ID = cus.CUSTOMER_ID ");
-			sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
-			sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
+			sql.append("\n	FROM pensso.t_receipt rc ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
+			sql.append("\n  INNER JOIN pensso.m_customer cus ON rc.CUSTOMER_ID = cus.CUSTOMER_ID ");
+			sql.append("\n  INNER JOIN pensso.ad_user us ON rc.USER_ID = us.USER_ID ");
+			sql.append("\n  LEFT JOIN pensso.m_sub_inventory inv ON inv.NAME = us.CODE ");
 			sql.append("\n  WHERE 1=1");
-			//sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
-			// today receipt, today order
-			//sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
 			sql.append("\n  AND rc.RECEIPT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
 			sql.append("\n  AND rc.RECEIPT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
 			     
-			sql.append("\n  AND rcl.ORDER_ID IN ( ");
-			sql.append("\n    SELECT order_id FROM t_order od  ");
-			sql.append("\n    WHERE 1=1 )");
-			// order doc_status may be not equals receipt 
-			//sql.append("\n  AND od.DOC_STATUS = rc.DOC_STATUS ");
-			//sql.append("\n    AND od.ORDER_DATE = rc.RECEIPT_DATE) ");
-			// Wit Edit 18/05/2011
+			sql.append("\n  AND rcl.INVOICE_ID IN ( ");
+			sql.append("\n    SELECT invoice_id FROM pensso.t_invoice  ");
+			sql.append("\n   )");
 			sql.append("\n  AND rc.user_id = "+user.getId());
-			sql.append("\n    AND rcby.PAYMENT_METHOD = 'CH') b");
-			sql.append("\n    order by b.RECEIPT_NO asc,b.PAYMENT_METHOD desc  ");
+			sql.append("\n  AND rcby.PAYMENT_METHOD = 'CH'");
+			sql.append("\n ) b");
+			sql.append("\n order by b.RECEIPT_NO asc,b.PAYMENT_METHOD desc  ");
 			
 			logger.debug("sql:"+sql.toString());
 			stmt = conn.createStatement();
@@ -222,50 +186,42 @@ public class InvoicePaymentAllReportProcess extends I_ReportProcess<InvoicePayme
 			sql.delete(0, sql.length());
 			sql.append("\n select SUM(A.COUNT_ALL) as COUNT_ALL ,SUM(A.COUNT_CANCEL) AS COUNT_CANCEL from(");
 			sql.append("\n  SELECT  COUNT(distinct (rc.receipt_no))  AS COUNT_ALL  ,0 as COUNT_CANCEL ");
-			sql.append("\n   FROM t_receipt rc ");
-			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
-			sql.append("\n  INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
-			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-			sql.append("\n  INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ");
-			sql.append("\n  INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
-			sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
-			sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
+			sql.append("\n  FROM pensso.t_receipt rc ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
+			sql.append("\n  INNER JOIN pensso.m_customer cus ON rc.CUSTOMER_ID = cus.CUSTOMER_ID ");
+			sql.append("\n  INNER JOIN pensso.ad_user us ON rc.USER_ID = us.USER_ID ");
+			sql.append("\n  LEFT JOIN pensso.m_sub_inventory inv ON inv.NAME = us.CODE ");
 			sql.append("\n  WHERE 1=1");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
-			// today receipt, today order
-			//sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
 			sql.append("\n  AND rc.RECEIPT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
 			sql.append("\n  AND rc.RECEIPT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
 			     
-			sql.append("\n  AND rcl.ORDER_ID IN ( ");
-			sql.append("\n      SELECT order_id FROM t_order od  ");
-			sql.append("\n      WHERE 1=1 )");
-			//sql.append("\n      AND od.ORDER_DATE = rc.RECEIPT_DATE ) ");
-			// Wit Edit 18/05/2011
+			sql.append("\n  AND rcl.INVOICE_ID IN ( ");
+			sql.append("\n    SELECT invoice_id FROM pensso.t_invoice  ");
+			sql.append("\n   )");
 			sql.append("\n  AND rc.user_id = "+user.getId());
-			sql.append("\n  union all ");
+			
+			sql.append("\n  UNION ALL ");
+			
 			sql.append("\n  SELECT 0 AS COUNT_ALL , COUNT(distinct (rc.receipt_no)) AS  COUNT_CANCEL  ");
-			sql.append("\n   FROM t_receipt rc ");
-			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
-			sql.append("\n  INNER JOIN t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
-			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
-			sql.append("\n  INNER JOIN t_order od ON rcl.ORDER_ID = od.ORDER_ID ");
-			sql.append("\n  INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
-			sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
-			sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
+			sql.append("\n  FROM pensso.t_receipt rc ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_match ON t_receipt_match.RECEIPT_LINE_ID = rcl.RECEIPT_LINE_ID ");
+			sql.append("\n  INNER JOIN pensso.t_receipt_by rcby ON rcby.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID  ");
+			sql.append("\n  INNER JOIN pensso.m_customer cus ON rc.CUSTOMER_ID = cus.CUSTOMER_ID ");
+			sql.append("\n  INNER JOIN pensso.ad_user us ON rc.USER_ID = us.USER_ID ");
+			sql.append("\n  LEFT JOIN pensso.m_sub_inventory inv ON inv.NAME = us.CODE ");
 			sql.append("\n  WHERE 1=1");
 			sql.append("\n  AND rc.DOC_STATUS = 'VO' ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
-			// today receipt, today order
-			//sql.append("\n  AND rc.RECEIPT_DATE = '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
 			sql.append("\n  AND rc.RECEIPT_DATE >= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
 			sql.append("\n  AND rc.RECEIPT_DATE <= to_date('"+DateUtil.convBuddhistToChristDate(t.getReceiptDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH)+"','dd/MM/yyyy') \n ");
 			     
-			sql.append("\n  AND rcl.ORDER_ID IN ( ");
-			sql.append("\n     SELECT order_id FROM t_order od  ");
-			sql.append("\n     WHERE 1=1 ) ");
-			//sql.append("\n     AND od.ORDER_DATE = rc.RECEIPT_DATE) ");
-			// Wit Edit 18/05/2011
+			sql.append("\n  AND rcl.INVOICE_ID IN ( ");
+			sql.append("\n    SELECT invoice_id FROM pensso.t_invoice  ");
+			sql.append("\n   )");
 			sql.append("\n  AND rc.user_id = "+user.getId());
 			sql.append("\n  ) A  ");
 			

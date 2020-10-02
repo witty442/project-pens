@@ -47,12 +47,7 @@ public class JobUtils {
 		try{
 			if(type.equals(Constants.TYPE_GENFOLDER_BY_CURRENTDATE)){
 			   folderName = DateUtil.stringValue(new Date(), "ddMMyyyy");
-			}else if(type.equals(Constants.TYPE_GENFOLDER_BY_ENTITY)){
-			 folderName = !Utils.isNull(param.getEntity()).equals("0")?param.getEntity():"ALL_ENTITY";
-			}else if(type.equals(Constants.TYPE_GENFOLDER_BY_PRODUCT)){
-			   folderName = !Utils.isNull(param.getProduct()).equals("0")?param.getProduct():"ALL_PRODUCT";
 			}
-			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}

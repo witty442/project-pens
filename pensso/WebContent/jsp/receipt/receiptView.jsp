@@ -1,3 +1,7 @@
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.isecinc.pens.model.MAddress"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.isecinc.pens.bean.Address"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -25,6 +29,21 @@
 	
 	List<References> internalBank= InitialReferences.getReferenes().get(InitialReferences.INTERNAL_BANK);
 	pageContext.setAttribute("internalBank",internalBank,PageContext.PAGE_SCOPE);
+	
+	/** display billTo for User choose Before filter Invoice **/
+	List<Address> custAddr = new ArrayList<Address>();
+	custAddr = new MAddress().lookUp(receiptForm.getReceipt().getCustomerId());
+	List<Address> billAddr = new ArrayList<Address>();
+
+	for(Address address:custAddr){
+		if("Y".equals(address.getIsActive())){
+			if("B".equalsIgnoreCase(address.getPurpose())){
+				billAddr.add(address);
+			}
+		}//if
+	}//for
+
+	pageContext.setAttribute("billAddr",billAddr,PageContext.PAGE_SCOPE);
 %>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -165,6 +184,14 @@ function loadMe(){
 									</html:select>
 								</td>
 							</tr>
+							<%-- <tr>
+								<td align="right"><bean:message key="Order.DeliveryDocAddress" bundle="sysele"/><font color="red"></font></td>
+								<td align="left" colspan="3">
+									<html:select property="receipt.billToAddressId" style="width:80%" disabled="true" styleClass="disableText">
+										<html:options collection="billAddr" property="siteUseId" labelProperty="lineString"/>
+									</html:select>
+								</td>
+							</tr> --%>
 							<tr>
 								<td align="right"><bean:message key="Description" bundle="sysele"/></td>
 								<td align="left" colspan="3">
@@ -306,6 +333,7 @@ function loadMe(){
 						<html:hidden property="receipt.orderType"/>
 						<html:hidden property="receipt.prepaid"/>
 						<html:hidden property="receipt.exported"/>
+						<input type="hidden" name="fromPage" id="fromPage" value ="<%=Utils.isNull(request.getParameter("fromPage")) %>"/>
 						</html:form>
 						<!-- BODY -->
 					</td>

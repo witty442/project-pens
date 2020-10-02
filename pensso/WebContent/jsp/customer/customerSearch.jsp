@@ -1,7 +1,6 @@
-<%@page import="com.pens.util.AppversionVerify"%>
+
 <%@page import="com.pens.util.PageingGenerate"%>
 <%@page import="com.isecinc.pens.ApplicationVersion"%>
-<%@page import="com.isecinc.pens.inf.manager.batchwork.AppversionVerifyWorker"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.Customer"%>
 <%@page import="java.util.Iterator"%>
@@ -28,8 +27,11 @@
 <%
 /*clear session form other page */
 SessionUtils.clearSessionUnusedForm(request, "customerForm");
-
-String role = ((User)session.getAttribute("user")).getType();
+User user = (User)session.getAttribute("user");
+String role = user.getType();
+if(user.getUserName().equalsIgnoreCase("admin")){
+	role = "ADMIN";
+}
 
 List<District> districtsAll = new ArrayList<District>();
 District dBlank = new District();
@@ -58,17 +60,6 @@ if(custShowTrip != null && custShowTrip.size() >0){
    }
 }
 
-//Get Message CheckVersion
-String[] msg4 = new String[2];
-if(request.getSession().getAttribute("appVersionCheckMsg") != null){
-	msg4=  (String[])request.getSession().getAttribute("appVersionCheckMsg");
-}else{
-	//System.out.println("Header.jsp AppVerify ");
-	msg4 = AppversionVerify.getApp().checkAppVersion(request) ;
-} 
-
-//Start init Appversion Verify 1 time in a day
-new AppversionVerifyWorker().start();
 
 %>
 <%@page import="com.isecinc.pens.bean.Province"%>
@@ -298,8 +289,8 @@ function search(path){
 									<html:options collection="actives" property="key" labelProperty="name"/>
 								</html:select>
 								
-								&nbsp;&nbsp; <html:checkbox property="customer.dispTotalInvoice">แสดงยอดค้างชำระ</html:checkbox>
-								&nbsp;&nbsp; <html:checkbox property="customer.dispHaveTrip">แสดงเฉพาะร้านที่มี Trip</html:checkbox>
+								&nbsp;&nbsp; <html:checkbox property="customer.dispTotalInvoice">&nbsp;แสดงยอดค้างชำระ</html:checkbox>
+								&nbsp;&nbsp; <html:checkbox property="customer.dispHaveTrip">&nbsp;แสดงเฉพาะร้านที่มี Trip</html:checkbox>
 							  
 							</td>
 						</tr>
@@ -356,28 +347,26 @@ function search(path){
 					   } %>
 					    <table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 							<tr >
-								<th class="cust_no">No.</th>
-								<th class="cust_code">หมายเลขลูกค้า</th>
-								<th class="cust_name">ชื่อ</th>
-								<th class="cust_name2">ที่อยู่</th>
-								<th class="cust_creditLimit">วงเงินสินเชื่อ</th>
-								<th class="cust_totalInvoice">ยอดบิลค้างชำระ</th>
-								<!-- <th class="cust_exported" >โอนข้อมูลแล้ว</th>
-								<th class="cust_interfaces">สร้างข้อมูลที่ระบบกลางแล้ว</th> -->
-								<th class="cust_status">สถานะ</th>
-								<th class="cust_actionOrder">ทำรายการขาย</th>
+								<th >No.</th>
+								<th >หมายเลขลูกค้า</th>
+								<th >ชื่อ</th>
+								<th >ที่อยู่</th>
+								<th >วงเงินสินเชื่อ</th>
+								<th >ยอดบิลค้างชำระ</th>
+								<th >สถานะ</th>
+								<th >ทำรายการขาย</th>
 								<% if( role.equalsIgnoreCase(User.TT)){ %>
-								  <th class="cust_actionReceipt">ทำรายการรับเงิน</th>
+								  <th>ทำรายการรับเงิน</th>
 								 <!--  <th class="cust_actionReceipt">ทำจัดรายการ</th> -->
 								<%} %>
 								<%if( role.equalsIgnoreCase(User.VAN)){ %>
-								   <th class="cust_actionEditCust" >แก้ไข ข้อมูลลูกค้า</th>
+								   <th>แก้ไข ข้อมูลลูกค้า</th>
 								<%}else{ %>
 								  <!--  <th class="cust_actionEditCust" >เปิดบิลพิเศษ</th> -->
 								 <!--  <th class="cust_actionEditCust" >ตั้งกองโชว์</th> -->
 								<%} %>
-								<th class="cust_actionView">แสดง</th>
-								<th class="cust_actionEdit">ทำรายการ</th>
+								<th >แสดง</th>
+								<th >ทำรายการ</th>
 								<th>แสดงรูปร้านค้า</th>
 							</tr>	
 							<c:forEach var="item" items="${customerForm.results}" varStatus="rows">
@@ -390,24 +379,15 @@ function search(path){
 								</c:otherwise>
 							</c:choose>
 							<tr class="<c:out value='${tabclass}'/>">
-								<td class="cust_no"><c:out value='${item.no}'/></td>
-								<td class="cust_code"><c:out value='${item.code}'/></td>
-								<td class="cust_name"><c:out value='${item.name}'/></td>
-								<td class="cust_name2"><c:out value='${item.addressSummary}'/></td>
-								<td class="cust_creditLimit"><fmt:formatNumber pattern="#,##0.00" value="${item.creditLimit}"/></td>
-								<td class="cust_totalInvoice"><fmt:formatNumber pattern="#,##0.00" value="${item.totalInvoice}"/></td>
-								<%-- <td class="cust_exported">
-								    <c:if test="${item.exported=='Y'}">
-										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-									</c:if>
-								</td>
-								<td class="cust_interfaces">
-								   <c:if test="${item.interfaces=='Y'}">
-										<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-									</c:if>
-								</td> --%>
-								<td class="cust_status"><c:out value='${item.activeLabel}'/></td>
-								<td class="cust_actionOrder">
+								<td class="td_text_center"><c:out value='${item.no}'/></td>
+								<td class="td_text_center"><c:out value='${item.code}'/></td>
+								<td class="td_text"><c:out value='${item.name}'/></td>
+								<td class="td_text"><c:out value='${item.addressSummary}'/></td>
+								<td class="td_text_right"><fmt:formatNumber pattern="#,##0.00" value="${item.creditLimit}"/></td>
+								<td class="td_text_right"><fmt:formatNumber pattern="#,##0.00" value="${item.totalInvoice}"/></td>
+								<td class="td_text"><c:out value='${item.activeLabel}'/></td>
+								
+								<td class="td_text_center">
 			 					    <c:if test="${item.isActive=='Y'}">
 								    <a href="#" onclick="toCreateNewOrder('${pageContext.request.contextPath}','add',${item.id})">
 							           <img src="${pageContext.request.contextPath}/images2/b_order.png" width="32" height="32" border="0" class="newPicBtn">
@@ -416,7 +396,7 @@ function search(path){
 								</td>
 								
 								<% if( role.equalsIgnoreCase(User.TT)){ %>
-									<td class="cust_actionReceipt">
+									<td class="td_text_center">
 									 <c:if test="${item.displayActionReceipt==''}">
 									   <c:if test="${item.isActive=='Y'}">
 									    <a href="#" onclick="toCreateNewReceipt('${pageContext.request.contextPath}','add','${item.id}');">
@@ -425,7 +405,7 @@ function search(path){
 									    </c:if>
 									 </c:if>
 									</td>
-									<%-- <td class="cust_actionReceipt">
+									<%-- <td class="td_text">
 									 <c:if test="${item.isActive=='Y'}">
 									     <a href="#" onclick="toCreateNewReqPromotion('${pageContext.request.contextPath}','${item.id}','customerSearch');">
 									       <img src="${pageContext.request.contextPath}/images2/b_reqpromotion.png" width="64" height="20" border="0" class="newPicBtn"/>
@@ -435,7 +415,7 @@ function search(path){
 									</td> --%>
 								<%} %>
 								<% if( role.equalsIgnoreCase(User.VAN)){ %>
-									<td class="cust_actionEditCust">
+									<td class="td_text_center">
 									   <c:if test="${item.displayActionEditCust==''}">
 										   <c:if test="${item.canActionEditCust=='true'}">
 										     <c:if test="${item.isActive=='Y'}">
@@ -453,9 +433,9 @@ function search(path){
 											</c:if>
 									   </c:if>
 									</td>
-							<% }else if( role.equalsIgnoreCase(User.TT)){ %>
+							  <% }else if( role.equalsIgnoreCase(User.TT)){ %>
 							   <!-- Edit Customer -->
-								<%-- <td class="cust_actionEditCust">
+								<%-- <td class="td_text">
 							        <c:if test="${item.canActionEditCust2=='true'}">
 							           <c:if test="${item.isActive=='Y'}">
 									        <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit2','${item.id}');">
@@ -465,14 +445,14 @@ function search(path){
 									</c:if>
 								</td> --%>
 								<!-- Order Special -->
-								<%-- <td class="cust_actionEditCust">
+								<%-- <td class="td_text">
 									 <c:if test="${item.isActive=='Y'}">
 								       <a href="#" onclick="toCreateNewOrderSpecial('${pageContext.request.contextPath}','add',${item.id})">
 							            <img src="${pageContext.request.contextPath}/images2/b_order_special.png" width="32" height="32" border="0" class="newPicBtn">
 							          </a>  
 							        </c:if>
 								</td> --%>
-								<%-- <td class="cust_actionEditCust">
+								<%-- <td class="td_text">
 									 <c:if test="${item.isActive=='Y'}">
 								       <a href="#" onclick="manageProdShowTT('${pageContext.request.contextPath}','${item.code}');">
 							                <b>  ตั้งกองโชว์</b>
@@ -481,22 +461,21 @@ function search(path){
 								</td> --%>
 							<%} %>
 							
-								<td class="cust_actionView">
+								<td class="td_text_center">
 								 <c:if test="${item.isActive=='Y'}">
 								   <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${item.id}');">
 									   <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif">
 									</a>
 									</c:if>
 								</td>
-								<td class="cust_actionEdit">
+								<td class="td_text_center">
 								  <c:if test="${item.isActive=='Y'}">
 								    <a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','process','${item.id}');">
 									  <img border=0 src="${pageContext.request.contextPath}/icons/process.gif">
 								    </a>
 								  </c:if>
 								</td>
-								<td class="cust_actionEdit">
-						
+								<td class="td_text_center">
 								    <c:if test="${item.imageFileName != ''}">
 										<a href="#" onclick="return showImage('${pageContext.request.contextPath}','${item.id}','${item.imageFileName}');">
 											<b>แสดงรูปภาพ </b>
@@ -505,7 +484,7 @@ function search(path){
 							    </td>
 							</tr>
 							</c:forEach>
-							</table>
+						 </table>
 					</c:if>	
 					
 				<!-- Result -->	
@@ -557,15 +536,7 @@ function search(path){
 </table>
 
 <div id="dialog" title="คำแนะนำ" style="display:none">
-    <p align="center"><b>
-     <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';"> <font color="red"><%=Utils.isNull(msg4[0])%></font></a> 
-     &nbsp;|&nbsp; <%=Utils.isNull(msg4[1]) %></b>
-    </p>
-    <%=AppversionVerify.getMessageToSales(request)%>
-	<p><font size="4"><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></font></p>
-	<p align="center"> <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="linkToInterfaces('<%=request.getContextPath() %>');" value="ไปยังหน้าดึงข้อมูลจากส่วนกลาง"/></a>&nbsp;&nbsp;
-	 <a href="javascript:close();"><input class="newPosBtn"  type="submit" onclick="close();" value="ปิดหน้าจอ"/></a></p>
-	<p align="center"><font size="2" color="green"><b>App Version [<%=ApplicationVersion.APP_VERSION %>] for verify deploy success</b></font> </p>
+   
 </div>
 
 </body>

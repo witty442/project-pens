@@ -198,7 +198,7 @@ function getAutoOnblur(e,obj,pageName){
 			form.zoneName.value = "";
 		}
 	}else{
-		getAutoDetail(obj,pageName);
+		//getAutoDetail(obj,pageName);
 	}
 }
 function getAutoKeypress(e,obj,pageName){
@@ -342,7 +342,7 @@ function getAutoDetail(obj,pageName){
 									<th >อุปกรณ์/รุ่น </th>
 									<th >Serial No</th>
 									<th >จำนวน</th>
-									<th >หมายุหตุ</th>
+									<th >หมายุหตุ </th>
 							   </tr>
 							<% 
 							String tabclass ="lineE";
@@ -371,7 +371,7 @@ function getAutoDetail(obj,pageName){
 										    	 }
 										     }
 										     %>
-										    <input type="text" name="itemType" id="itemType" size="20" readonly value="<%=itemType%>" tabindex="-1" class="disableText">
+										    <input type="text" name="itemType" id="itemType" size="20"  value="<%=itemType%>" tabindex="-1" autoComplete="off">
 										</td>
 										<td class="td_text" width="15%">
 										   <input type="text" name="itemName" id="itemName" size="50" maxlength="60" tabindex="<%out.print(tabindex);tabindex++;%>" autoComplete='off'> 
@@ -412,8 +412,9 @@ function getAutoDetail(obj,pageName){
 										    		 itemType = itemO.getValue();
 										    	 }
 										     }
+										    itemType = Utils.isNull(item.getItemType());//get from db value
 										     %>
-										    <input type="text" name="itemType" id="itemType" size="20" readonly value="<%=itemType%>" tabindex="-1" class="disableText">
+										    <input type="text" name="itemType" id="itemType" size="20"  value="<%=itemType%>" tabindex="-1" class="enableText">
 										</td>
 										<td class="td_text" width="15%">
 										  <input type="text" name="itemName" id="itemName" size="50" maxlength="60" 

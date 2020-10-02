@@ -10,7 +10,6 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%
 
 %>
@@ -37,6 +36,7 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js"></script>
 
 <script type="text/javascript">
 
@@ -52,6 +52,14 @@ function searchForm(path){
 function clearForm(path){
    document.searchTaskForm.action = path + "/jsp/searchTask.do?do=prepare&action=new";
    document.searchTaskForm.submit();
+}
+function submitViewDetail(path,transactionId){
+	//alert('checkDate1');
+	//document.searchTaskForm.action = path + "/jsp/monitorInterfacesAction.do?do=viewById&transactionId="+transactionId;
+	//document.searchTaskForm.submit();   
+	
+	var url = path + "/jsp/interfaces/monitor_interfacesById.jsp?transactionId="+transactionId;
+	PopupCenterFullHeight(url, "MonitorDetail", 800);
 }
 </script>
 

@@ -88,8 +88,8 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		setPartyType(ConvertNullUtil.convertToString(rst.getString("PARTY_TYPE")).trim());
 		setExported(rst.getString("EXPORTED"));
 
-		// Total Invoice
-		//setTotalInvoice( MReceiptSummary.lookCreditAmtByCustomerId(getId()));
+		// Total Invoice amount
+		setTotalInvoice( MReceiptSummary.lookCreditAmtByCustomerId(rst.getInt("user_id"),getId()));
 		
 		// Order Amount
 		setOrderAmount(new MOrder().lookUpByCustomer(getId()));
@@ -151,39 +151,6 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 	private String tripDay2;
 	private String tripDay3;
 	private String custGroup;
-	
-	
-	public String getCustGroup() {
-		return custGroup;
-	}
-
-	public void setCustGroup(String custGroup) {
-		this.custGroup = custGroup;
-	}
-
-	public String getTripDay() {
-		return tripDay;
-	}
-
-	public void setTripDay(String tripDay) {
-		this.tripDay = tripDay;
-	}
-
-	public String getTripDay2() {
-		return tripDay2;
-	}
-
-	public void setTripDay2(String tripDay2) {
-		this.tripDay2 = tripDay2;
-	}
-
-	public String getTripDay3() {
-		return tripDay3;
-	}
-
-	public void setTripDay3(String tripDay3) {
-		this.tripDay3 = tripDay3;
-	}
 
 	/** CODE */
 	private String code;
@@ -311,6 +278,39 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
     
     private String imageFileName;
     
+    
+	public String getTripDay() {
+		return tripDay;
+	}
+
+	public void setTripDay(String tripDay) {
+		this.tripDay = tripDay;
+	}
+
+	public String getTripDay2() {
+		return tripDay2;
+	}
+
+	public void setTripDay2(String tripDay2) {
+		this.tripDay2 = tripDay2;
+	}
+
+	public String getTripDay3() {
+		return tripDay3;
+	}
+
+	public void setTripDay3(String tripDay3) {
+		this.tripDay3 = tripDay3;
+	}
+
+	public String getCustGroup() {
+		return custGroup;
+	}
+
+	public void setCustGroup(String custGroup) {
+		this.custGroup = custGroup;
+	}
+
 	public String getDispHaveTrip() {
 		return dispHaveTrip;
 	}

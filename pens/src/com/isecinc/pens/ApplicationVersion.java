@@ -2,5 +2,5 @@ package com.isecinc.pens;
 
 public class ApplicationVersion {
    /** set for check tomcat deploy success **/
-	final public static String APP_VERSION ="07-2563";
+	final public static String APP_VERSION ="09-2563";
 }

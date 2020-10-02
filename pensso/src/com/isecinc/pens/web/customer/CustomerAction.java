@@ -36,6 +36,7 @@ import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnectionApps;
 import com.pens.util.DateToolsUtil;
 import com.pens.util.EnvProperties;
 import com.pens.util.excel.ExcelHeader;
@@ -78,16 +79,16 @@ public class CustomerAction extends I_Action {
 			String whereCause = " AND CUSTOMER_ID = " + customer.getId() + " AND USER_ID = " + user.getId();
 			whereCause += " ORDER BY TRIP_ID DESC ";
 			Trip[] trips = new MTrip().search(whereCause);
-			if (trips != null) customerForm.getCustomer().setTrip(trips[0].getTripDateFrom());
+			if (trips != null){
+				customerForm.getCustomer().setTrip(trips[0].getTripDateFrom());
+			}
 
 			// get back search key
 			if (customerForm.getCriteria().getSearchKey() == null) {
 				if (request.getSession(true).getAttribute("CMSearchKey") != null) {
-					customerForm.getCriteria().setSearchKey(
-							(String) request.getSession(true).getAttribute("CMSearchKey"));
+					customerForm.getCriteria().setSearchKey((String) request.getSession(true).getAttribute("CMSearchKey"));
 				} else {
-					customerForm.getCriteria()
-							.setSearchKey((String) request.getSession(true).getAttribute("searchKey"));
+					customerForm.getCriteria().setSearchKey((String) request.getSession(true).getAttribute("searchKey"));
 				}
 			} else {
 				request.getSession(true).removeAttribute("CMSearchKey");
@@ -168,45 +169,46 @@ public class CustomerAction extends I_Action {
 			String whereCause = "";
 			if (customerForm.getCustomer().getTerritory() != null
 					&& !customerForm.getCustomer().getTerritory().trim().equals("")) {
-				whereCause += "\n AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
+				whereCause += "\n AND c.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
 			}
 			if (customerForm.getCustomer().getCode() != null && !customerForm.getCustomer().getCode().trim().equals("")) {
-				whereCause += "\n AND m_customer.CODE LIKE '%"
+				whereCause += "\n AND c.CODE LIKE '%"
 						+ customerForm.getCustomer().getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
 						+ "%' ";
 			}
 			if (customerForm.getCustomer().getName() != null && !customerForm.getCustomer().getName().trim().equals("")) {
-				whereCause += "\n AND m_customer.NAME LIKE '%"
+				whereCause += "\n AND c.NAME LIKE '%"
 						+ customerForm.getCustomer().getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
 						+ "%' ";
 			}
 			if (customerForm.getCustomer().getIsActive() != null
 					&& !customerForm.getCustomer().getIsActive().equals("")) {
-				whereCause += "\n AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
+				whereCause += "\n AND c.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
 			}
 			// WIT EDIT :04/08/2563
 			if(!user.getUserName().equalsIgnoreCase("ADMIN")){
-			   whereCause += "\n AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
-			   whereCause += "\n AND m_customer.USER_ID = " + user.getId();
+			   whereCause += "\n AND c.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
+			   whereCause += "\n AND c.USER_ID = " + user.getId();
 			}
 			
 			if ( !"".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) && !"0".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) ){
-				whereCause += "\n AND m_address.district_id = " + customerForm.getCustomer().getDistrict() + "";
+				whereCause += "\n AND a.district_id = " + customerForm.getCustomer().getDistrict() + "";
 			}
-			
+			logger.debug("SearchProvince:"+customerForm.getCustomer().getSearchProvince());
 			if (customerForm.getCustomer().getSearchProvince() != 0) {
-				whereCause += "\n AND m_customer.CUSTOMER_ID IN (select customer_id ";
-				whereCause += "\n from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
-						 + ")";
+				whereCause += "\n AND c.CUSTOMER_ID IN (";
+				whereCause += "\n  select customer_id from pensso.m_address";
+				whereCause += "\n  where province_id = " + customerForm.getCustomer().getSearchProvince();
+				whereCause += "\n )";
 			}
 			
 			//Check Disp have Trip Or no
 			request.getSession().setAttribute("dispHaveTrip", "N");
 			if (  !Utils.isNull(customerForm.getCustomer().getDispHaveTrip()).equals("") ) {
-				whereCause +="\n AND ( m_customer.trip_day <> 0 or m_customer.trip_day2 <>0 or m_customer.trip_day3 <> 0) ";
+				whereCause +="\n AND ( c.trip_day <> 0 or c.trip_day2 <>0 or c.trip_day3 <> 0) ";
 			    request.getSession().setAttribute("dispHaveTrip", "Y");
 			}
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnectionApps.getInstance().getConnection();
 	
 			/** Get Case Trip **/
 			if ( Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equalsIgnoreCase("Y")) {

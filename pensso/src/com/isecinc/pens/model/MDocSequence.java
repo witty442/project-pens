@@ -9,7 +9,7 @@ import com.isecinc.pens.bean.DocSequence;
 import com.isecinc.pens.bean.DocType;
 import com.isecinc.pens.bean.User;
 import com.pens.util.DBCPConnectionProvider;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * DocSequence Model
@@ -94,7 +94,7 @@ public class MDocSequence extends I_Model<DocSequence> {
 							|| dt.getName().equalsIgnoreCase(DocSequence.RECEIPT_NUMNER)
 							|| dt.getName().equalsIgnoreCase(DocSequence.VISIT_NUMBER)) {
 						// get id
-						id = SequenceProcess.getNextValueInt(TABLE_NAME);
+						id = SequenceProcessAll.getIns().getNextValueInt("c_doctype_sequence");
 						values = new Object[] { id, dt.getId(), salesCode, "MM", 1, 1, Database.getCurrentYear(),
 								Database.getCurrentMonth(), "Y" };
 						// set id = 0 for create new record
@@ -105,7 +105,7 @@ public class MDocSequence extends I_Model<DocSequence> {
 				if (activeUser.getType().equalsIgnoreCase(User.VAN)) {
 					if (dt.getName().equalsIgnoreCase(DocSequence.CUSTOMER_NUMBER)) {
 						// get id
-						id = SequenceProcess.getNextValueInt(TABLE_NAME);
+						id = SequenceProcessAll.getIns().getNextValueInt("c_doctype_sequence");
 						values = new Object[] { id, dt.getId(), salesCode, "", 1, 1, Database.getCurrentYear(),
 								Database.getCurrentMonth(), "Y" };
 						// set id = 0 for create new record
@@ -115,7 +115,7 @@ public class MDocSequence extends I_Model<DocSequence> {
 							|| dt.getName().equalsIgnoreCase(DocSequence.RECEIPT_NUMNER)
 							|| dt.getName().equalsIgnoreCase(DocSequence.VISIT_NUMBER)) {
 						// get id
-						id = SequenceProcess.getNextValueInt(TABLE_NAME);
+						id = SequenceProcessAll.getIns().getNextValueInt(TABLE_NAME);
 						values = new Object[] { id, dt.getId(), salesCode, "MM", 1, 1, Database.getCurrentYear(),
 								Database.getCurrentMonth(), "Y" };
 						// set id = 0 for create new record
@@ -126,7 +126,7 @@ public class MDocSequence extends I_Model<DocSequence> {
 				if (activeUser.getType().equalsIgnoreCase(User.DD)) {
 					if (dt.getName().equalsIgnoreCase(DocSequence.MEMBER_NUMBER)) {
 						// get id
-						id = SequenceProcess.getNextValueInt(TABLE_NAME);
+						id = SequenceProcessAll.getIns().getNextValueInt("c_doctype_sequence");
 						values = new Object[] { id, dt.getId(), "", "", 1, 1, Database.getCurrentYear(),
 								Database.getCurrentMonth(), "Y" };
 						// set id = 0 for create new record
@@ -135,7 +135,7 @@ public class MDocSequence extends I_Model<DocSequence> {
 					if (dt.getName().equalsIgnoreCase(DocSequence.ORDER_NUMNER)
 							|| dt.getName().equalsIgnoreCase(DocSequence.RECEIPT_NUMNER)) {
 						// get id
-						id = SequenceProcess.getNextValueInt(TABLE_NAME);
+						id = SequenceProcessAll.getIns().getNextValueInt("c_doctype_sequence");
 						values = new Object[] { id, dt.getId(), "", "MM", 1, 1, Database.getCurrentYear(),
 								Database.getCurrentMonth(), "Y" };
 						// set id = 0 for create new record
@@ -195,7 +195,7 @@ public class MDocSequence extends I_Model<DocSequence> {
 
 	
 	public boolean saveNew(DocSequence docSequence, int activeUserID, Connection conn) throws Exception {
-		docSequence.setId(SequenceProcess.getNextValue("c_doctype_sequence").longValue());
+		docSequence.setId(SequenceProcessAll.getIns().getNextValue("c_doctype_sequence").longValue());
 		Object[] values = { docSequence.getId(),docSequence.getDoctypeID(),docSequence.getSalesCode(),docSequence.getOrderType(),
 				            docSequence.getStartNo(),docSequence.getCurrentNext(),
 				            docSequence.getCurrentYear(),docSequence.getCurrentMonth(), docSequence.getActive() ,activeUserID };

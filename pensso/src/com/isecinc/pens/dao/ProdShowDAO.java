@@ -1,7 +1,6 @@
 package com.isecinc.pens.dao;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -12,8 +11,6 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.ProdShowBean;
 import com.isecinc.pens.inf.helper.Utils;
-import com.pens.util.DateToolsUtil;
-import com.pens.util.seq.SequenceProcess;
 
 public class ProdShowDAO {
 	private static Logger logger = Logger.getLogger("PENS");

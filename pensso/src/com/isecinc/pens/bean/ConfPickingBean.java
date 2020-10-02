@@ -11,7 +11,8 @@ public class ConfPickingBean implements Serializable ,Comparable<ConfPickingBean
 	 */
 	private static final long serialVersionUID = -5066534727878051512L;
 	private String transactionDate;
-	
+	private String transactionDateFrom;
+	private String transactionDateTo;
 	private String regionCri;
 	private String provinceCri;
 	private String amphurCri;
@@ -40,6 +41,7 @@ public class ConfPickingBean implements Serializable ,Comparable<ConfPickingBean
 	private double vatAmountD;
 	private double netAmountD;
 	private String invoiceNo;
+	private String invoiceFlag;
 	private String invoiceDate;
 	private String invoiceType;
 	private String invoiceRef;
@@ -74,6 +76,24 @@ public class ConfPickingBean implements Serializable ,Comparable<ConfPickingBean
 	private String unitSellingPrice;
 	
 	
+	public String getInvoiceFlag() {
+		return invoiceFlag;
+	}
+	public void setInvoiceFlag(String invoiceFlag) {
+		this.invoiceFlag = invoiceFlag;
+	}
+	public String getTransactionDateFrom() {
+		return transactionDateFrom;
+	}
+	public void setTransactionDateFrom(String transactionDateFrom) {
+		this.transactionDateFrom = transactionDateFrom;
+	}
+	public String getTransactionDateTo() {
+		return transactionDateTo;
+	}
+	public void setTransactionDateTo(String transactionDateTo) {
+		this.transactionDateTo = transactionDateTo;
+	}
 	public String getQty1() {
 		return qty1;
 	}

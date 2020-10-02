@@ -165,7 +165,11 @@ function popCalendar(thisObj, thisEvent) {
 }
 function inputTimeNew(e, objText){
 	var keynum = e.keyCode;
-	
+	//alert(keynum);
+	//backspace (8) ,delete(46) no action
+	if(keynum == 8 || keynum == 46){
+		return true;
+	}
  	if(inputNum2(e)){
 		if((objText.value.length==0 && keynum!=8) || keynum==37 || keynum==39){
 			if(keynum > 50){return false;}	
@@ -177,7 +181,7 @@ function inputTimeNew(e, objText){
 				return false;
 			}
 		}
-		if(objText.value.length==2){
+		if(objText.value.length==2 && objText.value.indexOf(":") == -1){
 			objText.value += ':';
 		}
 		if((objText.value.length==5 && keynum!=8) || keynum==37 || keynum==39){
@@ -194,22 +198,28 @@ function inputTimeNew(e, objText){
 	}
 }
 function inputTimeM(e, objText){
-	if( !inputNum2(e,objText) ){
+	inputTimeNew(e,objText);
+	
+	/* if( !inputNum2(e,objText) ){
 		alert("ระบุข้อมูลเวลาเป็นตัวเลขเท่านั้น");
 		objText.value="";
 		//alert(objText.value);
 		return false;
 	}else{
 		return inputTimeNew(e,objText);
-	}
+	} */
 }
 function validateInputTime(inputField) {
-	var isValid = /^([0-1]?[0-9]|2[0-4]):([0-5][0-9])(:[0-5][0-9])?$/.test(inputField.value);
-
-    if (!isValid) {
-    	alert("กรอกข้อมูลเวลาไม่ถูกต้อง ");
+	var isValid = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?$/.test(inputField.value);
+	
+	if (!isValid) {
+    	alert("กรอกข้อมูล รูปแบบเวลาไม่ถูกต้อง ตัวอย่าง 08:30 ,23:59 ");
         inputField.style.backgroundColor = '#fba';
         inputField.focus();
+    
+    }else{
+    	inputField.style.backgroundColor = 'white';
+    	
     }
     //alert(isValid);
     return isValid;
@@ -402,8 +412,8 @@ function sumTotal(){
 								<th>ประเภทการโอน</th>
 								<th>ธนาคารของ PENS</th>
 								<th>วันที่โอน</th>
-								<th>เวลาที่โอน</th>
-								<th>ยอดงเงินที่โอน</th>
+								<th>เวลาที่โอน <br/>(รูปแบบเวลา 24 ชม . 08:30)</th>
+								<th>ยอดเงินที่โอน</th>
 								<th>เลขที่เช็ค</th>
 								<th>วันที่หน้าเช็ค</th>
 							</tr>
@@ -466,7 +476,7 @@ function sumTotal(){
 										    readonly="true" id="transferDate" value="<%=Utils.isNull(mc.getTransferDate())%>"  <%=rowDisbleCommand %>  />
 										 </td>
 										 <td class ="td_text_center" width="10%">
-										    <input type="text" name="transferTime" size= "6"   onkeypress='inputTimeM(event, this);' onkeyup='inputTimeM(event, this);'
+										    <input type="text" name="transferTime" size= "6"  onkeypress='inputTimeM(event, this);' onkeyup='inputTimeM(event, this);'
 										     onchange="validateInputTime(this)"
 										     autocomplete="off" id="transferTime" value="<%=Utils.isNull(mc.getTransferTime())%>"  <%=rowDisbleCommand %> />
 										 </td>

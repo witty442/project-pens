@@ -96,10 +96,10 @@ public class BatchTaskDAO {
 			  
 			logger.debug("SQL:"+sql);
 			if(model.getTransactionId() ==null){
-				 model.setTransactionId(SequenceProcessAll.getIns().getNextValue("monitor"));
+				 model.setTransactionId(SequenceProcessAll.getIns().getNextValue("monitor.transaction_id"));
 			}
 			if(model.getMonitorId() ==null){
-				 model.setMonitorId(SequenceProcessAll.getIns().getNextValue("monitor_2"));
+				 model.setMonitorId(SequenceProcessAll.getIns().getNextValue("monitor.monitor_id"));
 			}
 			logger.debug("Transaction id:"+model.getTransactionId());
 
@@ -158,7 +158,7 @@ public class BatchTaskDAO {
 			logger.debug("SQL:"+sql);
 			logger.debug("SucessCound:"+model.getSuccessCount());
 			if(model.getId() ==null){
-				model.setId(SequenceProcessAll.getIns().getNextValue("monitor_item"));
+				model.setId(SequenceProcessAll.getIns().getNextValue("monitor_item.id"));
 			}
 			
 			int index = 0;
@@ -618,6 +618,7 @@ public class BatchTaskDAO {
 				m.setTransactionType(rs.getString("TRANSACTION_TYPE"));
 				m.setMonitorId(rs.getBigDecimal("monitor_id"));
 				m.setName(rs.getString("name"));
+				m.setThName(rs.getString("th_name"));
 				m.setType(rs.getString("type"));
 				m.setStatus(rs.getInt("status"));
 				m.setStatusDesc(getStatDesc(rs.getInt("status")));
@@ -709,6 +710,7 @@ public class BatchTaskDAO {
 				m.setTransactionType(rs.getString("TRANSACTION_TYPE"));
 				m.setMonitorId(rs.getBigDecimal("monitor_id"));
 				m.setName(rs.getString("name"));
+				m.setThName(rs.getString("th_name"));
 				m.setType(rs.getString("type"));
 				m.setStatus(rs.getInt("status"));
 				m.setCreateUser(rs.getString("create_user"));

@@ -239,7 +239,7 @@ public class ReceiptAction extends I_Action {
 
 			Receipt receipt = receiptForm.getReceipt();
 
-			// set interfaces & payment & docstatus
+			// set interfaces & payment & doc status
 			receipt.setInterfaces("N");
 
 			conn = DBConnectionApps.getInstance().getConnection();
@@ -264,34 +264,19 @@ public class ReceiptAction extends I_Action {
 			}
 			
 			// Save Receipt
-			/*if (!new MReceipt().save(receipt, userActive.getId(), conn)) {
+			if (!new MReceipt().save(receipt, userActive.getId(), conn)) {
 				// return with duplicate Document no
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.DUPLICATE).getDesc());
 				conn.rollback();
 				return "prepare";
-			}*/
+			}
+		
 
 			// Delete Receipt Line,update order, Before Create new 
 			if (ConvertNullUtil.convertToString(receiptForm.getDeletedId()).trim().length() > 0) {
 				// reverse payment flag to line
-				String[] ids = receiptForm.getDeletedId().substring(1).trim().split(",");
-				ReceiptLine line;
-				/*List<OrderLine> olines;
-				Order order;
-				MOrderLine mOrderLine = new MOrderLine();
-				for (String id : ids) {
-					line = new MReceiptLine().find(id);
-					order = new MOrder().find(String.valueOf(line.getOrder().getId()));
-					olines = new MOrderLine().lookUp(order.getId());
-					for (OrderLine ol : olines) {
-						ol.setPayment("Y");
-						ol.setExported("N");
-						ol.setNeedExport("N");
-						ol.setInterfaces("N");
-						mOrderLine.save(ol, userActive.getId(), conn);
-					}//for 2
-				}//for 1
-                */		
+				String[] receiptLineIds = receiptForm.getDeletedId().substring(1).trim().split(",");
+				ReceiptLine receiptLine;
 				
 				/** Delete Match Line by receipt_line_id :WIT Edit 07/04/2011**/
 				new MReceiptMatch().deleteByReceiptLineId(receiptForm.getDeletedId().substring(1).trim(), conn);
@@ -305,6 +290,7 @@ public class ReceiptAction extends I_Action {
 			i = 1;
 			MReceiptLine mReceiptLine = new MReceiptLine();
 			MOrder mOrder = new MOrder();
+			MOrderLine mOrderLine = new MOrderLine();
 			for (ReceiptLine line : receiptForm.getLines()) {
 				line.setLineNo(i++);
 				line.setReceiptId(receipt.getId());
@@ -313,15 +299,20 @@ public class ReceiptAction extends I_Action {
 				}
 				mReceiptLine.save(line, userActive.getId(), conn);
 
-				/*order = new MOrder().find(String.valueOf(line.getOrder().getId()));
-				*//** WIT Edit 11/04/2011 :Add Case Cancel Receipt **//*
-				if(receiptForm.getReceipt().getDocStatus().equals(Receipt.STATUS_CANCEL)){
-				   order.setPayment("N");	
-				}else{
-				   order.setPayment("Y");
-				}
-				mOrder.save(order, userActive.getId(), conn);
-               */
+				/** mark order payment =Y **/
+				order = new MOrder().findOrderByInvoice(line.getOrder().getInvoiceId());
+				if(order != null){
+					if(receiptForm.getReceipt().getDocStatus().equals(Receipt.STATUS_CANCEL)){
+					   order.setPayment("N");	
+					}else{
+					   order.setPayment("Y");
+					}
+					mOrder.updatePaymentOrder(order, userActive.getId(), conn);
+					
+					/** mark OrderLine payment = Y **/
+					mOrderLine.updatePaymentOrderLine(conn, order.getId(), "Y");
+				}//if check order not null
+	           	
 			}//while
 
 			// Delete Match CN

@@ -22,8 +22,29 @@ public class ScheduleForm extends I_Form{
 	String entity;
 	String product;
 	String everyDay;
+	String everyType;
+	String everyMinutes;
+	String everyHourly;
 	
 	
+	public String getEveryType() {
+		return everyType;
+	}
+	public void setEveryType(String everyType) {
+		this.everyType = everyType;
+	}
+	public String getEveryMinutes() {
+		return everyMinutes;
+	}
+	public void setEveryMinutes(String everyMinutes) {
+		this.everyMinutes = everyMinutes;
+	}
+	public String getEveryHourly() {
+		return everyHourly;
+	}
+	public void setEveryHourly(String everyHourly) {
+		this.everyHourly = everyHourly;
+	}
 	public String getnDay() {
 		return nDay;
 	}

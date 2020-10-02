@@ -438,7 +438,7 @@ public class ImportItemBarcodeCrossRefToOracleFromExcelTask extends BatchTask im
 		}
 		return isExist;
 	}
-	public static boolean isShipToLocationExist(Connection conn,String shipToLocation) throws Exception {
+	public static boolean isShipToLocationExist1(Connection conn,String shipToLocation) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();

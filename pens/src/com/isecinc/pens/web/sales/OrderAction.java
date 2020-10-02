@@ -794,11 +794,10 @@ public class OrderAction extends I_Action {
 				return "prepare";
 			}
 
-			User userActive = (User) request.getSession(true).getAttribute("user");
 			Order order = orderForm.getOrder();
 			
 			/*** Wit Edit:15/05/2555  Obj:Case User TT(CreditSale) Validate W1 Check PlaceOfBilled ****/
-			if(User.TT.equals(userActive.getType()) && !"".equals(order.getPlaceOfBilled())){
+			if(User.TT.equals(user.getType()) && !"".equals(order.getPlaceOfBilled())){
 				StringBuffer errorItemMsg = new StringBuffer("");
 				logger.debug("placeOfBilled["+order.getPlaceOfBilled()+"]");
 				String[] placeOfBilled = order.getPlaceOfBilled().split("\\|");
@@ -868,11 +867,11 @@ public class OrderAction extends I_Action {
 			int i = 1;
 
 			if (!order.getOrderType().equalsIgnoreCase(Order.DIRECT_DELIVERY)) {
-				orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
+				orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), user, (String) request
 						.getSession().getAttribute("memberVIP")));
 			}
 			if (((String) request.getSession().getAttribute("memberVIP")).equalsIgnoreCase("Y")) {
-				orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), userActive, (String) request
+				orderForm.setLines(new OrderProcess().fillLinesSave(orderForm.getLines(), user, (String) request
 						.getSession().getAttribute("memberVIP")));
 			}
 
@@ -882,7 +881,7 @@ public class OrderAction extends I_Action {
 			}
 
 			// Sales Reps --current user who's create/edit record--
-			order.setSalesRepresent(userActive);
+			order.setSalesRepresent(user);
 
 			//Recalculate lineAmount (qty*price) ,total_amount = lineAmount-discount in Lines
 			orderForm.setLines(new MOrder().reCalculateLineAmountInLinesAfterCalcPromotion(orderForm.getLines()));
@@ -894,7 +893,7 @@ public class OrderAction extends I_Action {
 			double beforeSave_NetAmount = order.getNetAmount(); 
 			
 			// Save Order
-			if (!new MOrder().save(order, userActive.getId(), conn)) {
+			if (!new MOrder().save(order, user.getId(), conn)) {
 				// return with duplicate Document no
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.DUPLICATE).getDesc());
 				conn.rollback();
@@ -926,7 +925,7 @@ public class OrderAction extends I_Action {
 				line.setSubInv(subInv);
 				
 				//Save Line to DB
-				new MOrderLine().save(line, userActive.getId(), conn);
+				new MOrderLine().save(line, user.getId(), conn);
 			}
 			// atiz.b 20110520 --member re-expired date with last order date
 			if (orderForm.getLines().size() > 0) {
@@ -942,110 +941,24 @@ public class OrderAction extends I_Action {
 			if(beforeSave_NetAmount != afterSave_NetAmount){
 			   logger.debug("ReSave Order netAmount error: beforeSave_NetAmount["+beforeSave_NetAmount+"]afterSave_NetAmount["+afterSave_NetAmount+"]");
 			   // Re-Save
-			   new MOrder().save(order, userActive.getId(), conn);
+			   new MOrder().save(order, user.getId(), conn);
 			}
 
-			// Trx History
+			/** create Trx History  **/
 			TrxHistory trx = new TrxHistory();
 			trx.setTrxModule(TrxHistory.MOD_ORDER);
 			if (orderId == 0) trx.setTrxType(TrxHistory.TYPE_INSERT);
 			else trx.setTrxType(TrxHistory.TYPE_UPDATE);
 			trx.setRecordId(order.getId());
-			trx.setUser(userActive);
-			new MTrxHistory().save(trx, userActive.getId(), conn);
+			trx.setUser(user);
+			new MTrxHistory().save(trx, user.getId(), conn);
 			// Trx History --end--
 
-			logger.debug("VanPaymentMethod:"+orderForm.getOrder().getVanPaymentMethod());
-			/** Case Van and User choose Cash -> createAutoReceipt**/
-			if (userActive.getRole().getKey().equals(User.VAN) 
-					&& "CASH".equalsIgnoreCase(orderForm.getOrder().getVanPaymentMethod())) {
-				 logger.debug("CreateAutoReceipt Case Van pay Cash");
-				 
-				 orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
-				 orderForm.getAutoReceipt().setReceiptAmount(order.getNetAmount());
-				 
-				 logger.debug("PDPAID ="+user.isPDPaid());
-				 //case PDPAID =Y use default bank 002
-				 if(user.isPDPaid()){
-				    orderForm.getAutoReceipt().setInternalBank("002");//SCB- “¢“ “∏ÿª√–¥‘…∞Ï 068-2-81805-7
-			     }else{
-			    	//PD_PAID =N use internal_bank from t_bank_transfer (internal_bank not found ->no export t_receipt)
-			    	orderForm.getAutoReceipt().setInternalBank("");
-			     }
-				 orderForm.getAutoReceipt().setReceiptDate(orderForm.getOrder().getOrderDate());
-				 
-				 /** Set ReceiptBy Manual **/
-				 List<ReceiptBy> receiptByList = new ArrayList<ReceiptBy>();
-				 ReceiptBy receiptBy = new ReceiptBy();
-				 receiptBy.setId(0);
-				 //receiptBy.setPaymentMethod("PD");
-				 receiptBy.setPaymentMethod("CS");
-				 receiptBy.setCreditCardType("");
-				 receiptBy.setBank("");
-				 receiptBy.setChequeNo("");
-				 receiptBy.setChequeDate("");
-				 receiptBy.setReceiptAmount(order.getNetAmount());
-				 receiptBy.setSeedId("");
-				 receiptBy.setAllBillId(String.valueOf(order.getId()));
-				 receiptBy.setAllPaid(String.valueOf(order.getNetAmount()));
-				 receiptByList.add(receiptBy);
-				 //process auto receipt cash
-				 
-				 //set order isCash =Y
-				 order.setIsCash("Y");
-				 
-				 new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, userActive, conn);
-				 //set msg 
-				 msg = SystemMessages.getCaption("SaveSucess", Utils.local_th);
-			
-			}else if (userActive.getRole().getKey().equals(User.VAN) && user.isPDPaid()
-					&& "CREDIT".equalsIgnoreCase(orderForm.getOrder().getVanPaymentMethod())) {
-				
-				logger.debug("CreateAutoReceipt Case Van pay Credit");
-				
-				//Case Sale set PDPAID =Y -> Pay Credit set receipt ispdpaid =N
-				 orderForm.getAutoReceipt().setIsPDPaid("N");
-				 
-				//set receipt 
-				 orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
-				 orderForm.getAutoReceipt().setReceiptAmount(order.getNetAmount());
-				 orderForm.getAutoReceipt().setInternalBank("002");//SCB- “¢“ “∏ÿª√–¥‘…∞Ï 068-2-81805-7
-				 orderForm.getAutoReceipt().setReceiptDate(orderForm.getOrder().getOrderDate());
-				 
-				 /** Set ReceiptBy Manual **/
-				 List<ReceiptBy> receiptByList = new ArrayList<ReceiptBy>();
-				 ReceiptBy receiptBy = new ReceiptBy();
-				 receiptBy.setId(0);
-				 receiptBy.setPaymentMethod("CS");
-				 receiptBy.setCreditCardType("");
-				 receiptBy.setBank("");
-				 receiptBy.setChequeNo("");
-				 receiptBy.setChequeDate("");
-				 receiptBy.setReceiptAmount(order.getNetAmount());
-				 receiptBy.setSeedId("");
-				 receiptBy.setAllBillId(String.valueOf(order.getId()));
-				 receiptBy.setAllPaid(String.valueOf(order.getNetAmount()));
-				 receiptByList.add(receiptBy);
-				 //process auto receipt 
-				 
-				 //Case Money_to_pens ='Y'  set exported='Z' no export
-				 if("Y".equalsIgnoreCase(user.getMoneyToPens())){
-				     new OrderProcess().createAutoReceipt_PDPAID_MONEYTOPENS(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, userActive, conn);
-				 }else{
-					 //Case Money_to_pens ='N'  set exported ='N' export normal
-					 new OrderProcess().createAutoReceipt(orderForm.getAutoReceipt(), order, orderForm.getLines(), receiptByList, null, userActive, conn); 
-				 }
-				 //set msg 
-				 msg = SystemMessages.getCaption("SaveSucess", Utils.local_th);
-				
-			}else{
-				//Case Van PD_PAID=N ->Don't create Receipt
-				if(userActive.getRole().getKey().equals(User.VAN)){
-				    msg  = SystemMessages.getCaption("SaveSucess", Utils.local_th);
-				}
+			/** Create Receipt Van **/
+			if (user.getRole().getKey().equals(User.VAN)){
+				msg = new OrderProcess().createVanReceipt(conn,user, orderForm,order);
 			}
 			
-			/** WIT Edit 20110804 ****************************************/
             //set Merge to 1 Line to show
 			orderForm.setLines(new OrderProcess().fillLinesShow(orderForm.getLines()));
 			
@@ -1053,8 +966,8 @@ public class OrderAction extends I_Action {
 			new MOrderLine().reOrgLineNo(orderForm.getOrder().getId(), conn);
 			
 			//save print pick date
-			if (userActive.getRole().getKey().equals(User.VAN)){
-			  new MOrder().updatePrintPickStamp(conn, order);
+			if (user.getRole().getKey().equals(User.VAN)){
+			   new MOrder().updatePrintPickStamp(conn, order);
 			}
 			
 			// Commit Transaction
@@ -1066,7 +979,7 @@ public class OrderAction extends I_Action {
 			orderForm.setLines(new OrderProcess().fillLinesShowBlankUOM(conn,String.valueOf(orderForm.getOrder().getPriceListId()),orderForm.getLines()));
 			
 			/********* WIT EDIT:20110804 :case not auto receipt cash  -> popup page AutoPay *****/
-			if(userActive.getRole().getKey().equals(User.VAN) &&  !orderForm.getOrder().isPaymentCashNow()){
+			if(user.getRole().getKey().equals(User.VAN) &&  !orderForm.getOrder().isPaymentCashNow()){
 				request.setAttribute("popup_autoreceipt", "true");
 			}
 			/**************************************************************/
@@ -1162,8 +1075,9 @@ public class OrderAction extends I_Action {
 					// assign order no to receipt no
 					orderForm.getAutoReceipt().setReceiptNo(order.getOrderNo());
 					
-					if(user.isPDPaid() && !isCash)
+					if(user.isPDPaid() && !isCash){
 						orderForm.getAutoReceipt().setIsPDPaid("N");
+					}
 				}
 				
 				logger.info("internalBank:"+orderForm.getAutoReceipt().getInternalBank());
@@ -1881,14 +1795,25 @@ public class OrderAction extends I_Action {
 				}
 			}*/
 			
-			//debug
-			//fileName = "tax_invoice_summary_new_pdf_report";//test
-			//fileType ="PDF";//test
-			
-			logger.info("Report Name:"+fileName);
-			String fileJasper = BeanParameter.getReportPath() + fileName;
-			reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
+			//debug Case Some OrderLine not show in summary Report
+			logger.debug("printReportPDF:"+Utils.isNull(request.getParameter("printReportPDF")));
+			if(Utils.isNull(request.getParameter("printReportPDF")).equalsIgnoreCase("PDF")){
+			   fileName = "tax_invoice_summary_new_pdf_report";//test
+			   fileType ="PDF";//test
+			  
+			   logger.info("Report Name:"+fileName);
+			   String fileJasper = BeanParameter.getReportPath() + fileName;
+			   reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
 				
+			}else{
+				logger.info("Report Name:"+fileName);
+				//fileType =SystemElements.PDF_TO_PRINTER; new wait dev
+				
+				String fileJasper = BeanParameter.getReportPath() + fileName;
+				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName, lstData);
+				
+			}
+
 			//stamp dateTime print
 			new MOrder().updatePrintTaxInvoiceStamp(conn,order.getOrderNo(), pReportTitle);
 			

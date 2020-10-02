@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.process.document.MemberDocumentProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * @author WITTY 
@@ -161,7 +162,7 @@ public class ExternalFunctionHelper {
 			}else if(Utils.isNull(colBean.getExternalFunction()).startsWith("GET_SEQ")){
 				//VALUE :GET-SEQ|TABLE_NAME
 				 String[] values = Utils.isNull(colBean.getExternalFunction()).split(Constants.delimeterPipe);
-				 id = SequenceHelper.getNextValue(values[1]).toString();
+				 id = SequenceProcessAll.getIns().getNextValue(values[1]).toString();
 				 exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_PURPOSE")){	
 				if("BILL_TO".equalsIgnoreCase(value)){
@@ -180,6 +181,10 @@ public class ExternalFunctionHelper {
 				id = "9999";
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_USER")){	
+				id = String.valueOf(userBean.getId());
+				exe = false;
+				
+			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_USER_BY_FILENAME")){	
 				id = String.valueOf(userBean.getId());
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_ORDER_ID")){
@@ -236,7 +241,7 @@ public class ExternalFunctionHelper {
 						
 						//** Case not found Receipt Id and Insert new receipt  Gen new receipt_id **/
 						if("".equals(Utils.isNull(id))){
-							id = String.valueOf(SequenceHelper.getNextValue("t_receipt"));
+							id = String.valueOf(SequenceProcessAll.getIns().getNextValue("t_receipt"));
 							RECEIPT_MAP.put(Utils.isNull(value), id);//Put New ReceiptId for use in receiptId Line
 						}else{
 							RECEIPT_MAP.put(Utils.isNull(value), id);

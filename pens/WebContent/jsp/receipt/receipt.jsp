@@ -272,15 +272,10 @@ function change_payment(val){
 						<!-- BUTTON -->
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>
-								<td align="center">
-									<a href="#" onclick="return save('${pageContext.request.contextPath}','<%=user.getType() %>');">
-									<!--<img src="${pageContext.request.contextPath}/images/b_save.gif" border="1" class="newPicBtn">-->
-									<input type="button" value="บันทึก" class="newPosBtn">
-									</a>
-									<a href="#" onclick="backsearch('${pageContext.request.contextPath}','${receiptForm.receipt.customerId}');">
-									<!--<img src="${pageContext.request.contextPath}/images/b_cancel.gif" border="1" class="newPicBtn">\-->
-									<input type="button" value="ยกเลิก" class="newNegBtn">
-									</a>
+								<td align="center">	
+									<input type="button" value="บันทึก" class="newPosBtn" onclick="return save('${pageContext.request.contextPath}','<%=user.getType() %>');">
+			
+									<input type="button" value="ยกเลิก" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${receiptForm.receipt.customerId}');">		
 								</td>
 							</tr>
 						</table>

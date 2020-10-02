@@ -15,7 +15,7 @@ public class ScheduleServiceManagerHelper {
 	
 	protected static Logger logger = Logger.getLogger("PENS");
 	
-	private void debug(ScheduleVO vo)throws Exception{
+	private void debug1(ScheduleVO vo)throws Exception{
 		logger.debug("********Start Debug ScheduleVO***************");
 		logger.debug("vo.getJobId():"+vo.getJobId());
 		logger.debug("vo.getNo():"+vo.getNo());
@@ -36,7 +36,7 @@ public class ScheduleServiceManagerHelper {
 	    	int index =1;
 	    	logger.debug("**Start CreateBatchTask**");
 	    	try{
-	    		debug(param);
+	    		//debug(param);
 	    		StringBuffer sql = new StringBuffer("");
 	    		sql.append(" INSERT INTO MONITOR_SCHEDULE (\n");
 	    		sql.append(" NO, PROGRAM_ID, GROUP_ID, \n"); //1-3
@@ -83,7 +83,7 @@ public class ScheduleServiceManagerHelper {
 	    	int index =1;
 	    	logger.debug("**Delete CreateBatchTask**");
 	    	try{
-	    		debug(param);
+	    		//debug(param);
 	    		StringBuffer sql = new StringBuffer("");
 	    		sql.append(" DELETE FROM MONITOR_SCHEDULE WHERE NO =? \n");
 	    		ps = conn.prepareStatement(sql.toString());
@@ -107,7 +107,7 @@ public class ScheduleServiceManagerHelper {
 	    	int index = 1;
 	    	logger.debug("**Start updateBatchTaskCaseSchedule**");
 	    	try{
-	    		debug(param);
+	    		//debug(param);
 	    		StringBuffer sql =new StringBuffer("");
 	    		sql.append(" UPDATE MONITOR_SCHEDULE  \n");
 	    		sql.append(" SET STATUS = ? , \n");
@@ -157,7 +157,7 @@ public class ScheduleServiceManagerHelper {
 	    	int index = 1;
 	    	logger.debug("**Start updateBatchTask**");
 	    	try{
-	    		debug(param);
+	    		//debug(param);
 	    		//Case Week afer run finish update status to SCHEDULE 
 	    		if(param.getType().equals(SchedulerConstant.SCHEDULE_TYPE_WEEKLY)){
 	    		   param.setStatus(SchedulerConstant.STATUS_SCHEDULE);
@@ -169,7 +169,8 @@ public class ScheduleServiceManagerHelper {
 	    		sql.append(" UPDATE_DATE = ?, UPDATE_USER =?,   \n");
 	    		sql.append(" SIZE_OF_FILE = ? ,NO_OF_RECORD =? ,FILE_NAME =?, \n");
 	    		sql.append(" BATCH_DATE = ? ,LAST_RUN_DATE =? ,NEXT_RUN_DATE =? ,  \n");
-	    		sql.append(" SOURCE_PATH = ? ,DEST_PATH =? ,Message = ?  \n");
+	    		sql.append(" SOURCE_PATH = ? ,DEST_PATH =? ,Message = ?,  \n");
+	    		sql.append(" TRANSACTION_ID = ? \n");
 	    		sql.append(" WHERE NO =?  \n");
 	    		ps = conn.prepareStatement(sql.toString());
 	    		ps.setString(index++, param.getStatus());//status
@@ -192,6 +193,7 @@ public class ScheduleServiceManagerHelper {
 	    		ps.setString(index++, Utils.isNull(param.getSourcePath())); //folderName
 	    		ps.setString(index++, Utils.isNull(param.getDestPath())); //
 	    		ps.setString(index++, Utils.isNull(param.getMessage())); //
+	    		ps.setBigDecimal(index++,param.getTransactionId()); 
 	    		
 	    		ps.setBigDecimal(index++,param.getNo()); //no
 	    		ps.execute();

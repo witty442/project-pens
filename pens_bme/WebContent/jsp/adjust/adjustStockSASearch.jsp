@@ -254,16 +254,15 @@ function getStoreNameModel(storeCode){
 									     <%=item.getStatusDesc() %>
 									</td>
 									<td class="td_text_center">
-									 <c:if test="${results.canEdit == false}">
+									   <%if(item.isCanEdit()==false){ %>
 										  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=item.getDocumentNo()%>','view')">
 										          ¥Ÿ
 										  </a>
-									  </c:if>
-									  <c:if test="${results.canEdit == true}">
+									  <%}else{ %>
 										  <a href="javascript:openEdit('${pageContext.request.contextPath}', '<%=item.getDocumentNo()%>','edit')">
 										          ·°È‰¢
 										  </a>
-									  </c:if>
+									<%} %>
 									</td>
 								</tr>
 							  <%no++;

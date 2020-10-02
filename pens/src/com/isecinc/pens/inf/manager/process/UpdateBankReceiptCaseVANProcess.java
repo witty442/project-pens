@@ -13,6 +13,8 @@ public class UpdateBankReceiptCaseVANProcess {
 	
 	public static Logger logger = Logger.getLogger("PENS");
 	
+	//Case Van PDPAID ='N' AND MONEY_TO_PENS ='Y  
+	//update bank(last transfer cash) in t_receipt_by and payment_method ='CS' (CASH) ONLY
 	public static int process(User userBean){
 		Connection conn = null;
         int i = 0;

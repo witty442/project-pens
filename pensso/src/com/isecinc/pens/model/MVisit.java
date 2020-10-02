@@ -1,6 +1,5 @@
 package com.isecinc.pens.model;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.List;
 
@@ -9,7 +8,7 @@ import com.isecinc.pens.bean.Visit;
 import com.isecinc.pens.process.document.VisitDocumentProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MVisit Class
@@ -71,7 +70,7 @@ public class MVisit extends I_Model<Visit> {
 	public boolean save(Visit visit, String userCode, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (visit.getId() == 0) {
-			id = SequenceProcess.getNextValueInt(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValueInt("t_visit");
 			String prefix = "";
 			visit.setCode(new VisitDocumentProcess().getNextDocumentNo(userCode, prefix, activeUserID, conn));
 		} else {

@@ -35,6 +35,11 @@ if(queryStr.indexOf("d-") != -1){
 	    <display:column  title="Size Of File" property="sizeOfFile"  sortable="false" class="td_text_center" style="width:5%"/>	
 	    <display:column  title="Tatal Record" property="noOfRecord"  sortable="false" class="td_text_center" style="width:5%"/>	
 	    
+	    <display:column  title="TransactionId" property="transactionId"  sortable="false" class="td_text_center" style="width:5%"/>	
+	     <display:column  title="ViewDetail" sortable="false" class="td_text_center" style="width:5%"> 
+	            <html:button property="button" value="View" onclick="submitViewDetail('${pageContext.request.contextPath}',${item.transactionId});"/>
+	    </display:column>
+	    
 	    <display:column  title="Delete" sortable="false" class="td_text_center" style="width:5%"> 
 	            <html:button property="button" value="Delete" onclick="submitDelete('${pageContext.request.contextPath}',${item.no});"/>
 	    </display:column>

@@ -449,8 +449,8 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  WHERE (rc.ISPDPAID IS NULL  OR rc.ISPDPAID ='') ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
-			/** Wit Edit :2311/2558 :Not include AIRPAY */
-			sql.append("\n  AND rcby.PAYMENT_METHOD <> 'AP' ");
+			/** Wit Edit :2311/2558 :Not include AIRPAY ,LOVE */
+			sql.append("\n  AND rcby.PAYMENT_METHOD NOT IN( 'AP','LOV') ");
 			
 			sql.append("\n  AND rc.DOC_STATUS = 'SV' ");
 			sql.append("\n  AND rc.RECEIPT_DATE >= '" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "' ");
@@ -660,8 +660,8 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		  	reportSql.append("\n    , od.ORDER_DATE");
 			reportSql.append("\n    , rcb.receipt_amount");
 			reportSql.append("\n    , IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID =''");
-			reportSql.append("\n    , rcb.payment_method" );
-		  	reportSql.append("\n    , rch.PD_PAYMENTMETHOD) as PAYMENT_METHOD " );
+			reportSql.append("\n       , rcb.payment_method" );
+		  	reportSql.append("\n       , rch.PD_PAYMENTMETHOD) as PAYMENT_METHOD " );
 	
 		  	//reportSql.append("\n ,IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='',IF(od.ORDER_DATE <>rch.receipt_date ,'CREDIT','CASH' ),'CREDIT') as payment_term ");
 		    //reportSql.append("\n ,IF(rch.ISPDPAID IS NULL OR rch.ISPDPAID ='','CREDIT','CASH' ) as payment_term ,rch.ISPDPAID , rch.PD_PAYMENTMETHOD ");
@@ -673,7 +673,7 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		  	reportSql.append("\n   ,(select max(cheque_date) from t_pd_receipt_his rh where rh.pdpaid_date =rch.PDPAID_DATE) as PD_CHEQUE_DATE");
 		  	reportSql.append("\n   , rch.PD_PAYMENTMETHOD ");
 		    reportSql.append("\n   , (CASE WHEN rcb.payment_method ='CS' THEN '1'" );
-		    reportSql.append("\n        WHEN rcb.payment_method ='AP' THEN '3'" );
+		    reportSql.append("\n        WHEN (rcb.payment_method ='AP' or rcb.payment_method ='LOV') THEN '3'" );
 		    reportSql.append("\n        ELSE '2' END) as order_p ");
 		            
 		    reportSql.append("\n   FROM t_receipt rch ");
@@ -751,7 +751,7 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		  	reportSql.append("\n    , 'Y' as ISPDPAID ");//14
 		  	reportSql.append("\n    , rch.cheque_date as PD_CHEQUE_DATE");//15
 		  	reportSql.append("\n    , rch.PD_PAYMENTMETHOD ");//16
-		    reportSql.append("\n    , (CASE WHEN rch.PD_PAYMENTMETHOD ='AP' THEN '3'" );
+		    reportSql.append("\n    , (CASE WHEN (rch.PD_PAYMENTMETHOD ='AP' OR rch.PD_PAYMENTMETHOD ='LOV') THEN '3'" );
 		    reportSql.append("\n        ELSE '2' END) as order_p ");//17
 		    reportSql.append("\n   FROM t_pd_receipt_his rch ");
 		  	reportSql.append("\n   INNER JOIN t_order od ON rch.ORDER_NO = od.ORDER_NO ");
@@ -809,10 +809,12 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 			inv.setPaymentMethod(rset.getString("payment_method"));
 			inv.setPaymentTerm(rset.getString("payment_term"));
 			
-			if("AP".equals(Utils.isNull(rset.getString("payment_method")))){
+			//Wallet (Airpay ,LoveLove)
+			if("AP".equals(Utils.isNull(rset.getString("payment_method")))
+			   || "LOV".equals(Utils.isNull(rset.getString("payment_method")))){
 				isairpay = true;
 				inv.setAirpayAmt(rset.getDouble("receipt_amount"));
-				inv.setPaymentTerm("AIRPAY");
+				inv.setPaymentTerm("WALLET");
 			}else{
 				if (!inv.getChequeNo().equals("") || (isPDPaid && isPDCheque)) {
 					inv.setChequeDate(DateToolsUtil.convertToString(rset.getDate("PD_CHEQUE_DATE")));
@@ -857,7 +859,7 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 			inv.setCode(user.getCode());
 			inv.setName(user.getName());
 			inv.setReceiptAmount(0);
-			inv.setPaymentTerm("AIRPAY");
+			inv.setPaymentTerm("WALLET");
 			resultL.add(inv);
 		 }
 					

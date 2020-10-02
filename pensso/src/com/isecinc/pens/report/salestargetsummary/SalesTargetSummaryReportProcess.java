@@ -143,8 +143,10 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 				
 				result.setSalesAmt(BigDecimal.valueOf(stn.getSoldAmount()));
 				
-				result.setSalesCompareTargetPct(BigDecimal.valueOf(stn.getPercentCompare()));
-				
+				logger.debug("stn.getPercentCompare():"+String.valueOf(stn.getPercentCompare()));
+				if( !String.valueOf(stn.getPercentCompare()).equals("NaN")){
+				  result.setSalesCompareTargetPct(BigDecimal.valueOf(stn.getPercentCompare()));
+				}
 				pos.add(result);
 			}
 		}

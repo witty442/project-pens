@@ -97,7 +97,10 @@ public class ConfPickingAction extends I_Action {
 		BudsAllBean bean = new BudsAllBean();
 		try {
 			 if("new".equalsIgnoreCase(request.getParameter("action"))){
-				bean.setConfPickingBean(new ConfPickingBean());
+				ConfPickingBean confPickingBean = new ConfPickingBean();
+				confPickingBean.setTransactionDateFrom(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+				confPickingBean.setTransactionDateTo(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+				bean.setConfPickingBean(confPickingBean);
 				aForm.setBean(bean);
 			 }
 			 aForm.setPageName(Utils.isNull(request.getParameter("pageName")));
@@ -248,6 +251,7 @@ public class ConfPickingAction extends I_Action {
 			budsAllForm.getBean().getConfPickingBean().setDataStrBuffer(null);
 			
 			ConfPickingBean confPickingBean = ConfPickingDAO.searchPickingDetail(budsAllForm.getMode(),budsAllForm.getSubPageName(), budsAllForm.getBean().getConfPickingBean(), false, user);
+			
 			if(confPickingBean != null && confPickingBean.getDataStrBuffer() != null){
 				budsAllForm.getBean().setConfPickingBean(confPickingBean);
 			    request.setAttribute("budsAllForm_RESULTS", confPickingBean.getDataStrBuffer());
@@ -453,6 +457,10 @@ public class ConfPickingAction extends I_Action {
 
 			    out.flush();
 			    out.close();
+			    
+			    //clear memory
+			    confPickingBean.setDataStrBuffer(null);
+			    confPickingBean.setRowTotalStrBuffer(null);
 			}else{
 				request.setAttribute("Message", "ไม่พบข้อมูล");
 			}
@@ -532,6 +540,10 @@ public class ConfPickingAction extends I_Action {
 
 			    out.flush();
 			    out.close();
+			    
+			   //clear memory
+			    confPickingBean.setDataStrBuffer(null);
+			    confPickingBean.setRowTotalStrBuffer(null);
 			}else{
 				request.setAttribute("Message", "ไม่พบข้อมูล");
 			}
@@ -569,6 +581,10 @@ public class ConfPickingAction extends I_Action {
 
 			    out.flush();
 			    out.close();
+			    
+			   //clear memory
+			    confPickingBean.setDataStrBuffer(null);
+			    confPickingBean.setRowTotalStrBuffer(null);
 			}else{
 				request.setAttribute("Message", "ไม่พบข้อมูล");
 			}

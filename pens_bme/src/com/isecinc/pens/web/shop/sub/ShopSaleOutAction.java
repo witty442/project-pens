@@ -344,6 +344,7 @@ public class ShopSaleOutAction {
 			sql.append("\n AND D.product_id = MP.product_id ");
 			sql.append("\n AND M.DOC_STATUS ='SV' ");
 			sql.append("\n AND M.CUSTOMER_NUMBER ='"+f.getBean().getCustGroup()+"' ");
+			sql.append("\n AND M.intflag ='S' ");//Interfaces Success Only
 			
 			if( !Utils.isNull(f.getBean().getStartDate()).equals("") && !Utils.isNull(f.getBean().getEndDate()).equals("") ){
 				dateTemp = DateUtil.parse(f.getBean().getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);

@@ -13,9 +13,9 @@ import com.isecinc.pens.scheduler.manager.ScheduleVO;
 import com.isecinc.pens.scheduler.manager.SchedulerConstant;
 
 
-public class RecoveryScheduleAction {
+public class RecoveryScheduleTaskAction {
 	
-	private static Logger logger = Logger.getLogger(RecoveryScheduleAction.class);
+	private static Logger logger = Logger.getLogger(RecoveryScheduleTaskAction.class);
 	public ScheduleVO execute(Connection conn,ScheduleVO vo) {
 		try{
 			reScheduleTask(conn);

@@ -968,15 +968,10 @@ public class OrderAction extends I_Action {
 			order.setPayment("N");
 			order.setDocStatus(Order.STATUS_RESERVE);
 			
-			Address billAddr = new MAddress().find(conn,""+order.getBillAddressId());
-			if(billAddr!=null)
-				order.setOraBillAddressID(billAddr.getReferenceId());
-			
-			Address shipAddr = new MAddress().find(conn,""+order.getShipAddressId());
-			if(shipAddr!=null)
-				order.setOraShipAddressID(shipAddr.getReferenceId());
+			//new 
+			order.setOraBillAddressID(order.getBillAddressId());
+			order.setOraShipAddressID(order.getShipAddressId());
 
-			
 			// Begin Transaction
 			conn.setAutoCommit(false);
 
@@ -1189,7 +1184,7 @@ public class OrderAction extends I_Action {
 				
 				//Generate Interfaces Order To Oracle Temp
 				//return productErrorMap cannot reserve order to display sales
-				productErrorMap = InterfaceOrderProcess.reserveStock(user,orderForm.getOrder().getId(),orderForm.getOrder().getOrderNo());
+				productErrorMap = InterfaceOrderProcess.reserveOrderCredit(user,orderForm.getOrder().getId(),orderForm.getOrder().getOrderNo());
 				
 				if(productErrorMap != null && !productErrorMap.isEmpty()){
 				     orderForm.getOrder().setDocStatus(Order.STATUS_UNAVAILABLE);
@@ -1200,6 +1195,10 @@ public class OrderAction extends I_Action {
 				 	 //Set Prev Step Action :set to StepOrder1 (for edit order)
 					 ControlOrderPage.setPrevOrderStepAction(request, ControlOrderPage.STEP_ORDER_1);
 					
+					 /** save product OrderLine is error cannot reserve **/
+					 //next phase
+					 //request.getSession().setAttribute("productErrorMap", productErrorMap);
+					 
 				     return "prepareEditOrder";//gotoPage SalesOrder.jsp for edit 
 				}else{
 				   // set msg save success
@@ -1452,6 +1451,9 @@ public class OrderAction extends I_Action {
 				}
 				if ( !"".equals(Utils.isNull(order.getDistrict())) && !"0".equals(Utils.isNull(order.getDistrict())) ){
 					whereCause += "\n AND a.district_id = " + order.getDistrict() + "";
+				}
+				if ( !Utils.isNull(order.getPickingNo()).equals("")) {
+					whereCause += "\n AND o.picking_no = '" +Utils.isNull(order.getPickingNo())+"'";
 				}
 				whereCause += "\n ORDER BY o.ORDER_DATE DESC,o.ORDER_NO DESC ";
 				Order[] results = new MOrder().searchOpt(whereCause);

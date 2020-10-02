@@ -1,6 +1,5 @@
 package com.isecinc.pens.model;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -11,7 +10,7 @@ import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.inf.helper.Utils;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * Receipt BY Model
@@ -71,7 +70,7 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 	public boolean save(ReceiptBy receiptBy, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (receiptBy.getId() ==0) {
-			id = SequenceProcess.getNextValue("t_receipt_by").longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt_by").longValue();
 		} else {
 			id = receiptBy.getId();
 		}
@@ -138,7 +137,7 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 			int tot = 0;
 			stmt = conn.createStatement();
 			String sql = "SELECT COUNT(*) as TOT FROM " + tableName;
-			sql += " WHERE RECEIPT_ID IN (SELECT RECEIPT_ID FROM T_RECEIPT WHERE DOC_STATUS = 'SV') AND " + columnDoc + "='" + documentNo + "' ";
+			sql += " WHERE RECEIPT_ID IN (SELECT RECEIPT_ID FROM PENSSO.T_RECEIPT WHERE DOC_STATUS = 'SV') AND " + columnDoc + "='" + documentNo + "' ";
 			if (id !=0) sql += "  AND " + columnId + "<> '" + id + "' ";
 			logger.debug(sql);
 			rst = stmt.executeQuery(sql);

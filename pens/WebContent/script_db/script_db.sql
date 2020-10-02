@@ -73,5 +73,6 @@ CREATE TABLE pens.c_after_action_sql (
 );
 /** 07-2563 **/
 alter table m_customer add cust_group varchar(40);
-/** 08-2563 **/
+/** 09-2563 **/
+insert into c_reference values(2902,'VanPaymentMethod','Love Love','Love Love','LOV','Y','Y');
 

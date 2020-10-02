@@ -17,7 +17,7 @@ String seed = request.getParameter("seed");
 String row = request.getParameter("row");
 String custId = request.getParameter("cust");
 String prepaid = request.getParameter("prepaid");
-
+String billToAddressId = request.getParameter("billToAddressId");
 User user = (User) session.getAttribute("user");
 
 List<Order> zero = new ArrayList<Order>();
@@ -25,9 +25,11 @@ List<Order> zero = new ArrayList<Order>();
 List<Order> orders = new ArrayList<Order>();
 
 if(prepaid.equalsIgnoreCase("Y")){
+	//WAIT Unknow 
 	//orders = new MOrder().lookUpPrepaid(user.getId(),Integer.parseInt(custId),user.getOrderType().getKey(),"in",selected);
 }else{
-	orders = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId),user.getOrderType().getKey(),"in",selected);
+	orders = new MOrder().lookUpByOrderAR(user.getId(),Integer.parseInt(custId),Integer.parseInt(billToAddressId)
+			,user.getOrderType().getKey(),"in",selected);
 }
 
 //remove zero credit

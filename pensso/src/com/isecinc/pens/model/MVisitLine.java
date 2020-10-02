@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.VisitLine;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MVisitLine Class
@@ -67,7 +67,7 @@ public class MVisitLine extends I_Model<VisitLine> {
 	public boolean save(VisitLine visitLine, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (visitLine.getId() == 0) {
-			id = SequenceProcess.getNextValueInt(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValueInt("t_visit_line");
 		} else {
 			id = visitLine.getId();
 		}

@@ -17,6 +17,7 @@ import com.isecinc.pens.scheduler.bean.TaskConditionDTO;
 import com.isecinc.pens.scheduler.manager.ScheduleVO;
 import com.isecinc.pens.scheduler.utils.EnvSchedulerProperties;
 import com.pens.util.DBConnection;
+import com.pens.util.DBConnectionApps;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
@@ -31,8 +32,8 @@ public class SearchTaskDAO {
 	        ArrayList<References> dataList  = new ArrayList<References>();
 	        References ref = null;
 	        try{            
-	        	  con = DBConnection.getInstance().getConnection();
-	        	  String sql ="select program_id ,program_name,type,rerun,visible from scheduler_job_initial \n";
+	        	  con = DBConnectionApps.getInstance().getConnection();
+	        	  String sql ="select program_id ,program_name,type,rerun,visible from pensso.scheduler_job_initial \n";
 	        	         sql +=" where visible = 'TRUE' \n";
 	        	  if(!"".equals(rerun)){
 	        		  sql +=" where visible = '"+rerun+"' \n";
@@ -40,7 +41,7 @@ public class SearchTaskDAO {
 	              pstmt = con.prepareStatement(sql);
 	              rs = pstmt.executeQuery();
 	              while (rs.next()){
-	            	  ref = new References(rs.getString("program_id")+","+rs.getString("program_name"),rs.getString("program_id")+"_"+rs.getString("program_name"));
+	            	  ref = new References(rs.getString("program_id")+","+rs.getString("program_name"),rs.getString("program_name"));
 	            	  dataList.add(ref);
 	              }
 	              
@@ -268,15 +269,13 @@ public class SearchTaskDAO {
                 if(!"".equals(Utils.isNull(dto.getProgramId()))){
                 	sql.append(" AND PROGRAM_ID = '"+dto.getProgramId()+"' \n");
                 }
-                sql.append("ORDER BY NO  \n");                
+                sql.append("ORDER BY NO DESC  \n");                
             }
            
             if(isDebugEnabled){
-                System.out.println("\nSQL : "+sql.toString());
+                System.out.println("\n SQL : "+sql.toString());
             }
-            
-    
-           
+ 
             pstmt = con.prepareStatement(sql.toString());
             
             /* Put parameter */            
@@ -372,9 +371,10 @@ public class SearchTaskDAO {
         dto.setNextRunDate(DateUtil.stringValue(rs.getTimestamp("NEXT_RUN_DATE"),"dd/MM/yyyy HH:mm:ss",Utils.local_th));
         
         dto.setParamRegen(rs.getString("PARAM_REGEN"));
+        dto.setTransactionId(rs.getBigDecimal("TRANSACTION_ID"));
         
-        System.out.println("NextDate:"+rs.getTimestamp("NEXT_RUN_DATE"));
-        System.out.println("NextRunDate:"+dto.getNextRunDate());
+       // System.out.println("NextDate:"+rs.getTimestamp("NEXT_RUN_DATE"));
+       // System.out.println("NextRunDate:"+dto.getNextRunDate());
         return dto;
         
     }

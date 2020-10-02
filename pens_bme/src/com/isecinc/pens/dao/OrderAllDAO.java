@@ -184,7 +184,8 @@ public class OrderAllDAO {
 				tableName = "PENSBME_ONHAND_BME_OSHOPPING";
 				storeType = Constants.STORE_TYPE_OSHOPPING_CODE;
 				storeTypeItemCode = Constants.STORE_TYPE_OSHOPPING_ITEM;
-				
+			
+				//change 7 to pensShop
 			}else if("7CATALOG".equalsIgnoreCase(Utils.isNull(pageName)) ){
 				tableName = "PENSBME_ONHAND_BME_7CATALOG";
 				storeType = Constants.STORE_TYPE_PENSHOP_CODE;
@@ -211,9 +212,24 @@ public class OrderAllDAO {
 				sql.append("\n  ) as remain_onhand_qty ");
 						
 				sql.append("\n ,(SELECT max(m.pens_value) from PENSBME_MST_REFERENCE m   ");
-				sql.append("\n   where m.reference_code ='"+storeTypeItemCode+"' and m.interface_desc = h.barcode) as item_oracle ");
+				if("7CATALOG".equalsIgnoreCase(Utils.isNull(pageName)) ){//=PENS_SHOP
+					sql.append("\n   where m.reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"') ");
+					sql.append("\n   and m.pens_desc6 in('MAYA' ,'TM21')");
+				}else{
+					sql.append("\n   where m.reference_code ='"+storeTypeItemCode+"' ");
+				}
+				sql.append("\n   and m.interface_desc = h.barcode");
+				sql.append("\n ) as item_oracle ");
+				
 				sql.append("\n ,(SELECT max(m.interface_value) from PENSBME_MST_REFERENCE m   ");
-				sql.append("\n   where m.reference_code ='"+storeTypeItemCode+"' and m.interface_desc = h.barcode) as item_style ");
+				if("7CATALOG".equalsIgnoreCase(Utils.isNull(pageName)) ){//=PENS_SHOP
+					sql.append("\n   where m.reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"') ");
+					sql.append("\n   and m.pens_desc6 in('MAYA' ,'TM21')");
+				}else{
+				    sql.append("\n   where m.reference_code ='"+storeTypeItemCode+"' ");
+				}
+				sql.append("\n   and m.interface_desc = h.barcode");
+				sql.append("\n ) as item_style ");
 				sql.append("\n from "+tableName+" h   \n");
 				sql.append("\n where 1=1 AND onhand_qty <> 0 and status <> 'ERROR'  ");
 				

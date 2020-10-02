@@ -11,7 +11,7 @@
 <body>
   <%
   User user = (User)session.getAttribute("user");
-  InterfaceReceiptProcess.processImportReceipt(user, request);
+ // InterfaceReceiptProcess.processImportReceipt(user, request);
   
   %>
 </body>

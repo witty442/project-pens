@@ -114,6 +114,13 @@ function save(path) {
 		return false;
 	}
 	
+	//Print Branch check store no 
+	if(document.getElementsByName('customer.printType')[1].checked 
+			&& document.getElementsByName('customer.printBranchDesc')[0].value ==""){
+		alert("กรุณาระบุสาขาที่ ");
+		document.getElementsByName('customer.printBranchDesc')[0].focus();
+		return false;
+	}
 	if(!createAddressList()){return false;}
 	if(!createContactList()){return false;}
 	document.customerForm.action = path + "/jsp/customerAction.do?do=save";
@@ -124,6 +131,14 @@ function save(path) {
 function saveEdit(path) {
 	if(!createAddressList()){return false;}
 	if(!createContactList()){return false;}
+	
+	//Print Branch check store no 
+	if(document.getElementsByName('customer.printType')[1].checked 
+			&& document.getElementsByName('customer.printBranchDesc')[0].value ==""){
+		alert("กรุณาระบุสาขาที่ ");
+		document.getElementsByName('customer.printBranchDesc')[0].focus();
+		return false;
+	}
 	
 	document.customerForm.action = path + "/jsp/customerAction.do?do=saveEdit";
 	document.customerForm.submit();

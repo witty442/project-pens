@@ -1,5 +1,4 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 <%@page import="com.isecinc.pens.inf.helper.Utils"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.User"%><html xmlns="http://www.w3.org/1999/xhtml">
@@ -7,13 +6,6 @@
 <%
 String role = ((User)session.getAttribute("user")).getType();
 User user = (User)session.getAttribute("user");
-
-String[] msg2 = new String[2];
-if(request.getSession().getAttribute("appVersionCheckMsg") != null){
-	msg2 =  (String[])request.getSession().getAttribute("appVersionCheckMsg");
-}else{
-	msg2 = AppversionVerify.getApp().checkAppVersion(request);
-}
 
 %>
 

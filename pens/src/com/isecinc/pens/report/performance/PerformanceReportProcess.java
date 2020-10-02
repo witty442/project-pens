@@ -64,13 +64,13 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			sql.append("\n    and t_receipt_by.PAYMENT_METHOD ='CH' ");
 			sql.append("\n  ) as cheque_no ");
 			
-			sql.append("\n ,( select min(t_receipt_by.cheque_no) ");
+			sql.append("\n ,( select 'wallet' as pay_no ");
 			sql.append("\n    from t_receipt, t_receipt_line  ,t_receipt_match , t_receipt_by ");
 			sql.append("\n    where od.order_id = t_receipt_line.order_id ");
 			sql.append("\n    and t_receipt.receipt_id = t_receipt_line.receipt_id and t_receipt.doc_status ='SV' ");
 			sql.append("\n    and t_receipt_match.RECEIPT_LINE_ID = t_receipt_line.RECEIPT_LINE_ID ");
 			sql.append("\n    and t_receipt_by.RECEIPT_BY_ID = t_receipt_match.RECEIPT_BY_ID ");
-			sql.append("\n    and t_receipt_by.PAYMENT_METHOD ='AP' ");
+			sql.append("\n    and t_receipt_by.PAYMENT_METHOD in('AP','LOV') ");//Wallet all(AP,LOV)
 			sql.append("\n  ) as airpay_no ");
 			
 			sql.append("\n  ,od.doc_status as status ");
@@ -113,9 +113,11 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 				if( !Utils.isNull(rst.getString("cheque_no")).equals("")){
                    p.setChequeNo(rst.getString("cheque_no"));
 				}else{
-				   p.setChequeNo(rst.getString("airpay_no"));
+				   //p.setChequeNo(rst.getString("airpay_no"));
+					p.setChequeNo("");//All Wallet(AP,LOV)
 				}
-                p.setAirpayNo(rst.getString("airpay_no"));
+                p.setAirpayNo("");//All Wallet(AP,LOV)
+                
                 p.setStatus(rst.getString("status"));
 				pos.add(p);
 			}

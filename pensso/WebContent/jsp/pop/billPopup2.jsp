@@ -24,13 +24,15 @@
 String selected = request.getParameter("selected");
 if(selected==null)selected="";
 String custId = request.getParameter("cust");
+String billToAddressId = request.getParameter("billToAddressId");
 User user = (User) session.getAttribute("user");
 Connection conn = null;
 try{
 	//init Connection 
 	conn = DBConnectionApps.getInstance().getConnection();
 	
-	List<Order> invoicesAll = new MOrder().lookUpByOrderAR(conn,user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in",selected);
+	List<Order> invoicesAll = new MOrder().lookUpByOrderAR(conn,user.getId(),Integer.parseInt(custId) ,Integer.parseInt(billToAddressId) 
+			,user.getOrderType().getKey(),"not in",selected);
 	double totalCreditNoteAmt = 0; 
 	double totalAdjustAmt = 0; 
 	 
@@ -52,7 +54,7 @@ try{
 		r.setAdjustAmt(totalAdjustAmt);
 		r.setOpenAmt();
 		
-		//System.out.println("OpenAmt(remain_amt):"+r.getOpenAmt());
+		System.out.println("OpenAmt(remain_amt):"+r.getOpenAmt());
 		//remove zero credit
 		if(r.getOpenAmt() > 0.01){
 			orders.add(r);
@@ -138,16 +140,13 @@ try{
 <!-- <div style="overflow:auto;height:300px;"> -->
 		<table align="center" border="0" cellpadding="0" cellspacing="1" width="100%" class="result">
 			<tr>
-				<th><bean:message key="Bill.No" bundle="sysele"/></th>
-				<th><bean:message key="Order.No" bundle="sysele"/></th>
-				<th><bean:message key="TotalAmount" bundle="sysele"/></th>
-				<th><bean:message key="CreditNoteAmt" bundle="sysele"/></th>
-				<th><bean:message key="Order.Behindhand" bundle="sysele"/>.</th>
-				<th><bean:message key="Order.Payment" bundle="sysele"/></th>
-				<!-- 
-				<th><bean:message key="Amount" bundle="sysele"/></th>
-				<th><bean:message key="Product.Balance" bundle="sysele"/></th>
-				 -->
+				<th>เลขที่ใบแจ้งหนี้</th>
+				<th>เลขที่รายการขาย</th>
+				<th>ยอดเงินรวม</th>
+				<th>ลดหนี้</th>
+				<th>ค้างชำระ.</th>
+				<th>รับชำระ</th>
+				
 			</tr>
 			<c:forEach var="results" items="${orders}" varStatus="rows">
 				<c:choose>
@@ -180,17 +179,12 @@ try{
 						<fmt:formatNumber pattern="#,##0.00" value="${results.openAmt}"/>
 						<input type="hidden" name="creditAmount" value="${results.creditAmount}">
 						<input type="hidden" name="paidAmount"  value="${results.paidAmount}"/>
-						<!-- Comment Out : Cannot 
-						input type="hidden" name="remainAmount"  value="${results.remainAmount}"/-->
 						<input type="hidden" name="remainAmount"  value="${results.openAmt}"/>
 					</td>
 					<td>
 						<input type="checkbox" name="chkReceipts">
 					</td>
-					<!-- 
-					<td><input type="text" name="paidAmount" onblur="calculateRemain();" onkeydown="return isNum0to9andpoint(this, event);" readonly="readonly" size="10;" style="text-align: right;" class="disableText" ></td>
-					<td><input type="text" name="remainAmount" readonly="readonly" size="10;" style="text-align: right;" class="disableText" ></td>
-					 -->
+				
 				</tr>
 			</c:forEach>
 			<tr>

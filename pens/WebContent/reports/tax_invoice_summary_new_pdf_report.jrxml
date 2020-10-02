@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="tax_invoice_summary_new_pdf_report" language="groovy" pageWidth="210" pageHeight="220" columnWidth="208" leftMargin="1" rightMargin="1" topMargin="1" bottomMargin="1">
-	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.zoom" value="4.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="8"/>
 	<parameter name="p_report_title" class="java.lang.String"/>
 	<parameter name="custName" class="java.lang.String"/>
 	<parameter name="custAddress1" class="java.lang.String"/>
@@ -85,7 +85,7 @@
 				<text><![CDATA[ที่อยู่:]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="2" y="0" width="197" height="12"/>
+				<reportElement x="2" y="0" width="197" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="11" isBold="true"/>
 				</textElement>
@@ -210,7 +210,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{productCode}+" "+$F{productName}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement isPrintRepeatedValues="false" x="44" y="13" width="51" height="12"/>
+				<reportElement x="44" y="13" width="51" height="12"/>
 				<box rightPadding="3">
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -223,7 +223,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{salePrice}]]></textFieldExpression>
 			</textField>
 			<textField pattern="">
-				<reportElement isPrintRepeatedValues="false" x="1" y="13" width="43" height="12"/>
+				<reportElement x="1" y="13" width="43" height="12"/>
 				<box rightPadding="3">
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -236,7 +236,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{mainQty} + "/" + $F{subQty}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement isPrintRepeatedValues="false" x="95" y="13" width="44" height="12"/>
+				<reportElement x="95" y="13" width="44" height="12"/>
 				<box rightPadding="3">
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -249,7 +249,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{discount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement isPrintRepeatedValues="false" x="139" y="13" width="52" height="12"/>
+				<reportElement x="139" y="13" width="52" height="12"/>
 				<box rightPadding="3">
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>

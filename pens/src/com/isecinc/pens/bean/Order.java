@@ -262,8 +262,17 @@ public class Order extends I_PO implements Serializable {
 	private String vanPaymentMethod;
     private boolean promotionSP;
 	private String custGroup;
-   
+    private String printReportPDF;
 	
+    
+	public String getPrintReportPDF() {
+		return printReportPDF;
+	}
+
+	public void setPrintReportPDF(String printReportPDF) {
+		this.printReportPDF = printReportPDF;
+	}
+
 	public String getCustGroup() {
 		return custGroup;
 	}

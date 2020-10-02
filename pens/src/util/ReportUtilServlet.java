@@ -9,10 +9,13 @@ package util;
  * @CurrentVersion 1.0
  * 
  */
-import java.awt.print.PrinterJob;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,20 +30,12 @@ import javax.naming.NamingException;
 import javax.print.Doc;
 import javax.print.DocFlavor;
 import javax.print.DocPrintJob;
+import javax.print.PrintException;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
-import javax.print.ServiceUI;
-import javax.print.attribute.AttributeSet;
-import javax.print.attribute.DocAttributeSet;
-import javax.print.attribute.HashAttributeSet;
-import javax.print.attribute.HashDocAttributeSet;
-import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.SimpleDoc;
 import javax.print.attribute.HashPrintServiceAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.PrintServiceAttributeSet;
-import javax.print.attribute.Size2DSyntax;
-import javax.print.attribute.standard.MediaSize;
-import javax.print.attribute.standard.MediaSizeName;
 import javax.print.attribute.standard.PrinterName;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -268,6 +263,13 @@ public class ReportUtilServlet extends HttpServlet {
 				try {
 					// generateHtmlOutput(jasperPrint, request, response);
 					generateHTML(request, response, fileJasper);
+				} catch (Exception e) {
+					System.out.println(e.toString());
+				}
+			} else if (fileType.equals(SystemElements.PDF_TO_PRINTER)) {
+				try {
+					
+					runReportListPDFToPrinter(request, response, conn, fileJasper, lstData, parameterMap, fileName);
 				} catch (Exception e) {
 					System.out.println(e.toString());
 				}
@@ -680,16 +682,6 @@ public class ReportUtilServlet extends HttpServlet {
 			
 			logger.debug("default printerName:"+pService.getName());
 			
-			/** Set property printer and Report **/
-			/*HashMap fontMap = new HashMap();
-			FontKey key = new FontKey("Angsana New", false, false);
-			PdfFont font = new PdfFont("ANGSAU.TTF", BaseFont.IDENTITY_H, true);
-			fontMap.put(key, font);
-
-			FontKey key2 = new FontKey("Angsana New", true, false);
-			PdfFont font2 = new PdfFont("ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
-			fontMap.put(key2, font2);*/
-
 			/** Case print Tax Invoice **/
 			if("tax_invoice_report".equalsIgnoreCase(fileName)){
 				//Default Printer EPSON(PENS_A5)
@@ -795,6 +787,94 @@ public class ReportUtilServlet extends HttpServlet {
 			throw e;
 		}
 	}
-	
+	@SuppressWarnings("unchecked")
+	private void runReportListPDFToPrinter(HttpServletRequest request, HttpServletResponse response, Connection conn,
+			String fileJasper, List lstData, HashMap parameterMap, String fileName) throws ServletException,
+			IOException, JRException {
+		InputStream insPDF = null;
+		File rptFile = null;
+		boolean defaultPrinter = false;
+		logger.debug("Print to PRINTER " + fileJasper);
+		String printerInvoiceName = "";
+		try {
+			rptFile = new File(fileJasper + ".jasper");
+			JRDataSource jrDataSource = createDataSource(lstData);
+			logger.debug("Data Source " + jrDataSource);
+
+			JasperReport rtfReport = (JasperReport) JRLoader.loadObject(rptFile.getPath());
+			JasperPrint rtfPrint = JasperFillManager.fillReport(rtfReport, parameterMap, jrDataSource);
+
+			logger.debug("RTF Print " + rtfPrint);
+			//looup printer service
+			PrintService pService = PrintServiceLookup.lookupDefaultPrintService();
+			logger.debug("default printerName:"+pService.getName());
+			
+			//Step 1 write file pdf to temp
+			fileName = fileName + ".pdf";
+			try {
+				rptFile = new File(fileJasper + ".jasper");
+				
+				// Set font for pdf.
+				HashMap fontMap = new HashMap();
+				FontKey key = new FontKey("Angsana New", false, false);
+				PdfFont font = new PdfFont("fonts/ANGSAU.TTF", BaseFont.IDENTITY_H, true);
+				fontMap.put(key, font);
+
+				FontKey key2 = new FontKey("Angsana New", true, false);
+				PdfFont font2 = new PdfFont("fonts/ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
+				fontMap.put(key2, font2);
+
+				ByteArrayOutputStream rtfOutput = new ByteArrayOutputStream();
+				JRPdfExporter exporter = new JRPdfExporter();
+				exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
+				exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, rtfOutput);
+				exporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, fileName);
+				exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
+				exporter.exportReport();
+				
+				byte[] bytes = null;
+				bytes = rtfOutput.toByteArray();
+				insPDF = new ByteArrayInputStream(bytes); 
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			//Step 2 print pdf to printer
+			try{
+				//Select Printer Small Is online
+				//select from 3 printerName no check online
+				printerInvoiceName = PrinterUtils.selectPrinterSmall();
+				
+				logger.info("Selected PrinterName:"+printerInvoiceName);
+						
+				PrintServiceAttributeSet printServiceAttributeSetManual = new HashPrintServiceAttributeSet();
+				printServiceAttributeSetManual.add(new PrinterName(printerInvoiceName, Locale.getDefault()));//Hardcode 
+				
+				DocPrintJob printJob = pService.createPrintJob();
+				// register a listener to get notified when the job is complete
+	            //printJob.addPrintJobListener(new PrintJobMonitor());
+	            
+				//MAKE Test
+				insPDF = new BufferedInputStream(new FileInputStream("d:\\dev_temp\\temp\\test.pdf"));
+				
+				logger.debug("InputStream PDF:"+insPDF);
+				Doc doc = new SimpleDoc(insPDF, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
+				
+	            // Print a document with the specified job attributes.
+				try{
+	              printJob.print(doc, null);
+				} catch (PrintException e) {
+			        e.printStackTrace();
+			    }
+			}catch(Exception e){
+			   e.printStackTrace();
+			   request.setAttribute("ERROR_MSG", "ไม่พบเครื่องพิมพ์ กรุณาตรวจสอบว่าเครื่องพิมพ์ทำงานหรือไม่ โปรดเช็คสายเสียบแน่นหรือไม่ ถ้าไม่ได้ลองทำการ รีสตาร์ท เครื่อง 1 ครั้ง ");
+			}
+		   
+		} catch (JRException e) {
+			logger.error(e.getMessage(),e);
+			throw e;
+		}
+	}
 	
 }

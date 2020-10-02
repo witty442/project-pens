@@ -23,5 +23,9 @@ System.out.println("PageName:"+pageName);
      <jsp:include page="page/saleOutCH.jsp" flush="true"/> 
 <%}else if(ShopAction.P_CH_STOCK_ONHAND.equalsIgnoreCase(pageName)) {%>
      <jsp:include page="page/stockOnhandCH.jsp" flush="true"/> 
+<%}if(ShopAction.P_SP_SALEOUT.equalsIgnoreCase(pageName)) {%>
+     <jsp:include page="page/saleOutSP.jsp" flush="true"/> 
+<%}else if(ShopAction.P_SP_STOCK_ONHAND.equalsIgnoreCase(pageName)) {%>
+     <jsp:include page="page/stockOnhandSP.jsp" flush="true"/> 
 <%} %>
 						

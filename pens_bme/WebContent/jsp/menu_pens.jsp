@@ -344,6 +344,19 @@
 			        </li> 
 		          </ul>
 	         </li> 
+	          <li><a class="parent"><span><%no++;out.print(no);%>.Siam Premium Outlet</span></a>
+				  <%subNo=0; %>
+				  <ul>
+				    <li>
+			           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SP_SALEOUT%>');">
+			           <span><%out.print(no);%>.<%subNo++;out.print(subNo);%><bean:message key="SPSaleOut" bundle="sysprop"/></span></a>
+			        </li>
+					 <li>
+			           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SP_STOCK_ONHAND%>');">
+			           <span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message key="SPStockOnhand" bundle="sysprop"/></span></a>
+			        </li> 
+		          </ul>
+	         </li> 
 	         <li>
 	           <a href="#" onclick="javascript:link(true,'${pageContext.request.contextPath}/jsp/shopAction.do?do=prepare&pageAction=new&pageName=<%=ShopAction.P_SHOP_PROM%>');"><span><%no++;out.print(no);%>.<bean:message key="ShopPromotion" bundle="sysprop"/></span></a>
 	        </li> 

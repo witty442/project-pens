@@ -132,6 +132,11 @@ function gotoSummaryReport(path, reportType,orderNo,statusOrder){
      param += "&reportType="+reportType;
      param +="&orderNo="+orderNo;
      param +="&statusOrder="+statusOrder;
+     if(document.getElementById('printReportPDF').checked){
+    	 param +="&printReportPDF="+document.getElementById('printReportPDF').value;
+     }else{
+    	 param +="&printReportPDF=PRINTER";
+     }
      
      var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
      var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
@@ -512,6 +517,15 @@ function stampPrint(){
 						<!-- BUTTON -->
 						<br />
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+						   <%if(role.equals(User.VAN)){ %>
+							    <tr>
+									<td align="right" width="10%"></td>
+									<td align="left">
+										<input type="checkbox" id="printReportPDF" name="printReportPDF" value ="PDF"/>
+										<font color="red">**พิมพ์ PDF (กรณีพิมพ์ข้อมูลออก Printer ไม่ได้)</font>
+									</td>
+								</tr>
+							<%} %>
 							<tr>
 								<td align="right" width="10%"></td>
 								<td align="left">
@@ -538,6 +552,7 @@ function stampPrint(){
 								   </c:if>
 									
 									<%if(role.equals(User.VAN)){ %>
+									   
 										<c:if test="${orderForm.order.docStatus=='SV'}">
 										     <c:if test="${orderForm.order.isCash=='Y'}">
 											    <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy','','');">

@@ -78,12 +78,14 @@ public class StockOnhandDAO {
 			   item.setProductName(Utils.isNull(rst.getString("description")));
 			   item.setUom1(Utils.isNull(rst.getString("primary_uom_code")));
 			   item.setUom2(Utils.isNull(rst.getString("second_uom_code")));
-			   item.setPriQtyOnhand(Utils.decimalFormat(rst.getDouble("onhand_pri_qty"),Utils.format_current_2_disgit));
-			   item.setSecQtyOnhand(Utils.decimalFormat(rst.getDouble("onhand_sec_qty"),Utils.format_current_2_disgit));
-			   item.setPriQtyReserve(Utils.decimalFormat(rst.getDouble("reservation_pri_qty"),Utils.format_current_2_disgit));
-			   item.setSecQtyReserve(Utils.decimalFormat(rst.getDouble("reservation_sec_qty"),Utils.format_current_2_disgit));
-			   item.setPriQtyAvailable(Utils.decimalFormat(rst.getDouble("Available_pri_qty"),Utils.format_current_2_disgit));
-			   item.setSecQtyAvailable(Utils.decimalFormat(rst.getDouble("Available_sec_qty"),Utils.format_current_2_disgit));
+			   
+			   //WAIT
+			   item.setPriQtyOnhand(String.valueOf(new Double(rst.getDouble("onhand_pri_qty")).intValue()));
+			   item.setSecQtyOnhand(String.valueOf(new Double(rst.getDouble("onhand_sec_qty")).intValue()));
+			   item.setPriQtyReserve(String.valueOf(new Double(rst.getDouble("reservation_pri_qty")).intValue()));
+			   item.setSecQtyReserve(String.valueOf(new Double(rst.getDouble("reservation_sec_qty")).intValue()));
+			   item.setPriQtyAvailable(String.valueOf(new Double(rst.getDouble("Available_pri_qty")).intValue()));
+			   item.setSecQtyAvailable(String.valueOf(new Double(rst.getDouble("Available_sec_qty")).intValue()));
 
 			   html.append(genRowTable(o, excel, item, r));
 		

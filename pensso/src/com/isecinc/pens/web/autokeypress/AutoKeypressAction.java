@@ -42,7 +42,18 @@ public class AutoKeypressAction {
 				//set criteria
 				cri.setCodeSearch(Utils.isNull(request.getParameter("productCode")));
 				
-				popupBeanResult = AutoKeypressDAO.searchProduct(cri); 
+				popupBeanResult = AutoKeypressDAO.searchProduct(cri,0); 
+				if(popupBeanResult != null){
+					resultAjax  = "5|"+popupBeanResult.getCode()+"|"+popupBeanResult.getProductId()+"|"+popupBeanResult.getDesc();
+					resultAjax += "|"+popupBeanResult.getUom1()+"|"+popupBeanResult.getUom2();
+				}else{
+					resultAjax = "-1||";
+				}
+			}else if("ProductStockOnhand".equalsIgnoreCase(pageName) ){
+				//set criteria
+				cri.setCodeSearch(Utils.isNull(request.getParameter("productCode")));
+				
+				popupBeanResult = AutoKeypressDAO.searchProductStockOnhand(cri,0); 
 				if(popupBeanResult != null){
 					resultAjax  = "5|"+popupBeanResult.getCode()+"|"+popupBeanResult.getProductId()+"|"+popupBeanResult.getDesc();
 					resultAjax += "|"+popupBeanResult.getUom1()+"|"+popupBeanResult.getUom2();

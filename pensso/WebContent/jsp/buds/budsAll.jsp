@@ -1,4 +1,4 @@
-<%@page import="com.pens.util.*"%>
+<%@page import="com.pens.util.SessionUtils"%>
 <%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -22,8 +22,12 @@ if(Utils.isNull(pageName).equals("")){
      <jsp:include page="page/controlPickingSearchPage.jsp" flush="true"/>  
 <%}else if("StockOnhandSearch".equalsIgnoreCase(pageName)){%>
      <jsp:include page="page/stockOnhandSearchPage.jsp" flush="true"/>  
-<%}else if("OrderEDI".equalsIgnoreCase(pageName)){%>
+<%}else if("OrderEDISearch".equalsIgnoreCase(pageName)){%>
+     <jsp:include page="page/orderEDISearchPage.jsp" flush="true"/>   
+<%}else if("OrderEDIDetail".equalsIgnoreCase(pageName)){%>
      <jsp:include page="page/orderEDIPage.jsp" flush="true"/>   
+<%}else if("InvoiceReport".equalsIgnoreCase(pageName)){%>
+     <jsp:include page="page/invoiceReportPage.jsp" flush="true"/>   
 <% } %>
 
 						

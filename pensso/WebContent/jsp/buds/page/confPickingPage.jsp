@@ -347,7 +347,7 @@ function setMainAddOrderPickingManual(orderNoAll){
 							<td align="center" width="100%">
 							<%if("ConfPicking".equals(subPageName)){ %>
 								<%if(UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.BUD_ADMIN})
-										&& bean.isCanConfirm()){ %>
+									&& bean.isCanConfirm()){ %>
 								    &nbsp;&nbsp;&nbsp;&nbsp;
 									<a href="javascript:confirmPicking('${pageContext.request.contextPath}')">
 									  <input type="button" value="ยืนยันชุดข้อมูลการจัด Picking" class="newPosBtnLong">

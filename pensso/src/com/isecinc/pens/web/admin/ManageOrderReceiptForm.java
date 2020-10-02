@@ -11,7 +11,10 @@ public class ManageOrderReceiptForm extends I_Form {
 	private static final long serialVersionUID = -6926286090895730569L;
 
 	private String documentDate;
-
+	private String documentDateFrom;
+	private String documentDateTo;
+	private String customerCode;
+	private String customerName;
 	private List<Order> orders;
 
 	private List<Receipt> receipts;
@@ -19,6 +22,39 @@ public class ManageOrderReceiptForm extends I_Form {
 	private int orderSize;
 
 	private int receiptSize;
+
+	
+	public String getDocumentDateFrom() {
+		return documentDateFrom;
+	}
+
+	public void setDocumentDateFrom(String documentDateFrom) {
+		this.documentDateFrom = documentDateFrom;
+	}
+
+	public String getDocumentDateTo() {
+		return documentDateTo;
+	}
+
+	public void setDocumentDateTo(String documentDateTo) {
+		this.documentDateTo = documentDateTo;
+	}
+
+	public String getCustomerCode() {
+		return customerCode;
+	}
+
+	public void setCustomerCode(String customerCode) {
+		this.customerCode = customerCode;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
 
 	public int getOrderSize() {
 		return orderSize;

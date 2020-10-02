@@ -307,6 +307,7 @@ public class ShopStockOnhandAction {
 					sql.append("\n ) MP ");
 					sql.append("\n WHERE L.ORDER_NUMBER = D.ORDER_NUMBER ");
 					sql.append("\n AND D.product_id = MP.product_id ");
+					sql.append("\n AND L.intflag ='S' ");//Interfaces Success Only
 					//Filter By StoreType
 					sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.CUSTOMER_NUMBER"));
 					sql.append("\n AND L.CUSTOMER_NUMBER ='"+f.getBean().getCustGroup()+"' ");
@@ -489,6 +490,7 @@ public class ShopStockOnhandAction {
 				sql.append("\n ) MP ");
 				sql.append("\n WHERE L.ORDER_NUMBER = D.ORDER_NUMBER ");
 				sql.append("\n AND D.product_id = MP.product_id ");
+				sql.append("\n AND L.intflag ='S' ");//Interfaces Success Only
 				//Filter By StoreType
 				sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.CUSTOMER_NUMBER"));
 				sql.append("\n AND L.CUSTOMER_NUMBER ='"+f.getBean().getCustGroup()+"' ");

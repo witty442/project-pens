@@ -10,25 +10,32 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DateUtil;
 import com.pens.util.EnvProperties;
+import com.pens.util.SQLHelper;
 
 
 
 public class CopyDB {
 	private static Logger logger = Logger.getLogger("PENS");
-	
 	public static void main(String[] args) {
+		copyPRODToUAT();
+		
+		//replaceSingleQuote("Bud's)");
+	}
+	public static void copyUATToPROD() {
 		String whereSQL  ="";
 		Connection connSource = null;
 		Connection connDest = null;
 		String schemaSource = "pensso";
 		String schemaDest = "pensso";
 		try{
-			connSource = getConnectionUAT_APPS();
-			connDest = getConnectionProduction_APPS();
-			
 			
 			/*****************copy uat to prod  (SO)********************/
+			//connSource = getConnectionUAT_APPS();
+			//connDest = getConnectionProduction_APPS();
+			logger.info("Copy from  UAT TO PRODUCTION");
+			
 			//processCopy(connSource,connDest,schemaSource,schemaDest,"C_DOCTYPE"," ");
 			/* processCopy(connSource,connDest,schemaSource,schemaDest,"C_MESSAGE"," ");
 			processCopy(connSource,connDest,schemaSource,schemaDest,"C_LOCKBOX"," ");
@@ -43,6 +50,125 @@ public class CopyDB {
 			
 			//processCopy(connSource,connDest,schemaSource,schemaDest,"m_province"," ");
 			//processCopy(connSource,connDest,schemaSource,schemaDest,"m_transport"," ");
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
+				if(connSource != null){
+					connSource.close();
+				}
+				if(connDest != null){
+					connDest.close();
+				}
+			}catch(Exception e){
+				
+			}
+		}
+	}
+	
+	public static void copyPRODToUAT() {
+		String whereSQL  ="";
+		Connection connSource = null;
+		Connection connDest = null;
+		String schemaSource = "pensso";
+		String schemaDest = "pensso";
+		try{
+			
+			/*****************copy  prod to uat (SO)********************/
+			connSource = getConnectionProduction_APPS("pensso"); //PROD
+			connDest = getConnectionUAT_APPS("pensso"); //UAT
+			
+			logger.info("Copy from PRODUCTION TO UAT");
+			
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"C_DOCTYPE"," ");
+			// processCopy(connSource,connDest,schemaSource,schemaDest,"C_MESSAGE"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"C_LOCKBOX"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"C_REFERENCE"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_ORG_RULE"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_ORG_RULE_ITEM"," ");
+			
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_DISTRICT"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_MAP_PROVINCE"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"MONITOR_ERROR_MAPPING"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"C_CONTROL_CODE"," ");
+			
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_PROVINCE"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_TRANSPORT"," ");
+		
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"AD_USER"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_CUSTOMER"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_CONTACT"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_ADDRESS"," ");
+			
+			//C4 and item
+			//delete all 
+			//SQLHelper.excUpdate(connDest,"delete from PENSSO.M_PRODUCT_CATEGORY");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_PRODUCT_CATEGORY"," ");
+			
+			/*SQLHelper.excUpdate(connDest,"delete from pensso.M_PRODUCT");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_PRODUCT_DIVIDE");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_PRODUCT_PRICE");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_UOM");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_UOM_CONVERSION");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_UOM_CLASS");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_UOM_CLASS_CONVERSION");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_PRICELIST");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_QUALIFIER");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_MODIFIER");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_MODIFIER_LINE");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_MODIFIER_ATTR");
+			SQLHelper.excUpdate(connDest,"delete from pensso.M_RELATION_MODIFIER");
+			
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_PRODUCT"," ");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_PRODUCT_DIVIDE"," ");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_PRODUCT_PRICE"," ");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_UOM"," ");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_UOM_CONVERSION"," ");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_UOM_CLASS"," ");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_UOM_CLASS_CONVERSION"," ");
+			
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_PRICELIST"," ");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_QUALIFIER"," ");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_MODIFIER"," ");*/
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_MODIFIER_LINE"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_MODIFIER_ATTR"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"M_RELATION_MODIFIER"," ");
+			
+			/** sequence **/
+			//SQLHelper.excUpdate(connDest,"delete from pensso.C_DOCTYPE_SEQUENCE");
+			//SQLHelper.excUpdate(connDest,"delete from pensso.C_SEQUENCE");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"C_DOCTYPE_SEQUENCE"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"C_SEQUENCE"," ");
+			
+			/** Transaction **/
+			//SQLHelper.excUpdate(connDest,"delete from pensso.T_INVOICE");
+			//SQLHelper.excUpdate(connDest,"delete from pensso.T_INVOICE_LINE");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"T_INVOICE"," ");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"T_INVOICE_LINE"," ");
+			//SQLHelper.excUpdate(connDest,"delete from pensso.T_PICKING_TRANS");
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"T_PICKING_TRANS"," ");
+			/*SQLHelper.excUpdate(connDest,"delete from pensso.T_ORDER");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"T_ORDER"," ");
+			SQLHelper.excUpdate(connDest,"delete from pensso.T_ORDER_LINE");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"T_ORDER_LINE"," ");*/
+			
+			/*SQLHelper.excUpdate(connDest,"delete from pensso.T_EDI");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"T_EDI"," ");
+			SQLHelper.excUpdate(connDest,"delete from pensso.T_EDI_LINE");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"T_EDI_LINE"," ");*/
+			
+			//processCopy(connSource,connDest,schemaSource,schemaDest,"T_PICKING_TRANS"," where transaction_date <= to_date('28082020','ddmmyyyy')");
+			
+			/*schemaSource = "pensbi";
+			schemaDest = "pensbi";
+			connSource = getConnectionProduction_APPS("pensbi"); //PROD
+			connDest = getConnectionUAT_APPS("pensbi"); //UAT
+			
+			SQLHelper.excUpdate(connDest,"delete from PENSBI.XXPENS_BI_MST_SUBBRAND");
+			processCopy(connSource,connDest,schemaSource,schemaDest,"XXPENS_BI_MST_SUBBRAND"," ");*/
+			
+			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
@@ -61,9 +187,9 @@ public class CopyDB {
 
     public static void processCopy(Connection connSource,Connection connDest,String schemaSource,String schemaDest,String tableName,String where) throws Exception{
 		try{
-			logger.debug("**start processProductionToUAT**");
+			logger.debug("**start Process Copy DB**");
 			
-			// gen row to insertsql data
+			// gen row to insert sql data
 			int countIns = generateInsertScript(connSource,connDest,schemaSource, schemaDest,tableName,where);
 			
 			logger.debug("Total Record Insert :"+countIns);
@@ -91,12 +217,14 @@ public class CopyDB {
 	    List<DBBackUpConfig> configList = new ArrayList<DBBackUpConfig>();
 	    int i = 0;
 		try{
+			logger.debug("connSource info:"+connSource.toString());
 			
 			sql.append("select * from user_tab_columns where table_name ='"+tableName+"' order by column_id \n");
 			logger.debug("sql list column table:\n"+sql.toString());
 			ps = connSource.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
 			while(rs.next()){
+				
 				//field,type,NULL(no,yes),key(pri,mul),default 
 				DBBackUpConfig config = new DBBackUpConfig();
 				config.setField(Utils.isNull(rs.getString("column_Name")));
@@ -108,6 +236,9 @@ public class CopyDB {
 				
 				
 				logger.debug("field:"+config.getField()+",Type:"+config.getType());
+			}
+			if(configList.size()==0){
+				logger.info("Not found config Table:"+tableName);
 			}
 			
 			/** Replace comma last **/
@@ -127,18 +258,18 @@ public class CopyDB {
 					DBBackUpConfig config = (DBBackUpConfig)configList.get(i);
 					
 					if(config.getType().toLowerCase().startsWith(("char"))){
-						values +="'"+Utils.isNull(rsSelect.getString(config.getField()))+"',";
+						values +="'"+replaceSingleQuote(Utils.isNull(rsSelect.getString(config.getField())))+"',";
 					}else if(config.getType().toLowerCase().startsWith(("varchar"))){
 						values +="'"+replaceSingleQuote(Utils.isNull(rsSelect.getString(config.getField())))+"',";
 					}else if(config.getType().toLowerCase().startsWith(("date"))){
 						if(rsSelect.getDate(config.getField()) != null){
-						   values +="STR_TO_DATE('"+Utils.stringValue(rsSelect.getDate(config.getField()),Utils.DD_MM_YYYY_WITHOUT_SLASH )+"','%d%m%Y'),";
+							values +="TO_DATE('"+DateUtil.stringValue(rsSelect.getDate(config.getField()),DateUtil.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
 						}else{
 						   values += "NULL,";
 						}
 					}else if(config.getType().toLowerCase().startsWith(("timstamp"))){
 						if(rsSelect.getDate(config.getField()) != null){
-						   values +="STR_TO_DATE('"+Utils.stringValue(rsSelect.getDate(config.getField()),Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH )+"','%d%m%Y %H%i%s'),";
+							values +="TO_DATE('"+DateUtil.stringValue(rsSelect.getDate(config.getField()),DateUtil.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
 						}else{
 						   values += "NULL,";
 						}
@@ -154,7 +285,7 @@ public class CopyDB {
 				if(values != null && values.length() >0){
 					values = values.substring(0,values.length()-1);
 					sqlInsert = "insert into "+schemaDest+"."+tableName+"("+columns+") values ("+values+")";
-					logger.debug("sqlInsert:"+sqlInsert);
+					//logger.debug("sqlInsert:"+sqlInsert);
 					//insert to DB Dest
 					int update =excUpdateOneSql(connDest, sqlInsert);
 					
@@ -169,6 +300,7 @@ public class CopyDB {
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 			e.printStackTrace();
+			logger.debug("Error:sqlInsert:"+sqlInsert);
 		}finally{
 			if(rs != null){
 				rs.close();
@@ -186,21 +318,22 @@ public class CopyDB {
 		return countIns;
 	}
     
-    public static int excUpdateOneSql(Connection conn,String sqlOne) {
+
+    public static int excUpdateOneSql(Connection conn,String sqlOne) throws Exception{
 	    PreparedStatement ps =null;
 	    int recordUpdate = 0;
 		try{  
 		    ps = conn.prepareStatement(sqlOne);
 			recordUpdate = ps.executeUpdate();
 		}catch(Exception e){
-	      logger.error(e.getMessage(),e);
+	      throw e;
 		}finally{
 			try{
 				if(ps != null){
 				   ps.close();ps = null;
 				}
 			}catch(Exception e){
-				logger.error(e.getMessage(),e);
+				throw e;
 			}
 		}
 		return recordUpdate;
@@ -208,24 +341,28 @@ public class CopyDB {
     /**
 	 * 
 	 * @param str
-	 * @return  'xxx'  -> \'xxx\'
+	 * @return 1: 'xxx'  -> \'xxx\'
+	 *         2:  (Bud's) -> \Bud'\'
 	 */
 	private static String replaceSingleQuote(String str){
 		try{
-			str = str.replaceAll("'", "\\\\'");
+			//logger.debug("before:"+str);
+			//str = str.replaceAll("'", "\\\\'");
+			str = str.replaceAll("'", "''");
+			//logger.debug("after:"+str);
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}
 		return str;
 	}
-	public  static Connection getConnectionUAT_APPS(){		
+	public  static Connection getConnectionUAT_APPS(String user){		
 		Connection _instanceInf =null;
 		EnvProperties env = EnvProperties.getInstance();
 		try {	
 			String driver = env.getProperty("connection.driver_class");
 			String url = "jdbc:oracle:thin:@//192.168.38.186:1529/TEST";
-			String username = "PENSSO";
-			String password = "PENSSO";
+			String username = user;
+			String password = user;
 			
 			//logger.debug("Try GetConnection DB:"+url+","+username+","+password);
 			
@@ -238,14 +375,14 @@ public class CopyDB {
 		}
 		return _instanceInf;	
 	}
-	public  static Connection getConnectionProduction_APPS(){		
+	public  static Connection getConnectionProduction_APPS(String user){		
 		Connection _instanceInf =null;
 		EnvProperties env = EnvProperties.getInstance();
 		try {	
 			String driver = env.getProperty("connection.driver_class");
 			String url = "jdbc:oracle:thin:@//192.168.37.185:1521/PENS";
-			String username = "pensso";
-			String password = "pensso";
+			String username = user;
+			String password = user;
 			
 			//logger.debug("Try GetConnection DB:"+url+","+username+","+password);
 			

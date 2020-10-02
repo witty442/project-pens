@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.MonitorItemBean;
 import com.pens.util.Constants;
-import com.pens.util.seq.SequenceProcess;
 import com.pens.util.seq.SequenceProcessAll;
 
 public class BatchTask {
@@ -67,7 +66,7 @@ public class BatchTask {
 		modelItem.setDestination("ORACLE");
 		modelItem.setStatus(Constants.STATUS_START);
 		modelItem.setSubmitDate(new Date());
-		modelItem.setId(SequenceProcessAll.getIns().getNextValue("monitor_item"));
+		modelItem.setId(SequenceProcessAll.getIns().getNextValue("monitor_item.id"));
 		
 		return modelItem;
 	}

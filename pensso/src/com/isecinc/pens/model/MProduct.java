@@ -240,20 +240,17 @@ public class MProduct extends I_Model<Product>{
 		sql.append(" \n ,(CASE WHEN st.product_id is not null THEN 'Y' ELSE '' end )as target ");
 		sql.append("\n  ,pd.taxable ");
 		sql.append("\n  ,(select count(*) as c from PENSSO.M_PRODUCT_DIVIDE mp where mp.product_code = pd.code) as check_input_half ");
-		//sql.append("\n  ,oh.quantity,oh.primary_quantity,oh.second_quantity");
 		sql.append("\n FROM PENSSO.M_Product pd ");
 		sql.append("\n INNER JOIN PENSSO.M_Product_Price pp1 ON pd.Product_ID = pp1.Product_ID ");
-		sql.append("\n AND pp1.UOM_ID = pd.UOM_ID ");
+		sql.append("\n   AND pp1.UOM_ID = pd.UOM_ID ");
 		sql.append("\n LEFT JOIN PENSSO.m_product_price pp2 ON pp2.PRODUCT_ID = pd.PRODUCT_ID ");
-		sql.append("\n AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID ");
+		sql.append("\n   AND pp2.PRICELIST_ID = pp1.PRICELIST_ID AND pp2.ISACTIVE = 'Y' AND pp2.UOM_ID <> pd.UOM_ID ");
 		sql.append("\n LEFT OUTER JOIN PENSSO.m_sales_target_new st ON  st.Product_ID = pp1.Product_ID ");
-		sql.append("\n AND TO_CHAR(st.target_from, 'YYYYMM')  = TO_CHAR(sysdate, 'YYYYMM')");
-		sql.append("\n AND USER_ID ="+u.getId());
-		
-		/*sql.append("\n LEFT JOIN APPS.xxpens_inv_onhand_z00_v oh ON oh.inventory_item_id = pd.product_id ");
-		sql.append("\n and oh.subinventory_code='Z001'");*/
-		
-		sql.append("\n WHERE pp1.ISACTIVE = 'Y'  AND pp1.PRICELIST_ID = "+pricelistId+" ");
+		sql.append("\n   AND TO_CHAR(st.target_from, 'YYYYMM')  = TO_CHAR(sysdate, 'YYYYMM')");
+		sql.append("\n   AND USER_ID ="+u.getId());
+	
+		sql.append("\n WHERE pp1.ISACTIVE = 'Y'  ");
+		sql.append("\n AND pp1.PRICELIST_ID = "+pricelistId+" ");
 		sql.append("\n AND pd.product_id in(");
 		sql.append("\n   select inventory_item_id FROM PENSBI.XXPENS_BI_MST_SUBBRAND sb ");
 		sql.append("\n   WHERE subbrand_no ='"+subBrandCode+"' ");
@@ -307,37 +304,34 @@ public class MProduct extends I_Model<Product>{
 				//check_input_half (found in m_product_devide no check input half 
 				catalog.setCheckInputHalf(rst.getInt("check_input_half")==0?"Y":"N");
 				
+				/** METHOD 1 **/
 				UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), "CTN");//default to CTN
 			    UOMConversion  uc2 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), catalog.getUom2());
 
 			    if(uc1 != null){
 			    	catalog.setUom1ConvRate(Utils.decimalFormat(uc1.getConversionRate(),Utils.format_number_no_disgit));
-			    	//logger.debug("uom1ConRate:"+catalog.getUom1ConvRate());
 			    }
 			    if(uc2 != null){
 			    	catalog.setUom2ConvRate(Utils.decimalFormat(uc2.getConversionRate(),Utils.format_number_no_disgit));
-			    	//logger.debug("uom2ConRate:"+catalog.getUom2ConvRate());
 			    }
 			    // TUB/ no conversion
 			    if(uc1.getConversionRate()==0 && uc2.getConversionRate()==0){
 			    	catalog.setUom2ConvRate("1");//default
 			    }
-			    
+
 			    //For no or check stock onhand
 			    if(checkStockFlag){
-			    	//OLD METHOD
 					stockArr = CheckStockOnhandProcess.checkStockOnhandItemProc(catalog.getProductCode(),catalog.getProductId()+"", catalog.getUom1(), catalog.getUom2());
 					if(stockArr != null ){
 						//logger.debug("stockArr[0]:"+stockArr[0]+",stockArr[1]:"+stockArr[1]);
 						catalog.setStockOnhandQty(Utils.convertStrToDouble(stockArr[0]));
+						
 						catalog.setStockOnhandQty1(Utils.convertStrToInt(stockArr[1]));
-						catalog.setStockOnhandQty2(Utils.convertStrToInt(stockArr[2]));
+						if( !Utils.isNull(stockArr[2]).equals("")){
+							//Case return 10.01 -> 10
+						    catalog.setStockOnhandQty2((new Double(stockArr[2])).intValue());
+						}
 					}
-					
-			    	//NEW 
-			    /*	catalog.setStockOnhandQty(rst.getDouble("quantity"));
-			    	catalog.setStockOnhandQty1(rst.getInt("primary_quantity"));
-					catalog.setStockOnhandQty2(rst.getInt("second_quantity"));*/
 			    }
 				productL.add(catalog);
 			}

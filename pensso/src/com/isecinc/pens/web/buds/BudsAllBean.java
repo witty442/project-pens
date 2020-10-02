@@ -3,6 +3,7 @@ package com.isecinc.pens.web.buds;
 import java.io.Serializable;
 
 import com.isecinc.pens.bean.ConfPickingBean;
+import com.isecinc.pens.bean.InvoiceReportBean;
 import com.isecinc.pens.bean.OrderEDIBean;
 import com.isecinc.pens.bean.StockOnhandBean;
 public class BudsAllBean implements  Serializable{
@@ -15,7 +16,16 @@ private static final long serialVersionUID = 8389174957413702703L;
 private ConfPickingBean confPickingBean;
 private StockOnhandBean stockOnhandBean;
 private OrderEDIBean orderEDIBean;
+private InvoiceReportBean invoiceReportBean;
 
+
+public InvoiceReportBean getInvoiceReportBean() {
+	return invoiceReportBean;
+}
+
+public void setInvoiceReportBean(InvoiceReportBean invoiceReportBean) {
+	this.invoiceReportBean = invoiceReportBean;
+}
 
 public StockOnhandBean getStockOnhandBean() {
 	return stockOnhandBean;

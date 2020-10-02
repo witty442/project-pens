@@ -13,7 +13,7 @@ import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Trip;
 import com.isecinc.pens.inf.helper.Utils;
 import com.pens.util.DBCPConnectionProvider;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MTrip Class
@@ -75,7 +75,7 @@ public class MTrip extends I_Model<Trip> {
 	public boolean save(Trip trip, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (trip.getId() == 0) {
-			id = SequenceProcess.getNextValueInt(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValueInt("m_trip");
 		} else {
 			id = trip.getId();
 		}

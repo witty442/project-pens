@@ -10,10 +10,10 @@ import org.quartz.JobExecutionContext;
 import com.isecinc.pens.scheduler.manager.ScheduleServiceManager;
 import com.isecinc.pens.scheduler.manager.ScheduleVO;
 import com.isecinc.pens.scheduler.manager.SchedulerConstant;
-import com.isecinc.pens.scheduler.taskaction.TCB001Action;
+import com.isecinc.pens.scheduler.taskaction.ImportReceiptTaskAction;
 import com.pens.util.DBConnection;
 
-public class TCB001Task implements org.quartz.Job{
+public class ImportReceiptTask implements org.quartz.Job{
 	
 	protected static Logger logger = Logger.getLogger("PENS");
 	
@@ -21,15 +21,14 @@ public class TCB001Task implements org.quartz.Job{
 		 Connection conn = null;
 		 ScheduleVO param = null;
 		 try{
-			 /** Get ScheduleVO From JonDataMap */
+			 /** Get ScheduleVO From JobDataMap */
 		    param = (ScheduleVO)jobExecutionContext.getJobDetail().getJobDataMap().get(SchedulerConstant.JOB_DATAMAP_PARAM);
 		    conn = DBConnection.getInstance().getConnection();
 		    
-		    
-		    logger.debug("TCB001Task"+":Process Task ...AT:"+new Date());
+		    logger.debug("ImportReceiptTask"+":Process Task ...AT:"+new Date());
 		    
 		    /******** Action************/
-		    TCB001Action action = new TCB001Action();
+		    ImportReceiptTaskAction action = new ImportReceiptTaskAction();
 		    param = action.execute(conn,param);
 		    /**********************************/
 		    

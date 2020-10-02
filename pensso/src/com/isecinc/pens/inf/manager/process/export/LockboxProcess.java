@@ -69,7 +69,7 @@ public class LockboxProcess {
 			sql = "	select receipt_id ,receipt_by_id,payment_method,bank from t_receipt_by  \n"+
 				  "	where t_receipt_by.receipt_id  in( \n"+
 			      "   select t_receipt.receipt_id  \n"+
-				  "	  from t_receipt ,m_customer	\n"+
+				  "	  from pensso.t_receipt ,pensso.m_customer	\n"+
 				  "	  where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID \n"+
 				  "   and t_receipt.DOC_STATUS = 'SV' \n"+
 				  "   and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+

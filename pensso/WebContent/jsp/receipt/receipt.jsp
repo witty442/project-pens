@@ -1,3 +1,6 @@
+<%@page import="com.isecinc.pens.model.MAddress"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.isecinc.pens.bean.Address"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -32,6 +35,21 @@
 	pageContext.setAttribute("internalBank",internalBank,PageContext.PAGE_SCOPE);
 	
 	User user = (User) session.getAttribute("user");
+	
+	/** display billTo for User choose Before filter Invoice **/
+	List<Address> custAddr = new ArrayList<Address>();
+	custAddr = new MAddress().lookUp(receiptForm.getReceipt().getCustomerId());
+	List<Address> billAddr = new ArrayList<Address>();
+
+	for(Address address:custAddr){
+		if("Y".equals(address.getIsActive())){
+			if("B".equalsIgnoreCase(address.getPurpose())){
+				billAddr.add(address);
+			}
+		}//if
+	}//for
+
+	pageContext.setAttribute("billAddr",billAddr,PageContext.PAGE_SCOPE);
 %>
 <html>
 <head>
@@ -175,6 +193,16 @@ function change_payment(val){
 									</html:select>
 								</td>
 							</tr>
+							<%-- <tr>
+								<td align="right"><bean:message key="Order.DeliveryDocAddress" bundle="sysele"/><font color="red">*</font></td>
+								<td align="left" colspan="3">
+									<html:select property="receipt.billToAddressId" style="width:80%">
+										<html:options collection="billAddr" property="siteUseId" labelProperty="lineString"/>
+									</html:select>
+								</td>
+							</tr> --%>
+							<html:hidden property="receipt.billToAddressId"/>
+							
 							<!-- Bill -->
 							<tr>
 								<td colspan="4">
@@ -273,14 +301,9 @@ function change_payment(val){
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>
 								<td align="center">
-									<a href="#" onclick="return save('${pageContext.request.contextPath}','<%=user.getType() %>');">
-									<!--<img src="${pageContext.request.contextPath}/images/b_save.gif" border="1" class="newPicBtn">-->
-									<input type="button" value="บันทึก" class="newPosBtn">
-									</a>
-									<a href="#" onclick="backsearch('${pageContext.request.contextPath}','${receiptForm.receipt.customerId}');">
-									<!--<img src="${pageContext.request.contextPath}/images/b_cancel.gif" border="1" class="newPicBtn">\-->
-									<input type="button" value="ยกเลิก" class="newNegBtn">
-									</a>
+									<input type="button" value="บันทึก" class="newPosBtn" onclick="return save('${pageContext.request.contextPath}','<%=user.getType() %>');">
+									
+									<input type="button" value="ยกเลิก" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${receiptForm.receipt.customerId}');">
 								</td>
 							</tr>
 						</table>
@@ -322,3 +345,7 @@ function change_payment(val){
 </body>
 </body>
 </html>
+
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../controlSaveLockScreen.jsp"/>
+<!-- Control Save Lock Screen -->

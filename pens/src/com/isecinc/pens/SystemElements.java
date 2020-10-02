@@ -84,6 +84,7 @@ public class SystemElements extends I_System {
 	public static final String HTML = "HTML";
 	public static final String WORD = "DOC";
 	public static final String PRINTER = "PRINTER";
+	public static final String PDF_TO_PRINTER = "PDF_TO_PRINTER";
 	
 	/** Follow By **/
 	public static final String Telephone = "Telephone";

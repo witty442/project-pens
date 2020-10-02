@@ -1,6 +1,5 @@
 package com.isecinc.pens.model;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,15 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.isecinc.core.model.I_Model;
-import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
-import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.inf.helper.Utils;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.DateUtil;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MOrderLine Class
@@ -31,7 +29,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 
 	private static final long serialVersionUID = -1170650417151328865L;
 
-	public static String TABLE_NAME = "t_order_line";
+	public static String TABLE_NAME = "pensso.t_order_line";
 	public static String COLUMN_ID = "ORDER_LINE_ID";
 
 	// Column Sales Online Side active
@@ -80,7 +78,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 	public boolean save(OrderLine line, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (line.getId() == 0) {
-			id = SequenceProcess.getNextValue("t_order_line").longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_order_line").longValue();
 		} else {
 			id = line.getId();
 		}
@@ -265,6 +263,22 @@ public class MOrderLine extends I_Model<OrderLine> {
 		}
 	}
 
+	public void updatePaymentOrderLine(Connection conn,long orderId,String payment) throws Exception {
+		Statement stmt = null;
+		try {
+			String sql = "update pensso.t_order_line set payment ='"+payment+"' where order_id ="+orderId;
+			stmt = conn.createStatement();
+			stmt.executeUpdate(sql);
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				stmt.close();
+			} catch (Exception e) {}
+			
+		}
+	}
+
 	/**
 	 * Delete
 	 * 
@@ -305,13 +319,7 @@ public class MOrderLine extends I_Model<OrderLine> {
 			double totalAmount = 0;
 			double percentCompare = 0;
 			int qty = 0;
-			// List<ProductPrice> pps;
-			// MProductPrice mProductPrice = new MProductPrice();
-			// UOM baseUOM = null;
-			// UOM uom = null;
-			// int capacity;
-			// int tempB = 0;
-			// int tempS = 0;
+	
 			for (SalesTargetNew t : targets) {
 				// logger.debug(t);
 				totalAmount = 0;
@@ -360,30 +368,6 @@ public class MOrderLine extends I_Model<OrderLine> {
 				}
 				t.setSubPromo(qty);
 
-				// uom conversion
-				// pps = mProductPrice.lookUp(t.getProduct().getId(), t.getPriceList().getId());
-				// for (ProductPrice pp : pps) {
-				// if (pp.getUom().getId().equalsIgnoreCase(t.getProduct().getUom().getId())) {
-				// baseUOM = pp.getUom();
-				// } else {
-				// uom = pp.getUom();
-				// }
-				// }
-				// capacity = new Double(new MUOMConversion().getCapacity(baseUOM, uom, t.getProduct())).intValue();
-				// // transfer from subQty>baseQty
-				// tempB = t.getSubQty() / capacity;
-				// tempS = t.getSubQty() % capacity;
-				//
-				// t.setBaseQty(t.getBaseQty() + tempB);
-				// t.setSubQty(tempS);
-				//
-				// // transfer from subQty>baseQty
-				// tempB = t.getSubPromo() / capacity;
-				// tempS = t.getSubPromo() % capacity;
-				//
-				// t.setBasePromo(t.getBasePromo() + tempB);
-				// t.setSubPromo(tempS);
-				// logger.debug("xxx");
 			}
 		} catch (Exception e) {
 			throw e;
@@ -423,10 +407,10 @@ public class MOrderLine extends I_Model<OrderLine> {
 			sql += "  and PROMOTION = 'Y' ";
 		}
 		sql += "  and ORDER_ID in ( \r\n";
-		sql += "	select ORDER_ID from t_order where doc_status = 'SV' \r\n";
+		sql += "	select ORDER_ID from t_order where doc_status = 'LOADING' \r\n";
 
-		sql += "	  and order_date >= '" + (DateToolsUtil.convertToTimeStamp(dateFrom==null?t.getTargetFrom():dateFrom)) + "' \r\n";
-		sql += "	  and order_date <= '" + (DateToolsUtil.convertToTimeStamp(dateTo==null?t.getTargetTo():dateTo)) + "' \r\n";
+		sql += "	  and order_date >= to_date('"+(DateUtil.convBuddhistToChristDate(dateFrom==null?t.getTargetFrom():dateFrom, DateUtil.DD_MM_YYYY_WITH_SLASH))+"','dd/mm/yyyy') \r\n";
+		sql += "	  and order_date <= to_date('"+(DateUtil.convBuddhistToChristDate(dateTo==null?t.getTargetTo():dateTo, DateUtil.DD_MM_YYYY_WITH_SLASH))+ "','dd/mm/yyyy') \r\n";
 		
 		sql += "	  and user_id = " + t.getUserId() + " \r\n";
 		sql += "	  and ar_invoice_no is not null \r\n";

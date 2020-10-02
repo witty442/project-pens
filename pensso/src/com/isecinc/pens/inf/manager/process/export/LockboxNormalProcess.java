@@ -45,7 +45,7 @@ public class LockboxNormalProcess {
 			"	CONCAT('LCK',SUBSTR(t_receipt.internal_bank,2,2)) AS	Lockbox_Number,	\n"+
 			"	'123'	AS	Origination,	\n"+
 			"   t_receipt.internal_bank     \n"+
-			"	from t_receipt ,m_customer		\n"+
+			"	from pensso.t_receipt ,pensso.m_customer \n"+
             //"	,(SELECT @rownum:=0) a	\n"+
 			"	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID 			\n"+
 			"   and t_receipt.DOC_STATUS = 'SV' 	\n"+
@@ -142,8 +142,7 @@ public class LockboxNormalProcess {
 			"	 '"+lockBoxNumber+"' AS	Lockbox_Number,		\n"+ // = Internal_blank
 			"	 t_receipt.receipt_no AS	Batch_Name,		\n"+ //BatchName running + rownum
 			"	 t_receipt.receipt_date	AS	Deposit_Date,	\n"+
-			
-            /** new Requirement  ****/
+
 			"   (select description from c_reference  where value = t_receipt.internal_bank and CODE ='InternalBank' ) AS Destination_Account,	\n"+ 
             "   (select description from c_reference  where value = t_receipt.internal_bank and CODE ='InternalBank' ) AS Remittance_Bank_Name ,	\n"+
             "   (select description from c_reference  where value = t_receipt.internal_bank and CODE ='InternalBank' ) AS Remittance_Bank_Branch_Name,	\n"+
@@ -154,15 +153,7 @@ public class LockboxNormalProcess {
 			"	m_customer.CODE	as customer_code,\n"+
 			"   '"+userBean.getCode()+"' as sales_code, \n"+
 			"   receipt_amount \n"+
-		/*	"   ,("+
-			"     select count(distinct payment_method,cheque_no) from t_receipt_by where receipt_by_id in( \n"+
-			"     select receipt_by_id from t_receipt r , t_receipt_match m \n"+
-			"       where r.receipt_id = m.receipt_id \n"+
-			"       and r.receipt_id = t_receipt.receipt_id \n"+
-			"     ) and write_off <> 'Y' \n"+
-			"   ) count_receipt_by \n"+*/
 			"	from t_receipt ,m_customer	\n"+
-            //"	,(SELECT @rownum:=0) a	\n"+
 			"	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID \n"+
 			"   and t_receipt.DOC_STATUS = 'SV' \n"+
 			"   and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
@@ -174,12 +165,7 @@ public class LockboxNormalProcess {
 			if( !Utils.isNull(receiptIdApplyTRAllBatch).equals("")){
 				sql +="   and t_receipt.receipt_id not in("+receiptIdApplyTRAllBatch+")";
 			}
-			
-			/*sql +="	group by t_receipt.receipt_id,	\n"+
-			"	  t_receipt.receipt_date,	\n"+
-			"	  m_customer.CODE	\n";*/
-
-            logger.debug("SQL:"+sql); 
+           // logger.debug("SQL:"+sql); 
             tableBean.setPrepareSqlSelect(sql);
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
@@ -267,40 +253,38 @@ public class LockboxNormalProcess {
             "	'"+lockBoxNumber+"' AS Lockbox_Number,	\n"+
             "	'"+batchName+"' AS Batch_Name,	\n"+
             "	(CASE WHEN t_receipt_by.payment_method <> 'CS' THEN  t_receipt_by.CHEQUE_NO \n"+
-            "          ELSE t_receipt.receipt_no  \n"+
+            "         ELSE t_receipt.receipt_no  \n"+
             "    END ) AS Payment_Number,	\n"+
-            "	NVL(t_receipt_by.receipt_amount,0) AS Remittance_Amount,	\n"+
+            "	NVL(t_receipt_by.receipt_amount,0) AS Remittance_Amount, \n"+
             "	t_receipt.receipt_date AS Deposit_Date,	\n"+
             "	'THB' AS Currency_Code,	\n"+
             "	m_customer.code AS Customer_Number,	\n"+
-            "	( select max(a.REFERENCE_ID) from m_address a 	\n"+
-            "	  where a.customer_id = m_customer.CUSTOMER_ID	\n"+
-            "	  and a.PURPOSE ='B' )  AS Billing_Location,	\n"+
+            
+            //"	t_receipt.bill_to_address_id AS Billing_Location, \n"+ //new code 
+            
+            "   (select max(address_id) from PENSSO.m_address "+
+            "     where t_receipt.customer_id= m_address.customer_id "+
+            "     and purpose ='B' "+
+            "   )AS Billing_Location,"+
+            
             "	rownum AS Item_Number,	\n"+
             "   t_receipt_by.payment_method as payment_method_code, \n"+
-            "   (select name from c_reference  where value = t_receipt_by.payment_method and CODE ='PaymentMethod' )as Payment_method ,\n"+
-            
-            /** OLD CODE **/
-            // "   (select name from c_reference  where value = t_receipt_by.bank and CODE ='Bank' )  AS Attribute_1,	\n"+ //CHEQUE BANK_NAME
-           
-            /** NEW CODE EDIT WIT :24/03/2011 **/
+            "   (select name from c_reference  where value = t_receipt_by.payment_method \n"+
+            "    and CODE ='PaymentMethod' )as Payment_method ,\n"+
             "   t_receipt_by.bank AS Attribute_1 , \n"+
-            
             "   t_receipt_by.CHEQUE_NO AS Attribute_2,	\n"+ 
             "   t_receipt_by.CHEQUE_DATE AS Attribute_3,  	\n"+ 
             "   '"+userBean.getCode()+"' AS Attribute_4,  	\n"+ //SALES_CODE
-            "   '-' AS Attribute_5  	\n"+ //TEMP_INVOICE WAIT
+            "   '-' AS Attribute_5 ,  	\n"+ //TEMP_INVOICE WAIT
             
-            // Pasuwat Wang-arrayagul
-            // Add Write Off Amount To First Line
-        /*  "  ,(SELECT SUM(IF(@rownum=1,rb.receipt_amount,0)) \n" +
-            "   FROM T_RECEIPT_BY rb WHERE rb.RECEIPT_ID = "+receiptId+ "\n"+
-            "   AND rb.WRITE_OFF = 'Y') as WriteOff_Amt \n "+*/
-            " , t_receipt.receipt_id \n"+
-            "	from t_receipt ,	\n"+
-            "	m_customer, 	\n"+
-            "	t_receipt_by	\n"+
-          //  "  , (SELECT @rownum:=0) a	\n"+
+            "   (SELECT SUM(Case when rownum=1 then rb.receipt_amount else 0 end) \n"+
+            "    FROM PENSSO.T_RECEIPT_BY rb WHERE rb.RECEIPT_ID = "+receiptId+
+            "    AND rb.WRITE_OFF = 'Y') as WriteOff_Amt , \n "+
+
+            "   t_receipt.receipt_id \n"+
+            "	from PENSSO.t_receipt ,	\n"+
+            "	PENSSO.m_customer, 	\n"+
+            "	PENSSO.t_receipt_by	\n"+
             "	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID 	\n"+
             "	and t_receipt.RECEIPT_ID = t_receipt_by.RECEIPT_ID	\n"+
             "	and t_receipt.receipt_id = "+receiptId+"	\n"+
@@ -311,7 +295,7 @@ public class LockboxNormalProcess {
              sql += "  and t_receipt_by.receipt_by_id not in("+receiptByIdTRSql+") \n";
             }
 
-            logger.debug("SQL:"+sql); 
+            logger.debug("XX SQL:"+sql); 
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			int lastPosition = 0;
@@ -463,7 +447,7 @@ public class LockboxNormalProcess {
              sql += "  and t_receipt_by.receipt_by_id not in("+receiptByIdTRSql+") \n";
             }
             
-            logger.debug("SQL:"+sql); 
+            //logger.debug("SQL:"+sql); 
 			ps = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
 			rs = ps.executeQuery();
 			int lastPosition = 0;

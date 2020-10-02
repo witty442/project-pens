@@ -52,7 +52,7 @@ function openDBBackupPopup(path){
 			  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';">
 			  <font color="red"><%=Utils.isNull(msg3[0]) %></font> </a>|&nbsp;<%=Utils.isNull(msg3[1]) %>
 			  &nbsp;<font color="black">
-			  Config:<%=EnvProperties.getInstance().getProperty("config.type") %>
+			  Config:<%=EnvProperties.getInstance().getProperty("product.type") %>
 			  </font> 
 			   &nbsp;|&nbsp;‡∫Õ√Ï‚∑√‰Õ∑’ : 087-8016837, 083-3061296
 			  </b>

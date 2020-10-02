@@ -19,48 +19,6 @@ public class LockboxBankTransferProcess {
 	
 	public static Logger logger = Logger.getLogger("PENS");
 	
-	/*public StringBuffer exportAllReceiptBy(Connection conn,TableBean tableBean,User userBean
-			,String receiptId,String receiptById) throws Exception{
-		StringBuffer dataAppend = new StringBuffer("");
-		PreparedStatement  ps = null;
-		ResultSet rs = null;
-		String sql = "";
-		String payMethod = "";
-		String lockBoxNumber ="";
-		String internalBank = "";
-		try{
-		      sql =" select receipt_by_id,payment_method,bank \n"
-				  +" from t_receipt_by where receipt_id ="+receiptId+" \n"
-				  +" and receipt_by_id ="+receiptById+" \n"
-				  +" and write_off <> 'Y' \n";
-		      logger.debug("sql:"+sql);
-		      
-              ps = conn.prepareStatement(sql);
-              rs = ps.executeQuery();
-              while(rs.next()){
-            	  receiptById = rs.getInt("receipt_by_id")+"";
-            	  payMethod = Utils.isNull(rs.getString("payment_method"));
-            	  if(payMethod.equalsIgnoreCase("TR")){
-            		  internalBank = Utils.isNull(rs.getString("bank"));
-            	  }
-            	  dataAppend.append(exportSalesReceiptLockBoxHeader(conn, tableBean, userBean
-            			  , receiptId,receiptById,internalBank, payMethod));
-              }
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}finally{
-			try{
-				if(ps != null){
-				   ps.close();
-				}
-				if(rs != null){
-					rs.close();
-				}
-			}catch(Exception ee){}
-		}
-		return dataAppend;
-	}*/
-	
 	public   StringBuffer exportSalesReceiptLockBoxHeader(Connection conn,TableBean tableBean,User userBean
 			,String receiptId,String receiptById, String internalBank,String payMethod) throws Exception{
 		PreparedStatement ps = null;
@@ -78,21 +36,21 @@ public class LockboxBankTransferProcess {
              
 			sql = "	select 	\n"+
 			"	'1'	AS	Record_Identifier,	\n"+
-			"	(select b.lockbox_name  from c_reference c ,c_lockbox b \n"+
+			"	(select b.lockbox_name  from pensso.c_reference c ,pensso.c_lockbox b \n"+
             "    where c.reference_id = b.reference_id \n"+
             "    and c.code='TransferBank' and c.value ='"+internalBank+"') AS	Lockbox_Number,	\n"+
            
-            "	(select b.bank_origination_number  from c_reference c ,c_lockbox b \n"+
+            "	(select b.bank_origination_number  from pensso.c_reference c ,pensso.c_lockbox b \n"+
             "    where c.reference_id = b.reference_id \n"+
             "    and c.code='TransferBank' and c.value ='"+internalBank+"') AS	Origination,\n"+
 			
 			/** Optional **/
-			"   t_receipt.receipt_id     \n"+
-			"	from t_receipt ,m_customer		\n"+
+			"   r.receipt_id     \n"+
+			"	from pensso.t_receipt r ,pensso.m_customer c	\n"+
             //"	,(SELECT @rownum:=0) a	\n"+
-			"	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID \n"+
-			"   and t_receipt.receipt_id = "+receiptId+" 	\n"+
-			"   group by t_receipt.internal_bank \n";
+			"	where r.CUSTOMER_ID = c.CUSTOMER_ID \n"+
+			"   and r.receipt_id = "+receiptId+" 	\n"+
+			"   group by r.internal_bank,r.receipt_id \n";
 
             logger.debug("SQL:"+sql); 
 			ps = conn.prepareStatement(sql);
@@ -177,35 +135,23 @@ public class LockboxBankTransferProcess {
 			
             /** new Requirement  ****/
             if(payMethod.equalsIgnoreCase("TR")){
-              sql += "   (select name from c_reference  where value = '"+internalBank+"' and CODE ='TransferBank' ) AS Destination_Account,	\n"+ 
-                     "   (select name from c_reference  where value = '"+internalBank+"' and CODE ='TransferBank' ) AS Remittance_Bank_Name ,	\n"+
-                     "   (select name from c_reference  where value = '"+internalBank+"' and CODE ='TransferBank' ) AS Remittance_Bank_Branch_Name,	\n";
+              sql += "   (select name from pensso.c_reference  where value = '"+internalBank+"' and CODE ='TransferBank' ) AS Destination_Account,	\n"+ 
+                     "   (select name from pensso.c_reference  where value = '"+internalBank+"' and CODE ='TransferBank' ) AS Remittance_Bank_Name ,	\n"+
+                     "   (select name from pensso.c_reference  where value = '"+internalBank+"' and CODE ='TransferBank' ) AS Remittance_Bank_Branch_Name,	\n";
             }
 			/** optional  ******/
 		sql +="	t_receipt.receipt_id,	\n"+
 			"	t_receipt.receipt_date,	\n"+
 			"	m_customer.CODE	as customer_code,\n"+
 			"   '"+userBean.getCode()+"' as sales_code, \n"+
-			"   receipt_amount, \n"+
-			"   ("+
-			"     select count(distinct payment_method,cheque_no) from t_receipt_by where receipt_by_id in( \n"+
-			"     select receipt_by_id from t_receipt r , t_receipt_match m \n"+
-			"       where r.receipt_id = m.receipt_id \n"+
-			"       and r.receipt_id = t_receipt.receipt_id \n"+
-			"       and m.receipt_by_id = "+receiptById+" \n"+
-			"     ) and write_off <> 'Y' \n"+
-			"   ) count_receipt_by \n"+
-			"	from t_receipt ,m_customer,	\n"+
-            "	(SELECT @rownum:=0) a	\n"+
+			"   receipt_amount \n"+
+			"	from pensso.t_receipt ,pensso.m_customer	\n"+
 			"	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID \n"+
 			"   and t_receipt.DOC_STATUS = 'SV' \n"+
 			"   and t_receipt.ORDER_TYPE = '"+ExportHelper.getOrderType(userBean)+"' \n"+
 			"	and m_customer.user_id =  "+userBean.getId()+"		\n"+
 			"   and ( t_receipt.EXPORTED  = 'N' OR t_receipt.EXPORTED  IS NULL) \n"+
-			"   and t_receipt.receipt_id = "+receiptId+" \n"+
-			"	group by t_receipt.receipt_id,	\n"+
-			"	t_receipt.receipt_date,	\n"+
-			"	m_customer.CODE	\n";
+			"   and t_receipt.receipt_id = "+receiptId+" \n";
 
             logger.debug("SQL:"+sql); 
             tableBean.setPrepareSqlSelect(sql);
@@ -223,6 +169,7 @@ public class LockboxBankTransferProcess {
 						if(colBean.getExternalFunction().equalsIgnoreCase("LEFT")){
 							dataAppend.append(ExportHelper.appendLeft(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}else {
+							logger.debug("xx colBean.getColumnName():"+colBean.getColumnName());
 							dataAppend.append(ExportHelper.appendRight(ExportHelper.covertToFormatExport(colBean,rs),Constants.INSERT_STR_DEFAULT_BLANK,colBean.getStartPosition(),colBean.getEndPosition()));
 						}
 					}else{
@@ -298,16 +245,19 @@ public class LockboxBankTransferProcess {
             "	(CASE WHEN t_receipt_by.payment_method = 'CH' THEN  t_receipt_by.CHEQUE_NO \n"+
             "          ELSE t_receipt.receipt_no  \n"+
             "    END ) AS Payment_Number,	\n"+
-            "	ifnull(t_receipt_by.receipt_amount,0) AS Remittance_Amount,	\n"+
+            "	NVL(t_receipt_by.receipt_amount,0) AS Remittance_Amount,	\n"+
             "	t_receipt.receipt_date AS Deposit_Date,	\n"+
             "	'THB' AS Currency_Code,	\n"+
             "	m_customer.code AS Customer_Number,	\n"+
-            "	( select max(a.REFERENCE_ID) from m_address a 	\n"+
-            "	  where a.customer_id = m_customer.CUSTOMER_ID	\n"+
-            "	  and a.PURPOSE ='B' )  AS Billing_Location,	\n"+
-            "	(@rownum:=@rownum+1) AS Item_Number,	\n"+
+            
+            "   (select max(address_id) from PENSSO.m_address "+
+            "     where t_receipt.customer_id= m_address.customer_id "+
+            "     and purpose ='B' "+
+            "   )AS Billing_Location,"+
+            
+            "	rownum AS Item_Number,	\n"+
             "   t_receipt_by.payment_method as payment_method_code, \n"+
-            "   (select name from c_reference  where value = t_receipt_by.payment_method and CODE ='PaymentMethod' )as Payment_method ,\n";
+            "   (select name from pensso.c_reference  where value = t_receipt_by.payment_method and CODE ='PaymentMethod' )as Payment_method ,\n";
             
             /** OLD CODE **/
             // "   (select name from c_reference  where value = t_receipt_by.bank and CODE ='Bank' )  AS Attribute_1,	\n"+ //CHEQUE BANK_NAME
@@ -329,14 +279,13 @@ public class LockboxBankTransferProcess {
             sql +="   '"+userBean.getCode()+"' AS Attribute_4,  	\n"+ //SALES_CODE
             "   '-' AS Attribute_5,  	\n"+ //TEMP_INVOICE WAIT
             
-            // Pasuwat Wang-arrayagul
-            // Add Write Off Amount To First Line
-            "     (SELECT SUM(IF(@rownum=1,rb.receipt_amount,0)) FROM T_RECEIPT_BY rb WHERE rb.RECEIPT_ID = "+receiptId+" AND rb.WRITE_OFF = 'Y') as WriteOff_Amt \n "+
-            
-            "	from t_receipt ,	\n"+
-            "	m_customer, 	\n"+
-            "	t_receipt_by,	\n"+
-            "   (SELECT @rownum:=0) a	\n"+
+		    "   (SELECT SUM(Case when rownum=1 then rb.receipt_amount else 0 end) \n"+
+		   "     FROM PENSSO.T_RECEIPT_BY rb WHERE rb.RECEIPT_ID = "+receiptId+
+		    "    AND rb.WRITE_OFF = 'Y') as WriteOff_Amt,  \n "+
+		    "   t_receipt.receipt_id \n"+
+            "	from pensso.t_receipt ,	\n"+
+            "	pensso.m_customer, 	\n"+
+            "	pensso.t_receipt_by	\n"+
             "	where t_receipt.CUSTOMER_ID = m_customer.CUSTOMER_ID 	\n"+
             "	and t_receipt.RECEIPT_ID = t_receipt_by.RECEIPT_ID	\n"+
             "	and t_receipt.receipt_id = "+receiptId+"	\n"+
@@ -441,8 +390,8 @@ public class LockboxBankTransferProcess {
             "	'"+paymentNumber+"' AS Payment_Number,	\n"+
             "	t_receipt_line.ar_invoice_no AS Invoice,	\n"+
             /** Witty Edit 08032011  Case One Cheque two Invoice **/
-            "	round(ifnull(t_receipt_match.paid_amount,0),2) AS Amount_Applied,	\n"+
-            "	@rownum:=@rownum+1  AS Overflow_Sequence,	\n"+
+            "	round(NVL(t_receipt_match.paid_amount,0),2) AS Amount_Applied,	\n"+
+            "	rownum  AS Overflow_Sequence,	\n"+
             "	'0' AS Overflow_Indicator,	\n"+
             "	'THB' AS Currency_Code,	\n"+
             "	'"+itemNumber+"' AS Item_Number,	\n"+
@@ -450,8 +399,7 @@ public class LockboxBankTransferProcess {
             "	from 	\n"+
             "	t_receipt_line ,	\n"+
             "	t_receipt_match , \n"+
-            "	t_receipt_by ,  \n"+
-            "   (SELECT @rownum:=0) a	\n"+
+            "	t_receipt_by   \n"+
             "	where 1=1	\n"+
             "   and t_receipt_line.RECEIPT_LINE_ID = t_receipt_match.RECEIPT_LINE_ID 	\n"+
             "   and t_receipt_match.RECEIPT_BY_ID = t_receipt_by.RECEIPT_BY_ID 	\n"+
@@ -470,18 +418,17 @@ public class LockboxBankTransferProcess {
             "	'"+paymentNumber+"' AS Payment_Number,	\n"+
             "	t_credit_note.credit_note_no AS Invoice,	\n"+
             /** Witty Edit 08032011  Case One Cheque two Invoice **/
-            "	round(ifnull(t_receipt_match_cn.paid_amount,0),2) AS Amount_Applied,	\n"+
-            "	@rownum:=@rownum+1  AS Overflow_Sequence,	\n"+
+            "	round(NVL(t_receipt_match_cn.paid_amount,0),2) AS Amount_Applied,	\n"+
+            "	rownum AS Overflow_Sequence, \n"+
             "	'0' AS Overflow_Indicator,	\n"+
             "	'THB' AS Currency_Code,	\n"+
             "	'"+itemNumber+"' AS Item_Number,	\n"+
             "	'"+batchName+"' AS Batch_Name	\n"+
             "	from 	\n" +
-            "   t_receipt_cn, \n"+
-            "	t_credit_note ,	\n"+
-            "	t_receipt_match_cn , \n"+
-            "	t_receipt_by ,  \n"+
-            "   (SELECT @rownum:=0) a	\n"+
+            "   pensso.t_receipt_cn, \n"+
+            "	pensso.t_credit_note ,	\n"+
+            "	pensso.t_receipt_match_cn , \n"+
+            "	pensso.t_receipt_by   \n"+
             "	where 1=1	\n"+
             "   and t_receipt_cn.CREDIT_NOTE_ID = t_credit_note.CREDIT_NOTE_ID 	\n"+
             "   and t_receipt_match_cn.receipt_cn_id = t_receipt_cn.receipt_cn_id \n"+
@@ -494,7 +441,7 @@ public class LockboxBankTransferProcess {
             "   and t_receipt_by.receipt_by_id ='"+receiptById+"' \n";
            
             logger.debug("SQL:"+sql); 
-			ps = conn.prepareStatement(sql);
+            ps = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
 			rs = ps.executeQuery();
 			int lastPosition = 0;
 

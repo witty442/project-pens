@@ -1,9 +1,9 @@
+<%@page import="com.pens.util.SessionUtils"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.isecinc.pens.model.MDistrict"%>
 <%@page import="com.isecinc.pens.bean.District"%>
 <%@page import="com.pens.util.SIdUtils"%>
-<%@ page language="java" contentType="text/html; charset=TIS-620"
-	pageEncoding="TIS-620"%>
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
@@ -15,6 +15,9 @@
 <%@page import="com.isecinc.pens.bean.User"%>
 <jsp:useBean id="orderForm" class="com.isecinc.pens.web.sales.OrderForm" scope="request" />
 <%
+/*clear session form other page */
+SessionUtils.clearSessionUnusedForm(request, "orderForm");
+
 
 User user = (User) request.getSession().getAttribute("user");
 String userName = user.getUserName();
@@ -77,7 +80,7 @@ body {
 		
 		loadDistrict(); 
 		<%if( !"".equals(orderForm.getOrder().getDistrict())){ %>
-		  document.getElementsByName('order.customer.district')[0].value = <%=orderForm.getOrder().getDistrict()%>;
+		  document.getElementsByName('order.district')[0].value = <%=orderForm.getOrder().getDistrict()%>;
 		<% } %>
 	}
 	function loadProvince(){
@@ -220,19 +223,15 @@ body {
 									maxlength="10" size="15" readonly="true" styleId="orderDateTo" />
 								</td>
 							</tr>
-							<%-- <tr>
-								<td align="right"><bean:message key="Order.No"  bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left"><html:text property="order.salesOrderNo" size="20" /></td>
-								<td align="right"><bean:message key="Bill.No"  bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left"><html:text property="order.arInvoiceNo" styleClass="\" autoComplete=\"off"size="20" /></td>
-							</tr> --%>
 							<tr>
 								<td align="right"><bean:message key="Status" bundle="sysele" />&nbsp;&nbsp;</td>
-								<td align="left"><html:select property="order.docStatus">
+								<td align="left" nowrap><html:select property="order.docStatus">
 									<html:option value=""></html:option>
 									<html:options collection="docstatus" property="key"
 										labelProperty="name" />
-								</html:select></td>
+								</html:select>
+								&nbsp;&nbsp;PickingNo&nbsp;<html:text property="order.pickingNo" size="15" styleClass="\" autoComplete=\"off" ></html:text>
+								</td>
 							</tr>
 						</table>
 						<br>
@@ -260,6 +259,7 @@ body {
 									<th class="status">ชื่อร้านค้า</th>
 									<th class="status">ที่อยู่ส่ง</th>
 									<th class="status"><bean:message key="Status" bundle="sysele" /></th>
+									<th class="status">Picking No</th>
 									<th class="status">ทำรายการ</th>
 									<th class="status"><bean:message key="View" bundle="sysprop" /></th>
 								</tr>
@@ -282,7 +282,7 @@ body {
 									<td align="left" width="15%">${results.customerName}</td>
 									<td align="left" width="30%">${results.addressSummary}</td>
 									<td align="center" width="8%">${results.docStatusLabel}</td>
-									<!-- OLD CODE  -->
+									<td align="center" width="8%">${results.pickingNo}</td>
 									<td align="center" width="8%">
 									<%if( !userName.equalsIgnoreCase("ADMIN")){ %>
 										<c:if test="${results.exported=='N'}">

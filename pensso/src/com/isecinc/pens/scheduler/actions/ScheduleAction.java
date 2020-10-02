@@ -21,7 +21,6 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
-import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.scheduler.bean.TaskConditionDTO;
@@ -44,10 +43,9 @@ public class ScheduleAction extends  I_Action
 	protected String prepare(String id, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		logger.debug("Interfaces Prepare Form");
-		ImportForm importForm = (ImportForm) form;
+		ScheduleForm aForm = (ScheduleForm) form;
 		String returnText = "prepare";
 		try {
-			importForm.setPage(Utils.isNull(request.getParameter("page")));
 			
 			if(Utils.isNull(request.getParameter("action")).equalsIgnoreCase("new")){
 				 request.getSession().setAttribute("dataList",null);
@@ -139,7 +137,7 @@ public class ScheduleAction extends  I_Action
 	    logger.debug("Action Run Batch");
 		try{
 			// Job & trigger information
-		     ScheduleVO param = covertToScheduleVO(f,request);
+		     ScheduleVO param = covertToScheduleVO(f,request,user);
 			 conn = DBConnection.getInstance().getConnection();
 			 
 			 logger.debug("1.groupid:"+param.getGroupId());
@@ -259,7 +257,7 @@ public class ScheduleAction extends  I_Action
 	 */
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
-		ImportForm tripForm = (ImportForm) form;
+		ScheduleForm aForm = (ScheduleForm) form;
 		try {
 
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc());
@@ -270,8 +268,6 @@ public class ScheduleAction extends  I_Action
 				conn.rollback();
 			} catch (Exception e2) {}
 		} finally {
-			request.setAttribute("type", SystemElements.ADMIN);
-			request.setAttribute("searchKey", tripForm.getCriteria().getSearchKey());
 			
 			try {
 				conn.close();
@@ -283,8 +279,8 @@ public class ScheduleAction extends  I_Action
 	
 	@Override
 	protected void setNewCriteria(ActionForm form) {
-		ImportForm tripForm = (ImportForm) form;
-		tripForm.setCriteria(new ImportCriteria());
+		//ImportForm tripForm = (ImportForm) form;
+		//tripForm.setCriteria(new ImportCriteria());
 	}
 
 	@Override
@@ -294,7 +290,7 @@ public class ScheduleAction extends  I_Action
 		return null;
 	}
     
-    private ScheduleVO covertToScheduleVO(ScheduleForm f,HttpServletRequest request) throws Exception{
+    private ScheduleVO covertToScheduleVO(ScheduleForm f,HttpServletRequest request,User user) throws Exception{
   
     	String taskName = Utils.isNull(f.getTaskName());//dynaForm.get("taskName"));
 		String hour = Utils.isNull(f.getHour());//dynaForm.get("hour"));
@@ -323,6 +319,10 @@ public class ScheduleAction extends  I_Action
 		 param.setStartMinute(Utils.isNull(f.getStartMinute()));
 		 param.setUserId(SecurityUtils.getInstance().getUserId(request));
 		 param.setEveryDay(f.getEveryDay());
+		 
+		 param.setEveryType(Utils.isNull(f.getEveryType()));
+		 param.setEveryMinutes(Utils.isNull(f.getEveryMinutes()));
+		 param.setEveryHourly(Utils.isNull(f.getEveryHourly()));
 		 param.setNDay(f.getNDay());
 		 
 		 //Gen JobName
@@ -330,6 +330,8 @@ public class ScheduleAction extends  I_Action
 		 
 		 //set localPath
 		 param.setLocalPath(request.getRealPath("temps"));
+		 
+		 param.setUser(user);
 		
     	return param;
     }
@@ -381,8 +383,8 @@ public class ScheduleAction extends  I_Action
 			}		    
 		}
 		
-		System.out.println("BatchFrom:"+tranDateSchFromStr);
-		System.out.println("BatchTO:"+tranDateSchToStr);
+		//System.out.println("BatchFrom:"+tranDateSchFromStr);
+		//System.out.println("BatchTO:"+tranDateSchToStr);
 		
 		Date tranDateSchFrom = (tranDateSchFromStr != null && !"".equals(tranDateSchFromStr))
 			?DateUtil.parse(tranDateSchFromStr,dateFormat) :null;

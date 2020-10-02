@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
+import com.isecinc.pens.bean.User;
+
 
 public class ScheduleVO implements Serializable{
     
@@ -35,16 +37,51 @@ public class ScheduleVO implements Serializable{
 	private Date nextRunDate;
 	private String crontriggerExp;
     private String everyDay;
+    private String everyType;
+    private String everyMinutes;
+    private String everyHourly;
     private String localPath;
     private String sourcePath;
     private String destPath;
     private String fileName;
     private String message;
     private String paramRegen;
+    private User user;
     private Map<String, String> paramMap;
+    private BigDecimal transactionId;//link monitor
     
     
-    
+	
+	public String getEveryType() {
+		return everyType;
+	}
+	public void setEveryType(String everyType) {
+		this.everyType = everyType;
+	}
+	public String getEveryMinutes() {
+		return everyMinutes;
+	}
+	public void setEveryMinutes(String everyMinutes) {
+		this.everyMinutes = everyMinutes;
+	}
+	public String getEveryHourly() {
+		return everyHourly;
+	}
+	public void setEveryHourly(String everyHourly) {
+		this.everyHourly = everyHourly;
+	}
+	public BigDecimal getTransactionId() {
+		return transactionId;
+	}
+	public void setTransactionId(BigDecimal transactionId) {
+		this.transactionId = transactionId;
+	}
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
 	public Map<String, String> getParamMap() {
 		return paramMap;
 	}

@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.isecinc.core.bean.References;
@@ -21,7 +20,7 @@ import com.isecinc.pens.init.InitialReferences;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.NumberToolsUtil;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * Receipt Line Model
@@ -81,7 +80,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 	public boolean save(ReceiptLine line, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (line.getId() ==0) {
-			id = SequenceProcess.getNextValue("t_receipt_line").longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt_line").longValue();
 		} else {
 			id = line.getId();
 		}
@@ -100,20 +99,29 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 
 	public boolean saveCaseImportReceipt(ReceiptLine line, int activeUserID, Connection conn) throws Exception {
 		 String[] columnsSaveImport = { COLUMN_ID, "LINE_NO", "RECEIPT_ID", "AR_INVOICE_NO", "SALES_ORDER_NO",
-				"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "INVOICE_ID", "CREATED_BY", "UPDATED_BY",
-				"DESCRIPTION", "IMPORT_TRANS_ID"};
+				"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "CREATED_BY", "UPDATED_BY",
+				"DESCRIPTION", "IMPORT_TRANS_ID","INVOICE_ID"};
 		 long id =0;
 		if (line.getId() ==0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME).longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt_line").longValue();
 		} else {
 			id = line.getId();
 		}
 		
-		Object[] values = { id, line.getLineNo(), line.getReceiptId(), line.getArInvoiceNo(), line.getSalesOrderNo(),
-				line.getInvoiceAmount(), line.getCreditAmount(), line.getPaidAmount(), line.getRemainAmount(),
-				line.getOrder().getId(), activeUserID, activeUserID,
+		Object[] values = { id,
+				line.getLineNo(),
+				line.getReceiptId(),
+				line.getArInvoiceNo(),
+				line.getSalesOrderNo(),
+				line.getInvoiceAmount(),
+				line.getCreditAmount(),
+				line.getPaidAmount(),
+				line.getRemainAmount(),
+			    activeUserID,
+			    activeUserID,
 				ConvertNullUtil.convertToString(line.getDescription()).trim(),
-		        line.getImportTransId()
+		        line.getImportTransId(),
+		        line.getOrder().getInvoiceId()
 		};
 		if (super.save(TABLE_NAME, columnsSaveImport, values, line.getId(), conn)) {
 			line.setId(id);
@@ -187,9 +195,9 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			sql += "\n  where rl.invoice_id = " + order.getInvoiceId();
 			sql += "\n  and rl.INVOICE_ID = o.INVOICE_ID ";
 			sql += "\n  and rl.receipt_id in ("
-					+ "   select receipt_id "
-					+ "   from " + MReceipt.TABLE_NAME 
-					+"    where doc_status = '"+Receipt.DOC_SAVE + "' ) ";
+					+"\n   select receipt_id "
+					+"\n   from " + MReceipt.TABLE_NAME 
+					+"\n   where doc_status = '"+Receipt.DOC_SAVE + "' ) ";
 
 			logger.debug("sql:\n"+sql);
 			

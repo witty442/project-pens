@@ -50,7 +50,8 @@ String role = ((User)session.getAttribute("user")).getType();
 
 <script type="text/javascript">
 function loadMe(){
-	new Epoch('epoch_popup', 'th', document.getElementById('transactionDate'));
+	new Epoch('epoch_popup', 'th', document.getElementById('transactionDateFrom'));
+	new Epoch('epoch_popup', 'th', document.getElementById('transactionDateTo'));
 }
 function search(){
 	var form = document.budsAllForm;
@@ -157,14 +158,21 @@ function setDataPopupValue(code,desc,pageName){
 								    styleClass="\" autoComplete=\"off" styleId="pickingNo"></html:text>
 								    <input type="button" name="btTransport" value="..." 
 								    onclick="openPopupPage('PICKING_NO_INVOICE')" class="newPosBtnLong"/>
-								     &nbsp;Transaction Date 
-								    <html:text property="bean.confPickingBean.transactionDate" styleId="transactionDate" size="10" readonly="true" styleClass=""/> 
+								  
 								  <%--  &nbsp;Summary Type
 								   <html:select property="bean.confPickingBean.summaryType">
 								     <html:option value="SUMMARY">Summary</html:option>
 								     <html:option value="DETAIL">Detail</html:option>
 								   </html:select> --%>
 							    </td>
+							 </tr>
+							 <tr>
+				                <td> Transaction Date From</td>
+								<td>
+								 <html:text property="bean.confPickingBean.transactionDateFrom" styleId="transactionDateFrom" size="10" readonly="true" styleClass=""/> 
+								 &nbsp;&nbsp;To&nbsp;&nbsp;
+								  <html:text property="bean.confPickingBean.transactionDateTo" styleId="transactionDateTo" size="10" readonly="true" styleClass=""/> 
+								</td>
 							 </tr>
 						</table>
 					<br>

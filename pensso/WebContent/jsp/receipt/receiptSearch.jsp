@@ -176,12 +176,8 @@ function loadMe(){
 								  </th>
 								<%} %>
 								<th class="status"><bean:message key="Status" bundle="sysele"/></th>
-								<%if(role.equalsIgnoreCase(User.DD)){ %>
-								  <th class="status">แบ่งชำระเป็นรายการ</th>
-								  <th class="status"><bean:message key="Edit" bundle="sysprop"/></th>
-								<%} %>
 								<%if(!role.equalsIgnoreCase(User.DD)){ %>
-								<th class="status"><bean:message key="Edit" bundle="sysprop"/></th>
+								  <th class="status"><bean:message key="Edit" bundle="sysprop"/></th>
 								<%} %>
 								<th class="status"><bean:message key="View" bundle="sysprop"/></th>
 							</tr>	
@@ -224,56 +220,9 @@ function loadMe(){
 							<%} %>
 							<td align="center" width="48px;">${results.docStatusLabel}</td>
 							
-							<%if(role.equalsIgnoreCase(User.DD)){ %>
-							<td align="center">
-								<c:if test="${results.prepaid=='N'}">
-								<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-								</c:if>
-							</td>
-							<td align="center">
-								<c:if test="${results.exported=='N'}">
-									<c:if test="${results.docStatus=='SV'}">
-										<c:if test="${results.prepaid=='N'}">
-										<!-- *** OLD CODE ********** -->
-<!--										<a href="#" onclick="javascript:prepareMR('${pageContext.request.contextPath}','edit','${results.id}');">-->
-<!--										<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>-->
-										<!-- *** OLD CODE ********** -->
-										<!-- WIT EDIT 03/08/2554*** -->
-<!--										<a href="#" onclick="javascript:openCancelReceiptPopup('${pageContext.request.contextPath}','${results.receiptNo}','${results.id}');">-->
-<!--											                                    ยกเลิกรายการ</a>-->
-										<!-- WIT EDIT 03/08/2554*** -->
-										</c:if>
-									</c:if>
-								</c:if>
-							</td>
-							<%} %>
-							<%if(!role.equalsIgnoreCase(User.DD)){ %>
-							<td align="center" width="47px;">
-								<c:if test="${results.exported=='N'}">
-									<c:if test="${results.docStatus=='SV'}">
-										<c:if test="${results.prepaid=='N'}">
-										   <!-- *** OLD CODE ********** -->
-<!--											<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit','${results.id}');">-->
-<!--											<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>-->
-
-											<!-- *** OLD CODE ********** -->
-											<!-- WIT EDIT 03/08/2554*** -->
-<!--											<a href="#" onclick="javascript:openCancelReceiptPopup('${pageContext.request.contextPath}','${results.receiptNo}','${results.id}');">-->
-<!--											                                    ยกเลิกรายการ</a>-->
-										    <!-- WIT EDIT 03/08/2554*** -->
-										</c:if>
-									</c:if>
-								</c:if>
-							</td>
-							<%} %>
-							
 							<td align="center">
 								<%if(!role.equalsIgnoreCase(User.DD)){ %>
 								<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${results.id}');">
-								<img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
-								<%} %>
-								<%if(role.equalsIgnoreCase(User.DD)){ %>
-								<a href="#" onclick="javascript:prepareMR('${pageContext.request.contextPath}','view','${results.id}');">
 								<img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
 								<%} %>
 							</td>

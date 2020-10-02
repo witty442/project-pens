@@ -1,6 +1,5 @@
 package com.isecinc.pens.model;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -12,7 +11,7 @@ import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptCN;
 import com.pens.util.DBCPConnectionProvider;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MAddress Class
@@ -55,7 +54,7 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 	public boolean save(ReceiptCN receiptCN, int activeUserID, Connection conn) throws Exception {
 		long id = 0;
 		if (receiptCN.getId() ==0) {
-			id = SequenceProcess.getNextValue("t_receipt_cn").longValue();
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt_cn").longValue();
 		} else {
 			id = receiptCN.getId();
 		}
@@ -177,7 +176,7 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 		try {
 
 			String sql = "select rl.PAID_AMOUNT ";
-			sql += "from t_receipt_cn rl, t_credit_note o ";
+			sql += "from pensso.t_receipt_cn rl, pensso.t_credit_note o ";
 			sql += "where rl.credit_note_id = " + cn.getId();
 			sql += "  and rl.credit_note_id = o.credit_note_id ";
 			sql += "  and o.active = 'Y' and o.doc_status ='SV' ";

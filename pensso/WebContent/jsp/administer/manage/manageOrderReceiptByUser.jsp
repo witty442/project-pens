@@ -155,6 +155,7 @@ function cancelRR(id){
 								<th><bean:message key="Customer" bundle="sysele"/></th>
 								<th class="costprice"><bean:message key="TotalAmount" bundle="sysele" /></th>
 								<th class="status">ยกเลิกรายการ</th>
+								<th class="status">แสดง</th>
 							</tr>
 							<%int i=1; %>
 							<%for(Order o : manageOrderReceiptByUserForm.getOrders()){ %>
@@ -167,6 +168,10 @@ function cancelRR(id){
 								<td align="center">
 									<a href="javascript:cancelOM('<%=o.getId() %>');">
 									<img src="${pageContext.request.contextPath}/icons/uncheck.gif" border="0" align="absmiddle"></a>
+								</td>
+								<td align="center">
+									<a href="javascript:viewReceipt('<%=o.getId() %>');">
+									<img src="${pageContext.request.contextPath}/icons/find.gif" border="0" align="absmiddle"></a>
 								</td>
 							</tr>
 							<%} %>

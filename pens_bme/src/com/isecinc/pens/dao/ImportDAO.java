@@ -1335,7 +1335,7 @@ public class ImportDAO {
 				}
 			}
 			if( !Utils.isNull(custCode).equals("")){
-				sql.append(" and pens_value ='"+custCode+"' \n");
+				sql.append(" and pens_value in("+SQLHelper.converToTextSqlIn(custCode)+") \n");
 			}
 			sql.append(" order by  sequence asc \n");
 			

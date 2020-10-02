@@ -34,6 +34,7 @@ public class GenerateAutoReceiptVan {
 		if("Y".equalsIgnoreCase(user.getPdPaid())){
 		    genAutoReceiptCashModel(user);
 		}else{
+			//PD_PAID =N ,MONEY_TO_PENS =Y
 			//New Case Van Bangkok
 			genAutoReceiptCashModelValidate(user);
 		}
@@ -58,11 +59,14 @@ public class GenerateAutoReceiptVan {
 					 //Validate Gen Auto Receipt 
 					String canReceiptChequeFlag = CustomerReceiptFilterUtils.canReceiptCheque(conn,order.getCustomerId());
 					String canReceiptCreditFlag = CustomerReceiptFilterUtils.canReceiptCredit(conn,order.getCustomerId());
-						
+					
+					logger.debug("canReceiptChequeFlag:"+canReceiptChequeFlag);
+					logger.debug("canReceiptCreditFlag:"+canReceiptCreditFlag);
 					if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag) ){
 						 /** orderForm.setCanReceiptMoreCash("Y"); **/
-						
+						logger.debug("-- No Gen AutoReceipt Case PD_PAID =N");
 					}else{
+						logger.debug("-- Gen AutoReceipt Case PD_PAID =N");
 						 /** orderForm.setCanReceiptMoreCash("N"); **/
 						//Case Customer No Cheque ,No Credit Gen AutoReceipt
 	

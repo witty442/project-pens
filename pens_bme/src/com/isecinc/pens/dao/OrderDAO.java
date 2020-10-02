@@ -1013,16 +1013,20 @@ public class OrderDAO {
 				String store_code = Utils.isNull(rst.getString("store_code"));
 				
 				String materialMaster = Utils.isNull(rst.getString("material_master_lotus"));
-				
-				if(store_code.startsWith(Constants.STORE_TYPE_FRIDAY_CODE)){
-				   materialMaster = Utils.isNull(rst.getString("material_master_friday"));
-				}else if(store_code.startsWith(Constants.STORE_TYPE_OSHOPPING_CODE)){
-				   materialMaster = Utils.isNull(rst.getString("material_master_oshopping"));
-				}else if(store_code.startsWith(Constants.STORE_TYPE_7CATALOG_CODE)){
-				   materialMaster = Utils.isNull(rst.getString("material_master_7catalog"));
-				}else if(store_code.startsWith(Constants.STORE_TYPE_TVD_CODE)){
-				   materialMaster = Utils.isNull(rst.getString("material_master_tvdirect"));
-				}
+				//temp for 
+				/*if("020998-1".equalsIgnoreCase(store_code)){
+					materialMaster = Utils.isNull(rst.getString("material_master_tvdirect"));
+				}else{*/
+					if(store_code.startsWith(Constants.STORE_TYPE_FRIDAY_CODE)){
+					   materialMaster = Utils.isNull(rst.getString("material_master_friday"));
+					}else if(store_code.startsWith(Constants.STORE_TYPE_OSHOPPING_CODE)){
+					   materialMaster = Utils.isNull(rst.getString("material_master_oshopping"));
+					}else if(store_code.startsWith(Constants.STORE_TYPE_7CATALOG_CODE)){
+					   materialMaster = Utils.isNull(rst.getString("material_master_7catalog"));
+					}else if(store_code.startsWith(Constants.STORE_TYPE_TVD_CODE)){
+					   materialMaster = Utils.isNull(rst.getString("material_master_tvdirect"));
+					}
+				//}
 				
 				String barcode = Utils.isNull(rst.getString("barcode"));
 				String qty = Utils.isNull(rst.getString("qty"));
@@ -1054,7 +1058,7 @@ public class OrderDAO {
 				}
 				
 				String whole_price_bf = Utils.isNull(rst.getString("whole_price_bf"));
-				logger.debug("whole_price_bf:"+whole_price_bf);
+				//logger.debug("whole_price_bf:"+whole_price_bf);
 				String whole_price_bf_1 = "";
 				String whole_price_bf_2 = "";
 				
@@ -1083,8 +1087,8 @@ public class OrderDAO {
 		    	String storeType = store_code.substring(0,6);
 		    	storeGroup = importDAO.getStoreTypeName(conn, storeType).getInterfaceDesc();
 		    	
-		    	logger.debug("storeType:"+storeType+",store_code:"+store_code+",storeGroup:"+storeGroup);
-				logger.debug("billType["+billType+"]");
+		    	//logger.debug("storeType:"+storeType+",store_code:"+store_code+",storeGroup:"+storeGroup);
+				//logger.debug("billType["+billType+"]");
 				
 		    	String custMat = "";
 

@@ -515,7 +515,7 @@ public class DateToolsUtil {
 	 * @throws Exception
 	 */
 	public static Timestamp convertToTimeStamp(String date) throws Exception {
-		System.out.println("convertToTimeStamp");
+		//System.out.println("convertToTimeStamp");
 		Timestamp ts = null;
 		if (date.length() > 0) {
 			Date d = new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).parse(date);

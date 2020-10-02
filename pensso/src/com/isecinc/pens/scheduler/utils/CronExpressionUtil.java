@@ -10,7 +10,7 @@ import com.isecinc.pens.scheduler.manager.exception.CronExpressionException;
 import com.pens.util.Utils;
 
 /**
- * @author Arthit Tanaphongwiset This is a helper class that using for
+ * @author Wittaya This is a helper class that using for
  *         converting all schedule type
  *         <p>
  *         (e.g. hourly, daily, monthly, etc.) to Cron expression in Unix
@@ -65,7 +65,7 @@ public class CronExpressionUtil {
 	
 	//sample  
 	//	0 9 12 1/2 * ? *  ->start every 2 day at 12:09 am
-	public static String dailyToCronExpr(String days ,Date startDate)
+	public static String dailyToCronExpr(String days ,String everyType,String everyMinute,String everyHourly,Date startDate)
 			throws CronExpressionException {
 		try {
 			StringBuffer cronExpr = new StringBuffer();
@@ -74,27 +74,42 @@ public class CronExpressionUtil {
 			if (Utils.isNull(days).equals("")) {
 				throw new CronExpressionException("Days is Empty");
 			}
-
-			cronDays.append("1/"+days);
+		
+			if( Utils.isNull(everyMinute).equals("")){
 				
-	
-			int startHour = Integer.parseInt(DateUtil.stringValue(startDate,
-					"HH"));
-			int startMinute = Integer.parseInt(DateUtil.stringValue(startDate,
-					"mm"));
-			int startDay = Integer.parseInt(DateUtil.stringValue(startDate,
-					"dd"));
-
-			// Cron Expression 0 startMinite startHour ? * dayOfWeek
-			cronExpr.append("0 ");
-			cronExpr.append(startMinute);
-			cronExpr.append(" ");
-			cronExpr.append(startHour);
-			cronExpr.append(" ");
-			cronExpr.append(cronDays);
-			cronExpr.append(" * ? *");
-			logger.debug("CronExpr : " + cronExpr.toString());
-
+				int startHour = Integer.parseInt(DateUtil.stringValue(startDate,
+						"HH"));
+				int startMinute = Integer.parseInt(DateUtil.stringValue(startDate,
+						"mm"));
+				int startDay = Integer.parseInt(DateUtil.stringValue(startDate,
+						"dd"));
+					
+				
+				cronDays.append("1/"+days);
+		
+				// Cron Expression 0 startMinite startHour ? * dayOfWeek
+				cronExpr.append("0 ");
+				cronExpr.append(startMinute);
+				cronExpr.append(" ");
+				cronExpr.append(startHour);
+				cronExpr.append(" ");
+				cronExpr.append(cronDays);
+				cronExpr.append(" * ? *");
+				logger.debug("CronExpr : " + cronExpr.toString());
+			}else{
+				if( Utils.isNull(everyType).equalsIgnoreCase("MINUTE")){
+					 // 0/30 0/1 * 1/1 * ? * ->Sample code
+				     // 0 0/30 * * * ?  
+				    cronExpr.append("0 0/"+everyMinute+" * 1/1 * ? *");
+			
+				}else{
+					//every Hourly
+					//ex run every 2 hour  :0 0 0/2 1/1 * ? *
+					
+					cronExpr.append("0 0 0/"+everyHourly+" 1/1 * ? *");
+				}
+				logger.debug("CronExpr : " + cronExpr.toString());
+			}
 			return cronExpr.toString();
 
 		} catch (Exception e) {

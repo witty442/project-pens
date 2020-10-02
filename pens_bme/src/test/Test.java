@@ -13,7 +13,20 @@ import com.pens.util.Utils;
 public class Test {
 	protected static  Logger logger = Logger.getLogger("PENS");
 	
+	
 	public static void main(String[] args) {
+		try {
+			String a ="D|3|8850133047630|2001026586545|∫’¡’°“ß‡°ß„π ’‰´¥Ï|204.19|0|1|";
+			String b ="D|4|8850133050876|2001026991981|∫’¡’‡ ◊ÈÕ„π ’‰´¥Ï|58.37|0||";
+			
+		    logger.debug("strExcel \n"+a.split("\\|",-1).length);
+		    logger.debug("strExcel \n"+b.split("\\|",-1).length);
+		} catch (Exception ex) {
+		   ex.printStackTrace();
+		}
+	}
+	
+	public static void main_22(String[] args) {
 		try {
 			String strExcel = FileUtil.readFile("D:\\Work_ISEC\\Project-BME\\DEV\\DataImport\\TRANS_LOTUS(SaleOut)\\New Format Sales-Out LOTUS_test.xlsb");
 		    logger.debug("strExcel \n"+strExcel);

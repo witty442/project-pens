@@ -29,7 +29,7 @@ import com.isecinc.pens.inf.manager.UpdateSalesManagerHelper;
 import com.isecinc.pens.inf.manager.process.bean.KeyNoImportTransBean;
 import com.isecinc.pens.inf.manager.process.bean.LineImportTransBean;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
-import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction2;
+import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.pens.util.ControlCode;
@@ -71,7 +71,7 @@ public class UpdateSalesProcess {
         UpdateSalesManagerHelper helper = new UpdateSalesManagerHelper();
         String receiptNoAll = "";
         ImportReceiptFunction importReceipt1 = new ImportReceiptFunction();
-        ImportReceiptFunction2 importReceipt2 = new ImportReceiptFunction2();
+        ImportReceiptFunction importReceipt2 = new ImportReceiptFunction();
         boolean useImportReceipt2 = false;
         LineImportTransBean lineBean = null;
 	    try {  

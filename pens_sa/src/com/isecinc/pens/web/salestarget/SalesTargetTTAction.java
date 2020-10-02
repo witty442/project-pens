@@ -210,11 +210,11 @@ public class SalesTargetTTAction  {
 	        	    h.setSalesrepCode(salesrepBean.getSalesrepCode());
 	        	    h.setSalesrepId(salesrepBean.getSalesrepId());
 	        	   
-	        	    //h.setSalesChannelNo(salesrepBean.getSalesChannelNo());
-	        	    //WIT Edit 17/08/2563 get from screen
-	        	    h.setSalesChannelNo(bean.getSalesZone());//salesChannel =salesZone
-	        	    
-	        	    h.setDivision(SalesTargetTTUtils.getDivision(conn,h.getSalesChannelNo()));
+	        	    h.setSalesChannelNo(salesrepBean.getSalesChannelNo());
+	        	    //Get Division By SalesZone
+	        	    h.setDivision(SalesTargetTTUtils.getDivision(conn,bean.getSalesZone()));
+	        	    logger.debug("Division:"+h.getDivision());
+	        	 
 	    			//set productList to salesrepCode
 	        	    h.setItems(productDataSaveListBySalesrep);
 	        		h.setStatus(SalesTargetConstants.STATUS_POST);

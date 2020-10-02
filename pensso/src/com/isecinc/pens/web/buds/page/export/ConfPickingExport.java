@@ -15,6 +15,7 @@ import com.isecinc.pens.bean.ConfPickingBean;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.model.MProduct;
+import com.pens.util.ControlCode;
 import com.pens.util.DBConnectionApps;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
@@ -190,7 +191,7 @@ public class ConfPickingExport {
 		sql.append("\n    WHERE t.HEADER_ID = l.HEADER_ID ");
 		sql.append("\n    AND t.customer_id = c.customer_id ");
 		sql.append("\n    AND c.customer_id = a.customer_id ");
-		sql.append("\n    AND t.ship_to_site_use_id = a.address_id ");
+		sql.append("\n    AND t.ship_to_address_id = a.address_id ");
 		sql.append("\n    AND a.purpose = 'S' ");
 		sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
 		sql.append("\n    GROUP BY t.picking_no, t.CUST_PO_NUMBER ,t.ORDERED_DATE  ");
@@ -467,6 +468,20 @@ public class ConfPickingExport {
 		sql.append("\n    AND l.product_id = p.product_id");
 		sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
 		sql.append("\n    group by p.code,p.name,l.uom_id ");
+		
+		if(ControlCode.canExecuteMethod("Picking", "OrderEDI")){
+			sql.append("\n    UNION ");
+			
+			sql.append("\n    /** Order EDI **/ ");
+			sql.append("\n    SELECT p.code as product_code , p.name as product_name ,l.order_quantity_uom as uom_id");
+			sql.append("\n    ,nvl(sum(l.ordered_quantity),0) as qty");
+			sql.append("\n    FROM pensso.t_edi t ,pensso.t_edi_line l");
+			sql.append("\n    ,pensso.m_product p ");
+			sql.append("\n    WHERE t.header_id = l.header_id ");
+			sql.append("\n    AND l.inventory_item_id = p.product_id");
+			sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
+			sql.append("\n    group by p.code,p.name,l.order_quantity_uom ");
+		}
 		sql.append("\n )M ");
 		sql.append("\n where 1=1");
 		sql.append("\n ORDER BY M.product_code");
@@ -502,16 +517,43 @@ public class ConfPickingExport {
 		sql.append("\n    and t.customer_id = c.customer_id ");
 		sql.append("\n    AND t.user_id = s.user_id ");
 		sql.append("\n    AND l.product_id = p.product_id ");
-		
 		sql.append("\n    AND c.customer_id = ship_address.customer_id ");
 		sql.append("\n    AND t.ship_address_id = ship_address.address_id ");
-		
 		sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
 		
-		//sql.append("\n    UNION ALL ");
+		if(ControlCode.canExecuteMethod("Picking", "OrderEDI")){
+		   sql.append("\n    UNION ALL ");
 		
-		//sql.append("\n    /** EDI **/ ");
+		   sql.append("\n    /** EDI **/ ");
+		   sql.append("\n    SELECT t.picking_no ,t.CUST_PO_NUMBER AS ORDER_NO ,t.ORDERED_DATE as ORDER_DATE ");
+		   sql.append("\n    ,c.code as customer_number ,c.name as CUSTOMER_NAME");
+		   sql.append("\n    ,s.code as salesrep_code ,s.name as salesrep_name");
+		   sql.append("\n    ,ship_address.line1 as s_line1,ship_address.line2 as s_line2,ship_address.line3 as s_line3");
+			sql.append("\n    ,ship_address.amphur as s_amphur,ship_address.province as s_province");
+			sql.append("\n    ,ship_address.postal_code as s_postal_code ,ship_address.alternate_name as s_alternate_name ");
+	
+			sql.append("\n    ,p.code as product_code ,p.name as product_name ");
+			sql.append("\n    ,l.ordered_quantity as qty ,l.order_quantity_uom as uom_id ,l.unit_price as UNIT_STANDARD_PRICE ");
+			sql.append("\n    ,(l.unit_price) as UNIT_SELLING_PRICE ");
+			sql.append("\n    ,NVL(l.line_amount,0) as total_amount ,NVL((l.line_amount*0.07),0) as vat_amount");
+			sql.append("\n    ,(NVL(l.line_amount,0) + NVL((l.line_amount*0.07),0)) as NET_AMOUNT");
+			
+			sql.append("\n    FROM pensso.t_edi t ,pensso.t_edi_line l");
+			sql.append("\n    ,pensso.m_customer c,pensso.ad_user s ,pensso.m_product p");
+			sql.append("\n    ,(select a.customer_id,a.address_id,a.line1,a.line2,a.line3 ,a.postal_code,a.alternate_name ");
+			sql.append("\n      ,(select name from pensso.m_district ad where ad.district_id = a.district_id) as amphur ");
+			sql.append("\n      ,(select name from pensso.m_province ad where ad.province_id = a.province_id) as province ");
+			sql.append("\n      from pensso.m_address a where a.purpose ='S'");
+			sql.append("\n    ) ship_address");
 		
+			sql.append("\n    WHERE t.header_id = l.header_id");
+			sql.append("\n    and t.customer_id = c.customer_id ");
+			sql.append("\n    AND t.salesrep_id = s.user_id ");
+			sql.append("\n    AND l.inventory_item_id = p.product_id ");
+			sql.append("\n    AND c.customer_id = ship_address.customer_id ");
+			sql.append("\n    AND t.ship_to_address_id = ship_address.address_id ");
+			sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
+		}
 		sql.append("\n )M ");
 		sql.append("\n where 1=1");
 		sql.append("\n ORDER BY M.order_no,M.customer_number,M.product_code");

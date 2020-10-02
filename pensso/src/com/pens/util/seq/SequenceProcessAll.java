@@ -2,6 +2,7 @@ package com.pens.util.seq;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
@@ -33,7 +34,29 @@ public class SequenceProcessAll {
 	  return _sequenceProcessAll;
 	}
 	
-	public BigDecimal getNextValue(String sequenceType) throws Exception {
+	public synchronized BigDecimal getNextValueBySeq(String sequenceName) throws Exception {
+		BigDecimal nextValue = new BigDecimal("0");
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs =null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			ps = conn.prepareStatement("select ("+sequenceName+") as nextVal from dual");
+			rs = ps.executeQuery();
+			if(rs.next()){
+				nextValue = new BigDecimal(rs.getString("nextVal"));
+			}
+			return nextValue;
+		}catch(Exception e){
+		   throw e;
+		}finally{
+			ps.close();
+			rs.close();
+		    conn.close();
+		}
+	}
+	
+	public synchronized BigDecimal getNextValue(String sequenceType) throws Exception {
 		Connection conn = null;
 		try{
 			conn = DBConnection.getInstance().getConnection();
@@ -47,9 +70,29 @@ public class SequenceProcessAll {
 		}
 		
 	}
-	public BigDecimal getNextValue(Connection conn,String sequenceType) throws Exception {
+	public synchronized BigDecimal getNextValue(Connection conn,String sequenceType) throws Exception {
 		return getNextValueModel(conn, sequenceType);
 	}
+	
+	public synchronized Integer getNextValueInt(Connection conn,String sequenceType) throws Exception {
+		return getNextValueModel(conn, sequenceType).intValue();
+	}
+	
+	public synchronized Integer getNextValueInt(String sequenceType) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getNextValueModel(conn, sequenceType).intValue();
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+		
+	}
+	
 	
 	/**
 	 * Get Next Value
@@ -58,7 +101,7 @@ public class SequenceProcessAll {
 	 * @return
 	 * @throws Exception
 	 */
-	public BigDecimal getNextValueModel(Connection conn,String sequenceType) throws Exception {
+	public synchronized BigDecimal getNextValueModel(Connection conn,String sequenceType) throws Exception {
 		BigDecimal nextValue = new BigDecimal("0");
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -101,7 +144,7 @@ public class SequenceProcessAll {
 	 * @return
 	 * @throws Exception
 	 */
-	public BigDecimal getNextValue(String sequenceType,Date dateObj) throws Exception {
+	public synchronized BigDecimal getNextValue(String sequenceType,Date dateObj) throws Exception {
 		Connection conn = null;
 		try{
 			conn = DBConnectionApps.getInstance().getConnection();
@@ -122,7 +165,7 @@ public class SequenceProcessAll {
 	 * @return
 	 * @throws Exception
 	 */
-	public BigDecimal getNextValue(Connection conn,String sequenceType,Date dateObj) throws Exception {
+	public synchronized BigDecimal getNextValue(Connection conn,String sequenceType,Date dateObj) throws Exception {
 		return getNextValueModel(conn, sequenceType,dateObj);
 	}
 	/**
@@ -133,7 +176,7 @@ public class SequenceProcessAll {
 	 * @return
 	 * @throws Exception
 	 */
-	public static BigDecimal getNextValueModel(Connection conn,String sequenceType,Date dateObj) throws Exception {
+	public static synchronized BigDecimal getNextValueModel(Connection conn,String sequenceType,Date dateObj) throws Exception {
 		BigDecimal nextValue = new BigDecimal("0");
 		Statement stmt = null;
 		ResultSet rst = null;

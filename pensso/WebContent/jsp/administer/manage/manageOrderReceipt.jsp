@@ -17,8 +17,11 @@
 <% 
   //default current date
  // System.out.println("docuDate["+Utils.isNull(manageOrderReceiptForm.getDocumentDate())+"]");
-  if( "".equals(Utils.isNull(manageOrderReceiptForm.getDocumentDate()))){
-	  manageOrderReceiptForm.setDocumentDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+  if( "".equals(Utils.isNull(manageOrderReceiptForm.getDocumentDateFrom()))){
+	  manageOrderReceiptForm.setDocumentDateFrom(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+  }
+  if( "".equals(Utils.isNull(manageOrderReceiptForm.getDocumentDateTo()))){
+	  manageOrderReceiptForm.setDocumentDateTo(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
   }
 %>
 <head>
@@ -43,13 +46,14 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript">
 function loadMe(){
-	new Epoch('epoch_popup','th',document.getElementById('documentDate'));	
+	new Epoch('epoch_popup','th',document.getElementById('documentDateFrom'));	
+	new Epoch('epoch_popup','th',document.getElementById('documentDateTo'));	
 }
 
 function search(){
-	if($('#documentDate').val()==''){
+	if($('#documentDateFrom').val()==''){
 		alert('ใส่วันที่ที่ต้องการค้นหา');
-		$('#documentDate').focus();
+		$('#documentDateFrom').focus();
 		return false;
 	}
 	document.manageOrderReceiptForm.action='${pageContext.request.contextPath}/jsp/manageOrderReceiptAction.do?do=search';
@@ -69,6 +73,11 @@ function cancelOM(id){
 function cancelRR(id){
 	if(!confirm('ต้องการยกเลิกรายการรับชำระนี้\r\nท่านแน่ใจหรือไม่?')){return false;}
 	document.manageOrderReceiptForm.action='${pageContext.request.contextPath}/jsp/manageOrderReceiptAction.do?do=save&type=RR&id='+id;
+	document.manageOrderReceiptForm.submit();
+}
+function viewReceipt(id){
+	var path='${pageContext.request.contextPath}';
+	document.manageOrderReceiptForm.action = path+"/jsp/receiptAction.do?do=prepare&id=" + id + "&action=view&fromPage=manageOrderReceipt";
 	document.manageOrderReceiptForm.submit();
 }
 </script>
@@ -113,12 +122,25 @@ function cancelRR(id){
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
 								<td width="45%"></td>
-								<td></td>
+								<td width="10%"></td>
+								<td width="45%"></td>
 							</tr>
 							<tr>
-								<td align="right">วันที่ทำรายการ<font color="red">*</font></td>
+								<td align="right">วันที่ทำรายการ จาก<font color="red">*</font></td>
 								<td align="left">
-									<html:text property="documentDate" styleId="documentDate" size="15" readonly="true"/>
+									<html:text property="documentDateFrom" styleId="documentDateFrom" size="15" readonly="true"/>
+								</td>
+								<td align="left">ถึง
+									<html:text property="documentDateTo" styleId="documentDateTo" size="15" readonly="true"/>
+								</td>
+							</tr>
+							<tr>
+								<td align="right">รหัสร้านค้า<font color="red">*</font></td>
+								<td align="left">
+									<html:text property="customerCode" styleId="customerCode" size="15" styleClass="\" autoComplete=\"off"/>
+								</td>
+								<td align="left">ชื่อร้านค้า
+									<html:text property="customerName" styleId="customerName" size="30" styleClass="\" autoComplete=\"off"/>
 								</td>
 							</tr>
 						</table>
@@ -127,14 +149,10 @@ function cancelRR(id){
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>
 								<td align="center">
-									<a href="javascript:search('${pageContext.request.contextPath}')">
-									<!--<img src="${pageContext.request.contextPath}/images/b_search.gif" border="1" class="newPicBtn">-->
-									<input type="button" value="ค้นหา" class="newPosBtn">
-									</a>
-									<a href="javascript:clearForm('${pageContext.request.contextPath}')">
-									<!--<img src="${pageContext.request.contextPath}/images/b_clear.gif" border="1" class="newPicBtn">-->
-									<input type="button" value="Clear" class="newNegBtn">
-									</a>
+									<input type="button" value="ค้นหา" class="newPosBtn" onclick="search('${pageContext.request.contextPath}')">
+									
+									<input type="button" value="Clear" class="newNegBtn" onclick=clearForm('${pageContext.request.contextPath}')">
+									
 								</td>
 							</tr>
 						</table>
@@ -143,47 +161,7 @@ function cancelRR(id){
 						<div align="left" class="recordfound">&nbsp;&nbsp;&nbsp;
 							<bean:message key="RecordsFound" bundle="sysprop" />&nbsp;<span class="searchResult"><%=manageOrderReceiptForm.getOrderSize()+manageOrderReceiptForm.getReceiptSize() %></span>&nbsp;<bean:message key="Records" bundle="sysprop" />
 						</div>
-						<!-- ORDER -->
-						<%if(manageOrderReceiptForm.getOrderSize()>0){ %>
-						<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
-							<tr>
-								<td colspan="5" class="footer" align="left">
-									<img border=0 src="${pageContext.request.contextPath}/icons/doc_active.gif">
-									<b><bean:message key="SalesOrder" bundle="sysprop" /></b>
-								</td>
-								<td class="footerNoAlign" align="right">
-									<span class="searchResult"><%=manageOrderReceiptForm.getOrderSize() %></span>&nbsp;<bean:message key="Records" bundle="sysprop" />
-								</td>
-							</tr>
-							<tr>
-								<th class="order"><bean:message key="No" bundle="sysprop" /></th>
-								<th class="code"><bean:message key="DocumentNo" bundle="sysele" /></th>
-								<th width="120px;"><bean:message key="TransactionDate" bundle="sysele" /></th>
-								<th><bean:message key="Customer" bundle="sysele"/></th>
-								<th class="costprice"><bean:message key="TotalAmount" bundle="sysele" /></th>
-								<th class="status">ยกเลิกรายการ</th>
-							</tr>
-							<%int i=1; %>
-							<%for(Order o : manageOrderReceiptForm.getOrders()){ %>
-							<tr class="lineO">
-								<td><%=i++ %></td>
-								<td align="left"><%=o.getOrderNo()%></td>
-								<td><%=o.getOrderDate()%></td>
-								<td align="left"><%=o.getCustomerName()%></td>
-								<td align="right"><%=new DecimalFormat("#,##0.00").format(o.getNetAmount())%></td>
-								<td align="center">
-									<a href="javascript:cancelOM('<%=o.getId() %>');">
-									<img src="${pageContext.request.contextPath}/icons/uncheck.gif" border="0" align="absmiddle"></a>
-								</td>
-							</tr>
-							<%} %>
-						</table>
-						<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
-							<tr>
-								<td class="footer">&nbsp;</td>
-							</tr>	
-						</table>
-						<%} %>
+			
 						<%if(manageOrderReceiptForm.getReceipts().size()>0){ %>
 						<br>
 						<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
@@ -203,6 +181,7 @@ function cancelRR(id){
 								<th><bean:message key="Customer" bundle="sysele"/></th>
 								<th class="costprice"><bean:message key="Order.Payment" bundle="sysele"/></th>
 								<th class="status">ยกเลิกรายการ</th>
+								<th class="status">แสดง</th>
 							</tr>
 							<%int i=1; %>
 							<%for(Receipt o : manageOrderReceiptForm.getReceipts()){ %>
@@ -215,6 +194,11 @@ function cancelRR(id){
 								<td align="center">
 									<a href="javascript:cancelRR('<%=o.getId() %>');">
 									<img src="${pageContext.request.contextPath}/icons/uncheck.gif" border="0" align="absmiddle"></a>
+								</td>
+								<td align="center">
+									<a href="javascript:viewReceipt('<%=o.getId() %>');">
+									 <img src="${pageContext.request.contextPath}/icons/lookup.gif" border="0" align="absmiddle">
+									</a>
 								</td>
 							</tr>
 							<%} %>
@@ -231,10 +215,7 @@ function cancelRR(id){
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
 								<td align="right">
-									<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp'">
-									<!--<img src="${pageContext.request.contextPath}/images/b_close.gif" border="1" class="newPicBtn">-->
-									<input type="button" value="ปิดหน้าจอ" class="newNegBtn">
-									</a>
+									<input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp'">
 								</td>
 								<td width="10%">&nbsp;</td>
 							</tr>

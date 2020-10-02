@@ -17,6 +17,8 @@ try{
 }
 %>
 <option value=""></option>
-<%for(Province u : provinces){ %>
+<%for(Province u : provinces){ 
+ //System.out.println("provinceId:"+u.getId());
+%>
 <option value="<%=u.getId()%>"><%=u.getName()%></option>
 <%}%>

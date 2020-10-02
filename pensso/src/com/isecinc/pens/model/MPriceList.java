@@ -1,7 +1,9 @@
 package com.isecinc.pens.model;
 
+import java.sql.Connection;
 import java.util.Calendar;
 import java.util.List;
+
 
 
 
@@ -23,7 +25,7 @@ public class MPriceList extends I_Model<PriceList> {
 
 	private static final long serialVersionUID = 8984201463664967119L;
 
-	public static String TABLE_NAME = "m_pricelist";
+	public static String TABLE_NAME = "pensso.m_pricelist";
 	public static String COLUMN_ID = "PriceList_ID";
 
 	/**
@@ -54,12 +56,44 @@ public class MPriceList extends I_Model<PriceList> {
 		return array;
 	}
 
+	public PriceList[] search(Connection conn,String whereCause) throws Exception {
+		List<PriceList> pos = super.search(conn,TABLE_NAME, COLUMN_ID, whereCause, PriceList.class);
+		if (pos.size() == 0) return null;
+		PriceList[] array = new PriceList[pos.size()];
+		array = pos.toArray(array);
+		return array;
+	}
 	/**
 	 * Get Current PriceList
 	 * 
 	 * @return
 	 * @throws Exception
 	 */
+	public PriceList getCurrentPriceList(Connection conn,String priceListType) throws Exception {
+		String whereCause = "and isactive = 'Y' ";
+		//whereCause += "  and price_list_type = '" + priceListType + "' ";
+		// whereCause += "  and date_format(effective_date,'%Y%m%d') <= date_format(current_timestamp,'%Y%m%d') ";
+		// whereCause += "  and date_format(effectiveto_date,'%Y%m%d') >= date_format(current_timestamp,'%Y%m%d') ";
+		//whereCause += "  and isactive = 'Y' ";
+		
+		//test 
+		whereCause +=" and pricelist_id =10011";
+		
+		logger.info("xx:"+whereCause);
+		PriceList[] pls = search(conn,whereCause);
+		if (pls != null) {
+			if (pls.length > 0) {
+				for (PriceList pl : pls) {
+					if (DateToolsUtil.checkStartEnd(pl.getEffectiveDate(), pl.getEffectiveToDate())) return pl;
+				}
+				return new PriceList();
+			} else {
+				return new PriceList();
+			}
+		} else {
+			return new PriceList();
+		}
+	}
 	public PriceList getCurrentPriceList(String priceListType) throws Exception {
 		String whereCause = "and isactive = 'Y' ";
 		//whereCause += "  and price_list_type = '" + priceListType + "' ";
@@ -85,7 +119,6 @@ public class MPriceList extends I_Model<PriceList> {
 			return new PriceList();
 		}
 	}
-	
 	public PriceList getCurrentPriceListByCustomer(String priceListType,String registerDate) throws Exception {
 
 		String whereCause = "and isactive = 'Y' ";

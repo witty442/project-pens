@@ -240,6 +240,7 @@ public class ImportOrderAutoSubFromWacoalTask extends BatchTask implements Batch
 			sql.append("\n AND ( O.ORDER_LOT_NO IS  NOT NULL OR ORDER_LOT_NO <> '')");
 			sql.append("\n AND O.ORDER_LOT_NO IN(  ");
 			sql.append("\n   SELECT ORDER_NUMBER FROM XXPENS_PO_ORDER_IMPORT_MST ");
+			sql.append("\n   WHERE INT_FLAG ='S' "); 
 			sql.append("\n  ) ");
 			
 			logger.debug("sql:"+sql.toString());
@@ -250,9 +251,9 @@ public class ImportOrderAutoSubFromWacoalTask extends BatchTask implements Batch
 			   if(rs.getInt("c") >0){
 				   exist = true;
 			   }
-			}//while	
+			}//	
 		}catch(Exception e){
-			e.printStackTrace();
+			logger.error(e.getMessage(),e);
 		}finally{
 			try{
 				if(ps != null){

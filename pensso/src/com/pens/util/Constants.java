@@ -21,7 +21,7 @@ public class Constants {
 	public static final String COLUMN_BLANK = "BLANK";
 	public static final String INSERT_STR_DEFAULT_BLANK = " ";
 	
-	public static final String TRANSACTION_TYPE = "Transction";
+	public static final String TRANSACTION_TYPE = "Transaction";
 	
 	public static final String TYPE_IMPORT = "IMPORT";
 	public static final String TYPE_EXPORT = "EXPORT";

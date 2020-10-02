@@ -80,6 +80,7 @@ function inputNum2(e,valueObj){
 	if(keynum==8){return true;}
 	if(keynum==9){return true;}
 	
+	/** Current THAI languague **/
 	//  eng top(pc) 48 -57
 	//  thai numpad(tablet) 231
 	//  del = 46
@@ -87,7 +88,15 @@ function inputNum2(e,valueObj){
 	//  left arrow	 37
 	//  right arrow	 39
 	//  eng numpad(pc) 96-105
-	if ((keynum>=48 && keynum<=57) || keynum==231 || keynum==46 || keynum==8 || keynum==37 || keynum==39 ||(keynum>=96 && keynum<=105)){
+	
+	/** Current Eng languague **/
+	
+	if (   (keynum>=48 && keynum<=57) 
+		|| (keynum>=96 && keynum<=105)
+		|| keynum==231 || keynum==46 
+		|| keynum==8 || keynum==37 
+		|| keynum==39 
+		){
 		return true;
 	}else{
 	    return false;

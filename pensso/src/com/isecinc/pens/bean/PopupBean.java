@@ -50,6 +50,8 @@ public class PopupBean implements Serializable{
 	private String price;
 	private String uom1;
 	private String uom2;
+	private double uom1ConversionRate;
+	private double uom2ConversionRate;
 	//search3
 	private String storeCode;
 	private String storeName;
@@ -76,6 +78,18 @@ public class PopupBean implements Serializable{
 	List<PopupBean> data2List;
 	
 	
+	public double getUom1ConversionRate() {
+		return uom1ConversionRate;
+	}
+	public void setUom1ConversionRate(double uom1ConversionRate) {
+		this.uom1ConversionRate = uom1ConversionRate;
+	}
+	public double getUom2ConversionRate() {
+		return uom2ConversionRate;
+	}
+	public void setUom2ConversionRate(double uom2ConversionRate) {
+		this.uom2ConversionRate = uom2ConversionRate;
+	}
 	public String getStoreType() {
 		return storeType;
 	}

@@ -129,14 +129,6 @@
 		<form-bean name="manageOrderReceiptForm"
 			type="com.isecinc.pens.web.admin.ManageOrderReceiptForm" />
 			
-		<!-- Manage Order Receipt By User -->
-		<form-bean name="manageOrderReceiptByUserForm"
-			type="com.isecinc.pens.web.admin.ManageOrderReceiptByUserForm" />
-
-		<!-- Manual Update Address -->
-		<form-bean name="manualUpdateAddressForm"
-			type="com.isecinc.pens.web.manual.ManualUpdateAddressForm" />
-			
 		<!-- BackUp DataBase -->
 		<form-bean name="dbManagementForm" type="com.isecinc.pens.web.db.DBManagementForm" />
 		
@@ -209,6 +201,10 @@
 		<form-bean name="stockInvForm" type="com.isecinc.pens.web.stockinv.StockInvForm" />
 		<form-bean name="budsAllForm" type="com.isecinc.pens.web.buds.BudsAllForm" />
 		<form-bean name="batchTaskForm" type="com.isecinc.pens.web.batchtask.BatchTaskForm"/>
+		
+		<!-- Schedule -->
+		<form-bean name="scheduleForm" type="com.isecinc.pens.scheduler.forms.ScheduleForm"/>
+		<form-bean name="searchTaskForm" type="com.isecinc.pens.scheduler.forms.SearchTaskForm"/>
 	</form-beans>
 
 	<action-mappings>
@@ -629,6 +625,7 @@
 			<forward name="clearform" path="/jsp/interfaces/monitor_interfaces.jsp" />
 			<forward name="getLog" path="/jsp/interfaces/dispLogs.jsp"></forward>
 			<forward name="showItemExport" path="/jsp/interfaces/interfaces_item_detail.jsp"></forward>
+			<forward name="searchById" path="/jsp/interfaces/monitor_interfacesById.jsp" />
 		</action>
 
 		<!-- SALES ANALYST -->
@@ -659,27 +656,6 @@
 			<forward name="search" path="/jsp/administer/manage/manageOrderReceipt.jsp" />
 			<forward name="clearform" path="/jsp/administer/manage/manageOrderReceipt.jsp" />
 			<forward name="prepare" path="/jsp/administer/manage/manageOrderReceipt.jsp" />
-		</action>
-		<!-- Manage Order Receipt By User -->
-		<action name="manageOrderReceiptByUserForm" path="/jsp/manageOrderReceiptByUser"
-			forward="/jsp/administer/manage/manageOrderReceiptByUser.jsp" />
-		<action name="manageOrderReceiptByUserForm" path="/jsp/manageOrderReceiptByUserAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.admin.ManageOrderReceiptByUserAction">
-			<forward name="search"
-				path="/jsp/administer/manage/manageOrderReceiptByUser.jsp" />
-			<forward name="clearform"
-				path="/jsp/administer/manage/manageOrderReceiptByUser.jsp" />
-			<forward name="prepare"
-				path="/jsp/administer/manage/manageOrderReceiptByUser.jsp" />
-		</action>
-		<!-- Manual Update Address -->
-		<action name="manualUpdateAddressForm" path="/jsp/manualUpdateAddressAction"
-			parameter="do" scope="request"
-			type="com.isecinc.pens.web.manual.ManualUpdateAddressAction">
-			<forward name="search" path="/jsp/manual/manualUpdateAddress.jsp" />
-			<forward name="clearform" path="/jsp/manual/manualUpdateAddress.jsp" />
-			<forward name="prepare" path="/jsp/manual/manualUpdateAddress.jsp" />
 		</action>
 
 		<!-- DB Management -->
@@ -869,6 +845,18 @@
            <forward name="search" path="/jsp/batchtask/batchTask.jsp"></forward>
            <forward name="batchFromPopup" path="/jsp/batchtask/batchTaskPopup.jsp"></forward>
            <forward name="batchFromPopupNoWait" path="/jsp/batchtask/batchTaskPopupNoWait.jsp"></forward>
+        </action>
+        
+        <!-- Schedule -->
+        <action  name="scheduleForm" path="/jsp/schedule" parameter="do" scope="request" type="com.isecinc.pens.scheduler.actions.ScheduleAction" >
+           <forward name="Success" path="/jsp/schedule/mainSchedule.jsp"></forward>
+           <forward name="Regen" path="/jsp/schedule/popupRegen.jsp"></forward>
+		   <forward name="Fail" path="/jsp/error.jsp"></forward>
+        </action>
+        
+        <action  name="searchTaskForm" path="/jsp/searchTask" parameter="do" scope="request" type="com.isecinc.pens.scheduler.actions.SearchTaskAction" >
+           <forward name="Success" path="/jsp/schedule/monitorSchedule.jsp"></forward>
+		   <forward name="Fail" path="/jsp/error.jsp"></forward>
         </action>
 	</action-mappings>
 

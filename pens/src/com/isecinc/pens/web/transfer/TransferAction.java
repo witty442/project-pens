@@ -299,6 +299,9 @@ public class TransferAction extends I_Action {
 			String[] chequeDate = request.getParameterValues("chequeDate");
 			
 			String[] row_can_edit = request.getParameterValues("row_can_edit");
+			
+			
+	            
 			logger.debug("keyDatas length:"+keyDatas.length);
 			logger.debug("transferType length:"+transferType.length);
 			
@@ -316,7 +319,15 @@ public class TransferAction extends I_Action {
 				   item.setTransferType(transferType[i]);
 				   item.setTransferBank(transferBank[i]);
 				   item.setTransferDate(transferDate[i]);
+				   
+				   /** append 0 to time 4:40 to 04:40**/
+			       /*String hh = transferTime[i].split(":")[0];
+			       hh = hh.length()==1?"0"+hh:hh;
+			       String MM = transferTime[i].split(":")[1];
+			       MM = MM.length()==1?"0"+MM:MM;*/
+				   
 				   item.setTransferTime(transferTime[i]);
+				   
 				   item.setAmount(amounts[i]);
 				   item.setChequeNo(chequeNo[i]);
 				   item.setChequeDate(chequeDate[i]);

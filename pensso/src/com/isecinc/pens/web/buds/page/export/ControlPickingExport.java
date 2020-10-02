@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.pens.bean.ConfPickingBean;
 import com.isecinc.pens.bean.User;
+import com.pens.util.ControlCode;
 import com.pens.util.DBConnectionApps;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
@@ -390,6 +391,7 @@ public class ControlPickingExport {
 	}
 	private static StringBuffer genSQLControlPickingReportTypeSummary(ConfPickingBean o) throws Exception{
 		StringBuffer sql = new StringBuffer();
+		sql.append("\n  /** genSQLControlPickingReportTypeSummary **/");
 		sql.append("\n  SELECT M.*");
 		sql.append("\n  FROM (");
 		sql.append("\n    /** SALES_APP **/ ");
@@ -412,36 +414,37 @@ public class ControlPickingExport {
 		sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
 		sql.append("\n    and t.doc_status ='"+I_PO.STATUS_LOADING+"'");
 		
-		//sql.append("\n    UNION ALL ");
-		
-		//sql.append("\n    /** EDI **/ ");
-		/*sql.append("\n    SELECT t.picking_no,inv.invoice_no ,inv.invoice_date");
-		sql.append("\n    , t.CUST_PO_NUMBER as ORDER_NO ,t.ORDERED_DATE as ORDER_DATE,t.CUST_PO_NUMBER as po_number");
-		sql.append("\n    ,c.code as customer_number ,c.name as CUSTOMER_NAME");
-		sql.append("\n    ,(select name from pensso.m_district ad where ad.district_id = a.district_id) as amphur");
-		sql.append("\n    ,(select name from pensso.m_province ad where ad.province_id = a.province_id) as province");
-		sql.append("\n    ,(select code from apps.xxpens_salesreps_v ad where ad.salesrep_id = t.salesrep_id) as salesrep_code");
-		sql.append("\n    ,a.alternate_name ,a.telephone");
-		sql.append("\n    ,sum(l.LINE_AMOUNT) as total_amount ,SUM((l.LINE_AMOUNT *0.07)) as vat_amount,SUM((l.LINE_AMOUNT+(l.LINE_AMOUNT *0.07))) as NET_AMOUNT");
-		
-		sql.append("\n    FROM pensso.T_EDI t ,pensso.t_invoice inv  ");
-		sql.append("\n    ,pensso.T_EDI_LINE l ,pensso.m_customer c,pensso.m_address a");
-		sql.append("\n    WHERE t.HEADER_ID = l.HEADER_ID ");
-		sql.append("\n    AND t.CUST_PO_NUMBER = inv.ref_order ");
-		sql.append("\n    AND t.customer_id = c.customer_id ");
-		sql.append("\n    AND c.customer_id = a.customer_id ");
-		sql.append("\n    AND t.ship_to_site_use_id = a.address_id ");
-		sql.append("\n    AND a.purpose = 'S' ");
-		sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
-		sql.append("\n    and t.doc_status ='"+I_PO.STATUS_LOADING+"'");
-		
-		sql.append("\n    GROUP BY t.picking_no, t.CUST_PO_NUMBER ,t.ORDERED_DATE  ");
-		sql.append("\n    ,c.code ,c.name ,a.district_id,a.province_id");
-		sql.append("\n    ,t.salesrep_id ,a.alternate_name ,a.telephone");
-		sql.append("\n    ,inv.invoice_no ");*/
+		if(ControlCode.canExecuteMethod("Picking", "OrderEDI")){
+			sql.append("\n    UNION ALL ");
+			
+			sql.append("\n    /** EDI **/ ");
+			sql.append("\n    SELECT t.picking_no,inv.invoice_no ,inv.invoice_date");
+			sql.append("\n    , t.CUST_PO_NUMBER as ORDER_NO ,t.ORDERED_DATE as ORDER_DATE");
+			sql.append("\n    ,t.CUST_PO_NUMBER as po_number");
+			sql.append("\n    ,c.code as customer_number ,c.name as CUSTOMER_NAME");
+			sql.append("\n    ,(select name from pensso.m_district ad where ad.district_id = a.district_id) as amphur");
+			sql.append("\n    ,(select name from pensso.m_province ad where ad.province_id = a.province_id) as province");
+			sql.append("\n    ,(select code from apps.xxpens_salesreps_v ad where ad.salesrep_id = t.salesrep_id) as salesrep_code");
+			sql.append("\n    ,a.alternate_name ,a.telephone");
+			sql.append("\n    ,NVL(sum(l.LINE_AMOUNT),0) as total_amount ,NVL(SUM((l.LINE_AMOUNT *0.07)),0) as vat_amount ");
+			sql.append("\n    ,NVL(SUM((l.LINE_AMOUNT+(l.LINE_AMOUNT *0.07))),0) as NET_AMOUNT");
+			sql.append("\n    FROM pensso.T_EDI t ,pensso.t_invoice inv  ");
+			sql.append("\n    ,pensso.T_EDI_LINE l ,pensso.m_customer c,pensso.m_address a");
+			sql.append("\n    WHERE t.HEADER_ID = l.HEADER_ID ");
+			sql.append("\n    AND to_char(t.header_id) = inv.ref_order ");
+			sql.append("\n    AND t.customer_id = c.customer_id ");
+			sql.append("\n    AND c.customer_id = a.customer_id ");
+			sql.append("\n    AND t.ship_to_address_id = a.address_id ");
+			sql.append("\n    AND a.purpose = 'S' ");
+			sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
+			sql.append("\n    and t.doc_status ='"+I_PO.STATUS_LOADING+"'");
+			
+			sql.append("\n    GROUP BY t.picking_no,inv.invoice_no,inv.invoice_date");
+			sql.append("\n    ,t.CUST_PO_NUMBER ,t.ORDERED_DATE  ");
+			sql.append("\n    ,c.code ,c.name ,a.district_id,a.province_id");
+			sql.append("\n    ,t.salesrep_id ,a.alternate_name ,a.telephone");
+		}
 		sql.append("\n )M ");
-		sql.append("\n where 1=1");
-		sql.append("\n and M.PICKING_NO ='"+o.getPickingNo()+"'");
 		sql.append("\n ORDER BY M.salesrep_code,M.customer_number");
 		
 		return sql;
@@ -449,6 +452,7 @@ public class ControlPickingExport {
 	
 	private static StringBuffer genSQLControlPickingReportTypeDetail(ConfPickingBean o) throws Exception{
 		StringBuffer sql = new StringBuffer();
+		sql.append("\n  /** genSQLControlPickingReportTypeDetail **/");
 		sql.append("\n  SELECT M.*");
 		sql.append("\n  FROM (");
 		sql.append("\n    /** SALES_APP **/ ");
@@ -490,7 +494,6 @@ public class ControlPickingExport {
 		sql.append("\n    and inv.invoice_id = inv_l.invoice_id");
 		sql.append("\n    and t.customer_id = c.customer_id ");
 		sql.append("\n    AND t.user_id = s.user_id ");
-		
 		sql.append("\n    AND c.customer_id = ship_address.customer_id ");
 		sql.append("\n    AND t.ship_address_id = ship_address.address_id ");
 		sql.append("\n    AND c.customer_id = bill_address.customer_id ");
@@ -499,32 +502,57 @@ public class ControlPickingExport {
 		sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
 		sql.append("\n    and t.doc_status ='"+I_PO.STATUS_LOADING+"'");
 		
-		//sql.append("\n    UNION ALL ");
-		
-		//sql.append("\n    /** EDI **/ ");
-		/*sql.append("\n    SELECT t.picking_no,'xxx' as invoice_no ,null as invoice_date");
-		sql.append("\n    , t.CUST_PO_NUMBER as ORDER_NO ,t.ORDERED_DATE as ORDER_DATE,t.CUST_PO_NUMBER as po_number");
-		sql.append("\n    ,c.code as customer_number ,c.name as CUSTOMER_NAME");
-		sql.append("\n    ,(select name from pensso.m_district ad where ad.district_id = a.district_id) as amphur");
-		sql.append("\n    ,(select name from pensso.m_province ad where ad.province_id = a.province_id) as province");
-		sql.append("\n    ,(select code from apps.xxpens_salesreps_v ad where ad.salesrep_id = t.salesrep_id) as salesrep_code");
-		sql.append("\n    ,a.alternate_name ,a.telephone");
-		sql.append("\n    ,sum(l.LINE_AMOUNT) as total_amount ,SUM((l.LINE_AMOUNT *0.07)) as vat_amount,SUM((l.LINE_AMOUNT+(l.LINE_AMOUNT *0.07))) as NET_AMOUNT");
-		
-		sql.append("\n    FROM pensso.T_EDI t  ,pensso.t_invoice inv  ");
-		sql.append("\n    ,pensso.T_EDI_LINE l ,pensso.m_customer c,pensso.m_address a");
-		sql.append("\n    WHERE t.HEADER_ID = l.HEADER_ID ");
-		sql.append("\n    AND t.CUST_PO_NUMBER = inv.ref_order ");
-		sql.append("\n    AND t.customer_id = c.customer_id ");
-		sql.append("\n    AND c.customer_id = a.customer_id ");
-		sql.append("\n    AND t.ship_to_site_use_id = a.address_id ");
-		sql.append("\n    AND a.purpose = 'S' ");
-		sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
-		sql.append("\n    and t.doc_status ='"+I_PO.STATUS_LOADING+"'");
-		sql.append("\n    GROUP BY t.picking_no, t.CUST_PO_NUMBER ,t.ORDERED_DATE  ");
-		sql.append("\n    ,c.code ,c.name ,a.district_id,a.province_id");
-		sql.append("\n    ,t.salesrep_id ,a.alternate_name ,a.telephone");
-		sql.append("\n    ,inv.invoice_no ");*/
+		if(ControlCode.canExecuteMethod("Picking", "OrderEDI")){
+			sql.append("\n    UNION ALL ");
+			
+			sql.append("\n    /** EDI **/ ");
+			sql.append("\n    SELECT t.picking_no ,t.CUST_PO_NUMBER AS ORDER_NO ,t.ORDERED_DATE AS ORDER_DATE ");
+			sql.append("\n    ,inv.cust_po_number,inv.invoice_no , inv.invoice_date,inv.ct_reference");
+			sql.append("\n    ,(select name from pensso.m_invoice_type ad where ad.type_id = inv.invoice_type_id) as invoice_type");
+			sql.append("\n    ,s.code as salesrep_code ,s.name as salesrep_name");
+			sql.append("\n    ,c.code as customer_number ,c.name as CUSTOMER_NAME");
+			
+			sql.append("\n    ,ship_address.line1 as s_line1,ship_address.line2 as s_line2,ship_address.line3 as s_line3");
+			sql.append("\n    ,ship_address.amphur as s_amphur,ship_address.province as s_province");
+			sql.append("\n    ,ship_address.postal_code as s_postal_code ,ship_address.alternate_name as s_alternate_name ");
+			
+			sql.append("\n    ,bill_address.line1 as b_line1,bill_address.line2 as b_line2,bill_address.line3 as b_line3");
+			sql.append("\n    ,bill_address.amphur as b_amphur,bill_address.province as b_province");
+			sql.append("\n    ,bill_address.postal_code as b_postal_code ,bill_address.alternate_name as b_alternate_name ");
+			
+			sql.append("\n    ,(select code from pensso.m_product p where p.product_id = inv_l.inventory_item_id ) as product_code");
+			sql.append("\n    ,inv_l.description as product_name ");
+			sql.append("\n    ,inv_l.QUANTITY_INVOICED as qty ,inv_l.uom_code ,inv_l.UNIT_STANDARD_PRICE,inv_l.UNIT_SELLING_PRICE");
+			sql.append("\n    ,inv_l.total_amount ,inv_l.vat_amount,inv_l.NET_AMOUNT");
+			
+			sql.append("\n    FROM pensso.T_EDI t ");
+			sql.append("\n    ,pensso.t_invoice inv ,pensso.t_invoice_line inv_l ");
+			sql.append("\n    ,pensso.m_customer c,pensso.ad_user s ");
+			
+			sql.append("\n    ,(select a.customer_id,a.address_id,a.line1,a.line2,a.line3 ,a.postal_code,a.alternate_name ");
+			sql.append("\n      ,(select name from pensso.m_district ad where ad.district_id = a.district_id) as amphur ");
+			sql.append("\n      ,(select name from pensso.m_province ad where ad.province_id = a.province_id) as province ");
+			sql.append("\n      from pensso.m_address a where a.purpose ='S'");
+			sql.append("\n    ) ship_address");
+			
+			sql.append("\n    ,(select a.customer_id,a.address_id,a.line1,a.line2,a.line3 ,a.postal_code,a.alternate_name  ");
+			sql.append("\n      ,(select name from pensso.m_district ad where ad.district_id = a.district_id) as amphur ");
+			sql.append("\n      ,(select name from pensso.m_province ad where ad.province_id = a.province_id) as province ");
+			sql.append("\n      from pensso.m_address a where a.purpose ='B'");
+			sql.append("\n    ) bill_address");
+			
+			sql.append("\n    WHERE to_char(t.header_id) = inv.ref_order");
+			sql.append("\n    and inv.invoice_id = inv_l.invoice_id");
+			sql.append("\n    and t.customer_id = c.customer_id ");
+			sql.append("\n    AND t.salesrep_id = s.user_id ");
+			sql.append("\n    AND c.customer_id = ship_address.customer_id ");
+			sql.append("\n    AND t.ship_to_address_id = ship_address.address_id ");
+			sql.append("\n    AND c.customer_id = bill_address.customer_id ");
+			sql.append("\n    AND t.bill_to_address_id = bill_address.address_id ");
+			
+			sql.append("\n    and t.PICKING_NO ='"+o.getPickingNo()+"'");
+			sql.append("\n    and t.doc_status ='"+I_PO.STATUS_LOADING+"'");
+		}
 		sql.append("\n )M ");
 		sql.append("\n where 1=1");
 		sql.append("\n and M.PICKING_NO ='"+o.getPickingNo()+"'");

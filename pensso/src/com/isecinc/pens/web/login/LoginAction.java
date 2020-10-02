@@ -15,6 +15,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.inf.manager.batchwork.BatchImportTransReceiptBySalesWorker;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.login.LoginProcess;
 import com.pens.util.ConvertNullUtil;
@@ -104,7 +105,7 @@ public class LoginAction extends DispatchAction {
 			request.getSession().setAttribute("appVersionMassageToSales",null);
 			
 			//after login ImportReceipt BySalesCode (user Login)
-			//new BatchImportReceiptWorker(user,request).run(); 
+			//new BatchImportTransReceiptBySalesWorker(user,request).run(); 
 			
 		} catch (Exception e) {
 			logger.error(e.getMessage());

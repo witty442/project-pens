@@ -50,6 +50,7 @@ public class Address extends I_PO implements Serializable {
 		setDisplayLabel();
 		
 		// Add Oracle Reference ID
+		setSiteUseId(rst.getInt("SITE_USE_ID"));
 		setReferenceId(rst.getInt("REFERENCE_ID"));
 	}
 
@@ -142,12 +143,21 @@ public class Address extends I_PO implements Serializable {
 
 	/** CUSTOMER ID */
 	private long customerId;
+	private long siteUseId;
 	
 	/** Reference ID (Oracle Address ID)*/
 	private int referenceId;
     private String alternateName;
     
     
+	public long getSiteUseId() {
+		return siteUseId;
+	}
+
+	public void setSiteUseId(long siteUseId) {
+		this.siteUseId = siteUseId;
+	}
+
 	public String getAlternateName() {
 		return alternateName;
 	}

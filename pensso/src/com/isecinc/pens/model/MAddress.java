@@ -1,6 +1,5 @@
 package com.isecinc.pens.model;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -9,13 +8,10 @@ import java.util.List;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Address;
-import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.District;
 import com.isecinc.pens.bean.Province;
-import com.isecinc.pens.bean.User;
 import com.pens.util.ConvertNullUtil;
-import com.pens.util.DBCPConnectionProvider;
-import com.pens.util.seq.SequenceProcess;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MAddress Class
@@ -77,7 +73,7 @@ public class MAddress extends I_Model<Address> {
 	public boolean save(Address address, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (address.getId() == 0) {
-			id = SequenceProcess.getNextValueInt(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValueInt(TABLE_NAME);
 		} else {
 			id = address.getId();
 		}

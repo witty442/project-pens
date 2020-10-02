@@ -17,6 +17,21 @@
  // System.out.println("Role:"+user.getRole().getKey());
 %>
 <ul id="nav">
+ <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN}) ){ %>
+      <li><a href="javascript: void(0)" class="parent">Administrator</a><%no=0; %>
+          <ul>
+		  	  <li> 
+		  	    <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/schedule.do?do=prepare&action=new';">
+		  	    <span><%no++; out.print(no); %>&nbsp;<bean:message bundle="sysprop" key="scheduler"/></span></a>
+			  </li>
+			  <li>
+				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/searchTask.do?do=prepare&action=new';">
+				<span><%no++; out.print(no); %>&nbsp;<bean:message bundle="sysprop" key="searchTask"/></span></a>
+			 </li>
+	     </ul>
+     </li>     
+  <%} %>
+  
  <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.TT}) ){no=0; %>
 	<li><a  href="javascript: void(0)" class="parent"><bean:message key="HomeMenu" bundle="sysprop"/></a>
 	<% no=0; %>
@@ -24,37 +39,11 @@
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/profile.do?id=<%=((User)session.getAttribute("user")).getId() %>';"><span><%no++;out.print(no);%>.<bean:message key="Profile" bundle="sysprop"/></span></a>
 			</li>
-			<%if(role.equalsIgnoreCase(User.ADMIN)){ %>
-           	<li>
-				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/user.do';"><span><%no++;out.print(no);%>.<bean:message key="User" bundle="sysprop"/></span></a>
-			</li>
-			<%} %>
-            <%if(role.equalsIgnoreCase(User.ADMIN)||role.equalsIgnoreCase(User.DD)){ %>
-            <li>
-            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/sysconfig.do';"><span><%no++;out.print(no);%>.<bean:message key="SystemConf" bundle="sysprop"/></span></a>
-            </li>
-            <%} %>
-            <%if(role.equalsIgnoreCase(User.ADMIN)){ %>
-	           <li>
-	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/tripAction.do?do=prepare&type=admin';"><span><%no++;out.print(no);%>.<bean:message key="Trip" bundle="sysprop"/></span></a>
-	            </li> 
-            <%}%>
-          
-            <%if(role.equalsIgnoreCase(User.ADMIN)){ %>
-	           	<li>
-					<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/customerSeqUpdate.jsp';"><span><%no++;out.print(no);%>.<bean:message key="CustomerSequenceUpdate" bundle="sysprop"/></span></a>
-				</li>
+            <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.TT}) ){ %>
 				<li>
 					<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/manageOrderReceipt.do';"><span><%no++;out.print(no);%>.<bean:message key="ManageOrderReceipt" bundle="sysprop"/></span></a>
 				</li>
 			<%} %>
-			
-			<%if( role.equalsIgnoreCase(User.ADMIN)){ %>
-				<li>
-					  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/pdReceipt.do?do=prepareAdmin';"><span><%no++;out.print(no);%>.จัดการบันทึก การเก็บเงินเชื่อ(Admin)</span></a>
-				</li>
-			<%} %>
-			
 		</ul>
 	</li>
   <%} %>
@@ -71,36 +60,41 @@
          </li>
    <%} %>
             
-
     <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.TT}) ){ no=0; %>
     <li><a  href="javascript: void(0)" class="parent"><bean:message key="Reports" bundle="sysprop"/></a>
     	<ul>
-    	
-            <%if(!role.equalsIgnoreCase(User.DD)){ %>
-	            <li>
-	            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/transactionSummaryReport.do';"><span><%no++;out.print(no);%>.<bean:message key="TransactionSummaryReport" bundle="sysprop"/></span></a>
-	            </li>
-            <%} %>
-
- 
-        	<%if(role.equalsIgnoreCase(User.TT)){ %>
-	        	<li>
-	          	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentAllReport.do';"><span><%no++;out.print(no);%>.<bean:message key="InvoicePaymentAllReport" bundle="sysprop"/></span></a>
-	         	</li>
-        	<%} %>
+            <li>
+            	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/transactionSummaryReport.do';"><span><%no++;out.print(no);%>.<bean:message key="TransactionSummaryReport" bundle="sysprop"/></span></a>
+            </li>
+          
+        	<li>
+          	   <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/invoicePaymentAllReport.do';"><span><%no++;out.print(no);%>.<bean:message key="InvoicePaymentAllReport" bundle="sysprop"/></span></a>
+         	</li>
+        	
         	<li>
             	<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/salesTargetSummary.do';"><span><%no++;out.print(no);%>.<bean:message key="SalesTargetSummary" bundle="sysprop"/></span></a>
             </li>
+             <li>
+           	     <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/budsAllAction.do?do=prepareSearchHead&action=new&pageName=InvoiceReport&subPageName=InvoiceReport';">
+           	     <span><%no++;out.print(no);%>.<bean:message key="InvoiceReport" bundle="sysprop"/></span></a>
+             </li>  
         </ul>
     </li>
     <%} %>
     
 	 <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.TT}) ){ no=0; %>
-       <%-- <li>
-         <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.EXPORT_RECEIPT%>';">
-		   <span><bean:message key="<%=BatchTaskConstants.EXPORT_RECEIPT%>" bundle="sysprop"/></span>
-		</a>
-	   </li> --%>
+        <li>
+           <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/batchTaskAction.do?do=prepare&pageAction=new&pageName=<%=BatchTaskConstants.EXPORT_RECEIPT%>';">
+		     <span><bean:message key="<%=BatchTaskConstants.EXPORT_RECEIPT%>" bundle="sysprop"/></span>
+		  </a>
+	   </li> 
+    <% } %>
+    
+     <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.MT}) ){ no=0; %>
+            <li>
+           	   <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/budsAllAction.do?do=prepareSearchHead&action=new&pageName=OrderEDISearch&subPageName=OrderEDISearch';">
+           	   <span><bean:message key="OrderEDISearch" bundle="sysprop"/></span></a>
+           </li>   
     <% } %>
     
 	 <%if ( UserUtils.userInRole("ROLE_ACCESS",user,new String[]{User.ADMIN,User.BUD_ADMIN,User.STOCK,User.TT}) ){ %>
@@ -138,6 +132,8 @@
 	     </ul>
      </li>  
    <%} %>
+   
+   
 </ul>
 
   

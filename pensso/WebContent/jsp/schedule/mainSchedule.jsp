@@ -11,7 +11,6 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
 <%@taglib uri="http://displaytag.sf.net" prefix="display" %>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
 <%
 String autoRefresh = Utils.isNull(request.getParameter("autoRefresh"));
@@ -122,6 +121,18 @@ function loadMe(){
 
 function submitForm(path){
 	//alert('checkDate1');
+	var valid = true;
+	var run = document.getElementById("run");
+	if(run.value =='DAILY'){
+		if(document.getElementById("startMinute").value ==""){
+        	document.getElementById("startMinute").focus();
+        	valid = false;
+		}
+        if(!valid){
+        	alert("กรุณากรอกข้อมูลให้ครบ");
+        	return false;
+        }
+	}
 	if(confirm("ยืนยันสร้าง Batch Task ")){
       document.scheduleForm.pageAction.value ="run";
       document.scheduleForm.action = path + "/jsp/schedule.do?do=runBatch";
@@ -308,8 +319,22 @@ function submitRegen(path,programId,paramRegen,type){
 										</td>
 									</tr>
 									<tr id="runDailyArea" align="center">
-										<td width="35%" align="left"><!-- ทุกๆ   --></td>
-										<td width="65%" align="left" nowrap> <html:hidden property="everyDay" styleId="everyDay" value="1"></html:hidden><!--  &nbsp;&nbsp;วัน --></td>
+										<td width="35%" align="right"> Run </td>
+										<td width="65%" align="left" nowrap> 
+										<html:radio property="everyType" value="MINUTE">Minutes</html:radio>
+										ทุกๆ 
+										<html:select property="everyMinutes">
+										   <html:option value="10">10</html:option>
+										   <html:option value="20">20</html:option>
+										   <html:option value="30">30</html:option>
+										</html:select>
+										นาที
+										&nbsp;&nbsp;&nbsp;&nbsp;
+										<html:radio property="everyType" value="HOURLY">Hourly</html:radio>
+										ทุกๆ 
+									     <html:text property="everyHourly" styleId="everyTime" size="2" maxlength="3"/>
+										ชั่วโมง
+										<html:hidden property="everyDay" styleId="everyDay" value="1"/>
 									</tr>
 									<tr id="runMonthlyArea" align="center">
 										<td width="35%" align="left">ทุกๆ วันที่  </td>
@@ -319,10 +344,10 @@ function submitRegen(path,programId,paramRegen,type){
 										<td  colspan="2">Start Time &nbsp;
 										<html:text property="startDate" styleId="startDate" readonly="true"/>
 										<a href="#" onClick="javascript: scheduleForm.startDate.value='';">Clear</a>
-										  <html:select property="startHour">
+										  <html:select property="startHour" styleId="startHour">
 											 <html:options collection="hourList" property="key" labelProperty="name"/>
 									       </html:select>:
-									       <html:select property="startMinute">
+									       <html:select property="startMinute" styleId="startMinute">
 											 <html:options collection="minuteList" property="key" labelProperty="name"/>
 									       </html:select>
 									      

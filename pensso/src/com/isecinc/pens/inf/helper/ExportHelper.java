@@ -21,6 +21,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
+import com.pens.util.DBConnection;
 import com.pens.util.EnvProperties;
 
 public class ExportHelper {
@@ -416,7 +417,13 @@ public class ExportHelper {
 					 return Utils.getNumberOnly(bankFullName[2]);
 				}
 			}
-			
+			if(colBean.getColumnName().equalsIgnoreCase("count_receipt_by")){ 
+				return getCountReceiptBy(rs.getString("receipt_id"));
+			}
+			if(colBean.getColumnName().equalsIgnoreCase("WriteOff_Amt") 
+					&& "1".equalsIgnoreCase(rs.getString("item_number"))){ //RowNum==1 (add writeOffAmt to first Row)
+				return getWriteOffAmt(rs.getString("receipt_id"));
+			}
 			/** Case Normal  **/
 			if(colBean.getColumnType().equalsIgnoreCase("DATE")){
 				logger.debug("colBean.getColumnName():"+colBean.getColumnName());
@@ -507,6 +514,7 @@ public class ExportHelper {
 	 */
 	public static String covertToFormatExport(Connection conn,ColumnBean colBean,ResultSet rs) throws Exception{
 		String dataConvertStr = "";
+		logger.debug("columnName:"+colBean.getColumnName());
 		
 		if(Constants.EXPORT_FILL_SYMBOL_ZERO.equalsIgnoreCase(colBean.getFillSymbol())){
 			dataConvertStr = Constants.EXPORT_STRING_SYMBOL_ZERO_DEFALUE;
@@ -742,6 +750,20 @@ public class ExportHelper {
 	}
 	
 	public static String  getCountReceiptBy(Connection conn,String receiptId) throws Exception{
+		return getCountReceiptByModel(conn, receiptId);
+	}
+	public static String  getCountReceiptBy(String receiptId) throws Exception{
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getCountReceiptByModel(conn, receiptId);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();
+		}
+	}
+	public static String  getCountReceiptByModel(Connection conn,String receiptId) throws Exception{
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String sql = "";
@@ -768,6 +790,20 @@ public class ExportHelper {
 		}
 	}
 	public static String  getWriteOffAmt(Connection conn,String receiptId) throws Exception{
+		return getWriteOffAmtModel(conn, receiptId);
+	}
+	public static String  getWriteOffAmt(String receiptId) throws Exception{
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return getWriteOffAmtModel(conn, receiptId);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();
+		}
+	}
+	public static String  getWriteOffAmtModel(Connection conn,String receiptId) throws Exception{
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String sql = "";

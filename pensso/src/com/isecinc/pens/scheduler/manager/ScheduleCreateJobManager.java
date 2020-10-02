@@ -140,7 +140,7 @@ public class ScheduleCreateJobManager {
 		    	  if(Utils.isNull(param.getEveryDay()).equals("")){
 		    		  param.setEveryDay("1");
 		    	  }
-		    	  cronTriggerStr = CronExpressionUtil.dailyToCronExpr(param.getEveryDay(), startTime);
+		    	  cronTriggerStr = CronExpressionUtil.dailyToCronExpr(param.getEveryDay(),param.getEveryType(),param.getEveryMinutes(),param.getEveryHourly(), startTime);
 		    	 
 		      }else if(SchedulerConstant.SCHEDULE_TYPE_WEEKLY.equals(param.getType())){
 				  //weekly

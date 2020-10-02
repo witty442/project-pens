@@ -93,6 +93,34 @@ public class MUser extends I_Model<User> {
 		}
 		return userDefault;
 	}
+	public User  getUserByUserName(String userName) {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Connection conn = null;
+		User user = new User();
+
+		try{
+			String sql ="\n select * from ad_user where user_name = '"+userName+"'" ;
+			       
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){ 
+				user = new User(rst);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close(); 
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return user;
+	}
 	public User  getActiveUserName() {
 		Statement stmt = null;
 		ResultSet rst = null;

@@ -2,8 +2,6 @@ package com.isecinc.pens.inf.manager;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.Savepoint;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,22 +12,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.print.attribute.HashAttributeSet;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.FTPFileBean;
 import com.isecinc.pens.inf.bean.MonitorBean;
 import com.isecinc.pens.inf.bean.MonitorItemBean;
 import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.ConvertUtils;
 import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.inf.helper.ExternalFunctionHelper;
 import com.isecinc.pens.inf.helper.ImportHelper;
@@ -41,10 +34,7 @@ import com.isecinc.pens.inf.manager.process.bean.FileImportTransBean;
 import com.isecinc.pens.inf.manager.process.bean.KeyNoImportTransBean;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptHelper;
-import com.isecinc.pens.model.MOrder;
 import com.pens.util.EnvProperties;
-import com.pens.util.LoggerUtils;
-import com.pens.util.seq.SequenceProcess;
 
 /**
  * @author WITTY
@@ -79,7 +69,7 @@ public class UpdateSalesManager {
 			monitorModel = dao.insertMonitor(connMonitor,monitorModel);
 				
 			//start Thread
-			new BatchImportWorker(monitorModel.getTransactionId(),monitorModel.getMonitorId(),monitorModel.getTransactionType(),userLogin,userRequest, requestTable, request,importAll).start();
+			new BatchImportWorker(monitorModel.getTransactionId(),monitorModel.getMonitorId(),monitorModel.getTransactionType(),userLogin,userRequest, requestTable,importAll).start();
 			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
@@ -104,7 +94,7 @@ public class UpdateSalesManager {
 	 * t_order , t_visit ,t_order_orcl
        t_receipt , t_receipt_orcl ,t_bill_plan ,t_adjust
 	 */
-	public  MonitorBean importFileToDB(BigDecimal transactionId ,BigDecimal monitorId,String transType,User userLogin ,User userRequest,String requestTable,HttpServletRequest request,boolean importAll) throws Exception{
+	public  MonitorBean importFileToDB(BigDecimal transactionId ,BigDecimal monitorId,String transType,User userLogin ,User userRequest,String requestTable,boolean importAll) throws Exception{
 		Connection conn = null;
 		Connection connMonitor = null;
 		LinkedHashMap<String,TableBean> initConfigMap = new LinkedHashMap<String,TableBean>();
@@ -409,5 +399,5 @@ public class UpdateSalesManager {
 		return monitorModel;
 	}
 	
-	
+
 }
