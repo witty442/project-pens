@@ -65,7 +65,7 @@ function backsearch(path,customerId) {
 		}
 		document.receiptForm.submit();
 	}else{
-		document.receiptForm.action = path+"/jsp/manageOrderReceipt.do";
+		document.receiptForm.action = path+"/jsp/manageOrderReceipt.do?action=back";
 		document.receiptForm.submit();
 	}
 	return true;

@@ -235,7 +235,16 @@ public class User extends I_PO implements Serializable {
    // private String roleVanSales;
    // private String roleCreditSales;
     
+    private boolean mobile;
 	
+    
+	public boolean isMobile() {
+		return mobile;
+	}
+
+	public void setMobile(boolean mobile) {
+		this.mobile = mobile;
+	}
 
 	public String getSalesrepFullName() {
 		return salesrepFullName;

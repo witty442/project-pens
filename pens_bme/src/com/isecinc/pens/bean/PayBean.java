@@ -36,6 +36,7 @@ public class PayBean implements Serializable{
 
 	private String cashFlag = "";
 	private String chequeFlag = "";
+	private String trFlag = "";
 	
 	private String DR_AC_NO ;
 	private String DR_DESC ;
@@ -52,8 +53,21 @@ public class PayBean implements Serializable{
 	private boolean canPrint;
 	private List<PayBean> items;
 	private String employeeName;
+	private String remark;
 	
 	
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public String getTrFlag() {
+		return trFlag;
+	}
+	public void setTrFlag(String trFlag) {
+		this.trFlag = trFlag;
+	}
 	public String getEmployeeName() {
 		return employeeName;
 	}

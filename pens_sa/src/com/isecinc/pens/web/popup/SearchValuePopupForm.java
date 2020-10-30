@@ -1,8 +1,8 @@
 package com.isecinc.pens.web.popup;
 
 import com.isecinc.core.web.I_Form;
-import com.isecinc.pens.report.salesanalyst.ConditionFilterBean;
-import com.isecinc.pens.report.salesanalyst.SABean;
+import com.isecinc.pens.web.report.analyst.bean.ABean;
+import com.isecinc.pens.web.report.analyst.bean.ConditionFilterBean;
 
 /**
 WITTY
@@ -14,8 +14,17 @@ public class SearchValuePopupForm extends I_Form {
 	private SearchValuePopupCriteria criteria = new SearchValuePopupCriteria();
     private String navigation;
     private String curNavigation;
+    private String reportName;
     
     
+	public String getReportName() {
+		return reportName;
+	}
+
+	public void setReportName(String reportName) {
+		this.reportName = reportName;
+	}
+
 	public String getCurNavigation() {
 		return curNavigation;
 	}
@@ -32,11 +41,11 @@ public class SearchValuePopupForm extends I_Form {
 		this.navigation = navigation;
 	}
 
-	public SABean getSalesBean() {
+	public ABean getSalesBean() {
 		return criteria.getSalesBean();
 	}
 
-	public void setSalesBean(SABean salesBean) {
+	public void setSalesBean(ABean salesBean) {
 		criteria.setSalesBean(salesBean);
 	}
 	

@@ -372,7 +372,7 @@ function saveTripByCustAjax(index,customerCode){
 								</td> --%>
 								
 								 <td class="td_text_center" width="5%">
-								   <select name="customerType" id="customerType">
+								   <select name="customerType" id="customerType" disabled="true">
 								    <option></option>
 								   <%
 									   selected ="";

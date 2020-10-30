@@ -8,8 +8,6 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
-
 public class DBConnection {
    
 	private static Logger logger = Logger.getLogger("PENS");

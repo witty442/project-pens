@@ -31,11 +31,19 @@ User user = (User)session.getAttribute("user");
 String screenWidth = "";
 if(session.getAttribute("screenWidth") != null){ 
 	screenWidth = (String)session.getAttribute("screenWidth");
+	int screenW = new Double(screenWidth).intValue();
+	if(screenW <=800){
+		screenW = 800;
+	}
+	//screenWidth = ""+(screenW-50);
 }
 String pageName = Utils.isNull(request.getParameter("pageName")); 
+
+
 %>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <meta http-equiv="Cache-Control" content="no-cache" /> 
 <meta http-equiv="Pragma" content="no-cache" /> 
@@ -56,9 +64,10 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/page/stockMC.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-
+<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script> 
+ --%>
 <!-- Calendar -->
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/calendar/jquery.calendars.picker.css" type="text/css" />
+ <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/calendar/jquery.calendars.picker.css" type="text/css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script> 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.plugin.js"></script> 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.js"></script>
@@ -67,13 +76,15 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai-th.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker-th.js"></script>
+  
+<!-- For fix Head and Column Table -->
 
-<!-- Sticky Header Table -->
-<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/bootstrap/bootstrap.min.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-stickytable-3.0.js"></script>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/jquery-stickytable-3.0.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+
+<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/epoch_styles.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
  --%>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/jquery.stickytable.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.stickytable.js"></script> 
-
 <script type="text/javascript">
 
 /** disable back button alway **/
@@ -88,9 +99,14 @@ function loadMe(){
            $('#expireDate1_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('thai','th')});
            $('#expireDate2_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('thai','th')});
            $('#expireDate3_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('thai','th')});
+         
+          // new Epoch('epoch_popup', 'th', document.getElementById('expireDate1_<%=(i+1)%>'));
+           //new Epoch('epoch_popup', 'th', document.getElementById('expireDate2_<%=(i+1)%>'));
+          // new Epoch('epoch_popup', 'th', document.getElementById('expireDate3_<%=(i+1)%>'));
 		<% }
 	  }
 	%>
+	//alert("<%=screenWidth%>");
 }
 
 function backsearch(path) {
@@ -161,9 +177,9 @@ function loadItem(path){
 						<jsp:include page="../error.jsp"/>
 						
 						<!-- Hidden -->
-		                 <input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
-						 <input type="hidden" id="tabIndex" name="tabIndex" value="<%=tabIndex%>"/>
-						TokenKey:<input type="hidden" name="TokenKey" value="<%= session.getAttribute(Globals.TRANSACTION_TOKEN_KEY) %>" >
+		                <input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
+						<input type="hidden" id="tabIndex" name="tabIndex" value="<%=tabIndex%>"/>
+						<input type="hidden" name="TokenKey" value="<%= session.getAttribute(Globals.TRANSACTION_TOKEN_KEY) %>" >
 
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
@@ -228,64 +244,39 @@ function loadItem(path){
 								     </c:if>
 								</div>
 					
-								<!--  Results  -->
-							
-							   <div class="sticky-table sticky-ltr-cells">
-								<table id="tblProduct" align="center" border="1" cellpadding="3" cellspacing="2" 
-								    class="table table-striped" width="100%">
+							   <!--  Results  -->
+							   <div style='height:450px;width:<%=screenWidth%>px;' >
+								<table id="myTable" class="table table-condensed table-striped" border="1">
 								     <thead>
 								       <tr >
-										<th rowspan="3">รหัส<br/>สินค้า</th>
-										<th rowspan="3">บาร์โค้ด</th>
-										<th rowspan="3">รายละเอียดสินค้า</th>
-										<th rowspan="3">บรรจุ</th>
-										<th rowspan="3">อายุ<br/>สินค้า</th>
-										<th rowspan="3">ราคา<br/>ปลีก</th>
-										<th rowspan="3">ราคา <br/>โปรโมชั่น</th>
-										<th rowspan="3">ขา</th>
-										<th colspan="12">สต๊อกสินค้า</th>
+										<th rowspan="3" class="td_bg_lineH">รหัส<br/>สินค้า</th>
+										<th rowspan="3" class="td_bg_lineH">บาร์โค้ด</th>
+										<th rowspan="3" class="td_bg_lineH">รายละเอียดสินค้า</th>
+										<th rowspan="3" class="td_bg_lineH">บรรจุ</th>
+										<th rowspan="3" class="td_bg_lineH">อายุ<br/>สินค้า</th>
+										<th rowspan="3" class="td_bg_lineH">ราคา<br/>ปลีก</th>
+										<th rowspan="3" class="td_bg_lineH">ราคา <br/>โปรโมชั่น</th>
+										<th rowspan="3" class="td_bg_lineH">ขา</th>
+										<th colspan="12" class="td_bg_lineH">สต๊อกสินค้า</th>
 									</tr>
 									<tr >
-									    <th rowspan="2">ใน<br/>ระบบ<br/>ห้าง</th>
-										<th rowspan="2">หลัง<br/>ร้าน</th>
-										<th rowspan="2">หน่วย<br/>บรรจุ</th>
-									    <th colspan="3">กลุ่มหมดอายุที่ 1</th>
-										<th colspan="3">กลุ่มหมดอายุที่ 2</th>
-										<th colspan="3">กลุ่มหมดอายุที่ 3</th>
+									    <th rowspan="2" class="td_bg_lineH">ใน<br/>ระบบ<br/>ห้าง</th>
+										<th rowspan="2" class="td_bg_lineH">หลัง<br/>ร้าน</th>
+										<th rowspan="2" class="td_bg_lineH">หน่วย<br/>บรรจุ</th>
+									    <th colspan="3" class="td_bg_lineH">กลุ่มหมดอายุที่ 1</th>
+										<th colspan="3" class="td_bg_lineH">กลุ่มหมดอายุที่ 2</th>
+										<th colspan="3" class="td_bg_lineH">กลุ่มหมดอายุที่ 3</th>
 									</tr>
 									<tr > 
-										<th >หน้า<br/>ร้าน</th>
-										<th >หน่วย<br/>บรรจุ</th>
-										<th >วันหมดอายุ</th>
-										<th >หน้า<br/>ร้าน</th>
-										<th >หน่วย<br/>บรรจุ</th>
-										<th >วันหมดอายุ</th>
-										<th >หน้า<br/>ร้าน</th>
-										<th >หน่วย<br/>บรรจุ</th>
-										<th >วันหมดอายุ</th>
-									</tr>
-									  <thead>
-								       <tr  class="sticky-header">
-										<th>รหัส<br/>สินค้า</th>
-										<th>บาร์โค้ด</th>
-										<th>รายละเอียดสินค้า</th>
-										<th>บรรจุ</th>
-										<th>อายุ<br/>สินค้า</th>
-										<th>ราคา<br/>ปลีก</th>
-										<th>ราคา <br/>โปรโมชั่น</th>
-										<th>ขา</th>
-										<th>ใน<br/>ระบบ<br/>ห้าง</th>
-										<th>หลัง<br/>ร้าน</th>
-										<th>หน่วย<br/>บรรจุ</th>
-										<th >หน้า<br/>ร้าน(1)</th>
-										<th >หน่วย<br/>บรรจุ(1)</th>
-										<th >วันหมดอายุ(1)</th>
-										<th >หน้า<br/>ร้าน(2)</th>
-										<th >หน่วย<br/>บรรจุ(2)</th>
-										<th >วันหมดอายุ(2)</th>
-										<th >หน้า<br/>ร้าน(3)</th>
-										<th >หน่วย<br/>บรรจุ(3)</th>
-										<th >วันหมดอายุ(3)</th>
+										<th  class="td_bg_lineH">หน้า<br/>ร้าน</th>
+										<th  class="td_bg_lineH">หน่วย<br/>บรรจุ</th>
+										<th  class="td_bg_lineH">วันหมดอายุ</th>
+										<th  class="td_bg_lineH">หน้า<br/>ร้าน</th>
+										<th  class="td_bg_lineH">หน่วย<br/>บรรจุ</th>
+										<th  class="td_bg_lineH">วันหมดอายุ</th>
+										<th  class="td_bg_lineH">หน้า<br/>ร้าน</th>
+										<th  class="td_bg_lineH">หน่วย<br/>บรรจุ</th>
+										<th  class="td_bg_lineH">วันหมดอายุ</th>
 									</tr>
 									</thead>
 									<tbody>
@@ -302,17 +293,15 @@ function loadItem(path){
 									 }
 								%>
 									<tr class="<%=tabclass%>">
-										<td class ="td_text_center"  width="4%">
-											<input type="text" name="productCode" id="productCode" value ="<%=b.getProductCode()%>" size="3"
-										       
-											    class="disableText"  tabindex="<%=tabIndex%>" autoComplete="off" readonly   
-											  /> 
-											 <input type="hidden" name="lineId" id="lineId" value ="<%=b.getLineId()%>"/>
-										</td>
-										<td class="td_text" width="8%">
+										<th class ="td_bg_lineA"  width="20%">
+											<%=b.getProductCode()%>
+										</th>
+										<td class="td_text" width="20%">
 									       <input type="text" name="barcode" id="barcode" value ="<%=b.getBarcode()%>" size="11" 
 											    class="disableText"  tabindex="<%=tabIndex%>" autoComplete="off" readonly  
 											  /> 
+											  <input type="hidden" name="productCode" id="productCode" value ="<%=b.getProductCode()%>" /> 
+											 <input type="hidden" name="lineId" id="lineId" value ="<%=b.getLineId()%>"/>
 										</td>
 										<td class="td_text"  width="9%">
 									       <input type="text" name="productName" id="productName" value ="<%=b.getProductName()%>" size="13" readonly class="disableText"/>	
@@ -418,14 +407,14 @@ function loadItem(path){
 											 %>
 											</select>
 										</td>
-										<td class="td_text_center" width="6%">
+										<td class="td_text_center" width="5%">
 										   <%tabIndex++; %>
 										   <input type='text' name='expireDate2' size='7'
 										   value='<%=b.getExpireDate2()%>' id="expireDate2_<%=b.getNo() %>"  readonly>
 									       <font color="red"></font>
 										</td>
 										<!-- ********* 3******************************* -->
-										<td class="td_number" width="4%">
+										<td class="td_number" width="5%">
 										    <%tabIndex++; %>
 											<input type="text"
 											tabindex="<%=tabIndex %>"
@@ -447,7 +436,7 @@ function loadItem(path){
 											 %>
 											</select>
 										</td>
-										<td class="td_text_center" width="6%">
+										<td class="td_text_center" width="10%">
 										   <%tabIndex++; %>
 										   <input type='text' name='expireDate3' size='7'
 										   value='<%=b.getExpireDate3()%>' id="expireDate3_<%=b.getNo() %>" readonly>
@@ -459,6 +448,13 @@ function loadItem(path){
 								</table>
 							   </div>
 							   
+							   <script>
+								  //load jquery
+								   $(function() {
+										//Load fix column and Head
+										$('#myTable').stickyTable({overflowy: true});
+									});
+								</script>
 								<!--  Results -->
 								</td>
 							</tr>

@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.PageingGenerate"%>
 <%@page import="com.isecinc.pens.web.stockmc.StockMCAction"%>
 <%@page import="com.pens.util.UserUtils"%>
 <%@page import="com.pens.util.SessionUtils"%>
@@ -85,6 +86,9 @@ function openEdit(path,action,id){
 	form.action = path + "/jsp/stockMCAction.do?do=viewDetail"+param;
 	form.submit();
 	return true;
+	
+	//var url = path + "/jsp/stockMCAction.do?do=viewDetail"+param;
+    //PopupCenterFull(url,"View")
 }
 
 function exportToExcel(path){
@@ -98,9 +102,9 @@ function exportToExcel(path){
 	form.submit();
 	return true;
 }
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.stockMCForm;
-	form.action = path + "/jsp/stockMCAction.do?do=searchHead&currPage="+currPage;
+	form.action =  "${pageContext.request.contextPath}/jsp/stockMCAction.do?do=searchHead&currPage="+currPage;
     form.submit();
     return true;
 }
@@ -175,6 +179,7 @@ function removeUnSelected(codeCheck){
 	codesAllNew = codesAllNew.substring(0,codesAllNew.length-1);
 	document.getElementsByName("codes")[0].value =  codesAllNew;
 }
+
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;">
@@ -250,6 +255,7 @@ function removeUnSelected(codeCheck){
 										<a href="javascript:openEdit('${pageContext.request.contextPath}','add','')">
 										  <input type="button" value=" เพิ่มรายการใหม่  " class="newPosBtnLong"> 
 										</a>
+									
 									<%}%>
 									<a href="javascript:exportToExcel('${pageContext.request.contextPath}')">
 									  <input type="button" value="Export To Excel" class="newPosBtnLong">
@@ -263,29 +269,16 @@ function removeUnSelected(codeCheck){
 					    
 					 	    <!-- ************************Result *************-->
 					 	    <c:if test="${stockMCForm.results != null}">
-						        <% 
-								   int totalPage = stockMCForm.getTotalPage();
-								   int totalRecord = stockMCForm.getTotalRecord();
-								   int currPage =  stockMCForm.getCurrPage();
-								   int startRec = stockMCForm.getStartRec();
-								   int endRec = stockMCForm.getEndRec();
-								   int no = startRec;
-								%>
-								<div align="left">
-								   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
-								   <span class="pagelinks">
-									หน้าที่ 
-									    <% 
-										 for(int r=0;r<totalPage;r++){
-											 if(currPage ==(r+1)){
-										 %>
-						 				   <strong><%=(r+1) %></strong>
-										 <%}else{ %>
-										    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-										       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-									 <% }} %>				
-									</span>
-								</div>
+					 	     <% 
+							   int totalPage = stockMCForm.getTotalPage();
+							   int totalRecord = stockMCForm.getTotalRecord();
+							   int currPage =  stockMCForm.getCurrPage();
+							   int startRec = stockMCForm.getStartRec();
+							   int endRec = stockMCForm.getEndRec();
+							   int no = startRec;
+							%>
+						        <%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
+									
 									<table id="tblProduct" align="center" border="1" cellpadding="3" cellspacing="1" class="tableSearch">
 									       <tr>
 									            <th >Selected</th>
@@ -333,9 +326,11 @@ function removeUnSelected(codeCheck){
 													</td>
 													<td class="td_text_center" width="4%">
 														 <%if ( UserUtils.userInRole("ROLE_MC",user,new String[]{User.ADMIN, User.MC_ENTRY}) ){ %>
-															   <a href="javascript:openEdit('${pageContext.request.contextPath}','edit', '<%=item.getId()%>')">
+															  <a href="javascript:openEdit('${pageContext.request.contextPath}','edit', '<%=item.getId()%>')">
 															      แก้ไข
-															  </a>
+															  </a> 
+															
+															   
 														  <%}else{ %>
 														      <a href="javascript:openEdit('${pageContext.request.contextPath}','view', '<%=item.getId()%>')">
 															      VIEW

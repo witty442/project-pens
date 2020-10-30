@@ -46,8 +46,7 @@ public class LockboxBankTransferProcess {
 			
 			/** Optional **/
 			"   r.receipt_id     \n"+
-			"	from pensso.t_receipt r ,pensso.m_customer c	\n"+
-            //"	,(SELECT @rownum:=0) a	\n"+
+			"	from pensso.t_receipt r ,pensso.m_customer c \n"+
 			"	where r.CUSTOMER_ID = c.CUSTOMER_ID \n"+
 			"   and r.receipt_id = "+receiptId+" 	\n"+
 			"   group by r.internal_bank,r.receipt_id \n";
@@ -391,7 +390,7 @@ public class LockboxBankTransferProcess {
             "	t_receipt_line.ar_invoice_no AS Invoice,	\n"+
             /** Witty Edit 08032011  Case One Cheque two Invoice **/
             "	round(NVL(t_receipt_match.paid_amount,0),2) AS Amount_Applied,	\n"+
-            "	rownum  AS Overflow_Sequence,	\n"+
+            "	rownum  AS Overflow_Sequence,	\n"+//get seq by ExportHelper
             "	'0' AS Overflow_Indicator,	\n"+
             "	'THB' AS Currency_Code,	\n"+
             "	'"+itemNumber+"' AS Item_Number,	\n"+
@@ -419,7 +418,7 @@ public class LockboxBankTransferProcess {
             "	t_credit_note.credit_note_no AS Invoice,	\n"+
             /** Witty Edit 08032011  Case One Cheque two Invoice **/
             "	round(NVL(t_receipt_match_cn.paid_amount,0),2) AS Amount_Applied,	\n"+
-            "	rownum AS Overflow_Sequence, \n"+
+            "	rownum AS Overflow_Sequence, \n"+ //get seq by ExportHelper
             "	'0' AS Overflow_Indicator,	\n"+
             "	'THB' AS Currency_Code,	\n"+
             "	'"+itemNumber+"' AS Item_Number,	\n"+
@@ -441,6 +440,10 @@ public class LockboxBankTransferProcess {
             "   and t_receipt_by.receipt_by_id ='"+receiptById+"' \n";
            
             logger.debug("SQL:"+sql); 
+            
+            //Clear OverFlowSequence by Request Number
+            ExportHelper.overflowSequenceRowNumMap.clear();
+            
             ps = conn.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
 			rs = ps.executeQuery();
 			int lastPosition = 0;

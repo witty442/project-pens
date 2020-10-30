@@ -132,6 +132,7 @@ public class ReceiptAction extends I_Action {
 		ReceiptForm receiptForm = (ReceiptForm) form;
 		Receipt receipt = null;
 		try {
+			String fromPage = Utils.isNull(request.getParameter("fromPage"));
 			receipt = new MReceipt().find(id);
 			logger.debug("receipt:"+receipt+",id:"+id);
 			if (receipt == null) {

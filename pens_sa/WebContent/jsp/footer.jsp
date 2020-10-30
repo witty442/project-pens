@@ -1,6 +1,6 @@
 
+<%@page import="com.pens.util.EnvProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.EnvProperties"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%

@@ -237,17 +237,19 @@ public class ImportPosProcess extends InterfaceUtils{
 				
 				StringBuffer sql = new StringBuffer("");
 			
-				sql.append(" INSERT INTO pensbme_pos_order_temp( \n");
-				sql.append(" order_number, account_number, ordered_date, subinventory,  \n");
+				sql.append(" INSERT INTO PENSBI.pensbme_pos_order_temp \n");
+				sql.append(" (order_number, account_number, ordered_date, subinventory,  \n");
 				sql.append(" cust_po_number, salesrep_number, item_no,  \n");
-				sql.append(" unit_price, qty, create_date,file_name,import_id)  \n");
-				sql.append(" VALUES( ?,?,?,? ,?,?,? ,?,?,?,?,?)");
+				sql.append(" unit_price, qty ,actual_cust_name,actual_cust_address,  \n");
+				sql.append(" actual_cust_id,invoice_no, ");
+				sql.append(" create_date,file_name,import_id  )\n");
+				sql.append(" VALUES( ?,?,?,? ,?,?,? ,?,?,?,?,?,?,?,?,?)");
 
 				ps = conn.prepareStatement(sql.toString());
 				  
 				int sheetNo = 0; // xls sheet no. or name
 				int rowNo = 1; // row of begin data
-				int maxColumnNo = 9; // max column of data per row
+				int maxColumnNo = 13; // max column of data per row
 				
 				Workbook wb1 = null;
 				XSSFWorkbook wb2 = null;
@@ -276,6 +278,10 @@ public class ImportPosProcess extends InterfaceUtils{
 				String item_no = "";
 				double unit_price = 0;
 				double qty = 0;
+				String actual_cust_name = "";
+				String actual_cust_address = "";
+				String actual_cust_id = "";
+				String invoice_no = "";
 				
 	            int no = 0;
 				logger.debug("select sheet(" + (sheetNo + 1) + ") name: " + sheet.getSheetName());
@@ -339,21 +345,37 @@ public class ImportPosProcess extends InterfaceUtils{
 						   //qty
 						   qty = Utils.isDoubleNull(cellValue);
 						   ps.setDouble(9, qty);
+						   
+						}else if(colNo==9){
+						    actual_cust_name = Utils.isNull(cellValue);
+						    ps.setString(10, actual_cust_name);
+						    
+						}else if(colNo==10){
+						    actual_cust_address = Utils.isNull(cellValue);
+						    ps.setString(11, actual_cust_address);
+						    
+						}else if(colNo==11){
+						    actual_cust_id =  ExcelHelper.isCellNumberOrText(cellValue);
+						    ps.setString(12, actual_cust_id);
+						    
+						}else if(colNo==12){
+						    invoice_no = Utils.isNull(cellValue);
+						    ps.setString(13, invoice_no);
 						}
 						  
 					}//for column
 					
 					 //CREATE_DATE
-					 ps.setTimestamp(10, new java.sql.Timestamp(new java.util.Date().getTime()));
+					 ps.setTimestamp(14, new java.sql.Timestamp(new java.util.Date().getTime()));
 					 //fileName
-					 ps.setString(11, fileName);
+					 ps.setString(15, fileName);
 					 //import_id (each import )
-					 ps.setBigDecimal(12, importId);
+					 ps.setBigDecimal(16, importId);
 						
 					 //Add Success Msg No Check PensItem
 			         ImportSummary s = new ImportSummary();
 			         s.setRow(i+1);
-			         s.setLineArr(s.getRow()+","+order_number+","+account_number+","+ordered_date+","+subinventory+","+cust_po_number+","+salerep_number+","+item_no+","+unit_price+","+qty+","+"Success");
+			         s.setLineArr(s.getRow()+","+order_number+","+account_number+","+ordered_date+","+subinventory+","+cust_po_number+","+salerep_number+","+item_no+","+unit_price+","+qty+","+actual_cust_name+","+"Success");
 			         s.setMessage("Success");
 			         successMap.put(i+"", s); 
 		
@@ -454,7 +476,7 @@ public class ImportPosProcess extends InterfaceUtils{
 			    insertHead(conn,importId);
 			}
 		} catch (Exception e) {
-			
+			e.printStackTrace();
 			//request.setAttribute("Message","ข้อมูลไฟล์ไม่ถูกต้อง:"+e.toString());
 			throw e;
 		} finally {
@@ -483,14 +505,17 @@ public class ImportPosProcess extends InterfaceUtils{
 			sqlIn = "insert into XXPENS_OM_POS_ORDER_MST \n";
 			sqlIn +=" ( created_by, creation_date,last_updated_by, last_update_date,last_update_login, \n";
 			sqlIn +=" header_id ,account_number,ordered_date , \n ";
-			sqlIn +=" subinventory,cust_po_number ,salesrep_number, int_flag,order_number ) \n";
-			sqlIn +=" values(?,?,?,?, ?,?,?,? ,?,?,?,?,?) \n";
+			sqlIn +=" subinventory,cust_po_number ,salesrep_number, int_flag,order_number,  \n";
+			sqlIn +=" actual_cust_name,actual_cust_address,actual_cust_id,invoice_no) \n";
+			sqlIn +=" values(?,?,?,?, ?,?,?,? ,?,?,?,?,?,?,?,?,?) \n";
 				  
 			logger.info("SQL:"+sqlIn);
 			psIn = conn.prepareStatement(sqlIn);
 			
 			sqlSelect +=" select distinct order_number ,account_number,ordered_date , \n ";
-			sqlSelect +=" subinventory,cust_po_number ,salesrep_number  from pensbme_pos_order_temp \n";
+			sqlSelect +=" subinventory,cust_po_number ,salesrep_number , \n";
+			sqlSelect +=" actual_cust_name,actual_cust_address ,actual_cust_id,invoice_no \n";
+			sqlSelect +=" from pensbi.pensbme_pos_order_temp \n";
 			sqlSelect +=" where import_Id ="+importId+"";
 			sqlSelect +=" order by order_number asc";
 
@@ -515,6 +540,11 @@ public class ImportPosProcess extends InterfaceUtils{
 				psIn.setString(++index,rs.getString("salesrep_number"));
 				psIn.setString(++index,"N");
 				psIn.setString(++index,rs.getString("order_number"));//order_number
+				
+				psIn.setString(++index,rs.getString("actual_cust_name"));
+				psIn.setString(++index,rs.getString("actual_cust_address"));
+				psIn.setString(++index,rs.getString("actual_cust_id"));
+				psIn.setString(++index,rs.getString("invoice_no"));
 				
 				psIn.executeUpdate();
 				

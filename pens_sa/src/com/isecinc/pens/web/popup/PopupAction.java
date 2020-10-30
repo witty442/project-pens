@@ -114,6 +114,11 @@ public class PopupAction extends I_Action {
 		String forward = "popup";
 		List<PopupForm> results = null;
 		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			if(!"newsearch".equalsIgnoreCase(action)){
+				return forward;
+			}
+			
 			if("Brand".equalsIgnoreCase(popupForm.getPageName()) ){
 				 results = PopupDAO.searchBrandList(popupForm);
 				 

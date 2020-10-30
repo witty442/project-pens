@@ -40,6 +40,7 @@ public class PayWhiteAction extends I_Action {
 
 	public static int pageSize = 30;
 	public static String STATUS_SAVE ="SV";
+	public static int maxRow = 16;
 	
 	public ActionForward prepare2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepare2");
@@ -318,7 +319,7 @@ public class PayWhiteAction extends I_Action {
 			String[] description =request.getParameterValues("description");
 			String[] amount =request.getParameterValues("amount");
 
-			for(int i=0;i<4;i++){
+			for(int i=0;i<10;i++){
 				PayBean item = new PayBean();
 
 				item.setLineId(Utils.convertStrToInt(lineId[i]));
@@ -422,7 +423,7 @@ public class PayWhiteAction extends I_Action {
 			
 			conn = DBConnection.getInstance().getConnection();
 			PayWhiteForm aForm = (PayWhiteForm) form;
-			String fileType = SystemElements.PRINTER;
+			String fileType = SystemElements.PDF;
 			logger.debug("fileType:"+fileType);
 			
 			//Search Again
@@ -430,22 +431,21 @@ public class PayWhiteAction extends I_Action {
 			PayBean cri = new PayBean();
 			cri.setDocNo(docNo);
 			
-			//PayBean h = PayWhiteDAO.searchHead(conn,cri,true).getItems().get(0);
 			PayBean h = PayWhiteDAO.searchHead(conn,cri,true,false,1,pageSize).getItems().get(0);
 			logger.debug("result:"+h.getDocNo());
 			
 			if(h != null){
-				//Head
-				if("CH".equalsIgnoreCase(h.getPaymethod())){
-				   parameterMap.put("cheque", h.getPaymethod());
-				}else{
-				   parameterMap.put("cash", h.getPaymethod());
-				}
+				
+				parameterMap.put("companyName","บริษัท เพนส์ มาร์เก็ตติ้ง แอนด์ ดิสทริบิวชั่น จํากัด");
+				parameterMap.put("docNo",h.getDocNo());
+				parameterMap.put("remark",h.getRemark());
 				// 22/10/2558
 			    String dd = h.getDocDate().substring(0,2);
 			    String MM = h.getDocDate().substring(3,5);
 			    String yyyy = h.getDocDate().substring(6,10);
 			    
+			    
+			    		
 				parameterMap.put("docDateDD", Utils.isNull(dd));
 				parameterMap.put("docDateMM", Utils.isNull(MM));
 				parameterMap.put("docDateYYYY", Utils.isNull(yyyy));
@@ -462,15 +462,8 @@ public class PayWhiteAction extends I_Action {
 				parameterMap.put("createUser", Utils.isNull(h.getCreateUser()));
 				
 				logger.debug("totalAmountLetter["+Utils.isNull(h.getTotalAmountLetter())+"]");
-				
-				String[] aa = Utils.isNull(h.getTotalAmount()).split("\\.");
-				parameterMap.put("totalAmount", Utils.isNull(aa[0]));
-				if(aa.length > 1){
-					parameterMap.put("totalAmount2Digit", Utils.isNull(aa[1]));
-				}else{
-					parameterMap.put("totalAmount2Digit", "");
-				}
-				
+			
+				parameterMap.put("totalAmount", h.getTotalAmount());
 				//*********************DR***************************************//
 				parameterMap.put("DR_AC_NO", Utils.isNull(h.getDR_AC_NO()));
 				parameterMap.put("DR_DESC", Utils.isNull(h.getDR_DESC()));
@@ -523,92 +516,31 @@ public class PayWhiteAction extends I_Action {
 				}else{
 					parameterMap.put("CR_TOTAL_DIGIT", "");
 				}
-			
-				
-				//Items
-				if(h.getItems() != null &&  h.getItems().size() >0){
-					for(int i=0;i<h.getItems().size();i++){
-						PayBean item = h.getItems().get(i);
-						if(i==0){
-							parameterMap.put("accountName1", Utils.isNull(item.getAccountName()));
-							parameterMap.put("description1", Utils.isNull(item.getDescription()));
-		
-							logger.debug("amount:"+item.getAmount());
-							String[] a = Utils.isNull(item.getAmount()).split("\\.");
-							
-							if( !Utils.isNull(a[0]).equals(""))
-							    parameterMap.put("amount1", Utils.convertToCurrencyNoDigitStr(Utils.isNull(a[0])));
-							
-							if(a.length > 1){
-								parameterMap.put("amount2Digit1", Utils.isNull(a[1]));
-							}else{
-								if( !Utils.isNull(a[0]).equals(""))
-								   parameterMap.put("amount2Digit1", "00");
-							}
-						}
-						if(i==1){
-							parameterMap.put("accountName2", Utils.isNull(item.getAccountName()));
-							parameterMap.put("description2", Utils.isNull(item.getDescription()));
-		
-							String[] a = Utils.isNull(item.getAmount()).split("\\.");
-							
-							if( !Utils.isNull(a[0]).equals(""))
-							    parameterMap.put("amount2", Utils.convertToCurrencyNoDigitStr(Utils.isNull(a[0])));
-							
-							if(a.length > 1){
-								parameterMap.put("amount2Digit2", Utils.isNull(a[1]));
-							}else{
-								if( !Utils.isNull(a[0]).equals(""))
-								   parameterMap.put("amount2Digit2", "00");
-							}
-						}
-						if(i==2){
-							parameterMap.put("accountName3", Utils.isNull(item.getAccountName()));
-							parameterMap.put("description3", Utils.isNull(item.getDescription()));
-		
-							String[] a = Utils.isNull(item.getAmount()).split("\\.");
-							if( !Utils.isNull(a[0]).equals(""))
-							    parameterMap.put("amount3", Utils.convertToCurrencyNoDigitStr(Utils.isNull(a[0])));
-							if(a.length > 1){
-							   parameterMap.put("amount2Digit3", Utils.isNull(a[1]));
-							}else{
-								if( !Utils.isNull(a[0]).equals(""))
-							       parameterMap.put("amount2Digit3", "00");
-							}
-						}
-						if(i==3){
-							parameterMap.put("accountName4", Utils.isNull(item.getAccountName()));
-							parameterMap.put("description4", Utils.isNull(item.getDescription()));
-		
-							String[] a = Utils.isNull(item.getAmount()).split("\\.");
-							
-							if( !Utils.isNull(a[0]).equals(""))
-							    parameterMap.put("amount4", Utils.convertToCurrencyNoDigitStr(Utils.isNull(a[0])));
-							if(a.length > 1){
-							   parameterMap.put("amount2Digit4", Utils.isNull(a[1]));
-							}else{
-								if( !Utils.isNull(a[0]).equals(""))
-							      parameterMap.put("amount2Digit4", "00");
-							}
-						}
+			    
+				//add blank to MaxRow
+				List<PayBean> rowItemList = h.getItems();
+				if(rowItemList.size() < maxRow){
+					int diff = maxRow-rowItemList.size();
+					for(int i=0;i<diff;i++){
+						PayBean rowBlank = new PayBean();
+						rowBlank.setAccountName("");
+						rowBlank.setDescription("");
+						rowBlank.setTotalAmount("");
+						rowItemList.add(rowBlank);
 					}
 				}
-				
+				logger.debug("maxrow["+maxRow+"]ItemList Size["+rowItemList.size()+"]");
 				//Gen Report
-				String fileName = "pay_in_white_report";
+				String fileName = "pay_in_white_pdf_report";
 				String fileJasper = BeanParameter.getReportPath() + fileName;
 				
 				logger.debug("start report");
-				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName,h.getItems());
+				reportServlet.runReport(request, response, conn, fileJasper, fileType, parameterMap, fileName,rowItemList);
 				
 				//set printer success
 				request.setAttribute("printerSuccess", "printerSuccess");
 				
 				logger.info("Print report PayInWhite Success");
-			}else{
-				
-				request.setAttribute("Message", "ไม่พบข้อมูล  พิมพ์รายการที่มีสถานะเป็น CLOSE เท่านั้น");
-				return  mapping.findForward("detail");
 			}
 		} catch (Exception e) {
 			logger.info("Print report PayInWhite Error");

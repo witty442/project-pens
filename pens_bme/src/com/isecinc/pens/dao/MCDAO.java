@@ -1045,13 +1045,16 @@ public class MCDAO {
 			StringBuilder sql = new StringBuilder();
 			Connection conn = null;
 			try {
-				sql.delete(0, sql.length());
 				sql.append("\n  SELECT M.* from MC_MST_REFERENCE M");
 				sql.append("\n  where 1=1 and reference_code ='"+refCode+"' ");
 				if("equals".equals(equals)){
 					sql.append("\n  and M.pens_value ='"+c.getCodeSearch()+"'");
 				}
-				sql.append("\n  ORDER BY pens_value asc \n");
+				if(refCode.equalsIgnoreCase("MCmonthlytrip")){
+				   sql.append("\n order by to_number(substr(pens_value,3,4) || substr(pens_value,0,2)) desc ");
+				}else{
+				   sql.append("\n  ORDER BY pens_value asc \n");
+				}
 				
 				logger.debug("sql:"+sql);
 				conn = DBConnection.getInstance().getConnection();

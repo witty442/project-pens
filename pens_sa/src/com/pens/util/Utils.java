@@ -181,7 +181,10 @@ public class Utils {
 		if (str ==null){
 			return "";
 		}
-		return ((String)str);
+		if(str instanceof Double){
+		  return String.valueOf(((Double)str));
+		}
+		return (String)str;
 	}
 	
 	public static BigDecimal isNullToZero(BigDecimal str) {

@@ -175,19 +175,6 @@ function submitBT(path){
 		//queryStr +="&q1="+document.getElementsByName("q1")[0].value;
 		//queryStr +="&q2="+document.getElementsByName("q2")[0].value;
 	}
-	if(currentTab =='tab_backupdb'){
-		queryStr +="&action=tab_backupdb";
-	}
-	
-	if(currentTab =='tab_cleardb'){
-		queryStr +="&action=tab_cleardb";
-	}
-	if(currentTab =='tab_clearcust_dup'){
-		queryStr +="&action=tab_clearcust_dup";
-	}
-	if(currentTab =='tab_add_db'){
-		queryStr +="&action=tab_add_db";
-	}
 	//alert("quertStr:"+queryStr);
 	
 	document.adminConsoleForm.action = path + "/jsp/adminConsole.do?do=process"+queryStr;
@@ -228,10 +215,6 @@ function addSlqToeSQL(sqlUtils){
     <INPUT TYPE="button" class="tab_style" id ="id_config_info" name ="tab_config_info" VALUE="Configuration Info" onclick ="switchTab('<%=request.getContextPath()%>','tab_config_info')" />
 	<INPUT TYPE="button" class="tab_style" id ="id_query" name ="tab_query" VALUE="Query DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_query')"> 
 	<INPUT TYPE="button" class="tab_style" id ="id_execute" name ="tab_execute"  VALUE="Execute DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_execute')">
-	<INPUT TYPE="button" class="tab_style" id ="id_backupdb" name ="tab_backupdb"  VALUE="BackUp DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_backupdb')">
-	<INPUT TYPE="button" class="tab_style" id ="id_cleardb" name ="tab_cleardb"  VALUE="Clear DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_cleardb')">
-	<INPUT TYPE="button" class="tab_style" id ="id_clearcust_dup" name ="tab_clearcust_dup"  VALUE="Clear Dup Address" onclick ="switchTab('<%=request.getContextPath()%>','tab_clearcust_dup')">
-	<INPUT TYPE="button" class="tab_style" id ="id_add_db" name ="tab_add_db"  VALUE="Update Script DB" onclick ="switchTab('<%=request.getContextPath()%>','tab_add_db')">
 	
     <div id="div_msg" style="display:none"> 
 		    <br/><br/>
@@ -252,8 +235,8 @@ function addSlqToeSQL(sqlUtils){
 	   <div id="div_query"  style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
 	      <BR>
 		   <span class="h1_style"> Query Tab </span> :
-	       <INPUT TYPE="button" class="button2_style" name ="B_QUERY" VALUE="Submit Query DB" onclick="submitBT('<%=request.getContextPath()%>');">
-	       <INPUT TYPE="button" class="button2_style" name ="B_EXPORT"  VALUE="Submit Export DB" onclick="submitExportBT('<%=request.getContextPath()%>');">
+	       <INPUT TYPE="button" class="button2_style" name ="B_QUERY" VALUE="Submit Query" onclick="submitBT('<%=request.getContextPath()%>');">
+	       <INPUT TYPE="button" class="button2_style" name ="B_EXPORT"  VALUE="Submit ExportToExcel" onclick="submitExportBT('<%=request.getContextPath()%>');">
 	        <BR><br>
 		    Please enter your text SQL 1:<BR>
 		 
@@ -278,10 +261,7 @@ function addSlqToeSQL(sqlUtils){
 		     &nbsp; &nbsp;<b>เลือก SQl ที่ใช้บ่อย:</b>
 		     <select id="sqlUtils" onchange="addSlqToeSQL(this)">
 			  <option value=""></option>
-			  <option value="delete from monitor; delete from monitor_item;delete from monitor_item_detail;">ClearMonitorImportExport</option>
-			  <option value="delete from t_temp_import_trans;">ClearTempImportImportTrans</option>
-			  <option value="delete from c_control_run_script_db;">ClearControlRunScriptDB</option>
-			  <option value="delete from c_control_salesapp_version;">ClearControlSalesAppVersion</option>
+			  <option value="select 1 from dual">Test Select</option>
 			</select>
 		  <BR>
 		    Please enter your text SQL To Execute:
@@ -304,39 +284,7 @@ function addSlqToeSQL(sqlUtils){
 		  <br>
 	  </div>
 	  
-	   <div id="div_cleardb" style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
-		  <BR>
-		  <span class="h1_style"> Clear DB Tab </span> :
-		   <INPUT class="button2_style" TYPE="button" name ="B_ClearDB"  VALUE="Submit Clear DB" onclick="submitBT('<%=request.getContextPath()%>');">
-		  <BR>
-		   <html:textarea property="resultClearDB" style=" width :100%;" rows="40"/>
-		  <br>
-	  </div>
-	  <div id="div_clearcust_dup" style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
-		  <BR>
-		  <span class="h1_style"> Clear Duplicate Address </span> :
-		   <INPUT class="button2_style" TYPE="button" name ="B_Clearcust_dup"  VALUE="Submit Clear Duplicate Address" onclick="submitBT('<%=request.getContextPath()%>');">
-		  <BR>
-		   <html:textarea property="resultClearCustDup" style=" width :100%;" rows="40"/>
-		  <br>
-	  </div>
-      <div id="div_add_db" style="position: absolute; left: 5px; top: 60px;width:100%;align:left;" >
-		  <BR>
-		  <span class="h1_style">Update Script DB </span> 
-		    &nbsp;<b>เลือก Script DB ที่ต้องการ Run:</b>
-		     <select id="scriptDBName" name="scriptDBName">
-				  <option value="script_db">Script DB Last Version</option>
-				  <option value="script_db_last_year">Script DB Last Year</option>
-				  <option value="script_db_all_backup">Script DB ALL</option>
-			</select>
-			&nbsp;&nbsp;
-			 <INPUT class="button2_style" TYPE="button" name ="B_AddNewDB"  
-		      VALUE="Submit" onclick="submitBT('<%=request.getContextPath()%>');">
-		  <BR>
-		  
-		   <html:textarea property="resultAddDB" style=" width :100%;" rows="40"/>
-		  <br>
-	  </div>
+	 
 </html:form>
 </body>
 </html>

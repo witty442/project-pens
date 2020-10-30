@@ -104,6 +104,7 @@ public class InitialReferences extends I_Initial {
 		}
 	}
 	
+	/** keyAll is null get all record by code **/
 	public static List<References>  getReferenesByManual(String code,String keyAll) {
 		Connection conn = null;
 		PreparedStatement ps = null;
@@ -115,13 +116,24 @@ public class InitialReferences extends I_Initial {
 			
 			sql.append("SELECT * FROM pensso.c_reference \n");
 			sql.append("WHERE ISACTIVE = 'Y' and code ='"+code+"' \n");
-			sql.append("AND value in("+SQLHelper.converToTextSqlIn(keyAll)+") \n");
+			if( !Utils.isNull(keyAll).equals("")){
+			  sql.append("AND value in("+SQLHelper.converToTextSqlIn(keyAll)+") \n");
+			}
+			sql.append(" order by reference_id asc");
 			logger.debug("sql:"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
 			rs = ps.executeQuery();
+			
+			//(String code, String key, String name)
 			while(rs.next()){
-			   References r = new References(Utils.isNull(rs.getString("code")),Utils.isNull(rs.getString("value")),Utils.isNull(rs.getString("name")));
+			   References r = new References();//(Utils.isNull(rs.getString("code")),Utils.isNull(rs.getString("value")),Utils.isNull(rs.getString("name")));
+				
+			    r.setCode(rs.getString("CODE"));
+				r.setKey(rs.getString("VALUE"));
+				r.setName(rs.getString("NAME"));
+				r.setDesc(rs.getString("DESCRIPTION"));
+			   
 			   refList.add(r);
 			}
 		} catch (Exception e) {

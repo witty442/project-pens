@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.pay.PayWhiteAction"%>
 <%@page import="com.isecinc.pens.web.pay.PayWhiteForm"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
@@ -214,7 +215,7 @@ function switchFlag(obj,name){
 									</td>
 								</tr>
 								<tr>
-                                    <td> จ่าย<font color="red"></font></td>
+                                    <td> ร้านค้า<font color="red"></font></td>
 									<td>		
 										 <html:text property="bean.payToName" styleId="payToName" size="50"  maxlength="40"> </html:text>
 									</td>
@@ -231,19 +232,13 @@ function switchFlag(obj,name){
                                     <td> แผนก <font color="red"></font></td>
 									<td>		
 										 <html:select property="bean.sectionId" styleId="sectionId">
-										
 									    </html:select>
+									    &nbsp;&nbsp;&nbsp;&nbsp;
+									    หมายเหตุ 
+									    <html:text property="bean.remark" styleId="remark" size="60" styleClass="\" autoComplete=\"off"> </html:text>
 									</td>
 								</tr>
-								<%-- <tr>
-                                    <td></td>
-									<td>		
-										 <html:radio property="bean.paymethod" styleId="paymethod" value="C"/>เงินสด
-										 <html:radio property="bean.paymethod" styleId="paymethod" value="CH"/>เช็ค 
-										 <html:checkbox property="bean.cashFlag" styleId="cashFlag" onclick="switchFlag(this,'cashFlag');">เงินสด</html:checkbox>
-										 <html:checkbox property="bean.chequeFlag" styleId="chequeFlag" onclick="switchFlag(this,'chequeFlag');">เช็ค</html:checkbox>
-									</td>
-								</tr> --%>
+								
 						   </table>
 						   
 						   <!-- Items -->
@@ -261,7 +256,7 @@ function switchFlag(obj,name){
 							int tabindex = 1;
 							if(items == null){
 								
-								for(int n=0;n<4;n++){
+								for(int n=0;n<PayWhiteAction.maxRow;n++){
 									if(n%2==0){
 										tabclass="lineO";
 									}
@@ -280,7 +275,7 @@ function switchFlag(obj,name){
 									</tr>
 							<% } //for
 							}else{
-                                 for(int n=0;n<4;n++){
+                                 for(int n=0;n<PayWhiteAction.maxRow;n++){
                                 	PayBean item = new PayBean();
                                 	if(n<items.size()){
                                 	  item = items.get(n);

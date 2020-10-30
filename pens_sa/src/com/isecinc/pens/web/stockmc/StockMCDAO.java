@@ -220,6 +220,83 @@ public class StockMCDAO {
 		}
 		return items;
 	}
+	public  StockMCBean searchStockMCDetail(String id,String productCode) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnectionApps();
+			return searchStockMCDetail(conn, id, productCode);
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+			throw e;
+		}finally{
+			conn.close();
+		}
+	}
+	public  StockMCBean searchStockMCDetail(Connection conn,String id,String productCode) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		StockMCBean h = null;
+		int no =0;
+		try {
+			sql.append("\n select D.* ");
+			sql.append("\n ,(select max(M.description) from pensbi.mc_item_cust M ");
+			sql.append("\n  where H.customer_code = M.customer_code ");
+			sql.append("\n  and M.item_pens = D.product_code and M.barcode = D.barcode) as description");
+			sql.append("\n FROM PENSBI.MC_COUNTSTK_HEADER H,PENSBI.MC_COUNTSTK_DETAIL D");
+			sql.append("\n WHERE H.id = D.id ");
+			sql.append("\n AND D.id = "+id);
+			sql.append("\n AND D.product_code = '"+productCode+"'");
+			sql.append("\n ORDER BY D.line_id asc");
+			
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+			   no++;
+			   h = new StockMCBean();
+			   h.setId(rst.getInt("id"));
+			   h.setNo(no);
+			   h.setLineId(rst.getInt("line_id"));
+			   h.setProductCode(Utils.isNull(rst.getString("product_code")));
+			   h.setBarcode(Utils.isNull(rst.getString("barcode")));
+			   h.setProductName(Utils.isNull(rst.getString("description")));
+			   h.setProductPackSize(Utils.isNull(rst.getString("PRODUCT_PACKSIZE")));
+			   h.setProductAge(Utils.isNull(rst.getString("PRODUCT_AGE")));
+			   h.setRetailPriceBF(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit)));
+			   h.setPromotionPrice(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("PROMOTION_PRICE"), Utils.format_current_2_disgit)));
+			   h.setLegQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("LEG_QTY"), Utils.format_current_no_disgit)));
+			   h.setBackendQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("BACKEND_QTY"), Utils.format_current_no_disgit)));
+			   h.setInStoreQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("IN_STORE_QTY"), Utils.format_current_no_disgit)));
+			   h.setUom(Utils.isNull(rst.getString("uom")));
+			   //1
+			   h.setFrontendQty1(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_1"), Utils.format_current_no_disgit)));
+			   h.setUom1(Utils.isNull(rst.getString("uom_1")));
+			   h.setExpireDate1(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_1"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+			   //2
+			   h.setFrontendQty2(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_2"), Utils.format_current_no_disgit)));
+			   h.setUom2(Utils.isNull(rst.getString("uom_2")));
+			   h.setExpireDate2(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_2"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+			   //3
+			   h.setFrontendQty3(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FRONTEND_QTY_3"), Utils.format_current_no_disgit)));
+			   h.setUom3(Utils.isNull(rst.getString("uom_3")));
+			   h.setExpireDate3(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_3"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+			
+			  
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return h;
+	}
+	
 	
 	public static List<StockMCBean> searchStockMCReport(Connection conn,String idSelected) throws Exception {
 		PreparedStatement ps = null;
@@ -314,7 +391,7 @@ public class StockMCDAO {
 		return sql;
 	}
 	
-	public static List<StockMCBean> getProductMCItemList(Connection conn,String customerCode) throws Exception {
+	public static List<StockMCBean> getProductMCItemList(Connection conn,String customerCode,int headerId) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -324,6 +401,12 @@ public class StockMCDAO {
 		try {
 			sql.append("\n select H.* FROM PENSBI.MC_ITEM_CUST H");
 			sql.append("\n WHERE customer_code = '"+customerCode+"'");
+			if(headerId != 0){
+				sql.append("\n AND item_pens not in(");
+				sql.append("\n   SELECT product_code from PENSBI.MC_COUNTSTK_DETAIL");
+				sql.append("\n   WHERE ID = "+headerId);
+				sql.append("\n )");
+			}
 			logger.debug("sql:"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
@@ -371,6 +454,50 @@ public class StockMCDAO {
 			} catch (Exception e) {}
 		}
 		return itemList;
+	}
+	
+	public static StockMCBean getProductMCItemInfo(String customerCode,String productCode) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		StockMCBean h = null;
+		Connection conn = null;
+		int no= 0;
+		try {
+			conn = DBConnection.getInstance().getConnectionApps();
+			sql.append("\n select H.* FROM PENSBI.MC_ITEM_CUST H");
+			sql.append("\n WHERE customer_code = '"+customerCode+"'");
+			sql.append("\n AND item_pens = '"+productCode+"'");
+			
+			logger.debug("sql:"+sql.toString());
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+			   no++;
+			   h = new StockMCBean();
+			   h.setNo(no);
+			   h.setProductCode(Utils.isNull(rst.getString("item_pens")));
+			   h.setBarcode(Utils.isNull(rst.getString("barcode")));
+			   h.setItemCust(Utils.isNull(rst.getString("item_cust")));
+			   h.setProductName(Utils.isNull(rst.getString("description")));
+			   h.setProductPackSize(Utils.isNull(rst.getString("packsize")));
+			   h.setProductAge(Utils.isNull(rst.getString("PRODUCT_AGE")));
+			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price"), Utils.format_current_2_disgit));
+			   h.setStartDate(DateUtil.stringValueChkNull(rst.getDate("start_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+
+			}//while
+
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return h;
 	}
 	
 	public static StockMCBean getProductMCItem(String storeCode,String productCode,String barcode) throws Exception {
@@ -482,6 +609,48 @@ public class StockMCDAO {
 			//delete stockMCItem not in 
 			deleteStockMCLine(conn, head.getId() ,head.getLineIdDeletes());
 			
+			conn.commit();
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+			conn.rollback();
+			throw e;
+		}finally{
+			if(conn != null){
+			   conn.close();conn=null;
+			}
+		}
+		return head;
+	}
+	
+	public StockMCBean saveByProduct(StockMCBean head) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			conn.setAutoCommit(false);
+	
+			//replace '&#8203;'= space : what in put from ??
+			head.setMcName(head.getMcName().replaceAll("//&#8203;", ""));
+			
+			if(head.getId() == 0){
+				head = insertStockMCHead(conn , head);
+			}else{
+				updateStockMCHead(conn , head);
+			}
+	
+			int maxLineId = getMaxLineId(conn, head.getId());//getMaxId by ID
+			StockMCBean line = head;
+			logger.debug("check id:"+head.getId());
+			logger.debug("check lineId:"+line.getLineId());
+			if(line.getLineId() ==0){
+			   maxLineId++;
+			   line.setId(head.getId());
+		       line.setLineId((maxLineId));
+		       
+		       insertStockMCLine(conn,line);
+			}else{
+			   line.setId(head.getId());
+			   updateStockMCLine(conn,line);
+			}
 			conn.commit();
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);

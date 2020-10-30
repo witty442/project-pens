@@ -1,12 +1,54 @@
 package com.pens.util;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.record.CountryRecord;
 
 import com.isecinc.pens.bean.User;
 
 public class UserUtils {
 	public static Logger logger = Logger.getLogger("PENS");
 	
+	public static int userIsMultiRoleCount(User user){
+		int coutRole = 0;
+		
+        if(!Utils.isNull(user.getRoleSalesTarget()).equals("")){
+        	coutRole++;
+        } 
+        if(!Utils.isNull(user.getRoleCRStock()).equals("")){
+        	coutRole++;
+        }
+        if(!Utils.isNull(user.getRoleSpider()).equals("")){
+        	coutRole++;
+        }
+        if(!Utils.isNull(user.getRoleStockVan()).equals("")){
+        	coutRole++;
+        }
+        if(!Utils.isNull(user.getRoleSA()).equals("")){
+        	coutRole++;
+        }
+        if(!Utils.isNull(user.getRoleProdShow()).equals("")){
+        	coutRole++;
+        }
+        if(!Utils.isNull(user.getRoleMC()).equals("")){
+        	coutRole++;
+        } 
+        if(!Utils.isNull(user.getRoleVanDoc()).equals("")){
+        	coutRole++;
+        }
+        if(!Utils.isNull(user.getRoleOnhand()).equals("")){
+        	coutRole++;
+        }
+        if(!Utils.isNull(user.getRoleCoverage()).equals("")){
+        	coutRole++;
+        }
+        if(!Utils.isNull(user.getRoleB2B()).equals("")){
+        	coutRole++;
+        }
+        if(!Utils.isNull(user.getRoleMkt()).equals("")){
+        	coutRole++;
+        }
+		return coutRole;
+	}
 	public static boolean userInRole(String roleType,User user,String[] roles){
 		boolean r = false;
 		String roleCheck = "";
@@ -88,6 +130,7 @@ public class UserUtils {
 		}//for 1
 		return r;
 	}
+	
 	
 	/*public static boolean userInRoleCreditStock(User user,String[] roles){
 		boolean r = false;

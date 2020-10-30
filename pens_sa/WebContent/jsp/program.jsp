@@ -16,7 +16,10 @@ programKey = function;
 //System.out.println(system);
 //System.out.println(function);
 //System.out.println(code);
-
+String fontColor = "";
+if("ProjectCAnalyst".equalsIgnoreCase(function)){
+	fontColor = "red";
+}
 
 if(system.length()>0) system = SystemProperties.getCaption(system,Locale.getDefault());
 if(function.length()>0) function = SystemProperties.getCaption(function,Locale.getDefault());
@@ -25,6 +28,8 @@ if(code.equals("null")){
 }else if(code != null && !code.equals("")){
 	code = SystemProperties.getCaption(code,Locale.getDefault());
 }
+
+
 %>
 
 <%@page import="java.util.Locale"%>
@@ -35,7 +40,9 @@ if(code.equals("null")){
  		<td width="41" align="left"><img src="${pageContext.request.contextPath}/images2/bullet.gif" width="37" height="19" /></td>
    		<td class="nav_txt" style="background:#FFFFFF url('${pageContext.request.contextPath}/images2/bulletLine.gif') no-repeat right;">
    			<a href="javascript:popupFull('/pens_help/jsp/doc/pens_sa/<%=programKey %>_DOC.jsp')">
-   		      <%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %>
+   		       <font color="<%=fontColor %>">
+   		         <%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %>
+   		       </font>
    			</a>
    		
    		</td>

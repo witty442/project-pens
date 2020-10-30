@@ -22,13 +22,13 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
 import com.isecinc.pens.web.popup.PopupDAO;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.prodshow.ProdShowBean;
 import com.isecinc.pens.web.prodshow.ProdShowDAO;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 

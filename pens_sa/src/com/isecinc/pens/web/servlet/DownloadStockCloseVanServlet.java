@@ -19,12 +19,12 @@ import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SalesrepDAO;
-import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
 import com.isecinc.pens.web.stock.StockBean;
 import com.isecinc.pens.web.stock.StockCloseVanBean;
 import com.isecinc.pens.web.stock.StockCloseVanReport;
 import com.pens.util.BeanParameter;
 import com.pens.util.DBConnection;
+import com.pens.util.EnvProperties;
 import com.pens.util.ReportUtilServlet;
 import com.pens.util.Utils;
 

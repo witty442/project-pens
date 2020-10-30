@@ -52,8 +52,15 @@ public class ProjectCBean implements Serializable{
     
     private List<ProjectCBean> itemsList;
     private StringBuffer dataStrBuffer;
+    private String[] chkMonth;
     
     
+	public String[] getChkMonth() {
+		return chkMonth;
+	}
+	public void setChkMonth(String[] chkMonth) {
+		this.chkMonth = chkMonth;
+	}
 	public String getBrand() {
 		return brand;
 	}

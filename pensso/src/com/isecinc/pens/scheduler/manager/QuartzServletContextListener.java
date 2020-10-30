@@ -30,6 +30,7 @@ private StdSchedulerFactory factory = null;
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
 	   ctx = servletContextEvent.getServletContext();
 		 try {
+			 System.out.println("QuartzServletContextListener start:");
 		  /*factory = new StdSchedulerFactory();
 		  // Start the scheduler now
 		  factory.getScheduler().start();

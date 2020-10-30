@@ -399,6 +399,14 @@ public class ReportUtilServlet extends HttpServlet {
 			FontKey key2 = new FontKey("Angsana New", true, false);
 			PdfFont font2 = new PdfFont("fonts/ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
 			fontMap.put(key2, font2);
+			/*
+			FontKey key3 = new FontKey("SansSerif", false, false);
+			PdfFont font3 = new PdfFont("fonts/SansSerif Regular.ttf", BaseFont.IDENTITY_H, true);
+			fontMap.put(key, font3);
+	
+			FontKey key4 = new FontKey("SansSerif", true, false);
+			PdfFont font4 = new PdfFont("fonts/SansSerif Bold.ttf", BaseFont.IDENTITY_H, false);
+			fontMap.put(key2, font4);*/
 		
 			ByteArrayOutputStream rtfOutput = new ByteArrayOutputStream();
 			JRPdfExporter exporter = new JRPdfExporter();
@@ -448,17 +456,19 @@ public class ReportUtilServlet extends HttpServlet {
 			
 			/** Set property printer and Report **/
 			HashMap fontMap = new HashMap();
-			/*FontKey key = new FontKey("Angsana New", false, false);
+			FontKey key = new FontKey("Angsana New", false, false);
 			PdfFont font = new PdfFont("fonts/ANGSAU.TTF", BaseFont.IDENTITY_H, true);
 			fontMap.put(key, font);
 	
 			FontKey key2 = new FontKey("Angsana New", true, false);
-			PdfFont font2 = new  PFont("fonts/ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
-			fontMap.put(key2, font2);*/
+			PdfFont font2 = new  PdfFont("fonts/ANGSAUB.TTF", BaseFont.IDENTITY_H, false);
+			fontMap.put(key2, font2);
 						
 			if("pay_in_report".equalsIgnoreCase(fileName) 
 				|| "pay_in_white_report".equalsIgnoreCase(fileName)
-				|| "pay_in_yellow_report".equalsIgnoreCase(fileName)){
+				|| "pay_in_yellow_report".equalsIgnoreCase(fileName)
+				|| "pay_in_all_report".equalsIgnoreCase(fileName)
+			){
 		
 				String printerPayInName = user.getPrinterName();//"HP LaserJet Professional P1606dn";
 				
@@ -474,7 +484,7 @@ public class ReportUtilServlet extends HttpServlet {
 
 					JRExporter exporter = new JRPrintServiceExporter();
 					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
-					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
+					exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
 					
 		        	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceAttributeSetManual);
 					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
@@ -485,21 +495,7 @@ public class ReportUtilServlet extends HttpServlet {
 					logger.debug("pay_inreport Step 1 Fix printer "+printerPayInName+" End exported");
 					
 		        }catch(Exception e){
-		        	
                     logger.debug("print pay_in_report Error not found printer name:"+printerPayInName);
-		        	//logger.debug("tax_invoice_report Step 2 User Printer defalut ");
-/*
-					JRExporter exporter = new JRPrintServiceExporter();
-					exporter.setParameter(JRExporterParameter.JASPER_PRINT, rtfPrint);
-					//exporter.setParameter(JRExporterParameter.FONT_MAP, fontMap);
-					
-					exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, printServiceDefaultAttributeSet);
-					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
-					exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.FALSE);*/
-		
-					//logger.debug("pay_in_report Step 2 User Printer defalut  Start exported...");
-					//exporter.exportReport();
-					//logger.debug("pay_in_report Step 2 User Printer defalut  End exported");
 		        }
 		     /** Normal **/
 			}else{

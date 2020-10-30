@@ -61,6 +61,7 @@
 		<form-bean name="payForm" type="com.isecinc.pens.web.pay.PayForm" />
 		<form-bean name="payWhiteForm" type="com.isecinc.pens.web.pay.PayWhiteForm" />
 		<form-bean name="payYellowForm" type="com.isecinc.pens.web.pay.PayYellowForm" />
+		<form-bean name="payInterForm" type="com.isecinc.pens.web.pay.PayInterForm" />
 		<form-bean name="rtForm" type="com.isecinc.pens.web.rt.RTForm" />
 		<form-bean name="nsForm" type="com.isecinc.pens.web.nissin.NSForm" />
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
@@ -573,12 +574,7 @@
 		
 		<action name="mcForm" path="/jsp/mcAction" parameter="do" scope="session" type="com.isecinc.pens.web.mc.MCAction">
 			<forward name="search2" path="/jsp/mc/mcSearch.jsp" />
-			<forward name="prepare2" path="/jsp/mc/mcSearch.jsp" />
-			<forward name="clear2" path="/jsp/mc/mcSearch.jsp" />
-			
 			<forward name="search" path="/jsp/mc/mcTrans.jsp" />
-			<forward name="prepare" path="/jsp/mc/mcTrans.jsp" />
-			<forward name="clear" path="/jsp/mc/mcTrans.jsp" />
 			
 			<forward name="report" path="/jsp/mc/mcSearch.jsp" />
 			<forward name="prepareMCStaff" path="/jsp/mc/mcStaffSearch.jsp" />
@@ -621,6 +617,11 @@
 			<forward name="search" path="/jsp/pay/payYellowSearch.jsp" />
 			<forward name="detail" path="/jsp/pay/payYellowDetail.jsp" />
 			<forward name="printPayPopup" path="/jsp/popup/printPayYellowPopup.jsp" />
+		</action>
+		<action name="payInterForm" path="/jsp/payInterAction" parameter="do" scope="session" type="com.isecinc.pens.web.pay.PayInterAction">
+			<forward name="search" path="/jsp/pay/payInterSearch.jsp" />
+			<forward name="detail" path="/jsp/pay/payInterDetail.jsp" />
+			<forward name="printPayPopup" path="/jsp/popup/printPayInterPopup.jsp" />
 		</action>
 		<action name="itManageForm" path="/jsp/itManageAction" parameter="do" scope="session" type="com.isecinc.pens.web.itmanage.ITManageAction">
 			<forward name="search" path="/jsp/itmanage/itManageSearch.jsp" />

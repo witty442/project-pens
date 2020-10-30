@@ -85,6 +85,80 @@ public class MReceipt extends I_Model<Receipt> {
 		array = pos.toArray(array);
 		return array;
 	}
+	public Receipt[] searchOpt(String whereCause) throws Exception {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<Receipt> receiptList = new ArrayList<Receipt>();
+		Receipt[] array = null;
+		try {
+			    String sql = "select * from pensso.t_receipt where 1=1 \n";
+			           sql += whereCause;
+			           
+				logger.debug("sql:"+sql);
+				conn = DBConnection.getInstance().getConnection();
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql);
+				
+				while(rst.next()){
+					Receipt m = new Receipt();
+					m.setId(rst.getLong("RECEIPT_ID"));
+					m.setReceiptNo(rst.getString("RECEIPT_NO").trim());
+					m.setReceiptDate(DateToolsUtil.convertToString(rst.getTimestamp("RECEIPT_DATE")));
+					m.setOrderType(rst.getString("ORDER_TYPE").trim());
+					m.setCustomerId(rst.getLong("CUSTOMER_ID"));
+					m.setCustomerName(rst.getString("CUSTOMER_NAME").trim());
+					m.setPaymentMethod(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim());
+					m.setBank(ConvertNullUtil.convertToString(rst.getString("BANK")).trim());
+					m.setChequeNo(ConvertNullUtil.convertToString(rst.getString("CHEQUE_NO")).trim());
+					m.setChequeDate("");
+					if (rst.getTimestamp("CHEQUE_DATE") != null)
+						m.setChequeDate(DateToolsUtil.convertToString(rst.getTimestamp("CHEQUE_DATE")));
+					m.setReceiptAmount(rst.getDouble("RECEIPT_AMOUNT"));
+					m.setInterfaces(rst.getString("INTERFACES").trim());
+					m.setDocStatus(rst.getString("DOC_STATUS").trim());
+					m.setSalesRepresent(new MUser().find(rst.getString("USER_ID")));
+					m.setCreditCardType(ConvertNullUtil.convertToString(rst.getString("CREDIT_CARD_TYPE")).trim());
+					m.setDescription(ConvertNullUtil.convertToString(rst.getString("DESCRIPTION")).trim());
+					m.setPrepaid(rst.getString("PREPAID").trim());
+					m.setApplyAmount(rst.getDouble("APPLY_AMOUNT"));
+
+					m.setExported(rst.getString("EXPORTED"));
+
+					m.setInternalBank(ConvertNullUtil.convertToString(rst.getString("INTERNAL_BANK")));
+					m.setBillToAddressId(rst.getInt("bill_to_address_id"));
+					
+					// Lookup Lines
+					m.setReceiptLines(new MReceiptLine().lookUp(m.getId()));
+
+					// Lookup Bys
+					m.setReceiptBys(new MReceiptBy().lookUp(m.getId()));
+
+					// Lookup CNs
+					m.setReceiptCNs(new MReceiptCN().lookUp(m.getId()));
+
+					receiptList.add(m);
+				}
+				
+				//convert to Obj
+				if(receiptList != null && receiptList.size() >0){
+					array = new Receipt[receiptList.size()];
+					array = receiptList.toArray(array);
+				}else{
+					array = null;
+				}
+				
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+					conn.close();
+				} catch (Exception e2) {}
+			}
+		return array;
+	}
 
 public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws Exception {
 	Connection conn = null;

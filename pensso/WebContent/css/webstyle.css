@@ -284,37 +284,6 @@ A:hover {
 	TEXT-DECORATION: none;
 }
 
-.order {
-	width: 40px;
-}
-
-.checkBox {
-	width: 20px;
-}
-
-.icon {
-	width: 15px;
-}
-
-.code {
-	width: 110px;
-}
-
-.name {
-	width: 180px;
-}
-
-.status {
-	width: 60px;
-}
-
-.costprice {
-	width: 80px;
-}
-
-.date {
-	width: 100px;
-}
 
 .result2 {
 	background-color: #D3D3D3;

@@ -150,6 +150,7 @@ public class PayWhiteDAO {
 				   h.setSectionName(Utils.isNull(rst.getString("section_name")));
 				   h.setStatus(Utils.isNull(rst.getString("status")));
 				   h.setPaymethod(Utils.isNull(rst.getString("pay_method")));
+				   h.setRemark(Utils.isNull(rst.getString("remark")));
 				   h.setDR_AC_NO(Utils.isNull(rst.getString("DR_AC_NO")));
 				   h.setDR_DESC(Utils.isNull(rst.getString("DR_DESC")));
 				   if( Utils.isNull(h.getPaymethod()).equals("C")){
@@ -263,9 +264,9 @@ public class PayWhiteDAO {
 			sql.append(" (DOC_NO, DOC_DATE, PAY_TO_NAME, DEPT_ID, SECTION_ID," +
 					" PAY_METHOD, STATUS, CREATE_DATE, CREATE_USER" +
 					" ,DR_AC_NO,DR_DESC,DR_AMOUNT,DR_INPUT_TAX_AMOUNT,DR_TOTAL" +
-					" ,CR_AC_NO,CR_DESC,CR_AMOUNT,CR_ACC_WT_TAX_AMOUNT,CR_TOTAL) \n");
+					" ,CR_AC_NO,CR_DESC,CR_AMOUNT,CR_ACC_WT_TAX_AMOUNT,CR_TOTAL,REMARK) \n");
 			sql.append(" VALUES \n"); 
-			sql.append(" (?, ?, ?, ?, ?, ?, ?, ?, ? ,?,?,?,?,?,?,?,?,?,?) \n");
+			sql.append(" (?, ?, ?, ?, ?, ?, ?, ?, ? ,?,?,?,?,?,?,?,?,?,?,?) \n");
 			
 			ps = conn.prepareStatement(sql.toString());
 			
@@ -294,7 +295,7 @@ public class PayWhiteDAO {
 			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_AMOUNT()));
 			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_ACC_WT_TAX_AMOUNT()));
 			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_TOTAL()));
-			
+			ps.setString(c++, Utils.isNull(o.getRemark()));
 			ps.executeUpdate();
 			
 		}catch(Exception e){
@@ -347,7 +348,7 @@ public class PayWhiteDAO {
 			sql.append(" UPDATE_USER =? ,UPDATE_DATE = ?  " );
 			sql.append(" ,DR_AC_NO = ? ,DR_DESC = ? ,DR_AMOUNT = ? ,DR_INPUT_TAX_AMOUNT = ? ,DR_TOTAL = ?  \n" );
 			sql.append(" ,CR_AC_NO = ? ,CR_DESC = ? ,CR_AMOUNT = ? ,CR_ACC_WT_TAX_AMOUNT = ? ,CR_TOTAL = ?  \n");
-			
+			sql.append(" ,REMARK =? \n");
 			sql.append(" WHERE DOC_NO = ?  \n" );
 
 			ps = conn.prepareStatement(sql.toString());
@@ -374,6 +375,7 @@ public class PayWhiteDAO {
 			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_AMOUNT()));
 			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_ACC_WT_TAX_AMOUNT()));
 			ps.setDouble(c++, Utils.convertStrToDouble(o.getCR_TOTAL()));
+			ps.setString(c++, Utils.isNull(o.getRemark()));
 			
 			ps.setString(c++, Utils.isNull(o.getDocNo()));
 

@@ -59,6 +59,9 @@ public class ImportManualExcel {
 			importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/ร้านค้าเครดิต.xlsx",4,3,0);*/
 			
 			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/Master Buds.xlsx",8,0);
+			
+			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/projectc_branch_tt.xlsx",10,0);
+			importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/projectc_target_tt.xlsx",7,0);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

@@ -26,6 +26,8 @@ pageContext.setAttribute("docstatus",docstatus,PageContext.PAGE_SCOPE);
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+
 <style type="text/css">
 <!--
 body {
@@ -159,27 +161,27 @@ function loadMe(){
 						<div align="left" class="recordfound">&nbsp;&nbsp;&nbsp;<bean:message key="RecordsFound"  bundle="sysprop"/>&nbsp;
 						<span class="searchResult">${receiptForm.criteria.searchResult}</span>&nbsp;
 						<bean:message key="Records"  bundle="sysprop"/></div>
-						<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+						<table align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 							<tr>
-								<th class="order"><bean:message key="No" bundle="sysprop"/></th>
-								<th class="name"><bean:message key="Receipt.No" bundle="sysele"/></th>
-								<th class="code"><bean:message key="TransactionDate" bundle="sysele"/></th>
-								<th class="code"><bean:message key="Order.Payment" bundle="sysele"/></th>
-								<th class="name"><bean:message key="Description"  bundle="sysele"/></th>
+								<th><bean:message key="No" bundle="sysprop"/></th>
+								<th><bean:message key="Receipt.No" bundle="sysele"/></th>
+								<th><bean:message key="TransactionDate" bundle="sysele"/></th>
+								<th><bean:message key="Order.Payment" bundle="sysele"/></th>
+								<th><bean:message key="Description"  bundle="sysele"/></th>
 								<%if(user.getRole().getKey().equalsIgnoreCase(User.VAN)){ %>
-								  <th class="status"><bean:message key="Order.Paid"  bundle="sysele"/></th>
+								  <th><bean:message key="Order.Paid"  bundle="sysele"/></th>
 								<%} %>
-								<th class="status"><bean:message key="Exported"  bundle="sysele"/></th>
-								<th class="status"><bean:message key="Interfaces"  bundle="sysele"/></th>
+								<th><bean:message key="Exported"  bundle="sysele"/></th>
+								<th ><bean:message key="Interfaces"  bundle="sysele"/></th>
 								<%if(!user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
-								  <th class="name"><bean:message key="Bill.No"  bundle="sysele"/>/ใบลดหนี้
+								  <th ><bean:message key="Bill.No"  bundle="sysele"/>/ใบลดหนี้
 								  </th>
 								<%} %>
-								<th class="status"><bean:message key="Status" bundle="sysele"/></th>
+								<th><bean:message key="Status" bundle="sysele"/></th>
 								<%if(!role.equalsIgnoreCase(User.DD)){ %>
 								  <th class="status"><bean:message key="Edit" bundle="sysprop"/></th>
 								<%} %>
-								<th class="status"><bean:message key="View" bundle="sysprop"/></th>
+								<th><bean:message key="View" bundle="sysprop"/></th>
 							</tr>	
 						<c:forEach var="results" items="${receiptForm.results}" varStatus="rows">
 						<c:choose>
@@ -191,40 +193,52 @@ function loadMe(){
 							</c:otherwise>
 						</c:choose>
 						<tr class="<c:out value='${tabclass}'/>">
-							<td width="36px;"><c:out value='${rows.index+1}'/></td>
-							<td align="center" width="96px;">${results.receiptNo}</td>
-							<td align="center" width="76px;">${results.receiptDate}</td>
-							<td align="right" width="67px;">
+							<td class="td_text_center" width="5%"><c:out value='${rows.index+1}'/></td>
+							<td class="td_text_center" width="10%">${results.receiptNo}</td>
+							<td class="td_text_center" width="5%">${results.receiptDate}</td>
+							<td class="td_text_center" width="5%">
 								<fmt:formatNumber pattern="#,##0.00" value="${results.receiptAmount}"/>
 							</td>
-							<td align="left" width="108px;">${results.description}</td>
+							<td class="td_text_center" width="15%">${results.description}</td>
 							<%if(user.getRole().getKey().equalsIgnoreCase(User.VAN)){ %>
-							<td align="center" width="43px;">
+							<td class="td_text_center" width="5%">
 								<c:if test="${results.prepaid=='Y'}">
 								<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 								</c:if>
 							</td>
 							<%} %>
-							<td align="center" width="47px;">
+							<td class="td_text_center" width="5%">
 								<c:if test="${results.exported=='Y'}">
 								<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 								</c:if>
 							</td>
-							<td align="center" width="47px;">
+							<td class="td_text_center" width="5%">
 								<c:if test="${results.interfaces=='Y'}">
 								<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
 								</c:if>
 							</td>
-							<%if(!user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
-							<td align="center" width="97px;">${results.invoiceNoLabel}</td>
-							<%} %>
-							<td align="center" width="48px;">${results.docStatusLabel}</td>
-							
-							<td align="center">
-								<%if(!role.equalsIgnoreCase(User.DD)){ %>
+							<td class="td_text_center" width="10%">${results.invoiceNoLabel}</td>
+							<td class="td_text_center" width="10%">${results.docStatusLabel}</td>
+							<td class="td_text_center" width="5%">
+								<c:if test="${results.exported=='N'}">
+									<c:if test="${results.docStatus=='SV'}">
+										<c:if test="${results.prepaid=='N'}">
+										   <!-- *** OLD CODE ********** -->
+<!--											<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','edit','${results.id}');">-->
+<!--											<img border=0 src="${pageContext.request.contextPath}/icons/doc_edit.gif"></a>-->
+
+											<!-- *** OLD CODE ********** -->
+											<!-- WIT EDIT 03/08/2554*** -->
+<!--											<a href="#" onclick="javascript:openCancelReceiptPopup('${pageContext.request.contextPath}','${results.receiptNo}','${results.id}');">-->
+<!--											                                    ยกเลิกรายการ</a>-->
+										    <!-- WIT EDIT 03/08/2554*** -->
+										</c:if>
+									</c:if>
+								</c:if>
+							</td>
+							<td class="td_text_center" width="5%">
 								<a href="#" onclick="javascript:prepare('${pageContext.request.contextPath}','view','${results.id}');">
 								<img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif"></a>
-								<%} %>
 							</td>
 						</tr>
 						</c:forEach>

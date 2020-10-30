@@ -251,7 +251,7 @@ public class ProjectCReportAction extends I_Action {
 			sql.append("\n    SELECT M.ORACLE_CUST_NO,B.BRANCH_ID,B.BRANCH_NAME");
 			sql.append("\n    ,M.CHECK_DATE,M.CHECK_USER");
 			sql.append("\n    ,D.PRODUCT_CODE,D.PRODUCT_NAME,D.FOUND,D.LEG,D.REMARK");
-			sql.append("\n    FROM PENSBI.PENSBME_TT_PROJECTC M ,PENSBI.PENSBME_TT_BRANCH B");
+			sql.append("\n    FROM PENSBI.PENSBME_TT_PROJECTC M ,PENSBI.PENS_TT_BRANCH B");
 			sql.append("\n    ,PENSBI.PENSBME_TT_PROJECTC_I D ,apps.xxpens_ar_cust_sales_all CS");
 			sql.append("\n    ,apps.xxpens_ar_customer_all_v C ");
 			sql.append("\n    WHERE M.ORACLE_CUST_NO = B.ORACLE_CUST_NO ");
@@ -582,7 +582,7 @@ public class ProjectCReportAction extends I_Action {
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		try{
-			sql.append("\n  SELECT distinct PROVINCE FROM PENSBI.PENSBME_TT_BRANCH where 1=1 ");
+			sql.append("\n  SELECT distinct PROVINCE FROM PENSBI.PENS_TT_BRANCH where 1=1 ");
 			if( !Utils.isNull(provinceName).equals("")){
 				sql.append("\n  and PROVINCE ='"+provinceName+"'");
 			}
@@ -631,7 +631,7 @@ public class ProjectCReportAction extends I_Action {
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
 		try{
-			sql.append("\n  SELECT distinct amphor FROM PENSBI.PENSBME_TT_BRANCH ");
+			sql.append("\n  SELECT distinct amphor FROM PENSBI.PENS_TT_BRANCH ");
 			sql.append("\n  where 1=1  ");
 			if( !Utils.isNull(provinceName).equals("")){
 				sql.append("\n  and province ='"+provinceName+"'");

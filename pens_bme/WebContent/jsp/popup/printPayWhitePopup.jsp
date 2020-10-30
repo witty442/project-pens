@@ -48,11 +48,13 @@ function loadMe(_path){
          document.tempForm.submit();
          
  <%} %>
- //after printer close window
- <%if("printerSuccess".equals(printerSuccess)){%>
-   setTimeout(function(){window.close();},8000);
- <%}%>
  
+   //close window 3 minute 60000(ms)=1(minute)
+   setTimeout(function(){window.close();},120000);
+   
+   var fiveMinutes = 60 * 2,
+   display = document.querySelector('#time');
+   startTimer(fiveMinutes, display);
 }
 /** Case Printer offline user choose printer **/
   function printReportByUser(_path){
@@ -70,6 +72,22 @@ function loadMe(_path){
       
      // setTimeout(function(){window.close();},9000);
 }
+  function startTimer(duration, display) {
+	    var timer = duration, minutes, seconds;
+	    setInterval(function () {
+	        minutes = parseInt(timer / 60, 10);
+	        seconds = parseInt(timer % 60, 10);
+
+	        minutes = minutes < 10 ? "0" + minutes : minutes;
+	        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+	        display.textContent = minutes + ":" + seconds;
+
+	        if (--timer < 0) {
+	            timer = duration;
+	        }
+	    }, 1000);
+	}
 </script>
 </head>
 <body onload="loadMe('${pageContext.request.contextPath}');" topmargin="0" bottommargin="0" leftmargin="100" rightmargin="150" class="popbody">
@@ -99,6 +117,8 @@ function loadMe(_path){
 			%>
 				 <input type="radio" name="printerName" id="printerName"
 				 value="<%=p.getName()%>"><b><%=p.getName()%>-<%=p.getDesc()%></b><br>
+				 
+				
 			<%}} %>
 			</td>
 		</tr>
@@ -118,14 +138,23 @@ function loadMe(_path){
 		</tr>
 		<tr>
 			<td align="center">
-			  <font size="3" color="green">	กำลังพิมพ์เอกสาร กรุณารอกสักครู่.............</font>
+			  <font size="3" color="green">	กำลังพิมพ์เอกสาร กรุณา รอ สักครู่.............</font>
 			</td>
 		</tr>
 		<tr>
 			<td align="center">
 			 	<a href="#" onclick="window.close();">
-				<input type="button" value="ปิดหน้าจอนี้" class="newBtn">
+				<input type="button" value="ปิดหน้าจอนี้" class="newPosBtnLong">
 				</a> 
+				 
+			</td>
+		</tr>
+		<tr>
+			<td align="center">
+				 <div><font size="3" color="red">
+				     กำลังจะปิดหน้าจอนี้... <span id="time">2</span> นาที!
+				 </font> 
+				 </div>
 			</td>
 		</tr>
 	</table>

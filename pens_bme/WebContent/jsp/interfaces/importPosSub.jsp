@@ -27,19 +27,20 @@ if(interfacesForm.getMonitorItemBeanResult() != null){
     <p></p>
 	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
-	  <th colspan="10">จำนวนรายการที่สามารถ Import ได้   ${interfacesForm.monitorItemBeanResult.successCount} รายการ </th>
+	  <th colspan="11">จำนวนรายการที่สามารถ Import ได้   ${interfacesForm.monitorItemBeanResult.successCount} รายการ </th>
 	</tr>
 	<tr>
 		<th width="5%">Line in Excel</th>
 		<th width="5%">Order no</th>
 		<th width="10%">Customer no</th>
-		<th width="10%">Order Date</th>
-		<th width="10%">Subinv</th>
+		<th width="5%">Order Date</th>
+		<th width="5%">Subinv</th>
 		<th width="10%">Reference</th>
-		<th width="10%">Sale code</th>
-		<th width="10%">Pens Item</th>
-		<th width="10%">Unit selling price</th>
-		<th width="10%">Qty</th>
+		<th width="7%">Sale code</th>
+		<th width="7%">Pens Item</th>
+		<th width="5%">Unit selling price</th>
+		<th width="5%">Qty</th>
+		<th width="15%">ชื่อลูกค้า</th>
 	</tr>
 	<%
 	 String[] lineArr = null;
@@ -68,11 +69,13 @@ if(interfacesForm.getMonitorItemBeanResult() != null){
 			<td><%=lineArr[7] %></td>
 			<td><%=lineArr[8] %></td>
 			<td><%=Utils.convertDoubleToStrNoDigit(lineArr[9]) %></td>
+			<td><%=lineArr[10] %></td>
 		</tr>
 		<%} %>
 		<tr class="hilight_text">
 		    <td colspan="9" align="right">Total Qty</td>
 			<td><%=totalQty%></td>
+			<td></td>
 		</tr>
 	</table>
    <%} %>
@@ -81,7 +84,7 @@ if(interfacesForm.getMonitorItemBeanResult() != null){
 	<p></p>
 	<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
-	  <th colspan="10">จำนวนรายการที่ไม่่สามารถ Import ได้   ${interfacesForm.monitorItemBeanResult.failCount} รายการ </th>
+	  <th colspan="11">จำนวนรายการที่ไม่่สามารถ Import ได้   ${interfacesForm.monitorItemBeanResult.failCount} รายการ </th>
 	</tr>
 	<tr>
 		<th width="5%">Line in Excel</th>
@@ -123,11 +126,13 @@ if(interfacesForm.getMonitorItemBeanResult() != null){
 			<td><%=lineArr[7] %></td>
 			<td><%=lineArr[8] %></td>
 			<td><%=lineArr[9] %></td>
+			<td><%=lineArr[10] %></td>
 		</tr>
 		<%} %>
 		<tr class="hilight_text">
 		    <td colspan="9" align="right">Total Qty</td>
 			<td><%=totalQty%></td>
+			<td></td>
 		</tr>
 	</table>
 	 <%} %>

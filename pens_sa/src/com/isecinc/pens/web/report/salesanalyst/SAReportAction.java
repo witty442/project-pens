@@ -23,6 +23,7 @@ import com.isecinc.pens.report.salesanalyst.SABean;
 import com.isecinc.pens.report.salesanalyst.SAGenerate;
 import com.isecinc.pens.report.salesanalyst.SAInitial;
 import com.isecinc.pens.report.salesanalyst.helper.SecurityHelper;
+import com.isecinc.pens.web.report.analyst.process.AInitial;
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
@@ -77,8 +78,12 @@ public class SAReportAction extends I_Action {
 				
 				formBean.setSalesBean(saBean);
 				
+				//clear parameter init
+				request.getSession().removeAttribute("PARAM_INIT_SalesAnalyst");
+				
 				//init session List
 				SAInitial.getInstance().initSession(request,user);
+				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

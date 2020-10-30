@@ -33,6 +33,7 @@ public class SessionUtils {
 	    		  //clear DATA Result (formName+RESULT)  ex stockOnhandForm_RESULT
 	    		  session.removeAttribute(mySessionVarName+"_RESULT");
 	    		  session.removeAttribute(mySessionVarName+"_RESULT_DETAIL");
+	    		  session.removeAttribute(mySessionVarName+"_SQL");
 	    	      logger.info("Remove Attr SessionName="+mySessionVarName+"_RESULT");
 	    	  }
     	  }

@@ -164,7 +164,7 @@ public class SecurityHelper {
 		
 	}
 	
-	
+	//OLD CODE
 	public static List<References> getAllColumnAccessList(Connection conn) throws Exception{
 		String sql = "";
 		PreparedStatement ps = null;
@@ -178,6 +178,7 @@ public class SecurityHelper {
 			sql +=" from c_reference    \n";
 			sql +=" where type ='GROUP_BY'  \n";
 			sql +=" and code <> 'ALL' \n";
+			sql +=" and report_name <> 'ProjectCAnalyst' \n";
 			sql +=" order by order_index  \n";
 			
 			logger.debug("sql:"+sql);

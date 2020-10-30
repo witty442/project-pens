@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
+import com.pens.util.EnvProperties;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 

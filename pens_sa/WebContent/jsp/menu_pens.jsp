@@ -28,17 +28,34 @@
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/roleAction.do?do=prepare&action=new';"><span><bean:message key="Role" bundle="sysprop"/></span></a>
 			</li>  --%> 
-			
+			<li>
+	         <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/changePassword.jsp';"><span>เปลี่ยนรหัสผ่าน</span></a>	
+	       </li>
+	        <li>
+	            <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/aReportAction.do?do=prepare&action=new&reportName=SalesAnalyst';">
+	              <span><bean:message key="SalesAnalysis" bundle="sysprop"/>(New Version) </span>
+	            </a>
+	         </li>
 		</ul>
 	</li>
 <%} %>
 <%if ( UserUtils.userInRole("ROLE_SA",user,new String[]{User.ADMIN,User.SA}) ){ %>
-	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
+	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new&reportName=SalesAnalyst';">
+	      <span><bean:message key="SalesAnalysis" bundle="sysprop"/>
+	      </span>
+	    </a>
 		<ul>
-			<%-- <li>
-	          <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new';"><span><bean:message key="SalesAnalysis" bundle="sysprop"/></span></a>
-	       </li> --%>
+	       <%--  <li>
+	          <a href="#" class="parent"  onclick="window.location='${pageContext.request.contextPath}/jsp/aReportAction.do?do=prepare&action=new&reportName=SalesAnalyst';">
+	          <span><bean:message key="SalesAnalyst" bundle="sysprop"/>(NEW)</span></a>
+	       </li>  --%>
 		</ul>
+	</li> 
+<%} %>
+
+<%if ( UserUtils.userInRole("ROLE_SA",user,new String[]{User.ADMIN,User.PROJECTC}) ){ %>
+	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/aReportAction.do?do=prepare&action=new&reportName=ProjectCAnalyst';">
+	    <span><bean:message key="ProjectCAnalyst" bundle="sysprop"/></span></a>
 	</li> 
 <%} %>
 
@@ -283,8 +300,8 @@
 	               <span><%no++;out.print(no);%>.<bean:message key="ProjectCReport" bundle="sysprop"/></span>
 	               </a>
 	             </li>  
+	             
              <%} %>
-             
 		</ul>
 	</li>  
 <%}%>
@@ -357,6 +374,12 @@
                <span><%no++;out.print(no);%>.<bean:message key="MasterItemStockMC" bundle="sysprop"/></span>
                </a>
              </li> 
+              <%-- <li>
+               <a href="#" class="parent"  
+               onclick="window.location='${pageContext.request.contextPath}/jsp/stockMCAction.do?do=prepareSearch&action=new&pageName=STOCKMCQuery';">
+               <span><%no++;out.print(no);%>.<bean:message key="StockMCQuery" bundle="sysprop"/></span>
+               </a>
+             </li>  --%>
           <%} %> 
 		</ul>
 	</li>  
@@ -408,10 +431,10 @@
 	</li>      
 <%}%>
 
-<!-- ************************************************************************** -->
-<li>
-   <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/changePassword.jsp';"><span>เปลี่ยนรหัสผ่าน</span></a>	
-</li>
-	
+<%if ( !UserUtils.userInRole("",user,new String[]{User.ADMIN}) ){ %>
+	<li>
+	    <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/changePassword.jsp';"><span>เปลี่ยนรหัสผ่าน</span></a>	
+	</li>
+<%} %>
 </ul>
    

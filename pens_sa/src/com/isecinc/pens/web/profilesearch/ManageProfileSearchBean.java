@@ -8,8 +8,15 @@ public class ManageProfileSearchBean implements Serializable{
    private int userId;
    private int profileId;
    private String profileName;
+   private String reportName;
   
-  
+   
+	public String getReportName() {
+	return reportName;
+}
+public void setReportName(String reportName) {
+	this.reportName = reportName;
+}
 	public int getProfileId() {
 		return profileId;
 	}

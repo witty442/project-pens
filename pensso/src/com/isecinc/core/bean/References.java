@@ -13,7 +13,8 @@ import java.sql.ResultSet;
 public class References implements Serializable {
 
 	private static final long serialVersionUID = 4133660991116726735L;
-
+	public References() {
+	}
 	/**
 	 * Constructor
 	 * 

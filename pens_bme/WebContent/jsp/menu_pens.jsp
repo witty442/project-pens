@@ -993,6 +993,12 @@
 				  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="GenBarcode"/></span></a>
 				</li> 
 			<%} %>
+			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.REDDOC_INTER}) ){%>
+				<li>
+				  <a href="#" onclick="javascript:link(false,'<%=contextPathProd%>/jsp/payInterAction.do?do=prepare2&action=new');">
+				  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="payInter"/></span></a>
+				</li>
+			<%} %>
 		</ul>
 	</li> 
 <%} %>

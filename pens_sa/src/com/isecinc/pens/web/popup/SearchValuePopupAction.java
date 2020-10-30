@@ -1,36 +1,32 @@
 package com.isecinc.pens.web.popup;
 
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.report.salesanalyst.ConditionFilterBean;
-import com.isecinc.pens.report.salesanalyst.DisplayBean;
-import com.isecinc.pens.report.salesanalyst.SABean;
-import com.isecinc.pens.report.salesanalyst.SAGenrateCondPopup;
-import com.isecinc.pens.report.salesanalyst.SAInitial;
-import com.isecinc.pens.web.stockmc.StockMCDAO;
-import com.isecinc.pens.web.stockmc.StockMCForm;
-import com.isecinc.pens.web.stockmc.StockMCMasterItemProcess;
-import com.isecinc.pens.web.stockmc.StockMCProcess;
+import com.isecinc.pens.web.report.analyst.bean.ABean;
+import com.isecinc.pens.web.report.analyst.bean.ConditionFilterBean;
+import com.isecinc.pens.web.report.analyst.bean.DisplayBean;
+import com.isecinc.pens.web.report.analyst.helper.AUtils;
+import com.isecinc.pens.web.report.analyst.process.AGenrateCondPopup;
+import com.isecinc.pens.web.report.analyst.process.AInitial;
 import com.pens.util.Utils;
-
 
 /**
   WITTY
-  SalesAnalystReportAction
+  SalesPopupAction
  * 
  */
 public class SearchValuePopupAction extends I_Action {
@@ -45,7 +41,7 @@ public class SearchValuePopupAction extends I_Action {
 			request.getSession().setAttribute("code_session", "");
 			request.getSession().setAttribute("desc_session", "");
 			request.getSession().setAttribute("RESULT",null);
-			formBean.setSalesBean(new SABean());
+			formBean.setSalesBean(new ABean());
 	
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -65,13 +61,17 @@ public class SearchValuePopupAction extends I_Action {
 		SearchValuePopupForm formBean = (SearchValuePopupForm) form;
 		String returnText = "prepare";
 		try {
-			request.getSession().setAttribute("code_session", "");
-			request.getSession().setAttribute("desc_session", "");
+			 request.getSession().setAttribute("code_session", "");
+			 request.getSession().setAttribute("desc_session", "");
+			 AInitial aInit = new AInitial().getAInit(request);
+			
+			 String reportName = Utils.isNull(request.getParameter("reportName"));
+			 logger.debug("reportName:"+reportName);
 			
 			 //DISPLAY Navigation
 			 String currCondNo = Utils.isNull(request.getParameter("currCondNo"));
 			 String currCondTypeValue = Utils.isNull(request.getParameter("currCondTypeValue"));
-			 String currCondNameText = Utils.isNull((String)SAInitial.getInstance().GROUP_BY_MAP.get(request.getParameter("currCondTypeValue")));
+			 String currCondNameText = Utils.isNull((String)aInit.GROUP_BY_MAP.get(request.getParameter("currCondTypeValue")));
 			 String load = Utils.isNull(request.getParameter("load"));
 			 
 			 //set Filter Cond
@@ -101,11 +101,11 @@ public class SearchValuePopupAction extends I_Action {
 			 }
 			 
 			//Display Navigation
-			 String curNavigation =Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue));  
+			 String curNavigation =Utils.isNull((String)aInit.GROUP_BY_MAP.get(currCondTypeValue));  
 			 String navigation ="";
 			 
 			 if(currCondNo.equals("1")){
-			 	 navigation += ""+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue));  
+			 	 navigation += ""+Utils.isNull((String)aInit.GROUP_BY_MAP.get(currCondTypeValue));  
 			 }else if(currCondNo.equals("2")){
 				 
 				 String cDisp1 = formBean.getFilterBean()!=null?formBean.getFilterBean().getCondValueDisp1():condValueDisp1;
@@ -113,32 +113,33 @@ public class SearchValuePopupAction extends I_Action {
 				 logger.debug("formBean.getFilterBean().getCondValueDisp1():"+formBean.getFilterBean().getCondValueDisp1());
 				 
 			 	 //Cond 1
-			 	 navigation += ""+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))+"["+cDisp1+"]" +"<br>";
+			 	 navigation += ""+Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType1))+"["+cDisp1+"]" +"<br>";
 			 	 //CurrCond
-			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue)) +"<br>"; 
+			 	 navigation += "#"+Utils.isNull((String)aInit.GROUP_BY_MAP.get(currCondTypeValue)) +"<br>"; 
 			 	
 			 }else if(currCondNo.equals("3")){
 			 	//Cond 1
-			 	 navigation += ""+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))+"["+condValueDisp1+"]" +"<br>";
+			 	 navigation += ""+Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType1))+"["+condValueDisp1+"]" +"<br>";
 			 	//Cond 2
-			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType2))+"["+condValueDisp2+"]" +"<br>";
+			 	 navigation += "#"+Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType2))+"["+condValueDisp2+"]" +"<br>";
 			 	 //CurrCond
-			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue)) +"<br>"; 
+			 	 navigation += "#"+Utils.isNull((String)aInit.GROUP_BY_MAP.get(currCondTypeValue)) +"<br>"; 
 			 }else if(currCondNo.equals("4")){
 			 	//Cond 1
-			 	 navigation += ""+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))+"["+condValueDisp1+"]" +"<br>";
+			 	 navigation += ""+Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType1))+"["+condValueDisp1+"]" +"<br>";
 			 	//Cond 2
-			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType2))+"["+condValueDisp2+"]" +"<br>";
+			 	 navigation += "#"+Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType2))+"["+condValueDisp2+"]" +"<br>";
 			 	//Cond 3
-			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType3))+"["+condValueDisp3+"]" +"<br>";
+			 	 navigation += "#"+Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType3))+"["+condValueDisp3+"]" +"<br>";
 			 	 //curCond
-			 	 navigation += "#"+Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue))+"<br>"; 
+			 	 navigation += "#"+Utils.isNull((String)aInit.GROUP_BY_MAP.get(currCondTypeValue))+"<br>"; 
 			 }
 			 
 	        //set Navigation
 			formBean.setCurNavigation(curNavigation);
 			formBean.setNavigation(navigation);
-			 
+			formBean.setReportName(reportName);
+			
 			 //set action  
 			 String action =  request.getParameter("action");
 			 if(action != null){
@@ -153,7 +154,7 @@ public class SearchValuePopupAction extends I_Action {
 			 
 			 formBean.setFilterBean(filterBean);
 			 
-			 formBean.setSalesBean(new SABean());
+			 formBean.setSalesBean(new ABean());
 			 
              //Clear parameters
 			 request.getSession().setAttribute("codes", null);
@@ -168,9 +169,8 @@ public class SearchValuePopupAction extends I_Action {
 		
 		return returnText;
 	}
-	
-	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		logger.debug("SearchValuePopupAction Search Current Action");
+	protected String search_OLD(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		logger.debug("Search Action OLD Method");
 		SearchValuePopupForm aForm = (SearchValuePopupForm) form;
 		String returnText = "search";
 		User user = (User) request.getSession().getAttribute("user");
@@ -179,11 +179,12 @@ public class SearchValuePopupAction extends I_Action {
 		boolean allRec = false;
 		List<DisplayBean> valueList = null;
 		int pageSize =20;
+		Map<String, ConditionFilterBean> cindAllMap = new HashMap<String, ConditionFilterBean>();
 		try {
 			 String action = Utils.isNull(request.getParameter("action"));
 			 String currCondType = Utils.isNull(request.getParameter("currCondType"));
 			 String currCondNo = Utils.isNull(request.getParameter("currCondNo"));			 
-			
+			 String reportName = Utils.isNull(request.getParameter("reportName"));	
 			logger.debug("currCondNo:"+currCondNo+",currCondType:"+currCondType);
 			
 			if( !"newsearch".equalsIgnoreCase(action) ){
@@ -203,7 +204,7 @@ public class SearchValuePopupAction extends I_Action {
 					logger.debug("condType2:"+filterBean.getCondType2()+",condCode2:"+filterBean.getCondCode2());
 					logger.debug("condType3:"+filterBean.getCondType3()+",condCode3:"+filterBean.getCondCode3());
 					
-					valueList = SAGenrateCondPopup.getConditionValueListByParent(user,currCondType,aForm.getSalesBean().getCode(),desc,filterBean);
+					valueList = AGenrateCondPopup.getConditionValueListByParent(reportName,user,currCondType,aForm.getSalesBean().getCode(),desc,filterBean);
 				    request.getSession().setAttribute("VALUE_LIST", valueList);
 				
 				    /** Case search customer show only 500 No criteria **/
@@ -214,7 +215,116 @@ public class SearchValuePopupAction extends I_Action {
 						}
 					}
 				}else{
-					valueList = SAGenrateCondPopup.getConditionValueList(request,currCondType,aForm.getSalesBean().getCode(),desc);
+					valueList = AGenrateCondPopup.getConditionValueList(reportName,request,currCondType,aForm.getSalesBean().getCode(),desc);
+					request.getSession().setAttribute("VALUE_LIST", valueList);	
+					
+					/** Case search customer show only 500 No criteria **/
+					if("Customer_id".equalsIgnoreCase(currCondType)){
+						if(Utils.isNull(aForm.getSalesBean().getCode()).equals("") && Utils.isNull(desc).equalsIgnoreCase("")){
+							request.setAttribute("Message","ระบบแสดงร้านค้าได้สูงสุด จำนวน 500 ร้านค้า เนื่องจากจำนวนร้านค้ามีจำนวนมาก  กรุณาระบุ รหัสร้านหรือชื่อร้านค้า ");
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.debug(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return returnText;
+	}
+	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		logger.debug("Search Action NEW Method");
+		SearchValuePopupForm aForm = (SearchValuePopupForm) form;
+		String returnText = "search";
+		User user = (User) request.getSession().getAttribute("user");
+		String desc = aForm.getSalesBean().getDesc();
+		int currPage = 1;
+		boolean allRec = false;
+		List<DisplayBean> valueList = null;
+		int pageSize =20;
+		ConditionFilterBean filterBean = null;
+		Map<String, ConditionFilterBean> condAllMap = new HashMap<String, ConditionFilterBean>();
+		boolean isRelate = false;
+		try {
+			 String action = Utils.isNull(request.getParameter("action"));
+			 String currCondType = Utils.isNull(request.getParameter("currCondType"));
+			 String currCondNo = Utils.isNull(request.getParameter("currCondNo"));			 
+			 String reportName = Utils.isNull(request.getParameter("reportName"));	
+			logger.debug("currCondNo:"+currCondNo+",currCondType:"+currCondType);
+			
+			if( !"newsearch".equalsIgnoreCase(action) ){
+				logger.debug("No Query");
+			}else{
+				//Set old criteria data to session
+				request.getSession().setAttribute("code_session", aForm.getSalesBean().getCode());
+				request.getSession().setAttribute("desc_session", aForm.getSalesBean().getDesc());
+				
+				if (currCondNo.equalsIgnoreCase("2") || currCondNo.equalsIgnoreCase("3") || currCondNo.equalsIgnoreCase("4")){
+					filterBean = aForm.getFilterBean();
+					filterBean.setCurrCondNo(currCondNo);
+					filterBean.setCurrCondType(currCondType);
+					
+					logger.debug("condType1:"+filterBean.getCondType1()+",condCode1:"+filterBean.getCondCode1());
+					logger.debug("condType2:"+filterBean.getCondType2()+",condCode2:"+filterBean.getCondCode2());
+					logger.debug("condType3:"+filterBean.getCondType3()+",condCode3:"+filterBean.getCondCode3());
+					
+					//Convert All Cond to Map Except CurrCon
+					//Cond 1
+					ConditionFilterBean filterBeanC = new ConditionFilterBean();
+					filterBeanC.setCondType(filterBean.getCondType1());
+					filterBeanC.setCondCode(filterBean.getCondCode1());
+					filterBeanC.setCondValueDisp(filterBean.getCondValueDisp1());
+					filterBeanC.setRelate(AUtils.isParentCodeRelate(currCondType, filterBeanC.getCondType()));
+					isRelate = filterBeanC.isRelate()?true:isRelate;
+					condAllMap.put("1",filterBeanC);
+					
+					//Cond 2
+					filterBeanC = new ConditionFilterBean();
+					filterBeanC.setCondType(filterBean.getCondType2());
+					filterBeanC.setCondCode(filterBean.getCondCode2());
+					filterBeanC.setCondValueDisp(filterBean.getCondValueDisp2());
+					filterBeanC.setRelate(AUtils.isParentCodeRelate(currCondType, filterBeanC.getCondType()));
+					isRelate = filterBeanC.isRelate()?true:isRelate;
+					condAllMap.put("2",filterBeanC);
+					
+					//Cond 3
+					filterBeanC = new ConditionFilterBean();
+					filterBeanC.setCondType(filterBean.getCondType3());
+					filterBeanC.setCondCode(filterBean.getCondCode3());
+					filterBeanC.setCondValueDisp(filterBean.getCondValueDisp3());
+					filterBeanC.setRelate(AUtils.isParentCodeRelate(currCondType, filterBeanC.getCondType()));
+					isRelate = filterBeanC.isRelate()?true:isRelate;
+					condAllMap.put("3",filterBeanC);
+					
+					//Cond 4
+					filterBeanC = new ConditionFilterBean();
+					filterBeanC.setCondType(filterBean.getCondType4());
+					filterBeanC.setCondCode(filterBean.getCondCode4());
+					filterBeanC.setCondValueDisp(filterBean.getCondValueDisp4());
+					filterBeanC.setRelate(AUtils.isParentCodeRelate(currCondType, filterBeanC.getCondType()));
+					isRelate = filterBeanC.isRelate()?true:isRelate;
+					condAllMap.put("4",filterBeanC);
+					
+					filterBean.setCondAllMap(condAllMap);
+					
+				}
+				logger.debug("isRelate:"+isRelate);
+				
+				if (isRelate){
+					
+					valueList = AGenrateCondPopup.getConditionValueListByParent(reportName,user,currCondType,aForm.getSalesBean().getCode(),desc,filterBean);
+				    request.getSession().setAttribute("VALUE_LIST", valueList);
+				
+				    /** Case search customer show only 500 No criteria **/
+					if("Customer_id".equalsIgnoreCase(currCondType)){
+						if(Utils.isNull(aForm.getSalesBean().getCode()).equals("") && Utils.isNull(desc).equalsIgnoreCase("")){
+							if(valueList != null && valueList.size() == 500)
+							 request.setAttribute("Message","ระบบแสดงร้านค้าได้สูงสุด จำนวน 500 ร้านค้า เนื่องจากจำนวนร้านค้ามีจำนวนมาก  กรุณาระบุ รหัสร้านหรือชื่อร้านค้า ");
+						}
+					}
+				}else{
+					valueList = AGenrateCondPopup.getConditionValueList(reportName,request,currCondType,aForm.getSalesBean().getCode(),desc);
 					request.getSession().setAttribute("VALUE_LIST", valueList);	
 					
 					/** Case search customer show only 500 No criteria **/

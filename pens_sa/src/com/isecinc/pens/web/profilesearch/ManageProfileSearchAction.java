@@ -3,27 +3,20 @@ package com.isecinc.pens.web.profilesearch;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.web.I_Action;
-import com.isecinc.pens.SystemMessages;
-import com.isecinc.pens.bean.Role;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.model.MRole;
-import com.isecinc.pens.report.salesanalyst.ProfileProcess;
-import com.isecinc.pens.report.salesanalyst.SABean;
-import com.isecinc.pens.report.salesanalyst.SAConstants;
-import com.isecinc.pens.report.salesanalyst.SAInitial;
+import com.isecinc.pens.web.report.analyst.bean.ABean;
+import com.isecinc.pens.web.report.analyst.process.AInitial;
+import com.isecinc.pens.web.report.analyst.process.ProfileProcess;
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
@@ -49,11 +42,12 @@ public class ManageProfileSearchAction extends I_Action {
 			if( "new".equalsIgnoreCase(Utils.isNull(request.getParameter("action")))){
 			   logger.debug("Prepare new");
 			   conn = DBConnection.getInstance().getConnectionApps();
+			   String reportName = Utils.isNull(request.getParameter("reportName"));
 			   
 			   String profileId = Utils.isNull(request.getParameter("profileId"));
 			   ManageProfileSearchBean bean = new ManageProfileSearchBean();
 			   bean.setProfileId(Utils.convertToInt(profileId));
-			   bean.setProfileName(ProfileProcess.getProfileName(conn, user.getId(), Utils.convertToInt(profileId)));
+			   bean.setProfileName(ProfileProcess.getProfileName(conn, user.getId(), Utils.convertToInt(profileId),reportName));
 			   aForm.setBean(bean);
 			}
 
@@ -113,17 +107,20 @@ public class ManageProfileSearchAction extends I_Action {
 			// Begin Transaction
 			conn.setAutoCommit(false);
 			
+			String reportName = Utils.isNull(request.getParameter("reportName"));
 			if("save".equalsIgnoreCase(action)){
 				//update 
 				aForm.getBean().setUserId(user.getId());
+				aForm.getBean().setReportName(reportName);
 			    status = ProfileProcess.updateProfileNameModel(conn, user, aForm.getBean());
 			    if(status ==false){
 			    	//insert new
-					SABean saBean = new SABean();
+					ABean saBean = new ABean();
 					saBean.setUserId(user.getId()+"");
 					saBean.setProfileName(aForm.getBean().getProfileName());
+					saBean.setReportName(reportName);
 					//getMax ProfileID by user ID
-					int nextProfileId = ProfileProcess.getMaxProfileId(conn, user.getId())+1;
+					int nextProfileId = ProfileProcess.getMaxProfileId(conn, user.getId(),reportName)+1;
 					saBean.setProfileId(nextProfileId+"");
 					
 					status = ProfileProcess.insertProfileBlankModel(conn, user, saBean);
@@ -132,14 +129,16 @@ public class ManageProfileSearchAction extends I_Action {
 					aForm.getBean().setUserId(user.getId());
 					aForm.getBean().setProfileId(Utils.convertStrToInt(saBean.getProfileId()));
 					aForm.getBean().setProfileName(saBean.getProfileName());
+					aForm.getBean().setReportName(saBean.getReportName());
 			    }
 			}else{
 				//insert new
-				SABean saBean = new SABean();
+				ABean saBean = new ABean();
 				saBean.setUserId(user.getId()+"");
 				saBean.setProfileName(aForm.getBean().getProfileName());
+				saBean.setReportName(reportName);
 				//getMax ProfileID by user ID
-				int nextProfileId = ProfileProcess.getMaxProfileId(conn, user.getId())+1;
+				int nextProfileId = ProfileProcess.getMaxProfileId(conn, user.getId(),reportName)+1;
 				saBean.setProfileId(nextProfileId+"");
 				
 				status = ProfileProcess.insertProfileBlankModel(conn, user, saBean);
@@ -148,7 +147,7 @@ public class ManageProfileSearchAction extends I_Action {
 				aForm.getBean().setUserId(user.getId());
 				aForm.getBean().setProfileId(Utils.convertStrToInt(saBean.getProfileId()));
 				aForm.getBean().setProfileName(saBean.getProfileName());
-		
+				aForm.getBean().setReportName(saBean.getReportName());
 			}
 			logger.debug("status:"+status);
 			if(status){
@@ -157,7 +156,7 @@ public class ManageProfileSearchAction extends I_Action {
 				References r = new References("0","ไม่เลือก");
 				profileList.add(r);
 				//new Code
-				profileList.addAll(SAInitial.initProfileList(conn, user.getId()));
+				profileList.addAll(AInitial.initProfileList(conn, user.getId(),reportName));
 				request.getSession(true).setAttribute("profileList", profileList);
 				
 				request.setAttribute("save_success", "save_success");

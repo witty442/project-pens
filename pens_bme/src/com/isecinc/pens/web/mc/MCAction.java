@@ -67,7 +67,7 @@ public class MCAction extends I_Action {
 		}finally{
 			
 		}
-		return mapping.findForward("prepare2");
+		return mapping.findForward("search2");
 	}
 	
 	public ActionForward search2(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -464,7 +464,7 @@ public class MCAction extends I_Action {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
-		return mapping.findForward("clear2");
+		return mapping.findForward("search2");
 	}
 	
 	/**

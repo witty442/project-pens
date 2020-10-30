@@ -272,7 +272,7 @@ public class MasterItemStockMCProcess extends I_Action {
 			conn = DBConnection.getInstance().getConnectionApps();
 			
 			 aForm.setMode("edit");
-			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode()));
+			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode(),0));
 			
 			// save token
 			saveToken(request);			

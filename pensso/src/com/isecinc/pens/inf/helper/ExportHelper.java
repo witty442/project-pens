@@ -27,6 +27,7 @@ import com.pens.util.EnvProperties;
 public class ExportHelper {
 
 	protected static Logger logger = Logger.getLogger("PENS");
+	public static Map<String, String> overflowSequenceRowNumMap = new HashMap<String, String>();
 	
 	public static void main(String[] a){
 		try{
@@ -424,6 +425,19 @@ public class ExportHelper {
 					&& "1".equalsIgnoreCase(rs.getString("item_number"))){ //RowNum==1 (add writeOffAmt to first Row)
 				return getWriteOffAmt(rs.getString("receipt_id"));
 			}
+			
+			/** Case Lockbox 4 OverflowPayment count Overflow_Sequence +1 Map by ReceiptNo*/
+			if(colBean.getColumnName().equalsIgnoreCase("Overflow_Sequence")){ 
+				if(overflowSequenceRowNumMap.get(rs.getString("Payment_Number")) ==null){
+				    overflowSequenceRowNumMap.put(rs.getString("Payment_Number"), "1");
+				    return "1";
+				}else{
+					int overSeq = Utils.convertStrToInt(overflowSequenceRowNumMap.get(rs.getString("Payment_Number")))+1;
+					overflowSequenceRowNumMap.put(rs.getString("Payment_Number"), overSeq+"");
+					return overSeq+"";
+				}
+			}//if
+			
 			/** Case Normal  **/
 			if(colBean.getColumnType().equalsIgnoreCase("DATE")){
 				logger.debug("colBean.getColumnName():"+colBean.getColumnName());

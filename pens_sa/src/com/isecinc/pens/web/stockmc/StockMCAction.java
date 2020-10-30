@@ -25,6 +25,7 @@ public class StockMCAction extends I_Action {
 
 	public static int pageSize = 60;
 	public static String pageSTockMC = "STOCKMC";
+	public static String pageSTockMCQuery = "STOCKMCQuery";
 	public static String pageMasItemStockMC = "MasterItemStockMC";
 	
 	public ActionForward prepareSearch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
@@ -40,6 +41,9 @@ public class StockMCAction extends I_Action {
 			if(pageSTockMC.equalsIgnoreCase(pageName)){
 				aForm.setPageName(pageName);
 				return new StockMCProcess().prepareSearch(mapping, aForm, request, response);
+			}else if(pageSTockMCQuery.equalsIgnoreCase(pageName)){
+				aForm.setPageName(pageName);
+				return new StockMCQueryProcess().prepareSearch(mapping, aForm, request, response);
 			}else if(pageMasItemStockMC.equalsIgnoreCase(pageName)){
 				aForm.setPageName(pageName);
 				return new StockMCMasterItemProcess().prepareSearch(mapping, aForm, request, response);
@@ -67,6 +71,8 @@ public class StockMCAction extends I_Action {
 			
 			if(pageSTockMC.equalsIgnoreCase(pageName)){
 				return new StockMCProcess().searchHead(mapping, form, request, response);
+			}else if(pageSTockMCQuery.equalsIgnoreCase(pageName)){
+				return new StockMCQueryProcess().searchHead(mapping, form, request, response);
 			}else if(pageMasItemStockMC.equalsIgnoreCase(pageName)){
 				return new StockMCMasterItemProcess().searchHead(mapping, form, request, response);
 			}
@@ -115,6 +121,26 @@ public class StockMCAction extends I_Action {
 		}
 		return mapping.findForward("detail");
 	}
+	public ActionForward viewDetailMobile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		logger.debug("viewDetail : ");
+		String pageName = Utils.isNull(request.getParameter("pageName")); 
+		try {
+			logger.debug("pageName:"+pageName);
+
+			if(pageSTockMC.equalsIgnoreCase(pageName)){
+				return new StockMCProcess().viewDetailMobile(mapping, form, request, response);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		} finally {
+			
+		}
+		return mapping.findForward("detail");
+	}
 	public ActionForward loadItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		
@@ -134,7 +160,25 @@ public class StockMCAction extends I_Action {
 		}
 		return mapping.findForward("detail");
 	}
-	
+	public ActionForward loadItemMobile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		logger.debug("loadItem : ");
+		StockMCForm aForm = (StockMCForm) form;
+		String pageName = Utils.isNull(request.getParameter("pageName")); 
+		try {
+			if(pageSTockMC.equalsIgnoreCase(pageName)){
+				return new StockMCProcess().loadItemMobile(mapping, aForm, request, response);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		} finally {
+			
+		}
+		return mapping.findForward("detail");
+	}
 	public ActionForward clearForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		
@@ -162,11 +206,12 @@ public class StockMCAction extends I_Action {
 		String msg = "";
 		StockMCForm aForm = (StockMCForm) form;
 		String pageName = Utils.isNull(request.getParameter("pageName")); 
+		
 		try {
 			logger.debug("save-->");
            
 			if(pageSTockMC.equalsIgnoreCase(pageName)){
-				return new StockMCProcess().save(aForm, request, response);
+				 return new StockMCProcess().save(aForm, request, response);
 			}else if(pageMasItemStockMC.equalsIgnoreCase(pageName)){
 				return new StockMCMasterItemProcess().save(aForm, request, response);
 			}	

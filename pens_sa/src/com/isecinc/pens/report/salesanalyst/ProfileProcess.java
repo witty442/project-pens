@@ -77,7 +77,8 @@ public class ProfileProcess {
 		PreparedStatement ps = null;
 		ResultSet rs= null;
 	    try{
-	    	sql =" select * from PENSBI.C_USER_PROFILE where user_id='"+userId+"'and profile_id = '"+profileId+"'" ;
+	    	sql =" \n select * from PENSBI.C_USER_PROFILE where user_id='"+userId+"'"
+	    			+ "\n  and profile_id = '"+profileId+"' and report_name ='SalesAnalyst'" ;
 	    	conn = DBConnection.getInstance().getConnection();
 	    	ps = conn.prepareStatement(sql);
 	    	rs = ps.executeQuery();
@@ -155,7 +156,7 @@ public class ProfileProcess {
 		PreparedStatement psIns = null;
 		try{
 			String sqlInsert = " INSERT INTO PENSBI.C_USER_PROFILE \n"
-					+" (USER_ID, PROFILE_ID, TYPE_SEARCH, DATE_FROM, DATE_TO,  \n"
+					+" (REPORT_NAME,USER_ID, PROFILE_ID, TYPE_SEARCH, DATE_FROM, DATE_TO,  \n"
 					+" MONTH, QUARTER, YEAR, COND_NAME1,  \n"
 					+" COND_NAME2, COND_NAME3, COND_NAME4, COND_CODE1,  \n"
 					+" COND_CODE2, COND_CODE3, COND_CODE4, COND_VALUE1,  \n"
@@ -165,7 +166,7 @@ public class ProfileProcess {
 					+" COL_UNIT2, COL_UNIT3, COL_UNIT4, COMPARE_DISP1,  \n"
 					+" COMPARE_DISP2, SUMMARY_TYPE, CREATED, CREATED_BY,GROUP_BY) \n"
 				    +" VALUES  \n"
-				    +" (?,?,?,?,?," 
+				    +" (?,?,?,?,?,?," 
 				    +" ?,?,?,?," 
 				    +" ?,?,?,?," 
 				    +" ?,?,?,?," 
@@ -178,7 +179,7 @@ public class ProfileProcess {
 			
 			psIns = conn.prepareStatement(sqlInsert);
 			int index = 0;
-			
+			psIns.setString(++index, "SalesAnalyst");
 			psIns.setString(++index, u.getId()+"");//1 USER_ID
 			psIns.setString(++index, b.getProfileId());//2 PROFILE_ID
 			psIns.setString(++index, b.getTypeSearch());//3 TYPE_SEARCH
@@ -253,7 +254,7 @@ public class ProfileProcess {
 					+" COL_NAME2=?, COL_NAME3=?, COL_NAME4=?, COL_UNIT1=?,  \n"
 					+" COL_UNIT2=?, COL_UNIT3=?, COL_UNIT4=?, COMPARE_DISP1=?,  \n"
 					+" COMPARE_DISP2=?, SUMMARY_TYPE=?, UPDATED=?, UPDATED_BY=? ,GROUP_BY =? \n"
-			        +" WHERE USER_ID =? AND PROFILE_ID = ? \n";
+			        +" WHERE USER_ID =? AND PROFILE_ID = ? AND REPORT_NAME ='SalesAnalyst' \n";
 				   
 			
 			psIns = conn.prepareStatement(sqlUpdate);

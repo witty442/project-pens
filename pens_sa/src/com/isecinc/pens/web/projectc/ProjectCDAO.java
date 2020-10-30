@@ -32,7 +32,7 @@ public class ProjectCDAO {
 			sql.append("\n select ");
 			sql.append("\n  H.* ");
 			sql.append("\n from apps.xxpens_ar_cust_sales_all M,apps.xxpens_ar_customer_all_v C");
-			sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ,PENSBI.PENSBME_TT_BRANCH H ");
+			sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ,PENSBI.PENS_TT_BRANCH H ");
 			sql.append("\n where M.cust_account_id = C.cust_account_id ");
 			sql.append("\n and M.primary_salesrep_id = Z.salesrep_id ");
 			sql.append("\n and H.oracle_cust_no = C.account_number ");
@@ -90,7 +90,7 @@ public class ProjectCDAO {
 	    boolean foundCheck = false;
 		try {
 			sql.append("\n select count(*) as c  ");
-			sql.append("\n FROM PENSBI.PENSBME_TT_PROJECTC H ,PENSBI.PENSBME_TT_BRANCH B");
+			sql.append("\n FROM PENSBI.PENSBME_TT_PROJECTC H ,PENSBI.PENS_TT_BRANCH B");
 			sql.append("\n WHERE B.oracle_cust_no = H.oracle_cust_no");
 			sql.append("\n and B.branch_id = H.branch_id");
 			sql.append("\n and H.oracle_cust_no ='"+o.getStoreCode()+"'");
@@ -123,7 +123,7 @@ public class ProjectCDAO {
 		int totalRec = 0;
 		try {
 			sql.append("\n select count(*) as c  ");
-			sql.append("\n FROM PENSBI.PENSBME_TT_PROJECTC H ,PENSBI.PENSBME_TT_BRANCH B");
+			sql.append("\n FROM PENSBI.PENSBME_TT_PROJECTC H ,PENSBI.PENS_TT_BRANCH B");
 			sql.append("\n WHERE B.oracle_cust_no = H.oracle_cust_no");
 			sql.append("\n and B.branch_id = H.branch_id");
 			 //GenWhereSQL
@@ -160,7 +160,7 @@ public class ProjectCDAO {
 			sql.append("\n select ");
 			sql.append("\n  H.* ,B.branch_name,B.address,B.amphor,B.province ");
 			sql.append("\n  ,B.latitude,B.longitude ,B.branch_size ");
-			sql.append("\n  FROM PENSBI.PENSBME_TT_PROJECTC H ,PENSBI.PENSBME_TT_BRANCH B");
+			sql.append("\n  FROM PENSBI.PENSBME_TT_PROJECTC H ,PENSBI.PENS_TT_BRANCH B");
 			sql.append("\n  WHERE B.oracle_cust_no = H.oracle_cust_no");
 			sql.append("\n  and B.branch_id = H.branch_id");
 			 //GenWhereSQL

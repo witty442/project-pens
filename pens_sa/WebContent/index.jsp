@@ -1,4 +1,4 @@
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.EnvProperties"%>
+<%@page import="com.pens.util.EnvProperties"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -26,7 +26,16 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript">
-
+function loadMe(){
+	if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+		 // alert("mobile");
+		 window.location = "${pageContext.request.contextPath}/indexMobile.jsp";
+	}else{
+		  //alert("not mobile");
+		// for test
+		//window.location = "${pageContext.request.contextPath}/indexMobile.jsp";
+	}
+}
 function gologin(e){
 	if(e == null || (e != null && e.keyCode == 13)){
 		login('${pageContext.request.contextPath}');
@@ -80,9 +89,9 @@ function login(path){
     return true;
 }
 
-</script>
+</script> 
 </head>
-<body onload="MM_preloadImages('${pageContext.request.contextPath}/images2/button_login2.png','${pageContext.request.contextPath}/images2/button_forgotpwd2.png')" topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0">
+<body onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_login2.png','${pageContext.request.contextPath}/images2/button_forgotpwd2.png')" topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0">
 <table width="939" height="517" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
   <tr>
     <td background="${pageContext.request.contextPath}/images2/loginbox_all.png" valign="top">

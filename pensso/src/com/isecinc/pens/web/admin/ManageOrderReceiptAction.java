@@ -19,6 +19,7 @@ import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.process.administer.ManageOrderReceiptProcess;
 import com.pens.util.DBConnectionApps;
 import com.pens.util.Debug;
+import com.pens.util.Utils;
 
 public class ManageOrderReceiptAction extends I_Action {
 
@@ -35,10 +36,22 @@ public class ManageOrderReceiptAction extends I_Action {
 			//manageOrderReceiptForm.setOrderSize(manageOrderReceiptForm.getOrders().size());
 			*/
 			
-			manageOrderReceiptForm.setReceipts(new ManageOrderReceiptProcess().getReceipt(manageOrderReceiptForm,user));
+			String action = Utils.isNull(request.getParameter("action"));
+			logger.debug("action :"+action);
+			if("searchBack".equalsIgnoreCase(action)){
+				ManageOrderReceiptForm manageOrderReceiptFormCri = (ManageOrderReceiptForm)request.getSession().getAttribute("ManageOrderReceiptForm_cri");
+				
+				manageOrderReceiptForm.setReceipts(new ManageOrderReceiptProcess().getReceipt(manageOrderReceiptFormCri,user));	
+				manageOrderReceiptForm.setReceiptSize(manageOrderReceiptForm.getReceipts().size());
 			
-			manageOrderReceiptForm.setReceiptSize(manageOrderReceiptForm.getReceipts().size());
-
+				manageOrderReceiptForm.setDocumentDateFrom(manageOrderReceiptFormCri.getDocumentDateFrom());
+				manageOrderReceiptForm.setDocumentDateTo(manageOrderReceiptFormCri.getDocumentDateTo());
+				manageOrderReceiptForm.setCustomerCode(manageOrderReceiptFormCri.getCustomerCode());
+				manageOrderReceiptForm.setCustomerName(manageOrderReceiptFormCri.getCustomerName());
+			}else{
+			    manageOrderReceiptForm.setReceipts(new ManageOrderReceiptProcess().getReceipt(manageOrderReceiptForm,user));
+			    manageOrderReceiptForm.setReceiptSize(manageOrderReceiptForm.getReceipts().size());
+			}
 			if (manageOrderReceiptForm.getOrderSize() + manageOrderReceiptForm.getReceiptSize() == 0) {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 			}

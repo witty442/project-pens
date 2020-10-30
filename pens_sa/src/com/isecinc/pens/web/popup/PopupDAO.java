@@ -1450,7 +1450,7 @@ public class PopupDAO {
 				sql.append("\n and M.code like 'S%' ");//Credit Sales Only
 				sql.append("\n and Z.zone in('0','1','2','3','4') ");
 				sql.append("\n and C.account_number in ( ");
-				sql.append("\n  select oracle_cust_no from PENSBI.PENSBME_TT_BRANCH"); //display only set
+				sql.append("\n  select oracle_cust_no from PENSBI.PENS_TT_BRANCH"); //display only set
 				sql.append("\n ) ");
 		
 				/** filter sales by user login **/
@@ -1514,7 +1514,7 @@ public class PopupDAO {
 				}
 				sql.append("\n SELECT distinct B.branch_id,B.branch_name ");
 				sql.append("\n from apps.xxpens_ar_cust_sales_all M,apps.xxpens_ar_customer_all_v C");
-				sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ,PENSBI.PENSBME_TT_BRANCH B ");
+				sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z ,PENSBI.PENS_TT_BRANCH B ");
 				sql.append("\n where M.cust_account_id = C.cust_account_id ");
 				sql.append("\n and M.primary_salesrep_id = Z.salesrep_id ");
 				sql.append("\n and B.oracle_cust_no = C.account_number ");

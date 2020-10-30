@@ -69,7 +69,7 @@ function getSQL(path, type) {
 function saveProfile(path, type) {
 	var profileId = $('#profileId').val();
 	if(profileId != '0'){
-	   document.salesAnalystReportForm.action = path + "/jsp/salesAnalystReportAction.do?do=saveProfile";
+	   document.salesAnalystReportForm.action = path + "/jsp/salesAnalystReportAction.do?do=saveProfile&reportName=SalesAnalyst";
 	   document.salesAnalystReportForm.submit();
 	   return true;
 	}
@@ -78,14 +78,14 @@ function saveProfile(path, type) {
 
 function editProfile(path, type) {
 	var profileId = $('#profileId').val();
-    var url = path + "/jsp/manageProfileSearchAction.do?do=prepare&action=new&profileId="+profileId;
+    var url = path + "/jsp/manageProfileSearchAction.do?do=prepare&action=new&reportName=SalesAnalyst&profileId="+profileId;
     PopupCenter(url, "", 600, 300) ;
 }
 
 
 function changeProfile(path, profileId) {
 	if(profileId != '0'){
-	   document.salesAnalystReportForm.action = path + "/jsp/salesAnalystReportAction.do?do=changeProfile";
+	   document.salesAnalystReportForm.action = path + "/jsp/salesAnalystReportAction.do?do=changeProfile&reportName=SalesAnalyst";
 	   document.salesAnalystReportForm.submit();
 	   return true;
 	}
@@ -378,7 +378,7 @@ function showSearchValuePopup(path,currCondNo){
 			param += "&condType3="+condType3+"&condCode3="+condCode3+"&condValueDisp3="+condValueDisp3;
 		}
 		
-		param +="&decode=true&load=1";
+		param +="&decode=true&load=1&reportName=SalesAnalyst";
 		//alert(param);
 		
 		url = path + "/jsp/searchValuePopupAction.do?do=prepare&action=new"+param;
@@ -676,7 +676,8 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
  	     param  += "&condDisp2="+condDisp2;
  	     param  += "&condDisp3="+condDisp3;
  	     param  += "&condDisp4="+condDisp4;
- 	     param  += "&condDisp5="+condDisp5
+ 	     param  += "&condDisp5="+condDisp5;
+ 	     param  += "&reportName=SalesAnalyst"
  	     
  	 $(function(){
  			var getData = $.ajax({

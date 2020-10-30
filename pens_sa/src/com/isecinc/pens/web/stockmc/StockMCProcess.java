@@ -45,8 +45,9 @@ public class StockMCProcess  extends I_Action{
 		try {
 			String action = Utils.isNull(request.getParameter("action")); 
 			String pageName = Utils.isNull(request.getParameter("pageName")); 
-
-			forward = "search";
+			
+			forward =user.isMobile()?"searchMobile":"search";
+			
 			if("new".equals(action)){
 				//clear session
 				request.getSession().removeAttribute("stock_mc_codes");
@@ -90,7 +91,8 @@ public class StockMCProcess  extends I_Action{
 		Connection conn = null;
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
-			logger.debug("action:"+action);
+	
+			logger.debug("action:"+action+",mobile:"+user.isMobile());
 			
 			//init connection
 			conn = DBConnection.getInstance().getConnectionApps();
@@ -98,7 +100,7 @@ public class StockMCProcess  extends I_Action{
 			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
 				//case  back
 				if("back".equalsIgnoreCase(action)){
-					aForm.setBean(aForm.getBeanCriteria());
+					aForm.setBean((StockMCBean)request.getSession().getAttribute("criteria_"));
 				}
 				//default currPage = 1
 				aForm.setCurrPage(currPage);
@@ -154,7 +156,7 @@ public class StockMCProcess  extends I_Action{
 				conn.close();
 			}
 		}
-		return mapping.findForward("search");
+		return mapping.findForward(user.isMobile()?"searchMobile":"search");
 	}
 	/**
 	 * Prepare without ID
@@ -177,7 +179,8 @@ public class StockMCProcess  extends I_Action{
 		StockMCDAO dao = new StockMCDAO();
 		try {
 			//save criteria
-			aForm.setBeanCriteria(aForm.getBean());
+			//aForm.setBeanCriteria(aForm.getBean());
+			request.getSession().setAttribute("criteria_", aForm.getBean());
 			
 			//init connection
 			conn = DBConnection.getInstance().getConnectionApps();
@@ -209,7 +212,15 @@ public class StockMCProcess  extends I_Action{
 				if(bean != null){
 					bean.setCanEdit(true);
 					aForm.setBean(bean);
-					aForm.setResults(bean.getItems());
+					
+					List<StockMCBean> productSaveList = bean.getItems();
+					List<StockMCBean> productNoSaveList = StockMCDAO.getProductMCItemList(conn,bean.getCustomerCode(),bean.getId());
+					
+					List<StockMCBean> productAllList = new ArrayList<StockMCBean>();
+					productAllList.addAll(productSaveList);
+					productAllList.addAll(productNoSaveList);
+					
+					aForm.setResults(productAllList);
 				}
 				aForm.setMode("edit");
 			}else if("view".equalsIgnoreCase(action)){
@@ -236,6 +247,82 @@ public class StockMCProcess  extends I_Action{
 		}
 		return mapping.findForward("detail");
 	}
+	public ActionForward viewDetailMobile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		logger.debug("viewDetail : ");
+		StockMCForm aForm = (StockMCForm) form;
+		Connection conn = null;
+		StockMCDAO dao = new StockMCDAO();
+		try {
+			//save criteria
+			//aForm.setBeanCriteria(aForm.getBean());
+			request.getSession().setAttribute("criteria_", aForm.getBean());
+			
+			//init connection
+			conn = DBConnection.getInstance().getConnectionApps();
+			
+			String id = Utils.isNull(request.getParameter("id"));
+			String action = Utils.isNull(request.getParameter("action"));
+			
+			logger.debug("action:"+action);
+			logger.debug("id:"+id);
+			
+			if("add".equalsIgnoreCase(action)){
+				StockMCBean bean = new StockMCBean();
+				// for test
+			/*	bean.setCustomerCode("020011");
+				bean.setCustomerName("Lotus");
+				bean.setMcName("MC NameNaja");
+				bean.setStoreCode("020047-1");*/
+				
+				bean.setStockDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+				bean.setCanEdit(true);
+				aForm.setBean(bean);
+				aForm.setResults(null);
+				aForm.setMode("add");
+			}else if("edit".equalsIgnoreCase(action)){
+				StockMCBean bean = new StockMCBean();
+			
+				bean.setId(Utils.convertStrToInt(id));
+				bean = dao.searchStockMC(conn, bean, true);
+				if(bean != null){
+					bean.setCanEdit(true);
+					aForm.setBean(bean);
+					List<StockMCBean> productSaveList = bean.getItems();
+					List<StockMCBean> productNoSaveList = StockMCDAO.getProductMCItemList(conn,bean.getCustomerCode(),bean.getId());
+
+					List<StockMCBean> productAllList = new ArrayList<StockMCBean>();
+					productAllList.addAll(productSaveList);
+					productAllList.addAll(productNoSaveList);
+					aForm.setResults(productAllList);
+				}
+				aForm.setMode("edit");
+			}else if("view".equalsIgnoreCase(action)){
+				StockMCBean bean = new StockMCBean();
+				bean.setId(Utils.convertStrToInt(id));
+				bean = dao.searchStockMC(conn, bean, true);
+				if(bean != null){
+					aForm.setBean(bean);
+					aForm.setResults(bean.getItems());
+				}
+				aForm.setMode("view");
+			}
+			aForm.setPageName(aForm.getPageName());
+			// save token
+			saveToken(request);			
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		} finally {
+			try {
+				 conn.close();
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("detailMobile");
+	}
+	
 	public ActionForward loadItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		
@@ -248,7 +335,7 @@ public class StockMCProcess  extends I_Action{
 			conn = DBConnection.getInstance().getConnectionApps();
 			
 			 aForm.setMode("edit");
-			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode()));
+			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode(),0));
 			
 			// save token
 			saveToken(request);			
@@ -263,7 +350,33 @@ public class StockMCProcess  extends I_Action{
 		}
 		return mapping.findForward("detail");
 	}
-	
+	public ActionForward loadItemMobile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		logger.debug("loadItem : ");
+		StockMCForm aForm = (StockMCForm) form;
+		String pageName = aForm.getPageName();
+		Connection conn = null;
+		try {
+			 //init connection
+			 conn = DBConnection.getInstance().getConnectionApps();
+			
+			 aForm.setMode("edit");
+			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode(),0));
+			
+			 // save token
+			 saveToken(request);			
+		} catch (Exception e) {
+			e.printStackTrace();
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return mapping.findForward("detailMobile");
+	}
 	public ActionForward clearForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
 		
@@ -294,7 +407,8 @@ public class StockMCProcess  extends I_Action{
 		String msg = "";
 		StockMCDAO dao = new StockMCDAO();
 		try {
-			logger.debug("save-->");
+			String subPageName = Utils.isNull(request.getParameter("subPageName")); 
+			logger.debug("save-->subPageName:"+subPageName);
 
 			// check Token
 			if (!isTokenValid(request)) {
@@ -307,93 +421,95 @@ public class StockMCProcess  extends I_Action{
 			m.setCreateUser(user.getUserName());
 			m.setUpdateUser(user.getUserName());
 			 
-			List<StockMCBean> itemList = new ArrayList<StockMCBean>();
-			String[] lineId =request.getParameterValues("lineId");
-			//String[] status =request.getParameterValues("status");
-			String[] productCode =request.getParameterValues("productCode");
-			String[] barcode =request.getParameterValues("barcode");
-			String[] productPackSize =request.getParameterValues("productPackSize");
-			String[] productAge =request.getParameterValues("productAge");
-			String[] retailPriceBF =request.getParameterValues("retailPriceBF");
 			
-			String[] promotionPrice =request.getParameterValues("promotionPrice");
-			String[] legQty =request.getParameterValues("legQty");
-			String[] inStoreQty =request.getParameterValues("inStoreQty");
-			String[] backendQty =request.getParameterValues("backendQty");
-			String[] uom =request.getParameterValues("uom");
+				List<StockMCBean> itemList = new ArrayList<StockMCBean>();
+				String[] lineId =request.getParameterValues("lineId");
+				//String[] status =request.getParameterValues("status");
+				String[] productCode =request.getParameterValues("productCode");
+				String[] barcode =request.getParameterValues("barcode");
+				String[] productPackSize =request.getParameterValues("productPackSize");
+				String[] productAge =request.getParameterValues("productAge");
+				String[] retailPriceBF =request.getParameterValues("retailPriceBF");
+				
+				String[] promotionPrice =request.getParameterValues("promotionPrice");
+				String[] legQty =request.getParameterValues("legQty");
+				String[] inStoreQty =request.getParameterValues("inStoreQty");
+				String[] backendQty =request.getParameterValues("backendQty");
+				String[] uom =request.getParameterValues("uom");
+				
+				String[] frontendQty1 =request.getParameterValues("frontendQty1");
+				String[] uom1 =request.getParameterValues("uom1");
+				String[] expireDate1 =request.getParameterValues("expireDate1");
+				
+				String[] frontendQty2 =request.getParameterValues("frontendQty2");
+				String[] uom2 =request.getParameterValues("uom2");
+				String[] expireDate2 =request.getParameterValues("expireDate2");
+				
+				String[] frontendQty3 =request.getParameterValues("frontendQty3");
+				String[] uom3 =request.getParameterValues("uom3");
+				String[] expireDate3 =request.getParameterValues("expireDate3");
+				
+				logger.debug("productCode:"+productCode.length);
+				logger.debug("backendQty:"+backendQty+":"+backendQty.length);
+				
+				//add value to Results
+				if(productCode != null && productCode.length > 0){
+					for(int i=0;i<productCode.length;i++){
+						if( !Utils.isNull(productCode[i]).equals("")){
+							StockMCBean l = new StockMCBean();
+							 logger.debug("lineId:"+lineId[i]);
+							 logger.debug("productCode["+i+"]["+Utils.isNull(productCode[i])+"]");
+							 
+							 l.setLineId(Utils.convertStrToInt(lineId[i]));
+							 l.setProductCode(Utils.isNull(productCode[i]));
+							 l.setBarcode(Utils.isNull(barcode[i]));
+							 l.setProductPackSize(Utils.isNull(productPackSize[i]));
+							 l.setProductAge(Utils.isNull(productAge[i]));
+							 l.setRetailPriceBF(retailPriceBF[i]);
+							 
+							 l.setPromotionPrice(promotionPrice[i]);
+							 l.setLegQty(Utils.isNull(legQty[i]));
+							 
+							 l.setInStoreQty(inStoreQty[i]);
+							 l.setBackendQty(backendQty[i]);
+							 l.setUom(Utils.isNull(uom[i]));
+							 
+							 l.setFrontendQty1(frontendQty1[i]);
+							 l.setUom1(uom1[i]);
+							 l.setExpireDate1(Utils.isNull(expireDate1[i]));
+						      
+							 l.setFrontendQty2(frontendQty2[i]);
+							 l.setUom2(uom2[i]);
+							 l.setExpireDate2(Utils.isNull(expireDate2[i]));
+							 
+							 l.setFrontendQty3(frontendQty3[i]);
+							 l.setUom3(uom3[i]);
+							 l.setExpireDate3(Utils.isNull(expireDate3[i]));
+							 
+							 l.setCreateUser(user.getUserName());
+							 l.setUpdateUser(user.getUserName());
+							 
+							 itemList.add(l);
+						}//if
+					}//for
+				}//if
+				
+				//set items list
+				m.setItems(itemList);
+				
+				//Save to DB
+				m = dao.save(m);
+				
+				//search 
+				m = dao.searchStockMC(m,true);
+				m.setCanEdit(true);
+				m.setLineIdDeletes("");//clear lineId delete 
+				stockForm.setBean(m);
+				stockForm.setResults(m.getItems());
+				
+				request.setAttribute("Message","บันทึกข้อมูลเรียบร้อย");
 			
-			String[] frontendQty1 =request.getParameterValues("frontendQty1");
-			String[] uom1 =request.getParameterValues("uom1");
-			String[] expireDate1 =request.getParameterValues("expireDate1");
-			
-			String[] frontendQty2 =request.getParameterValues("frontendQty2");
-			String[] uom2 =request.getParameterValues("uom2");
-			String[] expireDate2 =request.getParameterValues("expireDate2");
-			
-			String[] frontendQty3 =request.getParameterValues("frontendQty3");
-			String[] uom3 =request.getParameterValues("uom3");
-			String[] expireDate3 =request.getParameterValues("expireDate3");
-			
-			logger.debug("productCode:"+productCode.length);
-			logger.debug("backendQty:"+backendQty+":"+backendQty.length);
-			
-			//add value to Results
-			if(productCode != null && productCode.length > 0){
-				for(int i=0;i<productCode.length;i++){
-					if( !Utils.isNull(productCode[i]).equals("")){// && !Utils.isNull(status[i]).equals("DELETE")){
-						StockMCBean l = new StockMCBean();
-						 logger.debug("lineId:"+lineId[i]);
-						// logger.debug("promotionPrice["+i+"]["+promotionPrice[i]+"]");
-						 
-						 l.setLineId(Utils.convertStrToInt(lineId[i]));
-						 l.setProductCode(Utils.isNull(productCode[i]));
-						 l.setBarcode(Utils.isNull(barcode[i]));
-						 l.setProductPackSize(Utils.isNull(productPackSize[i]));
-						 l.setProductAge(Utils.isNull(productAge[i]));
-						 l.setRetailPriceBF(retailPriceBF[i]);
-						 
-						 l.setPromotionPrice(promotionPrice[i]);
-						 l.setLegQty(Utils.isNull(legQty[i]));
-						 
-						 l.setInStoreQty(inStoreQty[i]);
-						 l.setBackendQty(backendQty[i]);
-						 l.setUom(Utils.isNull(uom[i]));
-						 
-						 l.setFrontendQty1(frontendQty1[i]);
-						 l.setUom1(uom1[i]);
-						 l.setExpireDate1(Utils.isNull(expireDate1[i]));
-					      
-						 l.setFrontendQty2(frontendQty2[i]);
-						 l.setUom2(uom2[i]);
-						 l.setExpireDate2(Utils.isNull(expireDate2[i]));
-						 
-						 l.setFrontendQty3(frontendQty3[i]);
-						 l.setUom3(uom3[i]);
-						 l.setExpireDate3(Utils.isNull(expireDate3[i]));
-						 
-						 l.setCreateUser(user.getUserName());
-						 l.setUpdateUser(user.getUserName());
-						 
-						 itemList.add(l);
-					}//if
-				}//for
-			}//if
-			
-			//set items list
-			m.setItems(itemList);
-			
-			//Save to DB
-			m = dao.save(m);
-			
-			//search 
-			m = dao.searchStockMC(m,true);
-			m.setCanEdit(true);
-			m.setLineIdDeletes("");//clear lineId delete 
-			stockForm.setBean(m);
-			stockForm.setResults(m.getItems());
-			
-			request.setAttribute("Message","บันทึกข้อมูลเรียบร้อย");
-		
+				
 			// save token
 			saveToken(request);
 		} catch (Exception e) {
@@ -406,6 +522,7 @@ public class StockMCProcess  extends I_Action{
 		}
 		return "detail";
 	}
+	
 	
 	public ActionForward exportToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {

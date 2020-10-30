@@ -20,6 +20,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
 import com.pens.util.EnvProperties;
+import com.pens.util.EnvQuartzProperties;
 import com.pens.util.SQLHelper;
 import com.pens.util.manual.cleardb.ClearDB;
 import com.pens.util.manual.cleardb.ClearDupDB;
@@ -71,22 +72,30 @@ public class AdminConsoleAction extends I_Action {
 				String configInfoTest ="";
 				
 				EnvProperties env = EnvProperties.getInstance();
+				EnvQuartzProperties envQuartz = EnvQuartzProperties.getInstance();
 				
 				String url = env.getProperty("connection.url");
 				String username = env.getProperty("connection.username");
 				String password = env.getProperty("connection.password");
-				configInfo += "*****Config Type:"+env.getProperty("config.type")+"************************\n";
-				configInfo += "\n Printer LQ300 NAME : EPSON LQ-300+ /II ESC/P 2 (PENS_A5)\n\n";
+				configInfo += "*----Product Type: "+env.getProperty("product.type")+"-----*\n";
+	
 				configInfo += " ----------------------  DataBase Config ----------------------------------------------------------------------- \n";
 				configInfo +="DB IP : "+url+"\n";
 				configInfo +="DB User : "+username+"\n";
-				configInfo +="DB Password : "+password+"\n";
+				//configInfo +="DB Password : "+password+"\n";
+				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
+				
+				configInfo += " ----------------------  DataBase Quartz Config --------------------------------------------------------------- \n";
+				configInfo +="ProductType : "+envQuartz.getProperty("product.type")+"\n";
+				configInfo +="DB IP : "+envQuartz.getProperty("org.quartz.dataSource.penssoDS.URL")+"\n";
+				configInfo +="DB User : "+envQuartz.getProperty("org.quartz.dataSource.penssoDS.user")+"\n";
+			
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 		
 				configInfo += " ----------------------  FTP Server Config ---------------------------------------------------------------------- \n";
 				configInfo +="FTP IP : "+env.getProperty("ftp.ip.server")+"\n";
 				configInfo +="FTP User : "+env.getProperty("ftp.username")+"\n";
-				configInfo +="FTP Password: "+env.getProperty("ftp.password")+"\n";
+				//configInfo +="FTP Password: "+env.getProperty("ftp.password")+"\n";
 				configInfo += " -------------------------------------------------------------------------------------------------------------------- \n";
 		
 			    configInfoTest = " ";

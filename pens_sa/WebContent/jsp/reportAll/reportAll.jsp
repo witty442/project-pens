@@ -22,7 +22,7 @@ if(Utils.isNull(pageName).equals("")){
 <%}else if("BoxNoNissinReport".equalsIgnoreCase(pageName)){ %>
      <jsp:include page="page/boxNoNissinReportPage.jsp" flush="true"/>    
 <%}else if("EffectiveSKUReport".equalsIgnoreCase(pageName)){ %>
-     <jsp:include page="page/effectiveSKUReportPage.jsp" flush="true"/>    
+     <jsp:include page="page/effectiveSKUReportPage.jsp" flush="true"/>  
 <% } %>
 
 						

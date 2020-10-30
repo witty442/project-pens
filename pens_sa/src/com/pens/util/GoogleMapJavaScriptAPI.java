@@ -1,6 +1,5 @@
 package com.pens.util;
 
-import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
 
 
 public class GoogleMapJavaScriptAPI {

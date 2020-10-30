@@ -192,13 +192,9 @@ function deleteBill(path){
 		tbl.rows[i+1].cells[8].innerHTML = iconLabel;
 	}
 }
-var countSave = 0;
+
 function save(path,type) {
-	/** Validate Press Save duplicate */
-    if(countSave > 0){
-    	return false;
-    }
-	countSave++;
+
 	if(document.getElementsByName('receipt.internalBank')[0].value==''){
 		alert('ใส่ข้อมูลการฝากเงินเข้าบัญชี');
 		document.getElementsByName('receipt.internalBank')[0].focus();
@@ -232,7 +228,9 @@ function save(path,type) {
 		return false;
 	}
 
-	
+	/**Control Save Lock Screen **/
+    startControlSaveLockScreen();
+    
 	document.receiptForm.action = path + "/jsp/receiptAction.do?do=save";
 	document.receiptForm.submit();
 	return true;

@@ -197,7 +197,7 @@ public class ShopBillSummaryAction {
 			sql.append("\n     ) MP");
 			sql.append("\n     where H.order_number = D.order_number");
 			sql.append("\n     AND D.product_id = MP.inventory_item_id ");
-			
+			sql.append("\n     AND H.intflag ='S' ");//Interfaces Success Only
 			if( !Utils.isNull(o.getGroupCode()).equals("")){
 				sql.append("\n    AND MP.MATERIAL_MASTER ='"+Utils.isNull(o.getGroupCode())+"'");
 			}
@@ -337,8 +337,8 @@ public class ShopBillSummaryAction {
 			sql.append("\n ,NVL(SUM(BB.discount_amt),0) as discount_amt");
 			
 			sql.append("\n ,NVL(SUM(BB.sell_af_disc),0) as sell_af_disc");
-			sql.append("\n ,NVL(SUM(BB.wacoal_amt,0)) as wacoal_amt");
-			sql.append("\n ,NVL(SUM(BB.pens_amt,0)) as pens_amt");
+			sql.append("\n ,NVL(SUM(BB.wacoal_amt),0) as wacoal_amt");
+			sql.append("\n ,NVL(SUM(BB.pens_amt),0) as pens_amt");
 			sql.append("\n FROM( ");
 			sql.append("\n SELECT AA.*");
 			sql.append("\n ,(AA.retail_sell_amt-AA.discount_amt) as sell_af_disc");
@@ -380,7 +380,7 @@ public class ShopBillSummaryAction {
 			sql.append("\n     ) MP");
 			sql.append("\n     where H.order_number = D.order_number");
 			sql.append("\n     AND D.product_id = MP.inventory_item_id ");
-			
+			sql.append("\n     AND H.intflag ='S' ");//Interfaces Success Only
 			if( !Utils.isNull(o.getGroupCode()).equals("")){
 				sql.append("\n    AND MP.MATERIAL_MASTER ='"+Utils.isNull(o.getGroupCode())+"'");
 			}
@@ -423,6 +423,7 @@ public class ShopBillSummaryAction {
 			sql.append("\n  )AA");
 			sql.append("\n  WHERE AA.retail_sell_amt > 0 ");
 			sql.append("\n  )BB");
+			sql.append("\n GROUP BY BB.sub_promo_name  ,BB.discount_percent ");
 			sql.append("\n ) M");
 			/**************************************************************************/
 			logger.debug("sql: \n"+sql.toString());

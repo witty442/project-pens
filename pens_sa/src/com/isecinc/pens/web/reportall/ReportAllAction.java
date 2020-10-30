@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.report.analyst.ProjectCTargetAction;
 import com.isecinc.pens.web.reportall.page.BoxNoNissinReportAction;
 import com.isecinc.pens.web.reportall.page.EffectiveSKUReportAction;
 import com.isecinc.pens.web.reportall.page.ProjectCReportAction;

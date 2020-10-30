@@ -1,10 +1,12 @@
+<%@page import="org.apache.struts.Globals"%>
+<%@page import="org.apache.struts.action.Action"%>
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="com.pens.util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.stockmc.StockMCUtils"%>
 <%@page import="com.isecinc.pens.web.stockmc.StockMCBean"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.pens.util.Utils"%>
-<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -29,11 +31,19 @@ User user = (User)session.getAttribute("user");
 String screenWidth = "";
 if(session.getAttribute("screenWidth") != null){ 
 	screenWidth = (String)session.getAttribute("screenWidth");
+	int screenW = new Double(screenWidth).intValue();
+	if(screenW <=800){
+		screenW = 800;
+	}
+	//screenWidth = ""+(screenW-50);
 }
 String pageName = Utils.isNull(request.getParameter("pageName")); 
+
+
 %>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <meta http-equiv="Cache-Control" content="no-cache" /> 
 <meta http-equiv="Pragma" content="no-cache" /> 
@@ -43,17 +53,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-
 <style type="text/css">
- #scroll {
-<%if(!"0".equals(screenWidth)){%>
-     width:101%;  
-    <%-- width:<%=screenWidth%>px;  --%>
-    height:250px;
-	overflow:scroll;
-	/* position:relative; */
-	white-space:nowrap;
-<%}%>
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <!-- Calendar -->
@@ -64,9 +64,10 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/page/stockMC.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-
+<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script> 
+ --%>
 <!-- Calendar -->
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/calendar/jquery.calendars.picker.css" type="text/css" />
+ <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/calendar/jquery.calendars.picker.css" type="text/css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script> 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.plugin.js"></script> 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.js"></script>
@@ -75,9 +76,22 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai-th.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker-th.js"></script>
- 
+  
+<!-- For fix Head and Column Table -->
 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-stickytable-3.0.js"></script>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/jquery-stickytable-3.0.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+
+<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/epoch_styles.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+ --%>
 <script type="text/javascript">
+
+/** disable back button alway **/
+window.location.hash="no-back-button";
+window.location.hash="Again-No-back-button";//again because google chrome don't insert first hash into history
+window.onhashchange=function(){window.location.hash="no-back-button";}
+
 function loadMe(){
 	<%if(stockMCForm.getResults() != null && stockMCForm.getResults().size() >0){ %>
 		<% List<StockMCBean> results = stockMCForm.getResults();
@@ -85,15 +99,16 @@ function loadMe(){
            $('#expireDate1_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('thai','th')});
            $('#expireDate2_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('thai','th')});
            $('#expireDate3_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('thai','th')});
+         
+          // new Epoch('epoch_popup', 'th', document.getElementById('expireDate1_<%=(i+1)%>'));
+           //new Epoch('epoch_popup', 'th', document.getElementById('expireDate2_<%=(i+1)%>'));
+          // new Epoch('epoch_popup', 'th', document.getElementById('expireDate3_<%=(i+1)%>'));
 		<% }
 	  }
 	%>
-	
+	//alert("<%=screenWidth%>");
 }
-function hideTrHead(){
-	  var tr = document.getElementById("tr_head_blank");
-      tr.style.display = "none";
-}
+
 function backsearch(path) {
     document.stockMCForm.action = path + "/jsp/stockMCAction.do?do=searchHead&action=back";
 	document.stockMCForm.submit();
@@ -118,6 +133,10 @@ function loadItem(path){
 	form.submit();
 	return true;
 }
+
+/***** Fix Header Table *******/
+
+/***** Fix Header Table *******/
 </script>
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
@@ -160,7 +179,8 @@ function loadItem(path){
 						<!-- Hidden -->
 		                 <input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
 						 <input type="hidden" id="tabIndex" name="tabIndex" value="<%=tabIndex%>"/>
-						   
+						TokenKey:<input type="hidden" name="TokenKey" value="<%= session.getAttribute(Globals.TRANSACTION_TOKEN_KEY) %>" >
+
 						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 							<tr>
 								<td colspan="4" align="center">
@@ -224,69 +244,41 @@ function loadItem(path){
 								     </c:if>
 								</div>
 					
-								<!--  Results  -->
-								<table id="tblProductHead" align="center" border="1" cellpadding="3" cellspacing="2" 
-								class="tableSearchNoWidthNoOverflow" width="100%">
-									<tr>
-										<th rowspan="3">รหัส<br/>สินค้า</th>
-										<th rowspan="3">บาร์โค้ด</th>
-										<th rowspan="3">รายละเอียดสินค้า</th>
-										<th rowspan="3">บรรจุ</th>
-										<th rowspan="3">อายุ<br/>สินค้า</th>
-										<th rowspan="3">ราคา<br/>ปลีก</th>
-										<th rowspan="3">ราคา <br/>โปรโมชั่น</th>
-										<th rowspan="3">ขา</th>
-										<th colspan="12">สต๊อกสินค้า</th>
+							   <!--  Results  -->
+							   <div style='height:450px;width:<%=screenWidth%>px;' >
+								<table id="myTable" class="table table-condensed table-striped" border="1">
+								     <thead>
+								       <tr >
+										<th rowspan="3" class="td_bg_lineH">รหัส<br/>สินค้า</th>
+										<th rowspan="3" class="td_bg_lineH">บาร์โค้ด</th>
+										<th rowspan="3" class="td_bg_lineH">รายละเอียดสินค้า</th>
+										<th rowspan="3" class="td_bg_lineH">บรรจุ</th>
+										<th rowspan="3" class="td_bg_lineH">อายุ<br/>สินค้า</th>
+										<th rowspan="3" class="td_bg_lineH">ราคา<br/>ปลีก</th>
+										<th rowspan="3" class="td_bg_lineH">ราคา <br/>โปรโมชั่น</th>
+										<th rowspan="3" class="td_bg_lineH">ขา</th>
+										<th colspan="12" class="td_bg_lineH">สต๊อกสินค้า</th>
 									</tr>
-									<tr>
-									    <th rowspan="2">ใน<br/>ระบบ<br/>ห้าง</th>
-										<th rowspan="2">หลัง<br/>ร้าน</th>
-										<th rowspan="2">หน่วย<br/>บรรจุ</th>
-									    <th colspan="3">กลุ่มหมดอายุที่ 1</th>
-										<th colspan="3">กลุ่มหมดอายุที่ 2</th>
-										<th colspan="3">กลุ่มหมดอายุที่ 3</th>
+									<tr >
+									    <th rowspan="2" class="td_bg_lineH">ใน<br/>ระบบ<br/>ห้าง</th>
+										<th rowspan="2" class="td_bg_lineH">หลัง<br/>ร้าน</th>
+										<th rowspan="2" class="td_bg_lineH">หน่วย<br/>บรรจุ</th>
+									    <th colspan="3" class="td_bg_lineH">กลุ่มหมดอายุที่ 1</th>
+										<th colspan="3" class="td_bg_lineH">กลุ่มหมดอายุที่ 2</th>
+										<th colspan="3" class="td_bg_lineH">กลุ่มหมดอายุที่ 3</th>
 									</tr>
-									<tr> 
-										<th >หน้า<br/>ร้าน</th>
-										<th >หน่วย<br/>บรรจุ</th>
-										<th >วันหมดอายุ</th>
-										<th >หน้า<br/>ร้าน</th>
-										<th >หน่วย<br/>บรรจุ</th>
-										<th >วันหมดอายุ</th>
-										<th >หน้า<br/>ร้าน</th>
-										<th >หน่วย<br/>บรรจุ</th>
-										<th >วันหมดอายุ</th>
+									<tr > 
+										<th  class="td_bg_lineH">หน้า<br/>ร้าน</th>
+										<th  class="td_bg_lineH">หน่วย<br/>บรรจุ</th>
+										<th  class="td_bg_lineH">วันหมดอายุ</th>
+										<th  class="td_bg_lineH">หน้า<br/>ร้าน</th>
+										<th  class="td_bg_lineH">หน่วย<br/>บรรจุ</th>
+										<th  class="td_bg_lineH">วันหมดอายุ</th>
+										<th  class="td_bg_lineH">หน้า<br/>ร้าน</th>
+										<th  class="td_bg_lineH">หน่วย<br/>บรรจุ</th>
+										<th  class="td_bg_lineH">วันหมดอายุ</th>
 									</tr>
-									
-									 <tr id="tr_head_blank" height="1px">
-										<td class ="td_text_center"  width="4%"></td>
-										<td class="td_text" width="8%"></td>
-										<td class="td_text"  width="8%"></td><!-- ProductName -->
-										<td class="td_text_center" width="5%"></td>
-										<td class="td_text_number" width="4%"></td>
-										<td class="td_text_center"  width="5%"></td>
-										<td class="td_text_center"  width="4%"></td><!-- PromotionPrice -->
-										<td class="td_text_center"  width="3%"></td>
-										<td class="td_text_center"  width="4%"></td>
-										<td class="td_text_center"  width="4%"></td>
-										<td class="td_text_center"  width="5%"></td>
-										
-										<td class="td_number" width="4%"></td>
-										<td class="td_number"  width="5%"></td>
-										<td class="td_text_center" width="6%"></td>
-										
-										<td class="td_number" width="4%"></td>
-										<td class="td_number" width="5%" ></td>
-										<td class="td_text_center" width="6%"></td>
-										
-										<td class="td_number" width="3%"></td>
-										<td class="td_number" width="4%" ></td>
-										<td class="td_text_center" width="6%"></td>
-									</tr> 
-								</table>
-								<div id ="scroll">
-								<table id="tblProduct" align="center" border="1" cellpadding="3" cellspacing="2" 
-								    class="tableSearchNoWidth" width="100%">
+									</thead>
 									<tbody>
 								<%
 								if(stockMCForm.getResults() != null && stockMCForm.getResults().size() >0){
@@ -301,26 +293,24 @@ function loadItem(path){
 									 }
 								%>
 									<tr class="<%=tabclass%>">
-										<td class ="td_text_center"  width="4%">
-											<input type="text" name="productCode" id="productCode" value ="<%=b.getProductCode()%>" size="3"
-										       
-											    class="disableText"  tabindex="<%=tabIndex%>" autoComplete="off" readonly   
-											  /> 
-											 <input type="hidden" name="lineId" id="lineId" value ="<%=b.getLineId()%>"/>
-										</td>
-										<td class="td_text" width="8%">
+										<th class ="td_bg_lineA"  width="20%">
+											<%=b.getProductCode()%>
+										</th>
+										<td class="td_text" width="20%">
 									       <input type="text" name="barcode" id="barcode" value ="<%=b.getBarcode()%>" size="11" 
 											    class="disableText"  tabindex="<%=tabIndex%>" autoComplete="off" readonly  
 											  /> 
+											  <input type="hidden" name="productCode" id="productCode" value ="<%=b.getProductCode()%>" /> 
+											 <input type="hidden" name="lineId" id="lineId" value ="<%=b.getLineId()%>"/>
 										</td>
-										<td class="td_text"  width="8%">
+										<td class="td_text"  width="9%">
 									       <input type="text" name="productName" id="productName" value ="<%=b.getProductName()%>" size="13" readonly class="disableText"/>	
 										</td>
 										<td class="td_text_center" width="5%">   
 									       <input type="text" name="productPackSize" id="productPackSize" value ="<%=b.getProductPackSize()%>" size="4" readonly class="disableNumber"/>	
 										</td>
 										<td class="td_text_number" width="4%">
-										 <input type="text" name="productAge" id="productAge" value ="<%=b.getProductAge()%>" size="2" readonly class="disableText"/>	  
+										 <input type="text" name="productAge" id="productAge" value ="<%=b.getProductAge()%>" size="3" readonly class="disableText"/>	  
 										</td>
 										<td class="td_text_center"  width="5%">
 										 <input type="text" name="retailPriceBF" id="retailPriceBF" value ="<%=b.getRetailPriceBF()%>" 
@@ -417,14 +407,14 @@ function loadItem(path){
 											 %>
 											</select>
 										</td>
-										<td class="td_text_center" width="6%">
+										<td class="td_text_center" width="5%">
 										   <%tabIndex++; %>
 										   <input type='text' name='expireDate2' size='7'
 										   value='<%=b.getExpireDate2()%>' id="expireDate2_<%=b.getNo() %>"  readonly>
 									       <font color="red"></font>
 										</td>
 										<!-- ********* 3******************************* -->
-										<td class="td_number" width="3%">
+										<td class="td_number" width="5%">
 										    <%tabIndex++; %>
 											<input type="text"
 											tabindex="<%=tabIndex %>"
@@ -432,7 +422,7 @@ function loadItem(path){
 											onkeydown="return isNum0to9andpoint(this,event);"
 											class="enableNumber" autocomplete="off"/>
 										</td>
-										<td class="td_number" width="4%" >
+										<td class="td_number" width="5%" >
 										    <%tabIndex++; %>
 											<select name="uom3" tabindex="<%=tabIndex %>" id="uom3">
 											 <% for(int n=0;n<uomList.size();n++){ 
@@ -446,7 +436,7 @@ function loadItem(path){
 											 %>
 											</select>
 										</td>
-										<td class="td_text_center" width="6%">
+										<td class="td_text_center" width="10%">
 										   <%tabIndex++; %>
 										   <input type='text' name='expireDate3' size='7'
 										   value='<%=b.getExpireDate3()%>' id="expireDate3_<%=b.getNo() %>" readonly>
@@ -457,6 +447,14 @@ function loadItem(path){
 								  </tbody>
 								</table>
 							   </div>
+							   
+							   <script>
+								  //load jquery
+								   $(function() {
+										//Load fix column and Head
+										$('#myTable').stickyTable({overflowy: true});
+									});
+								</script>
 								<!--  Results -->
 								</td>
 							</tr>
@@ -521,9 +519,9 @@ function loadItem(path){
 </body>
 </html>
 <script>
-	//hide row tableHead
-	//hideTrHead();
+
 </script>
+
 <%}catch(Exception e){
   e.printStackTrace();
 }

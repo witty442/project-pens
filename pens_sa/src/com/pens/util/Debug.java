@@ -19,7 +19,7 @@ public class Debug {
 	public void debug(String message){
 		if(isDebug){
 			if(level==level_0){
-		      logger.debug(message);
+		      //logger.debug(message);
 			}
 		}
 	}

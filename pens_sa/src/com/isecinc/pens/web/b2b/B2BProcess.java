@@ -17,11 +17,11 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
 import com.isecinc.pens.web.batchtask.BatchTaskConstants;
 import com.isecinc.pens.web.batchtask.BatchTaskForm;
 import com.isecinc.pens.web.batchtask.task.ImportB2BMakroFromExcelTask;
 import com.pens.util.DBConnection;
+import com.pens.util.EnvProperties;
 import com.pens.util.FileUtil;
 import com.pens.util.Utils;
 

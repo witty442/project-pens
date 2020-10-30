@@ -301,7 +301,7 @@ function change_payment(val){
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 							<tr>
 								<td align="center">
-									<input type="button" value="บันทึก" class="newPosBtn" onclick="return save('${pageContext.request.contextPath}','<%=user.getType() %>');">
+									<input type="button" value="บันทึก" class="newPosBtn" onclick="save('${pageContext.request.contextPath}','<%=user.getType() %>');">
 									
 									<input type="button" value="ยกเลิก" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${receiptForm.receipt.customerId}');">
 								</td>
@@ -318,6 +318,8 @@ function change_payment(val){
 						<html:hidden property="receipt.exported" value="N"/>
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>
 						</html:form>
+						
+						<input type="hidden" name="fromPage" id="fromPage" value =""/>
 						<!-- BODY -->
 					</td>
 					<td width="6px;" background="${pageContext.request.contextPath}/images2/boxcont1_6.gif"></td>

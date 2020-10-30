@@ -26,7 +26,9 @@
 		<form-bean name="salesAnalystReportForm" type="com.isecinc.pens.web.report.salesanalyst.SAReportForm" />
 		<form-bean name="searchValuePopupForm" type="com.isecinc.pens.web.popup.SearchValuePopupForm" />
 		<form-bean name="searchRolePopupForm" type="com.isecinc.pens.web.popup.SearchRolePopupForm" />
-			
+		<!-- NEW Analyst -->
+		<form-bean name="aReportForm" type="com.isecinc.pens.web.report.analyst.AReportForm" />
+		
 		<!-- Group ROLE -->
 		<form-bean name="groupRoleForm" type="com.isecinc.pens.web.group.GroupRoleForm" />
 		<form-bean name="salesTargetForm" type="com.isecinc.pens.web.salestarget.SalesTargetForm" />
@@ -59,9 +61,10 @@
 		<!-- LOGIN -->
 		<action name="loginForm" path="/login" parameter="do" scope="request" type="com.isecinc.pens.web.login.LoginAction">
 			 <forward name="change_password" path="/jsp/administer/changePassword.jsp"  />
-             <forward name="pass_user" path="/jsp/salesAnalystReportAction.do?do=prepare&amp;action=new" redirect="true" /> 
+             <forward name="pass_user" path="/jsp/salesAnalystReportAction.do?do=prepare&amp;action=new&amp;reportName=SalesAnalyst" redirect="true" /> 
              <forward name="pass_salestarget" path="/jsp/mainpage.jsp" redirect="true" /> 
-             <forward name="pass_mcentry" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new" redirect="true" /> 
+             <forward name="pass_mcentry" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new&amp;pageName=STOCKMC" redirect="true" /> 
+			 <forward name="pass_mcentryMobile" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new&amp;pageName=STOCKMC" redirect="true" /> 
 			 <forward name="pathRedirect" path="/redirectPage.jsp" /> 
 			 <forward name="fail" path="/index.jsp" /> 
 		</action>
@@ -116,8 +119,16 @@
 			<forward name="prepare" path="/jsp/salesAnalyst/sales_analyst.jsp" />
 			<forward name="clearform" path="/jsp/salesAnalyst/sales_analyst.jsp" />
 		</action>
+		<!-- NEW SALES ANALYST -->
+		<action name="aReportForm" path="/jsp/aReportAction" forward="/jsp/analyst/analyst.jsp" />
+		<action name="aReportForm" path="/jsp/aReportAction" parameter="do" scope="session"
+			type="com.isecinc.pens.web.report.analyst.AReportAction">
+			<forward name="search" path="/jsp/analyst/analyst.jsp" />
+			<forward name="prepare" path="/jsp/analyst/analyst.jsp" />
+			<forward name="clearform" path="/jsp/analyst/analyst.jsp" />
+		</action>
 		
-		<!-- SALES ANALYST -->
+		<!-- SALES ANALYST POPUP -->
 		<action name="searchValuePopupForm" path="/jsp/searchValuePopupAction" forward="/jsp/popup/searchValuePopup.jsp" />
 		<action name="searchValuePopupForm" path="/jsp/searchValuePopupAction" parameter="do" scope="session"
 			type="com.isecinc.pens.web.popup.SearchValuePopupAction">
@@ -148,6 +159,12 @@
 		<action name="stockMCForm" path="/jsp/stockMCAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockmc.StockMCAction">
 			<forward name="search" path="/jsp/stockMC/stockMCSearch.jsp"/>
 			<forward name="detail" path="/jsp/stockMC/stockMC.jsp" />
+			
+		    <forward name="stockMCQuery" path="/jsp/stockMC/stockMCQuerySearch.jsp"/>
+				
+			<forward name="searchMobile" path="/jsp/stockMC/stockMCMobileSearch.jsp"/>
+			<forward name="detailMobile" path="/jsp/stockMC/stockMCMobile.jsp" />
+			
 			<forward name="searchMasterItem" path="/jsp/stockMC/stockMCMasterItemSearch.jsp" />
 			<forward name="detailMasterItem" path="/jsp/stockMC/stockMCMasterItem.jsp" />
 		</action>

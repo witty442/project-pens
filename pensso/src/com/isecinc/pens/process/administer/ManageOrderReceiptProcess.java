@@ -45,7 +45,6 @@ public class ManageOrderReceiptProcess {
 	public List<Receipt> getReceipt(ManageOrderReceiptForm aForm,User user) throws Exception {
 		List<Receipt> receipts = new ArrayList<Receipt>();
 		String whereCause = "";
-		whereCause = "\n  and doc_status = 'SV' and EXPORTED = 'N' ";
 		
 		whereCause += "\n  and receipt_date >= to_date('"+ DateUtil.convBuddhistToChristDate(aForm.getDocumentDateFrom(), DateUtil.DD_MM_YYYY_WITH_SLASH) + "','dd/mm/yyyy') ";
 		whereCause += "\n  and receipt_date <= to_date('"+ DateUtil.convBuddhistToChristDate(aForm.getDocumentDateTo(), DateUtil.DD_MM_YYYY_WITH_SLASH) + "','dd/mm/yyyy') ";
@@ -64,10 +63,10 @@ public class ManageOrderReceiptProcess {
 			whereCause += "\n  and c.name LIKE '%"+Utils.isNull(aForm.getCustomerName())+"%'";
 		}
 		whereCause += "\n )";
+		whereCause += "\n order by receipt_date desc";
 		
-		logger.debug("whereCause :\n"+whereCause);
 		
-		Receipt[] rs = new MReceipt().search(whereCause);
+		Receipt[] rs = new MReceipt().searchOpt(whereCause);
 		if (rs != null) receipts = Arrays.asList(rs);
 		return receipts;
 	}

@@ -1,4 +1,5 @@
-package com.isecinc.pens.scheduler.utils; 
+package com.pens.util; 
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,29 +12,27 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import com.pens.util.FileUtil;
-
-
-
 /**
  * @author WITTY
  *
  */
-public final class EnvSchedulerProperties extends Properties{
+public final class EnvProperties extends Properties{
     /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private static Logger logger = Logger.getLogger(EnvSchedulerProperties.class);
-    private static EnvSchedulerProperties _instance;
+	private static Logger logger = Logger.getLogger(EnvProperties.class);
+    private static EnvProperties _instance;
 	private static final String VAR_PATTERN = "\\$\\{([^\\}]+)\\}";
 	private static final int START_VAR_PATTERN_CHAR_COUNT = 2;
 	private static final int END_VAR_PATTERN_CHAR_COUNT = 1;
 	private static final Pattern pat = Pattern.compile(VAR_PATTERN);
-	private static final String propName ="scheduler.properties";
-
-	private EnvSchedulerProperties() throws IOException {
+	private static final String propNameControl ="inf-config/env.txt";
+	private static  String propName = "";
+    
+	private EnvProperties() throws IOException {
+		//logger.debug("reload");
 		reload();
 	}
 
@@ -72,10 +71,13 @@ public final class EnvSchedulerProperties extends Properties{
 	 *	Gets a single instance of EnvProperties. Properties are readen from abc.txt file.
 	 *	@return a single instance of EnvProperties
 	 */
-	public static synchronized EnvSchedulerProperties getInstance() {
+	public static synchronized EnvProperties getInstance() {
 		try {
-			if(_instance == null)
-				_instance = new EnvSchedulerProperties();
+			//logger.debug("Instance EnvProperties :"+_instance);
+			if(_instance == null){
+				//logger.debug("new Instance EnvProperties");
+				_instance = new EnvProperties();
+			}
 		}catch(IOException e) {
 			logger.error("Cannot load properties file");
 			e.printStackTrace();
@@ -91,6 +93,13 @@ public final class EnvSchedulerProperties extends Properties{
 		InputStream is = null;
 		try{
 			ClassLoader cl = FileUtil.class.getClassLoader();
+			
+			/*# -------control-env.txt Config For Load Properties UAT OR Product --------------------------#*/
+			InputStream fis = cl.getResourceAsStream(propNameControl);
+		    String productType = FileUtil.readControlEnvFile(fis);
+		    propName = "inf-config/"+productType.toLowerCase()+"-env.properties";
+		    
+			logger.info("load peroperties file name:"+propName);
 		    is = cl.getResourceAsStream(propName);
 		    
 			load(is);
@@ -98,13 +107,16 @@ public final class EnvSchedulerProperties extends Properties{
 			fillUpVariable();
 		}catch (IOException e){
 			logger.error(e.getMessage(),e);
+			e.printStackTrace();
 			throw e;
+		}catch(Exception ee){
+			logger.error(ee.getMessage(),ee);
+			ee.printStackTrace();
 		}
 	}
-	  
 	
 	public static void main(String[] argv) {
-		String value= EnvSchedulerProperties.getInstance().getProperty("DB2.SCHEMA");
+		String value= EnvProperties.getInstance().getProperty("product.type");
 		System.out.println(value);
 		//logger.debug(value);
 	}

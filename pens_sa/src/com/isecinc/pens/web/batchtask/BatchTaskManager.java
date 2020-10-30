@@ -19,9 +19,9 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.MonitorBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
+import com.pens.util.EnvProperties;
 import com.pens.util.Utils;
 
 public class BatchTaskManager {

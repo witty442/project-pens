@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import com.isecinc.pens.report.salesanalyst.helper.EnvProperties;
 
 @SuppressWarnings( { "static-access", "serial", "deprecation" })
 public class PhotoServlet extends HttpServlet {

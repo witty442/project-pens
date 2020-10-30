@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="tax_invoice_summary_report" language="groovy" pageWidth="210" pageHeight="220" columnWidth="208" leftMargin="1" rightMargin="1" topMargin="1" bottomMargin="1">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="162"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="p_report_title" class="java.lang.String"/>
 	<parameter name="custName" class="java.lang.String"/>
 	<parameter name="custAddress1" class="java.lang.String"/>
@@ -190,7 +190,7 @@
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="25">
+		<band height="25" splitType="Stretch">
 			<textField>
 				<reportElement x="1" y="1" width="204" height="12"/>
 				<box>

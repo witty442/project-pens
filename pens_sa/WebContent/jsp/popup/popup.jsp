@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.isecinc.pens.web.popup.PopupHelper"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.pens.util.Utils"%>
@@ -7,15 +8,24 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
 <head>
-<title></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<%
+User user = (User)session.getAttribute("user");
+%>
+<title>Popup Search </title>
+ <%if(user.isMobile()){ %>
+    <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_mobile_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+ <%}else{%>
+    <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+    <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+ <% }%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script> 
+
+<!-- Bootstrap -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap/bootstrap-4.5.2.min.css">
+<script src="${pageContext.request.contextPath}/js/bootstrap/bootstrap-4.5.2.min.js"></script>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/bootstrap/grid.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 
 <jsp:useBean id="popupForm" class="com.isecinc.pens.web.popup.PopupForm" scope="session" />
 <%
@@ -45,20 +55,27 @@
 	    currentPage = request.getParameter(queryStr)==null?"1":request.getParameter(queryStr);
 	 }
 	 
-    System.out.println("codes:"+codes);
+   // System.out.println("DATA_LIST:"+session.getAttribute("DATA_LIST"));
 %>
 
 <script type="text/javascript">
 function searchPopup(path) {
-    document.popupForm.action = path + "/jsp/popupAction.do?do=search";
+    document.popupForm.action = path + "/jsp/popupAction.do?do=search&action=newsearch";
     document.popupForm.submit();
    return true;
 }
+function gotoPage(currPage){
+	document.popupForm.action = "${pageContext.request.contextPath}/jsp/popupAction.do?do=search&currPage="+currPage;
+	document.popupForm.submit();
+	return true;
+}
+
 function selectAll(){
 	document.getElementsByName("codes")[0].value = 'ALL,';
 	document.getElementsByName("descs")[0].value = 'ALL,';
 }
 function selectOneRadio(){
+	var found = false;
 	var pageName ='<%=pageName%>';
 	var chRadio = document.getElementsByName("chCheck");
 	var retCode = document.getElementsByName("code_temp");
@@ -69,8 +86,12 @@ function selectOneRadio(){
         	//alert(i+":"+code[i+1].value);
             window.opener.setDataPopupValue(retCode[i].value,retDesc[i].value,pageName);
         	window.close();
+        	found = true;
             break;
         }
+	}
+	if(!found){
+	  alert("กรุณาเลือกข้อมูลก่อน กด OK");
 	}
 }
 
@@ -241,6 +262,7 @@ window.onload = function(){
 }
 
 </script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 <body  topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
 <html:form action="/jsp/popupAction">
@@ -252,53 +274,62 @@ window.onload = function(){
 <input type="hidden" name="hideAll" value ="<%=hideAll%>" />
 <input type="hidden" name="selectone" value ="<%=selectone%>" />
 
-<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" class="tableHead">
-    <tr height="21px" class="txt1">
-		<th width="15%" >&nbsp;</th> 
-		<th width="90%" ><b>ค้นหาข้อมูล <%=headName%></b></th>
-	</tr>
-	<tr height="21px" class="txt1">
-		<td width="15%" ><b><%=codeSearchTxtName %></b>  </td>
-		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px" styleClass="\" autoComplete=\"off"/>
-		<input type="button" name="search"  class="newPosBtnLong"  value="Search" onclick="searchPopup('<%=request.getContextPath()%>')" />
-		</td>
-	</tr>
-	<tr height="21px" class="txt1">
-		<td nowrap><b><%=descSearchTxtName %></b></td>
-		<td ><html:text property="descSearch"  size="60" style="height:20px" styleClass="\" autoComplete=\"off"/></td>
-	</tr>
-</table>
-
-<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
-	<tr>
-		<td align="center">
-		    <%if(selectone.equalsIgnoreCase("false")){ %>
-			  <input type="button" name="ok" value="OK" onclick="selectMultiple()" style="width:80px;"  class="newPosBtnLong" />
+<!-- <div class="container"> -->
+  <!-- Head Table -->
+  <div class="row mb-1">
+     <div class="col-12 themed-grid-col" align="center">ค้นหาข้อมูล <%=headName%></div>
+  </div>
+  <div class="row mb-1">
+     <div class="col-4 themed-grid-col-detail"><%=codeSearchTxtName %></div>
+      <div class="col-8 themed-grid-col-detail">
+        <html:text property="codeSearch"  styleClass="\" autoComplete=\"off"/>
+      </div>
+  </div>
+   <div class="row mb-1">
+     <div class="col-4 themed-grid-col-detail"><%=descSearchTxtName %></div>
+      <div class="col-8 themed-grid-col-detail">
+        <html:text property="descSearch"  styleClass="\" autoComplete=\"off"/>
+        <input type="button" name="search"  value="Search" class="btn btn-primary" onclick="searchPopup('<%=request.getContextPath()%>')" />
+      
+      </div>
+  </div>
+  <%if(session.getAttribute("DATA_LIST") != null){ %>
+	 <div class="row mb-1">
+	      <div class="col-12 themed-grid-col-detail" align="center">
+	        
+			  <%if(selectone.equalsIgnoreCase("false")){ %>
+			  <input type="button" name="ok" value="  OK  " onclick="selectMultiple()"  class="btn btn-primary" />
 			<%}else{ %>
-			  <input type="button" name="ok" value="OK" onclick="selectOneRadio()" style="width:80px;"  class="newPosBtnLong" />
+			  <input type="button" name="ok" value="  OK  " onclick="selectOneRadio()"  class="btn btn-primary" />
 			<%} %>
-			<input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:80px;"  class="newPosBtnLong" />
-			&nbsp;
-			<%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  /> เลือกทั้งหมด <%} %>
-		</td>
-	</tr>
-</table>
+	   
+	         <input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:120px" class="btn btn-primary" />
+				&nbsp;
+			 <%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  />&nbsp; เลือกทั้งหมด <%} %>
+	     </div>
+	  </div>
+  <%}	 %>
+<!-- </div> -->
+
 <!-- RESULT -->
 <%if(session.getAttribute("DATA_LIST") != null){ %>
 	<%if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)
 		|| "BrandProdShow".equalsIgnoreCase(pageName)|| "BrandStockVan".equalsIgnoreCase(pageName)){ %>
-	     <jsp:include page="popup_sub/BrandResult.jsp" /> 
+	    <%--  <jsp:include page="popup_sub/BrandResult.jsp" />  --%>
+	    <jsp:include page="popup_sub/popupResult.jsp" /> 
+	    
 	<%}else if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
 			|| "CustomerLocation".equalsIgnoreCase(pageName) || "CustomerVanProdShow".equalsIgnoreCase(pageName)
 			|| "CustomerCreditPromotion".equalsIgnoreCase(pageName)|| "CustomerLocNoTrip".equalsIgnoreCase(pageName)
 			|| "CustomerStockMC".equalsIgnoreCase(pageName)
 			){ 
 	%>
-	     <jsp:include page="popup_sub/CustomerResult.jsp" /> 
+	     <%-- <jsp:include page="popup_sub/CustomerResult.jsp" />  --%>
+	     <jsp:include page="popup_sub/popupResult.jsp" /> 
 	<%}else if("ItemStock".equalsIgnoreCase(pageName) || "ItemCreditPromotion".equalsIgnoreCase(pageName) 
 			 || "ItemStockVan".equalsIgnoreCase(pageName)){ %>
-	     <jsp:include page="popup_sub/ItemResult.jsp" /> 
-	     
+	    <%--  <jsp:include page="popup_sub/ItemResult.jsp" />  --%>
+	     <jsp:include page="popup_sub/popupResult.jsp" /> 
 	<%}else if("PDStockVan".equalsIgnoreCase(pageName) ){ %>
 	     <jsp:include page="popup_sub/pdStockVanResult.jsp" /> 
 	<%}else{ %>  
@@ -309,6 +340,22 @@ window.onload = function(){
     <font size="2" color="red">ไม่พบข้อมูล</font>
 <%} %>
 <!-- RESULT -->
+
+ <!-- Button Action -->
+ <%if(session.getAttribute("DATA_LIST") != null){ %>
+   <div class="row mb-1">
+      <div class="col-12 themed-grid-col-detail" align="center">
+        
+		  <%if(selectone.equalsIgnoreCase("false")){ %>
+		  <input type="button" name="ok" value="  OK  " onclick="selectMultiple()"  class="btn btn-primary" />
+		<%}else{ %>
+		  <input type="button" name="ok" value="  OK  " onclick="selectOneRadio()"  class="btn btn-primary" />
+		<%} %>
+   
+         <input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:120px" class="btn btn-primary" />
+     </div>
+  </div>
+ <%} %>
 </html:form>
 </body>
 </html>

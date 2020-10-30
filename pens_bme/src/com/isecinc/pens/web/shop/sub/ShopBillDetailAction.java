@@ -190,6 +190,7 @@ public class ShopBillDetailAction {
 			sql.append("\n     ) MP");
 			sql.append("\n     where H.order_number = D.order_number");
 			sql.append("\n     AND D.product_id = MP.inventory_item_id ");
+			sql.append("\n     AND H.intflag ='S' ");//Interfaces Success Only
 			//MAYA SHOP
 			sql.append("\n     AND H.CUSTOMER_NUMBER ='"+PickConstants.STORE_TYPE_PENSHOP_CODE+"' ");
 			
@@ -372,6 +373,7 @@ public class ShopBillDetailAction {
 			sql.append("\n     ) MP");
 			sql.append("\n     where H.order_number = D.order_number");
 			sql.append("\n     AND D.product_id = MP.inventory_item_id ");
+			sql.append("\n     AND H.intflag ='S' ");//Interfaces Success Only
 			sql.append("\n     AND H.customer_number ='"+PickConstants.STORE_TYPE_PENSHOP_CODE+"'");
 			if( !Utils.isNull(o.getGroupCode()).equals("")){
 				sql.append("\n    AND MP.MATERIAL_MASTER LIKE '"+Utils.isNull(o.getGroupCode())+"%'");
@@ -419,7 +421,9 @@ public class ShopBillDetailAction {
 			sql.append("\n )AA");
 			sql.append("\n WHERE AA.retail_sell_amt > 0 ");
 			sql.append("\n )M");
-       
+            
+			logger.debug("sql :\n"+sql.toString());
+            
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 			if(rst.next()) {

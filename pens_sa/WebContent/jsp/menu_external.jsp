@@ -1,5 +1,5 @@
+<%@page import="com.pens.util.EnvProperties"%>
 <%@page import="com.isecinc.pens.web.stock.StockConstants"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.helper.EnvProperties"%>
 <%@page import="com.pens.util.EncyptUtils"%>
 <%@page import="java.net.InetAddress"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>

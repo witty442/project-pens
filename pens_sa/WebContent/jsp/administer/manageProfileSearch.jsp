@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -14,6 +15,7 @@
 <jsp:useBean id="manageProfileSearchForm" class="com.isecinc.pens.web.profilesearch.ManageProfileSearchForm" scope="request" /> 
 <%
 User user = (User)session.getAttribute("user");
+String reportName = Utils.isNull(request.getParameter("reportName"));
 %>
 
 <html>
@@ -33,6 +35,7 @@ function loadMe(path){
 	<%}%>
 }
 function saveProfile(path){
+	
     document.manageProfileSearchForm.action = path + "/jsp/manageProfileSearchAction.do?do=save&action=save";
 	document.manageProfileSearchForm.submit();
 }
@@ -108,7 +111,7 @@ function changeProfile(){
 			</td>
 		</tr>
 	</table>
-
+     <input type="hidden" name="reportName" id="reportName" value ="<%=reportName %>"/>
 	<jsp:include page="../searchCriteria.jsp"></jsp:include>
 	</html:form>
 	<!-- BODY -->

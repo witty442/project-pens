@@ -29,6 +29,8 @@
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+
 <style type="text/css">
 <!--
 body {
@@ -48,6 +50,10 @@ body {
 function loadMe(){
 	new Epoch('epoch_popup','th',document.getElementById('documentDateFrom'));	
 	new Epoch('epoch_popup','th',document.getElementById('documentDateTo'));	
+	
+	<%if("back".equalsIgnoreCase(Utils.isNull(request.getParameter("action")))){%>
+	  searchBack();
+	<%}%>
 }
 
 function search(){
@@ -56,10 +62,23 @@ function search(){
 		$('#documentDateFrom').focus();
 		return false;
 	}
+	if($('#documentDateTo').val()==''){
+		alert('ใส่วันที่ที่ต้องการค้นหา');
+		$('#documentDateTo').focus();
+		return false;
+	}
 	document.manageOrderReceiptForm.action='${pageContext.request.contextPath}/jsp/manageOrderReceiptAction.do?do=search';
 	document.manageOrderReceiptForm.submit();
 }
-
+function searchBack(){
+	if($('#documentDateFrom').val()==''){
+		alert('ใส่วันที่ที่ต้องการค้นหา');
+		$('#documentDateFrom').focus();
+		return false;
+	}
+	document.manageOrderReceiptForm.action='${pageContext.request.contextPath}/jsp/manageOrderReceiptAction.do?do=search&action=searchBack';
+	document.manageOrderReceiptForm.submit();
+}
 function clearForm(){
 	window.location = '${pageContext.request.contextPath}/jsp/manageOrderReceipt.do';
 }
@@ -77,6 +96,27 @@ function cancelRR(id){
 }
 function viewReceipt(id){
 	var path='${pageContext.request.contextPath}';
+    var documentDateFrom = document.getElementById("documentDateFrom").value;
+    var documentDateTo = document.getElementById("documentDateTo").value;
+    var customerCode = document.getElementById("customerCode").value;
+    var customerName = document.getElementById("customerName").value;
+    
+	var param ="documentDateFrom="+documentDateFrom;
+    param +="&documentDateTo="+documentDateTo;
+    param +="&customerCode="+customerCode;
+    param +="&customerName="+customerName;
+    
+    /** save cri for back from ReceiptView.jsp **/
+	var getData = $.ajax({
+		url: "${pageContext.request.contextPath}/jsp/ajax/setManageOrderReceiptCriSessionAjax.jsp",
+		data : encodeURI(param),
+		async: false,
+		cache: false,
+		success: function(getData){
+		  returnString = jQuery.trim(getData);
+		}
+	}).responseText;
+	
 	document.manageOrderReceiptForm.action = path+"/jsp/receiptAction.do?do=prepare&id=" + id + "&action=view&fromPage=manageOrderReceipt";
 	document.manageOrderReceiptForm.submit();
 }
@@ -135,7 +175,7 @@ function viewReceipt(id){
 								</td>
 							</tr>
 							<tr>
-								<td align="right">รหัสร้านค้า<font color="red">*</font></td>
+								<td align="right">รหัสร้านค้า<font color="red"></font></td>
 								<td align="left">
 									<html:text property="customerCode" styleId="customerCode" size="15" styleClass="\" autoComplete=\"off"/>
 								</td>
@@ -164,9 +204,9 @@ function viewReceipt(id){
 			
 						<%if(manageOrderReceiptForm.getReceipts().size()>0){ %>
 						<br>
-						<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+						<table align="center" border="0" cellpadding="3" cellspacing="1" class="tableSearch">
 							<tr>
-								<td colspan="5" class="footer" align="left">
+								<td colspan="8" class="footer" align="left">
 									<img border=0 src="${pageContext.request.contextPath}/icons/doc_active.gif">
 									<b><bean:message key="Receipt" bundle="sysprop" /></b>
 								</td>
@@ -175,27 +215,46 @@ function viewReceipt(id){
 								</td>
 							</tr>
 							<tr>
-								<th class="order"><bean:message key="No" bundle="sysprop"/></th>
-								<th class="code"><bean:message key="Receipt.No" bundle="sysele"/></th>
-								<th width="120px;"><bean:message key="TransactionDate" bundle="sysele"/></th>
-								<th><bean:message key="Customer" bundle="sysele"/></th>
-								<th class="costprice"><bean:message key="Order.Payment" bundle="sysele"/></th>
-								<th class="status">ยกเลิกรายการ</th>
-								<th class="status">แสดง</th>
+								<th ><bean:message key="No" bundle="sysprop"/></th>
+								<th ><bean:message key="Receipt.No" bundle="sysele"/></th>
+								<th ><bean:message key="TransactionDate" bundle="sysele"/></th>
+								<th ><bean:message key="Customer" bundle="sysele"/></th>
+								<th >สถานะ</th>
+								<th >ส่งข้อมูลเข้าส่วนกลาง</th>
+								<th ><bean:message key="Order.Payment" bundle="sysele"/></th>
+								<th >ยกเลิกรายการ</th>
+								<th >แสดง</th>
 							</tr>
 							<%int i=1; %>
 							<%for(Receipt o : manageOrderReceiptForm.getReceipts()){ %>
 							<tr class="lineO">
-								<td><%=i++ %></td>
-								<td align="left"><%=o.getReceiptNo()%></td>
-								<td><%=o.getReceiptDate()%></td>
-								<td align="left"><%=o.getCustomerName()%></td>
-								<td align="right"><%=new DecimalFormat("#,##0.00").format(o.getReceiptAmount())%></td>
-								<td align="center">
-									<a href="javascript:cancelRR('<%=o.getId() %>');">
-									<img src="${pageContext.request.contextPath}/icons/uncheck.gif" border="0" align="absmiddle"></a>
+								<td class="td_text_center" width="5%"><%=i++ %></td>
+								<td class="td_text_center" width="10%"><%=o.getReceiptNo()%></td>
+								<td class="td_text_center" width="5%"><%=o.getReceiptDate()%></td>
+								<td class="td_text" width="25%"><%=o.getCustomerName()%></td>
+								<td class="td_text_center" width="5%">
+								<%
+								  if(o.getDocStatus().equalsIgnoreCase("VO")){
+									  out.print("ยกเลิก");
+								  }else{
+									  out.print("บันทึก"); 
+								  }
+								%>
+								<td class="td_text_center" width="5%">
+								   <%if(o.getExported().equalsIgnoreCase("Y")){ %>
+									   <img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+									<%} %>
 								</td>
-								<td align="center">
+								</td>
+								<td class="td_number" width="10%"><%=new DecimalFormat("#,##0.00").format(o.getReceiptAmount())%></td>
+								<td class="td_text_center" width="10%">
+								    <%if( !Utils.isNull(o.getDocStatus()).equalsIgnoreCase("VO")
+								    	&& !Utils.isNull(o.getExported()).equalsIgnoreCase("Y")) {%>
+									   <a href="javascript:cancelRR('<%=o.getId() %>');">
+									   <img src="${pageContext.request.contextPath}/icons/uncheck.gif" border="0" align="absmiddle"></a>
+								    <%} %>
+								</td>
+								<td  class="td_text_center" width="10%">
 									<a href="javascript:viewReceipt('<%=o.getId() %>');">
 									 <img src="${pageContext.request.contextPath}/icons/lookup.gif" border="0" align="absmiddle">
 									</a>

@@ -437,7 +437,7 @@ public class SAInitial {
         String profileName ="";
         int maxProfileId= 0;
 		try{
-			sql = "SELECT * from pensbi.c_user_profile where user_id ="+userId +" order by profile_id asc ";
+			sql = "SELECT * from pensbi.c_user_profile where user_id ="+userId +" and report_name ='SalesAnalyst' order by profile_id asc ";
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			while(rs.next()){

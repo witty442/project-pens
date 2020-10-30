@@ -1,17 +1,15 @@
-<%@page import="com.isecinc.pens.report.salesanalyst.DisplayBean"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="com.isecinc.pens.web.report.analyst.bean.DisplayBean"%>
+<%@page import="com.isecinc.pens.web.report.analyst.process.AInitial"%>
 <%@page import="java.util.List"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="java.sql.Connection"%>
 <%@page import="com.pens.util.*"%>
-<%@page import="com.isecinc.pens.report.salesanalyst.SAInitial"%>
 
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
-<%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
-<%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
-<%@taglib uri="http://displaytag.sf.net" prefix="display" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <jsp:useBean id="searchValuePopupForm" class="com.isecinc.pens.web.popup.SearchValuePopupForm" scope="session" />
@@ -26,33 +24,39 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js"></script>
-<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script> --%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 
 <%
  boolean isMultiSelect = false;
+ User user =(User)session.getAttribute("user");
  String load = Utils.isNull(request.getParameter("load"));
-
+ String reportName = Utils.isNull(request.getParameter("reportName"));
+ AInitial aInit = new AInitial().getAInit(request);	
+ 
  String currCondNo = Utils.isNull(request.getParameter("currCondNo"));
  String currCondTypeValue = Utils.isNull(request.getParameter("currCondTypeValue"));
- String currCondNameText = Utils.isNull((String)SAInitial.getInstance().GROUP_BY_MAP.get(request.getParameter("currCondTypeValue")));
+ String currCondNameText = Utils.isNull((String)aInit.GROUP_BY_MAP.get(request.getParameter("currCondTypeValue")));
  String searchType = Utils.isNull(request.getParameter("searchType"));
  String currentPage = Utils.isNull(request.getParameter("currentPage"));
+ 
+ System.out.println("reportName:"+reportName); 
+ System.out.println("currCondNo:"+currCondNo);
+ System.out.println("currCondTypeValue:"+currCondTypeValue);
+ System.out.println("currCondNameText:"+currCondNameText);
+ System.out.println("searchType:"+searchType);
+ System.out.println("currentPage:"+Utils.isNull(currentPage)); 
+ System.out.println("desc1:"+request.getParameter("salesBean.desc")); 
+ 
+ System.out.println("GROUP_BY_MAP:"+aInit.GROUP_BY_MAP.toString());
 
-/*  System.out.println("currCondNo:"+currCondNo);
-System.out.println("currCondTypeValue:"+currCondTypeValue);
-System.out.println("currCondNameText:"+currCondNameText);
-System.out.println("searchType:"+searchType);
-System.out.println("currentPage:"+Utils.isNull(currentPage)); 
-System.out.println("desc1:"+request.getParameter("salesBean.desc")); */
+ String code = session.getAttribute("code_session")!=null?(String)session.getAttribute("code_session"):"";
+ String desc = session.getAttribute("desc_session")!=null?(String)session.getAttribute("desc_session"):"";
 
-String code = session.getAttribute("code_session")!=null?(String)session.getAttribute("code_session"):"";
-String desc = session.getAttribute("desc_session")!=null?(String)session.getAttribute("desc_session"):"";
-
- if(SAInitial.MULTI_SELECTION_LIST.contains(currCondTypeValue)){
+ System.out.println("MultiSelectList:"+aInit.MULTI_SELECTION_LIST.toString());
+ if(aInit.MULTI_SELECTION_LIST.contains(currCondTypeValue)){
 	 isMultiSelect = true;
  } 
- //System.out.println("isMultiSelect:"+isMultiSelect);
+ System.out.println("isMultiSelect:"+isMultiSelect);
  
  pageContext.setAttribute("isMultiSelect", isMultiSelect, PageContext.PAGE_SCOPE);
  
@@ -98,7 +102,8 @@ function searchPopup(path, type) {
     document.searchValuePopupForm.submit();
    return true;
 }
-function gotoPage(path, currPage) {
+function gotoPage(currPage) {
+	var path  = '${pageContext.request.contextPath}';
 	document.searchValuePopupForm.action = path + "/jsp/searchValuePopupAction.do?do=search&currentPage="+currPage;
 	document.searchValuePopupForm.submit();
 }
@@ -362,21 +367,21 @@ function loadNav(){
 	var currCondNo = document.getElementById("currCondNo");
 	//alert(<%=condType1%>);
 	if(currCondNo.value =='1'){
-	    nav1.innerHTML = "<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue))%>";
+	    nav1.innerHTML = "<%=Utils.isNull((String)aInit.GROUP_BY_MAP.get(currCondTypeValue))%>";
 	}else if(currCondNo.value =='2'){
-		nav1.innerHTML = "<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
-		nav2.innerHTML = " >><%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue))%>";
+		nav1.innerHTML = "<%=Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
+		nav2.innerHTML = " >><%=Utils.isNull((String)aInit.GROUP_BY_MAP.get(currCondTypeValue))%>";
 		
 	}else if(currCondNo.value =='3'){
-		nav1.innerHTML= "<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
-		nav2.innerHTML= ">><%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType2))%>["+document.getElementById("condValueDisp2").value+"]";
-		nav3.innerHTML= ">><%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue))%>";
+		nav1.innerHTML= "<%=Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
+		nav2.innerHTML= ">><%=Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType2))%>["+document.getElementById("condValueDisp2").value+"]";
+		nav3.innerHTML= ">><%=Utils.isNull((String)aInit.GROUP_BY_MAP.get(currCondTypeValue))%>";
 	
 	}else if(currCondNo.value =='4'){
-		nav1.innerHTML = "<%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
-		nav2.innerHTML= " >><%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType2))%>["+document.getElementById("condValueDisp2").value+"]";
-		nav3.innerHTML= " >><%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(condType3))%>["+document.getElementById("condValueDisp3").value+"]";
-		nav4.innerHTML= " >><%=Utils.isNull((String)SAInitial.GROUP_BY_MAP.get(currCondTypeValue))%>";
+		nav1.innerHTML = "<%=Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType1))%>["+document.getElementById("condValueDisp1").value+"]";
+		nav2.innerHTML= " >><%=Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType2))%>["+document.getElementById("condValueDisp2").value+"]";
+		nav3.innerHTML= " >><%=Utils.isNull((String)aInit.GROUP_BY_MAP.get(condType3))%>["+document.getElementById("condValueDisp3").value+"]";
+		nav4.innerHTML= " >><%=Utils.isNull((String)aInit.GROUP_BY_MAP.get(currCondTypeValue))%>";
 	}
 }
 
@@ -424,19 +429,19 @@ function loadDataFromMain(){
 <input type="hidden" name="codes" size="50" value ="<%=codes%>" />
 <input type="hidden" name="keys" size="50" value ="<%=keys%>" />
 <input type="hidden" name="descs" size="50" value ="<%=descs%>" />
-
 <input type="hidden" name="currentPage" size="50" value ="<%=currentPage%>" />
+<input type="hidden" name="reportName" value ="<%=reportName%>" />
 
-<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%"  class="tableHead">
-      
+<table align="center" border="0" cellpadding="1" cellspacing="2"  width="100%"  class="tableHead">
 	 <tr>
 		<th class="headTitle" colspan="2" align="center">ค้นหาข้อมูล :<%=currCondNameText %></th>
 	</tr>
 	<tr >
 		<td class="headSubTitle" colspan="2" align="left" height="40px">
-		   <span id="nav1" class="headSubTitle" ></span><span id="nav2"class="headSubTitle" >
-		   </span><span id="nav3" class="headSubTitle" ></span><span id="nav4" class="headSubTitle" ></span>
-		
+		   <span id="nav1" class="headSubTitle" ></span>
+		   <span id="nav2"class="headSubTitle" ></span>
+		   <span id="nav3" class="headSubTitle" ></span>
+		   <span id="nav4" class="headSubTitle" ></span>
 		</td>
 	</tr>
 	<%-- <tr height="21px">
@@ -445,7 +450,7 @@ function loadDataFromMain(){
 	<tr height="21px">
 		<td width="15%" align="right"><b>รหัส&nbsp;</b></td>
 		<td width="90%" align="left">
-		<html:text property="salesBean.code"  size="30" style="height:20px" styleClass="\" autoComplete=\"off" />
+		<html:text property="salesBean.code"  size="35" style="height:20px" styleClass="\" autoComplete=\"off" />
 		</td>
 	</tr>
 	<tr height="21px">
@@ -455,10 +460,10 @@ function loadDataFromMain(){
 		</td>
 	</tr>
 </table>
-
+<br/>
 <table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" bgcolor="#F1F1F1">
 	<tr>
-		<td align="left">
+		<td align="center">
 			<input type="button" name="ok" value=" OK " class="newPosBtnLong"  onclick="selectData()" style="width:80px;"/>
 			<input type="button" name="close" value="Close" class="newPosBtnLong"  onclick="javascript:window.close();" style="width:80px;"/>
 		</td>
@@ -467,9 +472,7 @@ function loadDataFromMain(){
 <div align="center">
  <b><font color="red" size="1"><%=Utils.isNull(request.getAttribute("Message")) %></font></b>
 </div>
-<!-- RESULT -->
-<%-- <display:table style="width:100%;" id="item" name="sessionScope.VALUE_LIST"  defaultsort="0" defaultorder="descending" requestURI="#" sort="list" pagesize="20" class="resultDisp">	
- --%>   
+ 
 <%if(session.getAttribute("VALUE_LIST") != null){
 	
 	  List<DisplayBean> valueList = (List<DisplayBean> )session.getAttribute("VALUE_LIST");
@@ -480,7 +483,7 @@ function loadDataFromMain(){
 	  int startRec = 0;
 	  int endRec = 0;
 	  int no = 0;
-	  
+	  boolean mobile = false;
 	  if(valueList != null && valueList.size() >0){
 			//calc Paging from List
 			System.out.println("currentPage:"+Utils.isNull(request.getParameter("currentPage")));
@@ -502,21 +505,9 @@ function loadDataFromMain(){
 		    System.out.println("startRec:"+startRec+" ,endRec:"+endRec);
 		}//if
 	%>
-	<div align="left">
-	   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=(startRec+1) %> ถึง  <%=endRec %>.</span>
-	   <span class="pagelinks">
-		หน้าที่ 
-		    <% 
-			 for(int r=0;r<totalPage;r++){
-				 if(currPage ==(r+1)){
-			 %>
-			   <strong><%=(r+1) %></strong>
-			 <%}else{ %>
-			    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-			       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-		 <% }} %>				
-		</span>
-	</div>
+
+	<%=PageingGenerate.genPageing(user, totalPage, totalRecord, currPage, startRec, endRec, no) %>
+	
 	<table id="tblProduct" align="center" border="1" cellpadding="3" cellspacing="1" class="tableSearch">
 	       <tr>
 	            <th>Selected</th>

@@ -49,6 +49,10 @@ if(printerByUserDefaultIsOnline && !"printSuccess".equals(printCopy)){
  
  //close auto
  setTimeout(function(){window.close();},10000);
+ 
+ var fiveMinutes = 30 ;
+ display = document.querySelector('#time');
+ startTimer(fiveMinutes, display);
 }
 
 //printCopy
@@ -63,6 +67,22 @@ function printReportCopy(){
      document.tempForm.action = path + "/jsp/payYellowAction.do?do=printReport"+param;
      document.tempForm.submit();
 } 
+function startTimer(duration, display) {
+    var timer = duration, minutes, seconds;
+    setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            timer = duration;
+        }
+    }, 1000);
+}
 </script>
 </head>
 <body onload="loadMe('${pageContext.request.contextPath}');" topmargin="0" bottommargin="0" leftmargin="100" rightmargin="150" class="popbody">
@@ -103,6 +123,14 @@ function printReportCopy(){
 				</a>
 			</td>
 		</tr>
+		<tr>
+			<td align="center">
+				 <div><font size="3" color="red">
+				     กำลังจะปิดหน้าจอนี้... <span id="time">1</span> นาที!
+				 </font> 
+				 </div>
+			</td>
+		</tr>
 	</table>
 <%}else{ %>
 	<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
@@ -119,6 +147,14 @@ function printReportCopy(){
 			 	<a href="#" onclick="window.close();">
 				<input type="button" value="ปิดหน้าจอนี้" class="newBtn">
 				</a> 
+			</td>
+		</tr>
+		<tr>
+			<td align="center">
+				 <div><font size="3" color="red">
+				     กำลังจะปิดหน้าจอนี้... <span id="time">30</span> วินาที!
+				 </font> 
+				 </div>
 			</td>
 		</tr>
 	</table>

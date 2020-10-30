@@ -13,8 +13,10 @@ Product Popup for Sales Order
 <%
 List<References> payment= InitialReferences.getReferenes().get(InitialReferences.PAYMENT_METHOD);
 List<References> banks= InitialReferences.getReferenes().get(InitialReferences.BANK);
-List<References> transferBanks= InitialReferences.getReferenes().get(InitialReferences.TRANSFER_BANK);
 
+//List<References> transferBanks= InitialReferences.getReferenes().get(InitialReferences.TRANSFER_BANK);
+List<References> transferBanks= InitialReferences.getReferenesByManual(InitialReferences.TRANSFER_BANK, "");
+	
 String seed = String.valueOf(Calendar.getInstance().getTimeInMillis());
 pageContext.setAttribute("seed",seed,PageContext.PAGE_SCOPE);
 

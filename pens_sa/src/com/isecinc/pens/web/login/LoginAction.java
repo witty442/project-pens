@@ -48,6 +48,8 @@ public class LoginAction extends DispatchAction {
 		Connection conn = null;
 		LoginForm loginForm = null;
 		String forwordStr = "pass_user";
+		String mobile = Utils.isNull(request.getParameter("mobile"));
+		boolean user2Role =false;
 		//String forwordStr = "pass_salestarget";
 		try {
 			logger.debug("Locale:"+Locale.getDefault());
@@ -59,17 +61,19 @@ public class LoginAction extends DispatchAction {
 			User user = null;
 			conn = DBConnection.getInstance().getConnection();
 			user = new LoginProcess().login(loginForm.getUserName(), loginForm.getPassword(), conn);
+			
 			//Case Van Login dummy
-			if(user ==null && loginForm.getUserName().toLowerCase().startsWith("v")){
+			if(user ==null && loginForm.getUserName().startsWith("V")){
 				user = loginDummyVan(loginForm.getUserName(), loginForm.getPassword());
 			 
 			//Case user creditSale not found in c_user_info login by dummy
-			}else if(user ==null && loginForm.getUserName().toLowerCase().startsWith("s")){
+			}else if(user ==null && loginForm.getUserName().startsWith("S")){
 				user = loginDummyCredit(loginForm.getUserName(), loginForm.getPassword());
 			}
+           
             
 			if (user == null) {
-				request.setAttribute("errormsg", "ไม่พบชื่อผู้ใช้งาน");
+				request.setAttribute("errormsg", "ไม่พบชื่อผู้ใช้งาน หรือ รหัสผ่านไม่ถูกต้อง");
 				return mapping.findForward("fail");
 			}else{
 				logger.debug("User Group:"+user.getUserGroupId());
@@ -88,6 +92,9 @@ public class LoginAction extends DispatchAction {
 			
 			request.getSession(true).setAttribute("screenWidth", ""+(Double.parseDouble(screenWidth)-100));
 			
+			//set mobile device
+			user.setMobile("true".equalsIgnoreCase(mobile)?true:false);
+			
 			request.getSession(true).setAttribute("user", user);
 			request.getSession().setAttribute("User", user.getUserName());//Show in Session tomcat
 			
@@ -95,6 +102,17 @@ public class LoginAction extends DispatchAction {
 			if( !UserUtils.userInRole("ROLE_SA",user, new String[]{User.ADMIN,User.SA})){
 				forwordStr = "pass_salestarget";
 			}
+			
+			logger.debug("UserRoleCount:"+UserUtils.userIsMultiRoleCount(user));
+			
+			/** check User is more 1 Role **/
+			if( !user.getUserName().equalsIgnoreCase("admin") 
+					&& UserUtils.userIsMultiRoleCount(user) ==1
+					&& UserUtils.userInRole("ROLE_MC",user, new String[]{User.MC_ENTRY})){
+				forwordStr = "true".equalsIgnoreCase(mobile)?"pass_mcentryMobile": "pass_mcentry";
+			}
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
@@ -153,19 +171,22 @@ public class LoginAction extends DispatchAction {
 			User user = new User();
 			user.setUserName(userName);
 			user.setPassword(password);
-			if(userName.startsWith("S")){
-			   user.setUserGroupName("Credit Sales");
+			if(userName.startsWith("S") || userName.startsWith("V")){
+				if(userName.startsWith("S")){
+				   user.setUserGroupName("Credit Sales");
+				}else if(userName.startsWith("V")){
+				   user.setUserGroupName("Van Sales");
+				}
+				SalesrepBean salesrepBean =  SalesrepDAO.getSalesrepBeanByCode(user.getUserName());
+				if(salesrepBean != null){
+					user.setName(user.getUserName() +" "+salesrepBean.getSalesrepFullName());
+					user.setId(Utils.convertStrToInt(salesrepBean.getSalesrepId()));
+					user.setCode(salesrepBean.getCode());
+					user.setSalesrepFullName(salesrepBean.getSalesrepFullName());
+				}
 			}else{
-			   user.setUserGroupName("Van Sales");
+				user = null;
 			}
-			SalesrepBean salesrepBean =  SalesrepDAO.getSalesrepBeanByCode(user.getUserName());
-			if(salesrepBean != null){
-				user.setName(user.getUserName() +" "+salesrepBean.getSalesrepFullName());
-				user.setId(Utils.convertStrToInt(salesrepBean.getSalesrepId()));
-				user.setCode(salesrepBean.getCode());
-				user.setSalesrepFullName(salesrepBean.getSalesrepFullName());
-			}
-			
 			request.getSession(true).setAttribute("user", user);
 			request.getSession(true).setAttribute("username", user.getUserName());
 			
