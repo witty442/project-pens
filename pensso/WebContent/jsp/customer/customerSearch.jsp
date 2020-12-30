@@ -1,6 +1,4 @@
-
 <%@page import="com.pens.util.PageingGenerate"%>
-<%@page import="com.isecinc.pens.ApplicationVersion"%>
 <%@page import="com.pens.util.*"%>
 <%@page import="com.isecinc.pens.bean.Customer"%>
 <%@page import="java.util.Iterator"%>
@@ -16,7 +14,8 @@
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-
+<%@page import="com.isecinc.pens.bean.Province"%>
+<%@page import="com.isecinc.pens.model.MProvince"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -59,11 +58,8 @@ if(custShowTrip != null && custShowTrip.size() >0){
       //customerForm.getCustomer().setDispHaveTrip("true");
    }
 }
-
-
 %>
-<%@page import="com.isecinc.pens.bean.Province"%>
-<%@page import="com.isecinc.pens.model.MProvince"%><html>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
@@ -135,32 +131,6 @@ function loadDistrict(){
 	});
 }
 
-<%if("true".equalsIgnoreCase(request.getParameter("showMsg"))){ %>
-
-/* $(function() {
-	$("#dialog").dialog({ height: 300,width:600,modal:false });
-  });
- 
- function close(){
-	 $("#dialog").dialog('close');
- }
- 
- function linkToInterfaces(path){
-	window.location = path+"/jsp/interfaces/interfaces.jsp";
- }
- 
- setTimeout(function(){ $("#dialog").dialog('close');},9000); */
- 
- <%}else{%>
- 
- <%}%>
-/*  function gotoPage(path,page){
-		document.customerForm.action = path + "/jsp/customerAction.do?do=searchPage&rf=Y";
-		document.getElementsByName('curPage')[0].value = page;
-		document.customerForm.submit();
-		return true;
-	} */
-	
 function search(path){
 	document.customerForm.action = path + "/jsp/customerAction.do?do=search&action=newsearch&rf=Y";
 	document.customerForm.submit();
@@ -199,10 +169,10 @@ function search(path){
 	 PopupCenter(path+"/jsp/location/markLocationMap.jsp?", "Mark location map",width,height); 
 }
  function exportToExcel(path){
-		document.customerForm.action = path + "/jsp/customerAction.do?do=exportToExcel";
-		document.customerForm.submit();
-		return true;
-	}
+	document.customerForm.action = path + "/jsp/customerAction.do?do=exportToExcel";
+	document.customerForm.submit();
+	return true;
+}
 </script>
 
 </head>
@@ -244,7 +214,8 @@ function search(path){
 						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body" width="100%">
 						<tr>
 							<td colspan="3" align="left">
-								<%if(role.equalsIgnoreCase(User.VAN)){ %>
+								<%if(role.equalsIgnoreCase(User.VAN)
+								 || role.equalsIgnoreCase(User.NIS)){ %>
 								  <a href="#" onclick="prepare('${pageContext.request.contextPath}','add')">
 								  <img border=0 src="${pageContext.request.contextPath}/icons/user_add.gif" align="absmiddle">
 								  &nbsp;<bean:message key="CreateNewRecord" bundle="sysprop"/></a>

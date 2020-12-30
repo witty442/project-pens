@@ -44,7 +44,7 @@ import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptHelper;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.process.SequenceProcess;
-import com.pens.utils.LoggerUtils;
+import com.pens.util.LoggerUtils;
 
 /**
  * @author WITTY

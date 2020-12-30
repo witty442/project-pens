@@ -196,7 +196,7 @@ function removeUnSelected(codeCheck){
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;">
        
-		   <h1 class="h3 mb-3 font-weight-normal">PENS Application
+		   <h1 class="h3 mb-3 font-weight-normal"><b>SALES ANALYSIS SYSTEM</b>
 		    &nbsp;&nbsp;&nbsp;
 		    <a href="${pageContext.request.contextPath}/?logoff=T" onmouseout="MM_swapImgRestore()" 
         	  onmouseover="MM_swapImage('Image14','','${pageContext.request.contextPath}/images2/button_logout2.png',1)">

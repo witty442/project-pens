@@ -51,6 +51,7 @@ import com.isecinc.pens.web.batchtask.BatchTaskListBean;
 import com.isecinc.pens.web.batchtask.subtask.GenStockOnhandRepTempBigCSubTask;
 import com.isecinc.pens.web.batchtask.subtask.GenStockOnhandRepTempLotusSubTask;
 import com.isecinc.pens.web.reportall.ReportAllBean;
+import com.isecinc.pens.web.reportall.ReportAllSpecialUtils;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
@@ -245,7 +246,10 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 			cri.setPensCustCodeFrom(storeCode);
 			sql = genSQLOnhandEndDateLotus(conn,cri);
 			
-			logger.debug("sql:"+sql.toString());
+			//logger.debug("sql:"+sql.toString());
+			if(logger.isDebugEnabled()){
+				FileUtil.writeFile("d://dev_temp//temp//sql.sql", sql.toString(), "TIS-620");
+			}
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
 			while(rst.next()){
@@ -329,17 +333,17 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 					sql.append("\n (select M.pens_desc from PENSBME_MST_REFERENCE M WHERE " +
 							"       M.pens_value = C.customer_code AND M.reference_code ='Store') as customer_desc, ");
 					sql.append("\n MP.MATERIAL_MASTER as group_type  ");
-					sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
-					sql.append("\n ,PENSBME_STYLE_MAPPING MP ");
+					sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
+					sql.append("\n ,PENSBI.PENSBME_STYLE_MAPPING MP ");
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 					sql.append("\n AND V.customer_id = C.customer_id  ");
 					sql.append("\n AND P.inventory_item_code = MP.pens_item");
 					sql.append("\n AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					
 					//Lotus Only 020047
 					sql.append("\n AND C.customer_code LIKE '020047-%'");
@@ -364,8 +368,8 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 					sql.append("\n (select M.pens_desc from PENSBME_MST_REFERENCE M WHERE " +
 							"       M.pens_value = J.store_code AND M.reference_code ='Store') as customer_desc, ");
 					sql.append("\n I.group_code as group_type ");
-					sql.append("\n FROM PENSBME_PICK_JOB J   ");
-					sql.append("\n ,PENSBME_PICK_BARCODE B ,PENSBME_PICK_BARCODE_ITEM I  ");
+					sql.append("\n FROM PENSBI.PENSBME_PICK_JOB J   ");
+					sql.append("\n ,PENSBI.PENSBME_PICK_BARCODE B ,PENSBI.PENSBME_PICK_BARCODE_ITEM I  ");
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND J.job_id = B.job_id  ");
 					sql.append("\n AND B.job_id = I.job_id ");
@@ -393,10 +397,10 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 					
                   sql.append("\n SELECT distinct ");
   				  sql.append("\n  L.PENS_CUST_CODE as customer_code,L.PENS_ITEM ");
-  				  sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
+  				  sql.append("\n ,(select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE ");
 			      sql.append("\n   M.pens_value = L.PENS_CUST_CODE AND M.reference_code ='Store') as customer_desc ");
 				  sql.append("\n ,L.PENS_GROUP_TYPE as group_type ");
-				  sql.append("\n  FROM PENSBME_SALES_FROM_LOTUS L ");
+				  sql.append("\n  FROM PENSBI.PENSBME_SALES_FROM_LOTUS L ");
 				  sql.append("\n WHERE 1=1 ");
 				  if( !Utils.isNull(c.getSalesDate()).equals("")){
                     sql.append("\n AND L.sales_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -419,7 +423,7 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 					sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
     				sql.append("\n   M.pens_value = L.store_code AND M.reference_code ='Store') as customer_desc ");
 					sql.append("\n ,L.item_issue_desc as group_type");
-					sql.append("\n FROM PENSBME_ADJUST_INVENTORY L WHERE 1=1 " );
+					sql.append("\n FROM PENSBI.PENSBME_ADJUST_INVENTORY L WHERE 1=1 " );
 					// L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
 					if( !Utils.isNull(c.getSalesDate()).equals("")){
 		                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -441,10 +445,10 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 					
 					/** Adjust receipt **/
 					sql.append("\n SELECT DISTINCT L.store_code as customer_code,L.item_receipt as pens_item ");
-					sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
+					sql.append("\n ,(select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE ");
     				sql.append("\n   M.pens_value = L.store_code AND M.reference_code ='Store') as customer_desc ");
 					sql.append("\n ,L.item_receipt_desc as group_type");
-					sql.append("\n FROM PENSBME_ADJUST_INVENTORY L WHERE 1=1 " );
+					sql.append("\n FROM PENSBI.PENSBME_ADJUST_INVENTORY L WHERE 1=1 " );
 					// L.status ='"+AdjustStockDAO.STATUS_INTERFACED+"'");	 
 					if( !Utils.isNull(c.getSalesDate()).equals("")){
 		                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
@@ -467,10 +471,10 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 					/** Adjust **/
 					sql.append("\n SELECT DISTINCT ");
 					sql.append("\n  L.STORE_CODE as customer_code,L.item_adjust as pens_item ");
-					sql.append("\n ,(select M.pens_desc from PENSBME_MST_REFERENCE M WHERE ");
+					sql.append("\n ,(select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE ");
     				sql.append("\n   M.pens_value = L.store_code AND M.reference_code ='Store') as customer_desc ");
 					sql.append("\n ,L.item_adjust_desc as group_type ");
-					sql.append("\n FROM PENSBME_ADJUST_SALES L  WHERE 1=1 ");	 
+					sql.append("\n FROM PENSBI.PENSBME_ADJUST_SALES L  WHERE 1=1 ");	 
 					if( !Utils.isNull(c.getSalesDate()).equals("")){
 		                sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
 					}
@@ -517,18 +521,21 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 					sql.append("\n SELECT  ");
 					sql.append("\n C.customer_code ,P.inventory_item_code as pens_item,  ");
 					sql.append("\n MP.MATERIAL_MASTER as group_type, ");
-					sql.append("\n NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
-					sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
-					sql.append("\n ,PENSBME_STYLE_MAPPING MP ");
+					
+					/** special case (product) Sum Qty (convert CTN(SA) to EA(BME) )**/
+					sql.append(ReportAllSpecialUtils.genSQLSumSpecialProduct("V.INVOICED_QTY","SALE_IN_QTY"));
+					
+					sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
+					sql.append("\n ,PENSBI.PENSBME_STYLE_MAPPING MP ");
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 					sql.append("\n AND V.customer_id = C.customer_id  ");
 					sql.append("\n AND P.inventory_item_code = MP.pens_item");
 					sql.append("\n AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					
 					//Lotus Only 020047
 					sql.append("\n AND C.customer_code LIKE '020047%'");
@@ -564,18 +571,21 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 						sql.append("\n SELECT  ");
 						sql.append("\n C.customer_code,P.inventory_item_code as pens_item,  ");
 						sql.append("\n MP.MATERIAL_MASTER as group_type, ");
-						sql.append("\n NVL(SUM(RETURNED_QTY),0)  as SALE_RETURN_QTY ");
-						sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-						sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-						sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
-						sql.append("\n ,PENSBME_STYLE_MAPPING MP ");
+						
+						/** special case (product) Sum Qty (convert CTN(SA) to EA(BME) )**/
+						sql.append(ReportAllSpecialUtils.genSQLSumSpecialProduct("V.RETURNED_QTY","SALE_RETURN_QTY"));
+						
+						sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
+						sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+						sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
+						sql.append("\n ,PENSBI.PENSBME_STYLE_MAPPING MP ");
 						sql.append("\n WHERE 1=1   ");
 						sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 						sql.append("\n AND V.customer_id = C.customer_id  ");
 						sql.append("\n AND P.inventory_item_code = MP.pens_item");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						//NOT IN pensbme_group_unuse_lotus
 						sql.append("\n AND MP.MATERIAL_MASTER NOT IN(select group_code from pensbme_group_unuse_lotus)");
 						//Lotus Only 020047
@@ -603,18 +613,21 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 			        	sql.append("\n SELECT  ");
 						sql.append("\n C.customer_code,P.inventory_item_code as pens_item,  ");
 						sql.append("\n MP.MATERIAL_MASTER as group_type, ");
-						sql.append("\n NVL(SUM(RETURNED_QTY),0)  as SALE_RETURN_QTY ");
-						sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-						sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-						sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
-						sql.append("\n ,PENSBME_STYLE_MAPPING MP ");
+						
+						/** special case (product) Sum Qty (convert CTN(SA) to EA(BME) )**/
+						sql.append(ReportAllSpecialUtils.genSQLSumSpecialProduct("V.RETURNED_QTY","SALE_RETURN_QTY"));
+						
+						sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
+						sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+						sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
+						sql.append("\n ,PENSBI.PENSBME_STYLE_MAPPING MP ");
 						sql.append("\n WHERE 1=1   ");
 						sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 						sql.append("\n AND V.customer_id = C.customer_id  ");
 						sql.append("\n AND P.inventory_item_code = MP.pens_item");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						//Lotus Only 020047
 						sql.append("\n AND C.customer_code LIKE '020047%'");
 						
@@ -640,8 +653,8 @@ public class GenStockEndDateLotusTask extends BatchTask implements BatchTaskInte
 						sql.append("\n J.store_code as customer_code,I.pens_item,  ");
 						sql.append("\n I.group_code as group_type, ");
 						sql.append("\n COUNT(*) as SALE_RETURN_QTY ");
-						sql.append("\n FROM PENSBME_PICK_JOB J   ");
-						sql.append("\n ,PENSBME_PICK_BARCODE B ,PENSBME_PICK_BARCODE_ITEM I  ");
+						sql.append("\n FROM PENSBI.PENSBME_PICK_JOB J   ");
+						sql.append("\n ,PENSBI.PENSBME_PICK_BARCODE B ,PENSBI.PENSBME_PICK_BARCODE_ITEM I  ");
 						sql.append("\n WHERE 1=1   ");
 						sql.append("\n AND J.job_id = B.job_id  ");
 						sql.append("\n AND B.job_id = I.job_id ");

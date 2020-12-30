@@ -42,6 +42,7 @@ public class InitialReferences extends I_Initial {
 	public static final String ROLE_TT = "RoleTT";
 	public static final String ROLE_VAN = "RoleVAN";
 	public static final String ROLE_DD = "RoleDD";
+	public static final String ROLE_NISSIN = "RoleNissin";
 	public static final String ACTIVE = "Active";
 	public static final String ALERT_PERIOD = "AlertPeriod";
 	public static final String QTY_DELIVER = "QtyDeliver";

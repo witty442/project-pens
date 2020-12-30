@@ -150,7 +150,7 @@ public class ReportSizeColorBigC_SQL {
 					sql.append("\n AND P.inventory_item_code = MI.pens_item  ");
 					sql.append("\n AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					sql.append("\n AND M.CUSTOMER_CODE LIKE '"+storeCode+"%'");
 					if(initDate != null){
 						 sql.append("\n AND V.invoice_date >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");

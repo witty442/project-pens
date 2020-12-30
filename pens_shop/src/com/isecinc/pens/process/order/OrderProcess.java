@@ -760,7 +760,8 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 				line.setTotalAmount(chkLine.getTotalAmount());
 				line.setPriceAfDiscount(chkLine.getPriceAfDiscount());
 				
-				if (chkLine.getProduct().getUom().getId().equals(chkLine.getUom().getId())) {
+				//set uom1 all time don't use uom2 
+				//if (chkLine.getProduct().getUom().getId().equals(chkLine.getUom().getId())) {
 					line.setVatAmount1(chkLine.getVatAmount());
 					line.setUom1(chkLine.getUom());
 					chkLine.setUom1(chkLine.getUom());
@@ -769,7 +770,7 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 					line.setLineAmount1(line.getLineAmount1() + chkLine.getLineAmount());
 					line.setDiscount1(line.getDiscount1() + chkLine.getDiscount());
 					line.setTotalAmount1(line.getTotalAmount1() + chkLine.getTotalAmount());
-				} else {
+				/*} else {
 					line.setVatAmount2(chkLine.getVatAmount());
 					line.setUom2(chkLine.getUom());
 					chkLine.setUom2(chkLine.getUom());
@@ -778,12 +779,12 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 					line.setLineAmount2(line.getLineAmount2() + chkLine.getLineAmount());
 					line.setDiscount2(line.getDiscount2() + chkLine.getDiscount());
 					line.setTotalAmount2(line.getTotalAmount2() + chkLine.getTotalAmount());
-				}
+				}*/
 				if (chkLine.getFullUom() == null) {
 					if (chkLine.getProduct().getUom().getId().equals(chkLine.getUom().getId())){
 						line.setFullUom(ConvertNullUtil.convertToString(chkLine.getUom().getCode() + "/"));
 					}else{
-						line.setFullUom(ConvertNullUtil.convertToString("/" + chkLine.getUom().getCode()));
+						//line.setFullUom(ConvertNullUtil.convertToString("/" + chkLine.getUom().getCode()));
 					}
 				} else {
 					line.setFullUom(chkLine.getFullUom());
@@ -909,7 +910,8 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 					line.setTotalAmount(chkLine.getTotalAmount());
 					line.setPriceAfDiscount(chkLine.getPriceAfDiscount());
 					
-					if (chkLine.getProduct().getUom().getId().equals(chkLine.getUom().getId())) {
+					//set uom1 all time don't use uom2 
+					//if (chkLine.getProduct().getUom().getId().equals(chkLine.getUom().getId())) {
 						line.setVatAmount1(chkLine.getVatAmount());
 						line.setUom1(chkLine.getUom());
 						chkLine.setUom1(chkLine.getUom());
@@ -918,7 +920,7 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 						line.setLineAmount1(line.getLineAmount1() + chkLine.getLineAmount());
 						line.setDiscount1(line.getDiscount1() + chkLine.getDiscount());
 						line.setTotalAmount1(line.getTotalAmount1() + chkLine.getTotalAmount());
-					} else {
+				/*	} else {
 						line.setVatAmount2(chkLine.getVatAmount());
 						line.setUom2(chkLine.getUom());
 						chkLine.setUom2(chkLine.getUom());
@@ -927,10 +929,10 @@ public List<OrderLine> fillLinesShowPromotion(List<OrderLine> lines) throws Exce
 						line.setLineAmount2(line.getLineAmount2() + chkLine.getLineAmount());
 						line.setDiscount2(line.getDiscount2() + chkLine.getDiscount());
 						line.setTotalAmount2(line.getTotalAmount2() + chkLine.getTotalAmount());
-					}
+					} */
 					if (chkLine.getFullUom() == null) {
-						line.setFullUom(ConvertNullUtil.convertToString(chkLine.getUom1().getCode()) + "/"
-								+ ConvertNullUtil.convertToString(chkLine.getUom2().getCode()));
+						line.setFullUom(ConvertNullUtil.convertToString(chkLine.getUom1().getCode()) + "/");
+								//+ ConvertNullUtil.convertToString(chkLine.getUom2().getCode()));
 					} else {
 						line.setFullUom(chkLine.getFullUom());
 					}

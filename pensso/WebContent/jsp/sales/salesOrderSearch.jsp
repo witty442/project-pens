@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.Utils"%>
 <%@page import="com.pens.util.SessionUtils"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.isecinc.pens.model.MDistrict"%>
@@ -67,8 +68,10 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SIdUtils.getInstance().getIdSession() %>"></script>
+
 <script type="text/javascript">
 	function loadMe() {
 		new Epoch('epoch_popup', 'th', document.getElementById('orderDateFrom'));
@@ -82,6 +85,8 @@ body {
 		<%if( !"".equals(orderForm.getOrder().getDistrict())){ %>
 		  document.getElementsByName('order.district')[0].value = <%=orderForm.getOrder().getDistrict()%>;
 		<% } %>
+		
+		sumTotalNetAmount();
 	}
 	function loadProvince(){
 		var cboProvince = document.getElementsByName('order.searchProvince')[0];
@@ -111,6 +116,19 @@ body {
 				}
 			}).responseText;
 		});
+	}
+	function sumTotalNetAmount(){
+		var tempNetAmount = document.getElementsByName("tempNetAmount");
+		var docStatusItem = document.getElementsByName("docStatusItem");
+		var totalTempNetAmount = 0;
+		if(tempNetAmount.length >0){
+			for(var i=0;i<tempNetAmount.length;i++){
+				if(docStatusItem[i].value !='CANCEL'){
+				   totalTempNetAmount +=convetTxtObjToFloat(tempNetAmount[i]);
+				}
+			}
+			document.getElementById("totalTempNetAmount").innerHTML =addCommas(Number(toFixed(totalTempNetAmount,2)).toFixed(2)); 
+		}
 	}
 </script>
 </head>
@@ -277,11 +295,16 @@ body {
 									<td align="center" width="7%">${results.orderNo}</td>
 									<td align="center" width="7%">${results.orderDate}</td>
 									<td align="right" width="7%"><fmt:formatNumber pattern="#,#00.00"
-										value="${results.netAmount}"></fmt:formatNumber></td>
+										value="${results.netAmount}"></fmt:formatNumber>
+										<input type="hidden" name="tempNetAmount" value="${results.netAmount}"/>
+										</td>
 									<td align="center" width="5%">${results.customerCode}</td>
 									<td align="left" width="15%">${results.customerName}</td>
 									<td align="left" width="30%">${results.addressSummary}</td>
-									<td align="center" width="8%">${results.docStatusLabel}</td>
+									<td align="center" width="8%">
+									${results.docStatusLabel}
+									<input type="hidden" name="docStatusItem" value="${results.docStatus}"/>
+									</td>
 									<td align="center" width="8%">${results.pickingNo}</td>
 									<td align="center" width="8%">
 									<%if( !userName.equalsIgnoreCase("ADMIN")){ %>
@@ -329,8 +352,13 @@ body {
 								</tr>
 							</c:forEach>
 								<tr>
-									<td align="left" class="footer" colspan="13">&nbsp;</td>
+									<td align="right" colspan="3"><b>Total</b></td>
+									<td align="right" ><b><span id="totalTempNetAmount"></span></b></td>
+									<td align="left" colspan="9">&nbsp;</td>
 								</tr>
+							<!-- 	<tr>
+									<td align="left" class="footer" colspan="13">&nbsp;</td>
+								</tr> -->
 							</table>
 						</c:if>
 						<br>
@@ -346,6 +374,7 @@ body {
 						<html:hidden property="order.roundTrip"/>
 						<html:hidden property="order.priceListId"/>
 						<html:hidden property="order.orderType" value="<%=role %>" />
+						<input type="hidden" name="fromPage" id="fromPage" value ="<%=Utils.isNull(request.getParameter("fromPage"))%>"/>
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>
 					</html:form> 
 					<!-- BODY -->

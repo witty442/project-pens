@@ -118,6 +118,13 @@ public class ProductCatalog implements Comparable{
 	}
 
 	public String getUom1() {
+		try {
+		   return new String(this.uom1.getBytes("ISO8859-1"), "TIS-620");
+		} catch (Exception ex) {
+			return "";
+		}
+	}
+	public String getUom1Display() {
 		return uom1;
 	}
 
@@ -126,9 +133,16 @@ public class ProductCatalog implements Comparable{
 	}
 
 	public String getUom2() {
+		try {
+		    return new String(this.uom2.getBytes("ISO8859-1"), "TIS-620");
+		} catch (Exception ex) {
+			return "";
+		}
+	}
+	public String getUom2Display() {
 		return uom2;
 	}
-
+	
 	public void setUom2(String uom2) {
 		this.uom2 = uom2;
 	}

@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.Types;
 
 import com.isecinc.pens.inf.helper.DBConnection;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 public class Test {
 
@@ -18,7 +18,7 @@ public class Test {
 		try{
 		   //testCallProc();
 			
-			System.out.println(NumberToolsUtil.round(new Double(".99"), 2, BigDecimal.ROUND_HALF_UP));
+			System.out.println(NumberUtil.round(new Double(".99"), 2, BigDecimal.ROUND_HALF_UP));
 			
 		}catch(Exception e){
 			e.printStackTrace();

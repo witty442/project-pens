@@ -69,8 +69,11 @@ pageContext.setAttribute("shipAddr",shipAddr,PageContext.PAGE_SCOPE);
 List<References> vatcodes = InitialReferences.getReferenes().get(InitialReferences.VAT_CODE);
 pageContext.setAttribute("vatcodes",vatcodes,PageContext.PAGE_SCOPE);
 
+List<References> docstatusAll = new ArrayList<References>();
+docstatusAll.add(new References("","",""));
 List<References> docstatus= InitialReferences.getReferenes().get(InitialReferences.DOC_STATUS);
-pageContext.setAttribute("docstatus",docstatus,PageContext.PAGE_SCOPE);
+docstatusAll.addAll(docstatus);
+pageContext.setAttribute("docstatus",docstatusAll,PageContext.PAGE_SCOPE);
 
 List<References> paymentTerm = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_TERM);
 pageContext.setAttribute("paymentTerm",paymentTerm,PageContext.PAGE_SCOPE);
@@ -102,7 +105,6 @@ System.out.println("debugMode:"+debugMode);
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
 <!-- Calendar -->
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/tablesorter.css" />
@@ -134,9 +136,12 @@ table#productList tbody td.number{text-align:right;}
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/lock-scroll.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+
+<!-- OLD Jquery -->
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
-
+<link type="text/css" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" rel="stylesheet" />
+ 
 <script type="text/javascript">
 //clear cach
 $.ajaxSetup({cache: false});
@@ -148,7 +153,7 @@ function openProductCategory(){
 	  //lockscreen
 	  lockScreen();
 	  
-	   $(document).ready(function() {
+	  $(document).ready(function() {
 		 // event.preventDefault();
 	     $("#brand-dialog").dialog("open");	    
 	  }); 
@@ -222,7 +227,11 @@ function loadProductsByBrand(subBrandCode){
 
 function loadMe(){
 	calculatePrice();	
-	//new Epoch('epoch_popup','th',document.getElementById('orderDate'));
+	
+	//enbale by m_customer.pre_order_flag
+	<%if(orderForm.getOrder().isCanEditOrderDate()){ %>
+       new Epoch('epoch_popup', 'th', document.getElementById('orderDate'));
+    <%}%>
 }
 
 function lockScreen() {
@@ -371,7 +380,7 @@ function addProductToSalesOrder(){
 			var product = new Object();
 			product.productId = products[i].productId;
 			product.product = products[i].productCode;
-	//		alert(products[i].productName);
+	        //alert(products[i].productName);
 			product.productLabel = decodeURIComponent(escapeParameter(products[i].productName));
 			//alert(products[i].productName);
 			
@@ -575,22 +584,27 @@ function validateVanCreditLimit(){
 						<%} %>
 							<tr>
 							 <%if(User.TT.equals(user.getType())){%>
-								<td align="right"><!-- สาย Load <font color="red">*</font> --></td>
-								<td align="left"><%-- <html:text property="order.loadNo" size="20" styleClass="\" autoComplete=\"off"/> --%></td>
+								<td align="right"></td>
+								<td align="left"></td>
 						     <%}else{ %>
 						        <td align="right"></td>
 								<td align="left"></td>
 						     <%} %>
 								<td align="right"><bean:message key="DocumentNo" bundle="sysele"/>&nbsp;&nbsp;</td>
 								<td align="left">
-									<html:text property="order.orderNo" size="20" readonly="true" styleClass="disableText"/>
+								    <html:text property="order.orderNo" size="20" readonly="true" styleClass="disableText"/>
 								</td>
 							</tr>
 							<tr>
 								<td></td><td></td>
 								<td align="right"><bean:message key="TransactionDate" bundle="sysele"/><font color="red">*</font></td>
 								<td align="left">
-									<html:text property="order.orderDate" maxlength="10" size="15" readonly="true" styleId="orderDate" styleClass="disableText"/>
+									
+								   <%if(orderForm.getOrder().isCanEditOrderDate()){ %>
+									    <html:text property="order.orderDate" maxlength="10" size="15" readonly="true" styleId="orderDate" styleClass="normalText"/>
+								   <%}else{ %>
+					                    <html:text property="order.orderDate" maxlength="10" size="15" readonly="true" styleId="orderDate" styleClass="disableText"/>
+									<%} %>
 								</td>
 							</tr>
 							<tr>
@@ -904,9 +918,9 @@ function validateVanCreditLimit(){
 									<html:hidden property="order.salesRepresent.id"/>
 									<html:hidden property="order.salesRepresent.code"/>
 								</td>
-								<td align="right"><bean:message key="Status" bundle="sysele"/><font color="red">*</font></td>
+								<td align="right"><bean:message key="Status" bundle="sysele"/><font color="red"></font></td>
 								<td valign="top">
-									<html:select property="order.docStatus">
+									<html:select property="order.docStatus" styleClass="disableText">
 										<html:options collection="docstatus" property="key" labelProperty="name"/>
 									</html:select>
 								</td>
@@ -956,6 +970,7 @@ function validateVanCreditLimit(){
 						<html:hidden property="order.exported" value="N"/>
 						<html:hidden property="order.isCash" value="N"/>
 					    <html:hidden property="order.custGroup"/>
+						<html:hidden property="order.canEditOrderDate"/>
 							
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
 						

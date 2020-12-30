@@ -323,11 +323,11 @@ function backsearch(path,customerId) {
 }
 
 function backToCusotmer(path,customerId) {
-	var orderType = document.getElementsByName("order.orderType")[0].value;
-	if(orderType=='DD'){
-		window.location = path+'/jsp/memberAction.do?do=prepare&id='+customerId+'&action=process';
-	}else{
+	var fromPage = document.getElementById("fromPage").value;
+	if(fromPage=='CustomerView'){
 		window.location = path+'/jsp/customerAction.do?do=prepare&id='+customerId+'&action=process';
+	}else{
+		window.location = path+'/jsp/customer.do';
 	}
 }
 

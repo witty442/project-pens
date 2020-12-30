@@ -30,6 +30,182 @@ public class PopupDAO {
 
 	private static Logger logger = Logger.getLogger("PENS");
 	
+	public static List<PopupBean> searchInvoiceSAList(PopupForm popupForm,boolean multi)
+			throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		PopupBean m = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		List<PopupBean> dataList = new ArrayList<PopupBean>();
+		int no=0;
+		String orderNo4Digit = "";
+		try {
+			PopupBean mCriteria = popupForm.getBean();
+			Map<String, String> paramMap = popupForm.getCriteriaMap();
+			
+			conn = DBConnectionApps.getInstance().getConnection();
+			
+			sql.append("\n SELECT distinct ");
+			sql.append("\n V.invoice_no,V.invoice_date,V.salesrep_id,V.customer_id");
+			sql.append("\n ,C.customer_code ,C.customer_desc ,V.sales_order_no");
+			sql.append("\n ,(select salesrep_code  from pensbi.XXPENS_BI_MST_SALESREP S ");
+			sql.append("\n where S.salesrep_id = V.salesrep_id) as salesrep_code");
+			sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V ");
+			sql.append("\n ,pensbi.XXPENS_BI_MST_CUSTOMER C");
+			sql.append("\n where V.customer_id = C.customer_id");
+			
+			if( !Utils.isNull(mCriteria.getCodeSearch()).equals("")){
+				sql.append("\n and V.invoice_no = '"+Utils.isNull(mCriteria.getCodeSearch())+"'");
+			}
+			
+			//sql.append("\n  ORDER BY t.code desc"); 
+			logger.debug("sql:" + sql);
+
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+				no++;
+				m = new PopupBean();
+				m.setNo(no);
+				m.setCode(Utils.isNull(rst.getString("invoice_no")));
+				m.setDesc(DateUtil.stringValue(rst.getDate("invoice_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+				m.setDesc2(Utils.isNull(rst.getString("customer_id")));
+				m.setDesc3(Utils.isNull(rst.getString("customer_code")));
+				m.setDesc4(Utils.isNull(rst.getString("customer_desc")));
+				
+				orderNo4Digit = Utils.isNull(rst.getString("sales_order_no"));
+				orderNo4Digit = orderNo4Digit.substring(orderNo4Digit.length()-4,orderNo4Digit.length());
+				m.setDesc5(orderNo4Digit);
+				dataList.add(m);
+				
+			}// while
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				if (conn != null) {
+					conn.close();
+					conn = null;
+				}
+			} catch (Exception e) {
+			}
+		}
+		return dataList;
+	}
+	public static List<PopupBean> searchSalesrepSAList(PopupForm popupForm,boolean multi)
+			throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		PopupBean m = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		List<PopupBean> dataList = new ArrayList<PopupBean>();
+		int no=0;
+		try {
+			PopupBean mCriteria = popupForm.getBean();
+			Map<String, String> paramMap = popupForm.getCriteriaMap();
+			
+			conn = DBConnectionApps.getInstance().getConnection();
+			
+			sql.append("\n SELECT S.*FROM pensbi.XXPENS_BI_MST_SALESREP S ");
+			sql.append("\n WHERE 1=1 ");
+			if( !Utils.isNull(mCriteria.getCodeSearch()).equals("")){
+				sql.append("\n and S.salesrep_code = '"+Utils.isNull(mCriteria.getCodeSearch())+"'");
+			}
+			
+			logger.debug("sql:" + sql);
+
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+				no++;
+				m = new PopupBean();
+				m.setNo(no);
+				m.setCode(Utils.isNull(rst.getString("salesrep_code")));
+				m.setDesc(Utils.isNull(rst.getString("salesrep_id")));
+				m.setDesc2(Utils.isNull(rst.getString("salesrep_desc")));
+				dataList.add(m);
+				
+			}// while
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				if (conn != null) {
+					conn.close();
+					conn = null;
+				}
+			} catch (Exception e) {
+			}
+		}
+		return dataList;
+	}
+	public static List<PopupBean> searchCustomerList(PopupForm popupForm,boolean multi)
+			throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		PopupBean m = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		List<PopupBean> dataList = new ArrayList<PopupBean>();
+		int no=0;
+		try {
+			PopupBean mCriteria = popupForm.getBean();
+			Map<String, String> paramMap = popupForm.getCriteriaMap();
+			
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			sql.append("\n  SELECT t.code,t.name ,t.customer_id");
+			sql.append("\n  FROM pensso.m_customer t");
+			sql.append("\n  WHERE 1=1");
+			
+			if( !Utils.isNull(mCriteria.getCodeSearch()).equals("")){
+				sql.append("\n and t.code like '%"+Utils.isNull(mCriteria.getCodeSearch())+"%'");
+			}
+			if( !Utils.isNull(mCriteria.getDescSearch()).equals("")){
+				sql.append("\n and t.name = '%"+Utils.isNull(mCriteria.getDescSearch())+"%'");
+			}
+		    if( !Utils.isNull(paramMap.get("customerType")).equals("")){
+		    	sql.append("\n and t.customer_type = '"+Utils.isNull(paramMap.get("customerType"))+"'");
+		    }
+			sql.append("\n  ORDER BY t.code desc"); 
+			logger.debug("sql:" + sql);
+
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+				no++;
+				m = new PopupBean();
+				m.setNo(no);
+				m.setCode(Utils.isNull(rst.getString("code")));
+				m.setDesc(Utils.isNull(rst.getString("name")));
+				m.setDesc2(Utils.isNull(rst.getString("customer_id")));
+				dataList.add(m);
+				
+			}// while
+			
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				if (conn != null) {
+					conn.close();
+					conn = null;
+				}
+			} catch (Exception e) {
+			}
+		}
+		return dataList;
+	}
+	
 	public static List<PopupBean> searchPickingNoList(PopupForm popupForm,String pageName)
 			throws Exception {
 		Statement stmt = null;
@@ -62,6 +238,9 @@ public class PopupDAO {
 			
 			if( !Utils.isNull(mCriteria.getCodeSearch()).equals("")){
 				sql.append("\n and t.picking_no like '%"+Utils.isNull(mCriteria.getCodeSearch())+"%'");
+			}
+			if( !Utils.isNull(mCriteria.getDescSearch()).equals("")){
+				sql.append("\n and t.transaction_date = to_date('"+DateUtil.convBuddhistToChristDate(mCriteria.getDescSearch(),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','"+DateUtil.DD_MM_YYYY_WITH_SLASH+"')");
 			}
 			sql.append("\n  ORDER BY t.picking_no desc"); 
 			logger.debug("sql:" + sql);

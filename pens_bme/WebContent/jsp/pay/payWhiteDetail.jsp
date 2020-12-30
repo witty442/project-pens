@@ -290,9 +290,9 @@ function switchFlag(obj,name){
 										  <input type="text" name="accountName" id="accountName" size="30" maxlength="15"
 										    value="<%=Utils.isNull(item.getAccountName())%>" tabindex="<%out.print(tabindex);tabindex++;%>">
 										</td>
-										<td class="td_text" width="30%"><input type="text" name="description" id="description" size="120" 
-										     maxlength="56" value="<%=Utils.isNull(item.getDescription())%>" tabindex="<%out.print(tabindex);tabindex++;%>"></td>
-										<td class="td_text" width="15%">
+										<td class="td_text" width="35%"><input type="text" name="description" id="description" size="120" 
+										     maxlength="70" value="<%=Utils.isNull(item.getDescription())%>" tabindex="<%out.print(tabindex);tabindex++;%>"></td>
+										<td class="td_text" width="10%">
                                           <input type="text" name="amount" id="amount" size="30" value="<%=Utils.isNull(item.getAmount())%>" 
                                           onblur="isNum2Digit(this);sumTotal();" class="enableNumber" tabindex="<%out.print(tabindex);tabindex++;%>">
                                         </td>

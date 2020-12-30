@@ -59,7 +59,6 @@ function loadMe(){
 		    
 		//submitedGenStockOnhandTemp
 		var url = path+'/jsp/batchTaskAction.do?do=prepare&pageAction=new&initBatchAction=initBatchFromPageByPopup&pageName=<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>';
-		//popupFull(url,'<%=Utils.isNull(request.getAttribute("BATCH_TASK_NAME"))%>');
 		popupBatchTaskPopup(url);
    <%}%>
 }
@@ -79,7 +78,10 @@ function search(){
 		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
 		   return false;
 	   } 
-	 
+	    
+	 /**  Control Save Lock Screen **/
+	 startControlSaveLockScreen();
+	    
 	form.action = path + "/jsp/reportAllAction.do?do=search";
 	form.submit();
 	return true;
@@ -167,15 +169,14 @@ function gotoAutoOrderPage(path){
 	url = path+'/jsp/autoOrderAction.do?do=prepareSearch&action=new'+param;
 	link(true,url);
 }
-function genReportEndDate(path){
+function genReportCompareEndDateLotus(path){
 	var form = document.reportAllForm;
 	var asOfDateFrom = form.salesDate.value;
 	var pensCustCodeFrom = form.pensCustCodeFrom.value;
 	   
     var param = "&customerCode="+form.pensCustCodeFrom.value;
         param += "&salesDate="+form.salesDate.value;
-        param += "&pageName=GEN_STOCK_REPORT_ENDDDATE_LOTUS";
-        param += "&pageStaus=child";
+        param += "&batchTaskName=genReportCompareEndDateLotus";
         
         if(asOfDateFrom ==""){ 
   		   alert("กรุณากรอกข้อมูลวันที่ As Of");
@@ -210,16 +211,9 @@ function genReportEndDate(path){
   	    }
   	    
         if(confirm("กรุณายืนยันการ  Data เปรียบเทียบนับสต็อก")){
-			url = path + "/jsp/interfacesAction.do?do=runBatch&action="+param;
-			//window.open(encodeURI(url),"",
-					   //"menubar=no,resizable=no,toolbar=no,scrollbars=no,width=<%=screenWidth%>px,height=<%=screenHeight%>px,status=no,left=0,top= 0");
-			var params = [
-			              'height='+screen.height,
-			              'width='+screen.width,
-			              'fullscreen=yes' // only works in IE, but here for completeness
-			          ].join(',');
-			var popup = window.open(encodeURI(url), 'popup_window', params); 
-			popup.moveTo(0,0);
+			form.action = path + "/jsp/reportAllAction.do?do=submitGenBatchTask"+param;
+			form.submit();
+			return true;
         }
 }
 </script>
@@ -368,7 +362,7 @@ function genReportEndDate(path){
 							</td>
 							 <td align="right" width="25%" nowrap>
 								<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
-									<a href="javascript:genReportEndDate('${pageContext.request.contextPath}')">
+									<a href="javascript:genReportCompareEndDateLotus('${pageContext.request.contextPath}')">
 									  <input type="button" value="Gen Data เปรียบเทียบนับสต็อก" class="newPosBtn">
 									</a>
 									
@@ -516,3 +510,5 @@ function genReportEndDate(path){
 </table>
 </body>
 </html>
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../../controlSaveLockScreen.jsp"/>

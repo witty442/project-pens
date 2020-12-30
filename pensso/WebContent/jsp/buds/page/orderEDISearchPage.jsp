@@ -57,10 +57,18 @@ function search(){
 	form.submit();
 	return true;
 }
-function viewDetail(orderNo){
+function viewDetail(orderNo,rType){
 	var form = document.budsAllForm;
-	var path =document.getElementById("path").value 
-	form.action = path + "/jsp/budsAllAction.do?do=viewDetail&pageName=OrderEDIDetail&subPageName=OrderEDIDetail&orderNo="+orderNo;
+	var path =document.getElementById("path").value ;
+	var param = "";
+	if(rType=='M'){
+	   //EDI Manual
+	   param = "&pageName=OrderEDIDetailManual&subPageName=OrderEDIDetailManual&orderNo="+orderNo;
+	}else{
+	   param = "&pageName=OrderEDIDetail&subPageName=OrderEDIDetail&orderNo="+orderNo;
+	}
+	
+	form.action = path + "/jsp/budsAllAction.do?do=viewDetail"+param;
 	form.submit();
 	return true;
 }
@@ -234,10 +242,11 @@ function clearForm(path){
 									    <td class="td_text_right" width="6%"><%=mc.getNetAmount()%></td>
 									    <td class="td_text_center" width="5%"><%=mc.getDocStatusDesc()%></td>
 										<td class="td_text_center" width="7%">
-										  <font size="2">
-										     <a href="javascript:viewDetail('<%=mc.getOrderNo()%>')">
+										  <font size="3"><b>
+										     <a href="javascript:viewDetail('<%=mc.getOrderNo()%>','<%=mc.getrType()%>')">
 										         <%=(mc.isCanEdit()?"á¡éä¢":"´Ù") %>
 											 </a>
+											 </b>
 										  </font>
 										</td>
 										

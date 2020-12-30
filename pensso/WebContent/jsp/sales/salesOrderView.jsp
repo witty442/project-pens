@@ -79,6 +79,7 @@ body {
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
 <script type="text/javascript">
+
 function loadMe(){
 	var totalAmountHaveVat = Number(document.getElementsByName("order.totalAmount")[0].value)
 	-Number(document.getElementsByName("order.totalAmountNonVat")[0].value);

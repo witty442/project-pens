@@ -38,22 +38,21 @@ public class GenCNDAO extends PickConstants{
 		GenCNBean h = null;
 		List<GenCNBean> items = new ArrayList<GenCNBean>();
 		int no=1;
-		int totalQty = 0;
+		double totalQty = 0;
 		boolean foundError = false;
 		try {
-			sql.append("\n SELECT s.invoice_date, ");
-			sql.append("\n  (select g.customer_code from PENSBI.XXPENS_BI_MST_CUSTOMER g ");
-			sql.append("\n   where g.customer_id = s.customer_id)as customer_code,  ");
-			sql.append("\n  (select g.customer_desc from PENSBI.XXPENS_BI_MST_CUSTOMER g ");
-			sql.append("\n   where g.customer_id = s.customer_id)as customer_desc, ");
-			sql.append("\n  s.invoice_no, ");
-			sql.append("\n  i.segment1 as pens_item, ");
-			sql.append("\n  NVL(sum(s.returned_qty),0) as qty ");
+			sql.append("\n SELECT s.invoice_date ");
+			sql.append("\n  ,(select g.customer_code from PENSBI.XXPENS_BI_MST_CUSTOMER g ");
+			sql.append("\n   where g.customer_id = s.customer_id)as customer_code  ");
+			sql.append("\n  ,(select g.customer_desc from PENSBI.XXPENS_BI_MST_CUSTOMER g ");
+			sql.append("\n   where g.customer_id = s.customer_id)as customer_desc ");
+			sql.append("\n  ,s.invoice_no,i.segment1 as pens_item,i.inventory_item_id ");
+			sql.append("\n  ,NVL(sum(s.returned_qty),0) as qty ");
 			sql.append("\n  FROM XXPENS_BI_SALES_ANALYSIS S,xxpens_om_item_mst_v i ");
 			sql.append("\n  WHERE 1=1 ");
 			sql.append("\n  and S.inventory_item_id = i.inventory_item_id ");
 			sql.append("\n  and S.INVOICE_NO ='"+o.getCnNo()+"' ");
-			sql.append("\n  group by s.invoice_date,s.customer_id,s.invoice_date,s.invoice_no,i.segment1");
+			sql.append("\n  group by s.invoice_date,s.customer_id,s.invoice_date,s.invoice_no,i.segment1,i.inventory_item_id ");
             sql.append("\n  ORDER BY i.segment1 asc");
 			logger.debug("sql:"+sql);
 			
@@ -68,7 +67,8 @@ public class GenCNDAO extends PickConstants{
 			   h.setStoreCode(Utils.isNull(rst.getString("customer_code")));
 			   h.setStoreName(Utils.isNull(rst.getString("customer_desc")));
 			   h.setPensItem(Utils.isNull(rst.getString("pens_item")));
-			   h.setQty(Utils.isNull(rst.getString("qty")));
+			   h.setInventoryItemId(Utils.isNull(rst.getString("inventory_item_id")));
+			   h.setQty(Utils.decimalFormat(rst.getDouble("qty"),Utils.format_current_5_digit));
  
 			   //Get Item FROM BMELOCKED
 			   Barcode b = searchProductByPensItemInBMELocked(conn, h.getPensItem());
@@ -86,7 +86,7 @@ public class GenCNDAO extends PickConstants{
 			   }
 			   items.add(h);
 			   
-			   totalQty += Utils.convertStrToInt(h.getQty());
+			   totalQty += Utils.convertStrToDouble(h.getQty());
 			   no++;
 			}//while
 			logger.debug("totalQty:"+totalQty);

@@ -164,8 +164,8 @@ function editItemMaster(path) {
 				<td>
 				    <html:text property="bean.salesrepCode" styleId="salesrepCode" size="10" 
 				    styleClass="\" autoComplete=\"off" 
-				    onkeypress="getAutoKeypress(event,this,'SalesrepSalesAll')"
-				    onblur="getAutoOnblur(event,this,'SalesrepSalesAll')"/>
+				    onkeypress="getAutoKeypress(event,this,'SalesrepSalesAll')"/>
+				    <!-- onblur="getAutoOnblur(event,this,'SalesrepSalesAll')"/> -->
 				     <input type="button" name="x2" value="..." onclick="openPopup('${pageContext.request.contextPath}','SalesrepSalesAll')"/>   
 				     <html:text property="bean.salesrepFullName" styleId="salesrepFullName" styleClass="disableText" readonly="true" size="40"/>
 						&nbsp;&nbsp;&nbsp;

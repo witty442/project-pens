@@ -55,6 +55,27 @@ public class SequenceProcessAll {
 		    conn.close();
 		}
 	}
+	public synchronized BigDecimal getNextValueBySeqDBApp(String sequenceName) throws Exception {
+		BigDecimal nextValue = new BigDecimal("0");
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs =null;
+		try{
+			conn = DBConnectionApps.getInstance().getConnection();
+			ps = conn.prepareStatement("select ("+sequenceName+") as nextVal from dual");
+			rs = ps.executeQuery();
+			if(rs.next()){
+				nextValue = new BigDecimal(rs.getString("nextVal"));
+			}
+			return nextValue;
+		}catch(Exception e){
+		   throw e;
+		}finally{
+			ps.close();
+			rs.close();
+		    conn.close();
+		}
+	}
 	
 	public synchronized BigDecimal getNextValue(String sequenceType) throws Exception {
 		Connection conn = null;

@@ -129,8 +129,12 @@ function getCustNameModel(customerCode){
 function openPopup(path,pageName){
 	var form = document.stockMCForm;
 	var param = "&pageName="+pageName;
-	 if("CustomerStockMC" == pageName){
+	if("CustomerStockMC" == pageName){
 		param +="&hideAll=true&customerCode="+form.customerCode.value;
+	}else if("BranchStockMC" == pageName){
+		param +="&hideAll=true";
+	}else if("Brand" == pageName){
+		param +="&hideAll=true";
 	}
 	url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
 	PopupCenterFullHeight(url,"",600);
@@ -140,6 +144,13 @@ function setDataPopupValue(code,desc,pageName){
 	if("CustomerStockMC" == pageName){
 		form.customerCode.value = code;
 		form.customerName.value = desc;
+	}else if("BranchStockMC" == pageName){
+		form.storeCode.value = code;
+		form.storeName.value = desc;
+	}else if("Brand" == pageName){
+		form.brand.value = code;
+		form.brandName.value = desc;
 	}
 } 
+
 

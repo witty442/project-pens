@@ -70,6 +70,34 @@ public class AutoKeypressAction {
 				}else{
 					resultAjax = "-1|||";
 				}
+			}else if("CustomerStockMC".equalsIgnoreCase(pageName) ){
+				//set criteria
+				criteriaForm.setCodeSearch(Utils.isNull(request.getParameter("customerCode")));
+				
+				List<PopupForm> popupList=   PopupDAO.searchCustomerStockMC(criteriaForm);
+				PopupForm popupForm = null;
+				if(popupList != null && popupList.size() >0){
+					popupForm = popupList.get(0);
+				}
+				if(popupForm != null){
+					resultAjax = "2|"+popupForm.getCode()+"|"+popupForm.getDesc();
+				}else{
+					resultAjax = "-1|||";
+				}
+			}else if("Brand".equalsIgnoreCase(pageName) ){
+				//set criteria
+				criteriaForm.setCodeSearch(Utils.isNull(request.getParameter("brand")));
+				
+				List<PopupForm> popupList=   PopupDAO.searchBrandList(criteriaForm);
+				PopupForm popupForm = null;
+				if(popupList != null && popupList.size() >0){
+					popupForm = popupList.get(0);
+				}
+				if(popupForm != null){
+					resultAjax = "2|"+popupForm.getCode()+"|"+popupForm.getDesc();
+				}else{
+					resultAjax = "-1|||";
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

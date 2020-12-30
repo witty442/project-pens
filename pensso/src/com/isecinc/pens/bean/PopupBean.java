@@ -47,6 +47,9 @@ public class PopupBean implements Serializable{
 	private String desc;
 	private String desc2;
 	private String desc3;
+	private String desc4;
+	private String desc5;
+	private String desc6;
 	private String price;
 	private String uom1;
 	private String uom2;
@@ -78,6 +81,24 @@ public class PopupBean implements Serializable{
 	List<PopupBean> data2List;
 	
 	
+	public String getDesc4() {
+		return desc4;
+	}
+	public void setDesc4(String desc4) {
+		this.desc4 = desc4;
+	}
+	public String getDesc5() {
+		return desc5;
+	}
+	public void setDesc5(String desc5) {
+		this.desc5 = desc5;
+	}
+	public String getDesc6() {
+		return desc6;
+	}
+	public void setDesc6(String desc6) {
+		this.desc6 = desc6;
+	}
 	public double getUom1ConversionRate() {
 		return uom1ConversionRate;
 	}

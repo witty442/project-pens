@@ -677,8 +677,8 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			
 			/** ORDER **/
 			sql.append("\n 	SELECT O.store_code, M.interface_value as store_no,M.pens_desc as store_name");
-			sql.append("\n 	FROM PENSBME_ORDER O  ");
-			sql.append("\n 	INNER JOIN PENSBME_MST_REFERENCE M	 ");
+			sql.append("\n 	FROM PENSBI.PENSBME_ORDER O  ");
+			sql.append("\n 	INNER JOIN PENSBI.PENSBME_MST_REFERENCE M	 ");
 			sql.append("\n  ON  O.store_code = M.pens_value   ");
 			sql.append("\n  AND M.reference_code = 'Store'    ");
 			sql.append("\n 	where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
@@ -689,8 +689,8 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			
 			/** Stock_ISSUE **/
 			sql.append("\n 	SELECT H.customer_no as store_code ,h.store_no ");
-			sql.append("\n 	,(select Max(M.pens_desc) from PENSBME_MST_REFERENCE M where M.reference_code = 'Store' and M.pens_value = H.customer_no) as store_name ");
-			sql.append("\n 	from PENSBME_STOCK_ISSUE H ,PENSBME_STOCK_ISSUE_ITEM I  ");
+			sql.append("\n 	,(select Max(M.pens_desc) from PENSBI.PENSBME_MST_REFERENCE M where M.reference_code = 'Store' and M.pens_value = H.customer_no) as store_name ");
+			sql.append("\n 	from PENSBI.PENSBME_STOCK_ISSUE H ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I  ");
 			sql.append("\n 	WHERE 1=1 ");
 			sql.append("\n 	and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
 			sql.append("\n 	and H.STATUS = '"+PickConstants.STATUS_ISSUED+"'");
@@ -701,8 +701,8 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n 	UNION ALL ");
 			/** PICK_Stock 14/11/2019 **/
 			sql.append("\n 	SELECT H.store_code ,h.store_no ");
-			sql.append("\n 	,(select Max(M.pens_desc) from PENSBME_MST_REFERENCE M where M.reference_code = 'Store' and M.pens_value = H.store_code) as store_name ");
-			sql.append("\n 	from PENSBME_PICK_STOCK H ,PENSBME_PICK_STOCK_I I  ");
+			sql.append("\n 	,(select Max(M.pens_desc) from PENSBI.PENSBME_MST_REFERENCE M where M.reference_code = 'Store' and M.pens_value = H.store_code) as store_name ");
+			sql.append("\n 	from PENSBI.PENSBME_PICK_STOCK H ,PENSBI.PENSBME_PICK_STOCK_I I  ");
 			sql.append("\n 	WHERE 1=1 ");
 			sql.append("\n 	and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
 			sql.append("\n 	and H.ISSUE_REQ_STATUS = '"+PickConstants.STATUS_ISSUED+"'");
@@ -712,7 +712,11 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n)A ");
 			
 			logger.debug("sql:"+sql.toString());
-		    
+			
+			if(logger.isDebugEnabled()){
+				FileUtil.writeFile("d://dev_temp/temp/icc_gen_orderexcel_store.sql", sql.toString());
+			}
+			
 			ps = conn.prepareStatement(sql.toString());
 			ps.setDate(1, new java.sql.Date(orderDate.getTime()));
 			ps.setDate(2, new java.sql.Date(orderDate.getTime()));
@@ -759,13 +763,13 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n A.mat ,A.WHOLE_PRICE_BF, A.RETAIL_PRICE_BF,A.NON_BME ");
 			sql.append("\n FROM( ");
 			sql.append("\n 		SELECT  DISTINCT " );
-			sql.append("\n      ( select max(M.interface_value) from PENSBME_MST_REFERENCE  M");
+			sql.append("\n      ( select max(M.interface_value) from PENSBI.PENSBME_MST_REFERENCE  M");
 			sql.append("\n        WHERE  O.barcode = M.interface_desc     ");
 			sql.append("\n        AND M.reference_code = 'LotusItem' )  as mat ");
 			sql.append("\n      ,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
 			sql.append("\n      ,P.NON_BME ");
-			sql.append("\n 		FROM PENSBME_ORDER O  ");
-			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
+			sql.append("\n 		FROM PENSBI.PENSBME_ORDER O  ");
+			sql.append("\n 		LEFT OUTER JOIN PENSBI.PENSBME_PRICELIST P   ");
 			sql.append("\n   		ON  P.group_code = O.group_code  ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n   		AND P.product ='"+batchParamMap.get(PARAM_PRODUCT_TYPE)+"'");
@@ -781,8 +785,8 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n        AND M.reference_code = 'LotusItem' )  as mat ");
 			sql.append("\n      ,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
 			sql.append("\n      ,P.NON_BME ");
-			sql.append("\n 		from PENSBME_STOCK_ISSUE H ,PENSBME_STOCK_ISSUE_ITEM I  ");
-			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
+			sql.append("\n 		from PENSBI.PENSBME_STOCK_ISSUE H ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I  ");
+			sql.append("\n 		LEFT OUTER JOIN PENSBI.PENSBME_PRICELIST P   ");
 			sql.append("\n 		    ON P.group_code = I.group_code  ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n   		AND P.product ='"+batchParamMap.get(PARAM_PRODUCT_TYPE)+"'");
@@ -799,8 +803,8 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n       I.material_master as mat ");
 			sql.append("\n      ,NVL(P.WHOLE_PRICE_BF,0) as WHOLE_PRICE_BF, NVL(P.RETAIL_PRICE_BF,0) as RETAIL_PRICE_BF ");
 			sql.append("\n      ,P.NON_BME ");
-			sql.append("\n 		from PENSBME_PICK_STOCK H ,PENSBME_PICK_STOCK_I I  ");
-			sql.append("\n 		LEFT OUTER JOIN PENSBME_PRICELIST P   ");
+			sql.append("\n 		from PENSBI.PENSBME_PICK_STOCK H ,PENSBI.PENSBME_PICK_STOCK_I I  ");
+			sql.append("\n 		LEFT OUTER JOIN PENSBI.PENSBME_PRICELIST P   ");
 			sql.append("\n 		    ON P.group_code = I.group_code  ");
 			sql.append("\n   		AND P.STORE_TYPE ='"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n   		AND P.product ='"+batchParamMap.get(PARAM_PRODUCT_TYPE)+"'");
@@ -815,6 +819,10 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n order by A.mat ");
 			
 			logger.debug("sql:"+sql.toString());
+			
+			if(logger.isDebugEnabled()){
+				FileUtil.writeFile("d://dev_temp/temp/icc_gen_orderexcel.sql", sql.toString());
+			}
 			
 			//Get StoreBeanMap 
 			Map<String, StoreBean> storeBeanOrderMap = getStoreBeanOrderMap(conn, batchParamMap);
@@ -899,20 +907,21 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n        WHERE  O.barcode = M.interface_desc     ");
 			sql.append("\n        AND M.reference_code = 'LotusItem' )  as mat ");
 			sql.append("\n      ,NVL(sum(qty),0) as qty ");
-			sql.append("\n 		FROM PENSBME_ORDER O  ");
+			sql.append("\n 		FROM PENSBI.PENSBME_ORDER O  ");
 			sql.append("\n 		where O.store_type = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
 			sql.append("\n 		and O.order_date = ?  ");
 			sql.append("\n 		and O.exported = 'Y'");
 			sql.append("\n 		group by  O.store_code ,o.barcode");
 			
 			sql.append("\n 	    UNION ALL ");
+			
 			/** Stock_ISSUE **/
 			sql.append("\n 		SELECT H.customer_no as store_code " );
 			sql.append("\n      ,( select max(M.interface_value) from PENSBME_MST_REFERENCE  M");
 			sql.append("\n        WHERE  I.barcode = M.interface_desc     ");
 			sql.append("\n        AND M.reference_code = 'LotusItem' )  as mat ");
 			sql.append("\n      ,NVL(sum(I.issue_qty),0) as qty  ");
-			sql.append("\n 		from PENSBME_STOCK_ISSUE H ,PENSBME_STOCK_ISSUE_ITEM I  ");
+			sql.append("\n 		from PENSBI.PENSBME_STOCK_ISSUE H ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I  ");
 			sql.append("\n 		WHERE 1=1 ");
 			sql.append("\n 		and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
 			sql.append("\n 		and H.STATUS = '"+PickConstants.STATUS_ISSUED+"'");
@@ -920,6 +929,20 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			sql.append("\n 		and H.delivery_date = ?  ");
 			sql.append("\n 		and H.exported = 'Y' ");
 			sql.append("\n 		group by H.customer_no,I.barcode");
+			
+			sql.append("\n 	    UNION ALL ");
+			/** Stock_PICK **/
+			sql.append("\n 		SELECT H.store_code " );
+			sql.append("\n      ,I.material_master as mat ");
+			sql.append("\n      ,NVL(count(*),0) as qty  ");
+			sql.append("\n 		from PENSBI.PENSBME_PICK_STOCK H ,PENSBI.PENSBME_PICK_STOCK_I I ");
+			sql.append("\n 		WHERE 1=1 ");
+			sql.append("\n 		and H.ISSUE_REQ_NO = I.ISSUE_REQ_NO ");
+			sql.append("\n 		and H.ISSUE_REQ_STATUS = '"+PickConstants.STATUS_ISSUED+"'");
+			sql.append("\n 		and H.cust_group = '"+batchParamMap.get(PARAM_CUST_GROUP)+"'");
+			sql.append("\n 		and H.delivery_date = ?  ");
+			sql.append("\n 		and H.exported = 'Y' ");
+			sql.append("\n 		group by H.store_code,I.material_master");
 			
 			sql.append("\n )A ");
 			sql.append("\n group by A.store_code,A.mat ");
@@ -929,6 +952,7 @@ public class GenerateOrderExcel extends InterfaceUtils{
 			
 			ps.setTimestamp(1, new java.sql.Timestamp(orderDate.getTime()));
 			ps.setTimestamp(2, new java.sql.Timestamp(orderDate.getTime()));
+			ps.setTimestamp(3, new java.sql.Timestamp(orderDate.getTime()));
 			
 			rs = ps.executeQuery();
 			String keyMap = "";

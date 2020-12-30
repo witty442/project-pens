@@ -62,6 +62,7 @@
 		<action name="loginForm" path="/login" parameter="do" scope="request" type="com.isecinc.pens.web.login.LoginAction">
 			 <forward name="change_password" path="/jsp/administer/changePassword.jsp"  />
              <forward name="pass_user" path="/jsp/salesAnalystReportAction.do?do=prepare&amp;action=new&amp;reportName=SalesAnalyst" redirect="true" /> 
+             <forward name="pass_user_new" path="/jsp/aReportAction.do?do=prepare&amp;action=new&amp;reportName=SalesAnalyst" redirect="true" /> 
              <forward name="pass_salestarget" path="/jsp/mainpage.jsp" redirect="true" /> 
              <forward name="pass_mcentry" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new&amp;pageName=STOCKMC" redirect="true" /> 
 			 <forward name="pass_mcentryMobile" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new&amp;pageName=STOCKMC" redirect="true" /> 

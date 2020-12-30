@@ -8,12 +8,15 @@ public class OrderEDIBean implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 2252606206581569871L;
+	private String rType;/** type edit ,M:MANUAL **/
 	private String orderDateFrom;
 	private String orderDateTo;
 	
 	private String pickingNo;
 	private String orderNo;
 	private String orderDate;
+	private String deliveryDate;
+	private long customerId;
 	private String customerCode;
 	private String customerName;
 	private String totalAmount;
@@ -34,16 +37,82 @@ public class OrderEDIBean implements Serializable{
 	private String qty;
 	private StringBuffer dataStrBuffer;
 	private String userName;
+	private int userId;
 	private List<OrderEDIBean> itemsList;
 	private String deleteLineIds;
 	private String rowStyle;
 	private String rowReadonly;
 	private String shipToAddress;
+	private String shipToAddressId;
+	private String billToAddressId;
+	private long shipToSiteUseId;
+	private long billToSiteUseId;
 	private long reservationId;
 	private boolean canEdit;
-	  
-	  
+	private String barcode;
+	private String shipToEanLocCode;
 	
+	 
+	public String getShipToEanLocCode() {
+		return shipToEanLocCode;
+	}
+	public void setShipToEanLocCode(String shipToEanLocCode) {
+		this.shipToEanLocCode = shipToEanLocCode;
+	}
+	public String getBarcode() {
+		return barcode;
+	}
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
+	}
+	public String getDeliveryDate() {
+		return deliveryDate;
+	}
+	public void setDeliveryDate(String deliveryDate) {
+		this.deliveryDate = deliveryDate;
+	}
+	public long getShipToSiteUseId() {
+		return shipToSiteUseId;
+	}
+	public void setShipToSiteUseId(long shipToSiteUseId) {
+		this.shipToSiteUseId = shipToSiteUseId;
+	}
+	public long getBillToSiteUseId() {
+		return billToSiteUseId;
+	}
+	public void setBillToSiteUseId(long billToSiteUseId) {
+		this.billToSiteUseId = billToSiteUseId;
+	}
+	public String getBillToAddressId() {
+		return billToAddressId;
+	}
+	public void setBillToAddressId(String billToAddressId) {
+		this.billToAddressId = billToAddressId;
+	}
+	public int getUserId() {
+		return userId;
+	}
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+	public long getCustomerId() {
+		return customerId;
+	}
+	public void setCustomerId(long customerId) {
+		this.customerId = customerId;
+	}
+	public String getShipToAddressId() {
+		return shipToAddressId;
+	}
+	public void setShipToAddressId(String shipToAddressId) {
+		this.shipToAddressId = shipToAddressId;
+	}
+	public String getrType() {
+		return rType;
+	}
+	public void setrType(String rType) {
+		this.rType = rType;
+	}
 	public String getDocStatusDesc() {
 		return docStatusDesc;
 	}
@@ -104,6 +173,7 @@ public class OrderEDIBean implements Serializable{
 	public void setDocStatus(String docStatus) {
 		this.docStatus = docStatus;
 	}
+	
 	public String getLineId() {
 		return lineId;
 	}

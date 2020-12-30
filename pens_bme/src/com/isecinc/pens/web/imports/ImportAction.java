@@ -27,7 +27,7 @@ import com.pens.util.Utils;
  * ImportAction Class
  * 
  * @author Witty.B
- * @version $Id: ConversionAction.java,v 1.0 19/10/2010 00:00:00
+ * @version $Id: ImportAction.java,v 1.0 19/10/2010 00:00:00
  * 
  */
 
@@ -211,13 +211,15 @@ public class ImportAction extends I_Action {
         	
         	return ImportLoadStockInitProcess.importProcess(mapping, importForm, request, response,"MTT");
         	
-         }else if("filePosBME".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
+        }else if("filePosBME".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
         	
         	return FilePosBMEProcess.importFilePostBME(mapping, importForm, request, response);
         
-         }else if("reconcile".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
-        	 importForm.setImported(false);
-        	 ReconcileProcess pro = new ReconcileProcess();
+        }else if("reconcile".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){
+        	
+        	importForm.setImported(false);
+        	ReconcileProcess pro = new ReconcileProcess();
+        	
         	return pro.run(mapping, importForm, request, response);
         	
         }else if("ftp_file_scan_barcode".equalsIgnoreCase(Utils.isNull(request.getParameter("page")))){

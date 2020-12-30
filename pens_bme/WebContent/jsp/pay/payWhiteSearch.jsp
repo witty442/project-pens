@@ -184,6 +184,7 @@ function printReport(path,docNo){
 									<th >จ่าย</th>
 									<th >ฝ่าย</th>
 									<th >แผนก</th>
+									<th >หมายเหตุ</th>
 									<th >แก้ไข</th>
 									<th >พิมพ์</th>
 									<th >Copy</th>
@@ -199,23 +200,23 @@ function printReport(path,docNo){
 								}
 								%>
 									<tr class="<%=tabclass%>">
-										<td class="td_text_center" width="10%"><%=mc.getDocNo() %></td>
-										<td class="td_text_center" width="10%"><%=mc.getDocDate()%></td>
-										<td class="td_text" width="25%"><%=mc.getPayToName()%></td>
-									    <td class="td_text" width="15%"><%=mc.getDeptId() %>:<%=mc.getDeptName()%></td>
-									    <td class="td_text" width="15%"><%=mc.getSectionId() %>:<%=mc.getSectionName()%></td>
-				
-										<td class="td_text_center" width="10%">
+										<td class="td_text_center" width="7%"><%=mc.getDocNo() %></td>
+										<td class="td_text_center" width="7%"><%=mc.getDocDate()%></td>
+										<td class="td_text" width="20%"><%=mc.getPayToName()%></td>
+									    <td class="td_text" width="10%"><%=mc.getDeptId() %>:<%=mc.getDeptName()%></td>
+									    <td class="td_text" width="10%"><%=mc.getSectionId() %>:<%=mc.getSectionName()%></td>
+				                        <td class="td_text" width="21%"><%=mc.getRemark() %></td>
+										<td class="td_text_center" width="8%">
 											 <a href="javascript:openEdit('${pageContext.request.contextPath}','<%=mc.getDocNo()%>')">
 											             แก้ไข
 											 </a>
 										</td>
-										<td class="td_text_center" width="10%">
+										<td class="td_text_center" width="8%">
 											 <a href="javascript:printReport('${pageContext.request.contextPath}','<%=mc.getDocNo()%>')">
 											             พิมพ์
 											 </a>
 										</td>
-										<td class="td_text_center" width="10%">
+										<td class="td_text_center" width="8%">
 											 <a href="javascript:openCopy('${pageContext.request.contextPath}','<%=mc.getDocNo()%>')">
 											     Copy
 											 </a>

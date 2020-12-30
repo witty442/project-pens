@@ -49,7 +49,7 @@ import com.pens.util.Debug;
  */
 public class OrderProcess {
 	private Logger logger = Logger.getLogger("PENS");
-    public Debug debug = new Debug(true);
+    public Debug debug = new Debug(false);
 	
 
 	/**

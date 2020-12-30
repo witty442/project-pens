@@ -87,7 +87,7 @@ public class ReportOnhandLotus_SQL {
 					sql.append("\n AND P.inventory_item_code = MP.pens_item");
 					sql.append("\n AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					//NOT IN pensbme_group_unuse_lotus
 					sql.append("\n AND MP.MATERIAL_MASTER NOT IN(select group_code from pensbme_group_unuse_lotus)");
 					
@@ -296,7 +296,7 @@ public class ReportOnhandLotus_SQL {
 					sql.append("\n AND P.inventory_item_code = MP.pens_item");
 					sql.append("\n AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					//NOT IN pensbme_group_unuse_lotus
 					sql.append("\n AND MP.MATERIAL_MASTER NOT IN(select group_code from pensbme_group_unuse_lotus)");
 					
@@ -344,7 +344,7 @@ public class ReportOnhandLotus_SQL {
 						sql.append("\n AND P.inventory_item_code = MP.pens_item");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						//NOT IN pensbme_group_unuse_lotus
 						sql.append("\n AND MP.MATERIAL_MASTER NOT IN(select group_code from pensbme_group_unuse_lotus)");
 						
@@ -383,7 +383,7 @@ public class ReportOnhandLotus_SQL {
 						sql.append("\n AND P.inventory_item_code = MP.pens_item");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						//NOT IN pensbme_group_unuse_lotus
 						sql.append("\n AND MP.MATERIAL_MASTER NOT IN(select group_code from pensbme_group_unuse_lotus)");
 						//Lotus Only 020047

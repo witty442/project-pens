@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.config.FormPropertyConfig;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
@@ -67,7 +68,7 @@ import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
 import com.pens.util.DateUtil;
 import com.pens.util.Debug;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 import com.pens.util.ReportHelper;
 import com.pens.util.ReportUtilServlet;
 
@@ -101,7 +102,7 @@ public class OrderAction extends I_Action {
 				forward = "search";
 				customerId = Utils.convertStrToLong(request.getParameter("customerId"));
 		
-			} else if (request.getParameter("memberId") != null) {
+			}else if (request.getParameter("memberId") != null) {
 				// go search
 				forward = "search";
 				customerId = Utils.convertStrToLong(request.getParameter("memberId"));
@@ -120,7 +121,9 @@ public class OrderAction extends I_Action {
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			
 			// get Customer Info
-			Customer customer = new MCustomer().findByWhereCond("where customer_id ="+customerId);
+			Customer custCri = new Customer();
+			custCri.setId(customerId);
+			Customer customer = new MCustomer().findOpt(conn,custCri);
 			
 			//Check Case VanSale Old order(PayCredit) No Pay disable Pay Credit ALL
 			boolean canSaveCasePayPrevBill = true;
@@ -155,6 +158,11 @@ public class OrderAction extends I_Action {
 			orderForm.setOrder(new Order());
 			orderForm.setAutoReceipt(new Receipt());
 			orderForm.setAutoReceiptFlag("N");
+			
+			//Check (m_customer.pre_order_flag)Customer can edit orderDate case (action =add)
+			if("add".equalsIgnoreCase(action) && Utils.isNull(customer.getPreOrderFlag()).equalsIgnoreCase("Y")){
+				orderForm.getOrder().setCanEditOrderDate(true);
+			}
 			
 			// default date time
 			orderForm.getOrder().setOrderDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
@@ -381,7 +389,17 @@ public class OrderAction extends I_Action {
 				//set creditLimit from customer
 				orderForm.setCustCreditLimit(customer.getCreditLimit());
 				 
-			}//if van
+			}else if(User.TT.equals(user.getType())){
+				// get Customer Info
+				Customer custCri = new Customer();
+				custCri.setId(orderForm.getOrder().getCustomerId());
+				Customer customer = new MCustomer().findOpt(conn,custCri);
+
+	            if(Utils.isNull(customer.getPreOrderFlag()).equalsIgnoreCase("Y")){
+					orderForm.getOrder().setCanEditOrderDate(true);
+				}
+			}
+				
 			
 			// Prepare order line to Edit
 			/** Promotion Process add add to Lines */
@@ -654,13 +672,6 @@ public class OrderAction extends I_Action {
 			User userActive = (User) request.getSession().getAttribute("user");
 			Customer customer = new MCustomer().find(conn,String.valueOf(orderForm.getOrder().getCustomerId()));
 			
-			/** Case User back action init new OrderDate to CurrentDate*/
-			if(orderForm.getOrder().getId() == 0){
-			   logger.info("set Order Date new To  CurrentDate");
-			   orderForm.getOrder().setOrderDate(new SimpleDateFormat("dd/MM/yyyy", new Locale("th", "TH")).format(new Date()));
-			   orderForm.getOrder().setOrderTime(new SimpleDateFormat("HH:mm", new Locale("th", "TH")).format(new Date()));
-			}
-			
 			/** Promotion Process  add to Lines */
 			
 			// remove promotion line
@@ -816,7 +827,8 @@ public class OrderAction extends I_Action {
 				Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
 				//set creditLimit from customer
 				orderForm.setCustCreditLimit(customer.getCreditLimit());
-			}
+				
+			}//if
 			
 			/** Promotion Process add add to Lines */
 			// remove promotion line
@@ -1369,9 +1381,10 @@ public class OrderAction extends I_Action {
 		User user = (User) request.getSession().getAttribute("user");
 		String action = Utils.isNull(request.getParameter("action"));
 		Customer custByUserId = null;
+		String fromPage = Utils.isNull(request.getParameter("fromPage"));
 		try {
 			logger.debug("action:"+action +"customerId:"+ orderForm.getOrder().getCustomerId());
-			if( "new".equalsIgnoreCase(action)){
+			if( "new".equalsIgnoreCase(action) && fromPage.equals("")){
 				if( orderForm.getOrder().getCustomerId()!=0){
 				   custByUserId = new MCustomer().findByWhereCond(" where user_id = "+user.getId());// Integer.parseInt(CUSTOMER_ID_MEYA_FIXED);
 				}
@@ -1388,15 +1401,21 @@ public class OrderAction extends I_Action {
 				}
 				orderForm.setOrder(order);
 			}else{
+				//Case fromPage:customerView :search by customerCode 
+				if("CustomerView".equalsIgnoreCase(fromPage)){
+					//set parameter
+					Order orderP = new Order();
+					orderP.setCustomerId(Utils.convertStrToLong(request.getParameter("customerId")));
+					orderP.setCustomerCode(Utils.isNull(request.getParameter("customerCode")));
+					orderForm.setOrder(orderP);
+				}else{
 				
-				request.getSession().removeAttribute("isAdd");
+				   request.getSession().removeAttribute("isAdd");
 	           
-				OrderCriteria criteria = getSearchCriteria(request, orderForm.getCriteria(), this.getClass().toString());
-				orderForm.setCriteria(criteria);
-				
+				   OrderCriteria criteria = getSearchCriteria(request, orderForm.getCriteria(), this.getClass().toString());
+				   orderForm.setCriteria(criteria);
+				}
 				Order order = orderForm.getOrder();
-				//logger.debug("Teritery:"+order.getTerritory());
-				
 				String whereCause = "";
 				if ( !Utils.isNull(order.getOrderNo()).equals("")) {
 					whereCause += " AND o.ORDER_NO LIKE '%"
@@ -2040,7 +2059,7 @@ public class OrderAction extends I_Action {
 			
 			//Split address to Show 2 Line
 			String[] custAddressArr = new String[2];
-			Address addressTemp = new MAddress().findAddressByCustomerId(conn,customer.getId()+"");
+			Address addressTemp = new MAddress().findAddressShipToByCustomerId(conn,customer.getId()+"");
 			if(addressTemp != null ){
 				custAddressArr = splitAddress(addressTemp);
 			}
@@ -2058,7 +2077,7 @@ public class OrderAction extends I_Action {
 				if(Utils.isNull(customer.getPrintType()).equals("H")){
 				     cusTaxNoMsg +="  สำนักงานใหญ่";
 				}else if(Utils.isNull(customer.getPrintType()).equals("B")){
-					 cusTaxNoMsg +=" สาขาที่  "+NumberToolsUtil.decimalFormat(Integer.parseInt(customer.getPrintBranchDesc()),NumberToolsUtil.format_current_five_digit);
+					 cusTaxNoMsg +=" สาขาที่  "+NumberUtil.decimalFormat(Integer.parseInt(customer.getPrintBranchDesc()),NumberUtil.format_current_five_digit);
 				}
 			}
 			
@@ -2218,7 +2237,7 @@ public class OrderAction extends I_Action {
 			
 			//Split address to Show 2 Line
 			String[] custAddressArr = new String[2];
-			Address address = new MAddress().findAddressByCustomerId(conn,request.getParameter("customerId"));
+			Address address = new MAddress().findAddressShipToByCustomerId(conn,request.getParameter("customerId"));
 			if(address != null ){
 				custAddressArr = splitAddress(address);
 			}
@@ -2233,9 +2252,9 @@ public class OrderAction extends I_Action {
 				}else{
 				  b.setProduct(no+")"+line.getProduct().getCode()+" "+line.getProduct().getName());
 				}
-				b.setQty(NumberToolsUtil.decimalFormat(line.getQty1(),NumberToolsUtil.format_current_no_disgit)+"/"+NumberToolsUtil.decimalFormat(line.getQty2(),NumberToolsUtil.format_current_no_disgit));
+				b.setQty(NumberUtil.decimalFormat(line.getQty1(),NumberUtil.format_current_no_disgit)+"/"+NumberUtil.decimalFormat(line.getQty2(),NumberUtil.format_current_no_disgit));
 				b.setUnit(Utils.isNull(line.getUom1().getCode())+"/"+Utils.isNull(line.getUom2().getCode()));
-				b.setPrice(NumberToolsUtil.decimalFormat(line.getPrice1(),NumberToolsUtil.format_current_2_disgit)+"/"+NumberToolsUtil.decimalFormat(line.getPrice2(),NumberToolsUtil.format_current_2_disgit));
+				b.setPrice(NumberUtil.decimalFormat(line.getPrice1(),NumberUtil.format_current_2_disgit)+"/"+NumberUtil.decimalFormat(line.getPrice2(),NumberUtil.format_current_2_disgit));
 				no++;
 				
 				lstData.add(b);

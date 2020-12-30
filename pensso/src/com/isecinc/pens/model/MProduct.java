@@ -612,7 +612,81 @@ public class MProduct extends I_Model<Product>{
 		
 		return catalog;
 	}
-	
+	public Product getProductEDIManaul(String productCode,User user) throws Exception {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		Product catalog = null;
+		StringBuffer sql = new StringBuffer("");
+		try {
+			sql.append("\n SELECT A.* FROM( ");
+			sql.append("\n SELECT pd.product_category_id, pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME ");
+			sql.append("\n , pd.CODE as PRODUCT_CODE");
+			sql.append("\n , pp1.UOM_ID as UOM1 , pp2.UOM_ID as UOM2 ");
+			sql.append("\n , (select max(bar_ea) from apps.xxpens_om_item_mst_v b where b.segment1 = pd.code) barcode ");
+			sql.append("\n FROM pensso.M_Product pd ");
+			sql.append("\n  INNER JOIN (");
+			sql.append("\n    select distinct Product_ID,uom_id ,ISACTIVE from pensso.M_Product_Price ");
+			sql.append("\n    where ISACTIVE = 'Y' ");
+			sql.append("\n  )pp1 ON pd.Product_ID = pp1.Product_ID AND pp1.UOM_ID = pd.UOM_ID ");
+			
+			sql.append("\n  LEFT JOIN (");
+			sql.append("\n    select distinct Product_ID,uom_id ,ISACTIVE from pensso.M_Product_Price ");
+			sql.append("\n    where ISACTIVE = 'Y' ");
+			sql.append("\n  )pp2 ON pd.Product_ID = pp2.Product_ID AND pp2.UOM_ID <> pd.UOM_ID ");
+			
+			sql.append("\n WHERE pd.code = '"+productCode+"'");
+			sql.append("\n AND ( ");
+			sql.append("\n    pp1.UOM_ID IN ( ");
+			sql.append("\n      SELECT UOM_ID FROM pensso.M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND NVL(con.DISABLE_DATE,sysdate) >= sysdate ");
+			sql.append("\n     ) ");
+			sql.append("\n     OR");
+			sql.append("\n     pp2.UOM_ID IN ( ");
+			sql.append("\n        SELECT UOM_ID FROM pensso.M_UOM_CONVERSION con WHERE con.PRODUCT_ID = pd.PRODUCT_ID AND NVL(con.DISABLE_DATE,sysdate) >= sysdate ");
+			sql.append("\n      ) ");
+			sql.append("\n   )");
+			
+			if( !"admin".equalsIgnoreCase(user.getUserName())){
+			   sql.append("\n AND pd.CODE NOT IN (");
+			   sql.append("\n   SELECT DISTINCT CODE ");
+			   sql.append("\n   FROM pensso.M_PRODUCT_UNUSED ");
+			   sql.append("\n   WHERE type ='"+user.getRole().getKey()+"') ");
+			}
+			sql.append("\n )A");
+			//FOR BUD ONLY
+			sql.append("\n WHERE A.product_category_id IN( ");
+			sql.append("\n   SELECT product_category_id from pensso.m_product_category ");
+			sql.append("\n   WHERE SEG_VALUE1 in('381','382','383') "); 
+			sql.append("\n ) ");
+		    sql.append("\n ORDER BY A.PRODUCT_CODE ");
+			logger.debug("sql:"+sql);
+			
+			conn = new DBConnectionApps().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if(rst.next()){
+				catalog = new Product();
+				catalog.setId(rst.getInt("PRODUCT_ID"));
+				catalog.setName(Utils.isNull(rst.getString("PRODUCT_NAME")));
+				catalog.setCode(Utils.isNull(rst.getString("PRODUCT_CODE")));
+				catalog.setUom1(Utils.isNull(rst.getString("UOM1")));
+				catalog.setUom2(ConvertNullUtil.convertToString(rst.getString("UOM2")));
+				catalog.setBarcode(Utils.isNull(rst.getString("barcode")));
+				
+				catalog.setConversionRate(getConversionRate(catalog.getId(),catalog.getUom1(),catalog.getUom2()));
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				stmt.close();
+				rst.close();
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		
+		return catalog;
+	}
 	public  String getConversionRate(int productId,String uom1,String uom2) throws Exception{
 		String conversionRate = "";
 		try{
@@ -779,4 +853,53 @@ public class MProduct extends I_Model<Product>{
 		}
 		return item;
 	}
+	
+	/** Nissin Pre Order **/
+	public  List<ProductCatalog> getProductCatalogBySubBrandNissin(String subBrandCode,String orderDate,String pricelistId ,User u) throws Exception {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rst = null;
+		
+		List<ProductCatalog> productL = new ArrayList<ProductCatalog>();
+		StringBuffer sql = new StringBuffer("");
+		sql.append("\n SELECT A.* FROM( ");
+		sql.append("\n SELECT pd.PRODUCT_ID , pd.NAME as PRODUCT_NAME , pd.CODE as PRODUCT_CODE ");
+		sql.append("\n ,UM.UOM1 ,UM.UOM2 ");
+		sql.append("\n FROM PENSSO.M_PRODUCT pd ,PENSSO.M_UOM_NIS UM");
+		sql.append("\n WHERE pd.code = UM.product_code  ");
+		sql.append("\n AND pd.product_id in(");
+		sql.append("\n   select inventory_item_id FROM PENSBI.XXPENS_BI_MST_SUBBRAND_NIS sb ");
+		sql.append("\n   WHERE subbrand_no ='"+subBrandCode+"' ");
+		sql.append("\n ) ");
+		sql.append("\n )A");
+        sql.append("\n ORDER BY A.PRODUCT_CODE ");
+		
+        logger.debug("sql:"+sql);
+   
+		conn = DBConnectionApps.getInstance().getConnection();
+		try {
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while(rst.next()){
+				ProductCatalog catalog = new ProductCatalog();
+				catalog.setProductId(rst.getInt("PRODUCT_ID"));
+				catalog.setProductName(rst.getString("PRODUCT_NAME"));
+				catalog.setProductCode( rst.getString("PRODUCT_CODE"));
+				catalog.setUom1(rst.getString("UOM1"));
+				catalog.setUom2(Utils.isNull(rst.getString("UOM2")));
+				catalog.setTaxable("");
+	
+				productL.add(catalog);
+			}
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		
+		return productL;
+	}
+	
 }

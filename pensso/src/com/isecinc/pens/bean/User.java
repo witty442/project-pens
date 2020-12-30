@@ -16,8 +16,8 @@ import com.jcraft.jsch.Logger;
 /**
  * User
  * 
- * @author Atiz.b
- * @version $Id: User.java,v 1.0 13/06/2010 15:52:00 atiz.b Exp $
+ * @author Wittaya.b
+ * @version $Id: User.java,v 1.0 20/11/2020
  * 
  */
 public class User extends I_PO implements Serializable {
@@ -30,6 +30,9 @@ public class User extends I_PO implements Serializable {
 	public static final String NB = "NB";
 	public static final String STOCK = "STOCK";
 	public static final String BUD_ADMIN = "BUDADMIN";
+	public static final String NIS = "NISSIN";
+	public static final String NIS_PENS = "NISSINPENS";
+	public static final String NIS_VIEW = "NISSINVIEW";
 	
 	private static final long serialVersionUID = 2247823086169174428L;
 
@@ -51,6 +54,7 @@ public class User extends I_PO implements Serializable {
 		setName(rst.getString("NAME").trim());
 		setType(convertToString(rst.getString("ROLE")).trim());
 		setRoleAccess(convertToString(rst.getString("ROLE")).trim());
+		setRoleAll(Utils.isNull(rst.getString("ROLE_ALL")));
 		setActive(rst.getString("ISACTIVE").trim());
 
 		// oracle fields
@@ -98,21 +102,23 @@ public class User extends I_PO implements Serializable {
 		try{
 			List<References> ref = new ArrayList<References>();
 			// customer type, sales group, order type
-			if ( !getType().equalsIgnoreCase(TT) && !getType().equalsIgnoreCase(VAN)) {
+			if ( !getType().equalsIgnoreCase(TT) && !getType().equalsIgnoreCase(VAN)
+			) {
 				// No Role Info
 			} else if (getType().equalsIgnoreCase(TT)) {
 				ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_TT);
 			} else if (getType().equalsIgnoreCase(VAN)) {
 				ref = InitialReferences.getReferenes().get(InitialReferences.ROLE_VAN);
 			} 
-			
-			for (References r : ref) {
-				if (r.getName().equalsIgnoreCase(InitialReferences.CUSTOMER_TYPE)) {
-					setCustomerType(r);
-				} else if (r.getName().equalsIgnoreCase(InitialReferences.SALES_GROUP)) {
-					setSalesGroup(r);
-				} else if (r.getName().equalsIgnoreCase(InitialReferences.ORDER_TYPE)) {
-					setOrderType(r);
+			if(ref != null){
+				for (References r : ref) {
+					if (r.getName().equalsIgnoreCase(InitialReferences.CUSTOMER_TYPE)) {
+						setCustomerType(r);
+					} else if (r.getName().equalsIgnoreCase(InitialReferences.SALES_GROUP)) {
+						setSalesGroup(r);
+					} else if (r.getName().equalsIgnoreCase(InitialReferences.ORDER_TYPE)) {
+						setOrderType(r);
+					} 
 				}
 			}
 			//System.out.println("activeRoleInfo:type{"+getType()+"}ref{"+ref+"}orderType{"+getOrderType()+"}");
@@ -124,7 +130,11 @@ public class User extends I_PO implements Serializable {
 					}
 				}
 			}else{
-				setRole( new References("admin", "admin"));
+				if(!Utils.isNull(getRoleAll()).equals("")){
+				   setRole( new References(Utils.isNull(getRoleAll()), Utils.isNull(getRoleAll())));
+				}else{
+				   setRole( new References("admin", "admin"));
+				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -190,7 +200,7 @@ public class User extends I_PO implements Serializable {
 	/** ROLE */
 	private References role;
 	private String roleAccess;
-
+	private String roleAll;
 	/** VAN NO */
 	private String vanNo;
 
@@ -205,7 +215,33 @@ public class User extends I_PO implements Serializable {
     /** moneyToPens */
     private String moneyToPens;
     
+    private boolean mobile;
+    private String module;
     
+	public String getModule() {
+		return module;
+	}
+
+	public void setModule(String module) {
+		this.module = module;
+	}
+
+	public String getRoleAll() {
+		return roleAll;
+	}
+
+	public void setRoleAll(String roleAll) {
+		this.roleAll = roleAll;
+	}
+
+	public boolean isMobile() {
+		return mobile;
+	}
+
+	public void setMobile(boolean mobile) {
+		this.mobile = mobile;
+	}
+
 	public String getRoleAccess() {
 		return roleAccess;
 	}

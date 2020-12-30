@@ -90,7 +90,7 @@ public class ReportOnhandTops_SQL {
 					sql.append("\n AND M.reference_code = 'TOPSitem'");
 					sql.append("\n AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					
 					//Tops 020058
 					sql.append("\n AND C.customer_code LIKE '020058%'");
@@ -275,7 +275,7 @@ public class ReportOnhandTops_SQL {
 					sql.append("\n AND M.reference_code = 'TOPSitem'");
 					sql.append("\n AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					
 					//Tops Only 020058
 					sql.append("\n AND C.customer_code LIKE '020058%'");
@@ -320,7 +320,7 @@ public class ReportOnhandTops_SQL {
 						sql.append("\n AND M.reference_code = 'TOPSitem'");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						//Tops Only 020058
 						sql.append("\n AND C.customer_code LIKE '020058%'");
 						
@@ -358,7 +358,7 @@ public class ReportOnhandTops_SQL {
 						sql.append("\n AND M.reference_code = 'TOPSitem'");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						//Tops Only 020047
 						sql.append("\n AND C.customer_code LIKE '020058%'");
 						

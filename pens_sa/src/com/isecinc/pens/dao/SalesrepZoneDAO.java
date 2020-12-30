@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.PopupBean;
+import com.isecinc.pens.bean.SalesZoneBean;
 import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
 import com.pens.util.DBConnection;
@@ -58,6 +59,52 @@ public class SalesrepZoneDAO {
 				} catch (Exception e) {}
 			}
 			return salesZoneDesc;
+		}
+	 public static SalesZoneBean getSalesZone(String salesZone) throws Exception {
+		 Connection conn = null;
+		 try{
+			 conn = DBConnection.getInstance().getConnectionApps();
+			 return getSalesZone(conn, salesZone);
+		 }catch(Exception e){
+			 throw e;
+		 }finally{
+			 if(conn != null){
+				 conn.close();
+			 }
+		 }
+	 }
+	 public static SalesZoneBean getSalesZone(Connection conn ,String salesZone) throws Exception {
+			Statement stmt = null;
+			ResultSet rst = null;
+			StringBuilder sql = new StringBuilder();
+			SalesZoneBean bean = null;
+			try {
+				if(Utils.isNull(salesZone).equals("")){
+					return null;
+				}
+				sql.append("\n select ZONE_NAME ");
+				sql.append("\n FROM PENSBI.XXPENS_BI_MST_SALES_ZONE  ");
+				sql.append("\n WHERE zone = '"+salesZone+"' \n");
+				
+				logger.debug("sql:"+sql);
+				stmt = conn.createStatement();
+				rst = stmt.executeQuery(sql.toString());
+			    if (rst.next()) {
+			    	bean =  new SalesZoneBean();
+			    	bean.setZone(Utils.isNull(rst.getString("zone")));
+			    	bean.setZoneName(Utils.isNull(rst.getString("zone_name")));
+			    	bean.setSalesrepCode(Utils.isNull(rst.getString("salesrep_code")));
+			    	bean.setSalesrepId(Utils.isNull(rst.getString("salesrep_code")));
+				}//if
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				try {
+					rst.close();
+					stmt.close();
+				} catch (Exception e) {}
+			}
+			return bean;
 		}
 	 
 	/** Get SalesrepZOneList By User filter TT**/

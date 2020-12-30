@@ -11,6 +11,9 @@ import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.District;
 import com.isecinc.pens.bean.Province;
 import com.pens.util.ConvertNullUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.DBConnectionApps;
+import com.pens.util.Utils;
 import com.pens.util.seq.SequenceProcessAll;
 
 /**
@@ -39,10 +42,10 @@ public class MAddress extends I_Model<Address> {
 	 * @throws Exception
 	 */
 	public Address find(String id) throws Exception {
-		return super.find(id, TABLE_NAME, COLUMN_ID, Address.class);
+		return super.find(id, "pensso."+TABLE_NAME, COLUMN_ID, Address.class);
 	}
 	public Address find(Connection conn,String id) throws Exception {
-		return super.find(conn,id, TABLE_NAME, COLUMN_ID, Address.class);
+		return super.find(conn,id, "pensso."+TABLE_NAME, COLUMN_ID, Address.class);
 	}
 	/**
 	 * Search
@@ -105,15 +108,27 @@ public class MAddress extends I_Model<Address> {
 		return pos;
 	}
 	
-	public Address findAddressByCustomerId(Connection conn,String customerId) throws Exception {
+	//ShipTo
+	public Address findAddressShipToByCustomerId(String customerId) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnectionApps.getInstance().getConnection();
+			return findAddressShipToByCustomerId(conn, customerId);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();
+		}
+	}
+	public Address findAddressShipToByCustomerId(Connection conn,String customerId) throws Exception {
 
 		Statement stmt = null;
 		ResultSet rst = null;
 		Address a = null;
 		try {
 			String sql = "select  a.*,\n";
-				 sql +=" (select max(d.name) from m_district d where d.district_id = a.district_id) as district_name \n";
-				 sql +=" from m_address a \n";
+				 sql +=" (select max(d.name) from pensso.m_district d where d.district_id = a.district_id) as district_name \n";
+				 sql +=" from pensso.m_address a \n";
 				 sql +=" where purpose ='S' \n";	
 				 sql +=" and customer_id = "+customerId;
 			
@@ -139,7 +154,7 @@ public class MAddress extends I_Model<Address> {
 				a.setPostalCode(rst.getString("POSTAL_CODE").trim());
 				a.setPurpose(rst.getString("PURPOSE").trim());
 				a.setIsActive(rst.getString("ISACTIVE").trim());
-
+				a.setSiteUseId(rst.getLong("site_use_id"));
 			}
 
 		} catch (Exception e) {
@@ -157,6 +172,144 @@ public class MAddress extends I_Model<Address> {
 		return a;
 	}
 	
+	//BillTo
+	public Address findAddressBillToByCustomerId(String customerId) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnectionApps.getInstance().getConnection();
+			return findAddressBillToByCustomerId(conn, customerId);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();
+		}
+	}
+	public Address findAddressBillToByCustomerId(Connection conn,String customerId) throws Exception {
+
+		Statement stmt = null;
+		ResultSet rst = null;
+		Address a = null;
+		try {
+			String sql = "select  a.*,\n";
+				 sql +=" (select max(d.name) from pensso.m_district d where d.district_id = a.district_id) as district_name \n";
+				 sql +=" from pensso.m_address a \n";
+				 sql +=" where purpose ='B' \n";	
+				 sql +=" and customer_id = "+customerId;
+			
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				a = new Address();
+				a.setId(rst.getInt("ADDRESS_ID"));
+				a.setCustomerId(rst.getLong("CUSTOMER_ID"));
+				a.setLine1(rst.getString("Line1").trim());
+				a.setLine2(rst.getString("Line2").trim());
+				a.setLine3(ConvertNullUtil.convertToString(rst.getString("Line3")).trim());
+				a.setLine4(ConvertNullUtil.convertToString(rst.getString("Line4")).trim());
+				
+				District d = new District();
+				d.setName(rst.getString("district_name"));
+				a.setDistrict(d);
+				Province p = new Province();
+				p.setName(rst.getString("province_name"));
+				a.setProvince(p);
+				
+				a.setPostalCode(rst.getString("POSTAL_CODE").trim());
+				a.setPurpose(rst.getString("PURPOSE").trim());
+				a.setIsActive(rst.getString("ISACTIVE").trim());
+                a.setSiteUseId(rst.getLong("site_use_id"));
+			}
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+	
+		}
+		
+		return a;
+	}
+	
+	public List<Address> findAddressShipToList(String customerId,String customerCode) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return findAddressShipToList(conn, customerId, customerCode);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(conn != null){
+				conn.close();
+			}
+		}
+	}
+	
+	public List<Address> findAddressShipToList(Connection conn,String customerId,String customerCode) throws Exception {
+
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<Address> dataList = new ArrayList<Address>();
+		Address a = null;
+		try {
+			String sql = "select  a.*,\n";
+				 sql +=" (select max(d.name) from pensso.m_district d where d.district_id = a.district_id) as district_name \n";
+				 sql +=" from pensso.m_address a \n";
+				 sql +=" where purpose ='S' \n";	
+				 if( !Utils.isNull(customerId).equals("") && !Utils.isNull(customerId).equals("0")){
+					sql +=" and customer_id = "+customerId;
+				 }
+				
+				 if( !Utils.isNull(customerCode).equals("")){
+					 sql +=" and customer_id =(select customer_id from pensso.m_customer where code = '"+customerCode+"')"; 
+				 }
+			
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){
+				a = new Address();
+				a.setId(rst.getInt("ADDRESS_ID"));
+				a.setCustomerId(rst.getLong("CUSTOMER_ID"));
+				a.setLine1(rst.getString("Line1").trim());
+				a.setLine2(rst.getString("Line2").trim());
+				a.setLine3(ConvertNullUtil.convertToString(rst.getString("Line3")).trim());
+				a.setLine4(ConvertNullUtil.convertToString(rst.getString("Line4")).trim());
+				
+				District d = new District();
+				d.setName(rst.getString("district_name"));
+				a.setDistrict(d);
+				Province p = new Province();
+				p.setName(rst.getString("province_name"));
+				a.setProvince(p);
+				
+				a.setPostalCode(rst.getString("POSTAL_CODE").trim());
+				a.setPurpose(rst.getString("PURPOSE").trim());
+				a.setIsActive(rst.getString("ISACTIVE").trim());
+				a.setSiteUseId(rst.getLong("site_use_id"));
+				dataList.add(a);
+			}
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+	
+		}
+		
+		return dataList;
+	}
+	
 	public Address findAddressByCustomerId(Connection conn,String customerId,String purpose) throws Exception {
 
 		Statement stmt = null;
@@ -164,8 +317,8 @@ public class MAddress extends I_Model<Address> {
 		Address a = null;
 		try {
 			String sql = "select  a.*,\n";
-				 sql +=" (select max(d.name) from m_district d where d.district_id = a.district_id) as district_name \n";
-				 sql +=" from m_address a \n";
+				 sql +=" (select max(d.name) from pensso.m_district d where d.district_id = a.district_id) as district_name \n";
+				 sql +=" from pensso.m_address a \n";
 				 sql +=" where purpose ='"+purpose+"' \n";	
 				 sql +=" and customer_id = "+customerId;
 				 sql +=" ORDER BY ADDRESS_ID DESC";
@@ -192,7 +345,7 @@ public class MAddress extends I_Model<Address> {
 				a.setPostalCode(rst.getString("POSTAL_CODE").trim());
 				a.setPurpose(rst.getString("PURPOSE").trim());
 				a.setIsActive(rst.getString("ISACTIVE").trim());
-
+				a.setSiteUseId(rst.getLong("site_use_id"));
 			}
 
 		} catch (Exception e) {

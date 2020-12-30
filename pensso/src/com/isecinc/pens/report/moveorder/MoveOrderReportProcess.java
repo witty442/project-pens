@@ -17,7 +17,7 @@ import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 /**
  * InvoiceDetailReportProcess Report

@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.report.salesanalyst.SAInitial;
+import com.isecinc.pens.web.report.analyst.process.AInitial;
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;
 
@@ -35,6 +36,7 @@ public class SecurityHelper {
 		COLUMN_KEY_MAP.put("Customer_Category","ประเภทขาย");//SaleType
 		COLUMN_KEY_MAP.put("Salesrep_id", "พนักงานขาย");	//SalesMan
 		COLUMN_KEY_MAP.put("SALES_ZONE", "ภาคตามสายดูแล");	//SalesZone
+		COLUMN_KEY_MAP.put("Customer_id", "ร้านค้า");	//Customer_id
 		
 		
 		MASTER_COLUMN_SEARCH_KEY_MAP.put("Brand", "Brand_no");//Brand
@@ -89,16 +91,25 @@ public class SecurityHelper {
 			html +="<table border='0' align='left' width='80%'>\n";
 			//html += "<tr><td colspan='3'> <b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"] </b></td></tr> \n";
 			
-			String roles[] = new String[6];
+			//String roles[] = new String[7];
+			html +="<tr><td>\n";
 			int i=0;
 			while(rs.next()){
 				 roleColumnAccess = rs.getString("role_column_access");
 			     String role= genRoleFilterByTableMaster(conn,user, roleColumnAccess);
-			     roles[i] = role;
+			    // roles[i] = role;
 			     i++;
+			     html+=" "+role;
 			}
-			html +="<tr>\n";
-			html += " <td>"+roles[0]+" : "+roles[1]+" : "+roles[2]+" : "+roles[3]+" : "+roles[4]+"</td>";  
+			
+		/*	if( !Utils.isNull(roles[0]).equals(""))html+=" "+roles[0];
+			if( !Utils.isNull(roles[1]).equals(""))html+=" "+roles[1];
+			if( !Utils.isNull(roles[2]).equals(""))html+=" "+roles[2];
+			if( !Utils.isNull(roles[3]).equals(""))html+=" "+roles[3];
+			if( !Utils.isNull(roles[4]).equals(""))html+=" "+roles[4];
+			if( !Utils.isNull(roles[5]).equals(""))html+=" "+roles[5];
+			if( !Utils.isNull(roles[6]).equals(""))html+=" "+roles[6];*/
+			html +="  </td>";  
 			html +="<tr>\n";  
 			html +="</table>\n";
 			html +="</div>";
@@ -427,7 +438,11 @@ public class SecurityHelper {
 			ps = conn.prepareStatement(sql1);
 			rs = ps.executeQuery();	
 			while(rs.next()){
-				condValue += "'"+rs.getString("role_data_access")+"',";
+				if(condType.equalsIgnoreCase("Customer_id")){
+				    condValue += rs.getString("role_data_access")+",";
+				}else{
+					condValue += "'"+rs.getString("role_data_access")+"',";
+				}
 			}
 			if( !Utils.isNull(condValue).equals("")){
 				condValue = condValue.substring(0,condValue.length()-1);
@@ -458,6 +473,10 @@ public class SecurityHelper {
 				if( !Utils.isNull(condValue).equals("")){
 				  sql = condValue;
 				}
+			}else if("Customer_id".equalsIgnoreCase(condType)){
+				if( !Utils.isNull(condValue).equals("")){
+				  sql = condValue;
+				}
 			}
 			
 			re[0] = sql;
@@ -478,6 +497,7 @@ public class SecurityHelper {
 		ResultSet rs =null;
 		String condValue = "";
 		String condDesc  ="";
+		References ref = null;
 		try{
 			String sql1 = " select distinct rc.role_data_access  \n";
 			sql1 += " from c_user_info a ,c_group_role ag ,c_role r ,c_role_access rc  \n";
@@ -494,21 +514,23 @@ public class SecurityHelper {
 			while(rs.next()){
 				condValue = rs.getString("role_data_access");
 				if( !Utils.isNull(condValue).equals("ALL")){
-				   List<References> dataList  = SAInitial.getInstance().getConditionValueList4Role(conn,condType,condValue,null);	
+				   List<References> dataList  = new AInitial().getConditionValueList4Role(conn,condType,condValue,null);	
 				   if(dataList !=null && dataList.size()> 1){
-				     condDesc  += ((References)dataList.get(1)).getName()+",";
+					  ref = (References)dataList.get(1);
+				      condDesc  += "<font color='#008080'>"+ref.getKey()+"- "+ref.getName()+"</font><b>|</b>";
 				   }else{
-					 condDesc  += ((References)dataList.get(0)).getName()+",";   
+					  ref = (References)dataList.get(0);
+					  condDesc  += "<font color='#008080'>"+ref.getKey()+"- "+ref.getName()+"</font><b>|</b>";   
 				   }
 				}else{
-				   condDesc  += "ALL,";
+				   condDesc  += "<font color='#008080'>ALL</font>,";
 				}
 			}
 			if( !Utils.isNull(condDesc).equals("")){
 				condDesc = condDesc.substring(0,condDesc.length()-1);
 			}
 			
-			sql = "<b>"+COLUMN_KEY_MAP.get(condType)+"</b>["+condDesc +"],";
+			sql = "&nbsp;<b><u>"+COLUMN_KEY_MAP.get(condType)+"</u></b><b>["+condDesc +"]</b>,";
             
 			return sql;
 		}catch(Exception e){

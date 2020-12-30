@@ -57,17 +57,17 @@ public class ReportSizeColorLotus_SQL {
 					"-(NVL(SALE_OUT.SALE_OUT_QTY,0) + NVL(SALE_RETURN.SALE_RETURN_QTY,0) + NVL(SALE_ADJUST.SALE_ADJUST_QTY,0)) " +
 					" ONHAND_QTY");
 			
-			sql.append("\n ,(select max(X.pens_value) from PENSBME_MST_REFERENCE X WHERE X.interface_desc=M.barcode and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as pens_item ");
-			sql.append("\n ,(select X.pens_desc from PENSBME_MST_REFERENCE X WHERE X.pens_value = M.store_code and reference_code = 'Store') as store_name ");
-			sql.append("\n ,(select X.interface_desc from PENSBME_MST_REFERENCE X WHERE X.pens_value = M.store_code and reference_code = 'SubInv') as sub_inv ");
+			sql.append("\n ,(select max(X.pens_value) from PENSBI.PENSBME_MST_REFERENCE X WHERE X.interface_desc=M.barcode and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as pens_item ");
+			sql.append("\n ,(select X.pens_desc from PENSBI.PENSBME_MST_REFERENCE X WHERE X.pens_value = M.store_code and reference_code = 'Store') as store_name ");
+			sql.append("\n ,(select X.interface_desc from PENSBI.PENSBME_MST_REFERENCE X WHERE X.pens_value = M.store_code and reference_code = 'SubInv') as sub_inv ");
 			
 			sql.append("\n FROM(  ");
 			   sql.append("\n SELECT DISTINCT AA.* FROM(");
 				    sql.append("\n SELECT DISTINCT L.store_code");
 					sql.append("\n ,L.group_code as group_type" );
-					sql.append("\n ,(select max(X.interface_value) from PENSBME_MST_REFERENCE X WHERE X.interface_desc=L.barcode and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as material_master ");
+					sql.append("\n ,(select max(X.interface_value) from PENSBI.PENSBME_MST_REFERENCE X WHERE X.interface_desc=L.barcode and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as material_master ");
 					sql.append("\n ,L.barcode ");
-					sql.append("\n FROM  PENSBME_ORDER L");
+					sql.append("\n FROM  PENSBI.PENSBME_ORDER L");
 					sql.append("\n WHERE  L.STORE_CODE LIKE '"+storeCode+"%'");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
 						sql.append("\n AND L.STORE_CODE IN("+SQLHelper.converToTextSqlIn(c.getPensCustCodeFrom())+") ");
@@ -83,7 +83,7 @@ public class ReportSizeColorLotus_SQL {
 
 					sql.append("\n SELECT DISTINCT L.cust_no as store_code");
 				    sql.append("\n ,L.GROUP_CODE as group_type, L.material_master,L.barcode ");
-					sql.append("\n FROM PENSBME_LOTUS_INIT_STK H,PENSBME_LOTUS_ONHAND_INIT_STK L");
+					sql.append("\n FROM PENSBI.PENSBME_LOTUS_INIT_STK H,PENSBI.PENSBME_LOTUS_ONHAND_INIT_STK L");
 					sql.append("\n WHERE 1=1 ");
 					sql.append("\n AND H.cust_no = L.cust_no  ");
 					sql.append("\n AND L.CUST_NO LIKE '"+storeCode+"%'");
@@ -102,19 +102,19 @@ public class ReportSizeColorLotus_SQL {
 					sql.append("\n SELECT DISTINCT M.CUSTOMER_CODE as store_code");
 					sql.append("\n ,MP.MATERIAL_MASTER as group_type ");
 					sql.append("\n ,MI.material_master,MI.barcode ");
-					sql.append("\n  FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
-					sql.append("\n ,PENSBME_STYLE_MAPPING MP ");
+					sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
+					sql.append("\n ,PENSBI.PENSBME_STYLE_MAPPING MP ");
 					sql.append("\n ,( ");
 					sql.append("\n   select pens_value as pens_item,");
 					sql.append("\n   interface_value as material_master,interface_desc as barcode ");
-					sql.append("\n   FROM PENSBME_MST_REFERENCE M ");
+					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
 					sql.append("\n  )MI ");
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
-					sql.append("\n   PENSBME_MST_REFERENCE M ");
+					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE  ( pens_value like  '"+storeCode+"%' )" );
 					sql.append("\n   AND M.reference_code ='Store' ");
 			        sql.append("\n  ) M ");
@@ -127,7 +127,7 @@ public class ReportSizeColorLotus_SQL {
 					sql.append("\n AND P.inventory_item_code = MP.pens_item");
 					sql.append("\n AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+					//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 					
 					if(initDate != null){
 						 sql.append("\n AND V.invoice_date >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
@@ -152,8 +152,8 @@ public class ReportSizeColorLotus_SQL {
 				
 					sql.append("\n SELECT DISTINCT M.store_code");
 					sql.append("\n ,I.group_code as group_type,I.material_master");
-					sql.append("\n ,(select max(X.interface_desc) from PENSBME_MST_REFERENCE X WHERE X.interface_value=I.material_master and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as barcode ");
-					sql.append("\n FROM PENSBME_PICK_STOCK M ,PENSBME_PICK_STOCK_I I ");
+					sql.append("\n ,(select max(X.interface_desc) from PENSBI.PENSBME_MST_REFERENCE X WHERE X.interface_value=I.material_master and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as barcode ");
+					sql.append("\n FROM PENSBI.PENSBME_PICK_STOCK M ,PENSBI.PENSBME_PICK_STOCK_I I ");
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND M.issue_req_no = I.issue_req_no ");
 					sql.append("\n AND M.issue_req_status ='"+PickConstants.STATUS_ISSUED+"'");
@@ -181,7 +181,7 @@ public class ReportSizeColorLotus_SQL {
 					/** STOCK _ISSUE **/
 					sql.append("\n SELECT  DISTINCT M.CUSTOMER_NO as store_code");
 					sql.append("\n ,I.group_code as group_type,I.material_master,I.barcode ");
-					sql.append("\n FROM PENSBME_STOCK_ISSUE M ,PENSBME_STOCK_ISSUE_ITEM I ");
+					sql.append("\n FROM PENSBI.PENSBME_STOCK_ISSUE M ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I ");
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND M.issue_req_no = I.issue_req_no  ");
 					sql.append("\n AND M.status ='"+PickConstants.STATUS_ISSUED+"'");
@@ -210,7 +210,7 @@ public class ReportSizeColorLotus_SQL {
 					/** RETURN **/
 					sql.append("\n SELECT DISTINCT J.STORE_CODE ");
 					sql.append("\n ,I.group_code as group_type,I.material_master,I.barcode ");
-					sql.append("\n FROM PENSBME_PICK_JOB J ,PENSBME_PICK_BARCODE B ,PENSBME_PICK_BARCODE_ITEM I ");
+					sql.append("\n FROM PENSBI.PENSBME_PICK_JOB J ,PENSBI.PENSBME_PICK_BARCODE B ,PENSBI.PENSBME_PICK_BARCODE_ITEM I ");
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND J.job_id = B.job_id  ");
 					sql.append("\n AND B.job_id = I.job_id ");
@@ -242,17 +242,17 @@ public class ReportSizeColorLotus_SQL {
 				    sql.append("\n SELECT J.STORE_CODE,J.item_adjust_desc as group_type ");
 					sql.append("\n ,( ");
 					sql.append("\n   select max(interface_value) as material_master ");
-					sql.append("\n   FROM PENSBME_MST_REFERENCE M ");
+					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
 					sql.append("\n   and M.pens_value = J.item_adjust");
 					sql.append("\n  ) as material_master");
 					sql.append("\n ,( ");
 					sql.append("\n   select max(interface_desc) as barcode ");
-					sql.append("\n   FROM PENSBME_MST_REFERENCE M ");
+					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
 					sql.append("\n   and M.pens_value = J.item_adjust");
 					sql.append("\n  ) as barcode");
-					sql.append("\n FROM PENSBME_ADJUST_SALES J ");
+					sql.append("\n FROM PENSBI.PENSBME_ADJUST_SALES J ");
 					
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND J.STATUS <> '"+PickConstants.STATUS_CANCEL+"' ");
@@ -285,7 +285,7 @@ public class ReportSizeColorLotus_SQL {
       		    sql.append("\n SELECT ");
 				sql.append("\n L.CUST_NO as STORE_CODE, L.GROUP_CODE as group_type, L.material_master,L.barcode,");
 				sql.append("\n SUM(QTY) AS INIT_SALE_QTY ");
-				sql.append("\n FROM PENSBME_LOTUS_INIT_STK H,PENSBME_LOTUS_ONHAND_INIT_STK L");
+				sql.append("\n FROM PENSBI.PENSBME_LOTUS_INIT_STK H,PENSBI.PENSBME_LOTUS_ONHAND_INIT_STK L");
 				sql.append("\n WHERE 1=1 ");
 				sql.append("\n and H.cust_no = L.cust_no  ");
 				sql.append("\n and H.COUNT_STK_DATE = L.COUNT_STK_DATE  ");
@@ -316,7 +316,7 @@ public class ReportSizeColorLotus_SQL {
 				sql.append("\n SELECT L.CUST_NO AS STORE_CODE,");
 			    sql.append("\n L.GROUP_CODE as group_type, L.material_master,L.barcode , ");
 				sql.append("\n NVL(COUNT(*),0) AS SALE_OUT_QTY ");
-				sql.append("\n FROM PENSBME_SALES_OUT L");
+				sql.append("\n FROM PENSBI.PENSBME_SALES_OUT L");
 				sql.append("\n WHERE 1=1 ");
 				sql.append("\n AND L.status = 'N'");
 				if(initDate != null){
@@ -353,9 +353,9 @@ public class ReportSizeColorLotus_SQL {
 			    sql.append("\n FROM (  ");
 						sql.append("\n SELECT  ");
 						sql.append("\n M.STORE_CODE, M.group_code as group_type,M.barcode");
-						sql.append("\n ,(select max(X.interface_value) from PENSBME_MST_REFERENCE X WHERE X.interface_desc=M.barcode and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as material_master ");
+						sql.append("\n ,(select max(X.interface_value) from PENSBI.PENSBME_MST_REFERENCE X WHERE X.interface_desc=M.barcode and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as material_master ");
 						sql.append("\n ,NVL(SUM(QTY),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBME_ORDER M ");
+						sql.append("\n FROM PENSBI.PENSBME_ORDER M ");
 						sql.append("\n WHERE 1=1  ");
 						if(initDate != null){
 							 sql.append("\n AND M.order_date  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
@@ -382,9 +382,9 @@ public class ReportSizeColorLotus_SQL {
 						
 						sql.append("\n SELECT  ");
 						sql.append("\n M.STORE_CODE, I.group_code as group_type,I.material_master");
-						sql.append("\n ,(select max(X.interface_desc) from PENSBME_MST_REFERENCE X WHERE X.interface_value=I.material_master and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as barcode ");
+						sql.append("\n ,(select max(X.interface_desc) from PENSBI.PENSBME_MST_REFERENCE X WHERE X.interface_value=I.material_master and REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"') as barcode ");
 						sql.append("\n ,NVL(COUNT(*),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBME_PICK_STOCK M ,PENSBME_PICK_STOCK_I I ");
+						sql.append("\n FROM PENSBI.PENSBME_PICK_STOCK M ,PENSBI.PENSBME_PICK_STOCK_I I ");
 						sql.append("\n WHERE 1=1   ");
 						sql.append("\n AND M.issue_req_no = I.issue_req_no ");
 						sql.append("\n AND M.issue_req_status ='"+PickConstants.STATUS_ISSUED+"'");
@@ -415,7 +415,7 @@ public class ReportSizeColorLotus_SQL {
 						sql.append("\n SELECT  ");
 						sql.append("\n M.CUSTOMER_NO AS STORE_CODE, I.group_code as group_type,I.material_master,I.barcode, ");
 						sql.append("\n NVL(SUM(I.ISSUE_QTY),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBME_STOCK_ISSUE M ,PENSBME_STOCK_ISSUE_ITEM I ");
+						sql.append("\n FROM PENSBI.PENSBME_STOCK_ISSUE M ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I ");
 						sql.append("\n WHERE 1=1   ");
 						sql.append("\n AND M.issue_req_no = I.issue_req_no  ");
 						sql.append("\n AND M.status ='"+PickConstants.STATUS_ISSUED+"'");
@@ -454,7 +454,7 @@ public class ReportSizeColorLotus_SQL {
 					sql.append("\n SELECT J.STORE_CODE, ");
 					sql.append("\n I.group_code as group_type,I.material_master,I.barcode ,");
 					sql.append("\n NVL(COUNT(*),0) as SALE_RETURN_QTY ");
-					sql.append("\n FROM PENSBME_PICK_JOB J ,PENSBME_PICK_BARCODE B ,PENSBME_PICK_BARCODE_ITEM I  ");
+					sql.append("\n FROM PENSBI.PENSBME_PICK_JOB J ,PENSBI.PENSBME_PICK_BARCODE B ,PENSBI.PENSBME_PICK_BARCODE_ITEM I  ");
 					sql.append("\n WHERE 1=1   ");
 					sql.append("\n AND J.job_id = B.job_id  ");
 					sql.append("\n AND B.job_id = I.job_id ");
@@ -504,7 +504,7 @@ public class ReportSizeColorLotus_SQL {
 				sql.append("\n   and M.pens_value = J.item_adjust");
 				sql.append("\n  ) as barcode");
 				sql.append("\n ,NVL(SUM(J.ITEM_ADJUST_QTY),0) as SALE_ADJUST_QTY ");
-				sql.append("\n FROM PENSBME_ADJUST_SALES J ");
+				sql.append("\n FROM PENSBI.PENSBME_ADJUST_SALES J ");
 				
 				sql.append("\n WHERE 1=1   ");
 				sql.append("\n AND J.STATUS <> '"+PickConstants.STATUS_CANCEL+"' ");

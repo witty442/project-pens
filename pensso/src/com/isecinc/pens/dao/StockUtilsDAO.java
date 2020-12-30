@@ -10,25 +10,29 @@ import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MUOMConversion;
 import com.pens.util.DBConnectionApps;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 public class StockUtilsDAO {
 	private static Logger logger = Logger.getLogger("PENS");
 	
-	public static void main1(String[] a){
+	public static void main(String[] a){
 		Connection conn = null;
 		try{
 			conn =DBConnectionApps.getInstance().getConnection();
-			String uomFrom ="CUP";
-			String uomTo ="CTN";
-			String subQty = StockUtilsDAO.convertStockQty(conn, "753157", uomFrom, uomTo, "20");
+			String uomFrom ="CTN";
+			String uomTo ="EA";
+			String subQty = StockUtilsDAO.convertStockQty(conn, "781157",  "CTN", "EA", "0.00833");
 			
 			System.out.println("subQty:"+subQty);
+			
+           String subQty2 = StockUtilsDAO.convertStockQty(conn, "781157", "CTN", "EA", "1");
+			
+			System.out.println("subQty2:"+subQty2);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
-	public static void main(String[] a){
+	public static void mainXX(String[] a){
 		Connection conn = null;
 		try{
 			conn =DBConnectionApps.getInstance().getConnection();
@@ -62,7 +66,7 @@ public class StockUtilsDAO {
 	        if(uc2.getConversionRate() > 0){
 	        	double qty2Temp = qty/ (uc1.getConversionRate()/uc2.getConversionRate()) ;
 	        	//convert to Str 1.666667
-				String qty2Str5Digit = NumberToolsUtil.decimalFormat(qty2Temp, NumberToolsUtil.format_current_6_digit);
+				String qty2Str5Digit = NumberUtil.decimalFormat(qty2Temp, NumberUtil.format_current_6_digit);
 				//substr remove digit no 6 :"7" -> 1.66666
 				qty2Str5Digit = qty2Str5Digit.substring(0,qty2Str5Digit.length()-1);
 				
@@ -110,7 +114,7 @@ public class StockUtilsDAO {
         	double qty2Temp = Utils.convertStrToDouble(secQtyIn) / (uc1.getConversionRate()/uc2.getConversionRate()) ;
         	//convert to Str 1.666667
         	logger.debug("qty2Temp:"+qty2Temp);
-			String qty2Str5Digit = NumberToolsUtil.decimalFormat(qty2Temp, NumberToolsUtil.format_current_6_digit);
+			String qty2Str5Digit = NumberUtil.decimalFormat(qty2Temp, NumberUtil.format_current_6_digit);
 			//substr remove digit no 6 :"7" -> 1.66666
 			qty2Str5Digit = qty2Str5Digit.substring(0,qty2Str5Digit.length()-1);
 			logger.debug("qty2Str5Digit:"+qty2Str5Digit);

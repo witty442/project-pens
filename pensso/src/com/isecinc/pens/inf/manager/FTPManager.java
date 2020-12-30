@@ -411,7 +411,7 @@ public class FTPManager {
     					       canGetFtpFile = ImportHelper.canGetFtpFileBudsSales(userBean, tableBean, ftpFileName,importAll);
     					   }
     					}
-    					logger.info("Table["+tableName+"]fileFtpname["+ftpFileName+"]canGetFtpFile["+canGetFtpFile+"]");
+    					//logger.info("Table["+tableName+"]fileFtpname["+ftpFileName+"]canGetFtpFile["+canGetFtpFile+"]");
     					
     					if(canGetFtpFile==true){
     						

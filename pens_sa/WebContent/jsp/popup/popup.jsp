@@ -289,7 +289,7 @@ window.onload = function(){
      <div class="col-4 themed-grid-col-detail"><%=descSearchTxtName %></div>
       <div class="col-8 themed-grid-col-detail">
         <html:text property="descSearch"  styleClass="\" autoComplete=\"off"/>
-        <input type="button" name="search"  value="Search" class="btn btn-primary" onclick="searchPopup('<%=request.getContextPath()%>')" />
+        <input type="button" name="Search"  value=" ค้นหา " class="btn btn-primary" onclick="searchPopup('<%=request.getContextPath()%>')" />
       
       </div>
   </div>
@@ -303,7 +303,7 @@ window.onload = function(){
 			  <input type="button" name="ok" value="  OK  " onclick="selectOneRadio()"  class="btn btn-primary" />
 			<%} %>
 	   
-	         <input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:120px" class="btn btn-primary" />
+	         <input type="button" name="Close" value="ปิดหน้าจอนี้" onclick="javascript:window.close();" style="width:120px" class="btn btn-primary" />
 				&nbsp;
 			 <%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  />&nbsp; เลือกทั้งหมด <%} %>
 	     </div>
@@ -346,13 +346,13 @@ window.onload = function(){
    <div class="row mb-1">
       <div class="col-12 themed-grid-col-detail" align="center">
         
-		  <%if(selectone.equalsIgnoreCase("false")){ %>
+		<%if(selectone.equalsIgnoreCase("false")){ %>
 		  <input type="button" name="ok" value="  OK  " onclick="selectMultiple()"  class="btn btn-primary" />
 		<%}else{ %>
 		  <input type="button" name="ok" value="  OK  " onclick="selectOneRadio()"  class="btn btn-primary" />
 		<%} %>
    
-         <input type="button" name="close" value="Close" onclick="javascript:window.close();" style="width:120px" class="btn btn-primary" />
+         <input type="button" name="close" value="ปิดหน้าจอนี้" onclick="javascript:window.close();" style="width:120px" class="btn btn-primary" />
      </div>
   </div>
  <%} %>

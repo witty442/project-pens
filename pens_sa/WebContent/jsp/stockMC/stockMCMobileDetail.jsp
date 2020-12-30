@@ -198,7 +198,8 @@ if( "edit".equalsIgnoreCase(action) || "view".equalsIgnoreCase(action)){
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-
+<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/epoch_styles.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+ --%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
@@ -211,13 +212,16 @@ if( "edit".equalsIgnoreCase(action) || "view".equalsIgnoreCase(action)){
  <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/calendar/jquery.calendars.picker.css" type="text/css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script> 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.plugin.js"></script> 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.plus.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker.js"></script> 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai-th.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker-th.js"></script>
-  
+
+   
+<%--  <script type="text/javascript" src="${pageContext.request.contextPath}/js/page/epoch_classes_mc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+    --%>
 <!-- Bootstrap -->
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap/bootstrap-4.5.2.min.css">
 <script src="${pageContext.request.contextPath}/js/bootstrap/bootstrap-4.5.2.min.js"></script>
@@ -237,10 +241,13 @@ window.location.hash="Again-No-back-button";//again because google chrome don't 
 window.onhashchange=function(){window.location.hash="no-back-button";}
 
 function loadMe(){
-     $('#expireDate1').calendarsPicker({calendar: $.calendars.instance('thai','th')});
-     $('#expireDate2').calendarsPicker({calendar: $.calendars.instance('thai','th')});
-     $('#expireDate3').calendarsPicker({calendar: $.calendars.instance('thai','th')});
+	// set instance is blank default eng christDate
+     $('#expireDate1').calendarsPicker({calendar: $.calendars.instance('','')});
+     $('#expireDate2').calendarsPicker({calendar: $.calendars.instance('','')});
+     $('#expireDate3').calendarsPicker({calendar: $.calendars.instance('','')});
      
+    //new Epoch('epoch_popup', 'th', document.getElementById('expireDate1'));
+    
      //set id to main 
      window.opener.headerId.value = <%=stockMCBean!= null?stockMCBean.getId():0%>;
 }
@@ -260,6 +267,13 @@ function checkCanSave(){
 	var mcName = document.getElementById("mcName");
 	var customerCode = document.getElementById("customerCode");
 	var storeCode = document.getElementById("storeCode");
+	var promotionPrice = document.getElementById("promotionPrice");
+	var legQty = document.getElementById("legQty");
+	var inStoreQty = document.getElementById("inStoreQty");
+	var backendQty = document.getElementById("backendQty");
+	var frontendQty1 = document.getElementById("frontendQty1");
+	var frontendQty2 = document.getElementById("frontendQty2");
+	var frontendQty3 = document.getElementById("frontendQty3");
 	
 	if(mcName.value ==''){
 		alert("กรุณาระบุ ชื่อ-นามสกุล พีซี");
@@ -278,6 +292,43 @@ function checkCanSave(){
 		storeCode.focus();
 		r = false;
 		return r;
+	}
+	
+	//validate input number
+	if(!isNum2Digit(promotionPrice)){
+		alert("กรุณาระบุ ราคาโปรโมชั้่นเป็นตัวเลขเท่านั้น");
+		promotionPrice.focus();
+		r = false;
+	}
+	if(!isNumPositive(legQty)){
+		alert("กรุณาระบุ ขา เป็นตัวเลขเท่านั้น");
+		legQty.focus();
+		r = false;
+	}
+	if(!isNumPositive(inStoreQty)){
+		alert("กรุณาระบุ ในระบบห้าง เป็นตัวเลขเท่านั้น");
+		inStoreQty.focus();
+		r = false;
+	}
+	if(!isNumPositive(backendQty)){
+		alert("กรุณาระบุ หลังร้าน เป็นตัวเลขเท่านั้น");
+		backendQty.focus();
+		r = false;
+	}
+	if(!isNumPositive(frontendQty1)){
+		alert("กรุณาระบุ หน้าร้านกลุ่มที่ 1 เป็นตัวเลขเท่านั้น");
+		frontendQty1.focus();
+		r = false;
+	}
+	if(!isNumPositive(frontendQty2)){
+		alert("กรุณาระบุ หน้าร้านกลุ่มที่ 2 เป็นตัวเลขเท่านั้น");
+		frontendQty2.focus();
+		r = false;
+	}
+	if(!isNumPositive(frontendQty3)){
+		alert("กรุณาระบุ หน้าร้านกลุ่มที่ 3 เป็นตัวเลขเท่านั้น");
+		frontendQty3.focus();
+		r = false;
 	}
 	return true;
 }
@@ -366,7 +417,7 @@ function clearForm(path){
 							    <div class="col-4 themed-grid-col-detail" align="right">ราคาโปรโมชั่น :</div>
 							    <div class="col-6 themed-grid-col-detail" align="left"> 
 									<%tabIndex++; %>
-									 <input type="number" min="1" max="7" name="promotionPrice" tabindex="<%=tabIndex %>" id="promotionPrice" 
+									 <input type="number" size="5" name="promotionPrice" tabindex="<%=tabIndex %>" id="promotionPrice" 
 									 value ="<%=Utils.isNull(stockMCBean.getPromotionPrice())%>" class="enableNumber"
 									 onkeydown="return isNum(this,event);" autocomplete="off"/>
 								</div>
@@ -375,7 +426,7 @@ function clearForm(path){
 							    <div class="col-4 themed-grid-col-detail" align="right"> ขา:</div>
 							    <div class="col-6 themed-grid-col-detail" align="left"> 
 							       <%tabIndex++; %>
-									 <input  type="number" min="1" max="5"  name="legQty" tabindex="<%=tabIndex %>" id="legQty" 
+									 <input  type="number" size="5"  name="legQty" tabindex="<%=tabIndex %>" id="legQty" 
 									 value ="<%=Utils.isNull(stockMCBean.getLegQty())%>" size="1"  class="enableNumber" 
 									 onkeydown="return isNum0to9andpoint(this,event);" autocomplete="off"/>	 
 								</div>
@@ -392,7 +443,7 @@ function clearForm(path){
 							    <div class="col-4 themed-grid-col-detail" align="right">ในระบบห้าง:</div>
 							    <div class="col-6 themed-grid-col-detail" align="left"> 
 							        <%tabIndex++; %>
-									 <input  type="number" min="1" max="5"  name="inStoreQty" tabindex="<%=tabIndex %>" id="inStoreQty" 
+									 <input  type="number" size="5"  name="inStoreQty" tabindex="<%=tabIndex %>" id="inStoreQty" 
 									 value ="<%=Utils.isNull(stockMCBean.getInStoreQty())%>" size="1"  class="enableNumber"
 									 onkeydown="return isNum0to9andpoint(this,event);" autocomplete="off"/>
 								</div>
@@ -401,7 +452,7 @@ function clearForm(path){
 							    <div class="col-4 themed-grid-col-detail" align="right">หลังร้าน:</div>
 							    <div class="col-6 themed-grid-col-detail" align="left"> 
 							        <%tabIndex++; %>
-									  <input  type="number" min="1" max="5"  name="backendQty" tabindex="<%=tabIndex %>" id="backendQty" 
+									  <input  type="number" size="5"  name="backendQty" tabindex="<%=tabIndex %>" id="backendQty" 
 									  value ="<%=Utils.isNull(stockMCBean.getBackendQty())%>" size="1" class="enableNumber"
 									  onkeydown="return isNum0to9andpoint(this,event);" autocomplete="off"/>	  
 								</div>
@@ -433,10 +484,10 @@ function clearForm(path){
 							    <div class="col-4 themed-grid-col-detail" align="right">หน้าร้าน :</div>
 							    <div class="col-6 themed-grid-col-detail" align="left"> 
 							    <%tabIndex++; %>
-									<input  type="number" min="1" max="5" 
+									<input  type="number" size="5"
 									tabindex="<%=tabIndex %>"
 									value="<%=Utils.isNull(stockMCBean.getFrontendQty1())%>" name="frontendQty1" size="1"
-									onkeydown="return isNum0to9andpoint(this,event);"
+									onkeydown="return isNum0to9andpoint(this,event);"  id="frontendQty1"
 									class="enableNumber" autocomplete="off"/>
 								</div>
 							  </div>
@@ -477,10 +528,10 @@ function clearForm(path){
 							    <div class="col-4 themed-grid-col-detail" align="right">หน้าร้าน :</div>
 							    <div class="col-6 themed-grid-col-detail" align="left"> 
 							    <%tabIndex++; %>
-									<input  type="number" min="1" max="5" 
+									<input  type="number" size="5"
 									tabindex="<%=tabIndex %>"
 									value="<%=Utils.isNull(stockMCBean.getFrontendQty2())%>" name="frontendQty2" size="1"
-									onkeydown="return isNum0to9andpoint(this,event);"
+									onkeydown="return isNum0to9andpoint(this,event);"  id="frontendQty2"
 									class="enableNumber" autocomplete="off"/>
 								</div>
 							  </div>
@@ -506,7 +557,7 @@ function clearForm(path){
 							    <div class="col-6 themed-grid-col-detail" align="left"> 
 							      <%tabIndex++; %>
 								   <input type='text' name='expireDate2' size='7' 
-								   value='<%=Utils.isNull(stockMCBean.getExpireDate1())%>'
+								   value='<%=Utils.isNull(stockMCBean.getExpireDate2())%>'
 								   id="expireDate2"  readonly >
 								</div>
 							  </div>
@@ -520,10 +571,10 @@ function clearForm(path){
 							    <div class="col-4 themed-grid-col-detail" align="right">หน้าร้าน :</div>
 							    <div class="col-6 themed-grid-col-detail" align="left"> 
 							    <%tabIndex++; %>
-									<input  type="number" min="1" max="5" 
+									<input  type="number" size="5"
 									tabindex="<%=tabIndex %>"
 									value="<%=Utils.isNull(stockMCBean.getFrontendQty3())%>" name="frontendQty3" size="1"
-									onkeydown="return isNum0to9andpoint(this,event);"
+									onkeydown="return isNum0to9andpoint(this,event);" id="frontendQty3"
 									class="enableNumber" autocomplete="off"/>
 								</div>
 							  </div>
@@ -549,7 +600,7 @@ function clearForm(path){
 							    <div class="col-6 themed-grid-col-detail" align="left"> 
 							      <%tabIndex++; %>
 								   <input type='text' name='expireDate3' size='7' 
-								   value='<%=Utils.isNull(stockMCBean.getExpireDate1())%>'
+								   value='<%=Utils.isNull(stockMCBean.getExpireDate3())%>'
 								   id="expireDate3"  readonly >
 								</div>
 							  </div>

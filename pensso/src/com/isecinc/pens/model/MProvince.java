@@ -5,6 +5,10 @@ import java.util.List;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Province;
+import com.isecinc.pens.bean.User;
+import com.pens.util.SQLHelper;
+import com.pens.util.UserUtils;
+import com.pens.util.Utils;
 
 /**
  * MProvince Class
@@ -60,16 +64,31 @@ public class MProvince extends I_Model<Province> {
 		return pos;
 	}
 
+	public List<Province> lookUp(int territory) {
+		return lookUp(null,territory, "");
+	}
+
 	/**
 	 * Look Up
 	 */
-	public List<Province> lookUp(int territory) {
+	public List<Province> lookUp(User user,int territory,String notInProvinceId) {
 		List<Province> pos = new ArrayList<Province>();
+		logger.debug("territory:"+territory);
 		try {
 			String whereCause = "\n   and province_id in (";
 			whereCause += "\n     select m.province_id from m_map_province m,c_reference r ";
 			whereCause += "\n     where m.reference_id = r.reference_id ";
-			whereCause += "\n     and r.value = '" + territory + "') ";
+			if(territory != -1){
+			   whereCause += "\n     and r.value = '" + territory + "'";
+			}
+			if( !Utils.isNull(notInProvinceId).equals("")){
+				whereCause += "\n     and province_id not in(" + SQLHelper.converToTextSqlIn(notInProvinceId) + ")";
+			}
+			/** Case Sales Nissin Filter By Province PENSSO.M_PROVINCE_SALES_NIS **/
+			if(user != null && !user.getUserName().equalsIgnoreCase("admin") && UserUtils.userInRole("ROLE_ALL",user,new String[]{User.NIS}) ){
+				whereCause += "\n    and m.province_id in (select province_id from pensso.m_province_sales_nis where salesrep_code ='"+user.getUserName()+"')" ;
+			}
+			whereCause += " \n )";
 			whereCause += " \n ORDER BY NAME ";
 			
 			logger.debug("whereClause :"+whereCause);
@@ -80,4 +99,5 @@ public class MProvince extends I_Model<Province> {
 		}
 		return pos;
 	}
+	
 }

@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,17 +20,20 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.model.I_PO;
 import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.Address;
 import com.isecinc.pens.bean.ConfPickingBean;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderEDIBean;
 import com.isecinc.pens.bean.StockOnhandBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.web.buds.BudsAllBean;
 import com.isecinc.pens.web.buds.BudsAllForm;
 import com.isecinc.pens.web.sales.InterfaceOrderProcess;
 import com.pens.util.ControlCode;
 import com.pens.util.DBConnectionApps;
+import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
 /**
@@ -168,6 +172,64 @@ public class OrderEDIAction extends I_Action {
 		        	orderEDIHBean.setCanEdit(true);
 		        }
 		        aForm.getBean().setOrderEDIBean(orderEDIHBean);
+		    }
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message",e.toString());
+		}
+		return mapping.findForward("budsAll");
+	}
+	public ActionForward viewDetailManual(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("viewDetailManual");
+		BudsAllForm aForm = (BudsAllForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		try {
+			conn = DBConnectionApps.getInstance().getConnection();
+			
+			aForm.setPageName(Utils.isNull(request.getParameter("pageName")));
+		
+			String mode = Utils.isNull(request.getParameter("mode"));
+		    String orderNo = Utils.isNull(request.getParameter("orderNo"));
+		    
+		    logger.debug("orderNo:"+orderNo);
+		    if(!"".equalsIgnoreCase(Utils.isNull(orderNo))){
+		    	//save criteria
+				request.getSession().setAttribute("_criteria", aForm.getBean().getOrderEDIBean());
+				
+		    	OrderEDIBean orderEDIHBean = new OrderEDIBean();
+		    	orderEDIHBean.setOrderNo(orderNo);
+		    	//Get Heade info
+		    	orderEDIHBean.setrType("M");//Manual EDi
+		    	orderEDIHBean = OrderEDIDAO.searchHead(conn,user, "", orderEDIHBean, true, 0, 0).getItemsList().get(0);
+		    	
+		    	//Get detail Order EDI
+		    	OrderEDIBean orderEDIDBean = OrderEDIDAO.searchOrderEDIDetail(orderNo,null);
+		    	orderEDIHBean.setItemsList(orderEDIDBean.getItemsList());
+		       
+		        //check edit
+		        if(    !Utils.isNull(orderEDIHBean.getDocStatus()).equals(I_PO.STATUS_CANCEL)
+		        	&& !Utils.isNull(orderEDIHBean.getDocStatus()).equals(I_PO.STATUS_PICKING)	
+		        	&& !Utils.isNull(orderEDIHBean.getDocStatus()).equals(I_PO.STATUS_LOADING) ){
+		        	orderEDIHBean.setCanEdit(true);
+		        }
+		        aForm.getBean().setOrderEDIBean(orderEDIHBean);
+		        aForm.setMode("edit");
+		    }else{
+		    	BudsAllBean allBean = new BudsAllBean();
+		    	//add new
+		    	OrderEDIBean orderEDIHBean = new OrderEDIBean();
+		    	orderEDIHBean.setOrderNo("");
+		    	
+		    	//Get Header info
+		    	orderEDIHBean.setrType("M");//Manual EDI
+		    	orderEDIHBean.setCanEdit(true);
+		    	orderEDIHBean.setOrderDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+		    	orderEDIHBean.setDeliveryDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+		    	allBean.setOrderEDIBean(orderEDIHBean);
+		    	
+		    	aForm.setBean(allBean);
+		    	aForm.setMode("add");
 		    }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -367,7 +429,117 @@ public class OrderEDIAction extends I_Action {
 		}
 		return mapping.findForward("budsAll");
 	}
-  
+	public ActionForward saveOrderEDIManual(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("saveOrderEDIManual");
+		User user = (User) request.getSession().getAttribute("user");
+		BudsAllForm aForm = (BudsAllForm) form;
+		try {
+			OrderEDIBean orderEDIBean = aForm.getBean().getOrderEDIBean();
+			orderEDIBean.setUserName(user.getUserName());
+			orderEDIBean.setrType("M");
+			orderEDIBean.setUserId(user.getId());
+			
+			List<OrderEDIBean> itemsList = new ArrayList<OrderEDIBean>();
+			//Set Item
+			String[] lineId = request.getParameterValues("lineId");
+			String[] productId = request.getParameterValues("productId");
+			String[] productCode = request.getParameterValues("productCode");
+			String[] productName = request.getParameterValues("productName");
+			String[] barcode = request.getParameterValues("barcode");
+			String[] uom = request.getParameterValues("uom");
+			String[] qty = request.getParameterValues("qty");
+			String[] unitPrice = request.getParameterValues("unitPrice");
+			String[] lineAmount = request.getParameterValues("lineAmount");
+			String[] status = request.getParameterValues("status");
+			
+			logger.debug("productCode:"+productCode.length);
+		
+			//add value to Results
+			if(productCode != null && productCode.length > 0){
+				for(int i=0;i<productCode.length;i++){
+					logger.debug("productCode:"+productCode[i]+",status:"+status[i]);
+					logger.debug("qty:"+qty[i]);
+					if( !Utils.isNull(productCode[i]).equals("") && !Utils.isNull(status[i]).equals("DELETE")
+						&& (!Utils.isNull(qty[i]).equals("")  )
+					 ){
+						 OrderEDIBean l = new OrderEDIBean();
+						 l.setHeaderId(orderEDIBean.getHeaderId());
+						 l.setLineId(Utils.isNull(lineId[i]));
+						 l.setProductId(Utils.isNull(productId[i]));
+						 l.setProductCode(Utils.isNull(productCode[i]));
+						 l.setProductName(Utils.isNull(productName[i]));
+						 l.setBarcode(Utils.isNull(barcode[i]));
+						 l.setUom(Utils.isNull(uom[i]));//transaction_uom
+						 l.setQty(Utils.isNull(qty[i]));
+						 l.setUnitPrice(Utils.isNull(unitPrice[i]));
+						 l.setLineAmount(Utils.isNull(lineAmount[i]));
+						 l.setStatus(Utils.isNull(status[i]));
+						 l.setUserName(user.getId()+"");
+						 
+						 itemsList.add(l);
+					}//if
+				}//for
+			}//if
+			
+			orderEDIBean.setItemsList(itemsList);
+			
+			//control code 
+			if(ControlCode.canExecuteMethod("Stock", "checkStockEDI")){
+				//before delete some row is reserver stock to delete old reserve stock
+				OrderEDIBean oldOrderEDIBean = OrderEDIDAO.searchOrderEDIDetail(orderEDIBean.getOrderNo(), null);
+				List<OrderEDIBean> dbLines = oldOrderEDIBean!=null?oldOrderEDIBean.getItemsList():null;
+				//case status ='RESERVE' in LINE  delete reservation in stock onhand
+				for (OrderEDIBean line : dbLines) {
+					if(line.getReservationId() != 0){
+					  logger.info("delete reserve Stock By ReservationId:"+line.getReservationId());
+					  InterfaceOrderProcess.deleteStockReservation(line.getReservationId());
+					}//if
+				}//for
+			}
+			
+			//Get address Detail ShipTo
+			Address shipToAddress = new MAddress().find(orderEDIBean.getShipToAddressId());
+			orderEDIBean.setShipToSiteUseId(shipToAddress.getSiteUseId());
+			orderEDIBean.setShipToEanLocCode(shipToAddress.getShipToEanLocCode());
+			
+			//Get address Detail BillTo
+			Address billToAddress = new MAddress().findAddressBillToByCustomerId(String.valueOf(orderEDIBean.getCustomerId()));
+			orderEDIBean.setBillToAddressId(String.valueOf(billToAddress.getId()));
+			orderEDIBean.setBillToSiteUseId(billToAddress.getSiteUseId());
+			
+			//save to db t_edi,temp edi oracle(xxpens_edi_order_header_temp,xxpens_edi_order_detail1_temp)
+			OrderEDIDAO.saveOrderEDIManual(orderEDIBean);
+			
+			// set msg save success
+			request.setAttribute("Message","บันทึกข้อมูลเรียบร้อยแล้ว");
+			
+	        //Search Data new refresh
+			OrderEDIBean orderEDIHBean = new OrderEDIBean();
+	    	orderEDIHBean.setOrderNo(orderEDIBean.getOrderNo());
+	    
+			//Get Header info
+			orderEDIHBean = OrderEDIDAO.searchHead(user,"", orderEDIHBean, true, 0, 0).getItemsList().get(0);
+	    	
+	    	//Get detail Order EDI
+	    	OrderEDIBean orderEDIDBean = OrderEDIDAO.searchOrderEDIDetail(orderEDIBean.getOrderNo(),null);
+	    	orderEDIHBean.setItemsList(orderEDIDBean.getItemsList());
+	       
+	        //check edit
+	        if(    !Utils.isNull(orderEDIHBean.getDocStatus()).equals(I_PO.STATUS_CANCEL)
+	        	&& !Utils.isNull(orderEDIHBean.getDocStatus()).equals(I_PO.STATUS_PICKING)	
+	        	&& !Utils.isNull(orderEDIHBean.getDocStatus()).equals(I_PO.STATUS_LOADING) ){
+	        	orderEDIHBean.setCanEdit(true);
+	        }
+	        aForm.getBean().setOrderEDIBean(orderEDIHBean);
+	        
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}finally{
+			
+		}
+		return mapping.findForward("budsAll");
+	}
 	public ActionForward confirmOrderEDI(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("confirmOrderEDI");
 		User user = (User) request.getSession().getAttribute("user");

@@ -45,6 +45,8 @@ public ActionForward runBatch(ActionMapping mapping, ActionForm form, HttpServle
 
 			/** insert to monitor_interface **/
 			MonitorBean monitorModel = new MonitorBean();
+			//FOR Check special deploy production on ddserver (save file to :d://dev_temp/)
+			monitorModel.setContextPath(request.getContextPath());
 			monitorModel.setName(pageName);
 			monitorModel.setType(pageName);
 			monitorModel.setStatus(Constants.STATUS_START);
@@ -103,6 +105,8 @@ public ActionForward runBatchFromPageByPopup(ActionMapping mapping, ActionForm f
 
 		/** insert to monitor_interface **/
 		MonitorBean monitorModel = new MonitorBean();
+		//FOR Check special deploy production on ddserver (save file to :d://dev_temp/)
+		monitorModel.setContextPath(request.getContextPath());
 		monitorModel.setName(pageName);
 		monitorModel.setType(pageName);
 		monitorModel.setStatus(Constants.STATUS_START);
@@ -155,6 +159,8 @@ public ActionForward runBatchFromPageByPopupNoWait(ActionMapping mapping, Action
 
 		/** insert to monitor_interface **/
 		MonitorBean monitorModel = new MonitorBean();
+		//FOR Check special deploy production on ddserver (save file to :d://dev_temp/)
+		monitorModel.setContextPath(request.getContextPath());
 		monitorModel.setName(pageName);
 		monitorModel.setType(pageName);
 		monitorModel.setStatus(Constants.STATUS_START);

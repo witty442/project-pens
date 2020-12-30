@@ -49,7 +49,9 @@ public class StockMCForm extends I_Form {
 		this.beanCriteria = beanCriteria;
 	}
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
-
+      if(getBean() != null){
+    	  getBean().setDispHaveCheckStock("");
+      }
 		
 	}
     

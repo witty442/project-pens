@@ -66,9 +66,16 @@ private static final long serialVersionUID = -990650039740579753L;
     private FormFile dataFile;
 	private User user;
 	private String thName;
-    
+    private String contextPath;
 	
-   public String getUpdateDateDisp() {
+    
+   public String getContextPath() {
+		return contextPath;
+	}
+	public void setContextPath(String contextPath) {
+		this.contextPath = contextPath;
+	}
+public String getUpdateDateDisp() {
 		return updateDateDisp;
 	}
 	public void setUpdateDateDisp(String updateDateDisp) {

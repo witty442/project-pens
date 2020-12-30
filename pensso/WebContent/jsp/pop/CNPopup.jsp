@@ -101,6 +101,12 @@ pageContext.setAttribute("cns",cns,PageContext.PAGE_SCOPE);
 		window.opener.addCN('${pageContext.request.contextPath}',retArry);
 		window.close();
 	}
+	function chkAllFlag(chkAll){
+		var objchk = document.getElementsByName('chkCN');
+		for (var c = 0; c < objchk.length; c++) {
+			objchk[c].checked = chkAll.checked;
+		}	
+	}
 </script>
 </head>
 <body onload="loadMe();" topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
@@ -116,7 +122,11 @@ pageContext.setAttribute("cns",cns,PageContext.PAGE_SCOPE);
 		<th><bean:message key="Bill.No" bundle="sysele"/></th>
 		<th><bean:message key="TotalAmount" bundle="sysele"/></th>
 		<th><bean:message key="Order.Behindhand" bundle="sysele"/></th>
-		<th><bean:message key="Order.Payment" bundle="sysele"/></th>
+		<th><bean:message key="Order.Payment" bundle="sysele"/>
+		    <p>
+		     <input type="checkbox" id="chkAll" name="chkAll" onclick="chkAllFlag(this)"/>
+			</p>
+		</th>
 	</tr>
 	<c:forEach var="results" items="${cns}" varStatus="rows">
 		<c:choose>
@@ -151,7 +161,7 @@ pageContext.setAttribute("cns",cns,PageContext.PAGE_SCOPE);
 				<input type="hidden" name="remainAmount"  value="${results.remainAmount}"/>
 			</td>
 			<td>
-				<input type="checkbox" name="chkCN">
+				<input type="checkbox" name="chkCN" name="chkCN">
 			</td>
 		</tr>
 	</c:forEach>

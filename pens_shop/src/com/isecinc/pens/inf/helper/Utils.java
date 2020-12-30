@@ -937,5 +937,8 @@ public class Utils {
 		}
 		return recordUpdate;
   }
+	public static int calcStartNoInPage(int currentPage,int maxPerPage){
+		return (((currentPage-1)*maxPerPage))+1;
+	}
 		
 }

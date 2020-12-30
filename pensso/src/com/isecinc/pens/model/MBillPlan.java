@@ -29,7 +29,7 @@ import com.isecinc.pens.process.document.MoveOrderReqDocumentProcess;
 import com.isecinc.pens.process.document.MoveOrderReturnDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 public class MBillPlan {
 
@@ -269,7 +269,7 @@ public class MBillPlan {
 				  m.setProductCode(rst.getString("code"));
 				  m.setProductName(rst.getString("name"));
 				  m.setFullUOM(rst.getString("uom"));
-				  m.setFullQTY(NumberToolsUtil.decimalFormat(rst.getDouble("qty"),NumberToolsUtil.format_current_no_disgit));
+				  m.setFullQTY(NumberUtil.decimalFormat(rst.getDouble("qty"),NumberUtil.format_current_no_disgit));
 				  
 				  lineList.add(m);
 				}//while

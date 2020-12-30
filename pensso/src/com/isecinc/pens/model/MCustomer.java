@@ -97,6 +97,37 @@ public class MCustomer extends I_Model<Customer> {
 			} catch (Exception e2) {}
 		}
 	}
+	public Customer findOpt(Connection conn ,Customer c) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Customer p = null;
+		try{
+			String sql  ="\n select c.* ";
+			       sql +="\n ,(select value from pensso.c_customer_config f ";
+			       sql +="\n  where f.customer_code = c.code ";
+			       sql +="\n  and f.config_type='PreOrderCustomer') as pre_order_flag";
+			       sql +="\n from pensso.m_customer c where 1=1" ;
+			if(c.getId() != 0){
+			   sql +="\n and c.customer_id ="+c.getId();
+			}
+			
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				p = new Customer(rst);
+				p.setPreOrderFlag(Utils.isNull(rst.getString("pre_order_flag")));
+			}
+			return p;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+	}
 	public String getCustGroup(Connection conn,long customerId) throws Exception {
 		return getCustGroupModel(conn, customerId);
 	}

@@ -720,6 +720,8 @@ public class SalesTargetTTDAO {
 			   
 			   //set can access
 			   h = SalesTargetTTUtils.setAccess(h,user,pageName);
+			   logger.debug("status:"+Utils.isNull(h.getStatus()));
+			   logger.debug("canPost:"+h.isCanPost());
 			   
 			   //getItems
 			   if(getItems)
@@ -1610,7 +1612,7 @@ public class SalesTargetTTDAO {
 			sql.append("\n and M.target_quarter = '"+Utils.isNull(o.getTargetQuarter())+"'");
 			sql.append("\n and M.target_year = '"+Utils.isNull(o.getTargetYear())+"'");
 			
-			//logger.debug("sql:"+sql);
+			logger.debug("sql:"+sql);
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			while (rst.next()) {

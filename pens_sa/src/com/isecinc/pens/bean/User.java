@@ -56,7 +56,7 @@ public class User extends I_PO implements Serializable {
 	public static final String PREORDER = "PREORDER";
 	public static final String PROJECTC = "PROJECTC";
 	private static final long serialVersionUID = 2247823086169174428L;
-
+    
 	/**
 	 * Default Constructor
 	 */
@@ -236,8 +236,26 @@ public class User extends I_PO implements Serializable {
    // private String roleCreditSales;
     
     private boolean mobile;
-	
+    private double screenWidth;
+    private double screenHeight;
     
+    
+   	public double getScreenWidth() {
+		return screenWidth;
+	}
+
+	public void setScreenWidth(double screenWidth) {
+		this.screenWidth = screenWidth;
+	}
+
+	public double getScreenHeight() {
+		return screenHeight;
+	}
+
+	public void setScreenHeight(double screenHeight) {
+		this.screenHeight = screenHeight;
+	}
+
 	public boolean isMobile() {
 		return mobile;
 	}

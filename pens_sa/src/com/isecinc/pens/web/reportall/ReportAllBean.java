@@ -8,6 +8,7 @@ import java.util.Map;
 import com.isecinc.pens.web.boxno.BoxNoBean;
 import com.isecinc.pens.web.projectc.ProjectCBean;
 import com.isecinc.pens.web.reportall.bean.EffectiveSKUBean;
+import com.isecinc.pens.web.reportall.bean.OrderNissin;
 import com.isecinc.pens.web.stock.StockBean;
 public class ReportAllBean implements  Serializable{
 
@@ -20,9 +21,17 @@ private static final long serialVersionUID = 8389174957413702703L;
   private StockBean stockBean;
   private BoxNoBean boxNoBean;
   private EffectiveSKUBean effectiveSKUBean;
-   
+  private OrderNissin orderNissin;
    
   
+public OrderNissin getOrderNissin() {
+	return orderNissin;
+}
+
+public void setOrderNissin(OrderNissin orderNissin) {
+	this.orderNissin = orderNissin;
+}
+
 public EffectiveSKUBean getEffectiveSKUBean() {
 	return effectiveSKUBean;
 }

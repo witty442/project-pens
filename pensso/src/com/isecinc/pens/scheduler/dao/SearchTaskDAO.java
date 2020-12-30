@@ -15,7 +15,7 @@ import com.isecinc.core.bean.References;
 import com.isecinc.pens.scheduler.bean.BatchTaskDTO;
 import com.isecinc.pens.scheduler.bean.TaskConditionDTO;
 import com.isecinc.pens.scheduler.manager.ScheduleVO;
-import com.isecinc.pens.scheduler.utils.EnvSchedulerProperties;
+import com.isecinc.pens.scheduler.utils.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DBConnectionApps;
 import com.pens.util.DateUtil;
@@ -115,13 +115,8 @@ public class SearchTaskDAO {
             boolean hasProduct = false;
             StringBuffer sql = new StringBuffer();
             
-            String limitRowStr = EnvSchedulerProperties.getInstance().getProperty("row.per.page");
-            int limitRow = 500; // Default
-            try{
-            	limitRow = Integer.parseInt(limitRowStr);
-            }catch(Exception e){
-            }
-            
+            int limitRow = Constants.MAX_PER_PAGE;
+
             if(logger.isDebugEnabled()){
 //            	logger.debug("limitPage : "+limitPage);
             }

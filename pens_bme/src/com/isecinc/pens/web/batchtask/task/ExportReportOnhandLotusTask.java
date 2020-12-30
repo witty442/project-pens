@@ -235,6 +235,7 @@ public class ExportReportOnhandLotusTask extends BatchTask implements BatchTaskI
 		boolean foundError = false;boolean passValid = false;String lineMsg = "";String errorMsg = "";
 		XSSFWorkbook workbook = null;
 		try{
+			String contextPath = monitorModel.getContextPath();
 		    //get parameter config 
 			String asOfDate = monitorModel.getBatchParamMap().get(PARAM_AS_OF_DATE);
 			String storeCode = monitorModel.getBatchParamMap().get(PARAM_STORE_CODE);

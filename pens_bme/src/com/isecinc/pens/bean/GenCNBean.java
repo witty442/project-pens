@@ -25,6 +25,7 @@ public class GenCNBean implements Serializable{
 	private String boxNo;
 	private String groupCode;
 	private String pensItem;
+	private String inventoryItemId;
 	private String barcode;
 	private String materialMaster;
 	private String wholePriceBF;
@@ -43,6 +44,14 @@ public class GenCNBean implements Serializable{
 	private List<GenCNBean> items;
 
 	
+	public String getInventoryItemId() {
+		return inventoryItemId;
+	}
+
+	public void setInventoryItemId(String inventoryItemId) {
+		this.inventoryItemId = inventoryItemId;
+	}
+
 	public boolean isFoundError() {
 		return foundError;
 	}

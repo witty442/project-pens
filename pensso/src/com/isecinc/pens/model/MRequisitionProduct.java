@@ -33,7 +33,7 @@ import com.isecinc.pens.process.document.MoveOrderReturnDocumentProcess;
 import com.isecinc.pens.process.document.RequisitionProductDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 public class MRequisitionProduct {
 
@@ -251,7 +251,7 @@ public class MRequisitionProduct {
 	        if(uc2.getConversionRate() > 0){
 	        	double qty2Temp = line.getQty2()/ (uc1.getConversionRate()/uc2.getConversionRate()) ;
 	        	//convert to Str 1.666667
-				String qty2Str5Digit = NumberToolsUtil.decimalFormat(qty2Temp, NumberToolsUtil.format_current_6_digit);
+				String qty2Str5Digit = NumberUtil.decimalFormat(qty2Temp, NumberUtil.format_current_6_digit);
 				//substr remove digit no 6 :"7" -> 1.66666
 				qty2Str5Digit = qty2Str5Digit.substring(0,qty2Str5Digit.length()-1);
 				

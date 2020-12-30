@@ -30,7 +30,7 @@ import com.isecinc.pens.process.document.MoveOrderReqDocumentProcess;
 import com.isecinc.pens.process.document.MoveOrderReturnDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 public class MMoveOrder {
 
@@ -252,7 +252,7 @@ public class MMoveOrder {
 	        if(uc2.getConversionRate() > 0){
 	        	double qty2Temp = line.getQty2()/ (uc1.getConversionRate()/uc2.getConversionRate()) ;
 	        	//convert to Str 1.666667
-				String qty2Str5Digit = NumberToolsUtil.decimalFormat(qty2Temp, NumberToolsUtil.format_current_6_digit);
+				String qty2Str5Digit = NumberUtil.decimalFormat(qty2Temp, NumberUtil.format_current_6_digit);
 				//substr remove digit no 6 :"7" -> 1.66666
 				qty2Str5Digit = qty2Str5Digit.substring(0,qty2Str5Digit.length()-1);
 				
@@ -1073,10 +1073,10 @@ public class MMoveOrder {
 				  m.setPdDesc(rst.getString("pd_desc"));
                   m.setProductCode(rst.getString("product_code"));
                   m.setUom1(rst.getString("uom1"));
-                  m.setQty1(NumberToolsUtil.decimalFormat(rst.getDouble("qty1"),NumberToolsUtil.format_current_no_disgit));
+                  m.setQty1(NumberUtil.decimalFormat(rst.getDouble("qty1"),NumberUtil.format_current_no_disgit));
                   m.setUom2(rst.getString("uom2"));
-                  m.setQty2(NumberToolsUtil.decimalFormat(rst.getDouble("qty2"),NumberToolsUtil.format_current_no_disgit));
-                  m.setTotalAmount(NumberToolsUtil.decimalFormat(rst.getDouble("total_amount"),NumberToolsUtil.format_current_2_disgit));
+                  m.setQty2(NumberUtil.decimalFormat(rst.getDouble("qty2"),NumberUtil.format_current_no_disgit));
+                  m.setTotalAmount(NumberUtil.decimalFormat(rst.getDouble("total_amount"),NumberUtil.format_current_2_disgit));
 				  m.setStatus(rst.getString("status"));
 				  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
 				  m.setExported(rst.getString("exported"));
@@ -1175,10 +1175,10 @@ public class MMoveOrder {
 				  m.setPdDesc(rst.getString("pd_desc"));
                   m.setProductCode(rst.getString("product_code"));
                   m.setUom1(rst.getString("uom1"));
-                  m.setQty1(NumberToolsUtil.decimalFormat(rst.getDouble("qty1"),NumberToolsUtil.format_current_no_disgit));
+                  m.setQty1(NumberUtil.decimalFormat(rst.getDouble("qty1"),NumberUtil.format_current_no_disgit));
                   m.setUom2(rst.getString("uom2"));
-                  m.setQty2(NumberToolsUtil.decimalFormat(rst.getDouble("qty2"),NumberToolsUtil.format_current_no_disgit));
-                  m.setTotalAmount(NumberToolsUtil.decimalFormat(rst.getDouble("total_amount"),NumberToolsUtil.format_current_2_disgit));
+                  m.setQty2(NumberUtil.decimalFormat(rst.getDouble("qty2"),NumberUtil.format_current_no_disgit));
+                  m.setTotalAmount(NumberUtil.decimalFormat(rst.getDouble("total_amount"),NumberUtil.format_current_2_disgit));
 				  m.setStatus(rst.getString("status"));
 				  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
 				  m.setExported(rst.getString("exported"));

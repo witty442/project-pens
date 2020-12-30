@@ -123,7 +123,7 @@ public class SPStockOnhandAction {
 			//Header
 			h.append("<table border='1'> \n");
 			h.append(" <tr> \n");
-			h.append("  <td align='left' colspan='"+colspan+"'><b>รายงาน Stock Onhand at I'm CHINA</b></td> \n");
+			h.append("  <td align='left' colspan='"+colspan+"'><b>รายงาน Stock Onhand at Siam Premium Outlet</b></td> \n");
 			h.append(" </tr> \n");
 			h.append(" <tr> \n");
 			h.append("  <td align='left' colspan='"+colspan+"' ><b>วันที่ขาย (As Of Date):"+form.getBean().getAsOfDate()+"</b></td> \n");

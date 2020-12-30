@@ -65,7 +65,7 @@ public class ModifierProcess {
 
 	private String terriory = "";
 	private String territoryName = "";
-	boolean isDebug = true;
+	boolean isDebug = false;
 
 	/**
 	 * Modifier with Territory

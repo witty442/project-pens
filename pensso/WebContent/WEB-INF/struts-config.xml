@@ -31,6 +31,8 @@
 			type="com.isecinc.pens.web.pricelist.PriceListForm" />
 		<!-- CUSTOMER -->
 		<form-bean name="customerForm" type="com.isecinc.pens.web.customer.CustomerForm" />
+		<form-bean name="customerNissinForm" type="com.isecinc.pens.web.customernissin.CustomerNissinForm" />
+		
 		<!-- CUSTOMER VISIT -->
 		<form-bean name="customervisitForm"
 			type="com.isecinc.pens.web.customervisit.VisitForm" />
@@ -201,6 +203,7 @@
 		<form-bean name="stockInvForm" type="com.isecinc.pens.web.stockinv.StockInvForm" />
 		<form-bean name="budsAllForm" type="com.isecinc.pens.web.buds.BudsAllForm" />
 		<form-bean name="batchTaskForm" type="com.isecinc.pens.web.batchtask.BatchTaskForm"/>
+		<form-bean name="orderNissinForm" type="com.isecinc.pens.web.ordernissin.OrderNissinForm"/>
 		
 		<!-- Schedule -->
 		<form-bean name="scheduleForm" type="com.isecinc.pens.scheduler.forms.ScheduleForm"/>
@@ -237,10 +240,13 @@
 			type="com.isecinc.pens.web.login.LoginAction">
 			<!-- <forward name="pass" path="/jsp/mainpage.jsp" redirect="true" /> -->
 			<forward name="pass" path="/jsp/customer/customerSearch.jsp?showMsg=true" redirect="true" />
+			<forward name="passNissin" path="/jsp/customerNissin.do?do=prepare&amp;action=new" redirect="true" />
+			<forward name="passNissinPens" path="/jsp/orderNissinAction.do?do=prepareSearchHead&amp;action=new" redirect="true" />
 			<forward name="passRoleNoSales" path="/jsp/mainpage.jsp" redirect="true" />
 			<forward name="pathRedirect" path="/redirectPage.jsp" /> 
 			<forward name="fail" path="/index.jsp" />
 			<forward name="logoff" path="/index.jsp" /> 
+			<forward name="orderNPM" path="/jsp/orderNissinAction.do?do=prepareSearchHead&amp;action=new&amp;mobile=true" redirect="true" />
 		</action>
 
 		<!-- USER -->
@@ -308,7 +314,19 @@
 			<forward name="view" path="/jsp/customer/customerView.jsp" />
 			<forward name="viewEdit" path="/jsp/customer/customerViewEdit.jsp" />
 		</action>
-
+       <!-- CUSTOMER NISSIN-->
+		<action name="customerNissinForm" path="/jsp/customerNissin"
+			forward="/jsp/customerNissin/customerNissinSearch.jsp" />
+		<action name="customerNissinForm" path="/jsp/customerNissinAction"
+			parameter="do" scope="request" type="com.isecinc.pens.web.customernissin.CustomerNissinAction">
+			<forward name="search" path="/jsp/customerNissin/customerNissinSearch.jsp" />
+			<forward name="prepare" path="/jsp/customerNissin/customerNissin.jsp" />
+			<forward name="re-search" path="/jsp/customerNissin/customerNissinSearch.jsp" />
+			<forward name="clearform" path="/jsp/customerNissin/customerNissinSearch.jsp" />
+			<forward name="view" path="/jsp/customerNissin/customerNissinView.jsp" />
+			<!-- <forward name="viewEdit" path="/jsp/customer/customerViewEdit.jsp" /> -->
+		</action>
+		
 		<!-- CUSTOMER VISIT -->
 		<action name="customervisitForm" path="/jsp/customervisit"
 			forward="/jsp/customer/customerVisitSearch.jsp" />
@@ -858,6 +876,15 @@
            <forward name="Success" path="/jsp/schedule/monitorSchedule.jsp"></forward>
 		   <forward name="Fail" path="/jsp/error.jsp"></forward>
         </action>
+        
+        <!-- Order Nissin -->
+		<action name="orderNissinForm" path="/jsp/orderNissinAction" parameter="do" scope="request" 
+		type="com.isecinc.pens.web.ordernissin.OrderNissinAction" >
+			<forward name="search" path="/jsp/orderNissin/orderNissinSearch.jsp" />
+			<forward name="detail" path="/jsp/orderNissin/orderNissin.jsp" />
+			<forward name="searchMobile" path="/jsp/orderNissin/orderNissinSearchMobile.jsp" />
+			<forward name="detailMobile" path="/jsp/orderNissin/orderNissinMobile.jsp" />
+		</action>
 	</action-mappings>
 
 	<message-resources key="sysprop" parameter="SystemProperties_th" />

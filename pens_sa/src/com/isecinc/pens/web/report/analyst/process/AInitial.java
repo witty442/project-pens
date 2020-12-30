@@ -60,6 +60,7 @@ public class AInitial {
 	public AInitial getAInit(HttpServletRequest request){
 		AInitial aInitial = null;
 		String reportName = Utils.isNull(request.getParameter("reportName"));
+		logger.debug("AInitial.reportName:"+reportName);
 		if(request.getSession().getAttribute("PARAM_INIT_"+reportName) != null){
 			aInitial = (AInitial)request.getSession().getAttribute("PARAM_INIT_"+reportName);
 		}else{
@@ -768,7 +769,7 @@ public class AInitial {
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
 				
-				returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
+				//returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
 				while(rs.next()){
 					returnList.add(new References(rs.getString("code"),rs.getString("code"),rs.getString("DESC1")));
 				}
@@ -784,7 +785,7 @@ public class AInitial {
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
 				
-				returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
+				//returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
 				while(rs.next()){
 					returnList.add(new References(rs.getString("CODE"),rs.getString("CODE") ,rs.getString("DESC1")));
 				}
@@ -800,7 +801,7 @@ public class AInitial {
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
 				
-				returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
+				//returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
 				while(rs.next()){
 					returnList.add(new References(rs.getString("code"),rs.getString("code") ,rs.getString("DESC1")));
 				}
@@ -808,7 +809,7 @@ public class AInitial {
 			}else if("Salesrep_id".equalsIgnoreCase(condType)){
 				sql  = "SELECT SALESREP_ID as ID, SALESREP_CODE as CODE, SALESREP_DESC as DESC1, CREATE_DATE FROM PENSBI.XXPENS_BI_MST_SALESREP WHERE 1=1 \n";
 				if( !Utils.isNull(code).equals("")){
-					sql +=" and SALESREP_CODE like '%"+code+"%' \n";
+					sql +=" and SALESREP_ID like '%"+code+"%' \n";
 				}
 				if( !Utils.isNull(desc).equals("")){
 					sql +=" and SALESREP_DESC like '%"+desc+"%' \n";
@@ -817,7 +818,7 @@ public class AInitial {
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
 				
-				returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
+				//returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
 				while(rs.next()){
 					returnList.add(new References(rs.getString("ID"),rs.getString("CODE") ,rs.getString("DESC1")));
 				}
@@ -833,7 +834,7 @@ public class AInitial {
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
 				
-				returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
+				//returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
 				while(rs.next()){
 					returnList.add(new References(rs.getString("CODE"),rs.getString("CODE") ,rs.getString("DESC1")));
 				}
@@ -850,11 +851,28 @@ public class AInitial {
 				ps = conn.prepareStatement(sql);
 				rs = ps.executeQuery();
 				
-				returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
+				//returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
 				while(rs.next()){
 					returnList.add(new References(rs.getString("CODE"),rs.getString("CODE") ,rs.getString("DESC1")));
 				}
 	
+			}else if("Customer_id".equalsIgnoreCase(condType)){
+				sql  = "SELECT CUSTOMER_ID as ID, CUSTOMER_CODE as CODE, CUSTOMER_DESC as DESC1, CREATE_DATE ";
+				sql +=" FROM PENSBI.XXPENS_BI_MST_CUSTOMER WHERE 1=1 \n";
+				if( !Utils.isNull(code).equals("")){
+					sql +=" and CUSTOMER_ID = '"+code+"' \n";
+				}
+				if( !Utils.isNull(desc).equals("")){
+					sql +=" and CUSTOMER_DESC like '%"+desc+"%' \n";
+				}
+				sql += "order by CUSTOMER_CODE  \n";
+				ps = conn.prepareStatement(sql);
+				rs = ps.executeQuery();
+				
+				//returnList.add(new References("ALL","ALL",AConstants.MSG_ALL_TH));
+				while(rs.next()){
+					returnList.add(new References(rs.getString("ID"),rs.getString("CODE") ,rs.getString("DESC1")));
+				}
 			}
 			
 			logger.debug("SQL:"+sql);

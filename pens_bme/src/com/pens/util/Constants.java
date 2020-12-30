@@ -31,8 +31,8 @@ public class Constants {
 	public static final String TYPE_IMPORT_BILL_ICC = "IMPORT_BILL_ICC";
 	public static final String TYPE_EXPORT_BILL_ICC = "EXPORT_BILL_ICC";
 	public static final String TYPE_GEN_ORDER_EXCEL = "GEN_ORDER_EXCEL";
-	public static final String TYPE_GEN_STOCK_ENDDATE_LOTUS = "GEN_STOCK_ENDDDATE_LOTUS";
-	public static final String TYPE_GEN_STOCK_REPORT_ENDDATE_LOTUS = "GEN_STOCK_REPORT_ENDDDATE_LOTUS";
+	//public static final String TYPE_GEN_STOCK_ENDDATE_LOTUS = "GEN_STOCK_ENDDDATE_LOTUS";
+	//public static final String TYPE_GEN_STOCK_REPORT_ENDDATE_LOTUS = "GEN_STOCK_REPORT_ENDDDATE_LOTUS";
 	public static final String TYPE_IMPORT_WACOAL_STOCK = "IMPORT_WACOAL_STOCK";
 	public static final String TYPE_IMPORT_WACOAL_SALESIN_RETURN = "IMPORT_WACOAL_SALESIN_RETURN";
 	public static final String TYPE_IMPORT_SALEOUT_WACOAL = "IMPORT_SALEOUT_WACOAL";

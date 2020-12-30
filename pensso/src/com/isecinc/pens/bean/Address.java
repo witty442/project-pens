@@ -52,6 +52,7 @@ public class Address extends I_PO implements Serializable {
 		// Add Oracle Reference ID
 		setSiteUseId(rst.getInt("SITE_USE_ID"));
 		setReferenceId(rst.getInt("REFERENCE_ID"));
+		setShipToEanLocCode(Utils.isNull(rst.getString("ship_to_ean_loc_code")));
 	}
 
 	/**
@@ -148,8 +149,17 @@ public class Address extends I_PO implements Serializable {
 	/** Reference ID (Oracle Address ID)*/
 	private int referenceId;
     private String alternateName;
+    private String shipToEanLocCode;
     
     
+	public String getShipToEanLocCode() {
+		return shipToEanLocCode;
+	}
+
+	public void setShipToEanLocCode(String shipToEanLocCode) {
+		this.shipToEanLocCode = shipToEanLocCode;
+	}
+
 	public long getSiteUseId() {
 		return siteUseId;
 	}

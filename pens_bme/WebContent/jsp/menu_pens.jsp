@@ -395,22 +395,17 @@
 					<li>
 						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=onhandLotusPeriod');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message bundle="sysprop" key="SummaryBMEOnhandLotusPeriod"/></span></a>
 					</li> 
-					<%if ( Utils.userInRole(user,new String[]{User.ADMIN}) ){%>
-					  	<%-- <li>
-							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=monthEndLotus');"><span>2.5 <bean:message bundle="sysprop" key="SummaryBMEMonthEndLotus"/></span></a>
-						</li>  --%>
-						
-						<li>
-							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reportAllAction.do?do=prepare&action=new&pageName=reportEndDateLotus');">
-							<span><%out.print(no);%>.<%subNo++;out.print(subNo);%> 
-							<bean:message bundle="sysprop" key="reportEndDateLotus"/></span>
-							</a>
-						</li>  
-					<%}else{ %>
-						<li>
-							<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=reportEndDateLotus');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message bundle="sysprop" key="reportEndDateLotus"/></span></a>
-						</li>
-					<%} %>
+				  	
+					<%-- OLD VERSION
+					  <li>
+						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/summaryAction.do?do=prepare&action=new&page=reportEndDateLotus');"><span><%out.print(no);%>.<%subNo++;out.print(subNo);%> <bean:message bundle="sysprop" key="reportEndDateLotus"/></span></a>
+					</li> --%>
+					<li>
+						<a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/reportAllAction.do?do=prepare&action=new&pageName=reportEndDateLotus');">
+						<span><%out.print(no);%>.<%subNo++;out.print(subNo);%> 
+						<bean:message bundle="sysprop" key="reportEndDateLotus"/></span>
+						</a>
+					</li>  
 			    </ul>
 			</li>
 			 <li><a class="parent" ><span><%no++;out.print(no);%>.รายงาน Tops</span></a>
@@ -613,6 +608,8 @@
 		</ul>
 	</li>
 <%} %>
+
+<!-- --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICK,User.PICKADMIN,User.SALE}) ){ no=0;%>
 	 <li><a  href="javascript: void(0)" class="parent"><span>Transaction</span></a>
 		<ul>
@@ -965,7 +962,7 @@
 			</li> 
 			<%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.WHITEDOC}) ){%>
 				<li>
-				  <a href="#" onclick="javascript:link(false,'<%=contextPathProd%>/jsp/payWhiteAction.do?do=prepare2&action=new');">
+				  <a href="#" onclick="javascript:link(true,'<%=contextPathProd%>/jsp/payWhiteAction.do?do=prepare2&action=new');">
 				  <span><%no++;out.print(no);%>.<bean:message bundle="sysprop" key="payWhite"/></span></a>
 				</li>
 			<%} %>

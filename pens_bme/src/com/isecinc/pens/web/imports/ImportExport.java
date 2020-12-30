@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
+import com.isecinc.pens.web.reportall.page.ReportEndDateLotusAction;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -27,7 +27,7 @@ private static Logger logger = Logger.getLogger("PENS");
 			h.append("<td align='left' colspan='"+colspan+"'>รหัสร้าน :"+form.getStoreCode()+" - "+Utils.isNull(request.getParameter("storeName"))+"</td> \n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='"+colspan+"'>วันที่ตรวจนับ :"+GenerateStockEndDateLotus.getEndDateStockTemp(form.getStoreCode())+"</td> \n");
+			h.append("<td align='left' colspan='"+colspan+"'>วันที่ตรวจนับ :"+ ReportEndDateLotusAction.getEndDateStockTemp(form.getStoreCode())+"</td> \n");
 			h.append("</tr> \n");
 			h.append("<tr> \n");
 			  h.append("<td>Group</td> \n");

@@ -18,7 +18,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Utils;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 public class MSummary {
 
@@ -284,8 +284,8 @@ public class MSummary {
 					//Calc CTN QTY and 
 					double[] newQty = calcCTNQty(productId,qty1Int,qty2Int,Utils.isNull(uom2));
 					
-					qty1 = NumberToolsUtil.decimalFormat(newQty[0],NumberToolsUtil.format_current_no_disgit)+" ";
-					qty2 = " "+NumberToolsUtil.decimalFormat(newQty[1],NumberToolsUtil.format_current_no_disgit);
+					qty1 = NumberUtil.decimalFormat(newQty[0],NumberUtil.format_current_no_disgit)+" ";
+					qty2 = " "+NumberUtil.decimalFormat(newQty[1],NumberUtil.format_current_no_disgit);
 					
 	                r[0] = uom1 +"/"+uom2;
 	                r[1] = qty1 +"/"+qty2;
@@ -365,8 +365,8 @@ public class MSummary {
 					//Calc CTN QTY and 
 					double[] newQty = calcCTNQty(productId,qty1Int,qty2Int,Utils.isNull(uom2));
 					
-					qty1 = NumberToolsUtil.decimalFormat(newQty[0],NumberToolsUtil.format_current_no_disgit)+" ";
-					qty2 = " "+NumberToolsUtil.decimalFormat(newQty[1],NumberToolsUtil.format_current_no_disgit);
+					qty1 = NumberUtil.decimalFormat(newQty[0],NumberUtil.format_current_no_disgit)+" ";
+					qty2 = " "+NumberUtil.decimalFormat(newQty[1],NumberUtil.format_current_no_disgit);
 					
 	                r[0] = uom1 +"/"+uom2;
 	                r[1] = qty1 +"/"+qty2;

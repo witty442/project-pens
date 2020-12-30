@@ -7,12 +7,12 @@
 String system="";
 String function="";
 String code="";
-String programKey = "";
+String programName = "";
 system=(request.getParameter("system")==null?"":request.getParameter("system"));
 function=(request.getParameter("function")==null?"":request.getParameter("function"));
 code=(request.getParameter("code")==null?"":request.getParameter("code"));
 
-programKey = function;
+programName = function;
 //System.out.println(system);
 //System.out.println(function);
 //System.out.println(code);
@@ -39,12 +39,18 @@ if(code.equals("null")){
 	<tr>
  		<td width="41" align="left"><img src="${pageContext.request.contextPath}/images2/bullet.gif" width="37" height="19" /></td>
    		<td class="nav_txt" style="background:#FFFFFF url('${pageContext.request.contextPath}/images2/bulletLine.gif') no-repeat right;">
-   			<a href="javascript:popupFull('/pens_help/jsp/doc/pens_sa/<%=programKey %>_DOC.jsp')">
+   		<%-- 	<a href="javascript:popupFull('/pens_help/jsp/doc/pens_sa/<%=programKey %>_DOC.jsp')">
    		       <font color="<%=fontColor %>">
    		         <%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %>
    		       </font>
-   			</a>
-   		
+   			</a> --%>
+   		   <strong>
+	   			<a href="javascript:popupFull('/pens_help/jsp/document.jsp?sessionId=<%=session.getId() %>&module=PENSSA&programName=<%=programName%>')">
+	   		       <font color="<%=fontColor %>">
+	   		        <%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %>
+	   		       </font>
+	   			</a>
+   			</strong>
    		</td>
 	</tr>
  	<tr>

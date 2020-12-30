@@ -98,6 +98,7 @@ public class ReportAllAction extends I_Action {
 		}
 		return "reportAll";
 	}
+	
 	public ActionForward genMonthEnd(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("genMonthEnd");
 		ReportAllForm aForm = (ReportAllForm) form;
@@ -111,7 +112,7 @@ public class ReportAllAction extends I_Action {
 		}
 		return mapping.findForward("reportAll");
 	}
-	
+
 	public ActionForward genEndDate(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("genEndDate");
 		ReportAllForm aForm = (ReportAllForm) form;
@@ -192,6 +193,23 @@ public class ReportAllAction extends I_Action {
 			 logger.debug("genStockEndDateLotus");
 			 if("reportOnhandLotus".equalsIgnoreCase(Utils.isNull(aForm.getPageName())) ){
 				 return new ReportOnhandLotusAction().genStockEndDateLotus(mapping, form, request, response);
+			 }
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
+			throw e;
+		}finally{
+		}
+		return mapping.findForward("reportAll");
+	}
+	
+	/** For batch popup **/
+	public ActionForward submitGenBatchTask(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		try {
+			 logger.debug("**submitGenBatchTask**");
+			 logger.debug(" start batchTaskName="+Utils.isNull(request.getParameter("batchTaskName")));
+			 if("genReportCompareEndDateLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("batchTaskName"))) ){
+				 return new ReportEndDateLotusAction().genReportCompareEndDateLotus(mapping, form, request, response);
 			 }
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());

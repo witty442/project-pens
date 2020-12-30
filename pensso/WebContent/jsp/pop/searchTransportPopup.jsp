@@ -91,9 +91,16 @@ if( !Utils.isNull(amphurAll).equals("")){
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script> 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-stickytable-3.0.js"></script>
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/jquery-stickytable-3.0.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<%-- <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-
+ --%>
+ <%if(user.isMobile()){ %>
+    <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_mobile_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+ <%}else{%>
+    <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+    <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+ <% }%>
+ 
 <jsp:useBean id="popupForm" class="com.isecinc.pens.web.popup.PopupForm" scope="request" />
 
 <script type="text/javascript">
@@ -207,11 +214,11 @@ function setProvinceChk(provinceChk){
 </table>
 <!-- RESULT -->
 <%if(results != null && results.size() >0){ %>
-<div style='height:600px;width:700px;'>
+<div style='align:cenetr;height:600px;width:900px;'>
 <table id='myTable' class='table table-condensed table-striped' border='1'> 
    <thead> 
     <tr>
-		<th ></th>
+		<th >.</th>
 		<th >สายขนส่ง</th>
 		<th ></th>
 		<th >จังหวัด</th>

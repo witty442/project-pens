@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.web.reportall.ReportAllBean;
+import com.isecinc.pens.web.reportall.ReportAllSpecialUtils;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
@@ -77,7 +78,7 @@ public class ReportOnhandLotusSQL {
 						sql.append("\n (select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE " +
 								"       M.pens_value = C.customer_code AND M.reference_code ='Store') as customer_desc, ");
 						sql.append("\n MP.MATERIAL_MASTER as group_type ");
-						sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+						sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
 						sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
 						sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 						sql.append("\n ,PENSBI.PENSBME_STYLE_MAPPING MP ");
@@ -87,7 +88,6 @@ public class ReportOnhandLotusSQL {
 						sql.append("\n AND P.inventory_item_code = MP.pens_item");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						//NOT IN pensbme_group_unuse_lotus
 						sql.append("\n AND MP.MATERIAL_MASTER NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 						
@@ -314,8 +314,11 @@ public class ReportOnhandLotusSQL {
 						sql.append("\n SELECT  ");
 						sql.append("\n C.customer_code ,P.inventory_item_code as pens_item,  ");
 						sql.append("\n MP.MATERIAL_MASTER as group_type, ");
-						sql.append("\n NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+						
+						/** special case (product) Sum Qty (convert CTN(SA) to EA(BME) )**/
+						sql.append(ReportAllSpecialUtils.genSQLSumSpecialProduct("V.INVOICED_QTY","SALE_IN_QTY"));
+						
+						sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
 						sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
 						sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 						sql.append("\n ,PENSBI.PENSBME_STYLE_MAPPING MP ");
@@ -325,7 +328,6 @@ public class ReportOnhandLotusSQL {
 						sql.append("\n AND P.inventory_item_code = MP.pens_item");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						//NOT IN pensbme_group_unuse_lotus
 						sql.append("\n AND MP.MATERIAL_MASTER NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 						
@@ -365,8 +367,11 @@ public class ReportOnhandLotusSQL {
 							sql.append("\n SELECT  ");
 							sql.append("\n C.customer_code,P.inventory_item_code as pens_item,  ");
 							sql.append("\n MP.MATERIAL_MASTER as group_type, ");
-							sql.append("\n NVL(SUM(RETURNED_QTY),0)  as SALE_RETURN_QTY ");
-							sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+							
+							/** special case (product) Sum Qty (convert CTN(SA) to EA(BME) )**/
+							sql.append(ReportAllSpecialUtils.genSQLSumSpecialProduct("V.RETURNED_QTY","SALE_RETURN_QTY"));
+							
+							sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
 							sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
 							sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 							sql.append("\n ,PENSBI.PENSBME_STYLE_MAPPING MP ");
@@ -376,7 +381,6 @@ public class ReportOnhandLotusSQL {
 							sql.append("\n AND P.inventory_item_code = MP.pens_item");
 							sql.append("\n AND V.Customer_id IS NOT NULL   ");
 							sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-							sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 							//NOT IN pensbme_group_unuse_lotus
 							sql.append("\n AND MP.MATERIAL_MASTER NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 							
@@ -407,8 +411,11 @@ public class ReportOnhandLotusSQL {
 				        	sql.append("\n SELECT  ");
 							sql.append("\n C.customer_code,P.inventory_item_code as pens_item,  ");
 							sql.append("\n MP.MATERIAL_MASTER as group_type, ");
-							sql.append("\n NVL(SUM(RETURNED_QTY),0)  as SALE_RETURN_QTY ");
-							sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+							
+							/** special case (product) Sum Qty (convert CTN(SA) to EA(BME) )**/
+							sql.append(ReportAllSpecialUtils.genSQLSumSpecialProduct("V.RETURNED_QTY","SALE_RETURN_QTY"));
+							
+							sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
 							sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
 							sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 							sql.append("\n ,PENSBI.PENSBME_STYLE_MAPPING MP ");
@@ -418,12 +425,11 @@ public class ReportOnhandLotusSQL {
 							sql.append("\n AND P.inventory_item_code = MP.pens_item");
 							sql.append("\n AND V.Customer_id IS NOT NULL   ");
 							sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-							sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 							//NOT IN pensbme_group_unuse_lotus
 							sql.append("\n AND MP.MATERIAL_MASTER NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 							//Lotus ONLY
 							sql.append("\n AND C.CUSTOMER_CODE IN(");
-							sql.append("\n   SELECT pens_value FROM PENSBI.PENSBME_MST_REFERENCE where reference_code = 'Store'");
+							sql.append("\n    SELECT pens_value FROM PENSBI.PENSBME_MST_REFERENCE where reference_code = 'Store'");
 							sql.append("\n    and pens_value like '020047%' and pens_desc4 ='N' ");
 							sql.append("\n )");
 							

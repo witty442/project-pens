@@ -64,7 +64,7 @@ import com.pens.util.CustomerReceiptFilterUtils;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
 import com.pens.util.Debug;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 import com.pens.util.ReportHelper;
 import com.pens.util.ReportUtilServlet;
 
@@ -1801,7 +1801,7 @@ public class OrderSpecialAction extends I_Action {
 			
 			//Split address to Show 2 Line
 			String[] custAddressArr = new String[2];
-			Address addressTemp = new MAddress().findAddressByCustomerId(conn,customer.getId()+"");
+			Address addressTemp = new MAddress().findAddressShipToByCustomerId(conn,customer.getId()+"");
 			if(addressTemp != null ){
 				custAddressArr = splitAddress(addressTemp);
 			}
@@ -1819,7 +1819,7 @@ public class OrderSpecialAction extends I_Action {
 				if(Utils.isNull(customer.getPrintType()).equals("H")){
 				     cusTaxNoMsg +="  สำนักงานใหญ่";
 				}else if(Utils.isNull(customer.getPrintType()).equals("B")){
-					 cusTaxNoMsg +=" สาขาที่  "+NumberToolsUtil.decimalFormat(Integer.parseInt(customer.getPrintBranchDesc()),NumberToolsUtil.format_current_five_digit);
+					 cusTaxNoMsg +=" สาขาที่  "+NumberUtil.decimalFormat(Integer.parseInt(customer.getPrintBranchDesc()),NumberUtil.format_current_five_digit);
 				}
 			}
 			
@@ -1968,7 +1968,7 @@ public class OrderSpecialAction extends I_Action {
 			
 			//Split address to Show 2 Line
 			String[] custAddressArr = new String[2];
-			Address address = new MAddress().findAddressByCustomerId(conn,request.getParameter("customerId"));
+			Address address = new MAddress().findAddressShipToByCustomerId(conn,request.getParameter("customerId"));
 			if(address != null ){
 				custAddressArr = splitAddress(address);
 			}
@@ -1983,9 +1983,9 @@ public class OrderSpecialAction extends I_Action {
 				}else{
 				  b.setProduct(no+")"+line.getProduct().getCode()+" "+line.getProduct().getName());
 				}
-				b.setQty(NumberToolsUtil.decimalFormat(line.getQty1(),NumberToolsUtil.format_current_no_disgit)+"/"+NumberToolsUtil.decimalFormat(line.getQty2(),NumberToolsUtil.format_current_no_disgit));
+				b.setQty(NumberUtil.decimalFormat(line.getQty1(),NumberUtil.format_current_no_disgit)+"/"+NumberUtil.decimalFormat(line.getQty2(),NumberUtil.format_current_no_disgit));
 				b.setUnit(Utils.isNull(line.getUom1().getCode())+"/"+Utils.isNull(line.getUom2().getCode()));
-				b.setPrice(NumberToolsUtil.decimalFormat(line.getPrice1(),NumberToolsUtil.format_current_2_disgit)+"/"+NumberToolsUtil.decimalFormat(line.getPrice2(),NumberToolsUtil.format_current_2_disgit));
+				b.setPrice(NumberUtil.decimalFormat(line.getPrice1(),NumberUtil.format_current_2_disgit)+"/"+NumberUtil.decimalFormat(line.getPrice2(),NumberUtil.format_current_2_disgit));
 				no++;
 				
 				lstData.add(b);

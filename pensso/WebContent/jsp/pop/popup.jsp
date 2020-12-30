@@ -1,10 +1,9 @@
 <%@page import="com.pens.util.Utils"%>
 <%@page import="com.pens.util.SIdUtils"%>
 <%@page import="com.isecinc.pens.web.popup.PopupHelper"%> 
-
+<%@page import="com.isecinc.pens.bean.User"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@taglib uri="/WEB-INF/struts-layout.tld" prefix="layout" %>
@@ -12,15 +11,36 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html>
 <head>
-<title></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/displaytag.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-
+<%
+User user = (User)session.getAttribute("user");
+%>
+<title>PopupAction</title> 
+ <%if(user.isMobile()){ %>
+    <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_mobile_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+ <%}else{%>
+    <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/popup_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+    <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+ <% }%>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script> 
+
+<!-- Bootstrap -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap/bootstrap-4.5.2.min.css">
+<script src="${pageContext.request.contextPath}/js/bootstrap/bootstrap-4.5.2.min.js"></script>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/bootstrap/grid.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+
+<!-- Calendar -->
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/calendar/jquery.calendars.picker.css" type="text/css" />
+
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.plugin.js"></script> 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.plus.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker.js"></script> 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai-th.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker-th.js"></script>
 
 <jsp:useBean id="popupForm" class="com.isecinc.pens.web.popup.PopupForm" scope="session" />
 <%
@@ -52,18 +72,48 @@
 	    currentPage = request.getParameter(queryStr)==null?"1":request.getParameter(queryStr);
 	 }
 	 
-    System.out.println("codes:"+codes);
+    System.out.println("Session DATA_LIST:"+session.getAttribute("DATA_LIST"));
 %>
 
 <script type="text/javascript">
 function searchPopup(path) {
-    document.popupForm.action = path + "/jsp/popupAction.do?do=searchAll";
+    document.popupForm.action = path + "/jsp/popupAction.do?do=searchAll&action=newsearch";
     document.popupForm.submit();
    return true;
+}
+function gotoPage(currPage){
+	document.popupForm.action = "${pageContext.request.contextPath}/jsp/popupAction.do?do=searchAll&currPage="+currPage;
+	document.popupForm.submit();
+	return true;
 }
 function selectAll(){
 	document.getElementsByName("codes")[0].value = 'ALL,';
 	document.getElementsByName("descs")[0].value = 'ALL,';
+}
+function selectOneRadio(){
+	var found = false;
+	var pageName ='<%=pageName%>';
+	var chRadio = document.getElementsByName("chCheck");
+	var retCode = document.getElementsByName("code_temp");
+	var retDesc = document.getElementsByName("desc");
+	var retDesc2 = document.getElementsByName("desc2");
+	
+	for(var i=0;i<chRadio.length;i++){
+        if(chRadio[i].checked){
+        	//alert(i+":"+code[i+1].value);
+        	if(pageName=="Customer"){
+			   window.opener.setDataPopupValue(retCode[i].value,retDesc[i].value,retDesc2[i].value,pageName);
+        	}else{
+               window.opener.setDataPopupValue(retCode[i].value,retDesc[i].value,pageName);
+        	}
+        	window.close();
+        	found = true;
+            break;
+        }
+	}
+	if(!found){
+	  alert("กรุณาเลือกข้อมูลก่อน กด OK");
+	}
 }
 function selectMultiple(){
 	var chk = document.getElementsByName("chCheck");
@@ -286,6 +336,13 @@ function setChkInPage(){
 
 window.onload = function(){
 	setChkInPage();
+	
+	<% if("PICKING_NO".equalsIgnoreCase(pageName)
+		|| "PICKING_NO_PRINT".equalsIgnoreCase(pageName)
+		|| "PICKING_NO_INVOICE".equalsIgnoreCase(pageName)
+		){ %>
+		 $('#descSearch').calendarsPicker({calendar: $.calendars.instance('thai','th')});
+	<%}%>
 }
 
 </script>
@@ -302,40 +359,49 @@ window.onload = function(){
 <input type="hidden" name="hideAll" value ="<%=hideAll%>" />
 <input type="hidden" name="selectone" value ="<%=selectone%>" />
 
-<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" class="tableHead">
-    <tr height="21px" class="headTitle1">
-		<th width="15%" >&nbsp;</th> 
-		<th width="90%" ><b>ค้นหาข้อมูล <%=headName%></b></th>
-	</tr>
-	<tr height="21px" class="headTitle1">
-		<td width="15%" ><b><%=codeSearchTxtName %></b> </td>
-		<td width="90%" ><html:text property="bean.codeSearch"  size="30" style="height:20px" styleClass="\" autoComplete=\"off"/>
-		<input type="button" name="search"  class="newPosBtnLong"  value="   ค้นหา     " 
-		onclick="searchPopup('<%=request.getContextPath()%>')" />
-		</td> 
-	</tr>
-	<tr height="21px" class="headTitle1">
-		<td nowrap><b><%=descSearchTxtName %></b></td>
-		<td ><html:text property="bean.descSearch"  size="60" style="height:20px" styleClass="\" autoComplete=\"off"/></td>
-	</tr>
-</table>
+<!-- <div class="container"> -->
+  <!-- Head Table -->
+  <div class="row mb-1">
+     <div class="col-12 themed-grid-col" align="center">ค้นหาข้อมูล <%=headName%></div>
+  </div>
+  <div class="row mb-1">
+     <div class="col-4 themed-grid-col-detail"><%=codeSearchTxtName %></div>
+      <div class="col-8 themed-grid-col-detail">
+        <html:text property="bean.codeSearch"  styleClass="\" autoComplete=\"off" styleId="codeSearch"/>
+      </div>
+  </div>
+   <div class="row mb-1">
+     <div class="col-4 themed-grid-col-detail"><%=descSearchTxtName %></div>
+      <div class="col-8 themed-grid-col-detail">
+        <html:text property="bean.descSearch"  styleClass="\" autoComplete=\"off" styleId="descSearch"/>
+        <input type="button" name="Search"  value=" ค้นหา " class="btn btn-primary" onclick="searchPopup('<%=request.getContextPath()%>')" />
+      
+      </div>
+  </div>
+  <%if(session.getAttribute("DATA_LIST") != null){ %>
+	 <div class="row mb-1">
+	      <div class="col-12 themed-grid-col-detail" align="center">
+	        
+			<%if(selectone.equalsIgnoreCase("false")){ %>
+			   <input type="button" name="ok" value="  OK  " onclick="selectMultiple()"  class="btn btn-primary" />
+			<%}else{ %>
+			   <input type="button" name="ok" value="  OK  " onclick="selectOneRadio()"  class="btn btn-primary" />
+			<%} %>
+	   
+	         <input type="button" name="Close" value="ปิดหน้าจอนี้" onclick="javascript:window.close();" style="width:120px" class="btn btn-primary" />
+				&nbsp;
+			 <%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  />&nbsp; เลือกทั้งหมด <%} %>
+	     </div>
+	  </div>
+  <%}	 %>
+<!-- </div> -->
 
-<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
-	<tr>
-		<td align="center">
-			<input type="button" name="ok" value="ยืนยันเลือกข้อมูล" onclick="selectMultiple()"  class="newPosBtnLong" />
-			<input type="button" name="close" value="Close" onclick="javascript:window.close();"  class="newPosBtnLong" />
-			&nbsp;
-			<%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  /> เลือกทั้งหมด <%} %>
-		</td>
-	</tr>
-</table>
 <!-- RESULT -->
 <%if(session.getAttribute("DATA_LIST") != null){ %>
 	  <!-- Result all PageName -->
 	 <jsp:include page="popup_sub/popupResult.jsp" /> 
 	
-<%}else if(session.getAttribute("search_submit") != null){ %>
+<%}else if(session.getAttribute("search_submit") != null && request.getAttribute("DATA_LIST") ==null){ %>
     <font size="2" color="red">ไม่พบข้อมูล</font>
 <%} %>
 <!-- RESULT -->

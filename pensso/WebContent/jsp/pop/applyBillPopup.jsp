@@ -206,7 +206,16 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		totalCNAmount = getTotalCNAmount();
 		calculateRemain();
 	}
-
+	
+	function chkAllFlag(chkAll){
+		var objchk = document.getElementsByName('chkReceipts');
+		for (var c = 0; c < objchk.length; c++) {
+			objchk[c].checked = chkAll.checked;
+			
+			changeReceiptText(c);
+		}	
+	}
+	
 	function changeReceiptText(row) {
 		var objchk = document.getElementsByName('chkReceipts');
 		var objtxt = document.getElementsByName('paidAmount');
@@ -476,9 +485,13 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		<th><bean:message key="Order.No" bundle="sysele"/></th>
 		<th><bean:message key="TotalAmount" bundle="sysele"/></th>
 		<th><bean:message key="Order.Behindhand" bundle="sysele"/></th>
-		<th><bean:message key="Order.Payment" bundle="sysele"/></th>
+		<th><bean:message key="Order.Payment" bundle="sysele"/> &nbsp;
+		   <input type="checkbox" id="chkAll" name="chkAll" onclick="chkAllFlag(this)"/>
+		</th>
 		<th><bean:message key="Amount" bundle="sysele"/></th>
-		<th><bean:message key="Product.Balance" bundle="sysele"/></th>
+		<th><bean:message key="Product.Balance" bundle="sysele"/>
+		
+		</th>
 	</tr>
 	<c:forEach var="results" items="${invoices}" varStatus="rows">
 		<c:choose>

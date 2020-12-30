@@ -529,12 +529,7 @@ public class OrderAction extends I_Action {
 	
 			//add Promotion to show
 			logger.info("fillLinesShow LINE Promotion");
-			List<OrderLine> promotionLinesCalcNew = null;
-			
-			/** Case Edit New Code Promotion Goods 1 old code 2 new Code **/
-			// default 1 old code
-			//promotionLinesCalcNew = orderProcess.fillLinesShow(modProcess.getAddLines());
-			promotionLinesCalcNew = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
+			List<OrderLine> promotionLinesCalcNew  = orderProcess.fillLinesShowPromotion(modProcess.getAddLines());
 
 			promotionLinesCalcNew = orderProcess.sumQtyProductPromotionDuplicate(promotionLinesCalcNew);
 	
@@ -1668,8 +1663,14 @@ public class OrderAction extends I_Action {
 				taxInvoice.setPercentDiscount(0);
 				taxInvoice.setDiscount(line.getDiscount());
 				
+				logger.debug("productNameShort:"+productNameShort);
+				logger.debug("line.getLineAmount():"+line.getLineAmount());
+				logger.debug("line.getDiscount():"+line.getDiscount());
 				if("S".equalsIgnoreCase(line.getPromotion())){
-				  taxInvoice.setLineAmount(line.getLineAmount() + line.getDiscount());
+					//OLD 
+				   //taxInvoice.setLineAmount(line.getLineAmount() + line.getDiscount());
+				   //WIT EDIT:25/12/2020
+					taxInvoice.setLineAmount(line.getLineAmount() - line.getDiscount());
 				}else{
 				   taxInvoice.setLineAmount(line.getLineAmount() - line.getDiscount());
 				}

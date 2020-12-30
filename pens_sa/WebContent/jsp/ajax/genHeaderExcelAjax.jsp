@@ -19,16 +19,23 @@ String condDisp3 = Utils.isNull(request.getParameter("condDisp3"));
 String condDisp4 = Utils.isNull(request.getParameter("condDisp4"));
 String condDisp5 = Utils.isNull(request.getParameter("condDisp5"));
 String reportName = Utils.isNull(request.getParameter("reportName"));
+String action = Utils.isNull(request.getParameter("action"));//=new (new version)
 
 String headerHtml  =  "";
 User user = (User)session.getAttribute("user");
 AInitial aInit = new AInitial().getAInit(request);
 try{
 	System.out.println("aBean Session:"+session.getAttribute("aReportForm"));
-	if("ProjectCAnalyst".equalsIgnoreCase(reportName)){
+	System.out.println("reportName:"+reportName +",action:"+action);
+	
+	if(action.equalsIgnoreCase("new") && "ProjectCAnalyst".equalsIgnoreCase(reportName)){;
 	    ABean salesBean = ((AReportForm)session.getAttribute("aReportForm")).getSalesBean();
 	    headerHtml = new AGenerate(aInit).genHeaderReportExportExcel(reportName, user,salesBean,columnCount,condDisp1,condDisp2,condDisp3,condDisp4,condDisp5).toString();
+	}else if(action.equalsIgnoreCase("new") && "SalesAnalyst".equalsIgnoreCase(reportName)){
+		ABean salesBean = ((AReportForm)session.getAttribute("aReportForm")).getSalesBean();
+		headerHtml = new AGenerate(aInit).genHeaderReportExportExcel(reportName, user,salesBean,columnCount,condDisp1,condDisp2,condDisp3,condDisp4,condDisp5).toString();	
 	}else{
+		//old version
 		SABean salesBean = ((SAReportForm)session.getAttribute("salesAnalystReportForm")).getSalesBean();
 		headerHtml = SAGenerate.genHeaderReportExportExcel(user,salesBean,columnCount,condDisp1,condDisp2,condDisp3,condDisp4,condDisp5).toString();
 	}

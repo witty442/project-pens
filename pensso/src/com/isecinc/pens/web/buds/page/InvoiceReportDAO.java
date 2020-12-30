@@ -19,7 +19,7 @@ import com.pens.util.ControlCode;
 import com.pens.util.DBConnectionApps;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
@@ -79,9 +79,9 @@ public class InvoiceReportDAO {
                 item.setAmphur(Utils.isNull(rst.getString("province"))+"/"+Utils.isNull(rst.getString("amphur")));
                 
                 //Invoice amount
-                item.setTotalAmount(Utils.decimalFormat(NumberToolsUtil.round(rst.getDouble("total_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
-                item.setVatAmount(Utils.decimalFormat(NumberToolsUtil.round(rst.getDouble("vat_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
-                item.setNetAmount(Utils.decimalFormat(NumberToolsUtil.round(rst.getDouble("net_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+                item.setTotalAmount(Utils.decimalFormat(NumberUtil.round(rst.getDouble("total_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+                item.setVatAmount(Utils.decimalFormat(NumberUtil.round(rst.getDouble("vat_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+                item.setNetAmount(Utils.decimalFormat(NumberUtil.round(rst.getDouble("net_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
                 
                 //remain InvoiceAmount 
             	/** 1 Invoice No Receipt **/
@@ -97,9 +97,9 @@ public class InvoiceReportDAO {
 	                    remainVatAmount=(remainNetAmount*7)/107;
 	                    remainTotalAmount=remainNetAmount-remainVatAmount;
 	                   
-	                    item.setRemainTotalAmount(Utils.decimalFormat(NumberToolsUtil.round(remainTotalAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
-	                    item.setRemainVatAmount(Utils.decimalFormat(NumberToolsUtil.round(remainVatAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
-	                    item.setRemainNetAmount(Utils.decimalFormat(NumberToolsUtil.round(remainNetAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainTotalAmount(Utils.decimalFormat(NumberUtil.round(remainTotalAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainVatAmount(Utils.decimalFormat(NumberUtil.round(remainVatAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainNetAmount(Utils.decimalFormat(NumberUtil.round(remainNetAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
 	                
 	                 /** 2 Invoice have Receipt **/
 	                }else  if(rst.getInt("receipt_line_id")!=0){
@@ -107,9 +107,9 @@ public class InvoiceReportDAO {
 	                    remainVatAmount=(remainNetAmount*7)/107;
 	                    remainTotalAmount=remainNetAmount-remainVatAmount;
 	                   
-	                    item.setRemainTotalAmount(Utils.decimalFormat(NumberToolsUtil.round(remainTotalAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
-	                    item.setRemainVatAmount(Utils.decimalFormat(NumberToolsUtil.round(remainVatAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
-	                    item.setRemainNetAmount(Utils.decimalFormat(NumberToolsUtil.round(remainNetAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainTotalAmount(Utils.decimalFormat(NumberUtil.round(remainTotalAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainVatAmount(Utils.decimalFormat(NumberUtil.round(remainVatAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainNetAmount(Utils.decimalFormat(NumberUtil.round(remainNetAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
 	                    
 	                }
                 }else if("CN".equalsIgnoreCase(rst.getString("r_type"))){
@@ -120,16 +120,16 @@ public class InvoiceReportDAO {
 	                    remainVatAmount=remainNetAmount/107;
 	                    remainTotalAmount=remainNetAmount-remainVatAmount;
 	                    
-	                    item.setRemainTotalAmount(Utils.decimalFormat(NumberToolsUtil.round(remainTotalAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
-	                    item.setRemainVatAmount(Utils.decimalFormat(NumberToolsUtil.round(remainVatAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
-	                    item.setRemainNetAmount(Utils.decimalFormat(NumberToolsUtil.round(remainNetAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainTotalAmount(Utils.decimalFormat(NumberUtil.round(remainTotalAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainVatAmount(Utils.decimalFormat(NumberUtil.round(remainVatAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainNetAmount(Utils.decimalFormat(NumberUtil.round(remainNetAmount, 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
 	                
 	                /** 4 CrdeitNote apply Receipt **/
 	                }else  if(rst.getInt("receipt_line_id")!=0){
 	                	   
-	                    item.setRemainTotalAmount(Utils.decimalFormat(NumberToolsUtil.round(rst.getDouble("remain_total_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
-	                    item.setRemainVatAmount(Utils.decimalFormat(NumberToolsUtil.round(rst.getDouble("remain_vat_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
-	                    item.setRemainNetAmount(Utils.decimalFormat(NumberToolsUtil.round(rst.getDouble("remain_net_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit)); 
+	                    item.setRemainTotalAmount(Utils.decimalFormat(NumberUtil.round(rst.getDouble("remain_total_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainVatAmount(Utils.decimalFormat(NumberUtil.round(rst.getDouble("remain_vat_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit));
+	                    item.setRemainNetAmount(Utils.decimalFormat(NumberUtil.round(rst.getDouble("remain_net_amount"), 2, BigDecimal.ROUND_HALF_UP),Utils.format_current_2_disgit)); 
 	                }
                 }
                 //logger.debug("before Remain_total_amountL:"+rst.getDouble("Remain_total_amount"));

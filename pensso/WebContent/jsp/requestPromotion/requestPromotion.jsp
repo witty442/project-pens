@@ -448,7 +448,7 @@ function calPrice(fieldName){
 							    	if(c != null){
 							    		lineNo = c.getLineNo()+"";
 							    		costDetail = c.getCostDetail();
-							    	    costAmount = NumberToolsUtil.decimalFormat(c.getCostAmount(), NumberToolsUtil.format_current_2_disgit);
+							    	    costAmount = NumberUtil.decimalFormat(c.getCostAmount(), NumberUtil.format_current_2_disgit);
 							    	}else{
 							    		lineNo = (i+1)+"";
 							    		costAmount = "";
@@ -535,15 +535,15 @@ function calPrice(fieldName){
 										price2 = Utils.isNull(c.getPrice2());
 										productName =Utils.isNull(c.getProductName());
 										
-										newCtn = NumberToolsUtil.decimalFormat(c.getNewCtn(), NumberToolsUtil.format_current_no_disgit); 
-										newAmount =  NumberToolsUtil.decimalFormat(c.getNewAmount(), NumberToolsUtil.format_current_2_disgit); 
+										newCtn = NumberUtil.decimalFormat(c.getNewCtn(), NumberUtil.format_current_no_disgit); 
+										newAmount =  NumberUtil.decimalFormat(c.getNewAmount(), NumberUtil.format_current_2_disgit); 
 										
-										stockCtn = NumberToolsUtil.decimalFormat(c.getStockCtn(), NumberToolsUtil.format_current_no_disgit); 
-										stockQty = NumberToolsUtil.decimalFormat(c.getStockQty(), NumberToolsUtil.format_current_2_disgit); 
-										borrowCtn = NumberToolsUtil.decimalFormat(c.getBorrowCtn(), NumberToolsUtil.format_current_no_disgit); 
-										borrowQty = NumberToolsUtil.decimalFormat(c.getBorrowQty(), NumberToolsUtil.format_current_2_disgit); 
+										stockCtn = NumberUtil.decimalFormat(c.getStockCtn(), NumberUtil.format_current_no_disgit); 
+										stockQty = NumberUtil.decimalFormat(c.getStockQty(), NumberUtil.format_current_2_disgit); 
+										borrowCtn = NumberUtil.decimalFormat(c.getBorrowCtn(), NumberUtil.format_current_no_disgit); 
+										borrowQty = NumberUtil.decimalFormat(c.getBorrowQty(), NumberUtil.format_current_2_disgit); 
 									
-										borrowAmount =  NumberToolsUtil.decimalFormat(c.getBorrowAmount(), NumberToolsUtil.format_current_2_disgit);
+										borrowAmount =  NumberUtil.decimalFormat(c.getBorrowAmount(), NumberUtil.format_current_2_disgit);
 										invoiceNo = Utils.isNull(c.getInvoiceNo()); 
 							    	}else{
 							    		lineNo = (i+1)+"";

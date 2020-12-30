@@ -11,8 +11,8 @@ public class PopupHelper {
 		 /** Criteria Name **/
 	    if("Brand".equalsIgnoreCase(pageName) 	){
 	    	headName = "แบรนด์("+pageName+")";
-	    	codeSearchTxtName = "Brand"; 
-	    	descSearchTxtName = "Brand Name";
+	    	codeSearchTxtName = "แบรนด์"; 
+	    	descSearchTxtName = "ชื่อ แบรนด์";
 	    }else if("SUB_Brand".equalsIgnoreCase(pageName) 	){
  	    	headName = "แบรนด์ย่อย("+pageName+")";
  	    	codeSearchTxtName = "SubBrand"; 
@@ -25,8 +25,8 @@ public class PopupHelper {
 	    	  headName = "<span title='"+pageName+"'>ร้านค้า("+pageName+")</span>";
 	    	}
 	    	
-	    	codeSearchTxtName = "Customer Code";
-	    	descSearchTxtName = "Customer Name";
+	    	codeSearchTxtName = "รหัสร้านค้า";
+	    	descSearchTxtName = "ชื่อร้านค้า";
 	    }else  if("PRODUCT".equalsIgnoreCase(pageName) || "PRODUCT_INFO".equalsIgnoreCase(pageName) ){
 	    	headName = "รหัสสินค้า("+pageName+")";
 	    	codeSearchTxtName = "รหัสสินค้า";
@@ -58,7 +58,7 @@ public class PopupHelper {
 	    }else  if("PICKING_NO_PRINT".equalsIgnoreCase(pageName)){
 		 	headName = "Picking No(ที่มีการ พิมพ์ Picking List แล้ว)";
 		 	codeSearchTxtName = "Picking No";
-		 	descSearchTxtName = "Picking No";
+		 	descSearchTxtName = "Transaction Date";
 	    }else  if("PICKING_NO_INVOICE".equalsIgnoreCase(pageName)){
 		 	headName = "Picking No (ที่มี INVOCIE)";
 		 	codeSearchTxtName = "Picking No";

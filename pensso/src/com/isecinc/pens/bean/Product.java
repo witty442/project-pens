@@ -85,12 +85,19 @@ public class Product extends I_PO implements Serializable {
 	private String uom1Price;
 	private String uom1ConvRate;
 	private String uom2ConvRate;
+	private String barcode;
 	
 	/** Product Price **/
 	private ProductPrice[] productPrices = null;
 
-	
-   
+	public String getBarcode() {
+		return barcode;
+	}
+
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
+	}
+
 	public String getUom1ConvRate() {
 		return uom1ConvRate;
 	}

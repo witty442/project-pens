@@ -148,6 +148,10 @@ public class GenerateHISHER extends InterfaceUtils{
 			
 			logger.debug("sql:"+sql.toString());
 			
+			if(logger.isDebugEnabled()){
+				FileUtil.writeFile("d://dev_temp/temp/icc_gen_penstock.sql", sql.toString());
+			}
+			
 			ps = conn.prepareStatement(sql.toString());
 			
 			ps.setDate(1, new java.sql.Date(date.getTime()));

@@ -54,6 +54,7 @@ public class SalesTargetTTSUPERCopyByBrand {
 				//convert to criteria
 				sourceBean = SalesTargetDAO.convertCriteria(sourceBean);
 				sourceBean.setStatus(SalesTargetConstants.STATUS_FINISH);// get only status Finish
+				sourceBean.setDivision(destBean.getDivision());
 				
 				logger.info("Copy from Period["+sourceBean.getPeriod()+"] to ["+destBean.getPeriod()+"]");
 				
@@ -103,7 +104,7 @@ public class SalesTargetTTSUPERCopyByBrand {
 			sql.append("\n from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
 			sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n where M.salesrep_id = Z.salesrep_id ");
-			sql.append("\n and M.division = 'B' ");//B = credit,van sales
+			sql.append("\n and M.division  ='"+Utils.isNull(sourceBean.getDivision())+"'");//B = credit,van sales
 			sql.append("\n and M.status ='"+SalesTargetConstants.STATUS_FINISH+"'");
 			sql.append("\n and M.brand ='"+Utils.isNull(sourceBean.getBrand())+"'");
 			sql.append("\n and M.CUSTOMER_CATEGORY ='"+Utils.isNull(sourceBean.getCustCatNo())+"'");
@@ -320,7 +321,7 @@ public class SalesTargetTTSUPERCopyByBrand {
 			sql.append("\n  select M.id ");
 			sql.append("\n  from XXPENS_BI_SALES_TARGET_TEMP M ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n  where M.salesrep_id = Z.salesrep_id");
-			sql.append("\n  and M.division = 'B' ");//B = credit,van sales
+			sql.append("\n  and M.division ='"+cri.getDivision()+"'");//B = credit,van sales ,I :Ice Bud
 			if( !Utils.isNull(status).equals("")){
 			   sql.append("\n  and M.status ='"+status+"'");
 			}

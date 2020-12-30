@@ -343,34 +343,10 @@ body {
 	    }
 	    </script>
 	    <!-- PROGRESS BAR -->
-	<% }else{ 
-		//Show Message In Parent window
-	    if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName) 
-	    	|| Constants.TYPE_GEN_STOCK_REPORT_ENDDATE_LOTUS.equals(pageName) ){  
-	    	
-	    	MonitorBean resultsBean = interfacesForm.getResults()[0];
-	    	String message = "Gen ข้อมูลเรียบร้อย";
-	    	
-	    	if(Utils.isNull(resultsBean.getErrorMsg()).equals("")){
-	 %>
-		       <script>
-		          window.opener.div_message.innerHTML = "<%=message %>";
-		          window.opener.div_error_message.innerHTML ="";
-		           window.close();
-		        </script>
-	  <%    }else{ 
-	            message = Utils.isNull(resultsBean.getErrorMsg());
-	  %>
-		        <script>
-			       window.opener.div_error_message.innerHTML = "<%=message %>";
-			       window.opener.div_message.innerHTML  ="";
-			       window.close();
-			    </script>
+	<% }else{ %>
+	
 	 
-	 <%    }
-	    }
-	}
-    %>
+    <% } %>
 
 </head>
 
@@ -415,18 +391,10 @@ body {
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="GenOrderExcel"/>
 		   		</jsp:include>
-		     <%}else if(Constants.TYPE_GEN_ITEM_MASTER_HISHER.equalsIgnoreCase(pageName)) {%>
+		    <%}else if(Constants.TYPE_GEN_ITEM_MASTER_HISHER.equalsIgnoreCase(pageName)) {%>
 		      	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="GenerateItemMasterHisHer"/>
 		 		</jsp:include>
-			 <%}else if(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equalsIgnoreCase(pageName)) {%>
-		     	<jsp:include page="../program.jsp">
-					<jsp:param name="function" value="GenStockEndDateLotus"/>
-				</jsp:include>
-			<%}else if(Constants.TYPE_GEN_STOCK_REPORT_ENDDATE_LOTUS.equalsIgnoreCase(pageName)) {%>
-		     	<jsp:include page="../program.jsp">
-					<jsp:param name="function" value="GenStockReportEndDateLotus"/>
-				</jsp:include>
 			<%}else if(Constants.TYPE_IMPORT_WACOAL_STOCK.equalsIgnoreCase(pageName)) {%>
 		     	<jsp:include page="../program.jsp">
 					<jsp:param name="function" value="ImportWacoalStock"/>
@@ -685,11 +653,8 @@ body {
 								<tr>
 									<td align="center" width ="100%">
 									    <input type="button" value="ตรวจสอบสถานะ ล่าสุด" class="newPosBtnLong" style="width: 200px;" onClick="javascript:search('${pageContext.request.contextPath}','admin')"> 
-									    <%if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName)){  %>
-									      <input type="button" value="ปิดหน้าต่างนี้" class="newPosBtnLong" style="width: 100px;" onClick="javascript:window.close()">
-									    <%}else{ %>
-									       <input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
-									    <%} %>
+									    <input type="button" value="Clear" class="newPosBtnLong" style="width: 100px;" onClick="javascript:clearForm('${pageContext.request.contextPath}','admin')">
+									    
 									</td>
 								</tr>
 							</table>   
@@ -731,11 +696,7 @@ body {
 								<p></p>
 								 <!-- BME Scan Result -->
 								<jsp:include page="subImportSaleOutWacoalResult.jsp"></jsp:include>
-						   <% }else if( Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS.equals(pageName)){ %> 
-							    <p></p>
-							    <jsp:include page="monitor_short.jsp"></jsp:include>
-								<p></p>
-								
+						 
 						  <% }else if( Constants.TYPE_IMPORT_WACOAL_STOCK.equals(pageName)){ %> 
 							    <p></p>
 							    <jsp:include page="interfacesResultImportWacoalStock.jsp"></jsp:include>

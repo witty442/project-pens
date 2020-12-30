@@ -26,6 +26,8 @@ if(Utils.isNull(pageName).equals("")){
      <jsp:include page="page/orderEDISearchPage.jsp" flush="true"/>   
 <%}else if("OrderEDIDetail".equalsIgnoreCase(pageName)){%>
      <jsp:include page="page/orderEDIPage.jsp" flush="true"/>   
+<%}else if("OrderEDIDetailManual".equalsIgnoreCase(pageName)){%>
+     <jsp:include page="page/orderEDIManualPage.jsp" flush="true"/>   
 <%}else if("InvoiceReport".equalsIgnoreCase(pageName)){%>
      <jsp:include page="page/invoiceReportPage.jsp" flush="true"/>   
 <% } %>

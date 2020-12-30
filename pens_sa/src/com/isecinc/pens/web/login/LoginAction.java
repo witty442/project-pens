@@ -16,6 +16,7 @@ import com.isecinc.pens.bean.SalesrepBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.SalesrepDAO;
 import com.isecinc.pens.process.login.LoginProcess;
+import com.pens.util.ControlCode;
 import com.pens.util.DBConnection;
 import com.pens.util.SIdUtils;
 import com.pens.util.UserUtils;
@@ -48,17 +49,22 @@ public class LoginAction extends DispatchAction {
 		Connection conn = null;
 		LoginForm loginForm = null;
 		String forwordStr = "pass_user";
-		String mobile = Utils.isNull(request.getParameter("mobile"));
 		boolean user2Role =false;
-		//String forwordStr = "pass_salestarget";
+		User user = null;
 		try {
-			logger.debug("Locale:"+Locale.getDefault());
+			//logger.debug("Locale:"+Locale.getDefault());
+			
+			/** control code redirect to new version SalesAnalysis **/
+			if(ControlCode.canExecuteMethod("SalesAnalysis", "NewVersion")){
+				forwordStr = "pass_user_new";
+			}
+			
 			//remove session id
 			SIdUtils.getInstance().clearInstance();
 			
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
-			User user = null;
+			
 			conn = DBConnection.getInstance().getConnection();
 			user = new LoginProcess().login(loginForm.getUserName(), loginForm.getPassword(), conn);
 			
@@ -93,7 +99,9 @@ public class LoginAction extends DispatchAction {
 			request.getSession(true).setAttribute("screenWidth", ""+(Double.parseDouble(screenWidth)-100));
 			
 			//set mobile device
+			String mobile = Utils.isNull(request.getParameter("mobile"));
 			user.setMobile("true".equalsIgnoreCase(mobile)?true:false);
+			user.setScreenWidth((Double.parseDouble(screenWidth)-100));
 			
 			request.getSession(true).setAttribute("user", user);
 			request.getSession().setAttribute("User", user.getUserName());//Show in Session tomcat
@@ -112,10 +120,15 @@ public class LoginAction extends DispatchAction {
 				forwordStr = "true".equalsIgnoreCase(mobile)?"pass_mcentryMobile": "pass_mcentry";
 			}
 			
+			/** hard code for SOFIAN user MC force to Mobile device ??? wait for debug IPHONE**/
+			/*if(user.getUserName().equalsIgnoreCase("sofian")){
+				user.setMobile(true);
+				forwordStr = "pass_mcentryMobile";
+				request.getSession(true).setAttribute("user", user);
+			}*/
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
+			logger.error(e.getMessage(),e);
 			request.setAttribute("errormsg", e.getMessage());
 			return mapping.findForward("fail");
 		} finally {

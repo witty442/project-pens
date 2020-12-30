@@ -1,3 +1,13 @@
+function gotoOrderSearch(){
+	var path = document.getElementById('path').value;
+	var customerId = document.getElementById('customerId').value;
+	var customerCode = document.getElementById('customerCode').value;
+	var param ="fromPage=CustomerView&customerCode="+customerCode;
+	    param +="&customerId="+customerId;
+	
+	//saleOrderAction.do?do=search&action=new
+	window.location = path+'/jsp/saleOrderAction.do?do=search&'+param;
+}
 function toOrder(path, customerId, type){
 	var searchKey = document.getElementsByName('criteria.searchKey')[0].value;
 	if(type == 'cus'){

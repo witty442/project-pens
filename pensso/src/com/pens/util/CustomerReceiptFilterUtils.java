@@ -35,9 +35,10 @@ public class CustomerReceiptFilterUtils {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try{
-			String sql = "select count(*) as x from m_customer c, c_customer_receipt_cheque r \n" +
-					" where c.customer_id ="+customerId+" and (r.isactive ='Y' or r.isactive is null or trim(r.isactive) ='') \n"+
-					" and r.customer_code = c.code \n";
+			String sql = "select count(*) as x from pensso.m_customer c, pensso.c_customer_config r \n" +
+					" where c.customer_id ="+customerId+" \n"+
+					" and r.customer_code = c.code \n"+
+					" and r.config_type ='CustomerReceiptCheque' and r.value ='Y'";
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			if(rs.next()){
@@ -70,10 +71,10 @@ public class CustomerReceiptFilterUtils {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try{
-			String sql = "select count(*) as x from m_customer c, c_customer_receipt_credit r \n" +
-					" where c.customer_id ="+customerId+" and (r.isactive ='Y' or r.isactive is null or trim(r.isactive) ='') \n"+
-					" and r.customer_code = c.code \n";
-			
+			String sql = "select count(*) as x from pensso.m_customer c, pensso.c_customer_config r \n" +
+					" where c.customer_id ="+customerId+" \n"+
+					" and r.customer_code = c.code \n"+
+			        " and r.config_type = 'CustomerReceiptCredit' and r.value ='Y' \n";
 			ps = conn.prepareStatement(sql);
 			rs = ps.executeQuery();
 			if(rs.next()){

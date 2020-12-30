@@ -1263,6 +1263,7 @@ public class PopupDAO {
 			}
 			return pos;
 		}
+	 
 	 public static List<PopupForm> searchCustomerStockMC(PopupForm c) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -1321,6 +1322,63 @@ public class PopupDAO {
 		return pos;
 	}
 	 
+	public static List<PopupForm> searchBranchStockMC(PopupForm c) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<PopupForm> pos = new ArrayList<PopupForm>();
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		String customerCode = "";
+		try {
+			conn = DBConnection.getInstance().getConnectionApps();
+			logger.debug("searchCustomerStockMC");
+
+			//criteria
+			if(c.getCriteriaMap() != null){
+			   customerCode = Utils.isNull(c.getCriteriaMap().get("customerCode"));
+			}else{
+			   customerCode = Utils.isNull(c.getCodeSearch());
+			}
+			logger.debug("customerCode:"+customerCode);
+			
+			sql.append("\n select distinct c.store_code ");
+			sql.append("\n from pensbi.MC_COUNTSTK_HEADER  c");
+			sql.append("\n where 1=1 ");
+			
+			if( !Utils.isNull(c.getCodeSearch()).equals("")){
+				sql.append("\n and c.store_code ='"+c.getCodeSearch()+"' ");
+			}
+			if( !Utils.isNull(c.getDescSearch()).equals("")){
+				sql.append("\n and c.store_code LIKE '%"+c.getDescSearch()+"%' ");
+			}
+			
+			sql.append("\n  ORDER BY c.store_code asc ");
+			
+			logger.debug("sql:"+sql);
+
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			int no = 0;
+			while (rst.next()) {
+				PopupForm item = new PopupForm();
+				no++;
+				item.setNo(no);
+				item.setCode(rst.getString("store_code"));
+				item.setDesc(rst.getString("store_code"));
+				pos.add(item);
+				
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return pos;
+	}
 	 public static List<PopupForm> searchSubInvList(PopupForm c){
 		    List<PopupForm> pos = new ArrayList<PopupForm>();
 			StringBuffer sql = new StringBuffer("");

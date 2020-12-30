@@ -156,7 +156,7 @@ public class GenerateMonthEndLotus {
 						sql.append("\n AND V.customer_id = C.customer_id  ");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						
 						//Lotus Only 020047
 						sql.append("\n AND C.customer_code LIKE '020047%'");
@@ -342,7 +342,7 @@ public class GenerateMonthEndLotus {
 						sql.append("\n AND V.customer_id = C.customer_id  ");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						
 						//Lotus Only 020047
 						sql.append("\n AND C.customer_code LIKE '020047%'");
@@ -388,7 +388,7 @@ public class GenerateMonthEndLotus {
 							sql.append("\n AND V.customer_id = C.customer_id  ");
 							sql.append("\n AND V.Customer_id IS NOT NULL   ");
 							sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-							sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+							//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 							//Lotus Only 020047
 							sql.append("\n AND C.customer_code LIKE '020047%'");
 							
@@ -424,7 +424,7 @@ public class GenerateMonthEndLotus {
 							sql.append("\n AND V.customer_id = C.customer_id  ");
 							sql.append("\n AND V.Customer_id IS NOT NULL   ");
 							sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-							sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+							//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 							//Lotus Only 020047
 							sql.append("\n AND C.customer_code LIKE '020047%'");
 							

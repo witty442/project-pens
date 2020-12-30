@@ -29,7 +29,7 @@ import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.StockDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 
 public class MStock {

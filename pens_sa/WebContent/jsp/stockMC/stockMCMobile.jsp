@@ -170,7 +170,7 @@ function openStockMCMobile(action,lineId,productCode,index){
 									    onclick="openPopup('${pageContext.request.contextPath}','CustomerStockMC')"/>
 							   <%}else{ %>
 							       <label for="customerCode"> ห้าง:</label>
-							        <html:text property="bean.customerCode" styleId="customerCode" 
+							        <html:text property="bean.customerCode" styleId="customerCode" readonly="true"
 									    styleClass="disableText \" autoComplete=\"off" />
 							   <%} %>
 						    </div>

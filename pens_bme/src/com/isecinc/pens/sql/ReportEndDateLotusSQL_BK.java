@@ -100,7 +100,7 @@ public class ReportEndDateLotusSQL_BK {
 						sql.append("\n\t\t AND P.inventory_item_code = MP.pens_item");
 						sql.append("\n\t\t AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n\t\t AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n\t\t AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n\t\t AND P.inventory_item_desc LIKE 'ME%' ");
 						//NOT IN pensbme_group_unuse_lotus
 						sql.append("\n\t\t AND MP.MATERIAL_MASTER NOT IN(select group_code from pensbme_group_unuse_lotus)");
 						//Lotus Only 020047
@@ -261,7 +261,7 @@ public class ReportEndDateLotusSQL_BK {
 					sql.append("\n\t\t AND P.inventory_item_code = MP.pens_item");
 					sql.append("\n\t\t AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n\t\t AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n\t\t AND P.inventory_item_desc LIKE 'ME%' ");
+					//sql.append("\n\t\t AND P.inventory_item_desc LIKE 'ME%' ");
 					//NOT IN pensbme_group_unuse_lotus
 					sql.append("\n\t\t AND MP.MATERIAL_MASTER NOT IN(select group_code from pensbme_group_unuse_lotus)");
 					//Lotus Only 020047

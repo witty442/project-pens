@@ -37,7 +37,7 @@ import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MReceiptMatchCN;
 import com.isecinc.pens.model.MUser;
 import com.isecinc.pens.process.document.ReceiptDocumentProcess;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 import com.pens.util.seq.SequenceProcessAll;
 
 /** New Code 08/2561  ***/
@@ -2008,7 +2008,7 @@ public class ImportReceiptFunction {
 					receiptLine.setRemainAmount(rs.getDouble("remain_amount")-paidAmountOracle);
 					
 					//set 2 digit 
-					receiptLine.setRemainAmount( NumberToolsUtil.round(receiptLine.getRemainAmount(), 2, BigDecimal.ROUND_HALF_UP));
+					receiptLine.setRemainAmount( NumberUtil.round(receiptLine.getRemainAmount(), 2, BigDecimal.ROUND_HALF_UP));
 					   
 					invoiceAmount = rs.getDouble("invoice_amount");
 				}
@@ -2061,7 +2061,7 @@ public class ImportReceiptFunction {
 					receiptLine.setRemainAmount(rs.getDouble("remain_amount")-paidAmountOracle);
 					
 					//set 2 digit 
-					receiptLine.setRemainAmount( NumberToolsUtil.round(receiptLine.getRemainAmount(), 2, BigDecimal.ROUND_HALF_UP));
+					receiptLine.setRemainAmount( NumberUtil.round(receiptLine.getRemainAmount(), 2, BigDecimal.ROUND_HALF_UP));
 					   
 					invoiceAmount = rs.getDouble("invoice_amount");
 				}
@@ -2085,7 +2085,7 @@ public class ImportReceiptFunction {
 				   receiptLine.setRemainAmount(rs.getDouble("net_amount")-paidAmountOracle);
 				   
 				   //set 2 digit 
-				   receiptLine.setRemainAmount( NumberToolsUtil.round(receiptLine.getRemainAmount(), 2, BigDecimal.ROUND_HALF_UP));
+				   receiptLine.setRemainAmount( NumberUtil.round(receiptLine.getRemainAmount(), 2, BigDecimal.ROUND_HALF_UP));
 				   
 				   invoiceAmount = rs.getDouble("net_amount");
 				}

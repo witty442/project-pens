@@ -11,7 +11,6 @@ import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.PhysicalSummary;
 import com.isecinc.pens.bean.TransactionSummary;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 

@@ -506,4 +506,73 @@ public class MSubBrand  {
 		}
 		return pos;
 	}
+	
+	
+	/** for nissin order **/
+	public List<References> lookUpSubBrandNissinList(int pageId,User u,boolean all) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnectionApps.getInstance().getConnection();
+			return lookUpSubBrandNissinList(conn, pageId, u, all);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(conn !=null){
+				conn.close();
+			}
+		}
+	}
+	
+	public List<References> lookUpSubBrandNissinList(Connection conn ,int pageId,User u,boolean all) throws Exception {
+		List<References> pos = new ArrayList<References>();
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuffer sql = new StringBuffer("");
+		try {
+			sql.append("\n select M.* from (");
+			sql.append("\n select A.* ,rownum as r__ from (");
+			sql.append("\n select AA.* from (");
+			sql.append("\n   SELECT distinct sb.subbrand_no ,sb.subbrand_desc ");
+			sql.append("\n   ,nvl((select cat.seq from pensso.m_catalog cat where sb.subbrand_no = cat.code),9999) as seq");
+			sql.append("\n   FROM PENSBI.XXPENS_BI_MST_SUBBRAND_NIS sb ");
+		    sql.append("\n   ,PENSSO.M_PRODUCT p ,PENSSO.M_PRODUCT_CATEGORY pdc");
+		    sql.append("\n   WHERE p.product_id = sb.inventory_item_id"); 
+		    sql.append("\n   AND p.product_category_id = pdc.product_category_id"); 
+			//Except DefaultValue No display
+		    sql.append("\n   AND sb.subbrand_no NOT IN (");
+		    sql.append("\n     SELECT c.CODE FROM PENSSO.M_CATALOG c WHERE c.ISEXCLUDE ='Y'");
+		    sql.append("\n   ) ") ;
+		    sql.append("\n   )AA ");
+		    sql.append("\n ORDER BY AA.seq, AA.subbrand_no ");
+		    sql.append("\n  )A ");
+		    if(!all){
+		       sql.append("\n   WHERE rownum < (("+pageId+" * "+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE+") + 1 )  ");
+		    }
+		    sql.append("\n )M  ");
+		    if(!all){
+		       sql.append("\n  WHERE r__ >= ((("+pageId+"-1) * "+NO_OF_PRODUCT_DISPLAY_IN_ONE_PAGE+") + 1)  ");
+		    }
+		    	
+			logger.debug("sql:\n"+sql.toString());
+
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			while (rst.next()) {
+			    References r = new References(rst.getString("subbrand_no"),rst.getString("subbrand_no"),Utils.isNull(rst.getString("subbrand_desc")));
+			    pos.add(r);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				rst.close();
+			} catch (Exception e2) {}
+			try {
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		return pos;
+	}
+	
 }

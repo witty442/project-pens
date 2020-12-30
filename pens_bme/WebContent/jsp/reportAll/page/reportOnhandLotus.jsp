@@ -83,7 +83,10 @@ function search(){
 		   alert("กรุณากรอกข้อมูลรหัสร้านค้า");
 		   return false;
 	   } 
-
+	    
+	/**  Control Save Lock Screen **/
+    startControlSaveLockScreen();
+	
 	form.action = path + "/jsp/reportAllAction.do?do=search";
 	form.submit();
 	return true;
@@ -319,7 +322,7 @@ function clearBatchForm(){
 							 <td align="right" width="25%" nowrap>
 							  <%if ( Utils.userInRole(user,new String[]{User.ADMIN,User.PICKADMIN}) ){%>
 									<a href="javascript:genStockEndDateLotus('${pageContext.request.contextPath}')">
-									  <input type="button" value="Gen Stock End Date" class="newPosBtn">
+									  <input type="button" value="Gen Stock End Date Lotus" class="newPosBtn">
 									</a>
 								<%} %>
 							</td>
@@ -332,11 +335,11 @@ function clearBatchForm(){
 							<td align="left">
 							    <%if ( Utils.userInRole(user,new String[]{User.PICKADMIN}) ){%>
 									<a href="javascript:searchBatchForm('<%=BatchTaskConstants.GEN_STOCK_ENDDATE_LOTUS%>')">
-									  <input type="button" value="ตรวจสอบสถานะล่าสุด(Batch)" class="newPosBtnLong"> 
+									  <input type="button" value="ตรวจสอบสถานะทำรายการล่าสุด(Batch)" class="newPosBtnLong"> 
 									</a>
 								<%}else{ %>
 								   <a href="javascript:searchBatchForm('<%=BatchTaskConstants.EXPORT_REPORT_ONHAND_LOTUS%>')">
-									  <input type="button" value="ตรวจสอบสถานะล่าสุด(Batch)" class="newPosBtnLong"> 
+									  <input type="button" value="ตรวจสอบสถานะทำรายการล่าสุด(Batch)" class="newPosBtnLong"> 
 									</a>
 								<%} %>
 								<!-- <a href="javascript:searchBatchForm()">
@@ -479,3 +482,5 @@ function clearBatchForm(){
 </table>
 </body>
 </html>
+ <!-- Control Save Lock Screen -->
+<jsp:include page="../../controlSaveLockScreen.jsp"/>

@@ -23,8 +23,9 @@ public class UserUtils {
 			userRoleTemp = "";
             if("ROLE_ACCESS".equalsIgnoreCase(roleType)){
             	userRoleTemp = Utils.isNull(user.getRoleAccess()).toLowerCase().trim();
+            }else if("ROLE_ALL".equalsIgnoreCase(roleType)){
+            	userRoleTemp = Utils.isNull(user.getRoleAll()).toLowerCase().trim();
             }
-            
             userRoles = userRoleTemp.split("\\|");
 			for(int j =0;j<userRoles.length;j++){
 				userRole = userRoles[j];

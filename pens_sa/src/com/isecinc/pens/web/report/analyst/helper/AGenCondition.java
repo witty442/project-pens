@@ -352,8 +352,8 @@ public class AGenCondition {
 		 	    		sql +="\t AND INVOICE_DATE >=TO_DATE('0101"+yearAllArrInt[0]+"','ddmmyyyy') \n"; //MinYear
 		 	    		sql +="\t\t AND INVOICE_DATE <=TO_DATE('3112"+yearAllArrInt[yearAllArrInt.length-1]+"','ddmmyyyy') \n"; //MinYear
 		 	    	}else{
-		 	    		sql +="\t AND ORDERED_DATE >=TO_DATE('0101"+yearAllArrInt[0]+"','ddmmyyyy') \n"; //MinYear
-		 	    		sql +="\t\t AND ORDERED_DATE <=TO_DATE('3112"+yearAllArrInt[yearAllArrInt.length-1]+"','ddmmyyyy') \n"; //MinYear
+		 	    		sql +="\t AND SALES_ORDER_DATE >=TO_DATE('0101"+yearAllArrInt[0]+"','ddmmyyyy') \n"; //MinYear
+		 	    		sql +="\t\t AND SALES_ORDER_DATE <=TO_DATE('3112"+yearAllArrInt[yearAllArrInt.length-1]+"','ddmmyyyy') \n"; //MinYear
 		 	    	}
 		    	}
 	    	}else{
@@ -362,8 +362,8 @@ public class AGenCondition {
 	 	    		sql +="\t AND INVOICE_DATE >=TO_DATE('0101"+allYear+"','ddmmyyyy') \n"; //MinYear
 	 	    		sql +="\t\t AND INVOICE_DATE <=TO_DATE('3112"+allYear+"','ddmmyyyy') \n"; //MinYear
 	 	    	}else{
-	 	    		sql +="\t AND ORDERED_DATE >=TO_DATE('0101"+allYear+"','ddmmyyyy') \n"; //MinYear
-	 	    		sql +="\t\t AND ORDERED_DATE <=TO_DATE('3112"+allYear+"','ddmmyyyy') \n"; //MinYear
+	 	    		sql +="\t AND SALES_ORDER_DATE >=TO_DATE('0101"+allYear+"','ddmmyyyy') \n"; //MinYear
+	 	    		sql +="\t\t AND SALES_ORDER_DATE <=TO_DATE('3112"+allYear+"','ddmmyyyy') \n"; //MinYear
 	 	    	}
 	    	}
 	    	return sql;
@@ -385,6 +385,8 @@ public class AGenCondition {
 	public  String genSqlWhereCondition(ABean salesBean,String aliasSub) throws Exception{
 		String sql = "";
 		logger.debug("**genSqlWhereCondition**");
+		
+		sql +=" /**genSqlWhereCondition**/ ";  
 		//logger.debug("condName1:"+Utils.isNull(salesBean.getCondName1()));
 		//logger.debug("condValue1:"+Utils.isNull(salesBean.getCondValue1()));
 		

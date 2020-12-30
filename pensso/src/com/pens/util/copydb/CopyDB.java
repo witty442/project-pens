@@ -169,6 +169,9 @@ public class CopyDB {
 			processCopy(connSource,connDest,schemaSource,schemaDest,"XXPENS_BI_MST_SUBBRAND"," ");*/
 			
 			
+			processCopy(connSource,connDest,schemaSource,schemaDest,"M_CUSTOMER_NIS"," ");
+			
+			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{

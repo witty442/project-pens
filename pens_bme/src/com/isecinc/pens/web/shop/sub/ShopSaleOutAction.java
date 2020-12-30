@@ -156,6 +156,8 @@ public class ShopSaleOutAction {
 			   h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ Terminal Shop</td> \n");
 			}else if (Utils.isNull(form.getBean().getCustGroup()).equals(PickConstants.STORE_TYPE_CHINA_CODE)){
 			   h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ Im Chaina Shop</td> \n");
+			}else if (Utils.isNull(form.getBean().getCustGroup()).equals(PickConstants.STORE_TYPE_SP_CODE)){
+			   h.append("  <td align='left' colspan='"+colspan+"'>รายงานรายละเอียดการขาย ที่ Siam Premium Outlet Shop</td> \n");
 			}
 			
 			h.append(" </tr> \n");

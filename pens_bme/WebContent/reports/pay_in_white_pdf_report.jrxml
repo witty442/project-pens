@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="pay_in_white_pdf_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="585" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5">
-	<property name="ireport.zoom" value="3.0"/>
-	<property name="ireport.x" value="761"/>
-	<property name="ireport.y" value="240"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="pay_in_white_pdf_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="585" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" isSummaryWithPageHeaderAndFooter="true">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="169"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="companyName" class="java.lang.String"/>
 	<parameter name="docNo" class="java.lang.String"/>
 	<parameter name="remark" class="java.lang.String"/>
@@ -47,11 +47,11 @@
 				<text><![CDATA[แผนก]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="452" y="62" width="134" height="20"/>
+				<reportElement x="465" y="62" width="121" height="20"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="16" isBold="false" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[เลขที่เอกสาร : .........................]]></text>
+				<text><![CDATA[Doc No : .........................]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="6" y="112" width="35" height="20"/>
@@ -117,7 +117,7 @@
 				<text><![CDATA[ฝ่าย]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="506" y="61" width="80" height="20"/>
+				<reportElement x="506" y="60" width="80" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="16"/>
 				</textElement>
@@ -170,7 +170,7 @@
 	<columnHeader>
 		<band height="25" splitType="Stretch">
 			<staticText>
-				<reportElement x="97" y="0" width="384" height="25"/>
+				<reportElement x="97" y="0" width="393" height="25"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -198,7 +198,7 @@
 				<text><![CDATA[ชื่อบัญชี]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="481" y="0" width="104" height="25"/>
+				<reportElement x="490" y="0" width="95" height="25"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -214,9 +214,9 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="25" splitType="Stretch">
+		<band height="22" splitType="Stretch">
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="97" height="25"/>
+				<reportElement x="0" y="0" width="97" height="22"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -224,13 +224,13 @@
 					<bottomPen lineWidth="0.1"/>
 					<rightPen lineWidth="0.1"/>
 				</box>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[" "+$F{accountName}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{accountName}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="481" y="0" width="100" height="25"/>
+				<reportElement x="490" y="0" width="91" height="22"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -244,7 +244,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="97" y="0" width="384" height="25"/>
+				<reportElement x="97" y="0" width="393" height="22"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -258,7 +258,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[" "+$F{description}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="580" y="0" width="5" height="25"/>
+				<reportElement x="580" y="0" width="5" height="22"/>
 				<box>
 					<bottomPen lineWidth="0.1"/>
 					<rightPen lineWidth="0.1"/>
@@ -271,9 +271,9 @@
 		</band>
 	</detail>
 	<summary>
-		<band height="220" splitType="Stretch">
+		<band height="280" splitType="Stretch">
 			<staticText>
-				<reportElement x="481" y="46" width="104" height="40"/>
+				<reportElement x="490" y="46" width="95" height="95"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -287,12 +287,12 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="196" y="165" width="75" height="19"/>
+				<reportElement x="196" y="220" width="75" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
 					<leftPen lineWidth="0.1"/>
-					<bottomPen lineWidth="0.1"/>
+					<bottomPen lineWidth="0.0"/>
 					<rightPen lineWidth="0.1"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -301,11 +301,11 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{DR_INPUT_TAX_AMOUNT}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="97" y="0" width="384" height="27"/>
+				<reportElement x="97" y="0" width="393" height="27"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
-					<leftPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.1"/>
 					<bottomPen lineWidth="0.1"/>
 					<rightPen lineWidth="0.1"/>
 				</box>
@@ -315,7 +315,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[" "+$P{totalAmountLetter}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="28" y="86" width="23" height="19"/>
+				<reportElement x="28" y="141" width="23" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -329,7 +329,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="291" y="105" width="190" height="22"/>
+				<reportElement x="294" y="160" width="196" height="22"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -343,7 +343,7 @@
 				<text><![CDATA[CR.]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="55" y="127" width="141" height="19"/>
+				<reportElement x="55" y="182" width="141" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -357,7 +357,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{DR_AC_NO}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="343" y="146" width="138" height="19"/>
+				<reportElement x="343" y="201" width="147" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -371,7 +371,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{CR_DESC}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="196" y="127" width="75" height="38"/>
+				<reportElement x="196" y="182" width="75" height="38"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -385,7 +385,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{DR_AMOUNT}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="105" width="196" height="22"/>
+				<reportElement x="0" y="160" width="196" height="22"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -399,10 +399,10 @@
 				<text><![CDATA[DR.]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="271" y="184" width="20" height="19"/>
+				<reportElement x="271" y="239" width="23" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
-					<topPen lineWidth="0.1"/>
+					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.1"/>
 					<bottomPen lineWidth="0.1"/>
 					<rightPen lineWidth="0.1"/>
@@ -413,7 +413,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{DR_TOTAL_DIGIT}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="55" y="165" width="141" height="19"/>
+				<reportElement x="55" y="220" width="141" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -424,10 +424,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[INPUT TAX]]></text>
+				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="165" width="56" height="19"/>
+				<reportElement x="0" y="220" width="56" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -438,10 +438,10 @@
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[A/C No.]]></text>
+				<text><![CDATA[ A/C No.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="74" y="86" width="23" height="19"/>
+				<reportElement x="74" y="141" width="23" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -455,7 +455,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="97" y="46" width="99" height="40"/>
+				<reportElement x="97" y="46" width="99" height="95"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -478,12 +478,12 @@
 					<rightPen lineWidth="0.1"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+					<font fontName="Angsana New" size="14" isBold="true" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[ผู้ตรวจสอบ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="55" y="184" width="141" height="19"/>
+				<reportElement x="55" y="239" width="141" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -491,13 +491,13 @@
 					<bottomPen lineWidth="0.1"/>
 					<rightPen lineWidth="0.1"/>
 				</box>
-				<textElement textAlignment="Right">
+				<textElement textAlignment="Center">
 					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[TOTAL                     ]]></text>
+				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="46" width="97" height="40"/>
+				<reportElement x="0" y="46" width="97" height="95"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -511,7 +511,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="196" y="105" width="95" height="22"/>
+				<reportElement x="196" y="160" width="98" height="22"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -525,7 +525,7 @@
 				<text><![CDATA[AMOUNT.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="97" y="86" width="25" height="19"/>
+				<reportElement x="97" y="141" width="25" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -539,7 +539,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="196" y="46" width="95" height="40"/>
+				<reportElement x="196" y="46" width="98" height="95"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -553,7 +553,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="86" width="28" height="19"/>
+				<reportElement x="0" y="141" width="28" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -567,7 +567,7 @@
 				<text><![CDATA[รหัส]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="147" y="86" width="239" height="19"/>
+				<reportElement x="147" y="141" width="245" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -581,7 +581,7 @@
 				<text><![CDATA[    วันที่บันทึกบัญชี.......................................................................................]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="343" y="127" width="138" height="19"/>
+				<reportElement x="343" y="182" width="147" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -595,7 +595,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{CR_AC_NO}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="291" y="27" width="95" height="19"/>
+				<reportElement x="294" y="27" width="98" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -604,15 +604,15 @@
 					<rightPen lineWidth="0.1"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+					<font fontName="Angsana New" size="14" isBold="true" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[ผู้จ่ายเงิน]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="559" y="184" width="26" height="19"/>
+				<reportElement x="559" y="239" width="26" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
-					<topPen lineWidth="0.1"/>
+					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.1"/>
 					<bottomPen lineWidth="0.1"/>
 					<rightPen lineWidth="0.1"/>
@@ -623,7 +623,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{CR_TOTAL_DIGIT}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="291" y="46" width="95" height="40"/>
+				<reportElement x="294" y="46" width="98" height="95"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -637,7 +637,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="184" width="56" height="19"/>
+				<reportElement x="0" y="239" width="56" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -648,10 +648,10 @@
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[Desc.]]></text>
+				<text><![CDATA[ Desc.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="122" y="86" width="25" height="19"/>
+				<reportElement x="122" y="141" width="25" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -665,7 +665,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="481" y="105" width="104" height="22"/>
+				<reportElement x="490" y="160" width="95" height="22"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -688,12 +688,12 @@
 					<rightPen lineWidth="0.1"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+					<font fontName="Angsana New" size="14" isBold="true" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[ผู้เบิก]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="386" y="27" width="95" height="19"/>
+				<reportElement x="392" y="27" width="98" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -702,12 +702,12 @@
 					<rightPen lineWidth="0.1"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+					<font fontName="Angsana New" size="14" isBold="true" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[ผู้รับเงิน]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="196" y="27" width="95" height="19"/>
+				<reportElement x="196" y="27" width="98" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -716,54 +716,12 @@
 					<rightPen lineWidth="0.1"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+					<font fontName="Angsana New" size="14" isBold="true" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[ผู้อนุมัติ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="146" width="56" height="19"/>
-				<box>
-					<pen lineWidth="0.1"/>
-					<topPen lineWidth="0.1"/>
-					<leftPen lineWidth="0.1"/>
-					<bottomPen lineWidth="0.1"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
-				</textElement>
-				<text><![CDATA[Desc.]]></text>
-			</staticText>
-			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="481" y="184" width="78" height="19"/>
-				<box>
-					<pen lineWidth="0.1"/>
-					<topPen lineWidth="0.1"/>
-					<leftPen lineWidth="0.1"/>
-					<bottomPen lineWidth="0.1"/>
-					<rightPen lineWidth="0.1"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{CR_TOTAL}]]></textFieldExpression>
-			</textField>
-			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="559" y="165" width="26" height="19"/>
-				<box>
-					<pen lineWidth="0.1"/>
-					<topPen lineWidth="0.1"/>
-					<leftPen lineWidth="0.1"/>
-					<bottomPen lineWidth="0.1"/>
-					<rightPen lineWidth="0.1"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{CR_ACC_WT_TAX_AMOUNT_DIGIT}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="291" y="146" width="52" height="19"/>
+				<reportElement x="0" y="201" width="56" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -777,7 +735,49 @@
 				<text><![CDATA[ Desc.]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="55" y="146" width="141" height="19"/>
+				<reportElement x="490" y="239" width="69" height="19"/>
+				<box>
+					<pen lineWidth="0.1"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.1"/>
+					<bottomPen lineWidth="0.1"/>
+					<rightPen lineWidth="0.1"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{CR_TOTAL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="559" y="220" width="26" height="19"/>
+				<box>
+					<pen lineWidth="0.1"/>
+					<topPen lineWidth="0.1"/>
+					<leftPen lineWidth="0.1"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.1"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{CR_ACC_WT_TAX_AMOUNT_DIGIT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="294" y="201" width="49" height="19"/>
+				<box>
+					<pen lineWidth="0.1"/>
+					<topPen lineWidth="0.1"/>
+					<leftPen lineWidth="0.1"/>
+					<bottomPen lineWidth="0.1"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[ Desc.]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="55" y="201" width="141" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -791,7 +791,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{DR_DESC}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="481" y="0" width="100" height="27"/>
+				<reportElement x="490" y="0" width="91" height="27"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -805,14 +805,17 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalAmount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="481" y="165" width="78" height="19"/>
+				<reportElement x="490" y="220" width="69" height="19"/>
+				<box>
+					<leftPen lineWidth="0.1"/>
+				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Angsana New" size="12"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{CR_ACC_WT_TAX_AMOUNT}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="343" y="165" width="138" height="19"/>
+				<reportElement x="343" y="220" width="147" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -823,10 +826,10 @@
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[ACCRUED WITHHOLDING TAXES]]></text>
+				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="386" y="86" width="199" height="19"/>
+				<reportElement x="392" y="141" width="193" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -837,10 +840,10 @@
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[ เลขที่เอกสาร.............................................................................]]></text>
+				<text><![CDATA[ เลขที่เอกสาร...........................................................................]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="559" y="127" width="26" height="38"/>
+				<reportElement x="559" y="182" width="26" height="38"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -854,7 +857,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{CR_AMOUNT_DIGIT}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="291" y="165" width="52" height="19"/>
+				<reportElement x="294" y="220" width="49" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -868,7 +871,7 @@
 				<text><![CDATA[ A/C No.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="51" y="86" width="23" height="19"/>
+				<reportElement x="51" y="141" width="23" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -882,7 +885,7 @@
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="291" y="184" width="52" height="19"/>
+				<reportElement x="294" y="239" width="49" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -896,7 +899,7 @@
 				<text><![CDATA[ Desc.]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="271" y="127" width="20" height="38"/>
+				<reportElement x="271" y="182" width="23" height="38"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -910,10 +913,10 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{DR_AMOUNT_DIGIT}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="196" y="184" width="75" height="19"/>
+				<reportElement x="196" y="239" width="75" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
-					<topPen lineWidth="0.1"/>
+					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.1"/>
 					<bottomPen lineWidth="0.1"/>
 					<rightPen lineWidth="0.1"/>
@@ -924,7 +927,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{DR_TOTAL}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="127" width="56" height="19"/>
+				<reportElement x="0" y="182" width="56" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -935,10 +938,10 @@
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[A/C No.]]></text>
+				<text><![CDATA[ A/C No.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="343" y="184" width="138" height="19"/>
+				<reportElement x="343" y="239" width="147" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -946,13 +949,13 @@
 					<bottomPen lineWidth="0.1"/>
 					<rightPen lineWidth="0.1"/>
 				</box>
-				<textElement textAlignment="Right">
+				<textElement textAlignment="Center">
 					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[TOTAL                    ]]></text>
+				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="481" y="27" width="104" height="19"/>
+				<reportElement x="490" y="27" width="95" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -961,12 +964,12 @@
 					<rightPen lineWidth="0.1"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+					<font fontName="Angsana New" size="14" isBold="true" isUnderline="false"/>
 				</textElement>
-				<text><![CDATA[ผู้ตรวจสอบ(บัญชี)]]></text>
+				<text><![CDATA[บัญชี]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="386" y="46" width="95" height="40"/>
+				<reportElement x="392" y="46" width="98" height="95"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -994,7 +997,7 @@
 				<text><![CDATA[จำนวนเงินตัวอักษร]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="481" y="127" width="78" height="38"/>
+				<reportElement x="490" y="182" width="69" height="38"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -1008,12 +1011,12 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{CR_AMOUNT}]]></textFieldExpression>
 			</textField>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement x="271" y="165" width="20" height="19"/>
+				<reportElement x="271" y="220" width="23" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
 					<leftPen lineWidth="0.1"/>
-					<bottomPen lineWidth="0.1"/>
+					<bottomPen lineWidth="0.0"/>
 					<rightPen lineWidth="0.1"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -1022,7 +1025,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{DR_INPUT_TAX_AMOUNT_DIGIT}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="291" y="127" width="52" height="19"/>
+				<reportElement x="294" y="182" width="49" height="19"/>
 				<box>
 					<pen lineWidth="0.1"/>
 					<topPen lineWidth="0.1"/>
@@ -1045,6 +1048,90 @@
 					<font fontName="Angsana New" size="16" isBold="false" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="258" width="196" height="19"/>
+				<box>
+					<pen lineWidth="0.1"/>
+					<topPen lineWidth="0.1"/>
+					<leftPen lineWidth="0.1"/>
+					<bottomPen lineWidth="0.1"/>
+					<rightPen lineWidth="0.1"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[               TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="196" y="258" width="75" height="19"/>
+				<box>
+					<pen lineWidth="0.1"/>
+					<topPen lineWidth="0.1"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.1"/>
+					<rightPen lineWidth="0.1"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="271" y="258" width="23" height="19"/>
+				<box>
+					<pen lineWidth="0.1"/>
+					<topPen lineWidth="0.1"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.1"/>
+					<rightPen lineWidth="0.1"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="559" y="258" width="26" height="19"/>
+				<box>
+					<pen lineWidth="0.1"/>
+					<topPen lineWidth="0.1"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.1"/>
+					<rightPen lineWidth="0.1"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="490" y="258" width="69" height="19"/>
+				<box>
+					<pen lineWidth="0.1"/>
+					<topPen lineWidth="0.1"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.1"/>
+					<rightPen lineWidth="0.1"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="294" y="258" width="196" height="19"/>
+				<box>
+					<pen lineWidth="0.1"/>
+					<topPen lineWidth="0.1"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.1"/>
+					<rightPen lineWidth="0.1"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[               TOTAL]]></text>
 			</staticText>
 		</band>
 	</summary>

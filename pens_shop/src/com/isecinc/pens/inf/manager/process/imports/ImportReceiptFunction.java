@@ -47,7 +47,7 @@ import com.isecinc.pens.model.MReceiptMatch;
 import com.isecinc.pens.model.MReceiptMatchCN;
 import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.ReceiptDocumentProcess;
-import com.pens.utils.LoggerUtils;
+import com.pens.util.LoggerUtils;
 import com.sun.org.apache.bcel.internal.generic.ISUB;
 
 /** Update Code 07/2561 **/

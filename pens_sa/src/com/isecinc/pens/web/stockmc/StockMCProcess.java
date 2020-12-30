@@ -91,7 +91,6 @@ public class StockMCProcess  extends I_Action{
 		Connection conn = null;
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
-	
 			logger.debug("action:"+action+",mobile:"+user.isMobile());
 			
 			//init connection
@@ -364,6 +363,21 @@ public class StockMCProcess  extends I_Action{
 			 aForm.setMode("edit");
 			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode(),0));
 			
+			 StockMCBean bean = aForm.getBean();
+			 
+			 //unknown case user key space bar in textfield ->system input &#8203;
+			 //REPLACE(mc_name,'&#8203;','') in text field (spacebar) some mobile device is error
+			 if( !Utils.isNull(bean.getMcName()).equals("")){
+			    bean.setMcName(bean.getMcName().replaceAll("&#8203;", ""));
+			 }
+			 if( !Utils.isNull(bean.getCustomerCode()).equals("")){
+			    bean.setCustomerCode(bean.getCustomerCode().replaceAll("&#8203;", ""));
+			 }
+			 if( !Utils.isNull(bean.getStoreCode()).equals("")){
+			    bean.setStoreCode(bean.getStoreCode().replaceAll("&#8203;", ""));
+			 }
+			 
+			 aForm.setBean(bean);
 			 // save token
 			 saveToken(request);			
 		} catch (Exception e) {
@@ -530,15 +544,16 @@ public class StockMCProcess  extends I_Action{
 		logger.debug("exportToExcel : ");
 		StockMCForm aForm = (StockMCForm) form;
 		StringBuffer resultTable = null;
-		String pageName = aForm.getPageName();
+		String pageName = Utils.isNull(request.getParameter("pageName"));
 		Connection conn = null;
+		User user = (User) request.getSession().getAttribute("user");
 		try {
 			conn = DBConnection.getInstance().getConnectionApps();
 			String idSelected =Utils.isNull(request.getSession().getAttribute("stock_mc_codes"));
 			
-			List<StockMCBean> items = StockMCDAO.searchStockMCReport(conn,idSelected);
+			List<StockMCBean> items = StockMCDAO.searchStockMCReport(pageName,conn,null,idSelected);
 		    if(items!= null && items.size() >0){
-		    	resultTable = StockMCExport.genExportStockMCReport(items);
+		    	resultTable = StockMCExport.genExportStockMCReport(pageName,user,items,true);
 				
 				java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");

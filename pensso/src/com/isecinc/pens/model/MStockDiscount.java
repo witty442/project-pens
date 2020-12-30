@@ -28,7 +28,7 @@ import com.isecinc.pens.process.document.StockDiscountDocumentProcess;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 
 public class MStockDiscount {
@@ -1197,7 +1197,7 @@ public class MStockDiscount {
 				/**  = priQtyall +(neg priQtyInit) - priQty(exist <> curRequestNumber) **/
 				//logger.debug("Calc priAllQty["+priAllQty+"]-priQtyInit["+priQtyInit+"]-priQtyNotInCurrReqNum["+priQtyNotInCurrRequestNumber+"]");
 				priAllQty =  priAllQty + priQtyInit - priQtyNotInCurrRequestNumber;
-				priAllQty = NumberToolsUtil.round(priAllQty, 5, BigDecimal.ROUND_HALF_UP); 
+				priAllQty = NumberUtil.round(priAllQty, 5, BigDecimal.ROUND_HALF_UP); 
 				//logger.debug("Result priAllQty:"+priAllQty);
 				
 				bean.setPriAllQty(priAllQty);

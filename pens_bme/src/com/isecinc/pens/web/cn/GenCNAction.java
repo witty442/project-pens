@@ -1,5 +1,6 @@
 package com.isecinc.pens.web.cn;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.Date;
 
@@ -15,6 +16,7 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Barcode;
 import com.isecinc.pens.bean.GenCNBean;
 import com.isecinc.pens.bean.Job;
+import com.isecinc.pens.bean.ProductBean;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.BarcodeDAO;
@@ -23,8 +25,10 @@ import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.JobDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.bme.util.StockBMEUtils;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.NumberUtil;
 import com.pens.util.Utils;
 
 /**
@@ -135,7 +139,7 @@ public class GenCNAction extends I_Action {
 		int countQty = 0;
 		int lineId = 0;
 		try {
-			conn = DBConnection.getInstance().getConnection();
+			conn = DBConnection.getInstance().getConnectionApps();
 			conn.setAutoCommit(false);
 			
 			GenCNBean h = aForm.getBean();
@@ -181,6 +185,7 @@ public class GenCNAction extends I_Action {
 			
 			String[] groupCode = request.getParameterValues("groupCode");
 			String[] pensItem = request.getParameterValues("pensItem");
+			String[] inventoryItemId = request.getParameterValues("inventoryItemId");
 			String[] qty = request.getParameterValues("qty");
 			String[] barcode = request.getParameterValues("barcode");
 			String[] wholePriceBF = request.getParameterValues("wholePriceBF");
@@ -199,7 +204,7 @@ public class GenCNAction extends I_Action {
 						 l.setJobId(ad.getJobId());		
 						 l.setGroupCode(Utils.isNull(groupCode[i]));
 						 l.setPensItem(Utils.isNull(pensItem[i]));
-						 
+						
 						 l.setBarcode(Utils.isNull(barcode[i]));
 						 l.setMaterialMaster(Utils.isNull(materialMaster[i]));
 						 l.setWholePriceBF(Utils.isNull(wholePriceBF[i]));
@@ -209,7 +214,20 @@ public class GenCNAction extends I_Action {
 						 l.setUpdateUser(user.getUserName());
 						 l.setStatus(PickConstants.STATUS_ISSUED);
 						 
-						 countQty = Utils.convertStrToInt(qty[i]);
+						 /** special case some product Convert CTN to EA ,481623(mask)
+						  * IPCM Ë¹éÒ¡Ò¡Í¹ÒÁÑÂª¹Ô´¼éÒ½éÒÂ¼ÊÁÁÑÊÅÔ¹ ÍÔÁá¾¤ á¾¤ 2 
+						  * **/
+						 if("481623".equals(l.getPensItem())){
+							 //convert CTN to EA
+						    String eaQty = StockBMEUtils.convertStockQty(conn, Utils.isNull(inventoryItemId[i]),  "CTN", "EA", qty[i]);
+						    // round up 2 digit
+						    Double eaQtyD = NumberUtil.round(new Double(eaQty), 2, BigDecimal.ROUND_UP);
+						    logger.debug("eaQtyD:"+eaQtyD);
+						    countQty = eaQtyD.intValue();
+						    logger.debug("countQty:"+countQty);
+						 }else{
+						    countQty = new Double(Utils.convertStrToDouble(qty[i])).intValue();
+						 }
 						 if(countQty >0){
 							for(int r=0;r<countQty;r++){
 								lineId++;
@@ -220,10 +238,10 @@ public class GenCNAction extends I_Action {
 							lineId++;
 							l.setLineId(lineId);
 						    BarcodeDAO.saveItemModel(conn, l);
-						 }
-					}
-				}
-			}
+						 }//if
+					}//if
+				}//for
+			}//if
 
 		   // hide save button
 		    h.setCanEdit(false);

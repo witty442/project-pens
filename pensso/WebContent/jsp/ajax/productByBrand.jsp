@@ -112,7 +112,7 @@ for(ProductCatalog catalog:catalogs) {
 	 </td>
 	<td align="center"><b><%=catalog.getProductCode()%></b></td>
 	<td><%=catalog.getProductNameDisplay()%></td>
-	<td align="center"><%=catalog.getUom1()%> &frasl; <%=catalog.getUom2()%></td>
+	<td align="center"><%=catalog.getUom1Display()%> &frasl; <%=catalog.getUom2Display()%></td>
 	<td align="center"><%=catalog.getUom2ConvRate()%>&frasl; <%=catalog.getUom1ConvRate()%></td>
 	<td align="right">
 	    <%=formatter.format(catalog.getPrice1())%> &frasl; <%=formatter.format(catalog.getPrice2())%>

@@ -559,22 +559,24 @@ public class FileUtil {
 	 
 
 		/** Get Root Temp for write file temp */
-		/** UAT:d://dev_temp/ **/
+		/** UAT:d://dev_temp/ (except pensbme_ddserver)**/
 		/** PROD:/PENS/ERP/apps/inst/saleonline/dev_temp/  **/
 		
 		public static String getRootPathTemp(EnvProperties env) {
 			String rootPathTemp = env.getProperty("path.temp");
 			try{
-				//Case rootPath prouctType=production (but deploy for test on 192.168.202.7or8)
+				//Case rootPath prouctType=production (but deploy for test on 192.168.202.7 or 8(witty dev))
 				// use path: d://dev_temp/
 				logger.debug("env productType:"+env.getProperty("product.type"));
+				logger.debug("localHost IP:"+InetAddress.getLocalHost().toString());
 				if(env.getProperty("product.type").equalsIgnoreCase("production")){
-					if(InetAddress.getLocalHost().equals("192.168.202.7") //witty
-						|| InetAddress.getLocalHost().equals("192.168.202.8")){
+					if(    InetAddress.getLocalHost().toString().indexOf("192.168.202.7") != -1 //ddserver
+						|| InetAddress.getLocalHost().toString().indexOf("192.168.202.8") != -1//witty
+					){
 						rootPathTemp = "d://dev_temp//";
 					}
 				}
-				
+				logger.info("rootPathTemp:"+rootPathTemp);
 			}catch(Exception e){
 				logger.error(e.getMessage(),e);
 			}

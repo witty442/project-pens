@@ -18,6 +18,7 @@ try{
 String whereCause = " AND TRX_MODULE = '"+module+"' ";
 whereCause+="  AND RECORD_ID = "+recordId;
 whereCause+=" ORDER BY TRX_HIST_ID DESC "; 
+System.out.println("whereCasue:"+whereCause);
 trxs = new MTrxHistory().lookUp(whereCause);
 }catch(Exception e){
 	e.printStackTrace();

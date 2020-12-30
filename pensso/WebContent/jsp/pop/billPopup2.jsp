@@ -1,4 +1,3 @@
-
 <%@page import="com.pens.util.DBConnectionApps"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.model.MAdjust"%>
@@ -120,6 +119,13 @@ try{
 		window.opener.addBill('${pageContext.request.contextPath}',retArry);
 		window.close();
 	}
+function chkAllFlag(chkAll){
+	var invoiceIdS = document.getElementsByName('invoiceId');
+	var objchk = document.getElementsByName('chkReceipts');
+	for (var c = 0; c < invoiceIdS.length; c++) {
+		objchk[c].checked = chkAll.checked;
+	}	
+}
 </script>
 </head>
 <body onload="loadMe();" topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
@@ -145,7 +151,10 @@ try{
 				<th>ยอดเงินรวม</th>
 				<th>ลดหนี้</th>
 				<th>ค้างชำระ.</th>
-				<th>รับชำระ</th>
+				<th>รับชำระ <p>
+				   <input type="checkbox" id="chkAll" name="chkAll" onclick="chkAllFlag(this)"/>
+				 </p>
+				</th>
 				
 			</tr>
 			<c:forEach var="results" items="${orders}" varStatus="rows">
@@ -182,7 +191,7 @@ try{
 						<input type="hidden" name="remainAmount"  value="${results.openAmt}"/>
 					</td>
 					<td>
-						<input type="checkbox" name="chkReceipts">
+						<input type="checkbox" name="chkReceipts" >
 					</td>
 				
 				</tr>

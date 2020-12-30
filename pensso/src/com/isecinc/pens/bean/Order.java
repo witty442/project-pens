@@ -3,6 +3,7 @@ package com.isecinc.pens.bean;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
+import java.util.List;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
@@ -14,7 +15,7 @@ import com.isecinc.pens.model.MOrgRule;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
 import com.pens.util.DateUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 /**
@@ -286,6 +287,7 @@ public class Order extends I_PO implements Serializable {
 	private String pickingNo;
 	private String provinceGroup;
 	private boolean canCancel;
+	private boolean canEditOrderDate;
 	
 	private String territory;
 	private int searchProvince;
@@ -293,6 +295,14 @@ public class Order extends I_PO implements Serializable {
 	private String district;
 	
 	
+	public boolean isCanEditOrderDate() {
+		return canEditOrderDate;
+	}
+
+	public void setCanEditOrderDate(boolean canEditOrderDate) {
+		this.canEditOrderDate = canEditOrderDate;
+	}
+
 	public String getDistrict() {
 		return district;
 	}
@@ -825,7 +835,7 @@ public class Order extends I_PO implements Serializable {
 	}
 
 	public void setOpenAmt() {
-		this.openAmt = NumberToolsUtil.round((this.getCreditAmount()+(this.getCreditNoteAmt()+this.getAdjustAmt())), 2, BigDecimal.ROUND_HALF_UP); 
+		this.openAmt = NumberUtil.round((this.getCreditAmount()+(this.getCreditNoteAmt()+this.getAdjustAmt())), 2, BigDecimal.ROUND_HALF_UP); 
 		/*System.out.println("this.getCreditAmount():"+this.getCreditAmount());
 		System.out.println("this.getCreditNoteAmt():"+this.getCreditNoteAmt());
 		System.out.println("this.getAdjustAmt():"+this.getAdjustAmt());*/

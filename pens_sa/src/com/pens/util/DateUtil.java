@@ -649,7 +649,18 @@ public class DateUtil {
 		}
 		return dateStr;
 	}
-	
+	//default eng
+	public static String stringValueChkNull(Date date, String format) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format);
+		try {
+			if(date ==null)
+				return "";
+			dateStr = ft.format(date);
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
 	public static Timestamp getCurrentTimestamp() {
 		return new Timestamp(System.currentTimeMillis());
 	}
@@ -702,5 +713,15 @@ public class DateUtil {
 			return true;
 		}
 		return false;
+	}
+	public static String convBuddhistToChristDate(String buddhistDate,String format) throws Exception{
+		String christDate = "";
+		try{
+		   Date christDateO = parse(buddhistDate, format,local_th) ;
+		   christDate = stringValue(christDateO, format);
+		}catch(Exception e){
+			throw e;
+		}
+		return christDate;
 	}
 }

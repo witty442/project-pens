@@ -36,8 +36,11 @@ pageContext.setAttribute("addresses",address,PageContext.PAGE_SCOPE);
 List<References> vatcodes = InitialReferences.getReferenes().get(InitialReferences.VAT_CODE);
 pageContext.setAttribute("vatcodes",vatcodes,PageContext.PAGE_SCOPE);
 
+List<References> docstatusAll = new ArrayList<References>();
+docstatusAll.add(new References("","",""));
 List<References> docstatus= InitialReferences.getReferenes().get(InitialReferences.DOC_STATUS);
-pageContext.setAttribute("docstatus",docstatus,PageContext.PAGE_SCOPE);
+docstatusAll.addAll(docstatus);
+pageContext.setAttribute("docstatus",docstatusAll,PageContext.PAGE_SCOPE);
 
 List<References> paymentTerm = InitialReferences.getReferenes().get(InitialReferences.PAYMENT_TERM);
 pageContext.setAttribute("paymentTerm",paymentTerm,PageContext.PAGE_SCOPE);
@@ -549,7 +552,7 @@ $(function(){
 									<html:hidden property="order.salesRepresent.id"/>
 									<html:hidden property="order.salesRepresent.code"/>
 								</td>
-								<td align="right"><bean:message key="Status" bundle="sysele"/><font color="red">*</font></td>
+								<td align="right"><bean:message key="Status" bundle="sysele"/><font color="red"></font></td>
 								<td valign="top">
 									<html:select property="order.docStatus" disabled="true" styleClass="disableText">
 										<html:options collection="docstatus" property="key" labelProperty="name"/>
@@ -610,10 +613,7 @@ $(function(){
 						
 						<html:hidden property="order.printDateTimePick"/>
 						<html:hidden property="order.printCountPick"/>
-						
-						<!-- ForTest -->
-					 	<%-- printDateTimePick:<html:text property="order.printDateTimePick"/><br/>
-						printCountPick:<html:text property="order.printCountPick"/> --%>
+						<html:hidden property="order.canEditOrderDate"/>
 						
 						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
 						<div id="productList" style="display: none;"></div>

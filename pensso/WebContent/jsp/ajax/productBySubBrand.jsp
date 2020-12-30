@@ -112,7 +112,7 @@ for(ProductCatalog catalog:catalogs) {
 	 </td>
 	<td align="center"><b><%=catalog.getProductCode()%></b></td>
 	<td><%=catalog.getProductNameDisplay()%></td>
-	<td align="center"><%=catalog.getUom1()%> &frasl; <%=catalog.getUom2()%></td>
+	<td align="center"><%=catalog.getUom1Display()%> &frasl; <%=catalog.getUom2Display()%></td>
 	<td align="center"><%=catalog.getUom2ConvRate()%>&frasl; <%=catalog.getUom1ConvRate()%></td>
 	<td align="right">
 	    <%=formatter.format(catalog.getPrice1())%> &frasl; <%=formatter.format(catalog.getPrice2())%>
@@ -133,7 +133,10 @@ for(ProductCatalog catalog:catalogs) {
 	onblur="isNumeric(this);linePrice('<%=rowNo%>','<%=catalog.getPrice1()%>','<%=catalog.getPrice2()%>')" 
 	value="<%=qty2%>" autoComplete="off"/>
 </td>
-<td class="number"><span name="totalLineAmtT"><%=lineAmtText%></span><input name="totalLineAmt" type="hidden" value="<%=lineAmt%>" />
+<td class="number">
+   <span name="totalLineAmtT"><%=lineAmtText%></span>
+   <input name="totalLineAmt" type="hidden" value="<%=lineAmt%>" />
+
 	<input name="price1" type="hidden" value="<%=catalog.getPrice1()%>" />
 		<input name="price2" type="hidden" value="<%=catalog.getPrice2()%>" />
 		<input name="uom1" type="hidden" value="<%=catalog.getUom1()%>" />
@@ -211,22 +214,26 @@ function linePrice(rowNo,price1,price2){
 		//compare Stock Onhand
 		var stockOnhandQty = document.getElementsByName("stockOnhandQty")[rowNo];//1.8
 		var inputPriQty =document.getElementsByName("inputPriQty")[rowNo];
-	
+	  
+	    
 		//convert qty2 to PriQty
 		var inputPriQtyTemp = document.getElementsByName("qty1")[rowNo];//set for sum +subQty
 		var subQty = 0;
-		 if(convetTxtObjToFloat(uom2ConvRate) > 0){
-	    	subQty = qty2 / (convetTxtObjToFloat(uom1ConvRate)/convetTxtObjToFloat(uom2ConvRate)) ;
-	    	//alert("subQty:"+subQty+"");
-	     }
+		if(convetTxtObjToFloat(uom2ConvRate) > 0){
+			if(qty2 !=0){
+	    	  subQty = qty2 / (convetTxtObjToFloat(uom1ConvRate)/convetTxtObjToFloat(uom2ConvRate)) ;
+	    	  alert("subQty:"+subQty+"");
+			}
+	    }
 		subQty +="";
 		//alert("subQty:"+subQty);
-		 if(subQty.indexOf(".") != -1){
+		if(subQty.indexOf(".") != -1){
 			inputPriQtyTemp  = convetTxtObjToFloat(inputPriQtyTemp)+ parseFloat(subQty.substr(0,subQty.indexOf("."))) ;
 			inputPriQtyTemp += subQty.substr(subQty.indexOf("."),subQty.length);//1.8
 		}else{
 			inputPriQtyTemp =convetTxtObjToFloat(inputPriQtyTemp)+ parseFloat(subQty);
-		} 
+		}//if
+		
 		//alert("inputPriQtyTemp:"+inputPriQtyTemp);
 		 inputPriQty.value = inputPriQtyTemp; 
 		
@@ -234,10 +241,16 @@ function linePrice(rowNo,price1,price2){
 			alert("ไม่สามารถ ระบุ Order เกินยอด Stock Onhand ได้ ");
 			document.getElementsByName("qty1")[rowNo].value ="";
 			document.getElementsByName("qty2")[rowNo].value ="";
-			document.getElementsByName("qty2")[rowNo].focus();
+			document.getElementsByName("totalLineAmtT")[rowNo].innerHTML ="";//display
+			document.getElementsByName("totalLineAmt")[rowNo].value ="";
+			
+			if( !document.getElementsByName("qty2")[rowNo].disabled){
+			   document.getElementsByName("qty2")[rowNo].focus();
+			}
 			return false;
-		} 
-		//alert("stockOnhandQty["+stockOnhandQty.value+"]inputPriQty["+inputPriQty+"]");
+		}//if 
+		
+		//alert("stockOnhandQty["+stockOnhandQty.value+"]inputPriQty["+inputPriQty.value+"]");
 	<%}%>
 }
 </script>

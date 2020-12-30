@@ -13,6 +13,7 @@ import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.web.reportall.ReportAllBean;
+import com.isecinc.pens.web.reportall.ReportAllSpecialUtils;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
@@ -31,6 +32,7 @@ public class ReportEndDateLotusSQL {
 				}else{
 					control = calcDueDate(conn,c.getPensCustCodeFrom(),c.getSalesDate());
 				}
+			sql.append("\n /** ReportEndDateLotus_SQL **/ ");
 			sql.append("\n SELECT A.* ");
 			sql.append("\n,(SELECT NVL(MAX(RETAIL_PRICE_BF),0) FROM PENSBME_ONHAND_BME_LOCKED T "
 					 + "\n WHERE A.group_type = T.group_item"
@@ -77,7 +79,7 @@ public class ReportEndDateLotusSQL {
 						sql.append("\n\t\t (select M.pens_desc from PENSBI.PENSBME_MST_REFERENCE M WHERE " );
 						sql.append("\n\t\t M.pens_value = C.customer_code AND M.reference_code ='Store') as customer_desc, ");
 						sql.append("\n\t\t MP.MATERIAL_MASTER as group_type ");
-						sql.append("\n\t\t FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+						sql.append("\n\t\t FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
 						sql.append("\n\t\t ,PENSBI.XXPENS_BI_MST_CUSTOMER C ");
 						sql.append("\n\t\t ,PENSBI.XXPENS_BI_MST_ITEM P ");
 						sql.append("\n\t\t ,PENSBI.PENSBME_STYLE_MAPPING MP ");
@@ -87,11 +89,13 @@ public class ReportEndDateLotusSQL {
 						sql.append("\n\t\t AND P.inventory_item_code = MP.pens_item");
 						sql.append("\n\t\t AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n\t\t AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n\t\t AND P.inventory_item_desc LIKE 'ME%' ");
 						//NOT IN pensbme_group_unuse_lotus
 						sql.append("\n\t\t AND MP.MATERIAL_MASTER NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 						//Lotus Only 020047
-						sql.append("\n\t\t AND C.customer_code LIKE '020047-%'");
+						sql.append("\n\t\t AND C.customer_code IN(");
+						sql.append("\n\t\t    SELECT pens_value FROM PENSBI.PENSBME_MST_REFERENCE where reference_code = 'Store'");
+						sql.append("\n\t\t   and pens_value like '020047%' and pens_desc4 ='N' ");
+						sql.append("\n\t\t )");
 						
 						//sql.append(genWhereCondDateMonthEnd(control,"V.invoice_date"));
 						
@@ -236,9 +240,11 @@ public class ReportEndDateLotusSQL {
 				sql.append("\n/******************* SALE IN ****************************************/");
 			        sql.append("\n\t\t SELECT  ");
 					sql.append("\n\t\t  C.customer_code ,P.inventory_item_code as pens_item");
-					sql.append("\n\t\t ,MP.MATERIAL_MASTER as group_type  ");
-					sql.append("\n\t\t ,NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
-					sql.append("\n\t\t FROM PENSBI.XXPENS_BI_SALES_ANALYSIS_V V   ");
+					sql.append("\n\t\t ,MP.MATERIAL_MASTER as group_type ,  ");
+					/** special case (product) Sum Qty (convert CTN(SA) to EA(BME) )**/
+					sql.append("\n\t\t "+ReportAllSpecialUtils.genSQLSumSpecialProduct("V.INVOICED_QTY","SALE_IN_QTY"));
+					
+					sql.append("\n\t\t FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
 					sql.append("\n\t\t ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
 					sql.append("\n\t\t ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 					sql.append("\n\t\t ,PENSBI.PENSBME_STYLE_MAPPING MP ");
@@ -248,11 +254,14 @@ public class ReportEndDateLotusSQL {
 					sql.append("\n\t\t AND P.inventory_item_code = MP.pens_item");
 					sql.append("\n\t\t AND V.Customer_id IS NOT NULL   ");
 					sql.append("\n\t\t AND V.inventory_item_id IS NOT NULL  ");
-					sql.append("\n\t\t AND P.inventory_item_desc LIKE 'ME%' ");
 					//NOT IN pensbme_group_unuse_lotus
 					sql.append("\n\t\t AND MP.MATERIAL_MASTER NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 					//Lotus Only 020047
-					sql.append("\n\t\t AND C.customer_code LIKE '020047-%'");
+					sql.append("\n\t\t AND C.customer_code IN(");
+					sql.append("\n\t\t    SELECT pens_value FROM PENSBI.PENSBME_MST_REFERENCE where reference_code = 'Store'");
+					sql.append("\n\t\t   and pens_value like '020047%' and pens_desc4 ='N' ");
+					sql.append("\n\t\t )");
+					
 					sql.append(genWhereCondDate(control,"V.invoice_date"));
 					
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){

@@ -23,7 +23,7 @@ import com.isecinc.pens.model.MSalesTargetPeriod;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.model.MUOMConversion;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 
 /**
@@ -264,8 +264,8 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 			if(uc2 != null){
 				double[] newQty = calcCTNQty(productId,qty1,qty2,uc2);
 					
-				String qtyTemp1 = NumberToolsUtil.decimalFormat(newQty[0],NumberToolsUtil.format_current_no_disgit)+" ";
-				String qtyTemp2 = " "+NumberToolsUtil.decimalFormat(newQty[1],NumberToolsUtil.format_current_no_disgit);
+				String qtyTemp1 = NumberUtil.decimalFormat(newQty[0],NumberUtil.format_current_no_disgit)+" ";
+				String qtyTemp2 = " "+NumberUtil.decimalFormat(newQty[1],NumberUtil.format_current_no_disgit);
 	
 				qtyStr = qtyTemp1 +"/"+qtyTemp2+"";
 			}

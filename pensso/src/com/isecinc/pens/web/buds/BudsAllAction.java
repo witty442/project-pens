@@ -73,6 +73,8 @@ public class BudsAllAction extends I_Action {
 				 return new ConfPickingAction().viewDetail(mapping, aForm, request, response);
 			 }else  if("OrderEDIDetail".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				 return new OrderEDIAction().viewDetail(mapping, aForm, request, response);
+			 }else  if("OrderEDIDetailManual".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new OrderEDIAction().viewDetailManual(mapping, aForm, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -249,13 +251,20 @@ public class BudsAllAction extends I_Action {
 		BudsAllForm aForm = (BudsAllForm) form;
 		try {
 			 String method = Utils.isNull(request.getParameter("method"));
-			 logger.debug("method:"+method);
+			 logger.debug("pageName["+aForm.getPageName()+"]method:"+method);
+			 
 			 if("OrderEDIDetail".equalsIgnoreCase(aForm.getPageName()) && "saveOrderEDI".equalsIgnoreCase(method)){
 				 return new OrderEDIAction().saveOrderEDI(mapping, aForm, request, response);
 			 }else if("OrderEDIDetail".equalsIgnoreCase(aForm.getPageName()) && "confirmOrderEDI".equalsIgnoreCase(method)){
 				 return new OrderEDIAction().confirmOrderEDI(mapping, aForm, request, response);
 			 }else if("OrderEDIDetail".equalsIgnoreCase(aForm.getPageName()) && "cancelOrderEDI".equalsIgnoreCase(method)){
 				 return new OrderEDIAction().cancelOrderEDI(mapping, aForm, request, response);
+			 }else if("OrderEDIDetailManual".equalsIgnoreCase(aForm.getPageName()) && "saveOrderEDIManual".equalsIgnoreCase(method)){
+				 return new OrderEDIAction().saveOrderEDIManual(mapping, aForm, request, response);
+			 }else if("OrderEDIDetailManual".equalsIgnoreCase(aForm.getPageName()) && "cancelOrderEDI".equalsIgnoreCase(method)){
+				 return new OrderEDIAction().cancelOrderEDI(mapping, aForm, request, response);
+			 }else if("OrderEDIDetailManual".equalsIgnoreCase(aForm.getPageName()) && "confirmOrderEDI".equalsIgnoreCase(method)){
+				 return new OrderEDIAction().confirmOrderEDI(mapping, aForm, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

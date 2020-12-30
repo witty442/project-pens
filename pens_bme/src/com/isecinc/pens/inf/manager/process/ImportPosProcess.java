@@ -35,6 +35,7 @@ import com.isecinc.pens.inf.helper.InterfaceUtils;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.NumberUtil;
 import com.pens.util.UploadXLSUtil;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHelper;
@@ -326,8 +327,8 @@ public class ImportPosProcess extends InterfaceUtils{
 						    ps.setString(4, subinventory);
 						}else if(colNo==4){
 						   //cust_po_number
-							cust_po_number = Utils.isNull(cellValue);
-						    ps.setString(5, cust_po_number);
+						   cust_po_number = Utils.isNull(cellValue);
+						   ps.setString(5, cust_po_number);
 						}else if(colNo==5){
 						   //salerep_number
 						   salerep_number = Utils.isNull(cellValue);
@@ -337,8 +338,8 @@ public class ImportPosProcess extends InterfaceUtils{
 						   item_no = Utils.convertDoubleToStrNoDigit(cellValue);
 						   ps.setString(7, item_no);
 						}else if(colNo==7){
-						  //unit_price
-						  unit_price = Utils.isDoubleNull(cellValue);
+						  //unit_price round(5 digit)
+						  unit_price = NumberUtil.round(Utils.isDoubleNull(cellValue),5,BigDecimal.ROUND_HALF_UP);
 						  ps.setDouble(8, unit_price);
 						
 						}else if(colNo==8){

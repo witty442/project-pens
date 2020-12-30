@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.ControlCode"%>
 <%@page import="com.isecinc.pens.web.batchtask.BatchTaskConstants"%>
 <%@page import="com.pens.util.UserUtils"%>
 <%@page import="com.isecinc.pens.web.stock.StockConstants"%>
@@ -22,12 +23,12 @@
            	<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/userAction.do?do=init&action=new';"><span><bean:message key="User" bundle="sysprop"/></span></a>
 			</li>
-			<%--  <li>
+			 <%--  <li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/groupRoleAction.do?do=prepare&action=new';"><span><bean:message key="Group" bundle="sysprop"/></span></a>
 			</li>
 			<li>
 				<a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/roleAction.do?do=prepare&action=new';"><span><bean:message key="Role" bundle="sysprop"/></span></a>
-			</li>  --%> 
+			</li>  --%>
 			<li>
 	         <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/administer/changePassword.jsp';"><span>เปลี่ยนรหัสผ่าน</span></a>	
 	       </li>
@@ -40,16 +41,19 @@
 	</li>
 <%} %>
 <%if ( UserUtils.userInRole("ROLE_SA",user,new String[]{User.ADMIN,User.SA}) ){ %>
-	<li><a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new&reportName=SalesAnalyst';">
+	<li>
+	<% if(ControlCode.canExecuteMethod("SalesAnalysis", "NewVersion")){ %>
+	    <!-- NEW VESRION -->
+	     <a href="#" class="parent"  onclick="window.location='${pageContext.request.contextPath}/jsp/aReportAction.do?do=prepare&action=new&reportName=SalesAnalyst';">
+	        <span><bean:message key="SalesAnalyst" bundle="sysprop"/>.</span>
+	      </a>
+	 <%}else{ %>
+	    <!-- OLD VESRION -->
+	    <a href="#" class="parent" onclick="window.location='${pageContext.request.contextPath}/jsp/salesAnalystReportAction.do?do=prepare&action=new&reportName=SalesAnalyst';">
 	      <span><bean:message key="SalesAnalysis" bundle="sysprop"/>
 	      </span>
 	    </a>
-		<ul>
-	       <%--  <li>
-	          <a href="#" class="parent"  onclick="window.location='${pageContext.request.contextPath}/jsp/aReportAction.do?do=prepare&action=new&reportName=SalesAnalyst';">
-	          <span><bean:message key="SalesAnalyst" bundle="sysprop"/>(NEW)</span></a>
-	       </li>  --%>
-		</ul>
+	 <%} %>
 	</li> 
 <%} %>
 
@@ -350,7 +354,14 @@
 	               <span><%no++;out.print(no);%>.<bean:message key="BoxNoNissinReport" bundle="sysprop"/></span>
 	               </a>  
 	            </li>  
+	            <li>
+	               <a href="#" class="parent" 
+	               onclick="window.location='${pageContext.request.contextPath}/jsp/reportAllAction.do?do=prepare&pageName=OrderNissinReport&action=new';">
+	               <span><%no++;out.print(no);%>.<bean:message key="OrderNissinReport" bundle="sysprop"/></span>
+	               </a>  
+	          </li>
 	       <%} %>
+	          
 		</ul>
 	</li>  
 <%}%>
@@ -374,12 +385,12 @@
                <span><%no++;out.print(no);%>.<bean:message key="MasterItemStockMC" bundle="sysprop"/></span>
                </a>
              </li> 
-              <%-- <li>
+              <li>
                <a href="#" class="parent"  
-               onclick="window.location='${pageContext.request.contextPath}/jsp/stockMCAction.do?do=prepareSearch&action=new&pageName=STOCKMCQuery';">
-               <span><%no++;out.print(no);%>.<bean:message key="StockMCQuery" bundle="sysprop"/></span>
+                  onclick="window.location='${pageContext.request.contextPath}/jsp/stockMCAction.do?do=prepareSearch&action=new&pageName=STOCKMCQuery';">
+                  <span><%no++;out.print(no);%>.<bean:message key="StockMCQuery" bundle="sysprop"/></span>
                </a>
-             </li>  --%>
+             </li> 
           <%} %> 
 		</ul>
 	</li>  

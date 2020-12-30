@@ -164,7 +164,7 @@ function printReport(path){
 	var param ="";
 	if(isSelectOne()){
 		/**Control Save Lock Screen **/
-		startControlSaveLockScreen();
+		//startControlSaveLockScreen();
 		
 		form.action = path + "/jsp/itManageAction.do?do=printReport"+param;
 		form.submit();
@@ -325,13 +325,7 @@ function getAutoDetail(obj,pageName){
 								   <html:hidden property="bean.zone" styleId ="zone" />
 								</td>
 							</tr>
-							<tr>
-				                 <td> หมายเหตุ<font color="red"></font></td>
-								<td>		
-									<html:text property="bean.remark" styleId ="remark" size="70" styleClass="\" autoComplete=\"off" />
-								  
-								</td>
-							</tr>
+							
 						   </table>
 						  
 						   <!-- Items -->
@@ -342,7 +336,7 @@ function getAutoDetail(obj,pageName){
 									<th >อุปกรณ์/รุ่น </th>
 									<th >Serial No</th>
 									<th >จำนวน</th>
-									<th >หมายุหตุ </th>
+									<th >หมายเหตุ </th>
 							   </tr>
 							<% 
 							String tabclass ="lineE";
@@ -385,7 +379,7 @@ function getAutoDetail(obj,pageName){
 										    onblur="isNum(this);"  class="enableNumber" autoComplete='off'>
 										</td>
 										<td class="td_text" width="15%">
-										<input type="text" name="remark" id="remark" size="40" maxlength="60" tabindex="<%out.print(tabindex);tabindex++;%>" autoComplete='off'>
+										
 										</td>
 									</tr>
 							<% } //for
@@ -431,7 +425,7 @@ function getAutoDetail(obj,pageName){
 										    onblur="isNum(this);"  class="enableNumber" autoComplete='off'>
 										</td>
 										<td class="td_text" width="15%">
-										<input type="text" name="remark" value="<%=Utils.isNull(item.getRemark())%>" id="remark" size="40" maxlength="60" tabindex="<%out.print(tabindex);tabindex++;%>" autoComplete='off'>
+										 <input type="text" name="remark" value="<%=Utils.isNull(item.getRemark())%>" id="remark" size="40" maxlength="60" tabindex="<%out.print(tabindex);tabindex++;%>" autoComplete='off'> 
 										</td>
 									</tr>
 						    <%}//for
@@ -439,6 +433,13 @@ function getAutoDetail(obj,pageName){
 							 
 					</table>
 					
+					<div align="center">
+				            <b>หมายเหตุ:</b>
+							<html:textarea property="bean.remark" styleId ="remark" styleClass="\" autoComplete=\"off" 
+							rows="10" cols="150" >
+							</html:textarea>
+					   
+					</div>
 					   <table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
 								<td align="left">

@@ -11,6 +11,8 @@ system=(request.getParameter("system")==null?"":request.getParameter("system"));
 function=(request.getParameter("function")==null?"":request.getParameter("function"));
 code=(request.getParameter("code")==null?"":request.getParameter("code"));
 
+String programName = function;
+
 //System.out.println(system);
 //System.out.println(function);
 //System.out.println(code);
@@ -29,7 +31,16 @@ if(code.equals("null")) code = SystemProperties.getCaption(SystemProperties.CREA
 	<tr>
  		<td width="5%" align="left"><img src="${pageContext.request.contextPath}/images2/bullet.gif" width="37" height="19" /></td>
    		<td width="85%" style="background:#FFFFFF url('${pageContext.request.contextPath}/images2/bulletLine.gif') no-repeat right;">
+   		    <font size="3">
+   		       <b>
+		   			<a href="javascript:popupFull('/pens_help/jsp/document.jsp?sessionId=<%=session.getId() %>&module=PENSSO&programName=<%=programName%>')">
+		   		      <%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %>
+		   			</a>
+	   			</b>
+   			</font>
+   			<%-- 
    			<strong><%=function.length()>0? function:"" %><%=code.length()>0? " > " + code : "" %></strong>
+   			 --%>
    		</td>
    		<td width="10%" align="right" nowrap>
    		   <div id="time" style="font-weight: bold"> </div>

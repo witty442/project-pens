@@ -17,7 +17,7 @@ import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 /**
  * InvoiceDetailReportProcess Report
@@ -84,11 +84,11 @@ public class InvoiceDetailReportProcess extends I_ReportProcess<InvoiceDetailRep
 					if(orderLine.getPromotion().equals("Y")){
 					   item.setPriceString("0.000000");
 					}else{
-					   item.setPriceString(NumberToolsUtil.decimalFormat(orderLine.getPrice1(),NumberToolsUtil.format_current_6_digit)+"/"+NumberToolsUtil.decimalFormat(orderLine.getPrice2(),NumberToolsUtil.format_current_6_digit));
+					   item.setPriceString(NumberUtil.decimalFormat(orderLine.getPrice1(),NumberUtil.format_current_6_digit)+"/"+NumberUtil.decimalFormat(orderLine.getPrice2(),NumberUtil.format_current_6_digit));
 					}
-					item.setLineAmount(NumberToolsUtil.decimalFormat(orderLine.getLineAmount(),NumberToolsUtil.format_current_6_digit));
-					item.setDiscountAmount(NumberToolsUtil.decimalFormat(orderLine.getDiscount()));
-					item.setTotalAmount(NumberToolsUtil.decimalFormat(orderLine.getLineAmount()-orderLine.getDiscount()));
+					item.setLineAmount(NumberUtil.decimalFormat(orderLine.getLineAmount(),NumberUtil.format_current_6_digit));
+					item.setDiscountAmount(NumberUtil.decimalFormat(orderLine.getDiscount()));
+					item.setTotalAmount(NumberUtil.decimalFormat(orderLine.getLineAmount()-orderLine.getDiscount()));
 					item.setShippingDate(orderLine.getShippingDate());
 					item.setRequestDate(orderLine.getRequestDate());
 		

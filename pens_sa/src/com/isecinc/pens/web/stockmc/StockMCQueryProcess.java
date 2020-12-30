@@ -34,7 +34,7 @@ import com.pens.util.excel.ExcelHeader;
 public class StockMCQueryProcess  extends I_Action{
 
 	
-	public static int pageSize = StockMCAction.pageSize;
+	public static int pageSize = 60;
 	
 	public ActionForward prepareSearch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepareSearch");
@@ -52,6 +52,7 @@ public class StockMCQueryProcess  extends I_Action{
 			if("new".equals(action)){
 				//clear session
 				request.getSession().removeAttribute("stock_mc_codes");
+				request.getSession().removeAttribute("RESULTS_ALL");
 				
 				//init connection
 				conn = DBConnection.getInstance().getConnectionApps();
@@ -60,6 +61,8 @@ public class StockMCQueryProcess  extends I_Action{
 				//prepare bean
 				StockMCBean bean = new StockMCBean();
 				//logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
+				bean.setStockDateFrom("01/"+DateUtil.stringValue(new Date(), "MM/yyyy"));
+				bean.setStockDateTo(DateUtil.getMaxDayOfMonth(new Date())+"/"+DateUtil.stringValue(new Date(), "MM/yyyy"));
 				aForm.setBean(bean);
 				
 			}else if("back".equals(action)){
@@ -86,24 +89,78 @@ public class StockMCQueryProcess  extends I_Action{
 		logger.debug("searchHead");
 		StockMCForm aForm = (StockMCForm) form;
 		User user = (User) request.getSession().getAttribute("user");
-		String msg = "";
-		int currPage = 1;
-		boolean allRec = false;
 		Connection conn = null;
 		String mobile = "";
+		int currPage = 1;
+		boolean allRec = false;
+		List<StockMCBean> items = null;
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
 			mobile = Utils.isNull(request.getParameter("mobile"));
+			String pageName = Utils.isNull(request.getParameter("pageName"));
 			logger.debug("action:"+action+",mobile:"+mobile);
+			
 			
 			//init connection
 			conn = DBConnection.getInstance().getConnectionApps();
-		
-			//get Items Show by Page Size
-			List<StockMCBean> items = StockMCDAO.searchStockMCReport(conn,"");
-		    //Gen to Html
-			StringBuffer resultTable = StockMCExport.genExportStockMCReport(items);
 			
+			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
+				//case  back
+				if("back".equalsIgnoreCase(action)){
+					aForm.setBean((StockMCBean)request.getSession().getAttribute("criteria_"));
+				}
+				items = StockMCDAO.searchStockMCReport(pageName,conn,aForm.getBean(),"");
+				
+				logger.debug("items size:"+items.size());
+				
+				//default currPage = 1
+				aForm.setCurrPage(currPage);
+			
+				//get Total Record
+				aForm.setTotalRecord(items.size());
+				//calc TotalPage
+				aForm.setTotalPage(Utils.calcTotalPage(aForm.getTotalRecord(), pageSize));
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize);
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+				
+				if(items != null && items.size()>0){
+				    //Gen to Html
+					StringBuffer resultTable = StockMCExport.genExportStockMCReport(pageName,user,items,false,aForm.getTotalPage(),aForm.getTotalRecord(),aForm.getCurrPage(),startRec,endRec);
+					request.getSession().setAttribute("RESULTS_ALL", items);
+					
+					request.setAttribute("RESULTS", resultTable);
+				}else{
+					request.setAttribute("Message","ไม่พบข้อมูล");
+				}
+			}else{
+				
+				items = (List)request.getSession().getAttribute("RESULTS_ALL");
+				logger.debug("items size:"+items.size());
+				
+				currPage = Utils.convertStrToInt(request.getParameter("currPage"));
+				aForm.setCurrPage(currPage);
+				
+				//calc startRec endRec
+				int startRec = ((currPage-1)*pageSize);
+				int endRec = (currPage * pageSize);
+			    if(endRec > aForm.getTotalRecord()){
+				   endRec = aForm.getTotalRecord();
+			    }
+			    aForm.setStartRec(startRec);
+			    aForm.setEndRec(endRec);
+				
+			    logger.debug("startRec["+startRec+"]endRec["+endRec+"]");
+			    //Gen to Html
+			    StringBuffer resultTable = StockMCExport.genExportStockMCReport(pageName,user,items,false,aForm.getTotalPage(),aForm.getTotalRecord(),aForm.getCurrPage(),startRec,endRec);
+					
+				request.setAttribute("RESULTS", resultTable);
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -190,14 +247,15 @@ public class StockMCQueryProcess  extends I_Action{
 		logger.debug("exportToExcel : ");
 		StockMCForm aForm = (StockMCForm) form;
 		StringBuffer resultTable = null;
-		String pageName = aForm.getPageName();
+		String pageName = Utils.isNull(request.getParameter("pageName"));
 		Connection conn = null;
+		User user = (User) request.getSession().getAttribute("user");
 		try {
 			conn = DBConnection.getInstance().getConnectionApps();
 			
-			List<StockMCBean> items = StockMCDAO.searchStockMCReport(conn,"");
+			List<StockMCBean> items = StockMCDAO.searchStockMCReport(pageName,conn,aForm.getBean(),"");
 		    if(items!= null && items.size() >0){
-		    	resultTable = StockMCExport.genExportStockMCReport(items);
+		    	resultTable = StockMCExport.genExportStockMCReport(pageName,user,items,true);
 				
 				java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");
@@ -224,6 +282,8 @@ public class StockMCQueryProcess  extends I_Action{
 		}
 		return null;
 	}
+	
+	
 	
 
 	/**

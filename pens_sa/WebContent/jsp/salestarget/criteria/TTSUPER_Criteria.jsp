@@ -10,7 +10,7 @@
 <%
 SalesTargetBean bean = ((SalesTargetForm)session.getAttribute("salesTargetForm")).getBean();
 User user = (User) request.getSession().getAttribute("user");
-System.out.println("TTSUPER Bean:"+bean);
+//System.out.println("TTSUPER Bean:"+bean);
 %>
 <script type="text/javascript">
 window.onload = function(){
@@ -142,10 +142,19 @@ function setPeriodDate(periodDesc){
 function copyFromLastMonthByTTSUPER(path,e){
 	var form = document.salesTargetForm;
 	var pageName = document.getElementsByName("pageName")[0].value;
+	var salesZone = document.getElementById("salesZone").value;
+	
 	if( $('#periodDesc').val()==""){
 		alert("กรุณากรอก เดือน");
+		$('#periodDesc').focus();
 		return false;
 	 } 
+	
+	if( $('#salesZone').val()==""){
+		alert("กรุณากรอก ภาคตามการดูแล");
+		$('#salesZone').focus();
+		return false;
+	} 
 	
 	if(confirm('ยืนยัน Copy From Last Month ')){
 	  //To disable f5
@@ -219,7 +228,7 @@ function copyRowByBrand(path,salesZone,brand,custCatNo,period,rowId){
 				      <html:options collection="CUSTOMER_CATEGORY_LIST" property="custCatNo" labelProperty="custCatDesc"/>
 				    </html:select> 
 				    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				    ภาคตามสายดูแล
+				    ภาคตามสายดูแล<font color="red">*</font>
 				     <html:select property="bean.salesZone" styleId="salesZone">
 						<html:options collection="SALES_ZONE_LIST" property="salesZone" labelProperty="salesZoneDesc"/>
 				    </html:select> 

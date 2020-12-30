@@ -501,17 +501,25 @@ body {
 								<td width="10%">&nbsp;</td>
 							</tr>
 						</table>
+						<div align="left" style="width: 80%;" class="programlabel">
+						 <bean:message key="TrxHist" bundle="sysprop"/>
+						 <a href="javascript:gotoOrderSearch();">
+						 <img border=0 src="${pageContext.request.contextPath}/icons/lookup.gif" align="absmiddle"></a>
+						</div>
+
 						<jsp:include page="../searchCriteria.jsp"></jsp:include>
-						<jsp:include page="../trxhist.jsp">
+						<%-- <jsp:include page="../trxhist.jsp">
 							<jsp:param name="module" value="<%=TrxHistory.MOD_CUSTOMER %>"/>
 							<jsp:param name="id" value="${customerForm.customer.id}"/>
-						</jsp:include>
-						<html:hidden property="customer.id"/>
+						</jsp:include> --%>
+						<html:hidden property="customer.id" styleId="customerId"/>
 						<html:hidden property="customer.exported"/>
+						<input type="hidden" name ="path" id="path" value="${pageContext.request.contextPath}"/>
+						
 						<input type="hidden" name="tf" value="<%=session.getAttribute("tf") %>">
 						<div id="addressList" style="text-align: left;display: none;"></div>
 						<div id="contactList" style="text-align: left;display: none;"></div>
-						<div title="CustomerView">..</div>
+						<div title="CustomerView">...</div>
 						</html:form>
 						<!-- BODY -->
 					</td>

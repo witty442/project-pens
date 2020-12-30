@@ -200,7 +200,17 @@ public class User extends I_PO implements Serializable {
 
 	private ConfigBean config;
 	
+	private boolean mobile;
 	
+	
+	public boolean isMobile() {
+		return mobile;
+	}
+
+	public void setMobile(boolean mobile) {
+		this.mobile = mobile;
+	}
+
 	public ConfigBean getConfig() {
 		return config;
 	}

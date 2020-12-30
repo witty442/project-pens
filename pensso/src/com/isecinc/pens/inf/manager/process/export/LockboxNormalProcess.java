@@ -399,7 +399,6 @@ public class LockboxNormalProcess {
             "	t_receipt_line ,	\n"+
             "	t_receipt_match , \n"+
             "	t_receipt_by   \n"+
-            //"   ,(SELECT @rownum:=0) a	\n"+
             "	where 1=1	\n"+
             "   and t_receipt_line.RECEIPT_LINE_ID = t_receipt_match.RECEIPT_LINE_ID 	\n"+
             "   and t_receipt_match.RECEIPT_BY_ID = t_receipt_by.RECEIPT_BY_ID 	\n"+
@@ -414,7 +413,7 @@ public class LockboxNormalProcess {
             }
             
             sql +=" UNION ALL  \n"+
-            /** CN Receord  ****/
+            /** CN Record  ****/
             "	select	\n"+
             "	'4' AS Record_Identifier,	\n"+
             "	'"+lockBoxNumber+"' AS Lockbox_Number,	\n"+
@@ -432,14 +431,12 @@ public class LockboxNormalProcess {
             "	t_credit_note ,	\n"+
             "	t_receipt_match_cn , \n"+
             "	t_receipt_by   \n"+
-           // "   ,(SELECT @rownum:=0) a	\n"+
             "	where 1=1	\n"+
             "   and t_receipt_cn.CREDIT_NOTE_ID = t_credit_note.CREDIT_NOTE_ID 	\n"+
             "   and t_receipt_match_cn.receipt_cn_id = t_receipt_cn.receipt_cn_id \n"+
             "   and t_receipt_match_cn.RECEIPT_BY_ID = t_receipt_by.RECEIPT_BY_ID 	\n"+
             " "+appendWhereCN+
             "	and t_receipt_cn.receipt_id ="+receiptId+"	\n"+
-            /** Witty add new Code 09/03/2011 **/
             "   and t_receipt_by.write_off ='N' \n";
             
             //not get receipt_by_id(TR)

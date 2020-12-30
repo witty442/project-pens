@@ -50,7 +50,11 @@ public class LoginAction extends DispatchAction {
 		Connection conn = null;
 		LoginForm loginForm = null;
 		String forward ="pass"; //to CustomerSearch
+		String gotoPage = "";
 		try {
+			//Get gotoPage redirect
+			gotoPage = Utils.isNull(request.getParameter("gotoPage"));
+			
 			//remove session id
 			SIdUtils.getInstance().clearInstance();
 			
@@ -71,17 +75,19 @@ public class LoginAction extends DispatchAction {
 			}
 			
 			//check redirect to main page
-			if ( user.getUserName().equalsIgnoreCase("admin") 
-				||
-				(    !user.getType().equalsIgnoreCase(User.VAN) 
-				  && !user.getType().equalsIgnoreCase(User.TT))
+			if (   user.getUserName().equalsIgnoreCase("admin") 
+				|| !user.getType().equalsIgnoreCase(User.TT)
 			){
-				forward = "passRoleNoSales";
+				if ( UserUtils.userInRole("ROLE_ALL",user,new String[]{User.NIS}) ){
+				   forward = "passNissin";
+			    }else if ( UserUtils.userInRole("ROLE_ALL",user,new String[]{User.NIS_PENS,User.NIS_VIEW}) ){
+			       forward = "passNissinPens";
+			    }else{
+				   forward = "passRoleNoSales";
+			    }
 			}
-			logger.debug("forward:"+forward);
 			
 			request.getSession(true).setAttribute("user", user);
-			
 			String screenWidth = Utils.isNull(request.getParameter("screenWidth"));
 			if(screenWidth.equals("")){
 				screenWidth ="0";
@@ -96,17 +102,19 @@ public class LoginAction extends DispatchAction {
 			}
 			logger.debug("After Calc ScreenWidth:"+screenWidth);
 			
+			//set mobile device
+			String mobile = Utils.isNull(request.getParameter("mobile"));
+			user.setMobile("true".equalsIgnoreCase(mobile)?true:false);
+			
 			request.getSession(true).setAttribute("screenWidth", screenWidth);
 			request.getSession(true).setAttribute("screenHeight", screenHeight);
 			
-			//clear check version
-			request.getSession().setAttribute("appVersionCheckMsg",null);
-			request.getSession().setAttribute("massageToSales",null);
-			request.getSession().setAttribute("appVersionMassageToSales",null);
+			//case config force gotoPage after login
+			if( !Utils.isNull(gotoPage).equals("")){
+				forward = gotoPage;
+			}
 			
-			//after login ImportReceipt BySalesCode (user Login)
-			//new BatchImportTransReceiptBySalesWorker(user,request).run(); 
-			
+			logger.info("forward:"+forward);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			request.setAttribute("errormsg", e.getMessage());

@@ -13,6 +13,7 @@ import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.report.analyst.ProjectCTargetAction;
 import com.isecinc.pens.web.reportall.page.BoxNoNissinReportAction;
 import com.isecinc.pens.web.reportall.page.EffectiveSKUReportAction;
+import com.isecinc.pens.web.reportall.page.OrderNissinReportAction;
 import com.isecinc.pens.web.reportall.page.ProjectCReportAction;
 import com.isecinc.pens.web.reportall.page.StockReturnAction;
 import com.isecinc.pens.web.reportall.page.StockExpireDetailAction_DESPRICATE;
@@ -53,6 +54,8 @@ public class ReportAllAction extends I_Action {
 					 return new BoxNoNissinReportAction().prepare(form, request, response);
 				 }else if("EffectiveSKUReport".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 					 return new EffectiveSKUReportAction().prepare(form, request, response);
+				 }else if("OrderNissinReport".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+					 return new OrderNissinReportAction().prepare(form, request, response);
 				 }
 			 }
 		} catch (Exception e) {
@@ -94,6 +97,8 @@ public class ReportAllAction extends I_Action {
 				 return new BoxNoNissinReportAction().search(form, request, response);
 			 }else if("EffectiveSKUReport".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				 return new EffectiveSKUReportAction().search(form, request, response);
+			 }else if("OrderNissinReport".equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				 return new OrderNissinReportAction().search(form, request, response);
 			 }
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

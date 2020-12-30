@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 
 
 
+
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
@@ -116,11 +117,15 @@ public class PopupAction extends I_Action {
 		String forward = "popup";
 		List<PopupForm> results = null;
 		try {
+			String action = Utils.isNull(request.getParameter("action"));
+			if(!"newsearch".equalsIgnoreCase(action)){
+				return forward;
+			}
+			
 		    if("ItemBarcode".equalsIgnoreCase(popupForm.getPageName()) ){
-				//For Stock
 				 results = PopupDAO.searchItemBarcodeList(popupForm,user);
 			}
-		    logger.debug("results.size():"+results.size());
+		    //logger.debug("results.size():"+results.size());
 		    
 			if(results != null && results.size() >0){
 				request.getSession().setAttribute("DATA_LIST", results);

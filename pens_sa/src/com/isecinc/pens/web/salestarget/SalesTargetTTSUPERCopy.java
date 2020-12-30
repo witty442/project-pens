@@ -61,6 +61,7 @@ public class SalesTargetTTSUPERCopy {
 				sourceBean.setBrand(destBean.getBrand());
 				sourceBean.setCustCatNo(destBean.getCustCatNo());
 				sourceBean.setSalesZone(destBean.getSalesZone());
+				sourceBean.setDivision(destBean.getDivision());
 				
 				logger.info("Copy from Period["+sourceBean.getPeriod()+"] to ["+destBean.getPeriod()+"]");
 				
@@ -111,11 +112,11 @@ public class SalesTargetTTSUPERCopy {
 			sourceBean = SalesTargetDAO.convertCriteria(sourceBean);
 			
 			sql.append("\n select M.id ,M.customer_category ,M.salesrep_id ,M.salesrep_code ");
-			sql.append("\n ,M.customer_id ,M.sales_channel ,Z.zone,M.brand");
+			sql.append("\n ,M.customer_id ,M.sales_channel ,Z.zone,M.brand ,M.division");
 			sql.append("\n from PENSBI.XXPENS_BI_SALES_TARGET_TEMP M ");
 			sql.append("\n ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n where M.salesrep_id = Z.salesrep_id ");
-			sql.append("\n and M.division = 'B' ");//B = credit,van sales
+			sql.append("\n and M.division = '"+sourceBean.getDivision()+"' ");//B = credit,van sales
 			sql.append("\n and M.status ='"+SalesTargetConstants.STATUS_FINISH+"'");
 			sql.append("\n and M.target_month = '"+Utils.isNull(sourceBean.getTargetMonth())+"'");
 			sql.append("\n and M.target_quarter = '"+Utils.isNull(sourceBean.getTargetQuarter())+"'");
@@ -174,7 +175,8 @@ public class SalesTargetTTSUPERCopy {
 				destBean.setSalesZone(Utils.isNull(rst.getString("zone")));
 				destBean.setBrand(Utils.isNull(rst.getString("brand")));
 				destBean.setSalesrepId(Utils.isNull(rst.getString("salesrep_id")));
-		
+				destBean.setDivision(Utils.isNull(rst.getString("division")));
+				
 				curBrandExist = salesTargetIsExistTEMP(conn,destBean,user,"");
 				logger.debug("*****Check CurBrandExist by salesrepID ********");
 				logger.debug("custCatNo["+destBean.getCustCatNo()+"]");
@@ -365,7 +367,7 @@ public class SalesTargetTTSUPERCopy {
 			sql.append("\n  select count(*) as c");
 			sql.append("\n  from XXPENS_BI_SALES_TARGET_TEMP M ,PENSBI.XXPENS_BI_MST_SALES_ZONE Z");
 			sql.append("\n  where M.salesrep_id = Z.salesrep_id");
-			sql.append("\n  and M.division = 'B' ");//B = credit,van sales
+			sql.append("\n  and M.division ='"+cri.getDivision()+"'");//B = credit,van sales ,I =ice Buds
 			if( !Utils.isNull(status).equals("")){
 			   sql.append("\n  and M.status ='"+status+"'");
 			}

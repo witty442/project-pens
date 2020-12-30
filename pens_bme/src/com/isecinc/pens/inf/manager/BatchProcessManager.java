@@ -15,7 +15,6 @@ import com.isecinc.pens.bean.MonitorItemBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.InterfaceDAO;
 import com.isecinc.pens.exception.ExceptionHandle;
-import com.isecinc.pens.imports.excel.ImportExcelProcess;
 import com.isecinc.pens.inf.manager.batchwork.BatchProcessWorker;
 import com.isecinc.pens.inf.manager.process.ExportOrderToICC;
 import com.isecinc.pens.inf.manager.process.GenerateHISHER;
@@ -25,8 +24,6 @@ import com.isecinc.pens.inf.manager.process.ImportBillICC;
 import com.isecinc.pens.inf.manager.process.ImportPosProcess;
 import com.isecinc.pens.inf.manager.process.ImportSaleOutWacoalProcess;
 import com.isecinc.pens.inf.manager.process.ImportWacoalProcess;
-import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
-import com.isecinc.pens.summary.process.GenerateReportEndDateLotus;
 import com.pens.util.Constants;
 import com.pens.util.DBConnection;
 import com.pens.util.EnvProperties;
@@ -69,12 +66,11 @@ public class BatchProcessManager {
            	
             	
             /** Process Transaction BME ****************************************************************************/
-            }else if(monitorModel.getType().equals(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)){
-            	monitorModel = (new BatchProcessManager()).processGenStockEndDateLotus(monitorModel, user,request);
-            	
-            }else if(monitorModel.getType().equals(Constants.TYPE_GEN_STOCK_REPORT_ENDDATE_LOTUS)){
+            //@depricate
+           
+         /*   }else if(monitorModel.getType().equals(Constants.TYPE_GEN_STOCK_REPORT_ENDDATE_LOTUS)){
             	monitorModel = (new BatchProcessManager()).processGenStockReportEndDateLotus(monitorModel, user,request);
-            	
+            */	
            /** Process Transaction BME ****************************************************************************/
            
            /** Process  Wacoal ****************************************************************************/
@@ -539,22 +535,6 @@ public class BatchProcessManager {
 			}
 		}
 		return monitorModel;
-	}
-	
-	public  MonitorBean processGenStockEndDateLotus(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
-		try{
-			return GenerateStockEndDateLotus.processGenStockEndDateLotus(monitorModel, user, request);
-		}catch(Exception e){
-			throw e;
-		}
-	}
-	
-	public  MonitorBean processGenStockReportEndDateLotus(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{
-		try{
-			return GenerateReportEndDateLotus.process(monitorModel, user, request);
-		}catch(Exception e){
-			throw e;
-		}
 	}
 	
 	public  MonitorBean processImportWacoalStock(MonitorBean monitorModel,User user,HttpServletRequest request) throws Exception{

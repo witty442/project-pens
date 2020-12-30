@@ -169,7 +169,7 @@ public class SearchValuePopupAction extends I_Action {
 		
 		return returnText;
 	}
-	protected String search_OLD(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+/*	protected String search_OLD(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.debug("Search Action OLD Method");
 		SearchValuePopupForm aForm = (SearchValuePopupForm) form;
 		String returnText = "search";
@@ -207,7 +207,7 @@ public class SearchValuePopupAction extends I_Action {
 					valueList = AGenrateCondPopup.getConditionValueListByParent(reportName,user,currCondType,aForm.getSalesBean().getCode(),desc,filterBean);
 				    request.getSession().setAttribute("VALUE_LIST", valueList);
 				
-				    /** Case search customer show only 500 No criteria **/
+				    *//** Case search customer show only 500 No criteria **//*
 					if("Customer_id".equalsIgnoreCase(currCondType)){
 						if(Utils.isNull(aForm.getSalesBean().getCode()).equals("") && Utils.isNull(desc).equalsIgnoreCase("")){
 							if(valueList != null && valueList.size() == 500)
@@ -218,7 +218,7 @@ public class SearchValuePopupAction extends I_Action {
 					valueList = AGenrateCondPopup.getConditionValueList(reportName,request,currCondType,aForm.getSalesBean().getCode(),desc);
 					request.getSession().setAttribute("VALUE_LIST", valueList);	
 					
-					/** Case search customer show only 500 No criteria **/
+					*//** Case search customer show only 500 No criteria **//*
 					if("Customer_id".equalsIgnoreCase(currCondType)){
 						if(Utils.isNull(aForm.getSalesBean().getCode()).equals("") && Utils.isNull(desc).equalsIgnoreCase("")){
 							request.setAttribute("Message","ระบบแสดงร้านค้าได้สูงสุด จำนวน 500 ร้านค้า เนื่องจากจำนวนร้านค้ามีจำนวนมาก  กรุณาระบุ รหัสร้านหรือชื่อร้านค้า ");
@@ -232,7 +232,7 @@ public class SearchValuePopupAction extends I_Action {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 		}
 		return returnText;
-	}
+	}*/
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.debug("Search Action NEW Method");
 		SearchValuePopupForm aForm = (SearchValuePopupForm) form;
@@ -319,8 +319,9 @@ public class SearchValuePopupAction extends I_Action {
 				    /** Case search customer show only 500 No criteria **/
 					if("Customer_id".equalsIgnoreCase(currCondType)){
 						if(Utils.isNull(aForm.getSalesBean().getCode()).equals("") && Utils.isNull(desc).equalsIgnoreCase("")){
-							if(valueList != null && valueList.size() == 500)
-							 request.setAttribute("Message","ระบบแสดงร้านค้าได้สูงสุด จำนวน 500 ร้านค้า เนื่องจากจำนวนร้านค้ามีจำนวนมาก  กรุณาระบุ รหัสร้านหรือชื่อร้านค้า ");
+							if(valueList != null && valueList.size() == 500){
+							   request.setAttribute("Message","ระบบแสดงร้านค้าได้สูงสุด จำนวน 500 ร้านค้า เนื่องจากจำนวนร้านค้ามีจำนวนมาก  กรุณาระบุ รหัสร้านหรือชื่อร้านค้า ");
+							}
 						}
 					}
 				}else{
@@ -330,7 +331,9 @@ public class SearchValuePopupAction extends I_Action {
 					/** Case search customer show only 500 No criteria **/
 					if("Customer_id".equalsIgnoreCase(currCondType)){
 						if(Utils.isNull(aForm.getSalesBean().getCode()).equals("") && Utils.isNull(desc).equalsIgnoreCase("")){
-							request.setAttribute("Message","ระบบแสดงร้านค้าได้สูงสุด จำนวน 500 ร้านค้า เนื่องจากจำนวนร้านค้ามีจำนวนมาก  กรุณาระบุ รหัสร้านหรือชื่อร้านค้า ");
+							if(valueList != null && valueList.size() == 500){
+								request.setAttribute("Message","ระบบแสดงร้านค้าได้สูงสุด จำนวน 500 ร้านค้า เนื่องจากจำนวนร้านค้ามีจำนวนมาก  กรุณาระบุ รหัสร้านหรือชื่อร้านค้า ");
+							}
 						}
 					}
 				}

@@ -13,8 +13,8 @@ public class PopupHelper {
 	       || "BrandProdShow".equalsIgnoreCase(pageName)|| "BrandStockVan".equalsIgnoreCase(pageName)	
 	       || "BrandSalesTargetPD".equalsIgnoreCase(pageName) ){
 	    	headName = "แบรนด์("+pageName+")";
-	    	codeSearchTxtName = "Brand";
-	    	descSearchTxtName = "Brand Name";
+	    	codeSearchTxtName = "แบรนด์";
+	    	descSearchTxtName = "ชื่อ แบรนด์";
 	    }else  if("Customer".equalsIgnoreCase(pageName) || "CustomerStock".equalsIgnoreCase(pageName)
 	      || "CustomerVanProdShow".equalsIgnoreCase(pageName) || "CustomerLocation".equalsIgnoreCase(pageName)
 	      || "CustomerCreditPromotion".equalsIgnoreCase(pageName)|| "CustomerLocNoTrip".equalsIgnoreCase(pageName) 
@@ -26,8 +26,8 @@ public class PopupHelper {
 	    	  headName = "<span title='"+pageName+"'>ร้านค้า("+pageName+")</span>";
 	    	}
 	    	
-	    	codeSearchTxtName = "Customer Code";
-	    	descSearchTxtName = "Customer Name";
+	    	codeSearchTxtName = "รหัสร้านค้า";
+	    	descSearchTxtName = "ชื่อร้านค้า";
 	    }else  if("ItemStock".equalsIgnoreCase(pageName) || "ItemCreditPromotion".equalsIgnoreCase(pageName)
 	    	       || "ItemCreditPromotion".equalsIgnoreCase(pageName)|| "ItemStockVan".equalsIgnoreCase(pageName)  	
 	    	       || "ItemSalesTargetPD".equalsIgnoreCase(pageName)){
@@ -49,23 +49,27 @@ public class PopupHelper {
 		 	descSearchTxtName = "SubInv Name";
 	    }else  if("Item".equalsIgnoreCase(pageName) ){
 		 	headName = "สินค้า";
-		 	codeSearchTxtName = "Product Code";
-		 	descSearchTxtName = "Product Name";
+		 	codeSearchTxtName = "รหัสสินค้า";
+		 	descSearchTxtName = "ชื่อสินค้า";
 	    }else  if("CustomerCreditSales".equalsIgnoreCase(pageName)){
 		 	headName = "ร้านค้า เครดิต(Credit Sales)";
-		 	codeSearchTxtName = "Customer Code";
-		 	descSearchTxtName = "Customer Name";
+		 	codeSearchTxtName = "รหัสร้านค้า";
+		 	descSearchTxtName = "ชื่อร้านค้า";
 	    }else  if("SalesrepCreditSales".equalsIgnoreCase(pageName)){
 		 	headName = "พนักงานขาย(Credit Sales)";
-		 	codeSearchTxtName = "Salesrep Code";
-		 	descSearchTxtName = "Salesrep Name";
+		 	codeSearchTxtName = "รหัสพนักงานขาย";
+		 	descSearchTxtName = "ชื่อ พนักงานขาย";
 	    }else  if("CustomerProjectC".equalsIgnoreCase(pageName)){
 		 	headName = "ร้านค้า (Credit Sales-Project C)";
-		 	codeSearchTxtName = "Customer Code";
-		 	descSearchTxtName = "Customer Name";
+		 	codeSearchTxtName = "รหัสร้านค้า";
+		 	descSearchTxtName = "ชื่อร้านค้า";
 	    }else  if("BranchProjectC".equalsIgnoreCase(pageName)){
 		 	headName = "สาขาร้านค้า (Credit Sales-Project C)";
 		 	codeSearchTxtName = "Branch Id";
+		 	descSearchTxtName = "Branch Name";
+	    }else  if("BranchStockMC".equalsIgnoreCase(pageName)){
+		 	headName = "สาขาร้านค้า (StockMC)";
+		 	codeSearchTxtName = "Branch Name";
 		 	descSearchTxtName = "Branch Name";
 	    }
 	    headTextArr[0] = headName;

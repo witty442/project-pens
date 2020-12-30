@@ -19,15 +19,8 @@
 
    <script>
    function login(path){
-		var w = 0;
-	    if(detectmob()){
-	      //alert("Mobile");
-		  var ratio = window.devicePixelRatio || 1;
-		  w = screen.width * ratio;
-		  var h = screen.height * ratio;
-	    }else{
-	    	w = screen.width;
-	    }
+		var w = screen.width;
+	    
 		//alert(w+":"+h);
 		document.getElementsByName('screenWidth')[0].value = w;
 		
@@ -43,27 +36,13 @@
 	    document.loginForm.submit();
 	    return true;
 	}
-   function detectmob() { 
-		 if( navigator.userAgent.match(/Android/i)
-		 || navigator.userAgent.match(/webOS/i)
-		 || navigator.userAgent.match(/iPhone/i)
-		 || navigator.userAgent.match(/iPad/i)
-		 || navigator.userAgent.match(/iPod/i)
-		 || navigator.userAgent.match(/BlackBerry/i)
-		 || navigator.userAgent.match(/Windows Phone/i)
-		 ){
-		    return true;
-		  }
-		 else {
-		    return false;
-		  }
-	}
+  
    </script>
   </head>
   <body class="text-center">
   	<html:form action="/login" onsubmit="return false;">
 	  
-	  <h1 class="h3 mb-3 font-weight-normal">PENS Application</h1>
+	  <h1 class="h3 mb-3 font-weight-normal"><b>SALES ANALYSIS SYSTEM</b></h1>
 	    <p>
 	     <label>รหัสผู้ใช้:</label>
 	     <html:text property="userName"   size="10"/>

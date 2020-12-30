@@ -144,6 +144,7 @@ public class ImportLoadStockInitProcess {
 				
 				/** validate StoreCode input is valid Master **/ 
 				String storeNameMaster = GeneralDAO.getStoreName(storeCode);
+				logger.debug("storeNameMaster:"+storeNameMaster);
 				if( Utils.isNull(storeNameMaster).equals("")){
 					request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  รหัสร้านค้าไม่ถูกต้อง["+storeCode+"] กรุณาตรวจสอบ");
 					return mapping.findForward("success");
@@ -157,14 +158,18 @@ public class ImportLoadStockInitProcess {
 				
 				/** validate StoreNo **/
 				 if("MTT".equalsIgnoreCase(importType)){
-					 String storeNoTemp = storeCode;
-					 if(storeCode.indexOf("-") != -1){
-					    storeNoTemp = storeCode.substring(0,storeCode.indexOf("-"));
+					 /**WIT:05/11/2020: Case MayaShop(000030) use same MTT table but not in MTT Group **/
+					 /** No check group MTT **/
+					 if( !"000030".equals(storeCode)){
+						 String storeNoTemp = storeCode;
+						 if(storeCode.indexOf("-") != -1){
+						    storeNoTemp = storeCode.substring(0,storeCode.indexOf("-"));
+						 }
+						 if( isStoreCodeCanImport(conn,"MTT",storeNoTemp)==false ){
+							request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลร้านค้าไม่ถูกต้อง");
+							return mapping.findForward("success");
+						 }
 					 }
-					if( isStoreCodeCanImport(conn,"MTT",storeNoTemp)==false ){
-						request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลร้านค้าไม่ถูกต้อง");
-						return mapping.findForward("success");
-					}
 				 }else{
 					if( !storeCode.startsWith(storeCodeValidate)){
 						request.setAttribute("Message","ไม่สามารถ Upload ไฟล์ "+fileName+"ได้เนื่องจากมีการ  ข้อมูลร้านค้าไม่ถูกต้อง");

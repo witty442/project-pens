@@ -784,6 +784,9 @@ public class ConfPickingDAO {
 		sql.append("\n    AND l.product_id = p.product_id ");
 		sql.append("\n    AND t.ship_address_id = a.address_id ");
 		sql.append("\n    AND a.purpose = 'S' ");
+		/** Case Pre_order_flag by customer no get order_date <= sysdate **/
+		sql.append("\n    AND t.order_date <= sysdate ");
+		
 		if( !"view".equalsIgnoreCase(mode)){
 			if( !Utils.isNull(o.getPickingNo()).equals("")){
 				sql.append("\n  and t.PICKING_NO ='"+o.getPickingNo()+"'");
@@ -883,6 +886,8 @@ public class ConfPickingDAO {
 		sql.append("\n    AND a.purpose = 'S' ");
 		sql.append("\n    AND t.doc_status in('"+I_PO.STATUS_RESERVE+"','"+I_PO.STATUS_REJECT+"')" );
 		sql.append("\n    AND (t.picking_no is null or t.picking_no ='')" );
+		/** Case Pre_order_flag by customer no get order_date <= sysdate **/
+		sql.append("\n    AND t.order_date <= sysdate ");
 		
 		if(ControlCode.canExecuteMethod("Picking", "OrderEDI")){
 			sql.append("\n    UNION ALL ");

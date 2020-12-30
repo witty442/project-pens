@@ -298,7 +298,7 @@ function openPopupSearch(path,pageName,mutiple){
 		
 	}
 	url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
-	PopupCenterFullHeight(url,"",600);
+	PopupCenterFullHeight(url,"",800);
 }
 function setDataPopupValue(code,desc,pageName){
 	var form = document.orderForm;

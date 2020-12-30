@@ -24,7 +24,7 @@ public class LockboxProcess {
 		String receiptByIdTRSql = "";
 		String receiptIdApplyTRAllBatch = "";
 		try{
-			//Gen Case TR
+			//Gen Case TR(BANK TRANSFER)
 			List<DataBean> dataTRList = getAllReceiptByByType(conn, userBean, "TR");
 			if(dataTRList != null && dataTRList.size() >0){
 			for(int i=0;i<dataTRList.size();i++){

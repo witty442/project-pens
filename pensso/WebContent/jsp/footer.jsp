@@ -16,10 +16,7 @@ String screenHeight= Utils.isNull(session.getAttribute("screenHeight"));
 <script type="text/javascript">
 
 function openPopup(path){
-	
-	var h= <%=screenHeight%>-50;
-	var w = <%=screenWidth%>-50;
-	PopupCenter(path+"/jsp/adminConsole.do?do=process&currentTab=tab_config_info", "Configuration",w,h); 
+	PopupCenterFull(path+"/jsp/adminConsole.do?do=process&currentTab=tab_config_info", "Configuration"); 
 	//window.open(path+'/jsp/adminConsole.do?do=process&currentTab=tab_config_info','Configuration','width='+screen_width+',height='+screen_height+"'");
 }
 
@@ -52,7 +49,8 @@ function openDBBackupPopup(path){
 			  <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';">
 			  <font color="red"><%=Utils.isNull(msg3[0]) %></font> </a>|&nbsp;<%=Utils.isNull(msg3[1]) %>
 			  &nbsp;<font color="black">
-			  Config:<%=EnvProperties.getInstance().getProperty("product.type") %>
+			  DB[<font color="red"><%=EnvProperties.getInstance().getProperty("product.type") %></font>] 
+			  Quartz[<font color="red"><%=EnvQuartzProperties.getInstance().getProperty("product.type") %></font>]
 			  </font> 
 			   &nbsp;|&nbsp;‡∫Õ√Ï‚∑√‰Õ∑’ : 087-8016837, 083-3061296
 			  </b>

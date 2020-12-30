@@ -23,7 +23,7 @@ import com.isecinc.pens.bean.TransactionSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
-import com.isecinc.pens.sql.ReportEndDateLotusSQL;
+import com.isecinc.pens.sql.ReportEndDateLotusSQL_NoUSE;
 import com.isecinc.pens.sql.ReportMonthEndLotusSQL;
 import com.isecinc.pens.sql.ReportOnhandAsOfKingSQL;
 import com.isecinc.pens.sql.ReportOnhandAsOf_Robinson_SQL;
@@ -40,6 +40,7 @@ import com.isecinc.pens.web.popup.PopupForm;
 import com.isecinc.pens.web.summary.SummaryForm;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 
@@ -405,7 +406,7 @@ public class SummaryDAO {
 			int totalQty = 0;
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT * from PENSBME_SALES_FROM_LOTUS ");
+				sql.append("\n  SELECT * from PENSBI.PENSBME_SALES_FROM_LOTUS ");
 				sql.append("\n  where 1=1  ");
 			
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
@@ -523,7 +524,7 @@ public class SummaryDAO {
 			Date salesDateToParam = null;
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT * from PENSBME_SALES_FROM_BIGC ");
+				sql.append("\n  SELECT * from PENSBI.PENSBME_SALES_FROM_BIGC ");
 				sql.append("\n  where 1=1  ");
 			
 
@@ -624,7 +625,7 @@ public class SummaryDAO {
 			Date salesDateToParam = null;
 			try {
 				sql.delete(0, sql.length());
-				sql.append("\n  SELECT * from PENSBME_SALES_FROM_BIGC_TEMP");
+				sql.append("\n  SELECT * from PENSBI.PENSBME_SALES_FROM_BIGC_TEMP");
 				sql.append("\n  where 1=1  ");
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
 					salesDateFlag = true;
@@ -714,7 +715,7 @@ public class SummaryDAO {
 			Date salesDateFromParam = null;
 			Date salesDateToParam = null;
 			try {
-				sql.append("\n  SELECT * from PENSBME_SALES_FROM_TOPS");
+				sql.append("\n  SELECT * from PENSBI.PENSBME_SALES_FROM_TOPS");
 				sql.append("\n  where 1=1  ");
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
 					salesDateFlag = true;
@@ -822,8 +823,8 @@ public class SummaryDAO {
 			try {
 				sql.delete(0, sql.length());
 				sql.append("\n  SELECT h.* " );
-				sql.append("\n  ,(SELECT pens_desc from PENSBME_MST_REFERENCE m where h.cust_no = m.pens_value and m.reference_code ='Store') as store_name " );
-				sql.append("\n from PENSBME_SALES_FROM_KING h");
+				sql.append("\n  ,(SELECT pens_desc from PENSBI.PENSBME_MST_REFERENCE m where h.cust_no = m.pens_value and m.reference_code ='Store') as store_name " );
+				sql.append("\n from PENSBI.PENSBME_SALES_FROM_KING h");
 				sql.append("\n  where 1=1  ");
 				if( !Utils.isNull(c.getSalesDateFrom()).equals("")&& !Utils.isNull(c.getSalesDateTo()).equals("")){
 					salesDateFlag = true;
@@ -2204,7 +2205,7 @@ public class SummaryDAO {
 			double onhand_amt = 0;
 			try {
 				conn = DBConnection.getInstance().getConnection();
-				sql = ReportEndDateLotusSQL.genSQL(conn, c, user, f.getSummaryType(),"ReportEndDate");
+				sql = ReportEndDateLotusSQL_NoUSE.genSQL(conn, c, user, f.getSummaryType(),"ReportEndDate");
 				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
@@ -2330,7 +2331,7 @@ public class SummaryDAO {
 					StoreBean storeBean = storeList.get(i);
 					c.setPensCustCodeFrom(storeBean.getStoreCode());
 					
-					sql = ReportEndDateLotusSQL.genSQL(conn, c, user, f.getSummaryType(),"ReportEndDate");
+					sql = ReportEndDateLotusSQL_NoUSE.genSQL(conn, c, user, f.getSummaryType(),"ReportEndDate");
 					
 					stmt = conn.createStatement();
 					rst = stmt.executeQuery(sql.toString());
@@ -2469,7 +2470,7 @@ public class SummaryDAO {
 						sql.append("\n AND V.customer_id = C.customer_id  ");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 
 		                sql.append("\n AND V.invoice_date >= to_date('"+christSalesDateFromStr+"','dd/mm/yyyy')  ");
 		                sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateToStr+"','dd/mm/yyyy')  ");
@@ -2575,7 +2576,7 @@ public class SummaryDAO {
 						sql.append("\n AND V.customer_id = C.customer_id  ");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						
 	                    sql.append("\n AND V.invoice_date >= to_date('"+christSalesDateFromStr+"','dd/mm/yyyy')  ");
 	                    sql.append("\n AND V.invoice_date <= to_date('"+christSalesDateToStr+"','dd/mm/yyyy')  ");
@@ -3055,15 +3056,15 @@ public class SummaryDAO {
 						sql.append("\n C.customer_code,   ");
 						sql.append("\n C.customer_desc, ");
 						sql.append("\n substr(P.inventory_item_desc,0,6) as group_type ");
-						sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-						sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-						sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+						sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
+						sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+						sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 						sql.append("\n WHERE 1=1   ");
 						sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 						sql.append("\n AND V.customer_id = C.customer_id  ");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						
 						//Lotus Only 020047
 						sql.append("\n AND C.customer_code LIKE '020047%'");
@@ -3090,8 +3091,7 @@ public class SummaryDAO {
 						sql.append("\n L.PENS_CUST_DESC as customer_desc, ");
 						sql.append("\n L.PENS_GROUP_TYPE as group_type, ");
 						sql.append("\n NVL(SUM(QTY),0) AS SALE_OUT_QTY ");
-						sql.append("\n FROM ");
-						sql.append("\n PENSBI.PENSBME_SALES_FROM_LOTUS L ");
+						sql.append("\n FROM PENSBI.PENSBME_SALES_FROM_LOTUS L ");
 						sql.append("\n,( ");
 								sql.append("\n select distinct pens_value,pens_desc2 from ");
 								sql.append("\n PENSBI.PENSBME_MST_REFERENCE M ");
@@ -3129,15 +3129,15 @@ public class SummaryDAO {
 						sql.append("\n C.customer_code,   ");
 						sql.append("\n substr(P.inventory_item_desc,0,6) as group_type, ");
 						sql.append("\n NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
-						sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-						sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-						sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+						sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
+						sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+						sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 						sql.append("\n WHERE 1=1   ");
 						sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 						sql.append("\n AND V.customer_id = C.customer_id  ");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						
 						//Lotus Only 020047
 						sql.append("\n AND C.customer_code LIKE '020047%'");
@@ -3170,15 +3170,15 @@ public class SummaryDAO {
 						sql.append("\n C.customer_code,   ");
 						sql.append("\n substr(P.inventory_item_desc,0,6) as group_type, ");
 						sql.append("\n NVL(SUM(RETURNED_QTY),0)  as SALE_RETURN_QTY ");
-						sql.append("\n FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-						sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-						sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+						sql.append("\n FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
+						sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+						sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 						sql.append("\n WHERE 1=1   ");
 						sql.append("\n AND V.inventory_item_id = P.inventory_item_id  ");
 						sql.append("\n AND V.customer_id = C.customer_id  ");
 						sql.append("\n AND V.Customer_id IS NOT NULL   ");
 						sql.append("\n AND V.inventory_item_id IS NOT NULL  ");
-						sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
+						//sql.append("\n AND P.inventory_item_desc LIKE 'ME%' ");
 						//Lotus Only 020047
 						sql.append("\n AND C.customer_code LIKE '020047%'");
 						
@@ -3206,7 +3206,10 @@ public class SummaryDAO {
 				sql.append("\n ) A ");
 				sql.append("\n ORDER BY A.customer_code,A.group_type asc ");
 				
-				logger.debug("sql:"+sql);
+				if(logger.isDebugEnabled()){
+				  //logger.debug("sql:"+sql);
+					FileUtil.writeFile("d://dev_temp/temp//sql.sql", sql.toString(), "TIS-620");
+				}
 				
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());

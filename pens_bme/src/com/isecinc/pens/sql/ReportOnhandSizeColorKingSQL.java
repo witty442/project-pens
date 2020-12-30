@@ -9,6 +9,7 @@ import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.constants.Constants;
 import com.isecinc.pens.dao.constants.PickConstants;
+import com.isecinc.pens.web.reportall.ReportAllSpecialUtils;
 import com.pens.util.DateUtil;
 import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
@@ -32,7 +33,7 @@ public class ReportOnhandSizeColorKingSQL {
 			if( initDate != null){
 				initDateStr = DateUtil.stringValue(initDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			}
-			
+			sql.append("\n /** ReportOnhandSizeColorKingSQL **/");
 			sql.append("\n SELECT A.* FROM(");
 			sql.append("\n SELECT M.*");
 			
@@ -54,11 +55,11 @@ public class ReportOnhandSizeColorKingSQL {
 			   sql.append("\n SELECT DISTINCT AA.* FROM(");
 				    sql.append("\n SELECT DISTINCT ");
 					sql.append("\n M.pens_item, L.group_code as group_type, M.material_master,L.barcode ");
-					sql.append("\n FROM PENSBME_ORDER L");
+					sql.append("\n FROM PENSBI.PENSBME_ORDER L");
 					sql.append("\n ,( ");
 					sql.append("\n   select pens_value as pens_item,");
 					sql.append("\n   interface_value as material_master,interface_desc as barcode ");
-					sql.append("\n   FROM PENSBME_MST_REFERENCE M ");
+					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
 					sql.append("\n   )M ");
 					sql.append("\n WHERE 1=1   ");
@@ -77,7 +78,7 @@ public class ReportOnhandSizeColorKingSQL {
 				    
 					sql.append("\n SELECT DISTINCT ");
 					sql.append("\n L.pens_item, L.group_item as group_type, L.material_master,L.barcode ");
-					sql.append("\n FROM  PENSBME_ONHAND_BME_LOCKED L ");
+					sql.append("\n FROM  PENSBI.PENSBME_ONHAND_BME_LOCKED L ");
 					sql.append("\n WHERE 1=1   ");
 					
 					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
@@ -91,7 +92,7 @@ public class ReportOnhandSizeColorKingSQL {
 					
 					sql.append("\n SELECT ");
   				    sql.append("\n DISTINCT L.PENS_ITEM,L.GROUP_CODE as group_type, L.material_master,L.barcode ");
-					sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBME_MTT_ONHAND_INIT_STK L");
+					sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBI.PENSBME_MTT_ONHAND_INIT_STK L");
 					sql.append("\n WHERE 1=1 ");
 					sql.append("\n AND H.cust_no = L.cust_no  ");
 					if( !Utils.isNull(c.getPensCustCodeFrom()).equals("") && !Utils.isNull(c.getPensCustCodeFrom()).equals("ALL")){
@@ -113,9 +114,9 @@ public class ReportOnhandSizeColorKingSQL {
 					sql.append("\n  P.inventory_item_code as pens_item ");
 					sql.append("\n ,MI.pens_desc2 as group_type ");
 					sql.append("\n ,MI.material_master,MI.barcode ");
-					sql.append("\n  FROM XXPENS_BI_SALES_ANALYSIS_V V   ");
-					sql.append("\n ,XXPENS_BI_MST_CUSTOMER C  ");
-					sql.append("\n ,XXPENS_BI_MST_ITEM P  ");
+					sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V   ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_CUSTOMER C  ");
+					sql.append("\n ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 					sql.append("\n ,( ");
 					sql.append("\n   select pens_value as pens_item, pens_desc2,");
 					sql.append("\n   interface_value as material_master,interface_desc as barcode ");
@@ -123,8 +124,8 @@ public class ReportOnhandSizeColorKingSQL {
 					sql.append("\n   WHERE REFERENCE_CODE ='"+Constants.STORE_TYPE_LOTUS_ITEM+"' " );
 					sql.append("\n  )MI ");
 					sql.append("\n ,( ");
-					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc from ");
-					sql.append("\n   PENSBI.PENSBME_MST_REFERENCE M ");
+					sql.append("\n   select distinct pens_value as customer_code, interface_value as cust_no,pens_desc as customer_desc ");
+					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE M ");
 					sql.append("\n   WHERE M.reference_code ='Store' ");
 					//Gen Filter StoreCode By StoreType
 					sql.append(SQLHelper.genFilterByStoreType(conn, "DUTYFREE", "pens_value"));
@@ -162,7 +163,7 @@ public class ReportOnhandSizeColorKingSQL {
 					/** Adjust issue  **/
 					sql.append("\n SELECT DISTINCT L.item_issue as pens_item,L.item_issue_desc as group_type");
 					sql.append("\n ,MI.material_master ,MI.barcode ");
-					sql.append("\n FROM PENSBME_ADJUST_INVENTORY L " );
+					sql.append("\n FROM PENSBI.PENSBME_ADJUST_INVENTORY L " );
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as pens_item,");
 					sql.append("\n   interface_value as material_master,interface_desc as barcode ");
@@ -192,7 +193,7 @@ public class ReportOnhandSizeColorKingSQL {
 					/** Adjust receipt **/
 					sql.append("\n SELECT DISTINCT L.item_receipt as pens_item ,L.item_receipt_desc as group_type");
 					sql.append("\n ,MI.material_master ,MI.barcode ");
-					sql.append("\n FROM PENSBME_ADJUST_INVENTORY L " );
+					sql.append("\n FROM PENSBI.PENSBME_ADJUST_INVENTORY L " );
 					sql.append("\n ,( ");
 					sql.append("\n   select distinct pens_value as pens_item,");
 					sql.append("\n   interface_value as material_master,interface_desc as barcode ");
@@ -225,7 +226,7 @@ public class ReportOnhandSizeColorKingSQL {
       		    sql.append("\n SELECT ");
 				sql.append("\n L.PENS_ITEM, L.GROUP_CODE as group_type, L.material_master,L.barcode,");
 				sql.append("\n SUM(QTY) AS INIT_SALE_QTY ");
-				sql.append("\n FROM PENSBME_MTT_INIT_STK H,PENSBME_MTT_ONHAND_INIT_STK L");
+				sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBI.PENSBME_MTT_ONHAND_INIT_STK L");
 				sql.append("\n WHERE 1=1 ");
 				sql.append("\n and H.cust_no = L.cust_no  ");
 				sql.append("\n and H.COUNT_STK_DATE = L.COUNT_STK_DATE  ");
@@ -257,7 +258,7 @@ public class ReportOnhandSizeColorKingSQL {
   				sql.append("\n SELECT L.PENS_ITEM, ");
 			    sql.append("\n L.GROUP_CODE as group_type, L.material_master,L.barcode , ");
 				sql.append("\n NVL(COUNT(*),0) AS SALE_OUT_QTY ");
-				sql.append("\n FROM PENSBME_SALES_OUT L");
+				sql.append("\n FROM PENSBI.PENSBME_SALES_OUT L");
 				sql.append("\n WHERE 1=1 ");
 				sql.append("\n AND L.status <> '"+PickConstants.STATUS_CANCEL+"'");
 				if(initDate != null){
@@ -291,14 +292,17 @@ public class ReportOnhandSizeColorKingSQL {
 			/*********************** SALE_IN **********************************/
 			sql.append("\n  SELECT P.inventory_item_code as pens_item, ");
 			sql.append("\n  MP.pens_desc2 as group_type,MP.material_master,MP.barcode ,");
-			sql.append("\n  NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
-			sql.append("\n  FROM XXPENS_BI_SALES_ANALYSIS_V V  ");
-			sql.append("\n  ,XXPENS_BI_MST_CUSTOMER C ");
-			sql.append("\n  ,XXPENS_BI_MST_ITEM P  ");
+			//sql.append("\n  NVL(SUM(INVOICED_QTY),0)  as SALE_IN_QTY ");
+			/** special case (product) Sum Qty (convert CTN(SA) to EA(BME) )**/
+			sql.append(ReportAllSpecialUtils.genSQLSumSpecialProduct("V.INVOICED_QTY","SALE_IN_QTY"));
+			
+			sql.append("\n  FROM PENSBI.XXPENS_BI_SALES_ANALYSIS V  ");
+			sql.append("\n  ,PENSBI.XXPENS_BI_MST_CUSTOMER C ");
+			sql.append("\n  ,PENSBI.XXPENS_BI_MST_ITEM P  ");
 			sql.append("\n  ,( ");
 			sql.append("\n    select distinct pens_value , pens_desc2 ,");
 			sql.append("\n    interface_value as material_master,interface_desc as barcode");
-			sql.append("\n    from PENSBME_MST_REFERENCE M ");
+			sql.append("\n    from PENSBI.PENSBME_MST_REFERENCE M ");
 			sql.append("\n    WHERE M.reference_code ='LotusItem' ");
 	        sql.append("\n   ) MP ");
 			sql.append("\n ,( ");
@@ -345,8 +349,8 @@ public class ReportOnhandSizeColorKingSQL {
 			sql.append("\n  SELECT I.pens_item, ");
 			sql.append("\n  I.group_code as group_type,I.material_master,I.barcode ,");
 			sql.append("\n  NVL(COUNT(*),0) as SALE_RETURN_QTY ");
-			sql.append("\n  FROM PENSBME_PICK_JOB J   ");
-			sql.append("\n  ,PENSBME_PICK_BARCODE B ,PENSBME_PICK_BARCODE_ITEM I  ");
+			sql.append("\n  FROM PENSBI.PENSBME_PICK_JOB J   ");
+			sql.append("\n  ,PENSBI.PENSBME_PICK_BARCODE B ,PENSBI.PENSBME_PICK_BARCODE_ITEM I  ");
 			sql.append("\n  WHERE 1=1   ");
 			sql.append("\n  AND J.job_id = B.job_id  ");
 			sql.append("\n  AND B.job_id = I.job_id ");
@@ -385,7 +389,7 @@ public class ReportOnhandSizeColorKingSQL {
 			sql.append("\n\t SELECT L.item_issue as pens_item,L.item_issue_desc as group_type");
 			sql.append("\n\t ,MI.material_master ,MI.barcode ");
 			sql.append("\n\t ,(NVL(SUM(ITEM_ISSUE_QTY),0)*-1) AS ISSUE_QTY ");
-			sql.append("\n\t FROM PENSBME_ADJUST_INVENTORY L " );
+			sql.append("\n\t FROM PENSBI.PENSBME_ADJUST_INVENTORY L " );
 			sql.append("\n\t ,( ");
 			sql.append("\n\t   select distinct pens_value as pens_item,");
 			sql.append("\n\t   interface_value as material_master,interface_desc as barcode ");
@@ -420,7 +424,7 @@ public class ReportOnhandSizeColorKingSQL {
 			sql.append("\n SELECT L.item_receipt as pens_item,L.item_receipt_desc as group_type ");
 			sql.append("\n ,MI.material_master ,MI.barcode ");
 			sql.append("\n ,NVL(SUM(ITEM_RECEIPT_QTY),0) AS RECEIPT_QTY ");
-			sql.append("\n FROM PENSBME_ADJUST_INVENTORY L  ");
+			sql.append("\n FROM PENSBI.PENSBME_ADJUST_INVENTORY L  ");
 			sql.append("\n\t ,( ");
 			sql.append("\n\t   select distinct pens_value as pens_item,");
 			sql.append("\n\t   interface_value as material_master,interface_desc as barcode ");

@@ -252,6 +252,7 @@ function isNum(obj){
 										    <input type="hidden" name="retailPriceBF" value ="${results.retailPriceBF}" />
 										    <input type="hidden" name="barcode" value ="${results.barcode}" />
 										    <input type="hidden" name="materialMaster" value ="${results.materialMaster}" />
+										    <input type="hidden" name="inventoryItemId" value ="${results.inventoryItemId}" />
 										</td>
 									</tr>
 							  </c:forEach>

@@ -40,15 +40,15 @@ public class MModifierRelation extends I_Model<ModifierRelation> {
 		ResultSet rst = null;
 		try {
 			conn = new DBCPConnectionProvider().getConnection(conn);
-			String sql = "select rm.RELATION_MODIFIER_ID ";
-			sql += "from m_relation_modifier rm , m_modifier_line ml ";
-			sql += "where rm.MODIFIER_LINE_TO_ID = ml.MODIFIER_LINE_ID ";
-			sql += "  and rm.MODIFIER_LINE_FROM_ID = " + modifierLineFromId;
-			sql += " order by ml.VALUE ";
+			String sql = "select rm.RELATION_MODIFIER_ID \n";
+			sql += "from m_relation_modifier rm , m_modifier_line ml \n";
+			sql += "where rm.MODIFIER_LINE_TO_ID = ml.MODIFIER_LINE_ID \n";
+			sql += "  and rm.MODIFIER_LINE_FROM_ID = " + modifierLineFromId +" \n";
+			sql += " order by ml.VALUE \n";
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
 			while (rst.next()) {
-				pos.add(find(rst.getString("rm.RELATION_MODIFIER_ID")));
+				pos.add(find(rst.getString("RELATION_MODIFIER_ID")));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

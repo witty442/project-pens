@@ -1,3 +1,4 @@
+<%@page import="com.isecinc.pens.web.popup.PopupHelper"%>
 <%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -20,7 +21,13 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
+<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script> --%>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script> 
+<!-- Bootstrap -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap/bootstrap-4.5.2.min.css">
+<script src="${pageContext.request.contextPath}/js/bootstrap/bootstrap-4.5.2.min.js"></script>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/bootstrap/grid.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+
 
 <jsp:useBean id="popupForm" class="com.isecinc.pens.web.popup.PopupForm" scope="session" />
 <%
@@ -29,39 +36,45 @@
     String currentPage = "1";
     String hideAll = Utils.isNull(request.getParameter("hideAll"));
     String mutiple = Utils.isNull(request.getParameter("mutiple"));
+    mutiple = mutiple.equals("")?"false":mutiple;
+    
     String headName ="";
     String codeSearchTxtName = "";
 	String descSearchTxtName = "";
 	String descSearchTxtName2 = "";
 	
     /** Criteria Name **/
-    if("Itembarcode".equalsIgnoreCase(pageName) || "Itembarcode".equalsIgnoreCase(pageName)
-     ){
-    	headName = "รหัสสินค้า("+pageName+")";
-    	codeSearchTxtName = "รหัสสินค้า";
-    	descSearchTxtName = "Material Master";
-    	descSearchTxtName2 = "Barcode";
-    }
+    String[] headTextArr = PopupHelper.genHeadTextPopup(pageName);//Gen By PageName Serarch
+    headName = headTextArr[0];
+    codeSearchTxtName = headTextArr[1];
+    descSearchTxtName = headTextArr[2];
+    descSearchTxtName2 = headTextArr[3];
     
     /** Store Select MutilCode in each Page **/
     String codes = Utils.isNull(session.getAttribute("codes"));
     String descs = Utils.isNull(session.getAttribute("descs"));
     
     String queryStr= request.getQueryString();
-	 if(queryStr.indexOf("d-") != -1){
+	if(queryStr.indexOf("d-") != -1){
 	 	queryStr = queryStr.substring(queryStr.indexOf("d-"),queryStr.indexOf("-p")+2 );
 	 	System.out.println("queryStr:"+queryStr);
 	    currentPage = request.getParameter(queryStr)==null?"1":request.getParameter(queryStr);
-	 }
+	}
 	 
     System.out.println("codes:"+codes);
+    System.out.println("mutiple:"+mutiple);
 %>
 
 <script type="text/javascript">
 function searchPopup(path) {
-    document.popupForm.action = path + "/jsp/popupAction.do?do=search";
+    document.popupForm.action = path + "/jsp/popupAction.do?do=search&action=newsearch";
     document.popupForm.submit();
    return true;
+}
+function gotoPage(currPage){
+	document.popupForm.action = "${pageContext.request.contextPath}/jsp/popupAction.do?do=search&currPage="+currPage;
+	document.popupForm.submit();
+	return true;
 }
 function selectAll(){
 	document.getElementsByName("codes")[0].value = 'ALL,';
@@ -75,14 +88,24 @@ function selectOneRadio(){
 
 	for(var i=0;i<chRadio.length;i++){
         if(chRadio[i].checked){
-        	//alert(i+":"+code[i+1].value);
-           // window.opener.setStoreMainValue(code[i].value,desc[i].value ,types);
+        	//alert(i+":"+code[i].value);
             window.opener.setDataPopupValue(code[i].value,desc[i].value,pageName);
         	window.close();
             break;
         }
 	}
 }
+function selectOneByRowClick(index){
+	var chRadio = document.getElementsByName("chCheck");
+	var pageName ='<%=pageName%>';
+	var code = document.getElementsByName("code_temp");
+	var desc = document.getElementsByName("desc");
+
+	//alert(i+":"+code[i].value);
+    window.opener.setDataPopupValue(code[index].value,desc[index].value,pageName);
+	window.close();
+}
+
 function selectMultiple(){
 	var chk = document.getElementsByName("chCheck");
 	var pageName ='<%=pageName%>';
@@ -260,58 +283,65 @@ window.onload = function(){
 <input type="hidden" name="mutiple" value ="<%=mutiple%>" />
 <input type="hidden" name="hideAll" value ="<%=hideAll%>" />
 
-<table align="center" border="0" cellpadding="0" cellspacing="2"  width="100%" class="tableHead">
-    <tr height="21px" class="txt1">
-		<th width="15%" >&nbsp;</th> 
-		<th width="90%" ><b>ค้นหาข้อมูล <%=headName%></b></th>
-	</tr>
-	<tr height="21px" class="txt1">
-		<td width="15%" align="right"><b><%=codeSearchTxtName %></b>  </td>
-		<td width="90%" ><html:text property="codeSearch"  size="30" style="height:20px" styleClass="\" autoComplete=\"off"/>
-		&nbsp;&nbsp;
-		<input type="button" name="search"  class="newPosBtnLong"  value=" ค้นหา " onclick="searchPopup('<%=request.getContextPath()%>')" />
-		</td>
-	</tr>
-	<tr height="21px" class="txt1">
-		<td nowrap align="right"><b><%=descSearchTxtName %></b></td>
-		<td ><html:text property="descSearch"  size="40" style="height:20px" styleClass="\" autoComplete=\"off"/></td>
-	</tr>
-	<%if("Itembarcode".equalsIgnoreCase(pageName) ) {%>
-	<tr height="21px" class="txt1">
-		<td nowrap align="right"><b><%=descSearchTxtName2 %></b></td>
-		<td ><html:text property="barcodeSearch"  size="40" style="height:20px" styleClass="\" autoComplete=\"off"/></td>
-	</tr>
-	<%} %>
-</table>
-
-<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%" >
-	<tr>
-		<td align="center">
-		<%if("true".equalsIgnoreCase(mutiple)){ %>
-			<input type="button" name="ok" value=" ยืนยัน " onclick="selectMultiple()" style="width:80px;"  class="newPosBtnLong" />
-		<%}else{ %>
-		    <input type="button" name="ok" value=" ยืนยัน " onclick="selectOneRadio()" style="width:80px;"  class="newPosBtnLong" />
-		<%} %>
-			<input type="button" name="close" value="ปิดหน้าจอนี้" onclick="javascript:window.close();" style="width:100px;"  class="newPosBtnLong" />
-			&nbsp;
-			<%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  /> เลือกทั้งหมด <%} %>
-		</td>
-	</tr>
-</table>
+  <!-- Head Table -->
+  <div class="row mb-1">
+     <div class="col-12 themed-grid-col" align="center">ค้นหาข้อมูล <%=headName%></div>
+  </div>
+  <div class="row mb-1">
+     <div class="col-4 themed-grid-col-detail" align="right"><%=codeSearchTxtName %></div>
+      <div class="col-8 themed-grid-col-detail">
+        <html:text property="codeSearch"  styleClass="\" autoComplete=\"off"/>
+      </div>
+  </div>
+  <div class="row mb-1">
+     <div class="col-4 themed-grid-col-detail" align="right"><%=descSearchTxtName %></div>
+      <div class="col-8 themed-grid-col-detail">
+        <html:text property="descSearch"  styleClass="\" autoComplete=\"off"/>
+         <%if( !"Itembarcode".equalsIgnoreCase(pageName)) {%>
+           <input type="button" name="Search"  value=" ค้นหา " class="btn btn-primary" onclick="searchPopup('<%=request.getContextPath()%>')" />
+        <%} %>
+      </div>
+  </div>
+  <%if("Itembarcode".equalsIgnoreCase(pageName)) {%>
+	 <div class="row mb-1">
+	     <div class="col-4 themed-grid-col-detail" align="right"><%=descSearchTxtName2 %></div>
+	      <div class="col-8 themed-grid-col-detail">
+	        <html:text property="descSearch"  styleClass="\" autoComplete=\"off"/>
+	        <input type="button" name="Search"  value=" ค้นหา " class="btn btn-primary" onclick="searchPopup('<%=request.getContextPath()%>')" />
+	      </div>
+	  </div>
+  <%} %>
+  
+ <%if(session.getAttribute("DATA_LIST") != null){ %>
+	 <div class="row mb-1">
+	      <div class="col-12 themed-grid-col-detail" align="center">
+	        
+			<%if(mutiple.equalsIgnoreCase("true")){ %>
+			  <input type="button" name="ok" value=" ยืนยัน  " onclick="selectMultiple()"  class="btn btn-primary" />
+			<%}else{ %>
+			  <input type="button" name="ok" value=" ยืนยัน  " onclick="selectOneRadio()"  class="btn btn-primary" />
+			<%} %>
+	   
+	         <input type="button" name="Close" value="ปิดหน้าจอนี้" onclick="javascript:window.close();" style="width:120px" class="btn btn-primary" />
+				&nbsp;
+			 <%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  />&nbsp; เลือกทั้งหมด 
+			 <%}else{ %>
+			  (สามารถเลือกข้อมูล โดยการ Double Click )
+			 <%} %>
+	     </div>
+	  </div>
+  <%}	 %>
+  
 <!-- RESULT -->
 <%
-//out.println("pageName["+pageName+"]DATA_LIST:"+(session.getAttribute("DATA_LIST")));
 if(session.getAttribute("DATA_LIST") != null){ 
  //out.println("pageName["+pageName+"]DATA_LIST SIZE:"+((List)session.getAttribute("DATA_LIST")).size());
 %>
-
-	<%if("ItemBarcode".equalsIgnoreCase(pageName) ){ %>
-	     <jsp:include page="popup_sub/ItemBarcodeResult.jsp?mutiple=<%=mutiple %>" /> 
-	<%}%>
-
+   <%-- <jsp:include page="popup_sub/ItemBarcodeResult.jsp?mutiple=<%=mutiple %>" />  --%>
+   <jsp:include page="popup_sub/popupResult.jsp?mutiple=<%=mutiple %>" /> 
 <%
 }else if(session.getAttribute("search_submit") != null){ %>
- <font size="2" color="red">ไม่พบข้อมูล</font>
+   <font size="2" color="red">ไม่พบข้อมูล</font>
 <%} %>
 <!-- RESULT -->
 </html:form>

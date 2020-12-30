@@ -19,7 +19,7 @@ import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 import com.pens.util.seq.SequenceProcessAll;
 
 /**
@@ -185,7 +185,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 	public double calculateCreditAmount(Connection conn,Order order) throws Exception {
 		Statement stmt = null;
 		ResultSet rst = null;
-		double creditAmt = NumberToolsUtil.round(order.getNetAmount(), 2, BigDecimal.ROUND_HALF_UP);
+		double creditAmt = NumberUtil.round(order.getNetAmount(), 2, BigDecimal.ROUND_HALF_UP);
 		double paidAmt = 0;
 		//logger.debug("Start creditAmt :"+creditAmt+", ar_invoice_no:"+order.getArInvoiceNo());
 		try {
@@ -346,7 +346,7 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 				
 				/******************(sum(receipt_line))*****************+(cn)***+(adjust)****/
 				rl.setCreditAmount(calculateCreditAmount(rl.getOrder())+cnAmt+adjustInvoiceAmt);
-				rl.setCreditAmount(NumberToolsUtil.round(rl.getCreditAmount(),2,BigDecimal.ROUND_HALF_UP));
+				rl.setCreditAmount(NumberUtil.round(rl.getCreditAmount(),2,BigDecimal.ROUND_HALF_UP));
 				
 				rl.setPaidAmount(rl.getInvoiceAmount() - rl.getCreditAmount());
 				

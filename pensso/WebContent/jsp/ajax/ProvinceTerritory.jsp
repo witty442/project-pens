@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
@@ -5,11 +7,13 @@
 <%@page import="com.isecinc.pens.model.MProvince"%>
 <%
 String refId = (String)request.getParameter("refId");
+String notInProvinceId = Utils.isNull(request.getParameter("notInProvinceId"));
 //System.out.println(refId);
 List<Province> provinces = new ArrayList<Province>();
+User user = (User) request.getSession(true).getAttribute("user");
 try{
 	if(refId != null && refId.length()>0){
-		provinces = new MProvince().lookUp(Integer.parseInt(refId));
+		provinces = new MProvince().lookUp(user,Integer.parseInt(refId),notInProvinceId);
 	}
 }catch(Exception e){
 	e.printStackTrace();

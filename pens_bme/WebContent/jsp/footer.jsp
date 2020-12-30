@@ -50,7 +50,7 @@ function pop(url, title) {
 			  </script>
 			  </font>
 			   
-			  ,ProductType[<b><%= EnvProperties.getInstance().getProperty("product.type")%></b>]
+			 ,<b>DB[<font color="red"><%= EnvProperties.getInstance().getProperty("product.type")%></font>]</b>
 		</td>
         <td width="60px"><img src="${pageContext.request.contextPath}/images2/footer_right2.png" border="0"/></td>
         <td width="31px;"><img src="${pageContext.request.contextPath}/images2/footer_right.png" border="0"/></td>

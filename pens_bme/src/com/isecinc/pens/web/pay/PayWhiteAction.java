@@ -319,7 +319,7 @@ public class PayWhiteAction extends I_Action {
 			String[] description =request.getParameterValues("description");
 			String[] amount =request.getParameterValues("amount");
 
-			for(int i=0;i<10;i++){
+			for(int i=0;i<maxRow;i++){
 				PayBean item = new PayBean();
 
 				item.setLineId(Utils.convertStrToInt(lineId[i]));

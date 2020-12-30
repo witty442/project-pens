@@ -313,6 +313,22 @@ public class ShopAction extends I_Action {
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
 				}
+			}else if(P_SP_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				fileName="Report Sale Siam Premium Outlet Shop.xls";
+				if(aForm.getResults() != null && aForm.getResults().size() > 0){
+					htmlTable = ShopSaleOutAction.exportSaleOutToExcel(request,aForm,user,aForm.getResults());	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
+			}else if(P_SP_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
+				fileName="Report Sale Siam Premium Outlet StockOnhand.xls";
+				if(aForm.getResults() != null && aForm.getResults().size() > 0){
+					htmlTable = SPStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
+				}else{
+					request.setAttribute("Message", "ไม่พบข้อมูล");
+					return mapping.findForward("export");
+				}
 			}
 			
 	        //logger.debug("fileName:"+fileName);

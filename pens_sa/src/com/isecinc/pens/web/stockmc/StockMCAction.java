@@ -235,6 +235,8 @@ public class StockMCAction extends I_Action {
 		try {
 			if(pageSTockMC.equalsIgnoreCase(pageName)){
 				return new StockMCProcess().exportToExcel(mapping, aForm, request, response);
+			}else if(pageSTockMCQuery.equalsIgnoreCase(pageName)){
+		       return new StockMCQueryProcess().exportToExcel(mapping, aForm, request, response);
 			}else if(pageMasItemStockMC.equalsIgnoreCase(pageName)){
 				return new StockMCMasterItemProcess().exportToExcel(mapping, form, request, response);
 			}	

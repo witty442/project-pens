@@ -18,7 +18,7 @@ import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.pens.util.DBCPConnectionProvider;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 public class MReceiptSummary {
 	/** Logger */
@@ -109,7 +109,7 @@ public class MReceiptSummary {
 				
 				creditAmtTemp  =receiptAmount + cnAmt + adjustInvoiceAmt;
 				
-				creditAmtTemp = NumberToolsUtil.round(creditAmtTemp,2,BigDecimal.ROUND_HALF_UP);
+				creditAmtTemp = NumberUtil.round(creditAmtTemp,2,BigDecimal.ROUND_HALF_UP);
 
 				//debug
 			

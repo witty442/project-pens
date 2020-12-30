@@ -35,7 +35,7 @@ public class SecurityHelper {
 		COLUMN_KEY_MAP.put("Customer_Category","ประเภทขาย");//SaleType
 		COLUMN_KEY_MAP.put("Salesrep_id", "พนักงานขาย");	//SalesMan
 		COLUMN_KEY_MAP.put("SALES_ZONE", "ภาคตามสายดูแล");	//SalesZone
-		
+		COLUMN_KEY_MAP.put("Customer_id", "ร้านค้า");	//Customer_id
 		
 		MASTER_COLUMN_SEARCH_KEY_MAP.put("Brand", "Brand_no");//Brand
 		MASTER_COLUMN_SEARCH_KEY_MAP.put("Division","div_no"); //Division
@@ -89,16 +89,24 @@ public class SecurityHelper {
 			html +="<table border='0' align='left' width='80%'>\n";
 			//html += "<tr><td colspan='3'> <b>สิทธิการเข้าถึงข้อมูลของคุณ :Role["+user.getUserGroupName()+"] </b></td></tr> \n";
 			
-			String roles[] = new String[6];
+			String roles[] = new String[7];
 			int i=0;
 			while(rs.next()){
 				 roleColumnAccess = rs.getString("role_column_access");
 			     String role= genRoleFilterByTableMaster(conn,user, roleColumnAccess);
 			     roles[i] = role;
+			     //logger.debug("roles["+i+"]["+roles[i]+"]");
 			     i++;
 			}
 			html +="<tr>\n";
-			html += " <td>"+roles[0]+" : "+roles[1]+" : "+roles[2]+" : "+roles[3]+" : "+roles[4]+"</td>";  
+			if( !Utils.isNull(roles[0]).equals(""))html+=" : "+roles[0];
+			if( !Utils.isNull(roles[1]).equals(""))html+=" : "+roles[1];
+			if( !Utils.isNull(roles[2]).equals(""))html+=" : "+roles[2];
+			if( !Utils.isNull(roles[3]).equals(""))html+=" : "+roles[3];
+			if( !Utils.isNull(roles[4]).equals(""))html+=" : "+roles[4];
+			if( !Utils.isNull(roles[5]).equals(""))html+=" : "+roles[5];
+			if( !Utils.isNull(roles[6]).equals(""))html+=" : "+roles[6];
+			html +="  </td>";  
 			html +="<tr>\n";  
 			html +="</table>\n";
 			html +="</div>";
@@ -286,6 +294,8 @@ public class SecurityHelper {
 			     
 			     String filterCond = filterArray[0];
 			     String filterCode = filterArray[1];
+			     
+			     logger.debug("filterCond:"+filterCond);
 			     if( !Utils.isNull(filterCond).equals("") && !Utils.isNull(filterCond).equals("'ALL'")){//not equals ALL
 			    	// whereSql +="/** RoleColumn:"+roleColumnAccess+" :"+filterCode+"**/ \n";
 			    	
@@ -389,7 +399,11 @@ public class SecurityHelper {
 			ps = conn.prepareStatement(sql1);
 			rs = ps.executeQuery();	
 			while(rs.next()){
-				condValue += "'"+rs.getString("role_data_access")+"',";
+				if(condType.equalsIgnoreCase("Customer_id")){
+				    condValue += rs.getString("role_data_access")+",";
+				}else{
+					condValue += "'"+rs.getString("role_data_access")+"',";
+				}
 			}
 			if( !Utils.isNull(condValue).equals("")){
 				condValue = condValue.substring(0,condValue.length()-1);
@@ -417,6 +431,10 @@ public class SecurityHelper {
 				  sql = condValue;
 				}
 			}else if("SALES_ZONE".equalsIgnoreCase(condType)){
+				if( !Utils.isNull(condValue).equals("")){
+				  sql = condValue;
+				}
+			}else if("Customer_id".equalsIgnoreCase(condType)){
 				if( !Utils.isNull(condValue).equals("")){
 				  sql = condValue;
 				}
@@ -457,10 +475,11 @@ public class SecurityHelper {
 				condValue = rs.getString("role_data_access");
 				if( !Utils.isNull(condValue).equals("ALL")){
 				   List<References> dataList  = SAInitial.getInstance().getConditionValueList4Role(conn,condType,condValue,null);	
+				  
 				   if(dataList !=null && dataList.size()> 1){
-				     condDesc  += ((References)dataList.get(1)).getName()+",";
+				      condDesc  += ((References)dataList.get(1)).getName()+",";
 				   }else{
-					 condDesc  += ((References)dataList.get(0)).getName()+",";   
+					  condDesc  += ((References)dataList.get(0)).getName()+",";   
 				   }
 				}else{
 				   condDesc  += "ALL,";

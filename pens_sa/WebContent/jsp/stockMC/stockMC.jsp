@@ -70,7 +70,7 @@ String pageName = Utils.isNull(request.getParameter("pageName"));
  <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/calendar/jquery.calendars.picker.css" type="text/css" />
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script> 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.plugin.js"></script> 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.plus.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker.js"></script> 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai.js"></script>
@@ -96,9 +96,9 @@ function loadMe(){
 	<%if(stockMCForm.getResults() != null && stockMCForm.getResults().size() >0){ %>
 		<% List<StockMCBean> results = stockMCForm.getResults();
 		 for(int i=0;i<results.size();i++){ %>
-           $('#expireDate1_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('thai','th')});
-           $('#expireDate2_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('thai','th')});
-           $('#expireDate3_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('thai','th')});
+           $('#expireDate1_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('','')});
+           $('#expireDate2_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('','')});
+           $('#expireDate3_<%=(i+1)%>').calendarsPicker({calendar: $.calendars.instance('','')});
          
           // new Epoch('epoch_popup', 'th', document.getElementById('expireDate1_<%=(i+1)%>'));
            //new Epoch('epoch_popup', 'th', document.getElementById('expireDate2_<%=(i+1)%>'));

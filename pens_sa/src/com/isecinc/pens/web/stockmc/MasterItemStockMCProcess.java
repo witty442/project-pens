@@ -444,15 +444,16 @@ public class MasterItemStockMCProcess extends I_Action {
 		logger.debug("exportToExcel : ");
 		StockMCForm aForm = (StockMCForm) form;
 		StringBuffer resultTable = null;
-		String pageName = aForm.getPageName();
 		Connection conn = null;
+		User user = (User) request.getSession().getAttribute("user");
 		try {
 			conn = DBConnection.getInstance().getConnectionApps();
 			String idSelected =Utils.isNull(request.getSession().getAttribute("stock_mc_codes"));
+			String pageName = Utils.isNull(request.getParameter("pageName"));
 			
-			List<StockMCBean> items = StockMCDAO.searchStockMCReport(conn,idSelected);
+			List<StockMCBean> items = StockMCDAO.searchStockMCReport(pageName,conn,null,idSelected);
 		    if(items!= null && items.size() >0){
-		    	resultTable = StockMCExport.genExportStockMCReport(items);
+		    	resultTable = StockMCExport.genExportStockMCReport(pageName,user,items,true);
 				
 				java.io.OutputStream out = response.getOutputStream();
 				response.setHeader("Content-Disposition", "attachment; filename=data.xls");

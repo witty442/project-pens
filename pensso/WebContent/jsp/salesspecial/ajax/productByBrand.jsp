@@ -111,8 +111,8 @@ for(ProductCatalog catalog:catalogs) {
 <td class="number"><span name="totalLineAmtT"><%=lineAmtText%></span><input name="totalLineAmt" type="hidden" value="<%=lineAmt%>" />
 <input name="price1" type="hidden" value="<%=catalog.getPrice1()%>" />
 	<input name="price2" type="hidden" value="<%=catalog.getPrice2()%>" />
-	<input name="uom1" type="hidden" value="<%=catalog.getUom1()%>" />
-	<input name="uom2" type="hidden" value="<%=catalog.getUom2()%>" />
+	<input name="uom1" type="hidden" value="<%=catalog.getUom1Display()%>" /> 
+	<input name="uom2" type="hidden" value="<%=catalog.getUom2Display()%>" />
 	<input name="productName" type="hidden" value="<%=catalog.getProductNameDisplay()%>" />
 	<input name="productCode" type="hidden" value="<%=catalog.getProductCode()%>" />
 	<input name="productId" type="hidden" value="<%=catalog.getProductId()%>" />

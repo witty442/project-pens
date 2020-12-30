@@ -29,7 +29,6 @@ import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.summary.process.GenerateMonthEndLotus;
-import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
 import com.isecinc.pens.web.batchtask.BatchTaskForm;
 import com.isecinc.pens.web.batchtask.task.GenStockOnhandRepTempTask;
 import com.isecinc.pens.web.summary.report.OpenBillRobinsonReportAction;
@@ -353,46 +352,7 @@ public class SummaryAction extends I_Action {
 							summaryForm.getOnhandSummary().setInitDate(DateUtil.stringValue(initDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 							request.setAttribute("Message", "ไม่พบข่อมูล");
 						}
-					}
-				}else if("reportEndDateLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
-					//set for display by page
-					request.getSession().setAttribute("summary" ,null);
-					summaryForm.setPage("reportEndDateLotus");
-					
-					//Validate asOfdate Must over than max End Date
-					String[] resultsValidate = ControlConstantsDB.canGenEndDateLotus(summaryForm.getOnhandSummary().getPensCustCodeFrom(),summaryForm.getOnhandSummary().getSalesDate());
-					if(resultsValidate[0].equals("false")){
-						summaryForm.setResults(null);
-						request.setAttribute("Message", "กรุณากรอก วันที่ขาย (As Of) มากกว่า วันที่ปิดสต๊อกล่าสุด ");
-					}else{
-						List<OnhandSummary> results = null;
-						OnhandSummary sumBean = new SummaryDAO().searchReportEndDateLotusAllStore(summaryForm,summaryForm.getOnhandSummary(),user);
-						
-						results = sumBean.getItemsList();
-						if (results != null  && results.size() >0) {
-							summaryForm.setResults(results);
-							request.getSession().setAttribute("summary", sumBean.getSummary());
-							
-							//logger.debug("results:"+summaryForm.getResults());
-							ImportDAO importDAO = new ImportDAO();
-							Master m = importDAO.getStoreName("Store", summaryForm.getOnhandSummary().getPensCustCodeFrom());
-							if(m != null)
-							  summaryForm.getOnhandSummary().setPensCustNameFrom(m.getPensDesc());
-							
-						} else {
-							summaryForm.setResults(null);
-							request.getSession().setAttribute("summary", null);
-							request.setAttribute("Message", "ไม่พบข่อมูล");
-						}
-						
-						//By StoreCode ONLY ,All Store Not Set
-						if( !Utils.isNull(summaryForm.getOnhandSummary().getPensCustCodeFrom()).equals("ALL")
-							&& Utils.isNull(summaryForm.getOnhandSummary().getPensCustCodeFrom()).indexOf(",") == -1){
-						   summaryForm.setEndDate(GenerateStockEndDateLotus.getEndDateStock(summaryForm.getOnhandSummary().getPensCustCodeFrom()));
-						   summaryForm.setEndSaleDate(GenerateStockEndDateLotus.getEndSaleDateLotus(summaryForm.getOnhandSummary().getPensCustCodeFrom(),summaryForm.getOnhandSummary().getSalesDate()) );
-						}
-					}
-						
+					}	
 				}else if("monthEndLotus".equalsIgnoreCase(Utils.isNull(request.getParameter("page"))) ){
 					List<OnhandSummary> results = new SummaryDAO().searchOnhandMonthEndLotus(summaryForm,summaryForm.getOnhandSummary(),user);
 					summaryForm.setPage("monthEndLotus");

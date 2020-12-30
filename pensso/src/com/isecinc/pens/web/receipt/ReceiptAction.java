@@ -41,7 +41,7 @@ import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DBConnectionApps;
 import com.pens.util.DateToolsUtil;
-import com.pens.util.NumberToolsUtil;
+import com.pens.util.NumberUtil;
 
 /**
  * Receipt Action
@@ -355,7 +355,7 @@ public class ReceiptAction extends I_Action {
 				for (String s : by.getAllPaid().trim().split("\\|")) {
 					//paidAmount += Double.parseDouble(s); //OLD CODE
 					logger.debug("allPaid:"+s);
-					paidAmount += NumberToolsUtil.strToDouble(s);//WIT EDIT 25/03/2011
+					paidAmount += NumberUtil.strToDouble(s);//WIT EDIT 25/03/2011
 				}
 				remainAmount = receiptAmount - paidAmount;
 				by.setPaidAmount(paidAmount);

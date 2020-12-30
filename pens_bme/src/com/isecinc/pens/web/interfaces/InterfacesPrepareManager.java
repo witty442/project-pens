@@ -113,21 +113,6 @@ public class InterfacesPrepareManager {
 				//clear Task running for next run
 				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_ITEM_MASTER_HISHER);
 				
-			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS)
-					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
-				//default value
-				InterfaceBean bean =new InterfaceBean();
-				bean.setTransactionDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			    bean.setTextFileName("");
-				bean.setOutputPath("");//Gen
-				
-				interfacesForm.setBean(bean);
-				logger.debug("transaDate:"+interfacesForm.getBean().getTransactionDate());
-				
-				//clear Task running for next run
-				dao.updateControlMonitor(new BigDecimal(0),Constants.TYPE_GEN_STOCK_ENDDATE_LOTUS);
-				
-				
 			}else if(Utils.isNull(request.getParameter("pageName")).equalsIgnoreCase(Constants.TYPE_IMPORT_SALEOUT_WACOAL)
 					&& Utils.isNull(request.getParameter("pageAction")).equalsIgnoreCase("NEW")){
 				//default value

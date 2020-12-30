@@ -23,24 +23,20 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Master;
-import com.isecinc.pens.bean.OnhandSummary;
 import com.isecinc.pens.bean.StoreBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.GeneralDAO;
 import com.isecinc.pens.dao.ImportDAO;
 import com.isecinc.pens.dao.StoreDAO;
-import com.isecinc.pens.dao.SummaryDAO;
 import com.isecinc.pens.dao.constants.ControlConstantsDB;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.summary.process.GenerateStockEndDateLotus;
 import com.isecinc.pens.web.batchtask.BatchTaskConstants;
 import com.isecinc.pens.web.batchtask.BatchTaskForm;
 import com.isecinc.pens.web.batchtask.task.GenStockOnhandRepTempTask;
 import com.isecinc.pens.web.reportall.ReportAllBean;
 import com.isecinc.pens.web.reportall.ReportAllForm;
 import com.isecinc.pens.web.reportall.sql.ReportEndDateLotusSQL;
-import com.isecinc.pens.web.summary.SummaryForm;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
@@ -167,8 +163,8 @@ public class ReportEndDateLotusAction extends I_Action {
 					//By StoreCode ONLY ,All Store Not Set
 					if( !Utils.isNull(aForm.getBean().getPensCustCodeFrom()).equals("ALL")
 						&& Utils.isNull(aForm.getBean().getPensCustCodeFrom()).indexOf(",") == -1){
-						aForm.getBean().setEndDate(GenerateStockEndDateLotus.getEndDateStock(aForm.getBean().getPensCustCodeFrom()));
-						aForm.getBean().setEndSaleDate(GenerateStockEndDateLotus.getEndSaleDateLotus(aForm.getBean().getPensCustCodeFrom(),aForm.getBean().getSalesDate()) );
+						aForm.getBean().setEndDate(getEndDateStock(aForm.getBean().getPensCustCodeFrom()));
+						aForm.getBean().setEndSaleDate(getEndSaleDateLotus(aForm.getBean().getPensCustCodeFrom(),aForm.getBean().getSalesDate()) );
 					}
 				}
 			}
@@ -306,13 +302,17 @@ public class ReportEndDateLotusAction extends I_Action {
 			item.setOnhandQty(Utils.decimalFormat(onhand_qty,Utils.format_current_no_disgit));
 			item.setOnhandAmt(Utils.decimalFormat(onhand_amt,Utils.format_current_2_disgit));
 			
+			logger.debug("**query success***");
 			//convert Map to List
 			pos = new ArrayList<ReportAllBean>(rowMap.values());
+			logger.debug("**Start sort***");
 			//Sort by StoreCode,GroupCode
 			 Collections.sort(pos, ReportAllBean.Comparators.STORE_CODE_GROUP_ASC);
 			 
 			c.setSummary(item);
 			c.setItemsList(pos);
+			
+			logger.debug("** success***");
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -452,6 +452,32 @@ public class ReportEndDateLotusAction extends I_Action {
 			
 			request.getSession().setAttribute("BATCH_PARAM_MAP",batchParaMap);
 			request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.GEN_STOCK_ONHAND_REP_TEMP);//set to popup page to BatchTask
+		} catch (Exception e) {
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+			logger.error(e.getMessage(),e);
+			throw e;
+		}finally{
+		}
+		return mapping.findForward("reportAll");
+	}
+	
+	/** For batch popup TaskName: GenStockOnhandTempTask **/
+	/** Prepare parameter **/
+	public ActionForward genReportCompareEndDateLotus(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("submit genReportCompareEndDateLotus");
+		ReportAllForm aForm = (ReportAllForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		try {
+			//Prepare Parameter to BatchTask
+			Map<String, String> batchParaMap = new HashMap<String, String>();
+			batchParaMap.put(GenStockOnhandRepTempTask.PARAM_ASOF_DATE, aForm.getBean().getSalesDate());
+			batchParaMap.put(GenStockOnhandRepTempTask.PARAM_STORE_CODE, aForm.getBean().getPensCustCodeFrom());
+			
+			logger.debug("storeCode:"+aForm.getBean().getPensCustCodeFrom());
+			logger.debug("asOfDate:"+aForm.getBean().getSalesDate());
+			
+			request.getSession().setAttribute("BATCH_PARAM_MAP",batchParaMap);
+			request.setAttribute("BATCH_TASK_NAME",BatchTaskConstants.GEN_REPORT_COMP_ENDDATE_LOTUS);//set to popup page to BatchTask
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
 			logger.error(e.getMessage(),e);
@@ -623,4 +649,109 @@ public class ReportEndDateLotusAction extends I_Action {
 		}
 		return h;
 	}
+	public static String getEndDateStock(String storeCode) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		String r = "";
+		try {
+			//Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			//String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			sql.append("\n select distinct max(ending_date) as max_ending_date FROM PENSBME_ENDDATE_STOCK WHERE 1=1 ");
+			sql.append("\n and store_code ='"+storeCode+"'");
+		
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if(rst.next()){
+				r = DateUtil.stringValue(rst.getDate("max_ending_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			}
+			
+			return r;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		
+	}
+	public static String getEndSaleDateLotus(String storeCode,String asOfDate) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		String r = "";
+		try {
+			Date asofDateTemp = DateUtil.parse(asOfDate, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			
+			sql.append("\n select distinct max(sales_date) as max_ending_date FROM PENSBME_SALES_FROM_LOTUS WHERE 1=1 ");
+			sql.append("\n and pens_cust_code ='"+storeCode+"'");
+		
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if(rst.next()){
+				if(rst.getDate("max_ending_date").before(asofDateTemp)){
+				   r = DateUtil.stringValue(rst.getDate("max_ending_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				}else{
+				   r = asOfDate;
+				}
+			}
+			
+			return r;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+	}
+	public static String getEndDateStockTemp(String storeCode) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		String r = "";
+		try {
+			//Date asofDateTemp = Utils.parse(asOfdate, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			//String christAsOfDateStr = Utils.stringValue(asofDateTemp, Utils.DD_MM_YYYY_WITH_SLASH);
+			
+			sql.append("\n select distinct max(ending_date) as max_ending_date FROM PENSBME_ENDDATE_STOCK_TEMP WHERE 1=1 ");
+			sql.append("\n and store_code ='"+storeCode+"'");
+		
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if(rst.next()){
+				r = DateUtil.stringValue(rst.getDate("max_ending_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			}
+			
+			return r;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		
+	}
+ 
 }

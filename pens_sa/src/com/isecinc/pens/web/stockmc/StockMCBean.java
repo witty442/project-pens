@@ -8,14 +8,16 @@ import com.isecinc.pens.bean.User;
 
 public class StockMCBean implements Serializable{
 
-
-
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 122668609503507874L;
 	private int id;
 	private String stockDate;
+	private String stockDateFrom;
+	private String stockDateTo;
+	private String productCodeFrom;
+	private String productCodeTo;
 	private String customerCode;
 	private String customerName;
 	private String storeCode;
@@ -24,7 +26,10 @@ public class StockMCBean implements Serializable{
 	
 	private String createUser;
 	private String updateUser;
-	
+	private String brand;
+	private String brandName;
+	private String brandFrom;
+	private String brandTo;
 	private List<StockMCBean> items;
 	private long lineId;
 	private long no;
@@ -62,8 +67,63 @@ public class StockMCBean implements Serializable{
 	//for delete lineIdArr
 	private String lineIdDeletes;
     private String endDate;
-     
+    private String dispHaveCheckStock;
 	
+    
+	public String getBrandFrom() {
+		return brandFrom;
+	}
+	public void setBrandFrom(String brandFrom) {
+		this.brandFrom = brandFrom;
+	}
+	public String getBrandTo() {
+		return brandTo;
+	}
+	public void setBrandTo(String brandTo) {
+		this.brandTo = brandTo;
+	}
+	public String getProductCodeFrom() {
+		return productCodeFrom;
+	}
+	public void setProductCodeFrom(String productCodeFrom) {
+		this.productCodeFrom = productCodeFrom;
+	}
+	public String getProductCodeTo() {
+		return productCodeTo;
+	}
+	public void setProductCodeTo(String productCodeTo) {
+		this.productCodeTo = productCodeTo;
+	}
+	public String getBrand() {
+		return brand;
+	}
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
+	public String getBrandName() {
+		return brandName;
+	}
+	public void setBrandName(String brandName) {
+		this.brandName = brandName;
+	}
+	public String getStockDateFrom() {
+		return stockDateFrom;
+	}
+	public void setStockDateFrom(String stockDateFrom) {
+		this.stockDateFrom = stockDateFrom;
+	}
+	public String getStockDateTo() {
+		return stockDateTo;
+	}
+	public void setStockDateTo(String stockDateTo) {
+		this.stockDateTo = stockDateTo;
+	}
+	public String getDispHaveCheckStock() {
+		return dispHaveCheckStock;
+	}
+	public void setDispHaveCheckStock(String dispHaveCheckStock) {
+		this.dispHaveCheckStock = dispHaveCheckStock;
+	}
 	public String getEndDate() {
 		return endDate;
 	}

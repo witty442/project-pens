@@ -50,6 +50,9 @@ public class ImportManualExcel {
 			
 			//importExcel("ORACLE","UAT","d://dev_temp//temp//ImportManualExcel/pd_sales_zone.xlsx",3,0);
 			
+			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/invoice.xlsx",0,1,0);//sheet0
+			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/invoice.xlsx",1,1,0);//sheet1
+			
 			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/Thailand Zip Code.xlsx",4,0);
 			
 			/*importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/ร้านค้าเครดิต.xlsx",0,3,0);
@@ -61,7 +64,7 @@ public class ImportManualExcel {
 			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/Master Buds.xlsx",8,0);
 			
 			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/projectc_branch_tt.xlsx",10,0);
-			importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/projectc_target_tt.xlsx",7,0);
+			//importExcel("ORACLE","PRODUCTION","d://dev_temp//temp//ImportManualExcel/projectc_target_tt.xlsx",7,0);
 		}catch(Exception e){
 			e.printStackTrace();
 		}

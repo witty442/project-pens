@@ -34,15 +34,29 @@ String codes = Utils.isNull(session.getAttribute("stock_mc_codes"));
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/popup.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/page/stockMC.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+
+<!-- Calendar -->
+ <link rel="StyleSheet" href="${pageContext.request.contextPath}/css/calendar/jquery.calendars.picker.css" type="text/css" />
+<%-- <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.10.0.js"></script>  --%>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.plugin.js"></script> 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.plus.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker.js"></script> 
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.thai-th.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar/jquery.calendars.picker-th.js"></script>
+
+<!-- For fix Head and Column Table -->
+
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-stickytable-3.0.js"></script>
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/jquery-stickytable-3.0.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 
 <script type="text/javascript">
 
@@ -56,7 +70,8 @@ window.onload = function(){
 }
 function loadMe(){
 	MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png');
-	new Epoch('epoch_popup','th',document.getElementById('stockDate'));
+	  $('#stockDateFrom').calendarsPicker({calendar: $.calendars.instance('','')});
+	  $('#stockDateTo').calendarsPicker({calendar: $.calendars.instance('','')});
 }
 function clearForm(path){
 	var form = document.stockMCForm;
@@ -67,11 +82,16 @@ function clearForm(path){
 }
 function search(path){
 	var form = document.stockMCForm;
-/* 	if( form.startDate.value ==""&& form.endDate.value==""){
-		alert("กรุณาระบุวันที่");
-		form.startDate.focus();
+
+ 	if(   form.stockDateFrom.value =="" && form.stockDateTo.value==""
+ 	   && form.customerCode.value =="" && form.storeCode.value==""
+ 	   && form.brandFrom.value =="" && form.brandTo.value==""
+ 	   && form.productCodeFrom.value =="" && form.productCodeTo.value==""
+ 	  ){
+		alert("กรุณาระบุ เงื่อนไข 1 อย่าง");
+		form.stockDateFrom.focus();
 		return false;
-	} */
+	} 
 	
 	form.action = path + "/jsp/stockMCAction.do?do=searchHead&action=newsearch";
 	form.submit();
@@ -93,11 +113,6 @@ function openEdit(path,action,id){
 
 function exportToExcel(path){
 	var form = document.stockMCForm;
-	var codes = document.getElementsByName("codes")[0].value;
-	if(codes == ''){
-		alert("กรุณาระบุ รายการที่ต้องการ Export ก่อน");
-		return false;
-	}
 	form.action = path + "/jsp/stockMCAction.do?do=exportToExcel&action=newsearch";
 	form.submit();
 	return true;
@@ -179,6 +194,86 @@ function removeUnSelected(codeCheck){
 	codesAllNew = codesAllNew.substring(0,codesAllNew.length-1);
 	document.getElementsByName("codes")[0].value =  codesAllNew;
 }
+/** auto Key Get Detail **/
+function getAutoOnblur(e,obj,pageName){
+	var form = document.stockMCForm;
+	if(obj.value ==''){
+		if("CustomerStockMC" == pageName){
+		  form.customerCode.value = '';
+		  form.customerName.value = '';
+		}else if("Brand" == pageName){
+		  form.brand.value = '';
+		  form.brandName.value = '';
+		}
+	}else{
+		getAutoDetail(obj,pageName);
+	}
+}
+/** enter **/
+function getAutoKeypress(e,obj,pageName){
+	var form = document.stockMCForm;
+	if(e != null && e.keyCode == 13){
+		if(obj.value ==''){
+			if("CustomerStockMC" == pageName){
+				form.customerCode.value = '';
+				form.customerName.value = '';
+			}else if("Brand" == pageName){
+			    form.brand.value = '';
+			    form.brandName.value = '';
+			}
+		}else{
+			getAutoDetail(obj,pageName);
+		}
+	}
+}
+
+function getAutoDetail(obj,pageName){
+	var returnString = "";
+	var form = document.stockMCForm;
+	
+	//prepare parameter
+	var param  ="pageName="+pageName;
+	if("CustomerStockMC"==pageName){
+		param +="&customerCode="+obj.value;
+	}else if("Brand"==pageName){
+		param +="&brand="+obj.value;
+	}
+	var getData = $.ajax({
+			url: "${pageContext.request.contextPath}/jsp/ajax/getAutoKeypressAjax.jsp",
+			data : param,
+			async: false,
+			cache: false,
+			success: function(getData){
+			  returnString = jQuery.trim(getData);
+			}
+		}).responseText;
+	 
+	if("CustomerStockMC" == pageName){
+		var retArr = returnString.split("|");
+		//alert(returnString);
+		if(retArr[0] !=-1){
+			form.customerCode.value = retArr[1];
+			form.customerName.value = retArr[2];
+		}else{
+			alert("ไม่พบข้อมูล");
+			form.customerCode.focus();
+			form.customerCode.value = '';
+			form.customerName.value = "";
+		}
+	}else if("Brand" == pageName){
+		var retArr = returnString.split("|");
+		//alert(returnString);
+		if(retArr[0] !=-1){
+			form.brand.value = retArr[1];
+			form.brandName.value = retArr[2];
+		}else{
+			alert("ไม่พบข้อมูล");
+			form.brand.focus();
+			form.brand.value = '';
+			form.brandName.value = "";
+		}
+	}
+}
 
 </script>
 </head>		
@@ -225,22 +320,50 @@ function removeUnSelected(codeCheck){
 						   <table align="center" border="0" cellpadding="3" cellspacing="0" >
 					       <tr>
 				                <td>วันที่ตรวจนับสต๊อก<font color="red"></font></td>
-								<td>		
-			                        <html:text property="bean.stockDate" styleId="stockDate" size="15" readonly="true" styleClass=""/>					    
+								<td colspan="3">		
+			                        <html:text property="bean.stockDateFrom" styleId="stockDateFrom" size="15" readonly="true" styleClass=""/>					    
+								    -
+								    <html:text property="bean.stockDateTo" styleId="stockDateTo" size="15" readonly="true" styleClass=""/>					    
 								</td>
-								<td> </td>
-								<td> </td>
 							</tr>
 							<tr>
 				                <td align="right"> ห้าง  </td>
 								<td colspan="2">
 								  <html:text property="bean.customerCode" styleId="customerCode" 
-								    size="10"  styleClass="\" autoComplete=\"off"
-									onkeypress="getCustNameKeypress(event,this)"/>
+								    size="15"  styleClass="\" autoComplete=\"off"
+									onkeypress="getAutoKeypress(event,this,'CustomerStockMC')"
+					                onblur="getAutoOnblur(event,this,'CustomerStockMC')"
+									/>
 								    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','CustomerStockMC')"/>   
 								   <html:text property="bean.customerName" styleId="customerName" size="40" readonly="true" styleClass="disableText"/>
+								   สาขา 
+								  <html:text property="bean.storeCode" styleId="storeCode" 
+								    size="10"  styleClass="\" autoComplete=\"off"/>
+								    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','BranchStockMC')"/>   
+								   <html:hidden property="bean.storeName" styleId="storeName"/>
+								</td>
+								
+							</tr>	
+							<tr>
+				                <td align="right"> แบรนด์ </td>
+								<td colspan="2">
+								  <html:text property="bean.brandFrom" styleId="brandFrom" 
+								    size="15"  styleClass="\" autoComplete=\"off"/>
+								  -
+								  <html:text property="bean.brandTo" styleId="brandTo" 
+								    size="15"  styleClass="\" autoComplete=\"off"/>
 								</td>
 							</tr>	
+							 <tr>
+				                <td align="right">รหัสสินค้า</td>
+								<td colspan="3">		
+			                        <html:text property="bean.productCodeFrom" styleId="productCodeFrom" size="15" styleClass="\" autoComplete=\"off"/>					    
+								    -
+								    <html:text property="bean.productCodeTo" styleId="productCodeTo" size="15" styleClass="\" autoComplete=\"off"/>					    
+								&nbsp;&nbsp;&nbsp;&nbsp;<html:checkbox property="bean.dispHaveCheckStock">&nbsp;&nbsp;แสดงเฉพาะ SKU ที่มีการบันทึกข้อมูล</html:checkbox>
+								
+								</td>
+							</tr>
 					   </table>
 					   <table  border="0" cellpadding="3" cellspacing="0" >
 							<tr>
@@ -258,10 +381,21 @@ function removeUnSelected(codeCheck){
 							</tr>
 						</table>
 					    
-					 	    <!-- ************************Result *************-->
-					 	    <c:if test="${stockMCForm.results != null}">
-					 	    
-						    </c:if>		
+					 	   <!-- ************************Result *************-->
+					 	    <%
+					 	    if(request.getAttribute("RESULTS") !=null){
+					 	    	out.println(((StringBuffer)request.getAttribute("RESULTS")).toString());
+					 	    %>
+					 	      <script>
+								  //load jquery
+								   $(function() {
+										//Load fix column and Head
+										$('#myTable').stickyTable({overflowy: true});
+									});
+								</script>
+					 	    <%
+					 	    }
+					 	    %>
 					 	</div>
 					 	
 					 	<!-- INPUT HIDDEN -->

@@ -685,8 +685,9 @@ function ReplaceAll( inText, inFindStr, inReplStr, inCaseSensitive ) {
  	     param  += "&condDisp2="+condDisp2;
  	     param  += "&condDisp3="+condDisp3;
  	     param  += "&condDisp4="+condDisp4;
- 	     param  += "&condDisp5="+condDisp5
+ 	     param  += "&condDisp5="+condDisp5;
  	     param  += "&reportName="+document.getElementById('reportName').value
+ 	     param  += "&action=new";
  	     
  	 $(function(){
  			var getData = $.ajax({

@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.bean.User;
+import com.isecinc.pens.dao.SalesrepZoneDAO;
 import com.isecinc.pens.exception.DataDuplicateException;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.DBConnection;
@@ -334,6 +335,9 @@ public class SalesTargetTTAction  {
 			bean.setUpdateUser(user.getUserName());
 			bean.setSessionId(request.getSession().getId());
 			
+			/** get division from SalesZone  zone =92 division=I (ice Buds) ,B:Van and credit**/
+			String division = Utils.isNull(bean.getSalesZone()).equals("92")?"I":"B";
+			bean.setDivision(division);
 			String errorCode = SalesTargetTTSUPERCopy.copyFromLastMonthByTTSUPER(user, bean,aForm.getPageName());
 			
 			if(errorCode.equalsIgnoreCase("DATA_CUR_EXIST_EXCEPTION")){
@@ -378,7 +382,12 @@ public class SalesTargetTTAction  {
 			paramBean.setUpdateUser(user.getUserName());
 			paramBean.setSessionId(request.getSession().getId());
 			
+			/** get division from SalesZone  zone =92 division=I (ice Buds) ,B:Van and credit**/
+			String division = Utils.isNull(paramBean.getSalesZone()).equals("92")?"I":"B";
+			paramBean.setDivision(division);
+			
 			String errorCode = SalesTargetTTSUPERCopyByBrand.copyBrandFromLastMonthByTTSUPER(user, paramBean,aForm.getPageName());
+			
 			if(errorCode.equalsIgnoreCase("DATA_CUR_EXIST_EXCEPTION")){
 				request.setAttribute("Message","ไม่สามารถ Copy ได้ เนื่องจากมีการบันทึกข้อมูลบางส่วนไปแล้ว");
 			}else if(errorCode.equalsIgnoreCase("DATA_MKT_NOT_POST_FOUND")){

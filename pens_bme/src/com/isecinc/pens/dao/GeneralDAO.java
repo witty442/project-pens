@@ -1461,7 +1461,7 @@ public class GeneralDAO {
 				sql.append("\n AND pens_value ='"+storeCode+"' \n");
 				sql.append("\n \n");
 				
-				//logger.debug("sql:"+sql);
+				logger.debug("sql:"+sql);
 
 				stmt = conn.createStatement();
 				rst = stmt.executeQuery(sql.toString());
@@ -1591,8 +1591,7 @@ public class GeneralDAO {
 			StringBuilder sql = new StringBuilder();
 			StoreBean s = null;
 			try {
-				sql.append("\n select *  ");
-				sql.append("\n FROM ");
+				sql.append("\n select * FROM ");
 				sql.append("\n PENSBI.PENSBME_MST_REFERENCE WHERE 1=1  and reference_code = 'Store' ");
 				sql.append("\n AND pens_value ='"+storeCode+"' \n");
 				sql.append("\n \n");

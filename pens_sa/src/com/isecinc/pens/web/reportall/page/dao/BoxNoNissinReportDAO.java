@@ -527,7 +527,7 @@ public class BoxNoNissinReportDAO {
 		   h.append("<td class='"+classText+"' width='15%'>"+item.getPdDesc()+"</td> \n");
 		}else{
 		   if( !excel){
-		      h.append("<td class='"+classTextCenter+"' width='8%'> </td>\n");
+		       h.append("<td class='"+classTextCenter+"' width='8%'> </td>\n");
 		   } 
 		   h.append("<td class='"+classTextCenter+"' width='7%'></td> \n");
 		   h.append("<td class='"+classTextCenter+"' width='5%'></td> \n");
