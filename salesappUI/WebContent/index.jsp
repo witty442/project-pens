@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <meta name="description" content="" />
-<title>Salesapp UI Index</title>
+<title>Salesapp UI Index XX</title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script>
 
