@@ -196,15 +196,11 @@ function removeUnSelected(codeCheck){
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;">
        
-		   <h1 class="h3 mb-3 font-weight-normal"><b>SALES ANALYSIS SYSTEM</b>
-		    &nbsp;&nbsp;&nbsp;
-		    <a href="${pageContext.request.contextPath}/?logoff=T" onmouseout="MM_swapImgRestore()" 
-        	  onmouseover="MM_swapImage('Image14','','${pageContext.request.contextPath}/images2/button_logout2.png',1)">
-        	  <img src="${pageContext.request.contextPath}/images2/button_logout1.png" 
-        	  name="Image14" width="60" height="60" border="0" id="Image14" />
-        	</a>
-		    </h1>
-		     
+            <!-- Include Header Mobile  -->
+            <jsp:include page="../templates/headerM.jsp"/>
+            <!-- /Include Header Mobile -->
+            
+		     stockMCMobileSearch
 			<a href="javascript:window.location='${pageContext.request.contextPath}/jsp/mainpage.jsp'">
 			  <input type="button" value="กลับหน้าหลัก " class="btn btn-primary"> 
 			</a>
@@ -349,6 +345,8 @@ function removeUnSelected(codeCheck){
             <input type="hidden" name="codes" value ="<%=codes%>" />
 		</html:form>
 		<!-- BODY -->
-					
+	    <!-- Include Footer Mobile  -->
+          <jsp:include page="../templates/footerM.jsp"/>
+        <!-- /Include Footer Mobile -->	
 </body>
 </html>

@@ -26,6 +26,7 @@ public class PerformanceReport implements Serializable {
 	private double receiptAmount;
 	private double aliAmount;
 	private double weAmount;
+	private double qrAmount;
 	private double airpayAmount;
 	private double vatAmount;
 	private String customerCode;
@@ -34,6 +35,7 @@ public class PerformanceReport implements Serializable {
 	private double vatReceipt;
 	private double vatAli;
 	private double vatWe;
+	private double vatQr;
 	private String chequeNo;
 	private String status;
 	private String airpayNo;
@@ -52,10 +54,44 @@ public class PerformanceReport implements Serializable {
 	private double allAirpayAmount;
 	private double allAliAmount;
 	private double allWeAmount;
+	private double allQrAmount;
 	private double allVatAliAmount;
 	private double allVatWeAmount;
+	private double allVatQrAmount;
 	
 	
+	public double getQrAmount() {
+		return qrAmount;
+	}
+
+	public void setQrAmount(double qrAmount) {
+		this.qrAmount = qrAmount;
+	}
+
+	public double getVatQr() {
+		return vatQr;
+	}
+
+	public void setVatQr(double vatQr) {
+		this.vatQr = vatQr;
+	}
+
+	public double getAllQrAmount() {
+		return allQrAmount;
+	}
+
+	public void setAllQrAmount(double allQrAmount) {
+		this.allQrAmount = allQrAmount;
+	}
+
+	public double getAllVatQrAmount() {
+		return allVatQrAmount;
+	}
+
+	public void setAllVatQrAmount(double allVatQrAmount) {
+		this.allVatQrAmount = allVatQrAmount;
+	}
+
 	public double getVatAli() {
 		return vatAli;
 	}

@@ -8,7 +8,11 @@ import java.util.Set;
 
 
 public class Test {
-
+	public static void main(String[] args) {
+		 String temp ="xx.jpg";
+        System.out.println(temp.substring(temp.indexOf("."),temp.length()));
+	}
+	
 	public static void main_2(String[] args) {
 		 String ddmmyyyy ="PD : PD บริษัท เอส.อาร์. ซุปเปอร์มาร์ท จำกัด(เพชรบูรณ์)";
          System.out.println("result:"+ddmmyyyy.replaceAll("\\/", ""));

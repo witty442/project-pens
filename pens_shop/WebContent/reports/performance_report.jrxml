@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="performance_report" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="2.0"/>
-	<property name="ireport.x" value="113"/>
-	<property name="ireport.y" value="169"/>
+	<property name="ireport.x" value="169"/>
+	<property name="ireport.y" value="160"/>
 	<parameter name="order_date" class="java.lang.String"/>
 	<parameter name="userPrint" class="java.lang.String"/>
 	<parameter name="total_discount" class="java.lang.Double"/>
@@ -15,11 +15,13 @@
 	<parameter name="total_receipt" class="java.lang.Double"/>
 	<parameter name="total_ali" class="java.lang.Double"/>
 	<parameter name="total_we" class="java.lang.Double"/>
+    <parameter name="total_qr" class="java.lang.Double"/>
 	<parameter name="total_visit" class="java.lang.Integer"/>
 	<parameter name="total_vat_cash" class="java.lang.Double"/>
 	<parameter name="total_vat_receipt" class="java.lang.Double"/>
 	<parameter name="total_vat_ali" class="java.lang.Double"/>
 	<parameter name="total_vat_we" class="java.lang.Double"/>
+    <parameter name="total_vat_qr" class="java.lang.Double"/>
 	<parameter name="total_customer" class="java.lang.Integer"/>
 	<parameter name="total_record_item" class="java.lang.Integer"/>
 	<parameter name="total_cancel_amount" class="java.lang.Double"/>
@@ -38,11 +40,13 @@
 	<field name="receiptAmount" class="java.lang.Double"/>
 	<field name="aliAmount" class="java.lang.Double"/>
 	<field name="weAmount" class="java.lang.Double"/>
+    <field name="qrAmount" class="java.lang.Double"/>
 	<field name="vatAmount" class="java.lang.Double"/>
 	<field name="vatCash" class="java.lang.Double"/>
 	<field name="vatReceipt" class="java.lang.Double"/>
 	<field name="vatAli" class="java.lang.Double"/>
 	<field name="vatWe" class="java.lang.Double"/>
+    <field name="vatQr" class="java.lang.Double"/>
 	<field name="creditCardNo" class="java.lang.String"/>
 	<field name="status" class="java.lang.String"/>
 	<variable name="v_sum_discount" class="java.lang.Double" calculation="Sum">
@@ -60,6 +64,9 @@
 	<variable name="v_sum_we" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$F{status}.equals("VO")?0:$F{weAmount}]]></variableExpression>
 	</variable>
+   <variable name="v_sum_qr" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{status}.equals("VO")?0:$F{qrAmount}]]></variableExpression>
+	</variable>
 	<variable name="v_sum_net" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$F{status}.equals("VO")?0:$F{netAmount}]]></variableExpression>
 	</variable>
@@ -74,6 +81,9 @@
 	</variable>
 	<variable name="v_sum_vat_we" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$F{status}.equals("VO")?0:$F{vatWe}]]></variableExpression>
+	</variable>
+    <variable name="v_sum_vat_qr" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{status}.equals("VO")?0:$F{vatQr}]]></variableExpression>
 	</variable>
 	<variable name="v_sum_vat" class="java.lang.Double" calculation="Sum">
 		<variableExpression><![CDATA[$F{status}.equals("VO")?0:$F{vatAmount}]]></variableExpression>
@@ -236,7 +246,7 @@
 				<text><![CDATA[ส่วนลด]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="429" y="1" width="55" height="38"/>
+				<reportElement x="483" y="1" width="72" height="38"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -288,19 +298,6 @@
 				<text><![CDATA[บัตรเครดิต]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="484" y="1" width="71" height="38"/>
-				<box>
-					<topPen lineWidth="1.0" lineStyle="Dashed"/>
-					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
-					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
-					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<text><![CDATA[ร้านค้า]]></text>
-			</staticText>
-			<staticText>
 				<reportElement x="123" y="1" width="28" height="38"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
@@ -327,20 +324,20 @@
 				<text><![CDATA[เลขที่ บัตรเครดิต]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="345" y="1" width="41" height="38"/>
+				<reportElement x="346" y="1" width="49" height="38"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
 					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
 					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
 				</box>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
 				<text><![CDATA[ALIPAY]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="386" y="1" width="43" height="38"/>
+				<reportElement x="394" y="1" width="45" height="38"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Dashed"/>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -351,6 +348,19 @@
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
 				<text><![CDATA[WECHAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="440" y="1" width="43" height="38"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Dashed"/>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<bottomPen lineWidth="1.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<text><![CDATA[QR CODE]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -377,17 +387,6 @@
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{orderNo}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="488" y="0" width="65" height="20"/>
-				<box>
-					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
-					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
-				</box>
-				<textElement>
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{customerName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToTallestObject" x="300" y="0" width="45" height="20"/>
@@ -445,7 +444,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{status}.equals( "VO" )?"\u0e22\u0e01\u0e40\u0e25\u0e34\u0e01":""]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="429" y="0" width="54" height="20"/>
+				<reportElement stretchType="RelativeToTallestObject" x="490" y="0" width="65" height="20"/>
 				<box>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
 					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -456,7 +455,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{netAmount}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="346" y="0" width="41" height="20"/>
+				<reportElement stretchType="RelativeToTallestObject" x="348" y="0" width="48" height="20"/>
 				<box>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
 					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -467,7 +466,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{aliAmount}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="388" y="0" width="40" height="20"/>
+				<reportElement stretchType="RelativeToTallestObject" x="399" y="0" width="40" height="20"/>
 				<box>
 					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
 					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
@@ -476,6 +475,17 @@
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{weAmount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToTallestObject" x="443" y="0" width="40" height="20"/>
+				<box>
+					<leftPen lineWidth="0.0" lineStyle="Dashed"/>
+					<rightPen lineWidth="0.0" lineStyle="Dashed"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{qrAmount}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -531,32 +541,6 @@
 			</staticText>
 			<staticText>
 				<reportElement x="123" y="105" width="49" height="20"/>
-				<box>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="484" y="105" width="72" height="20"/>
-				<box>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="484" y="85" width="72" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -647,7 +631,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_receipt}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="429" y="43" width="54" height="20"/>
+				<reportElement x="490" y="44" width="62" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -686,19 +670,6 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_cash}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="484" y="44" width="70" height="20"/>
-				<box>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
-			<staticText>
 				<reportElement x="123" y="86" width="49" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
@@ -725,7 +696,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_receipt}-$P{total_vat_receipt}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="429" y="105" width="55" height="20"/>
+				<reportElement x="490" y="106" width="62" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -764,7 +735,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_cash}-$V{v_sum_vat_cash}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="429" y="84" width="54" height="20"/>
+				<reportElement x="490" y="84" width="62" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -856,7 +827,7 @@ ____/____/____]]></text>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_receipt}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="429" y="2" width="54" height="20"/>
+				<reportElement x="490" y="3" width="62" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -868,19 +839,6 @@ ____/____/____]]></text>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_net}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="488" y="2" width="66" height="20"/>
-				<box>
-					<topPen lineWidth="0.0"/>
-					<leftPen lineWidth="0.0"/>
-					<bottomPen lineWidth="0.0"/>
-					<rightPen lineWidth="0.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Angsana New" size="14"/>
-				</textElement>
-				<text><![CDATA[]]></text>
-			</staticText>
 			<line>
 				<reportElement x="0" y="43" width="555" height="1"/>
 				<graphicElement>
@@ -894,7 +852,7 @@ ____/____/____]]></text>
 				</graphicElement>
 			</line>
 			<textField pattern="#,##0.00">
-				<reportElement x="429" y="22" width="54" height="20"/>
+				<reportElement x="490" y="24" width="62" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -921,7 +879,7 @@ ____/____/____]]></text>
 				<text><![CDATA[พิมพ์วันที่ : ]]></text>
 			</staticText>
 			<textField pattern="#,##0.00">
-				<reportElement x="346" y="2" width="40" height="20"/>
+				<reportElement x="348" y="2" width="46" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -934,7 +892,7 @@ ____/____/____]]></text>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_ali}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="387" y="3" width="41" height="20"/>
+				<reportElement x="399" y="3" width="40" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -947,7 +905,7 @@ ____/____/____]]></text>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_we}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="345" y="44" width="41" height="20"/>
+				<reportElement x="348" y="44" width="46" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -960,7 +918,7 @@ ____/____/____]]></text>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_ali}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="388" y="44" width="40" height="20"/>
+				<reportElement x="399" y="44" width="40" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -973,7 +931,7 @@ ____/____/____]]></text>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_we}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="346" y="84" width="40" height="20"/>
+				<reportElement x="348" y="84" width="46" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -986,7 +944,7 @@ ____/____/____]]></text>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_ali}-$V{v_sum_vat_ali}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="388" y="84" width="39" height="20"/>
+				<reportElement x="399" y="84" width="40" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -999,7 +957,7 @@ ____/____/____]]></text>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_we}-$V{v_sum_vat_we}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="346" y="106" width="40" height="20"/>
+				<reportElement x="348" y="106" width="46" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -1012,7 +970,7 @@ ____/____/____]]></text>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_ali}-$P{total_vat_ali}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement x="389" y="106" width="38" height="20"/>
+				<reportElement x="399" y="106" width="40" height="20"/>
 				<box>
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
@@ -1023,6 +981,58 @@ ____/____/____]]></text>
 					<font fontName="Angsana New" size="14"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_we}-$P{total_vat_we}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="443" y="3" width="40" height="20"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_qr}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="443" y="43" width="40" height="20"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_qr}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="443" y="84" width="40" height="20"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{v_sum_qr}-$V{v_sum_vat_qr}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="443" y="105" width="40" height="20"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Angsana New" size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$P{total_qr}-$P{total_vat_qr}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

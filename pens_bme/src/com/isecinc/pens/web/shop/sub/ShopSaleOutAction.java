@@ -337,10 +337,13 @@ public class ShopSaleOutAction {
 			sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
 			sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 			sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
-			sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,XXPENS_OM_ITEM_MST_V I");
+			sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
+			sql.append("\n   ,PENSBI.BME_PRODUCT_GROUP PG ");
 			sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
 			sql.append("\n   AND MP.pens_desc6 in ('MAYA' , 'TM21') ");
-			sql.append("\n   AND MP.pens_value =I.segment1 ");
+			sql.append("\n   AND MP.pens_value = I.segment1 ");
+			sql.append("\n   AND MP.pens_value = PG.PENS_ITEM ");
+			sql.append("\n   AND MP.INTERFACE_DESC  = PG.barcode ");
 			sql.append("\n ) MP ");
 			sql.append("\n WHERE M.ORDER_NUMBER = D.ORDER_NUMBER ");
 			sql.append("\n AND D.product_id = MP.product_id ");

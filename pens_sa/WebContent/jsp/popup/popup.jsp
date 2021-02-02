@@ -308,7 +308,13 @@ window.onload = function(){
 			 <%if(!"true".equals(hideAll)){ %><input type ="checkbox" name="chCheckAll" id="chCheckAll" onclick="selectAll();"  />&nbsp; เลือกทั้งหมด <%} %>
 	     </div>
 	  </div>
-  <%}	 %>
+  <%}else{	 %>
+     <div class="row mb-1">
+	      <div class="col-12 themed-grid-col-detail" align="center">
+	          <input type="button" name="Close" value="ปิดหน้าจอนี้" onclick="javascript:window.close();" style="width:120px" class="btn btn-primary" />
+	      </div>
+	 </div>
+  <%} %>
 <!-- </div> -->
 
 <!-- RESULT -->

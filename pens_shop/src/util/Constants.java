@@ -25,4 +25,5 @@ public class Constants {
 	public static final String PAYMT_ALI = "ALI";
 	public static final String PAYMT_WE = "WE";
 	public static final String PAYMT_GOV = "GOV";
+	public static final String PAYMT_QR = "QR";
 }

@@ -100,7 +100,6 @@ public class StockMCQueryProcess  extends I_Action{
 			String pageName = Utils.isNull(request.getParameter("pageName"));
 			logger.debug("action:"+action+",mobile:"+mobile);
 			
-			
 			//init connection
 			conn = DBConnection.getInstance().getConnectionApps();
 			
@@ -197,7 +196,7 @@ public class StockMCQueryProcess  extends I_Action{
 			conn = DBConnection.getInstance().getConnectionApps();
 			
 			 aForm.setMode("edit");
-			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode(),0));
+			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode(),"",0));
 			
 			// save token
 			saveToken(request);			

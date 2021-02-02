@@ -65,7 +65,14 @@
              <forward name="pass_user_new" path="/jsp/aReportAction.do?do=prepare&amp;action=new&amp;reportName=SalesAnalyst" redirect="true" /> 
              <forward name="pass_salestarget" path="/jsp/mainpage.jsp" redirect="true" /> 
              <forward name="pass_mcentry" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new&amp;pageName=STOCKMC" redirect="true" /> 
-			 <forward name="pass_mcentryMobile" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new&amp;pageName=STOCKMC" redirect="true" /> 
+			 
+			 <!-- Version 1 -->
+			 <!--  <forward name="pass_mcentryMobile" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new&amp;pageName=STOCKMC" redirect="true" /> 
+ 		  -->
+ 		  
+             <!-- Version 2 -->
+			  <forward name="pass_mcentryMobile" path="/jsp/stockMCAction.do?do=stockMCMStep1&amp;action=new" redirect="true" /> 
+			  
 			 <forward name="pathRedirect" path="/redirectPage.jsp" /> 
 			 <forward name="fail" path="/index.jsp" /> 
 		</action>
@@ -162,12 +169,22 @@
 			<forward name="detail" path="/jsp/stockMC/stockMC.jsp" />
 			
 		    <forward name="stockMCQuery" path="/jsp/stockMC/stockMCQuerySearch.jsp"/>
-				
-			<forward name="searchMobile" path="/jsp/stockMC/stockMCMobileSearch.jsp"/>
-			<forward name="detailMobile" path="/jsp/stockMC/stockMCMobile.jsp" />
-			
+		    
+			<!-- OLD -->	
+			<!-- <forward name="searchMobile" path="/jsp/stockMC/stockMCMobileSearch.jsp"/> -->
+			<!-- <forward name="detailMobile" path="/jsp/stockMC/stockMCMobile.jsp" /> -->
+			<!-- NEW -->
+		    <forward name="searchMobile" path="/jsp/stockMC/stockMCMSearch.jsp"/> 
+			<forward name="detailMobile" path="/jsp/stockMC/stockMCMSearchDetail.jsp" />
+		
 			<forward name="searchMasterItem" path="/jsp/stockMC/stockMCMasterItemSearch.jsp" />
 			<forward name="detailMasterItem" path="/jsp/stockMC/stockMCMasterItem.jsp" />
+			
+			 <forward name="stockMCMStep1" path="/jsp/stockMC/stockMCMStep1.jsp"/>
+			 <forward name="stockMCMStep2" path="/jsp/stockMC/stockMCMStep2.jsp"/>
+			 <forward name="stockMCMStep3" path="/jsp/stockMC/stockMCMStep3.jsp"/>
+			 <forward name="stockMCMStep4" path="/jsp/stockMC/stockMCMStep4.jsp"/>
+			 <forward name="stockMCMStep5" path="/jsp/stockMC/stockMCMStep5.jsp"/>
 		</action>
 		<action name="stockOnhandForm" path="/jsp/stockOnhandAction" parameter="do" scope="session" type="com.isecinc.pens.web.stockonhand.StockOnhandAction">
 			<forward name="search" path="/jsp/stockonhand/stockOnhandSearch.jsp" />

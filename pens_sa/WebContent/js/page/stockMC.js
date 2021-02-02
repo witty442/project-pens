@@ -132,9 +132,19 @@ function openPopup(path,pageName){
 	if("CustomerStockMC" == pageName){
 		param +="&hideAll=true&customerCode="+form.customerCode.value;
 	}else if("BranchStockMC" == pageName){
-		param +="&hideAll=true";
+		//check input customerCode;
+		var customerCode  = document.getElementById("customerCode");
+		if(customerCode.value != ""){
+		   param +="&hideAll=true&customerCode="+form.customerCode.value;
+		}else{
+		   alert("กรุณาระบุห้าง ");
+		   customerCode.focus();
+		   return false;
+		}
 	}else if("Brand" == pageName){
 		param +="&hideAll=true";
+	}else if("BrandStockMC" == pageName){
+		param +="&hideAll=true&customerCode="+form.customerCode.value;
 	}
 	url = path + "/jsp/popupAction.do?do=prepare&action=new"+param;
 	PopupCenterFullHeight(url,"",600);
@@ -148,6 +158,9 @@ function setDataPopupValue(code,desc,pageName){
 		form.storeCode.value = code;
 		form.storeName.value = desc;
 	}else if("Brand" == pageName){
+		form.brand.value = code;
+		form.brandName.value = desc;
+	}else if("BrandStockMC" == pageName){
 		form.brand.value = code;
 		form.brandName.value = desc;
 	}

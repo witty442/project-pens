@@ -274,7 +274,12 @@ function getAutoDetail(obj,pageName){
 		}
 	}
 }
-
+function openImageFile(stockDate,customerCode,storeCode,brand){
+	var path = document.getElementById("path").value;
+	var imageFileName = stockDate+"-"+customerCode+"-"+storeCode+"-"+brand+".jpg";
+	var url =path+"/jsp/stockMC/showImage.jsp?fileName="+imageFileName;
+	PopupCenter(url,"",700,600);
+}
 </script>
 </head>		
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0"  style="height: 100%;">
@@ -318,32 +323,40 @@ function getAutoDetail(obj,pageName){
 						<div align="center">
 						   	<!--  Criteria -->
 						   <table align="center" border="0" cellpadding="3" cellspacing="0" >
-					       <tr>
-				                <td>วันที่ตรวจนับสต๊อก<font color="red"></font></td>
-								<td colspan="3">		
-			                        <html:text property="bean.stockDateFrom" styleId="stockDateFrom" size="15" readonly="true" styleClass=""/>					    
-								    -
-								    <html:text property="bean.stockDateTo" styleId="stockDateTo" size="15" readonly="true" styleClass=""/>					    
-								</td>
-							</tr>
+					       
 							<tr>
 				                <td align="right"> ห้าง  </td>
-								<td colspan="2">
+								<td colspan="3">
 								  <html:text property="bean.customerCode" styleId="customerCode" 
 								    size="15"  styleClass="\" autoComplete=\"off"
 									onkeypress="getAutoKeypress(event,this,'CustomerStockMC')"
 					                onblur="getAutoOnblur(event,this,'CustomerStockMC')"
 									/>
-								    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','CustomerStockMC')"/>   
+								    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','CustomerStockMC','false')"/>   
 								   <html:text property="bean.customerName" styleId="customerName" size="40" readonly="true" styleClass="disableText"/>
-								   สาขา 
+								
+								</td>
+							</tr>	
+							<tr>
+				                <td align="right"> สาขา   </td>
+								<td colspan="3">
 								  <html:text property="bean.storeCode" styleId="storeCode" 
 								    size="10"  styleClass="\" autoComplete=\"off"/>
-								    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','BranchStockMC')"/>   
-								   <html:hidden property="bean.storeName" styleId="storeName"/>
+								    <input type="button" name="x1" value="..." onclick="openPopup('${pageContext.request.contextPath}','BranchStockMC','false')"/>   
+								    <html:text property="bean.storeName" styleId="storeName" size="40" readonly="true" styleClass="disableText"/>
 								</td>
-								
 							</tr>	
+							<tr>
+				                <td align="right">วันที่ตรวจนับสต๊อก<font color="red"></font></td>
+								<td colspan="3">		
+			                        <html:text property="bean.stockDateFrom" styleId="stockDateFrom" size="15" readonly="true" styleClass=""/>					    
+								    -
+								    <html:text property="bean.stockDateTo" styleId="stockDateTo" size="15" readonly="true" styleClass=""/>					    
+								 &nbsp;&nbsp;&nbsp;&nbsp;
+								  <html:checkbox property="bean.dispCheckStockLatest">&nbsp;&nbsp;แสดงเฉพาะ การนับครั้งล่าสุด(ล่าสุดของแต่ละรหัสสินค้า)</html:checkbox>
+								
+								</td>
+							</tr>
 							<tr>
 				                <td align="right"> แบรนด์ </td>
 								<td colspan="2">
@@ -360,9 +373,20 @@ function getAutoDetail(obj,pageName){
 			                        <html:text property="bean.productCodeFrom" styleId="productCodeFrom" size="15" styleClass="\" autoComplete=\"off"/>					    
 								    -
 								    <html:text property="bean.productCodeTo" styleId="productCodeTo" size="15" styleClass="\" autoComplete=\"off"/>					    
-								&nbsp;&nbsp;&nbsp;&nbsp;<html:checkbox property="bean.dispHaveCheckStock">&nbsp;&nbsp;แสดงเฉพาะ SKU ที่มีการบันทึกข้อมูล</html:checkbox>
-								
+								   &nbsp;&nbsp;&nbsp;&nbsp;
+								  <html:checkbox property="bean.dispHaveCheckStock">&nbsp;&nbsp;แสดงเฉพาะ SKU ที่มีการบันทึกข้อมูล</html:checkbox>
 								</td>
+							</tr>
+							<tr>
+				                <td align="right">เลือกข้อมูลตามการบันทึกตรวจนับ</td>
+								<td colspan="3">		
+								  <html:select property="bean.typeSearch">
+								     <html:option value="ALL">ทั้งหมด</html:option>
+								     <html:option value="Y">มีสต๊อก(YES)</html:option>
+								     <html:option value="N">ไม่มีสต๊อก(NO)</html:option>
+								     <html:option value="D">ไม่ได้สินค้าเข้ามาจำหน่าย(Deranged)</html:option>
+								  </html:select>
+			                    </td>
 							</tr>
 					   </table>
 					   <table  border="0" cellpadding="3" cellspacing="0" >

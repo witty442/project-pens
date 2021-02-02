@@ -88,6 +88,67 @@ public class PopupAction extends I_Action {
 		return forward;
 	}
 
+	public ActionForward prepareAndSearch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
+		logger.debug("prepareAndSearch");
+		PopupForm popupForm = (PopupForm) form;
+		String pageName  =Utils.isNull(request.getParameter("pageName"));
+		String action  =Utils.isNull(request.getParameter("action"));
+		String forward = "popup";
+		try {
+             logger.debug("prepare action:"+action+",pageName["+pageName+"]");
+			 
+			 if("new".equalsIgnoreCase(action) ){
+				 request.getSession().setAttribute("search_submit", null);
+				 request.getSession().setAttribute("DATA_LIST", null);
+				 popupForm.setCodeSearch("");
+				 popupForm.setDescSearch("");
+				 popupForm.setNo(0);
+				 popupForm.setPageName(pageName);
+				 popupForm.setCriteriaMap(null);
+				 
+				 //set Criteria From Main Page
+				 String[] queryStr = request.getQueryString().split("\\&");
+				// logger.debug("queryStr:"+queryStr);
+				 if(queryStr != null && queryStr.length>0){
+					 Map<String, String> criteriaMap = new HashMap<String, String>();
+					 String paramName = "";
+					 String paramValue = "";
+					 String[] paramNameAll = null;
+					 for(int i=0;i<queryStr.length;i++){
+						
+						 if( !queryStr[i].startsWith("do") && !queryStr[i].startsWith("action") 
+							&& !queryStr[i].startsWith("pageName")){
+							 
+							logger.debug("queryStr[i]:"+queryStr[i]);
+							 
+						    paramNameAll = queryStr[i].split("\\=");
+						    paramName = paramNameAll[0];
+						    if(paramNameAll.length >1){
+						       paramValue = paramNameAll[1];
+						    }else{
+						       paramValue ="";
+						    }
+						    logger.debug(paramName+":"+paramValue);
+						    criteriaMap.put(paramName, paramValue);
+						 }//if
+					 }
+					 popupForm.setCriteriaMap(criteriaMap);
+				 }
+				 
+				 request.getSession().setAttribute("codes", null);
+				 request.getSession().setAttribute("descs", null);
+				 
+				 
+				 //search 
+				 request.setAttribute("actionR", "newsearch");
+				 search(popupForm, request, response);
+			 }
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc() + e.toString());
+		}
+		return mapping.findForward(forward);
+	}
 	/**
 	 * Prepare with ID
 	 */
@@ -115,7 +176,8 @@ public class PopupAction extends I_Action {
 		List<PopupForm> results = null;
 		try {
 			String action = Utils.isNull(request.getParameter("action"));
-			if(!"newsearch".equalsIgnoreCase(action)){
+			String actionR = Utils.isNull(request.getAttribute("actionR"));
+			if(!"newsearch".equalsIgnoreCase(action) && !"newsearch".equalsIgnoreCase(actionR)){
 				return forward;
 			}
 			
@@ -181,6 +243,9 @@ public class PopupAction extends I_Action {
 			}else if("BranchStockMC".equalsIgnoreCase(popupForm.getPageName()) ){
 				results = PopupDAO.searchBranchStockMC(popupForm);
 				
+			}else if("BrandStockMC".equalsIgnoreCase(popupForm.getPageName()) ){
+				results = PopupDAO.searchBrandStockMC(popupForm);
+			
 			}else if("SubInvOnhand".equalsIgnoreCase(popupForm.getPageName()) ){
 				results = PopupDAO.searchSubInvList(popupForm);
 

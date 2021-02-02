@@ -204,6 +204,7 @@ public class GenStockOnhandRepTempLotusSubTask {
 					
 			sql.append("\n LEFT OUTER JOIN( ");
 			sql.append("\n/******************* SALE IN ****************************************/");
+			   sql.append("\n\t\t SELECT MM.* FROM( ");
 		        sql.append("\n\t\t SELECT  ");
 				sql.append("\n\t\t  C.customer_code ,P.inventory_item_code as pens_item");
 				sql.append("\n\t\t ,MP.MATERIAL_MASTER as group_type  ");
@@ -218,9 +219,6 @@ public class GenStockOnhandRepTempLotusSubTask {
 				sql.append("\n\t\t AND P.inventory_item_code = MP.pens_item");
 				sql.append("\n\t\t AND V.Customer_id IS NOT NULL   ");
 				sql.append("\n\t\t AND V.inventory_item_id IS NOT NULL  ");
-				//sql.append("\n\t\t AND P.inventory_item_desc LIKE 'ME%' ");
-				//NOT IN pensbme_group_unuse_lotus
-				sql.append("\n\t\t AND MP.MATERIAL_MASTER NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 				//Lotus Only 020047
 				sql.append("\n\t\t AND C.customer_code LIKE '020047-%'");
 				sql.append(genWhereCondDateLotus(control,"V.invoice_date"));
@@ -230,6 +228,8 @@ public class GenStockOnhandRepTempLotusSubTask {
 				sql.append(genWhereFilterConfigRep(c.getPensCustCodeFrom(),"\n\t AND MP.MATERIAL_MASTER"));
 				
 				sql.append("\n\t GROUP BY C.customer_code,P.inventory_item_code,MP.MATERIAL_MASTER");
+				//NOT IN pensbme_group_unuse_lotus
+				sql.append("\n\t )MM WHERE MM.GROUP_TYPE NOT IN(select group_code from PENSBI.pensbme_group_unuse_lotus)");
 			sql.append("\n )SALE_IN ");
 			sql.append("\n ON  M.customer_code = SALE_IN.customer_code ");
 			sql.append("\n AND M.pens_item = SALE_IN.pens_item ");

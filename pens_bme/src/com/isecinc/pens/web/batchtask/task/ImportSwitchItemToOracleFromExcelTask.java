@@ -337,10 +337,11 @@ public class ImportSwitchItemToOracleFromExcelTask extends BatchTask implements 
 						errorMsg ="UOM CODE ต้องเป็น CTN หรือ EA เท่านั้น ";
 						importError = true;
 					}
-					//step 2 validate SUBINVENTORY (Start with V,G,X,M) ONLY
+					//step 2 validate SUBINVENTORY (Start with V,G,X,M,P) ONLY
 					if( !SUBINVENTORY.startsWith("V") && !SUBINVENTORY.startsWith("G")
-							&& !SUBINVENTORY.startsWith("X") && !SUBINVENTORY.startsWith("M")){
-						errorMsg +=",SUBINVENTORY ต้องขึ้นต้นด้วย V,G,X,M เท่านั้น";
+							&& !SUBINVENTORY.startsWith("X") && !SUBINVENTORY.startsWith("M")
+							&& !SUBINVENTORY.startsWith("P")){
+						errorMsg +=",SUBINVENTORY ต้องขึ้นต้นด้วย V,G,X,M,P เท่านั้น";
 						importError = true;
 					}
 					

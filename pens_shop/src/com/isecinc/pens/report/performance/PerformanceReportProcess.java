@@ -48,11 +48,13 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CREDITCARD+"' THEN  od.NET_AMOUNT ELSE 0 END AS RECEIPT_AMOUNT, ");
 			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_ALI+"' THEN  od.NET_AMOUNT ELSE 0 END AS ALI_AMOUNT, ");
 			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_WE+"' THEN  od.NET_AMOUNT ELSE 0 END AS WE_AMOUNT, ");
+			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_QR+"' THEN  od.NET_AMOUNT ELSE 0 END AS QR_AMOUNT, ");
 			
 			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CASH+"' THEN od.VAT_AMOUNT ELSE 0 END AS VAT_CASH, ");
 			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CREDITCARD+"' THEN od.VAT_AMOUNT ELSE 0 END AS VAT_RECEIPT, ");
 			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_ALI+"' THEN od.VAT_AMOUNT ELSE 0 END AS VAT_ALI, ");
 			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_WE+"' THEN od.VAT_AMOUNT ELSE 0 END AS VAT_WE, ");
+			sql.append("\n  CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_QR+"' THEN od.VAT_AMOUNT ELSE 0 END AS VAT_QR, ");
 			
 			sql.append("\n  od.VAT_AMOUNT, od.NET_AMOUNT, cus.CODE AS CUSTOMER_CODE, od.customer_bill_name ");
 			sql.append("\n  ,od.credit_card_no ");
@@ -86,6 +88,7 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 				p.setReceiptAmount(rst.getDouble("RECEIPT_AMOUNT"));//=creditCardAmt
 				p.setAliAmount(rst.getDouble("ALI_AMOUNT"));
 				p.setWeAmount(rst.getDouble("WE_AMOUNT"));
+				p.setQrAmount(rst.getDouble("QR_AMOUNT"));
 				
 				p.setVatAmount(rst.getDouble("VAT_AMOUNT"));
 				p.setNetAmount(rst.getDouble("NET_AMOUNT"));
@@ -95,6 +98,7 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 				p.setVatReceipt(rst.getDouble("VAT_RECEIPT"));//=creditCardAmt
 				p.setVatAli(rst.getDouble("VAT_ALI"));
 				p.setVatWe(rst.getDouble("VAT_WE"));
+				p.setVatQr(rst.getDouble("VAT_QR"));
 				
 				if( !Utils.isNull(rst.getString("credit_card_no")).equals("")){
 				   creditcard = rst.getString("credit_card_no");
@@ -148,7 +152,8 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			sql.append("\n  SUM(CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CASH+"' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_CASH_AMT, ");
 			sql.append("\n  SUM(CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CREDITCARD+"' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_RECEIPT_AMT, ");
 			sql.append("\n  SUM(CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_ALI+"' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_ALI_AMT, ");
-			sql.append("\n  SUM(CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_WE+"' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_WE_AMT ");
+			sql.append("\n  SUM(CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_WE+"' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_WE_AMT, ");
+			sql.append("\n  SUM(CASE od.PAYMENT_METHOD WHEN '"+Constants.PAYMT_QR+"' THEN od.VAT_AMOUNT ELSE 0 END) AS VAT_QR_AMT ");
 			
 			sql.append("\n  FROM t_order od  INNER JOIN ad_user us ON od.USER_ID = us.USER_ID ");
 			sql.append("\n  INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
@@ -160,6 +165,8 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			sql.append("\n  AND us.USER_ID = " + user.getId());
 			sql.append("\n  ORDER BY od.ORDER_ID ");
 
+			logger.debug("\n"+sql.toString());
+			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
 			if (rst.next()) {
@@ -172,6 +179,7 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 				p.setAllVatReceiptAmount(rst.getDouble("VAT_RECEIPT_AMT"));
 				p.setAllVatAliAmount(rst.getDouble("VAT_ALI_AMT"));
 				p.setAllVatWeAmount(rst.getDouble("VAT_WE_AMT"));
+				p.setAllVatQrAmount(rst.getDouble("VAT_QR_AMT"));
 			}
 
 			// Get cash amount & receipt amount.
@@ -180,7 +188,8 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			sql.append("\n  CASE t_order.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CASH+"' THEN t_order.NET_AMOUNT ELSE 0 END AS CASH_AMOUNT, ");
 			sql.append("\n  CASE t_order.PAYMENT_METHOD WHEN '"+Constants.PAYMT_CREDITCARD+"' THEN t_order.NET_AMOUNT ELSE 0 END AS RECEIPT_AMOUNT, ");
 			sql.append("\n  CASE t_order.PAYMENT_METHOD WHEN '"+Constants.PAYMT_ALI+"' THEN t_order.NET_AMOUNT ELSE 0 END AS ALI_AMOUNT, ");
-			sql.append("\n  CASE t_order.PAYMENT_METHOD WHEN '"+Constants.PAYMT_WE+"' THEN t_order.NET_AMOUNT ELSE 0 END AS WE_AMOUNT ");
+			sql.append("\n  CASE t_order.PAYMENT_METHOD WHEN '"+Constants.PAYMT_WE+"' THEN t_order.NET_AMOUNT ELSE 0 END AS WE_AMOUNT, ");
+			sql.append("\n  CASE t_order.PAYMENT_METHOD WHEN '"+Constants.PAYMT_QR+"' THEN t_order.NET_AMOUNT ELSE 0 END AS QR_AMOUNT ");
 			sql.append("\n  FROM t_order ");
 			sql.append("\n  WHERE t_order.USER_ID = " + user.getId());
 			sql.append("\n  AND t_order.DOC_STATUS = 'SV' ");
@@ -195,17 +204,20 @@ public class PerformanceReportProcess extends I_ReportProcess<PerformanceReport>
 			double allReceiptAmount = 0;
 			double allAliAmount = 0;
 			double allWeAmount = 0;
+			double allQrAmount = 0;
 			while (rst.next()) {
 				allCashAmount += rst.getDouble("CASH_AMOUNT");
 				allReceiptAmount += rst.getDouble("RECEIPT_AMOUNT");
 				allAliAmount += rst.getDouble("ALI_AMOUNT");
 				allWeAmount += rst.getDouble("WE_AMOUNT");
+				allQrAmount += rst.getDouble("QR_AMOUNT");
 			}
 
 			p.setAllCashAmount(allCashAmount);
 			p.setAllReceiptAmount(allReceiptAmount);
 			p.setAllAliAmount(allAliAmount);
 			p.setAllWeAmount(allWeAmount);
+			p.setAllQrAmount(allQrAmount);
 			
 			/** WIT Edit 15/08/2554 :find totalCancelAmount Today **/
 			sql.delete(0, sql.length());

@@ -19,7 +19,6 @@ function loadMe(){
 	}else{
 		 window.location = "${pageContext.request.contextPath}/indexPC.jsp";
 	}
-	
 }
 
 function isWindowPC(){

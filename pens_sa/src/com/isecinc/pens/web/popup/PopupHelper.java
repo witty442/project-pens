@@ -11,7 +11,7 @@ public class PopupHelper {
 		 /** Criteria Name **/
 	    if("Brand".equalsIgnoreCase(pageName) || "BrandStock".equalsIgnoreCase(pageName)
 	       || "BrandProdShow".equalsIgnoreCase(pageName)|| "BrandStockVan".equalsIgnoreCase(pageName)	
-	       || "BrandSalesTargetPD".equalsIgnoreCase(pageName) ){
+	       || "BrandSalesTargetPD".equalsIgnoreCase(pageName) || "BrandStockMC".equalsIgnoreCase(pageName)){
 	    	headName = "แบรนด์("+pageName+")";
 	    	codeSearchTxtName = "แบรนด์";
 	    	descSearchTxtName = "ชื่อ แบรนด์";

@@ -122,9 +122,14 @@ function openStockMCMobile(action,lineId,productCode,index){
 </head>
 <body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
 
+            <!-- Include Header Mobile  -->
+            <jsp:include page="../templates/headerM.jsp"/>
+            <!-- /Include Header Mobile -->
+            
 			<!-- BODY -->
 			<html:form action="/jsp/stockMCAction">
 			<jsp:include page="../error.jsp"/>
+			
 			
 			<!-- Hidden -->
              <input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
@@ -135,7 +140,7 @@ function openStockMCMobile(action,lineId,productCode,index){
                    <!-- BUTTON -->
 					<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
 						<tr>
-							<td align="center">
+							<td align="center">stockMCMobile:
 							   <a href="#" onclick="backsearch('${pageContext.request.contextPath}');">
 								  <input type="button" value="ปิดหน้าจอ"  class="btn btn-primary">
 							    </a>
@@ -298,6 +303,10 @@ function openStockMCMobile(action,lineId,productCode,index){
 	<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
 	</html:form>
 	<!-- BODY -->
+	
+	  <!-- Include Footer Mobile  -->
+        <jsp:include page="../templates/footerM.jsp"/>
+       <!-- /Include Footer Mobile -->	
 					
 </body>
 </html>

@@ -230,7 +230,7 @@ public class MProduct extends I_Model<Product>{
 		ResultSet rst = null;
 		String stockArr[] = null;
 		boolean checkStockFlag = false;
-		
+		UOMConversion  uc1 = null ,uc2 = null;
 		List<ProductCatalog> productL = new ArrayList<ProductCatalog>();
 		StringBuffer sql = new StringBuffer("");
 		sql.append("\n SELECT A.* FROM( ");
@@ -301,12 +301,21 @@ public class MProduct extends I_Model<Product>{
 				catalog.setUom1(rst.getString("UOM1"));
 				catalog.setUom2(ConvertNullUtil.convertToString(rst.getString("UOM2")));
 				catalog.setTaxable(ConvertNullUtil.convertToString(rst.getString("TAXABLE")));
+				
 				//check_input_half (found in m_product_devide no check input half 
 				catalog.setCheckInputHalf(rst.getInt("check_input_half")==0?"Y":"N");
 				
 				/** METHOD 1 **/
-				UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), "CTN");//default to CTN
-			    UOMConversion  uc2 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), catalog.getUom2());
+				//old code fix UOM1 = CTN
+				//UOMConversion  uc1 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), "CTN");//default to CTN
+			    
+				//NEW get from master product 
+				if( !Utils.isNull(catalog.getUom1()).equals("")){
+				    uc1 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), Utils.isNull(catalog.getUom1()));//get from master
+				}else{
+				    uc1 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), "CTN");//default to CTN
+				}
+				uc2 = new MUOMConversion().getCurrentConversion(conn,catalog.getProductId(), catalog.getUom2());
 
 			    if(uc1 != null){
 			    	catalog.setUom1ConvRate(Utils.decimalFormat(uc1.getConversionRate(),Utils.format_number_no_disgit));

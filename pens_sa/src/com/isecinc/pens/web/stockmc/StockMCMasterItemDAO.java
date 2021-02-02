@@ -90,6 +90,9 @@ public class StockMCMasterItemDAO {
 			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price"), Utils.format_current_2_disgit));
 			   h.setStartDate(DateUtil.stringValueChkNull(rst.getDate("start_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   h.setEndDate(DateUtil.stringValueChkNull(rst.getDate("end_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+			   h.setBrand(Utils.isNull(rst.getString("brand")));
+			   h.setUom(Utils.isNull(rst.getString("uom")));
+			   h.setStatus(Utils.isNull(rst.getString("status")));
 			   items.add(h);
 			}//while
 		} catch (Exception e) {
@@ -145,6 +148,13 @@ public class StockMCMasterItemDAO {
 			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price"), Utils.format_current_2_disgit));
 			   h.setStartDate(DateUtil.stringValueChkNull(rst.getDate("start_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			   h.setEndDate(DateUtil.stringValueChkNull(rst.getDate("end_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+			
+			   h.setUom(Utils.isNull(rst.getString("uom")));
+			   h.setBrand(Utils.isNull(rst.getString("brand")));
+			   h.setStatus(Utils.isNull(rst.getString("status")));
+			   if(Utils.isNull(h.getStatus()).equalsIgnoreCase("active")){
+				   h.setStatusFlag("true");
+			   }
 			}//while
 
 		} catch (Exception e) {
@@ -201,8 +211,8 @@ public class StockMCMasterItemDAO {
 		try {
 			sql.append(" INSERT INTO PENSBI.MC_ITEM_CUST( \n");
 			sql.append(" CUSTOMER_CODE, ITEM_PENS, ITEM_CUST,BARCODE,DESCRIPTION, \n");
-			sql.append(" PACKSIZE,PRODUCT_AGE,RETAIL_PRICE) \n");
-			sql.append(" VALUES (?,?,?,?,?,?,?,?) \n");
+			sql.append(" PACKSIZE,PRODUCT_AGE,RETAIL_PRICE,UOM,BRAND,STATUS) \n");
+			sql.append(" VALUES (?,?,?,?,?,?,?,?,?,?,?) \n");
 			  
 			//logger.debug("SQL:"+sql);
 			//Gen ID running
@@ -218,7 +228,9 @@ public class StockMCMasterItemDAO {
 			ps.setString(++index, Utils.isNull(model.getProductPackSize()));
 			ps.setString(++index, Utils.isNull(model.getProductAge()));
 			ps.setDouble(++index, Utils.convertStrToDouble(model.getRetailPriceBF()));
-			
+			ps.setString(++index, Utils.isNull(model.getUom()));
+			ps.setString(++index, Utils.isNull(model.getBrand()));
+			ps.setString(++index, !Utils.isNull(model.getStatusFlag()).equalsIgnoreCase("")?"ACTIVE":"");
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
 			
@@ -242,6 +254,8 @@ public class StockMCMasterItemDAO {
 			sql.append(" SET ITEM_PENS =? , ITEM_CUST =? \n");
 			sql.append(" ,DESCRIPTION =? , PACKSIZE =? \n");
 			sql.append(" ,PRODUCT_AGE =? , RETAIL_PRICE =? \n");
+			sql.append(" ,UOM =? , BRAND =? \n");
+			sql.append(" ,STATUS =?  \n");
 			sql.append(" where customer_code = ? and barcode =? \n");
 			  
 			logger.debug("SQL:"+sql);
@@ -255,6 +269,9 @@ public class StockMCMasterItemDAO {
 			ps.setString(++index, Utils.isNull(model.getProductPackSize()));
 			ps.setString(++index, Utils.isNull(model.getProductAge()));
 			ps.setDouble(++index, Utils.convertStrToDouble(model.getRetailPriceBF()));
+			ps.setString(++index, Utils.isNull(model.getUom()));
+			ps.setString(++index, Utils.isNull(model.getBrand()));
+			ps.setString(++index, !Utils.isNull(model.getStatusFlag()).equalsIgnoreCase("")?"ACTIVE":"");
 			
 			ps.setString(++index, Utils.isNull(model.getCustomerCode()));
 			ps.setString(++index, Utils.isNull(model.getBarcode()));

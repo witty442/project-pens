@@ -1,0 +1,18 @@
+#ColName,PK,TEXT POSITION,TYPES,DefaultValue,EXTERNAL,Position: Start,Position: End,FillSymbol
+Record_Identifier,N,0,CHAR,,RIGHT,1,1,Blank
+Lockbox_Number,N,1,CHAR,,RIGHT,3,17,Blank
+Batch_Name,N,2,CHAR,,RIGHT,19,34,Blank
+Payment_Number,N,3,CHAR,,RIGHT,36,50,Blank
+Remittance_Amount,N,4,CHAR,,RIGHT,52,62,Blank
+Deposit_Date,N,5,DATE,dd-MMM-yyyy,RIGHT,64,74,Blank
+Currency_Code,N,6,CHAR,,RIGHT,76,78,Blank
+Customer_Number,N,7,CHAR,,RIGHT,80,95,Blank
+Billing_Location,N,8,CHAR,,RIGHT,97,107,Blank
+Item_Number,N,9,CHAR,,RIGHT,109,111,Blank
+Payment_method,N,10,CHAR,,RIGHT,113,139,Blank
+Attribute_1,N,11,CHAR,,RIGHT,141,151,Blank
+Attribute_2,N,12,CHAR,,RIGHT,153,173,Blank
+Attribute_3,N,13,DATE,yyyy/MM/dd,RIGHT,175,185,Blank
+Attribute_4,N,14,CHAR,,RIGHT,187,197,Blank
+Attribute_5,N,15,CHAR,,RIGHT,199,219,Blank
+WriteOff_Amt,N,16,CHAR,,RIGHT,221,231,Blank

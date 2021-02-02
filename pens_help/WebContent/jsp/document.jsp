@@ -92,7 +92,9 @@ if( !Utils.isNull(sessionId).equals("")){
   <input type="hidden" name="programName" value="<%=programName%>" />
 
 	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
-		
+		<tr>
+	 		<td colspan="2" align="center"><font size="4">App Version:28/01/2564<b></b></font> </td>
+		</tr>
 	 	<tr>
 	 		<td colspan="2" align="center"><font size="3"><b>Module : <u><%=module %></u></b></font> </td>
 		</tr>

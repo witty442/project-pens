@@ -12,6 +12,7 @@
   <title>Login</title>
   <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js"></script>
   <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
+  <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script> 
   <!-- Bootstrap -->
  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap/bootstrap-4.5.2.min.css">
  <script src="${pageContext.request.contextPath}/js/bootstrap/bootstrap-4.5.2.min.js"></script>
@@ -42,17 +43,21 @@
   <body class="text-center">
   	<html:form action="/login" onsubmit="return false;">
 	  
-	  <h1 class="h3 mb-3 font-weight-normal"><b>SALES ANALYSIS SYSTEM</b></h1>
-	    <p>
-	     <label>รหัสผู้ใช้:</label>
-	     <html:text property="userName"   size="10"/>
-	    </p>
-	    <p>
-	    <label>รหัสผ่าน:</label>
-	      <html:password property="password"   onkeypress="gologin(event);" size="10"/>
-	   </p>
+	     <h1 class="h3"> SALES ANALYSIS SYSTEM</h1>
+	 
+	     <div class="form-outline mb-4">
+	        <label class="form-label" for="userName">รหัสผู้ใช้</label>
+	        <html:text property="userName" styleId="userName" size="10" />
+	      </div>
+	    
+	   <div class="form-outline mb-4">
+	      <label class="form-label" for="password">รหัสผ่าน</label>
+	      <html:password property="password" styleId="password"  onkeypress="gologin(event);" size="10" />
+	   </div>
 	  <p>
-	    <button class="btn btn-lg btn-primary" type="submit" onclick="return login('${pageContext.request.contextPath}');"> Login </button>
+	    <%--   <button class="btn btn-primary" type="submit" onclick="return login('${pageContext.request.contextPath}');">    Login    </button> --%>
+	      <input type="submit" name="backBT" value="     Login      " class="btn btn-primary"
+					      onclick="return login('${pageContext.request.contextPath}');"/> 
 	 </p>
 	  <p class="mt-5 mb-3 text-muted">
 	      <font color="red">

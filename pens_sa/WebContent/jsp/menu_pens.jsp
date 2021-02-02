@@ -371,9 +371,18 @@
 	<li><a href="javascript: void(0)" class="parent" ><span>MC</span></a>
 		<ul>
 		 <%if ( UserUtils.userInRole("ROLE_MC",user,new String[]{User.ADMIN, User.MC_ENTRY,User.MT_QUERY}) ){ %>
-	        <li>
+	       <!-- OLD VERSION -->
+	       <%--  <li>
                <a href="#" class="parent"  
                onclick="window.location='${pageContext.request.contextPath}/jsp/stockMCAction.do?do=prepareSearch&action=new&pageName=STOCKMC';">
+               <span><%no++;out.print(no);%>.<bean:message key="StockMC" bundle="sysprop"/></span>
+               </a>
+             </li>  --%>
+             
+             <!-- NEW Version -->
+              <li>
+               <a href="#" class="parent"  
+               onclick="window.location='${pageContext.request.contextPath}/jsp/stockMCAction.do?do=stockMCMStep1&action=new&pageName=STOCKMC';">
                <span><%no++;out.print(no);%>.<bean:message key="StockMC" bundle="sysprop"/></span>
                </a>
              </li> 

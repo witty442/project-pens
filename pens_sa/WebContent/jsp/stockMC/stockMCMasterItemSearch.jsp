@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.PageingGenerate"%>
 <%@page import="com.isecinc.pens.web.stockmc.StockMCAction"%>
 <%@page import="com.pens.util.UserUtils"%>
 <%@page import="com.pens.util.SessionUtils"%>
@@ -85,9 +86,9 @@ function exportToExcel(path){
 	form.submit();
 	return true;
 }
-function gotoPage(path,currPage){
+function gotoPage(currPage){
 	var form = document.stockMCForm;
-	form.action = path + "/jsp/stockMCAction.do?do=searchHead&currPage="+currPage;
+	form.action = "${pageContext.request.contextPath}/jsp/stockMCAction.do?do=searchHead&currPage="+currPage;
     form.submit();
     return true;
 }
@@ -223,21 +224,7 @@ function setDataPopupValue(code,desc,pageName){
 								   int endRec = stockMCForm.getEndRec();
 								   int no = startRec;
 								%>
-								<div align="left">
-								   <span class="pagebanner">รายการทั้งหมด  <%=totalRecord %> รายการ, แสดงรายการที่  <%=startRec %> ถึง  <%=endRec %>.</span>
-								   <span class="pagelinks">
-									หน้าที่ 
-									    <% 
-										 for(int r=0;r<totalPage;r++){
-											 if(currPage ==(r+1)){
-										 %>
-						 				   <strong><%=(r+1) %></strong>
-										 <%}else{ %>
-										    <a href="javascript:gotoPage('${pageContext.request.contextPath}','<%=(r+1)%>')"  
-										       title="Go to page <%=(r+1)%>"> <%=(r+1) %></a>
-									 <% }} %>				
-									</span>
-								</div>
+								<%=PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no) %>
 									<table id="tblProduct" align="center" border="1" cellpadding="3" cellspacing="1" class="tableSearch">
 									       <tr>
 									           <!--  <th >Selected</th> -->
@@ -251,6 +238,9 @@ function setDataPopupValue(code,desc,pageName){
 												<th >บรรจุ</th>
 												<th >อายุสินค้า</th>
 												<th >ราคาปลีก</th>
+												<th >แบรนด์</th>
+												<th >หน่วย</th>
+												<th >สถานะ</th>
 												<th >Action</th>						
 										   </tr>
 										<% 
@@ -295,6 +285,15 @@ function setDataPopupValue(code,desc,pageName){
 													<td class="td_text_center" width="5%">
 														 <%=item.getRetailPriceBF() %>
 													</td>
+													<td class="td_text_center" width="5%">
+														 <%=item.getBrand() %>
+													</td>
+													<td class="td_text_center" width="5%">
+														 <%=item.getUom() %>
+													</td>
+													<td class="td_text_center" width="5%">
+														 <%=item.getStatus() %>
+													</td>
 													<td class="td_text_center" width="4%">
 														 <%if ( UserUtils.userInRole("ROLE_MC",user,new String[]{User.ADMIN, User.MC_ENTRY}) ){ %>
 															   <a href="javascript:openEdit('${pageContext.request.contextPath}','edit','<%=item.getCustomerCode()%>', '<%=item.getBarcode()%>')">
@@ -317,6 +316,7 @@ function setDataPopupValue(code,desc,pageName){
 					 	<input type="hidden" name="pageName" value="<%=pageName %>"/>
 					 	<input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
 					 	<input type="hidden" name="currentPage"  value ="<%=stockMCForm.getCurrPage()%>" />
+                        <input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
                     
 					</html:form>
 					<!-- BODY -->

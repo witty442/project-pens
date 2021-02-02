@@ -222,7 +222,7 @@ function linePrice(rowNo,price1,price2){
 		if(convetTxtObjToFloat(uom2ConvRate) > 0){
 			if(qty2 !=0){
 	    	  subQty = qty2 / (convetTxtObjToFloat(uom1ConvRate)/convetTxtObjToFloat(uom2ConvRate)) ;
-	    	  alert("subQty:"+subQty+"");
+	    	  //alert("subQty:"+subQty+"");
 			}
 	    }
 		subQty +="";

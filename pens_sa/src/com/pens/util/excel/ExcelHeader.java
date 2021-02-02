@@ -29,6 +29,11 @@ public class ExcelHeader {
 		EXCEL_HEADER.append("   mso-number-format:'"+a+"'; \n");
 		EXCEL_HEADER.append(" } \n");
 		
+		EXCEL_HEADER.append(" .text_center{ \n");
+		EXCEL_HEADER.append("   mso-number-format:'"+a+"'; \n");
+		EXCEL_HEADER.append("   text-align: center; \n");
+		EXCEL_HEADER.append(" } \n");
+		
 		EXCEL_HEADER.append(" .text_center_bold{ \n");
 		EXCEL_HEADER.append("    mso-number-format:'"+a+"'; \n");
 		EXCEL_HEADER.append("    font-weight: bold; \n");

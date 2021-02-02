@@ -51,8 +51,15 @@ public class InvoicePaymentReport implements Serializable{
 	private double totalAliAmt;
 	private double totalWeAmt;
 	private double totalGovAmt;
+	private double totalQrAmt;
 	
 	
+	public double getTotalQrAmt() {
+		return totalQrAmt;
+	}
+	public void setTotalQrAmt(double totalQrAmt) {
+		this.totalQrAmt = totalQrAmt;
+	}
 	public double getTotalGovAmt() {
 		return totalGovAmt;
 	}

@@ -171,7 +171,7 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		sql.append("\n  INNER JOIN m_customer cus ON od.CUSTOMER_ID = cus.CUSTOMER_ID ");
 		sql.append("\n  INNER JOIN ad_user us ON rc.USER_ID = us.USER_ID ");
 		sql.append("\n  LEFT JOIN m_sub_inventory inv ON inv.NAME = us.CODE ");
-		sql.append("\n  WHERE rcby.PAYMENT_METHOD IN('CS','CR','ALI','WE','GOV')");
+		sql.append("\n  WHERE rcby.PAYMENT_METHOD IN('CS','CR','ALI','WE','GOV','QR')");
 		sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 	
 		switch (type) {
@@ -279,7 +279,25 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS )  ");
 		}
 			break;
-			
+		case 13: {
+			// today QR Count
+			sql.append("\n  AND rcby.PAYMENT_METHOD ='QR'");
+			sql.append("\n  AND rc.receipt_date = DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND rcl.ORDER_ID IN ( ");
+			sql.append("\n  SELECT order_id FROM t_order od  ");
+			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS )  ");
+		}
+			break;
+		case 14: {
+			// Before QR Count
+			sql.append("\n  AND rcby.PAYMENT_METHOD ='QR'");
+			sql.append("\n  AND rc.RECEIPT_DATE >= '" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "' ");
+			sql.append("\n  AND rc.RECEIPT_DATE < '" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "' ");
+			sql.append("\n  AND rcl.ORDER_ID IN ( ");
+			sql.append("\n  SELECT order_id FROM t_order od  ");
+			sql.append("\n  WHERE od.DOC_STATUS = rc.DOC_STATUS )  ");
+		}
+			break;
 		default:
 			break;
 		}
@@ -595,6 +613,7 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		double totalAliAmt = 0;
 		double totalWeAmt = 0;
 		double totalGovAmt = 0;
+		double totalQrAmt = 0;
 		try{
 		StringBuffer reportSql = new StringBuffer(); 
 		reportSql.append("\n SELECT M. * FROM( " );
@@ -679,6 +698,10 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 				inv.setPaymentTerm("GOV");
 				iscash = true;
 				totalGovAmt += rset.getDouble("receipt_amount");
+			}else if("QR".equalsIgnoreCase(inv.getPaymentMethod())){
+				inv.setPaymentTerm("QR");
+				iscash = true;
+				totalQrAmt += rset.getDouble("receipt_amount");
 			}else{
 			   inv.setPaymentTerm("CREDIT");//creditCard
 			   inv.setCreditCardAmt(rset.getDouble("receipt_amount"));
@@ -709,6 +732,8 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 		 dataReport.setTotalAliAmt(totalAliAmt);
 		 dataReport.setTotalWeAmt(totalWeAmt);
 		 dataReport.setTotalGovAmt(totalGovAmt);
+		 dataReport.setTotalQrAmt(totalQrAmt);
+		 
 	     dataReport.setItemsList(resultL);
 		 return dataReport;
 	  }catch(Exception e){
@@ -856,6 +881,48 @@ public class InvoicePaymentNewReportProcess extends I_ReportProcess<InvoicePayme
 			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
 			sql.append("\n  WHERE rc.PD_PAYMENTMETHOD IN ('GOV') ");
+			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
+			sql.append("\n  AND rc.RECEIPT_DATE >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
+			sql.append("\n  AND rc.RECEIPT_DATE < DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");
+			sql.append("\n  AND rc.DOC_STATUS = 'SV' ");
+			sql.append("\n  AND rcl.ORDER_ID IN (SELECT ORDER_ID FROM t_order ");
+			sql.append("\n  WHERE t_order.DOC_STATUS = 'SV' )");
+			// Wit Edit 18/05/2011
+			sql.append("\n  AND rc.user_id = "+user.getId());
+			
+			logger.debug("sql:"+sql.toString());
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			if (rst.next()) {
+				creditSalesAmt = rst.getDouble("CASH_AMOUNT");
+			}
+
+			//value[0] = cashReceipt;
+			//value[1] = receiptCnt;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+		
+		return creditSalesAmt;
+	}
+	public double sumQrAmtBefore(InvoicePaymentReport t, User user,Connection conn) throws Exception 
+	{
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		double creditSalesAmt = 0d;
+		try {
+			sql.delete(0, sql.length());
+			sql.append("\n  SELECT SUM(rcby.RECEIPT_AMOUNT) AS CASH_AMOUNT ");
+			sql.append("\n  FROM t_receipt rc ");
+			sql.append("\n  INNER JOIN t_receipt_line rcl ON rcl.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  INNER JOIN t_receipt_by rcby ON rcby.RECEIPT_ID = rc.RECEIPT_ID ");
+			sql.append("\n  WHERE rc.PD_PAYMENTMETHOD IN ('QR') ");
 			sql.append("\n  AND rcby.WRITE_OFF = 'N' ");
 			sql.append("\n  AND rc.RECEIPT_DATE >= DATE('" + DateToolsUtil.convertToTimeStamp(t.getStartDate()) + "') ");
 			sql.append("\n  AND rc.RECEIPT_DATE < DATE('" + DateToolsUtil.convertToTimeStamp(t.getReceiptDate()) + "') ");

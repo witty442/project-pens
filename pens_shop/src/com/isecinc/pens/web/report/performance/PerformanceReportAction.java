@@ -48,6 +48,7 @@ public class PerformanceReportAction extends I_ReportAction<PerformanceReport> {
 				
 				parameterMap.put("total_ali", p.getAllAliAmount());
 				parameterMap.put("total_we", p.getAllWeAmount());
+				parameterMap.put("total_qr", p.getAllQrAmount());
 				
 				parameterMap.put("total_vat", p.getAllVatAmount());
 				parameterMap.put("total_net", p.getAllNetAmount());
@@ -57,6 +58,7 @@ public class PerformanceReportAction extends I_ReportAction<PerformanceReport> {
 				
 				parameterMap.put("total_vat_ali", p.getAllVatAliAmount());
 				parameterMap.put("total_vat_we", p.getAllVatWeAmount());
+				parameterMap.put("total_vat_qr", p.getAllVatQrAmount());
 				
 				parameterMap.put("total_cancel_amount", p.getTotalCancelAmountToday());
 				

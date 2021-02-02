@@ -1345,6 +1345,7 @@ public class OrderAction extends I_Action {
 				h.append("<table border='1'>");
 				h.append("<tr>");
 				   h.append("<td>Store Code </td>");
+				   h.append("<td>Store Name </td>");
 				   h.append("<td>Order Date</td>");
 				   h.append("<td>Pens Item</td>");
 				   h.append("<td>Group Code </td>");
@@ -1362,6 +1363,7 @@ public class OrderAction extends I_Action {
 	            		Order o = orderResult.getOrderItemList().get(i);
 	            		h.append("<tr> \n");    
 		            		h.append("<td>"+o.getStoreCode()+"</td>");
+		            		h.append("<td class='text'>"+o.getStoreName()+"</td>");
 		  				    h.append("<td>"+o.getOrderDate()+"</td>");
 		  				    h.append("<td class='text'>"+o.getItem()+"</td>");
 		  				    h.append("<td class='text'>"+o.getGroupCode()+"</td>");

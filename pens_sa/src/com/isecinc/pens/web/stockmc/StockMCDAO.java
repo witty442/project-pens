@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 import com.pens.util.seq.SequenceProcessAll;
@@ -25,8 +26,16 @@ public class StockMCDAO {
 		int totalRec = 0;
 		try {
 			sql.append("\n select count(*) as c FROM ");
-			sql.append("\n PENSBI.MC_COUNTSTK_HEADER H");
-			sql.append("\n WHERE 1=1");
+			sql.append("\n PENSBI.MC_COUNTSTK_HEADER H ");
+			sql.append("\n ,( ");
+			sql.append("\n   SELECT DISTINCT C.CUSTOMER_CODE,C.CUSTOMER_NAME ");
+			sql.append("\n   ,B.BRANCH_NO,B.BRANCH_NAME ");
+			sql.append("\n   FROM PENSBI.MC_CUST C ,PENSBI.MC_CUST_BRANCH B");
+			sql.append("\n   WHERE C.customer_code = B.customer_code ");
+			sql.append("\n )C ");
+			sql.append("\n WHERE H.customer_code = C.customer_code ");
+			sql.append("\n AND H.store_code = C.branch_no ");
+
 			 //GenWhereSQL
 			sql.append(" "+genWhereCondSql(conn,o));
 		
@@ -59,9 +68,18 @@ public class StockMCDAO {
 			sql.append("\n select M.* from (");
 			sql.append("\n select A.* ,rownum as r__ from (");
 			sql.append("\n select H.ID, H.stock_date ,H.customer_code,H.store_code ,H.create_user,H.mc_name");
-			sql.append("\n ,(select m.customer_name from pensbi.mc_cust m where H.customer_code = m.customer_code) as customer_name ");
-			sql.append("\n FROM PENSBI.MC_COUNTSTK_HEADER H");
-			sql.append("\n WHERE 1=1");
+			sql.append("\n ,C.customer_name ,C.branch_name");
+			sql.append("\n FROM PENSBI.MC_COUNTSTK_HEADER H ");
+			sql.append("\n ,( ");
+			sql.append("\n   SELECT DISTINCT C.CUSTOMER_CODE,C.CUSTOMER_NAME ");
+			sql.append("\n   ,B.BRANCH_NO,B.BRANCH_NAME ");
+			sql.append("\n   FROM PENSBI.MC_CUST C ,PENSBI.MC_CUST_BRANCH B");
+			sql.append("\n   WHERE C.customer_code = B.customer_code ");
+			sql.append("\n )C ");
+			sql.append("\n WHERE H.customer_code = C.customer_code ");
+			sql.append("\n AND H.store_code = C.branch_no ");
+			
+			
 			 //GenWhereSQL
 			sql.append(" "+genWhereCondSql(conn,o));
 		
@@ -86,9 +104,13 @@ public class StockMCDAO {
 			   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 			   h.setCustomerName(Utils.isNull(rst.getString("customer_name")));
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
-			   h.setStoreName(Utils.isNull(rst.getString("store_code")));
+			   h.setStoreName(Utils.isNull(rst.getString("branch_name")));
 			   h.setCreateUser(Utils.isNull(rst.getString("create_user")));
 			   h.setMcName(rst.getString("mc_name"));  
+			   
+			   if(DateUtil.compareWithToday(h.getStockDate()) ==0){
+				   h.setCanEdit(true);
+			   }
 			   items.add(h);
 			}//while
 		} catch (Exception e) {
@@ -119,10 +141,16 @@ public class StockMCDAO {
 		StockMCBean h = null;
 		try {
 			sql.append("\n select H.*");
-			sql.append("\n ,(select M.customer_name from pensbi.mc_cust M ");
-			sql.append("\n   where M.customer_code = H.customer_code ) as customer_name");
+			sql.append("\n ,C.customer_name ,C.branch_name");
 			sql.append("\n FROM PENSBI.MC_COUNTSTK_HEADER H");
-			sql.append("\n WHERE 1=1");
+			sql.append("\n ,( ");
+			sql.append("\n   SELECT DISTINCT C.CUSTOMER_CODE,C.CUSTOMER_NAME ");
+			sql.append("\n   ,B.BRANCH_NO,B.BRANCH_NAME ");
+			sql.append("\n   FROM PENSBI.MC_CUST C ,PENSBI.MC_CUST_BRANCH B");
+			sql.append("\n   WHERE C.customer_code = B.customer_code ");
+			sql.append("\n )C ");
+			sql.append("\n WHERE H.customer_code = C.customer_code ");
+			sql.append("\n AND H.store_code = C.branch_no ");
 			 //GenWhereSQL
 			sql.append(" "+genWhereCondSql(conn,o));
 			sql.append("\n  ORDER BY H.stock_date desc");
@@ -138,9 +166,14 @@ public class StockMCDAO {
 			   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 			   h.setCustomerName(Utils.isNull(rst.getString("customer_name")));
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
-			   h.setStoreName(Utils.isNull(rst.getString("store_code")));
+			   h.setStoreName(Utils.isNull(rst.getString("branch_name")));
 			   h.setCreateUser(Utils.isNull(rst.getString("create_user")));
 			   h.setMcName(rst.getString("mc_name"));  
+			   
+			   //check can edit
+			   if(DateUtil.compareWithToday(h.getStockDate())==0){
+				   h.setCanEdit(true);
+			   }
 			   if(getItems){
 				   h.setItems(searchStockMCDetail(conn, h.getId()));
 			   }
@@ -168,6 +201,15 @@ public class StockMCDAO {
 			sql.append("\n ,(select max(M.description) from pensbi.mc_item_cust M ");
 			sql.append("\n  where H.customer_code = M.customer_code ");
 			sql.append("\n  and M.item_pens = D.product_code and M.barcode = D.barcode) as description");
+			
+			sql.append("\n ,(select max(M.brand) from pensbi.mc_item_cust M ");
+			sql.append("\n  where H.customer_code = M.customer_code ");
+			sql.append("\n  and M.item_pens = D.product_code and M.barcode = D.barcode) as brand");
+			
+			sql.append("\n ,(select max(M.description) from pensbi.mc_item_cust M ");
+			sql.append("\n  where H.customer_code = M.customer_code ");
+			sql.append("\n  and M.item_pens = D.product_code and M.barcode = D.barcode) as brand_name");
+			
 			sql.append("\n FROM PENSBI.MC_COUNTSTK_HEADER H,PENSBI.MC_COUNTSTK_DETAIL D");
 			sql.append("\n WHERE H.id = D.id ");
 			sql.append("\n AND D.id = "+id);
@@ -183,6 +225,8 @@ public class StockMCDAO {
 			   h.setId(rst.getInt("id"));
 			   h.setNo(no);
 			   h.setLineId(rst.getInt("line_id"));
+			   h.setBrand(Utils.isNull(rst.getString("brand")));
+			   h.setBrandName(Utils.isNull(rst.getString("brand_name")));
 			   h.setProductCode(Utils.isNull(rst.getString("product_code")));
 			   h.setBarcode(Utils.isNull(rst.getString("barcode")));
 			   h.setProductName(Utils.isNull(rst.getString("description")));
@@ -207,6 +251,14 @@ public class StockMCDAO {
 			   h.setUom3(Utils.isNull(rst.getString("uom_3")));
 			   h.setExpireDate3(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_3"), DateUtil.DD_MM_YYYY_WITH_SLASH));
 			
+			   h.setItemCheck(Utils.isNull(rst.getString("item_check")));
+			   h.setDateInStore(DateUtil.stringValueChkNull(rst.getDate("date_In_Store"), DateUtil.DD_MM_YYYY_WITH_SLASH));
+			   h.setDateInStoreQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("date_In_Store_qty"), Utils.format_current_no_disgit)));
+			   h.setReasonNId(Utils.isNull(rst.getString("reason_n_id")));
+			   h.setReasonDId(Utils.isNull(rst.getString("reason_d_id")));
+			   
+			   h.setNote(Utils.isNull(rst.getString("note")));
+			   
 			   items.add(h);
 			}//while
 
@@ -240,9 +292,19 @@ public class StockMCDAO {
 		int no =0;
 		try {
 			sql.append("\n select D.* ");
+			
 			sql.append("\n ,(select max(M.description) from pensbi.mc_item_cust M ");
 			sql.append("\n  where H.customer_code = M.customer_code ");
 			sql.append("\n  and M.item_pens = D.product_code and M.barcode = D.barcode) as description");
+			
+			sql.append("\n ,(select max(M.brand) from pensbi.mc_item_cust M ");
+			sql.append("\n  where H.customer_code = M.customer_code ");
+			sql.append("\n  and M.item_pens = D.product_code and M.barcode = D.barcode) as brand");
+			
+			sql.append("\n ,(select max(M.master_leg_qty) from pensbi.mc_item_cust M ");
+			sql.append("\n  where H.customer_code = M.customer_code ");
+			sql.append("\n  and M.item_pens = D.product_code and M.barcode = D.barcode) as master_leg_qty");
+			
 			sql.append("\n FROM PENSBI.MC_COUNTSTK_HEADER H,PENSBI.MC_COUNTSTK_DETAIL D");
 			sql.append("\n WHERE H.id = D.id ");
 			sql.append("\n AND D.id = "+id);
@@ -253,19 +315,21 @@ public class StockMCDAO {
 			
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
-			while(rst.next()) {
+			if(rst.next()) {
 			   no++;
 			   h = new StockMCBean();
 			   h.setId(rst.getInt("id"));
 			   h.setNo(no);
 			   h.setLineId(rst.getInt("line_id"));
 			   h.setProductCode(Utils.isNull(rst.getString("product_code")));
+			   h.setBrand(Utils.isNull(rst.getString("brand")));
 			   h.setBarcode(Utils.isNull(rst.getString("barcode")));
 			   h.setProductName(Utils.isNull(rst.getString("description")));
 			   h.setProductPackSize(Utils.isNull(rst.getString("PRODUCT_PACKSIZE")));
 			   h.setProductAge(Utils.isNull(rst.getString("PRODUCT_AGE")));
 			   h.setRetailPriceBF(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit)));
 			   h.setPromotionPrice(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("PROMOTION_PRICE"), Utils.format_current_2_disgit)));
+			   h.setMasterLegQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("MASTER_LEG_QTY"), Utils.format_current_no_disgit)));
 			   h.setLegQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("LEG_QTY"), Utils.format_current_no_disgit)));
 			   h.setBackendQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("BACKEND_QTY"), Utils.format_current_no_disgit)));
 			   h.setInStoreQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("IN_STORE_QTY"), Utils.format_current_no_disgit)));
@@ -283,7 +347,13 @@ public class StockMCDAO {
 			   h.setUom3(Utils.isNull(rst.getString("uom_3")));
 			   h.setExpireDate3(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_3"), DateUtil.DD_MM_YYYY_WITH_SLASH));
 			
-			  
+			   h.setItemCheck(Utils.isNull(rst.getString("item_check")));
+			   h.setDateInStore(DateUtil.stringValueChkNull(rst.getDate("date_In_Store"), DateUtil.DD_MM_YYYY_WITH_SLASH));
+			   h.setDateInStoreQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("date_In_Store_qty"), Utils.format_current_no_disgit)));
+			   h.setReasonNId(Utils.isNull(rst.getString("reason_n_id")));
+			   h.setReasonDId(Utils.isNull(rst.getString("reason_d_id")));
+			   
+			   h.setNote(Utils.isNull(rst.getString("note")));
 			}//while
 
 		} catch (Exception e) {
@@ -306,15 +376,52 @@ public class StockMCDAO {
 		List<StockMCBean> items = new ArrayList<StockMCBean>();
 		int no =0;
 		try {
-			sql.append("\n select H.stock_date,H.customer_code,H.store_code,H.mc_name,H.create_user ");
-			sql.append("\n ,(select M.customer_name from pensbi.mc_cust M ");
-			sql.append("\n   where M.customer_code = H.customer_code ) as customer_name");
-			sql.append("\n ,D.* ,(select max(M.description) from pensbi.mc_item_cust M ");
+			sql.append("\n select ");
+			sql.append("\n  H.stock_date,H.customer_code,H.store_code,H.create_user");
+			sql.append("\n , C.customer_name ,C.branch_name");
+			sql.append("\n , D.* ");
+			sql.append("\n , P.brand");
+			
+			sql.append("\n ,(select max(M.description) from pensbi.mc_item_cust M ");
 			sql.append("\n  where H.customer_code = M.customer_code ");
 			sql.append("\n  and M.item_pens = D.product_code and M.barcode = D.barcode) as description");
+			
+			sql.append("\n ,(select oos_reason from pensbi.MC_OOS_REASON M ");
+			sql.append("\n   where M.oos_id = D.reason_n_id ) as reason_n_desc");
+			sql.append("\n ,(select derange_reason from pensbi.MC_DERANGED_REASON M ");
+			sql.append("\n   where M.derange_id = D.reason_d_id ) as reason_d_desc");
+			
 			sql.append("\n FROM PENSBI.MC_COUNTSTK_HEADER H,PENSBI.MC_COUNTSTK_DETAIL D");
+			
+			/** latest by product brand **/
+			if( !Utils.isNull(o.getDispCheckStockLatest()).equals("")){
+				sql.append("\n ,( ");
+				sql.append("\n   SELECT max(H.stock_date) as max_stock_date");
+				sql.append("\n   ,H.CUSTOMER_CODE,H.STORE_CODE,D.PRODUCT_CODE ");
+				sql.append("\n   FROM PENSBI.MC_COUNTSTK_HEADER H,PENSBI.MC_COUNTSTK_DETAIL D");
+				sql.append("\n   WHERE H.id = D.id");
+				sql.append("\n   GROUP BY H.CUSTOMER_CODE,H.STORE_CODE,D.PRODUCT_CODE");
+				sql.append("\n )L ");
+			}
+			sql.append("\n ,( ");
+			sql.append("\n   SELECT DISTINCT C.CUSTOMER_CODE,C.CUSTOMER_NAME ");
+			sql.append("\n   ,B.BRANCH_NO,B.BRANCH_NAME ");
+			sql.append("\n   FROM PENSBI.MC_CUST C ,PENSBI.MC_CUST_BRANCH B");
+			sql.append("\n   WHERE C.customer_code = B.customer_code ");
+			sql.append("\n )C ");
 			sql.append("\n ,apps.xxpens_om_item_mst_v P");
-			sql.append("\n WHERE H.id = D.id AND P.segment1=D.product_code ");
+			sql.append("\n WHERE H.id = D.id ");
+			sql.append("\n AND P.segment1 = D.product_code ");
+			sql.append("\n AND H.customer_code = C.customer_code ");
+			sql.append("\n AND H.store_code = C.branch_no ");
+			
+			if( !Utils.isNull(o.getDispCheckStockLatest()).equals("")){
+				sql.append("\n AND H.stock_date = L.max_stock_date ");
+				sql.append("\n AND H.customer_code = L.customer_code ");
+				sql.append("\n AND H.store_code = L.store_code ");
+				sql.append("\n AND D.product_code = L.product_code ");
+			}
+			
 			if( !Utils.isNull(idSelected).equals("")){
 			   sql.append("\n AND D.id in( "+SQLHelper.converToTextSqlIn(idSelected)+")");
 			}
@@ -363,12 +470,20 @@ public class StockMCDAO {
 					sql.append("\n AND D.product_code = '"+o.getProductCodeTo()+"'");
 				}
 			}
+			if( !Utils.isNull(o.getTypeSearch()).equals("ALL")){
+				sql.append("\n AND D.ITEM_CHECK ='"+o.getTypeSearch()+"'");
+			}
+			
 			if("STOCKMCQuery".equalsIgnoreCase(pageName)){
 			   sql.append("\n ORDER BY H.stock_date desc ,H.customer_code,H.store_code asc, D.line_id asc");
 			}else{
 			   sql.append("\n ORDER BY H.stock_date,H.customer_code,H.store_code , D.line_id asc");
 			}
-			logger.debug("sql:"+sql);
+			
+			//logger.debug("sql:"+sql);
+			if(logger.isDebugEnabled()){
+				FileUtil.writeFile("d://dev_temp//temp//sql.sql", sql.toString(), "TIS-620");
+			}
 			
 			ps = conn.prepareStatement(sql.toString());
 			rst = ps.executeQuery();
@@ -379,12 +494,14 @@ public class StockMCDAO {
 			   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 			   h.setCustomerName(Utils.isNull(rst.getString("customer_name")));
 			   h.setStoreCode(Utils.isNull(rst.getString("store_code")));
+			   h.setStoreName(Utils.isNull(rst.getString("branch_name")));
 			   h.setCreateUser(Utils.isNull(rst.getString("create_user")));
-			   h.setMcName(rst.getString("mc_name"));  
+			   //h.setMcName(rst.getString("mc_name"));  
 			   
 			   h.setId(rst.getInt("id"));
 			   h.setNo(no);
 			   h.setLineId(rst.getInt("line_id"));
+			   h.setBrand(Utils.isNull(rst.getString("brand")));
 			   h.setProductCode(Utils.isNull(rst.getString("product_code")));
 			   h.setBarcode(Utils.isNull(rst.getString("barcode")));
 			   h.setProductName(Utils.isNull(rst.getString("description")));
@@ -409,6 +526,14 @@ public class StockMCDAO {
 			   h.setUom3(Utils.isNull(rst.getString("uom_3")));
 			   h.setExpireDate3(DateUtil.stringValueChkNull(rst.getDate("EXPIRE_DATE_3"), DateUtil.DD_MM_YYYY_WITH_SLASH));
 			
+			   h.setItemCheck(Utils.isNull(rst.getString("item_check")));
+			   h.setDateInStore(DateUtil.stringValueChkNull(rst.getDate("date_In_Store"), DateUtil.DD_MM_YYYY_WITH_SLASH));
+			   h.setDateInStoreQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("date_In_Store_qty"), Utils.format_current_no_disgit)));
+			   
+			   h.setReasonNDesc(Utils.isNull(rst.getString("reason_n_desc")));
+			   h.setReasonDDesc(Utils.isNull(rst.getString("reason_d_desc")));
+			   h.setNote(Utils.isNull(rst.getString("note")));
+			   
 			   items.add(h);
 			}//while
 
@@ -431,18 +556,27 @@ public class StockMCDAO {
 		if( !Utils.isNull(o.getCustomerCode()).equals("")){
 			sql.append("\n and H.customer_code = '"+Utils.isNull(o.getCustomerCode())+"'");
 		}
+		if( !Utils.isNull(o.getCustomerName()).equals("")){
+			sql.append("\n and C.customer_name LIKE  '%"+Utils.isNull(o.getCustomerName())+"%'");
+		}
 		if( !Utils.isNull(o.getStoreCode()).equals("")){
 			sql.append("\n and H.store_code = '"+Utils.isNull(o.getStoreCode())+"'");
+		}
+		if( !Utils.isNull(o.getStoreName()).equals("")){
+			sql.append("\n and C.branch_name LIKE  '%"+Utils.isNull(o.getStoreName())+"%'");
 		}
 	     if(!Utils.isNull(o.getStockDate()).equalsIgnoreCase("")){
 			Date endDate = DateUtil.parse(o.getStockDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 			String endDateStr = DateUtil.stringValue(endDate, DateUtil.DD_MM_YYYY_WITH_SLASH);
 			sql.append("\n and H.stock_date = to_date('"+endDateStr+"','dd/mm/yyyy')");
 		}
+	     if( !Utils.isNull(o.getCreateUser()).equals("")){
+	    	 sql.append("\n and H.create_user = '"+o.getCreateUser()+"'");
+	     }
 		return sql;
 	}
 	
-	public static List<StockMCBean> getProductMCItemList(Connection conn,String customerCode,int headerId) throws Exception {
+	public static List<StockMCBean> getProductMCItemList(Connection conn,String customerCode,String brand,int headerId) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
 		StringBuilder sql = new StringBuilder();
@@ -452,12 +586,17 @@ public class StockMCDAO {
 		try {
 			sql.append("\n select H.* FROM PENSBI.MC_ITEM_CUST H");
 			sql.append("\n WHERE customer_code = '"+customerCode+"'");
+			sql.append("\n AND status ='ACTIVE' ");
+			if( !Utils.isNull(brand).equals("")){
+				sql.append("\n AND brand = '"+brand+"'");
+			}
 			if(headerId != 0){
 				sql.append("\n AND item_pens not in(");
 				sql.append("\n   SELECT product_code from PENSBI.MC_COUNTSTK_DETAIL");
 				sql.append("\n   WHERE ID = "+headerId);
 				sql.append("\n )");
 			}
+			sql.append("\n order by h.item_pens ");
 			logger.debug("sql:"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
@@ -507,6 +646,7 @@ public class StockMCDAO {
 		return itemList;
 	}
 	
+	
 	public static StockMCBean getProductMCItemInfo(String customerCode,String productCode) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rst = null;
@@ -519,7 +659,7 @@ public class StockMCDAO {
 			sql.append("\n select H.* FROM PENSBI.MC_ITEM_CUST H");
 			sql.append("\n WHERE customer_code = '"+customerCode+"'");
 			sql.append("\n AND item_pens = '"+productCode+"'");
-			
+			sql.append("\n AND status = 'ACTIVE'");
 			logger.debug("sql:"+sql.toString());
 			
 			ps = conn.prepareStatement(sql.toString());
@@ -536,7 +676,9 @@ public class StockMCDAO {
 			   h.setProductAge(Utils.isNull(rst.getString("PRODUCT_AGE")));
 			   h.setRetailPriceBF(Utils.decimalFormat(rst.getDouble("retail_price"), Utils.format_current_2_disgit));
 			   h.setStartDate(DateUtil.stringValueChkNull(rst.getDate("start_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
-
+			   h.setBrand(Utils.isNull(rst.getString("brand")));
+			   h.setMasterLegQty(Utils.isNull(rst.getString("master_leg_qty")));
+			   h.setUom(Utils.isNull(rst.getString("uom")));
 			}//while
 
 		} catch (Exception e) {
@@ -680,7 +822,7 @@ public class StockMCDAO {
 			conn.setAutoCommit(false);
 	
 			//replace '&#8203;'= space : what in put from ??
-			head.setMcName(head.getMcName().replaceAll("//&#8203;", ""));
+			//head.setMcName(head.getMcName().replaceAll("//&#8203;", ""));
 			
 			if(head.getId() == 0){
 				head = insertStockMCHead(conn , head);
@@ -692,6 +834,56 @@ public class StockMCDAO {
 			StockMCBean line = head;
 			logger.debug("check id:"+head.getId());
 			logger.debug("check lineId:"+line.getLineId());
+			
+			//clear value case change TEM_CHECK ,Y,N,D
+			if(line.getItemCheck().equals("Y")){
+			   //clear N
+				line.setReasonNId("");
+				line.setDateInStore("");
+				line.setDateInStoreQty("");
+				
+			   //clear D
+				line.setReasonDId("");
+			}else if(line.getItemCheck().equals("N")){
+				//clear Y
+				line.setLegQty("");
+				line.setInStoreQty("");
+				line.setBackendQty("");
+				line.setUom("");
+				line.setFrontendQty1("");
+				line.setUom1("");
+				line.setExpireDate1("");
+				line.setFrontendQty2("");
+				line.setUom2("");
+				line.setExpireDate2("");
+				line.setFrontendQty3("");
+				line.setUom3("");
+				line.setExpireDate3("");
+				
+				//clear D
+				line.setReasonDId("");
+			}else if(line.getItemCheck().equals("D")){
+				//clear Y
+				line.setLegQty("");
+				line.setInStoreQty("");
+				line.setBackendQty("");
+				line.setUom("");
+				line.setFrontendQty1("");
+				line.setUom1("");
+				line.setExpireDate1("");
+				line.setFrontendQty2("");
+				line.setUom2("");
+				line.setExpireDate2("");
+				line.setFrontendQty3("");
+				line.setUom3("");
+				line.setExpireDate3("");
+				
+				//clear N
+				line.setReasonNId("");
+				line.setDateInStore("");
+				line.setDateInStoreQty("");
+			}
+			
 			if(line.getLineId() ==0){
 			   maxLineId++;
 			   line.setId(head.getId());
@@ -798,11 +990,14 @@ public class StockMCDAO {
 			sql.append(" ID, LINE_ID, PRODUCT_CODE,PRODUCT_PACKSIZE,PRODUCT_AGE,RETAIL_PRICE_BF, \n"); //6
 			sql.append(" PROMOTION_PRICE,LEG_QTY, BACKEND_QTY,IN_STORE_QTY, UOM,  \n");//11
 			sql.append(" FRONTEND_QTY_1, UOM_1, EXPIRE_DATE_1,FRONTEND_QTY_2,UOM_2, \n");//16
-			sql.append(" EXPIRE_DATE_2, FRONTEND_QTY_3, UOM_3, EXPIRE_DATE_3,CREATE_DATE,CREATE_USER,BARCODE ) \n");//22
+			sql.append(" EXPIRE_DATE_2, FRONTEND_QTY_3, UOM_3, EXPIRE_DATE_3,CREATE_DATE  \n");//
+			sql.append(" ,CREATE_USER,BARCODE,ITEM_CHECK,date_In_Store,date_In_Store_qty,reason_n_id,reason_d_id");
+			sql.append(" ,note)");
 			sql.append(" VALUES (?,?,?,?,?,?,"
 					          + "?,?,?,?,?,?,"
 					          + "?,?,?,?,?,?,"
-					          + "?,?,?,?,?) \n");//23
+					          + "?,?,?,?,?,?,"
+					          + "?,?,?,?,?) \n");//
 
 			logger.debug("SQL:"+sql);
 			
@@ -848,6 +1043,17 @@ public class StockMCDAO {
 			ps.setString(++index, line.getCreateUser());//22
 			ps.setString(++index, line.getBarcode());//23
 			
+			ps.setString(++index, Utils.isNull(line.getItemCheck()));//24
+			
+			if( !Utils.isNull(line.getDateInStore()).equals("")){//25
+				 ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getDateInStore(), DateUtil.DD_MM_YYYY_WITH_SLASH).getTime()));
+			}else{
+				 ps.setNull(++index,java.sql.Types.DATE);
+			}
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getDateInStoreQty()));//26
+			ps.setString(++index, Utils.isNull(line.getReasonNId()));//27
+			ps.setString(++index, Utils.isNull(line.getReasonDId()));//28
+			ps.setString(++index, Utils.isNull(line.getNote()));//29
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
 			
@@ -871,8 +1077,9 @@ public class StockMCDAO {
 			sql.append(" UPDATE PENSBI.MC_COUNTSTK_DETAIL SET \n");
 			sql.append(" PROMOTION_PRICE=? ,LEG_QTY=? ,IN_STORE_QTY=?, BACKEND_QTY=?  , UOM=? ,  \n");//5
 			sql.append(" FRONTEND_QTY_1=? , UOM_1=? , EXPIRE_DATE_1=? ,FRONTEND_QTY_2=? ,UOM_2=? , \n");//10
-			sql.append(" EXPIRE_DATE_2=? , FRONTEND_QTY_3=? , UOM_3=? , EXPIRE_DATE_3=? ,UPDATE_DATE=? ,UPDATE_USER =?  \n");//16
-			
+			sql.append(" EXPIRE_DATE_2=? , FRONTEND_QTY_3=? , UOM_3=? , EXPIRE_DATE_3=? ,UPDATE_DATE=? ,UPDATE_USER =? , \n");//16
+			sql.append(" ITEM_CHECK=? ,date_In_Store=? ,date_In_Store_qty = ? ,reason_n_id = ? ,reason_d_id = ?, \n");
+			sql.append(" NOTE=? \n");
 			sql.append(" WHERE ID = ? AND LINE_ID = ? \n");//18
 
 			//logger.debug("SQL:"+sql);
@@ -913,8 +1120,18 @@ public class StockMCDAO {
 			
 			ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));
 			ps.setString(++index, line.getUpdateUser());
+			ps.setString(++index, Utils.isNull(line.getItemCheck()));
+			if( !Utils.isNull(line.getDateInStore()).equals("")){
+				 ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getDateInStore(), DateUtil.DD_MM_YYYY_WITH_SLASH).getTime()));
+			}else{
+				 ps.setNull(++index,java.sql.Types.DATE);
+			}
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getDateInStoreQty()));
+			ps.setString(++index, Utils.isNull(line.getReasonNId()));
+			ps.setString(++index, Utils.isNull(line.getReasonDId()));
+			ps.setString(++index, Utils.isNull(line.getNote()));
 			
-			//where 
+			//key update
 			ps.setInt(++index, line.getId());
 			ps.setLong(++index, line.getLineId());//18
 			

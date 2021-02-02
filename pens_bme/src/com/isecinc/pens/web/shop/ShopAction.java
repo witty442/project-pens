@@ -3,9 +3,7 @@ package com.isecinc.pens.web.shop;
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.sql.Connection;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,20 +15,13 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.AutoCNDAO;
 import com.isecinc.pens.dao.constants.PickConstants;
 import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.web.autocn.AutoCNBean;
-import com.isecinc.pens.web.autocn.AutoCNForm;
-import com.isecinc.pens.web.shop.sub.CHINAStockOnhandAction;
-import com.isecinc.pens.web.shop.sub.SPStockOnhandAction;
-import com.isecinc.pens.web.shop.sub.ShopSaleOutAction;
-import com.isecinc.pens.web.shop.sub.ShopStockOnhandAction;
 import com.isecinc.pens.web.shop.sub.ShopBillDetailAction;
 import com.isecinc.pens.web.shop.sub.ShopBillSummaryAction;
 import com.isecinc.pens.web.shop.sub.ShopPromotionAction;
-import com.isecinc.pens.web.shop.sub.TerminalStockOnhandAction;
-import com.pens.util.DBConnection;
+import com.isecinc.pens.web.shop.sub.ShopSaleOutAction;
+import com.isecinc.pens.web.shop.sub.ShopStockOnhandAction;
 import com.pens.util.DateUtil;
 import com.pens.util.Utils;
 
@@ -162,7 +153,7 @@ public class ShopAction extends I_Action {
 			if(request.getParameter(queryStr) != null){
 				
 			}else{
-				/** Sales Out  **/
+				/****** Sales Out ******/
 				 if(P_MAYA_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 					 aForm = ShopSaleOutAction.search(request, aForm,user);
 					 
@@ -175,20 +166,20 @@ public class ShopAction extends I_Action {
 				 }else if(P_SP_SALEOUT.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 				    aForm = ShopSaleOutAction.search(request, aForm,user);
 				    
-				 /** Stock Onhand **/
+				 /****** Stock Onhand ******/
 				 }else if(P_MAYA_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
 					 aForm = ShopStockOnhandAction.search(request, aForm,user);
 					 
 				 }else if(P_TM_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
-					 aForm = TerminalStockOnhandAction.search(request, aForm,user);
+					 aForm = ShopStockOnhandAction.search(request, aForm,user);
 					 
 				 }else if(P_CH_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
-					 aForm = CHINAStockOnhandAction.search(request, aForm,user);
+					 aForm = ShopStockOnhandAction.search(request, aForm,user);
 					 
 				 }else if(P_SP_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
-					 aForm = SPStockOnhandAction.search(request, aForm,user);
+					 aForm = ShopStockOnhandAction.search(request, aForm,user);
 					 
-				 /** Shop Promotion **/
+				 /******* Shop Promotion *******/
 				 }else if(P_SHOP_PROM.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){  
 					 String action = Utils.isNull(request.getParameter("action"));
 					 if("back".equalsIgnoreCase(action)){
@@ -261,7 +252,7 @@ public class ShopAction extends I_Action {
 					return mapping.findForward("export");
 				}
 			}else if(P_MAYA_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
-				fileName="Report Sale MAYA StockOnhand.xls";
+				fileName="Report Stock-Onhand at MAYA.xls";
 				if(aForm.getResults() != null && aForm.getResults().size() > 0){
 					htmlTable = ShopStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
 				}else{
@@ -289,9 +280,9 @@ public class ShopAction extends I_Action {
 					return mapping.findForward("export");
 				}
 			}else if(P_TM_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
-				fileName="Report Sale TERMINAL StockOnhand.xls";
+				fileName="Report Stock-Onhand Terminal21-Asok.xls";
 				if(aForm.getResults() != null && aForm.getResults().size() > 0){
-					htmlTable = TerminalStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
+					htmlTable = ShopStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -306,9 +297,9 @@ public class ShopAction extends I_Action {
 					return mapping.findForward("export");
 				}
 			}else if(P_CH_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
-				fileName="Report Sale Im Chaina StockOnhand.xls";
+				fileName="Report Stock-Onhand Im Chaina.xls";
 				if(aForm.getResults() != null && aForm.getResults().size() > 0){
-					htmlTable = CHINAStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
+					htmlTable = ShopStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");
@@ -322,9 +313,9 @@ public class ShopAction extends I_Action {
 					return mapping.findForward("export");
 				}
 			}else if(P_SP_STOCK_ONHAND.equalsIgnoreCase(Utils.isNull(request.getParameter("pageName"))) ){
-				fileName="Report Sale Siam Premium Outlet StockOnhand.xls";
+				fileName="Report Stock-Onhand Siam Premium Outlet.xls";
 				if(aForm.getResults() != null && aForm.getResults().size() > 0){
-					htmlTable = SPStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
+					htmlTable = ShopStockOnhandAction.exportToExcel(request,aForm,user,aForm.getResults());	
 				}else{
 					request.setAttribute("Message", "ไม่พบข้อมูล");
 					return mapping.findForward("export");

@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.apache.struts.upload.FormFile;
+
 import com.isecinc.pens.bean.User;
 
 public class StockMCBean implements Serializable{
@@ -34,6 +36,7 @@ public class StockMCBean implements Serializable{
 	private long lineId;
 	private long no;
 	private String status;
+	private String statusFlag;
 	private String productCode;
 	private String barcode;
 	private String productName;
@@ -42,6 +45,7 @@ public class StockMCBean implements Serializable{
 	private String retailPriceBF;
 	
 	private String promotionPrice;
+	private String masterLegQty;
 	private String legQty;
 	private String inStoreQty;
 	private String backendQty;
@@ -59,6 +63,13 @@ public class StockMCBean implements Serializable{
 	private String uom3;
 	private String expireDate3;
 	
+	private String itemCheck;// Y:YES ,N:NO ,D:Derange
+	private String reasonNId;
+	private String reasonNDesc;
+	private String dateInStore;
+	private String dateInStoreQty;
+	private String reasonDId;
+	private String reasonDDesc;
 	//control
 	private boolean canEdit;
 	//MC_ITEM
@@ -68,8 +79,91 @@ public class StockMCBean implements Serializable{
 	private String lineIdDeletes;
     private String endDate;
     private String dispHaveCheckStock;
-	
+    private String dispCheckStockLatest;
+	private String note;
+
+    private String imageFileName;
+    private String typeSearch;
     
+	public String getStatusFlag() {
+		return statusFlag;
+	}
+	public void setStatusFlag(String statusFlag) {
+		this.statusFlag = statusFlag;
+	}
+	public String getDispCheckStockLatest() {
+		return dispCheckStockLatest;
+	}
+	public void setDispCheckStockLatest(String dispCheckStockLatest) {
+		this.dispCheckStockLatest = dispCheckStockLatest;
+	}
+	public String getTypeSearch() {
+		return typeSearch;
+	}
+	public void setTypeSearch(String typeSearch) {
+		this.typeSearch = typeSearch;
+	}
+	public String getImageFileName() {
+		return imageFileName;
+	}
+	public void setImageFileName(String imageFileName) {
+		this.imageFileName = imageFileName;
+	}
+	
+	public String getNote() {
+		return note;
+	}
+	public void setNote(String note) {
+		this.note = note;
+	}
+	public String getReasonNId() {
+		return reasonNId;
+	}
+	public void setReasonNId(String reasonNId) {
+		this.reasonNId = reasonNId;
+	}
+	public String getReasonNDesc() {
+		return reasonNDesc;
+	}
+	public void setReasonNDesc(String reasonNDesc) {
+		this.reasonNDesc = reasonNDesc;
+	}
+	public String getReasonDId() {
+		return reasonDId;
+	}
+	public void setReasonDId(String reasonDId) {
+		this.reasonDId = reasonDId;
+	}
+	public String getReasonDDesc() {
+		return reasonDDesc;
+	}
+	public void setReasonDDesc(String reasonDDesc) {
+		this.reasonDDesc = reasonDDesc;
+	}
+	public String getDateInStore() {
+		return dateInStore;
+	}
+	public void setDateInStore(String dateInStore) {
+		this.dateInStore = dateInStore;
+	}
+	public String getDateInStoreQty() {
+		return dateInStoreQty;
+	}
+	public void setDateInStoreQty(String dateInStoreQty) {
+		this.dateInStoreQty = dateInStoreQty;
+	}
+	public String getMasterLegQty() {
+		return masterLegQty;
+	}
+	public void setMasterLegQty(String masterLegQty) {
+		this.masterLegQty = masterLegQty;
+	}
+	public String getItemCheck() {
+		return itemCheck;
+	}
+	public void setItemCheck(String itemCheck) {
+		this.itemCheck = itemCheck;
+	}
 	public String getBrandFrom() {
 		return brandFrom;
 	}

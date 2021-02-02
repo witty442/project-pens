@@ -22,7 +22,7 @@ public class PhotoServlet extends HttpServlet {
 	        throws ServletException, IOException {
         //path image-> /PENS/TEST/apps/inst/saleonline/Transaction/Sales-Out-Photo
 		//onTest
-		String imageFileLocalPath = "D:\\SalesApp\\Images-Prodshow\\";
+		String imageFileLocalPath = "";
 		File file = null;
 		FileInputStream fis = null;
 		EnvProperties env = EnvProperties.getInstance();
@@ -40,7 +40,14 @@ public class PhotoServlet extends HttpServlet {
 		    		//PROD "/PENS/ERP/apps/inst/saleonline/Transaction/StockCR-ProjectC-Photo/";
 		    		 
 			    	imageFileLocalPath= env.getProperty("path.projectc.photo");   
-		    	 }
+			    	
+		    	 }else if("StockMC".equalsIgnoreCase(pageName)){
+			    	//UAT  "d:/dev_temp/images/mc/";
+			    	//PROD "/PENS/ERP/apps/inst/saleonline/images/mc/";
+			    		 
+				    imageFileLocalPath= env.getProperty("path.stockmc.photo");   
+			    }
+		    	 
 		    	  imageFileLocalPath +=fileName; 
 		    	  System.out.println("imageFileLocalPath:"+imageFileLocalPath);
 		    	  

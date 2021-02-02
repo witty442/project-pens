@@ -590,7 +590,9 @@ public class OrderDAO {
 				sql.append("\n   ,h.invoice_no,h.order_lot_no ,h.WHOLE_PRICE_BF,h.RETAIL_PRICE_BF,nvl(sum(h.qty),0) as qty ");	
 				sql.append("\n   ,(select max(L.material_master) from PENSBME_ONHAND_BME_LOCKED L ");
 				sql.append("\n         where L.barcode = h.barcode) as material_master ");
-				sql.append("\n  from PENSBME_ORDER h where 1=1  ");
+				sql.append("\n  ,(select pens_desc from PENSBI.PENSBME_MST_REFERENCE m WHERE m.reference_code ='Store' ");
+				sql.append("\n   and m.status ='Active' and h.store_code = m.pens_value) as store_name ");
+				sql.append("\n  from PENSBI.PENSBME_ORDER h where 1=1  ");
 				
 				if( !Utils.isNull(o.getSalesDateFrom()).equals("") 
 						&& !Utils.isNull(o.getSalesDateTo()).equals("") ){
@@ -650,6 +652,7 @@ public class OrderDAO {
 			while (rst.next()) {
 				Order item = new Order();
 				item.setStoreCode(rst.getString("STORE_CODE"));
+				item.setStoreName(rst.getString("STORE_NAME"));
 				item.setOrderDate(DateUtil.stringValue(rst.getDate("order_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				item.setGroupCode(rst.getString("GROUP_CODE"));
 				item.setItem(rst.getString("item"));

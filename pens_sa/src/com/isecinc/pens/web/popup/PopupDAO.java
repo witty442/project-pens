@@ -1331,28 +1331,28 @@ public class PopupDAO {
 		String customerCode = "";
 		try {
 			conn = DBConnection.getInstance().getConnectionApps();
-			logger.debug("searchCustomerStockMC");
+			logger.debug("searchBranchStockMC");
 
 			//criteria
 			if(c.getCriteriaMap() != null){
 			   customerCode = Utils.isNull(c.getCriteriaMap().get("customerCode"));
-			}else{
-			   customerCode = Utils.isNull(c.getCodeSearch());
 			}
 			logger.debug("customerCode:"+customerCode);
 			
-			sql.append("\n select distinct c.store_code ");
-			sql.append("\n from pensbi.MC_COUNTSTK_HEADER  c");
-			sql.append("\n where 1=1 ");
-			
+			sql.append("\n select distinct c.branch_no ,c.branch_name ");
+			sql.append("\n from pensbi.MC_CUST_BRANCH  c");
+			sql.append("\n where status ='ACTIVE' ");
+			if( !Utils.isNull(customerCode).equals("")){
+			    sql.append("\n and c.customer_code ='"+customerCode+"' ");
+			}
 			if( !Utils.isNull(c.getCodeSearch()).equals("")){
-				sql.append("\n and c.store_code ='"+c.getCodeSearch()+"' ");
+				sql.append("\n and c.branch_no ='"+c.getCodeSearch()+"' ");
 			}
 			if( !Utils.isNull(c.getDescSearch()).equals("")){
-				sql.append("\n and c.store_code LIKE '%"+c.getDescSearch()+"%' ");
+				sql.append("\n and c.branch_name LIKE '%"+c.getDescSearch()+"%' ");
 			}
 			
-			sql.append("\n  ORDER BY c.store_code asc ");
+			sql.append("\n  ORDER BY c.branch_no asc ");
 			
 			logger.debug("sql:"+sql);
 
@@ -1363,8 +1363,8 @@ public class PopupDAO {
 				PopupForm item = new PopupForm();
 				no++;
 				item.setNo(no);
-				item.setCode(rst.getString("store_code"));
-				item.setDesc(rst.getString("store_code"));
+				item.setCode(rst.getString("branch_no"));
+				item.setDesc(rst.getString("branch_name"));
 				pos.add(item);
 				
 			}//while
@@ -1379,6 +1379,65 @@ public class PopupDAO {
 		}
 		return pos;
 	}
+	
+	public static List<PopupForm> searchBrandStockMC(PopupForm c) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<PopupForm> pos = new ArrayList<PopupForm>();
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		String customerCode = "";
+		try {
+			conn = DBConnection.getInstance().getConnectionApps();
+			logger.debug("searchBrandStockMC");
+
+			//criteria
+			if(c.getCriteriaMap() != null){
+			   customerCode = Utils.isNull(c.getCriteriaMap().get("customerCode"));
+			}
+			logger.debug("customerCode:"+customerCode);
+			
+			sql.append("\n select c.* from(");
+			sql.append("\n  select distinct c.brand ");
+			sql.append("\n  ,(select brand_desc from PENSBI.XXPENS_BI_MST_BRAND b where b.brand_no = c.brand) as brand_name");
+			sql.append("\n  from pensbi.MC_ITEM_CUST c");
+			sql.append("\n  where c.customer_code ='"+customerCode+"' ");
+			sql.append("\n ) c where 1=1");
+			if( !Utils.isNull(c.getCodeSearch()).equals("")){
+				sql.append("\n and c.brand ='"+c.getCodeSearch()+"' ");
+			}
+			if( !Utils.isNull(c.getDescSearch()).equals("")){
+				sql.append("\n and c.brand_name LIKE '%"+c.getDescSearch()+"%' ");
+			}
+			
+			sql.append("\n  ORDER BY c.brand asc ");
+			
+			logger.debug("sql:"+sql);
+
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			int no = 0;
+			while (rst.next()) {
+				PopupForm item = new PopupForm();
+				no++;
+				item.setNo(no);
+				item.setCode(rst.getString("brand"));
+				item.setDesc(rst.getString("brand_name"));
+				pos.add(item);
+				
+			}//while
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+		return pos;
+	}
+	
 	 public static List<PopupForm> searchSubInvList(PopupForm c){
 		    List<PopupForm> pos = new ArrayList<PopupForm>();
 			StringBuffer sql = new StringBuffer("");

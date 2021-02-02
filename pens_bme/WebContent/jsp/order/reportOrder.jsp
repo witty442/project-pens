@@ -435,6 +435,7 @@ function setGroupMainValue(code,desc,types){
 		                <tbody>
 		                  <tr>
 		                  <th width="3%">Store Code</th>
+		                  <th width="5%">Store Name</th>
 		                  <th width="4%">Order Date</th>
 		                  <th width="3%">Pens Item</th>
 		                  <th width="5%">Group Code</th>
@@ -465,6 +466,7 @@ function setGroupMainValue(code,desc,types){
 					
 						<tr class="<%=classStyle%>">
 						    <td><%=o.getStoreCode()%></td>
+						    <td><%=o.getStoreName()%></td>
 						    <td><%=o.getOrderDate()%></td>
 							<td><%=o.getItem()%></td>
 							<td><%=o.getGroupCode()%></td>

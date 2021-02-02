@@ -36,6 +36,7 @@ public class StockMCProcess  extends I_Action{
 	
 	public static int pageSize = StockMCAction.pageSize;
 	
+	
 	public ActionForward prepareSearch(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response)  throws Exception {
 		logger.debug("prepareSearch");
 		StockMCForm aForm = (StockMCForm) form;
@@ -46,7 +47,8 @@ public class StockMCProcess  extends I_Action{
 			String action = Utils.isNull(request.getParameter("action")); 
 			String pageName = Utils.isNull(request.getParameter("pageName")); 
 			
-			forward =user.isMobile()?"searchMobile":"search";
+			//forward =user.isMobile()?"searchMobile":"search";
+			forward = "searchMobile";//force to mobile
 			
 			if("new".equals(action)){
 				//clear session
@@ -58,6 +60,7 @@ public class StockMCProcess  extends I_Action{
 				aForm.setResults(null);
 				//prepare bean
 				StockMCBean bean = new StockMCBean();
+				bean.setStockDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				//logger.debug("User["+user.getUserName()+"]pageName["+pageName+"]");
 				aForm.setBean(bean);
 				
@@ -95,6 +98,8 @@ public class StockMCProcess  extends I_Action{
 			
 			//init connection
 			conn = DBConnection.getInstance().getConnectionApps();
+			//filter by userLogin
+			aForm.getBean().setCreateUser(user.getUserName());
 			
 			if("newsearch".equalsIgnoreCase(action) || "back".equalsIgnoreCase(action)){
 				//case  back
@@ -155,7 +160,8 @@ public class StockMCProcess  extends I_Action{
 				conn.close();
 			}
 		}
-		return mapping.findForward(user.isMobile()?"searchMobile":"search");
+		//return mapping.findForward(user.isMobile()?"searchMobile":"search");
+		return mapping.findForward("searchMobile");
 	}
 	/**
 	 * Prepare without ID
@@ -213,7 +219,7 @@ public class StockMCProcess  extends I_Action{
 					aForm.setBean(bean);
 					
 					List<StockMCBean> productSaveList = bean.getItems();
-					List<StockMCBean> productNoSaveList = StockMCDAO.getProductMCItemList(conn,bean.getCustomerCode(),bean.getId());
+					List<StockMCBean> productNoSaveList = StockMCDAO.getProductMCItemList(conn,bean.getCustomerCode(),"",bean.getId());
 					
 					List<StockMCBean> productAllList = new ArrayList<StockMCBean>();
 					productAllList.addAll(productSaveList);
@@ -289,7 +295,7 @@ public class StockMCProcess  extends I_Action{
 					bean.setCanEdit(true);
 					aForm.setBean(bean);
 					List<StockMCBean> productSaveList = bean.getItems();
-					List<StockMCBean> productNoSaveList = StockMCDAO.getProductMCItemList(conn,bean.getCustomerCode(),bean.getId());
+					List<StockMCBean> productNoSaveList = StockMCDAO.getProductMCItemList(conn,bean.getCustomerCode(),"",bean.getId());
 
 					List<StockMCBean> productAllList = new ArrayList<StockMCBean>();
 					productAllList.addAll(productSaveList);
@@ -334,7 +340,7 @@ public class StockMCProcess  extends I_Action{
 			conn = DBConnection.getInstance().getConnectionApps();
 			
 			 aForm.setMode("edit");
-			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode(),0));
+			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode(),"",0));
 			
 			// save token
 			saveToken(request);			
@@ -361,7 +367,7 @@ public class StockMCProcess  extends I_Action{
 			 conn = DBConnection.getInstance().getConnectionApps();
 			
 			 aForm.setMode("edit");
-			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode(),0));
+			 aForm.setResults(StockMCDAO.getProductMCItemList(conn,aForm.getBean().getCustomerCode(),"",0));
 			
 			 StockMCBean bean = aForm.getBean();
 			 

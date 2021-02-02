@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.upload.FormFile;
+
 import com.isecinc.core.web.I_Form;
 
 public class StockMCForm extends I_Form {
@@ -15,8 +18,22 @@ public class StockMCForm extends I_Form {
     private StockMCBean bean ;
     private StockMCBean beanCriteria ;
     private String mode;
-
+    private String fromPage;
+    private FormFile imageFile;
     
+    
+	public FormFile getImageFile() {
+		return imageFile;
+	}
+	public void setImageFile(FormFile imageFile) {
+		this.imageFile = imageFile;
+	}
+	public String getFromPage() {
+		return fromPage;
+	}
+	public void setFromPage(String fromPage) {
+		this.fromPage = fromPage;
+	}
 	public String getMode() {
 		return mode;
 	}
@@ -51,6 +68,7 @@ public class StockMCForm extends I_Form {
 	public void reset(ActionMapping mapping, HttpServletRequest request) {
       if(getBean() != null){
     	  getBean().setDispHaveCheckStock("");
+    	  getBean().setStatusFlag("");
       }
 		
 	}

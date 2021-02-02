@@ -240,6 +240,27 @@ function setDataPopupValue(code,desc,pageName){
 								<td >
 								  <html:text property="bean.productAge" size="10" styleId="productAge"  styleClass="\" autoComplete=\"off"/>						
 								</td>
+							</tr>	
+							<tr>
+				                <td align="right"> หน่วย  <font color="red">*</font></td>
+								<td >
+								  <html:text property="bean.uom" size="10"  styleId="uom"  styleClass="\" autoComplete=\"off"/>						
+								</td>
+								<td align="right">&nbsp;&nbsp;แบรนด์ <font color="red">*</font></td>
+								<td >
+								  <html:text property="bean.brand" size="10" styleId="brand"  styleClass="\" autoComplete=\"off"/>						
+								
+								</td>
+							</tr>	
+							<tr>
+				                <td align="right"> สถานะ  <font color="red">*</font></td>
+								<td>
+								  <html:checkbox property="bean.statusFlag">
+								      &nbsp;&nbsp;สถานะใช้งาน
+								  </html:checkbox>
+								</td>
+								<td align="right">&nbsp;&nbsp;</td>
+								<td></td>
 							</tr>		
 					   </table>
 					   <table  border="0" cellpadding="3" cellspacing="0" >

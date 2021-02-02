@@ -1,0 +1,719 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="pay_in_h_report" language="groovy" pageWidth="610" pageHeight="445" columnWidth="610" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="829"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="companyName" class="java.lang.String"/>
+	<parameter name="paymentMethod" class="java.lang.String"/>
+	<parameter name="docNo" class="java.lang.String"/>
+	<parameter name="docDateDD" class="java.lang.String"/>
+	<parameter name="docDateMM" class="java.lang.String"/>
+	<parameter name="docDateYYYY" class="java.lang.String"/>
+	<parameter name="payInName" class="java.lang.String"/>
+	<parameter name="deptName" class="java.lang.String"/>
+	<parameter name="sectionName" class="java.lang.String"/>
+	<parameter name="totalAmountLetter" class="java.lang.String"/>
+	<parameter name="totalAmount" class="java.lang.String"/>
+	<parameter name="totalAmount2Digit" class="java.lang.String"/>
+	<parameter name="createUser" class="java.lang.String"/>
+	<parameter name="accountName1" class="java.lang.String"/>
+	<parameter name="description1" class="java.lang.String"/>
+	<parameter name="amount1" class="java.lang.String"/>
+	<parameter name="amount2Digit1" class="java.lang.String"/>
+	<parameter name="accountName2" class="java.lang.String"/>
+	<parameter name="description2" class="java.lang.String"/>
+	<parameter name="amount2" class="java.lang.String"/>
+	<parameter name="amount2Digit2" class="java.lang.String"/>
+	<parameter name="accountName3" class="java.lang.String"/>
+	<parameter name="description3" class="java.lang.String"/>
+	<parameter name="amount3" class="java.lang.String"/>
+	<parameter name="amount2Digit3" class="java.lang.String"/>
+	<parameter name="accountName4" class="java.lang.String"/>
+	<parameter name="description4" class="java.lang.String"/>
+	<parameter name="amount4" class="java.lang.String"/>
+	<parameter name="amount2Digit4" class="java.lang.String"/>
+	<parameter name="DR_AC_NO" class="java.lang.String"/>
+	<parameter name="DR_DESC" class="java.lang.String"/>
+	<parameter name="DR_AMOUNT" class="java.lang.String"/>
+	<parameter name="DR_AMOUNT_DIGIT" class="java.lang.String"/>
+	<parameter name="DR_INPUT_TAX_AMOUNT" class="java.lang.String"/>
+	<parameter name="DR_INPUT_TAX_AMOUNT_DIGIT" class="java.lang.String"/>
+	<parameter name="DR_TOTAL" class="java.lang.String"/>
+	<parameter name="DR_TOTAL_DIGIT" class="java.lang.String"/>
+	<parameter name="CR_AC_NO" class="java.lang.String"/>
+	<parameter name="CR_DESC" class="java.lang.String"/>
+	<parameter name="CR_AMOUNT" class="java.lang.String"/>
+	<parameter name="CR_AMOUNT_DIGIT" class="java.lang.String"/>
+	<parameter name="CR_ACC_WT_TAX_AMOUNT" class="java.lang.String"/>
+	<parameter name="CR_ACC_WT_TAX_AMOUNT_DIGIT" class="java.lang.String"/>
+	<parameter name="CR_TOTAL" class="java.lang.String"/>
+	<parameter name="CR_TOTAL_DIGIT" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="445">
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="44" y="86" width="278" height="17"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{payInName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="381" y="86" width="214" height="17"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{sectionName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="510" y="47" width="85" height="17"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{docDateDD}+" / "+$P{docDateMM}+" / "+$P{docDateYYYY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="20" y="132" width="95" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{accountName1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="115" y="132" width="380" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" "+$P{description1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="495" y="132" width="70" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="570" y="132" width="25" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount2Digit1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="20" y="149" width="95" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{accountName2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="115" y="149" width="380" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" "+$P{description2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="495" y="149" width="70" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="570" y="149" width="25" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount2Digit2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="20" y="166" width="95" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{accountName3}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="115" y="166" width="380" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" "+$P{description3}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="495" y="166" width="70" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount3}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="570" y="166" width="25" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount2Digit3}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="20" y="183" width="95" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{accountName4}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="115" y="183" width="380" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[" "+$P{description4}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="495" y="183" width="70" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount4}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="570" y="183" width="25" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{amount2Digit4}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="20" y="200" width="475" height="34"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="11"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalAmountLetter}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="495" y="200" width="70" height="34"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalAmount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="570" y="200" width="25" height="34"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="10"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalAmount2Digit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="161" y="6" width="274" height="31"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{companyName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="20" y="44" width="415" height="37"/>
+				<textElement textAlignment="Left">
+					<font fontName="SansSerif" size="11" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PENS HOLDING PTE LTD.
+S EU TONG SEN STREET #14-94 THE CENTRAL SINGAPORE 059818]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="478" y="25" width="32" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="478" y="47" width="32" height="17"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Date. ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="86" width="23" height="17"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[To]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="112" width="95" height="20"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Account Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="115" y="112" width="380" height="20"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Descrption]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="495" y="112" width="100" height="20"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Amount USD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="200" width="226" height="18"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="11" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[TOTAL INVOICE VALUE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="245" width="95" height="19"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Prepared]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="264" width="95" height="40"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="115" y="245" width="95" height="19"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Checker]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="115" y="264" width="95" height="40"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="245" width="95" height="19"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Approved]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="264" width="95" height="40"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="305" y="245" width="95" height="19"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Cashier]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="305" y="264" width="95" height="40"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="245" width="95" height="19"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Receiver]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="264" width="95" height="40"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.2"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="495" y="245" width="100" height="19"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[A/C Recorder]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="495" y="264" width="100" height="40"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.2"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="12" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="89" width="278" height="17"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[......................................................................................................................................................................................................................................................]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="565" y="132" width="5" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="11"/>
+				</textElement>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="565" y="149" width="5" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="11"/>
+				</textElement>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="565" y="166" width="5" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="11"/>
+				</textElement>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="565" y="183" width="5" height="17"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="11"/>
+				</textElement>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="565" y="200" width="5" height="34"/>
+				<box>
+					<pen lineWidth="0.2"/>
+					<topPen lineWidth="0.2"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.2"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="11"/>
+				</textElement>
+			</textField>
+			<staticText>
+				<reportElement x="510" y="49" width="85" height="17"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="89" width="214" height="17"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[......................................................................................................................................................................................................................................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="325" y="86" width="56" height="17"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[Department]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="478" y="64" width="117" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[......................................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="510" y="28" width="85" height="17"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="11" isBold="false" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[.......................................................]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="510" y="25" width="85" height="17"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="11"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{docNo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+</jasperReport>

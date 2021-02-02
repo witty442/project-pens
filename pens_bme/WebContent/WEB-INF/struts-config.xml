@@ -62,6 +62,8 @@
 		<form-bean name="payWhiteForm" type="com.isecinc.pens.web.pay.PayWhiteForm" />
 		<form-bean name="payYellowForm" type="com.isecinc.pens.web.pay.PayYellowForm" />
 		<form-bean name="payInterForm" type="com.isecinc.pens.web.pay.PayInterForm" />
+		<form-bean name="payInterWWForm" type="com.isecinc.pens.web.pay.PayInterWWForm" />
+		<form-bean name="payInterHForm" type="com.isecinc.pens.web.pay.PayInterHForm" />
 		<form-bean name="rtForm" type="com.isecinc.pens.web.rt.RTForm" />
 		<form-bean name="nsForm" type="com.isecinc.pens.web.nissin.NSForm" />
 		<form-bean name="tempForm" type="com.isecinc.pens.web.temp.TempForm" />
@@ -622,6 +624,16 @@
 			<forward name="search" path="/jsp/pay/payInterSearch.jsp" />
 			<forward name="detail" path="/jsp/pay/payInterDetail.jsp" />
 			<forward name="printPayPopup" path="/jsp/popup/printPayInterPopup.jsp" />
+		</action>
+		<action name="payInterWWForm" path="/jsp/payInterWWAction" parameter="do" scope="session" type="com.isecinc.pens.web.pay.PayInterWWAction">
+			<forward name="search" path="/jsp/pay/payInterWWSearch.jsp" />
+			<forward name="detail" path="/jsp/pay/payInterWWDetail.jsp" />
+			<forward name="printPayPopup" path="/jsp/popup/printPayInterWWPopup.jsp" />
+		</action>
+		<action name="payInterHForm" path="/jsp/payInterHAction" parameter="do" scope="session" type="com.isecinc.pens.web.pay.PayInterHAction">
+			<forward name="search" path="/jsp/pay/payInterHSearch.jsp" />
+			<forward name="detail" path="/jsp/pay/payInterHDetail.jsp" />
+			<forward name="printPayPopup" path="/jsp/popup/printPayInterHPopup.jsp" />
 		</action>
 		<action name="itManageForm" path="/jsp/itManageAction" parameter="do" scope="session" type="com.isecinc.pens.web.itmanage.ITManageAction">
 			<forward name="search" path="/jsp/itmanage/itManageSearch.jsp" />

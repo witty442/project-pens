@@ -190,18 +190,18 @@ function gotoOrderNissinSearch(path){
 								<td colspan="6"></td>
 							</tr>
 						    <tr>
-								<td align="right" width="20%">ชื่อร้านค้า<font color="red">*</font></td>
+								<td align="right" width="20%" nowrap>ชื่อร้านค้า<font color="red">*</font></td>
 								<td align="left" colspan="3"  width="20%">
 									<html:text property="customer.name" size="70" styleId="customerName"  styleClass="\" autoComplete=\"off"/>
 								</td>
-								<td align="right" width="15%">Ref.Cust ID&nbsp;&nbsp;</td>
+								<td align="right" width="15%" nowrap>Ref.Cust ID&nbsp;&nbsp;</td>
 								<td align="left" width="40%">
 									<html:text property="customer.id" size="25" styleId="customerId"
 									styleClass="disableText" readonly="true"/>
 								</td>
 							</tr>
 							<tr>
-								<td align="right">เลขที่/ซอย<font color="red"></font></td>
+								<td align="right" nowrap>เลขที่/ซอย<font color="red"></font></td>
 								<td align="left">
 									<html:text property="customer.addressLine1" size="25" styleId="addressLine1"  styleClass="\" autoComplete=\"off"/>
 								</td>
@@ -209,7 +209,7 @@ function gotoOrderNissinSearch(path){
 								<td align="left">
 									<html:text property="customer.addressLine2" size="25"  styleClass="\" autoComplete=\"off"/>
 								</td>
-								<td align="right">แขวง/ตำบล<font color="red"></font></td>
+								<td align="right" nowrap>แขวง/ตำบล<font color="red"></font></td>
 								<td align="left">
 									<html:text property="customer.addressLine3" size="25"  styleClass="\" autoComplete=\"off"/>
 								</td>
@@ -227,7 +227,7 @@ function gotoOrderNissinSearch(path){
 								</td>
 							</tr>
 							<tr>
-								<td align="right" >เบอร์โทรติดต่อร้านค้า<font color="red"></font></td>
+								<td align="right"  nowrap>เบอร์โทรติดต่อร้านค้า<font color="red"></font></td>
 								<td align="left" >
 									<html:text property="customer.mobile" size="25" styleId="mobile"  styleClass="\" autoComplete=\"off"/>
 								</td>

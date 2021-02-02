@@ -64,16 +64,17 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		parameterMap.put("curAliAmt", dataReport.getTotalAliAmt());
 		parameterMap.put("curWeAmt", dataReport.getTotalWeAmt());
 		parameterMap.put("curGovAmt", dataReport.getTotalGovAmt());
-		
+		parameterMap.put("curQrAmt", dataReport.getTotalQrAmt());
 		
 		parameterMap.put("curCashCnt", process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 1));//currentCashCnt
 		parameterMap.put("curCreditCardCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 2));//curCreditcasrCnt
 		parameterMap.put("curAliCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 6));//curAliCnt
 		parameterMap.put("curWeCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 7));//curWechatCnt
 		parameterMap.put("curGovCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 11));//curGovchatCnt
+		parameterMap.put("curQrCnt",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 13));//curQrCnt
 		
-		logger.debug("curAliCnt:"+parameterMap.get("curAliCnt"));
-		logger.debug("curWeCnt:"+parameterMap.get("curWeCnt"));
+		//logger.debug("curAliCnt:"+parameterMap.get("curAliCnt"));
+		//logger.debug("curWeCnt:"+parameterMap.get("curWeCnt"));
 		
 		//sum cancel amt today =receiptDate
 		double[] curCancelCash = process.sumCurCancelCashAmt(reportForm.getInvoicePaymentReport(), user, conn);
@@ -92,12 +93,15 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		parameterMap.put("weAmtBefore",weAmtBefore);
 		double govAmtBefore = process.sumGovAmtBefore(reportForm.getInvoicePaymentReport(), user, conn);
 		parameterMap.put("govAmtBefore",govAmtBefore);
+		double qrAmtBefore = process.sumQrAmtBefore(reportForm.getInvoicePaymentReport(), user, conn);
+		parameterMap.put("qrAmtBefore",qrAmtBefore);
 		
 		parameterMap.put("cashCntBefore", process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 3));
 		parameterMap.put("creditCardCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 4));
 		parameterMap.put("aliCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 9));
 		parameterMap.put("weCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 10));
 		parameterMap.put("govCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 12));
+		parameterMap.put("qrCntBefore",process.countReport(reportForm.getInvoicePaymentReport(), user, conn, 14));
 		/*******************************************************************************************************/		
 		
 		parameterMap.put("reportPath", BeanParameter.getReportPath());
@@ -123,24 +127,28 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		      p_sum_all_cnt += (Integer)parameterMap.get("curAliCnt");
 		      p_sum_all_cnt += (Integer)parameterMap.get("curWeCnt");
 		      p_sum_all_cnt += (Integer)parameterMap.get("curGovCnt");
+		      p_sum_all_cnt += (Integer)parameterMap.get("curQrCnt");
 		      
 		      p_sum_all_cnt += (Integer)parameterMap.get("cashCntBefore");
 		      p_sum_all_cnt += (Integer)parameterMap.get("creditCardCntBefore");
 		      p_sum_all_cnt += (Integer)parameterMap.get("aliCntBefore");
 		      p_sum_all_cnt += (Integer)parameterMap.get("weCntBefore");
 		      p_sum_all_cnt += (Integer)parameterMap.get("govCntBefore");
-
+		      p_sum_all_cnt += (Integer)parameterMap.get("qrCntBefore");
+		      
       double  p_sum_all_amt = (Double)parameterMap.get("curCashAmt");
 		      p_sum_all_amt += (Double)parameterMap.get("curCreditCardAmt");
 		      p_sum_all_amt += (Double)parameterMap.get("curAliAmt");
 		      p_sum_all_amt += (Double)parameterMap.get("curWeAmt");
 		      p_sum_all_amt += (Double)parameterMap.get("curGovAmt");
+		      p_sum_all_amt += (Double)parameterMap.get("curQrAmt");
 		      
 		      p_sum_all_amt += (Double)parameterMap.get("cashAmtBefore");
 		      p_sum_all_amt += (Double)parameterMap.get("creditCardAmtBefore");
 		      p_sum_all_amt += (Double)parameterMap.get("aliAmtBefore");
 		      p_sum_all_amt += (Double)parameterMap.get("weAmtBefore");
 		      p_sum_all_amt += (Double)parameterMap.get("govAmtBefore");
+		      p_sum_all_amt += (Double)parameterMap.get("qrAmtBefore");
 		      
 		parameterMap.put("p_sum_all_cnt",p_sum_all_cnt);
 		parameterMap.put("p_sum_all_amt",p_sum_all_amt);
@@ -151,7 +159,8 @@ public class InvoicePaymentNewReportAction extends I_ReportAction<InvoicePayment
 		p_sum_all_amt_b += (Double)parameterMap.get("aliAmtBefore");
 		p_sum_all_amt_b += (Double)parameterMap.get("weAmtBefore");
 		p_sum_all_amt_b += (Double)parameterMap.get("govAmtBefore");
-		      
+		p_sum_all_amt_b += (Double)parameterMap.get("qrAmtBefore");
+		
 		logger.debug("p_sum_all_amt_b:"+p_sum_all_amt_b);
 		
 		return lstReport;

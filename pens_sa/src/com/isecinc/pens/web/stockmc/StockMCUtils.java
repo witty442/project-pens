@@ -14,6 +14,7 @@ import com.isecinc.pens.bean.PopupBean;
 import com.isecinc.pens.bean.User;
 import com.pens.util.DBConnection;
 import com.pens.util.Utils;
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 public class StockMCUtils {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -63,5 +64,63 @@ public class StockMCUtils {
 	  return salesChannelDesc;
 	}
 	
-	
+	public static List<String[]> getReasonNList(){
+		List<String[]> dataList = new ArrayList<String[]>();
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		try{
+			sql.append("\n  SELECT oos_id ,oos_reason from PENSBI.MC_OOS_REASON M  order by oos_id");
+			conn = DBConnection.getInstance().getConnectionApps();
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			//add blank
+			dataList.add(new String[]{"",""});
+			while (rst.next()) {
+				dataList.add(new String[]{rst.getString("oos_id"),rst.getString("oos_reason")});
+			}//while
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+	  return dataList;
+	}
+	public static List<String[]> getReasonDList(){
+		List<String[]> dataList = new ArrayList<String[]>();
+		Statement stmt = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnectionApps();
+			sql.append("\n  SELECT derange_id ,derange_reason from PENSBI.MC_DERANGED_REASON M order by derange_id");
+
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql.toString());
+			//add blank
+			dataList.add(new String[]{"",""});
+			while (rst.next()) {
+				dataList.add(new String[]{rst.getString("derange_id"),rst.getString("derange_reason")});
+			}//while
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+				conn.close();
+			} catch (Exception e) {}
+		}
+	  return dataList;
+	}
 }
