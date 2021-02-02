@@ -24,10 +24,10 @@ import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
-public class ShopStockOnhandAction {
+public class SPStockOnhandAction {
  private static Logger logger = Logger.getLogger("PENS");
  private static int pageSize =50;
-	
+ 
  public static ShopForm search(HttpServletRequest request, ShopForm f,User user) throws Exception{
 	   Statement stmt = null;
 		ResultSet rst = null;
@@ -60,7 +60,6 @@ public class ShopStockOnhandAction {
 					item.setSaleOutQty(Utils.decimalFormat(rst.getDouble("SALE_OUT_QTY"),Utils.format_current_2_disgit));
 					item.setSaleReturnQty(Utils.decimalFormat(rst.getDouble("SALE_RETURN_QTY"),Utils.format_current_2_disgit));
 					item.setAdjustQty("0");//wait for spec
-					item.setStockShortQty(Utils.decimalFormat(rst.getDouble("STOCK_SHORT_QTY"),Utils.format_current_2_disgit));
 					item.setOnhandQty(Utils.decimalFormat(rst.getDouble("ONHAND_QTY"),Utils.format_current_2_disgit));
 					
 					pos.add(item);
@@ -68,7 +67,7 @@ public class ShopStockOnhandAction {
 	
 				if(pos != null && pos.size() >0){
 					f.setResults(pos);
-					
+					//request.getSession().setAttribute("summary" ,item);
 					//calc Paging
 					f.setTotalRecord(f.getResults().size());
 					f.setTotalPage(Utils.calcTotalPage(f.getTotalRecord(), pageSize));
@@ -104,9 +103,9 @@ public class ShopStockOnhandAction {
 			throw e;
 		} finally {
 			try {
-				if(rst != null){rst.close();}
-				if(stmt != null){stmt.close();}
-				if(conn != null){conn.close();}
+				rst.close();
+				stmt.close();
+				conn.close();
 			} catch (Exception e) {}
 		}
 		return f;
@@ -124,7 +123,7 @@ public class ShopStockOnhandAction {
 			//Header
 			h.append("<table border='1'> \n");
 			h.append(" <tr> \n");
-			h.append("  <td align='left' colspan='"+colspan+"'><b>รายงาน Stock Onhand at MAYA</b></td> \n");
+			h.append("  <td align='left' colspan='"+colspan+"'><b>รายงาน Stock Onhand at Siam Premium Outlet</b></td> \n");
 			h.append(" </tr> \n");
 			h.append(" <tr> \n");
 			h.append("  <td align='left' colspan='"+colspan+"' ><b>วันที่ขาย (As Of Date):"+form.getBean().getAsOfDate()+"</b></td> \n");
@@ -215,13 +214,7 @@ public class ShopStockOnhandAction {
 			sql.append("\n , NVL(TRANS_IN.TRANS_IN_QTY,0) AS TRANS_IN_QTY");
 			sql.append("\n , NVL(SALE_OUT.SALE_OUT_QTY,0) AS SALE_OUT_QTY");
 			sql.append("\n , NVL(SALE_RETURN.SALE_RETURN_QTY,0) AS SALE_RETURN_QTY");
-			sql.append("\n , NVL(STOCK_SHORT.STOCK_SHORT_QTY,0) AS STOCK_SHORT_QTY");
-			sql.append("\n ,("
-					+ "  ( NVL(INIT_MTT.INIT_SALE_QTY,0) + NVL(TRANS_IN.TRANS_IN_QTY,0) ) "
-					+ "- (   NVL(SALE_OUT.SALE_OUT_QTY,0)"
-					+ "    + NVL(SALE_RETURN.SALE_RETURN_QTY,0)"
-					+ "    + NVL(STOCK_SHORT.STOCK_SHORT_QTY,0) )"
-					+ " ) ONHAND_QTY");
+			sql.append("\n , (NVL(INIT_MTT.INIT_SALE_QTY,0) + NVL(TRANS_IN.TRANS_IN_QTY,0)) - (NVL(SALE_OUT.SALE_OUT_QTY,0)+NVL(SALE_RETURN.SALE_RETURN_QTY,0)) ONHAND_QTY");
 			
 			sql.append("\n FROM(  ");
 			   sql.append("\n SELECT DISTINCT AA.* FROM(");
@@ -255,17 +248,18 @@ public class ShopStockOnhandAction {
 						sql.append("\n AND L.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					
-					sql.append("\n UNION");
+					sql.append("\n UNION ");
 					/** ORDER BME (TRANS_IN)*/
 					sql.append("\n SELECT DISTINCT");
 					sql.append("\n L.GROUP_CODE as group_type,L.ITEM AS PENS_ITEM ,MP.MATERIAL_MASTER,L.BARCODE ");
 					sql.append("\n FROM PENSBI.PENSBME_ORDER L");
 					sql.append("\n ,(" );
-					sql.append("\n   SELECT MP.PENS_VALUE as PENS_ITEM ");
+					sql.append("\n   SELECT DISTINCT MP.PENS_VALUE as PENS_ITEM ");
 					sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 					sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ");
-					sql.append("\n   WHERE reference_code ='"+Constants.STORE_TYPE_7CATALOG_ITEM+"'");
+					sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
+					sql.append("\n   AND MP.pens_desc6 in ('MAYA' , 'TM21','IMCHINA') ");
 					sql.append("\n ) MP ");
 					sql.append("\n WHERE 1=1 ");
 					sql.append("\n AND L.BARCODE = MP.BARCODE ");
@@ -290,24 +284,79 @@ public class ShopStockOnhandAction {
 						sql.append("\n AND L.ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
 					sql.append("\n UNION ");
+					/** Pick Stock **/
+					sql.append("\n SELECT DISTINCT I.group_code as group_type,I.PENS_ITEM,I.material_master");
+					sql.append("\n ,(select max(X.interface_desc) from PENSBI.PENSBME_MST_REFERENCE X ");
+					sql.append("\n   WHERE X.interface_value=I.material_master ");
+					sql.append("\n   AND REFERENCE_CODE in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"') ");
+					sql.append("\n   AND X.pens_desc6 in ('MAYA' , 'TM21','IMCHINA') ");
+					sql.append("\n  ) as barcode ");
+					sql.append("\n FROM PENSBI.PENSBME_PICK_STOCK M ,PENSBI.PENSBME_PICK_STOCK_I I ");
+					sql.append("\n WHERE 1=1   ");
+					sql.append("\n AND M.issue_req_no = I.issue_req_no ");
+					sql.append("\n AND M.issue_req_status ='"+PickConstants.STATUS_ISSUED+"'");
+					sql.append("\n AND M.store_code ='"+f.getBean().getCustGroup()+"' ");
+					if(initDate != null){
+						 sql.append("\n AND M.ISSUE_REQ_DATE  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					}else{
+						 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					}
+					if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
+						sql.append("\n AND I.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
+						sql.append("\n AND I.MATERIAL_MASTER  <='"+Utils.isNull(c.getStyleTo())+"' ");
+					}
+					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+						sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+						sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
+					}
+					sql.append("\n UNION ");
+					/** Pick Stock Issue **/
+					sql.append("\n SELECT DISTINCT I.group_code as group_type,I.PENS_ITEM,I.material_master");
+					sql.append("\n ,(select max(X.interface_desc) from PENSBI.PENSBME_MST_REFERENCE X ");
+					sql.append("\n   WHERE X.interface_value=I.material_master ");
+					sql.append("\n   AND REFERENCE_CODE in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"') ");
+					sql.append("\n   AND X.pens_desc6 in ('MAYA' , 'TM21','IMCHINA') ");
+					sql.append("\n  ) as barcode ");
+					sql.append("\n FROM PENSBI.PENSBME_STOCK_ISSUE M ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I ");
+					sql.append("\n WHERE 1=1   ");
+					sql.append("\n AND M.issue_req_no = I.issue_req_no ");
+					sql.append("\n AND M.status ='"+PickConstants.STATUS_ISSUED+"'");
+					sql.append("\n AND M.CUSTOMER_NO ='"+f.getBean().getCustGroup()+"' ");
+					if(initDate != null){
+						 sql.append("\n AND M.ISSUE_REQ_DATE  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+						 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					}else{
+						 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+					}
+					if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
+						sql.append("\n AND I.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
+						sql.append("\n AND I.MATERIAL_MASTER  <='"+Utils.isNull(c.getStyleTo())+"' ");
+					}
+					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+						sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+						sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
+					}
+					
+					sql.append("\n UNION");
+					
 					/** ORDER ORACLE(SALEOUT) */
 					sql.append("\n SELECT DISTINCT");
 					sql.append("\n MP.GROUP_CODE as group_type,MP.PENS_ITEM ,MP.MATERIAL_MASTER,MP.BARCODE ");
 					sql.append("\n FROM APPS.XXPENS_OM_SHOP_ORDER_MST L,APPS.XXPENS_OM_SHOP_ORDER_DT D ");
 					sql.append("\n ,(" );
-					sql.append("\n   SELECT I.inventory_item_id as product_id");
+					sql.append("\n   SELECT DISTINCT I.inventory_item_id as product_id");
 					sql.append("\n   ,MP.pens_desc2 as group_code ");
 					sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
 					sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 					sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
-					sql.append("\n   WHERE reference_code ='"+Constants.STORE_TYPE_7CATALOG_ITEM+"'");
-					sql.append("\n   AND MP.pens_desc6 in ('MAYA') ");
+					sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
+					sql.append("\n   AND MP.pens_desc6 in ('MAYA' , 'TM21','IMCHINA') ");
 					sql.append("\n   AND MP.pens_value =I.segment1 ");
 					sql.append("\n ) MP ");
 					sql.append("\n WHERE L.ORDER_NUMBER = D.ORDER_NUMBER ");
 					sql.append("\n AND D.product_id = MP.product_id ");
-					sql.append("\n AND L.intflag ='S' ");//Interfaces Success Only
 					//Filter By StoreType
 					sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.CUSTOMER_NUMBER"));
 					sql.append("\n AND L.CUSTOMER_NUMBER ='"+f.getBean().getCustGroup()+"' ");
@@ -361,44 +410,10 @@ public class ShopStockOnhandAction {
 						sql.append("\n AND D.PENS_ITEM >='"+Utils.isNull(c.getPensItemFrom())+"' ");
 						sql.append("\n AND D.PENS_ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 					}
-					
-					sql.append("\n UNION ");
-					sql.append("\n /******************* STOCK_SHORT ****************************************/");
-					sql.append("\n SELECT DISTINCT ");
-					sql.append("\n L.item_adjust_desc as group_type,L.item_adjust as pens_item,MP.MATERIAL_MASTER ,MP.barcode ");
-					sql.append("\n FROM PENSBI.PENSBME_ADJUST_SALES L ");
-					sql.append("\n ,(" );
-					sql.append("\n   SELECT MP.PENS_VALUE as PENS_ITEM ");
-					sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
-					sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
-					sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ");
-					sql.append("\n   WHERE reference_code ='"+Constants.STORE_TYPE_7CATALOG_ITEM+"'");
-					sql.append("\n ) MP ");
-					sql.append("\n WHERE L.item_adjust = MP.PENS_ITEM ");	 
-					//Filter By StoreType
-					sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.STORE_CODE"));
-					sql.append("\n AND L.STORE_CODE ='"+f.getBean().getCustGroup()+"' ");
-					if(initDate != null){
-						sql.append("\n AND L.transaction_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
-						sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-					}else{
-						sql.append("\n AND L.transaction_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-					}
-					if( !Utils.isNull(c.getGroupCodeFrom()).equals("") ){
-						sql.append("\n AND L.item_adjust_desc LIKE '"+Utils.isNull(c.getGroupCodeFrom())+"%' ");
-					}
-					if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
-					    sql.append("\n AND L.item_adjust_desc  >='"+Utils.isNull(c.getStyleFrom())+"' ");
-						sql.append("\n AND L.item_adjust_desc  <='"+Utils.isNull(c.getStyleTo())+"' ");
-					}
-					if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
-						sql.append("\n AND L.item_adjust >='"+Utils.isNull(c.getPensItemFrom())+"' ");
-						sql.append("\n AND L.item_adjust <='"+Utils.isNull(c.getPensItemTo())+"' ");
-					}
 					sql.append("\n )AA");
         sql.append("\n )M ");
         sql.append("\n LEFT OUTER JOIN(	 ");
-        sql.append("\n /******************* INIT MTT *************************************/");
+	       /**** INIT MTT STOCK *****************/
    		    sql.append("\n SELECT L.GROUP_CODE as group_type ,L.pens_item ,L.MATERIAL_MASTER ,L.BARCODE");
 			sql.append("\n ,SUM(QTY) AS INIT_SALE_QTY ");
 			sql.append("\n FROM PENSBI.PENSBME_MTT_INIT_STK H,PENSBI.PENSBME_MTT_ONHAND_INIT_STK L");
@@ -434,16 +449,21 @@ public class ShopStockOnhandAction {
 			sql.append("\n AND M.group_type = INIT_MTT.group_type ");		
 			
 		   sql.append("\n LEFT OUTER JOIN(	 ");
-		   sql.append("\n /******************* TRANS_IN *************************************/");
+		   
+		   /******** TRANS_IN *****************/
+		   sql.append("\n SELECT T.group_type,T.PENS_ITEM ,T.MATERIAL_MASTER,T.BARCODE");
+	        sql.append("\n ,NVL(SUM(T.TRANS_IN_QTY),0) AS TRANS_IN_QTY FROM(");
+		    /** ORDER **/
 		    sql.append("\n SELECT L.GROUP_CODE as group_type,L.ITEM AS PENS_ITEM ,MP.MATERIAL_MASTER,L.BARCODE");
 	        sql.append("\n ,NVL(SUM(L.QTY),0) AS TRANS_IN_QTY ");
 	        sql.append("\n FROM PENSBI.PENSBME_ORDER L");
 			sql.append("\n ,(" );
-			sql.append("\n   SELECT MP.PENS_VALUE as PENS_ITEM ");
+			sql.append("\n   SELECT DISTINCT MP.PENS_VALUE as PENS_ITEM ");
 			sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 			sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 			sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ");
-			sql.append("\n   WHERE reference_code ='"+Constants.STORE_TYPE_7CATALOG_ITEM+"'");
+			sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
+			sql.append("\n   AND MP.pens_desc6 in ('MAYA' , 'TM21','IMCHINA') ");
 			sql.append("\n ) MP ");
 			sql.append("\n WHERE 1=1 ");
 			sql.append("\n AND L.BARCODE = MP.BARCODE ");
@@ -468,29 +488,92 @@ public class ShopStockOnhandAction {
 				sql.append("\n AND L.ITEM <='"+Utils.isNull(c.getPensItemTo())+"' ");
 			}
 			sql.append("\n  GROUP BY L.GROUP_CODE,L.ITEM ,MP.MATERIAL_MASTER,L.BARCODE");
+			
+			sql.append("\n  UNION ALL");
+			
+			/** Pick Stock **/
+			sql.append("\n SELECT I.group_code as group_type,I.PENS_ITEM,I.material_master");
+			sql.append("\n ,(select max(X.interface_desc) from PENSBI.PENSBME_MST_REFERENCE X ");
+			sql.append("\n   WHERE X.interface_value=I.material_master ");
+			sql.append("\n   AND REFERENCE_CODE in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"') ");
+			sql.append("\n   AND X.pens_desc6 in ('MAYA' , 'TM21','IMCHINA') ");
+			sql.append("\n  ) as barcode ");
+			sql.append("\n ,NVL(COUNT(*),0) AS TRANS_IN_QTY ");
+			sql.append("\n FROM PENSBI.PENSBME_PICK_STOCK M ,PENSBI.PENSBME_PICK_STOCK_I I ");
+			sql.append("\n WHERE 1=1   ");
+			sql.append("\n AND M.issue_req_no = I.issue_req_no ");
+			sql.append("\n AND M.issue_req_status ='"+PickConstants.STATUS_ISSUED+"'");
+			sql.append("\n AND M.store_code ='"+f.getBean().getCustGroup()+"' ");
+			if(initDate != null){
+				 sql.append("\n AND M.ISSUE_REQ_DATE  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+				 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+			}else{
+				 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+			}
+			if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
+				sql.append("\n AND I.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
+				sql.append("\n AND I.MATERIAL_MASTER  <='"+Utils.isNull(c.getStyleTo())+"' ");
+			}
+			if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+				sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+				sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
+			}
+			sql.append("\n GROUP BY  I.group_code,I.PENS_ITEM,I.material_master");
+			
+			sql.append("\n UNION ALL");
+			
+			/** Pick Stock Issue **/
+			sql.append("\n SELECT I.group_code as group_type,I.PENS_ITEM,I.material_master");
+			sql.append("\n ,(select max(X.interface_desc) from PENSBI.PENSBME_MST_REFERENCE X ");
+			sql.append("\n   WHERE X.interface_value=I.material_master ");
+			sql.append("\n   AND REFERENCE_CODE in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"') ");
+			sql.append("\n   AND X.pens_desc6 in ('MAYA' , 'TM21','IMCHINA') ");
+			sql.append("\n  ) as barcode ");
+			sql.append("\n ,NVL(SUM(I.issue_qty),0) AS TRANS_IN_QTY ");
+			sql.append("\n FROM PENSBI.PENSBME_STOCK_ISSUE M ,PENSBI.PENSBME_STOCK_ISSUE_ITEM I ");
+			sql.append("\n WHERE 1=1   ");
+			sql.append("\n AND M.issue_req_no = I.issue_req_no ");
+			sql.append("\n AND M.status ='"+PickConstants.STATUS_ISSUED+"'");
+			sql.append("\n AND M.CUSTOMER_NO ='"+f.getBean().getCustGroup()+"' ");
+			if(initDate != null){
+				 sql.append("\n AND M.ISSUE_REQ_DATE  >= to_date('"+initDateStr+"','dd/mm/yyyy')  ");
+				 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+			}else{
+				 sql.append("\n AND M.ISSUE_REQ_DATE  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
+			}
+			if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
+				sql.append("\n AND I.MATERIAL_MASTER  >='"+Utils.isNull(c.getStyleFrom())+"' ");
+				sql.append("\n AND I.MATERIAL_MASTER  <='"+Utils.isNull(c.getStyleTo())+"' ");
+			}
+			if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
+				sql.append("\n AND I.pens_item >='"+Utils.isNull(c.getPensItemFrom())+"' ");
+				sql.append("\n AND I.pens_item <='"+Utils.isNull(c.getPensItemTo())+"' ");
+			}
+			sql.append("\n    GROUP BY  I.group_code,I.PENS_ITEM,I.material_master");
+			sql.append("\n  )T GROUP BY T.group_type,T.PENS_ITEM ,T.MATERIAL_MASTER,T.BARCODE");
 			sql.append("\n )TRANS_IN ");
 			sql.append("\n ON  M.pens_item = TRANS_IN.pens_item ");	 
 			sql.append("\n AND M.group_type = TRANS_IN.group_type ");
 	
 			sql.append("\n LEFT OUTER JOIN( ");
-			sql.append("\n /******************* SALE_OUT *************************************/");
+			 /******** SALE_OUT *****************/
 				sql.append("\n SELECT");
 				sql.append("\n MP.GROUP_CODE as group_type,MP.PENS_ITEM ,MP.MATERIAL_MASTER,MP.BARCODE ");
 				sql.append("\n ,NVL(SUM(D.ORDERED_QUANTITY),0) as SALE_OUT_QTY");
 				sql.append("\n FROM APPS.XXPENS_OM_SHOP_ORDER_MST L,APPS.XXPENS_OM_SHOP_ORDER_DT D ");
 				sql.append("\n ,(" );
-				sql.append("\n   SELECT I.inventory_item_id as product_id");
+				sql.append("\n   SELECT DISTINCT I.inventory_item_id as product_id");
 				sql.append("\n   ,MP.PENS_DESC2 as GROUP_CODE ");
 				sql.append("\n   ,MP.PENS_VALUE as PENS_ITEM ");
 				sql.append("\n   ,MP.INTERFACE_VALUE as MATERIAL_MASTER ");
 				sql.append("\n   ,MP.INTERFACE_DESC as BARCODE ");
 				sql.append("\n   FROM PENSBI.PENSBME_MST_REFERENCE MP ,APPS.XXPENS_OM_ITEM_MST_V I");
-				sql.append("\n   WHERE reference_code ='"+Constants.STORE_TYPE_7CATALOG_ITEM+"'");
+				sql.append("\n   WHERE reference_code in('"+Constants.STORE_TYPE_7CATALOG_ITEM+"','"+Constants.STORE_TYPE_LOTUS_ITEM+"')");
+				sql.append("\n   AND MP.pens_desc6 in ('MAYA' , 'TM21','IMCHINA') ");
 				sql.append("\n   AND MP.pens_value =I.segment1 ");
 				sql.append("\n ) MP ");
 				sql.append("\n WHERE L.ORDER_NUMBER = D.ORDER_NUMBER ");
 				sql.append("\n AND D.product_id = MP.product_id ");
-				sql.append("\n AND L.intflag ='S' ");//Interfaces Success Only
 				//Filter By StoreType
 				sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.CUSTOMER_NUMBER"));
 				sql.append("\n AND L.CUSTOMER_NUMBER ='"+f.getBean().getCustGroup()+"' ");
@@ -516,7 +599,7 @@ public class ShopStockOnhandAction {
 			sql.append("\n ON M.pens_item = SALE_OUT.pens_item ");
 			sql.append("\n AND M.group_type  = SALE_OUT.group_type ");
 			sql.append("\n LEFT OUTER JOIN ( ");
-			sql.append("\n /******************* SALE_RETURN *************************************/");
+			 /******** SALE_RETURN *****************/
 				sql.append("\n SELECT ");
 				sql.append("\n D.GROUP_CODE as group_type,D.PENS_ITEM ,D.MATERIAL_MASTER,D.BARCODE ");
 				sql.append("\n ,COUNT(*) as SALE_RETURN_QTY ");
@@ -551,43 +634,11 @@ public class ShopStockOnhandAction {
 			sql.append("\n )SALE_RETURN ");
 			sql.append("\n  ON M.pens_item = SALE_RETURN.pens_item ");
 			sql.append("\n  AND M.group_type   = SALE_RETURN.group_type");
-			
-			//STOCK_SHORT
-			sql.append("\n LEFT OUTER JOIN(	 ");
-			sql.append("\n /******************* STOCK_SHORT ****************************************/");
-			  sql.append("\n\t SELECT ");
-			  sql.append("\n\t L.item_adjust as pens_item,L.item_adjust_desc as group_type, ");
-			  sql.append("\n\t NVL(SUM(ITEM_ADJUST_QTY),0) AS STOCK_SHORT_QTY ");
-			  sql.append("\n\t FROM PENSBI.PENSBME_ADJUST_SALES L ");
-			  sql.append("\n\t WHERE 1=1 ");	 
-			 //Filter By StoreType
-			 sql.append(SQLHelper.genFilterByStoreType(conn, storeType, "L.STORE_CODE"));
-			 sql.append("\n AND L.STORE_CODE ='"+f.getBean().getCustGroup()+"' ");
-			 if(initDate != null){
-				 sql.append("\n AND L.transaction_date  > to_date('"+initDateStr+"','dd/mm/yyyy')  ");
-				 sql.append("\n AND L.transaction_date <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-			 }else{
-				 sql.append("\n AND L.transaction_date  <= to_date('"+christSalesDateStr+"','dd/mm/yyyy')  ");
-			 }
-			 if( !Utils.isNull(c.getGroupCodeFrom()).equals("") ){
-				sql.append("\n AND L.item_adjust_desc LIKE '"+Utils.isNull(c.getGroupCodeFrom())+"%' ");
-			 }
-			 if( !Utils.isNull(c.getStyleFrom()).equals("") && !Utils.isNull(c.getStyleTo()).equals("")){
-				sql.append("\n AND L.item_adjust_desc  >='"+Utils.isNull(c.getStyleFrom())+"' ");
-				sql.append("\n AND L.item_adjust_desc  <='"+Utils.isNull(c.getStyleTo())+"' ");
-			 }
-			 if( !Utils.isNull(c.getPensItemFrom()).equals("") && !Utils.isNull(c.getPensItemTo()).equals("")){
-				sql.append("\n AND L.item_adjust >='"+Utils.isNull(c.getPensItemFrom())+"' ");
-				sql.append("\n AND L.item_adjust <='"+Utils.isNull(c.getPensItemTo())+"' ");
-			 }
-			  
-			sql.append("\n\t  GROUP BY L.item_adjust,L.item_adjust_desc ");
-			sql.append("\n )STOCK_SHORT ");
-			sql.append("\n ON  M.pens_item = STOCK_SHORT.pens_item ");	 
-			sql.append("\n AND M.group_type = STOCK_SHORT.group_type ");
-			
 			sql.append("\n ) A ");
+			
 			sql.append("\n ORDER BY A.MATERIAL_MASTER asc ");
+			
+			//logger.debug("sql:"+sql);
 			
 			//debug write sql to file
 			if(logger.isDebugEnabled()){
