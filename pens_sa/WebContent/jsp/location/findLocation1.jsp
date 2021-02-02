@@ -1,4 +1,5 @@
 
+<%@page import="com.pens.util.GoogleMapJavaScriptAPI"%>
 <%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -174,7 +175,7 @@ TABLE.result TD {
 
     </script>
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJUWErumNlehQ6rT4rP52yThSNsYd7bsI&callback=initMap&region=TH&language=th">
+    src="https://maps.googleapis.com/maps/api/js?key=<%=GoogleMapJavaScriptAPI.getInstance().getAPIKey() %>&callback=initMap&region=TH&language=th">
     </script>
     
     <form>

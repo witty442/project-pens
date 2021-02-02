@@ -8,7 +8,7 @@ public class GoogleMapJavaScriptAPI {
     
     public GoogleMapJavaScriptAPI(){
     	try{
-    		API_KEY = EnvProperties.getInstance().getProperty("google.map.api.key");
+    		API_KEY = EnvProperties.getInstance().getProperty("GoogleMapAPIKey");
 		}catch(Exception e){
 		}
     }
