@@ -10,7 +10,10 @@
 <%
 %>
 <div align="left">&nbsp;&nbsp;„∫≈¥Àπ’È</div>
-<table id="tblCN" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+<div class="table-responsive">
+  <table class="table table-bordered table-striped table-light"
+     id="tblCN" width="100%" cellspacing="0">
+    <thead class="thead-dark">
 	<tr>
 		<th class="order"><bean:message key="No"  bundle="sysprop"/></th>
 		<th>‡≈¢∑’Ë„∫≈¥Àπ’È</th>
@@ -20,6 +23,7 @@
 		<th class="costprice"><bean:message key="AmountReceived" bundle="sysele"/></th>
 		<th class="costprice"><bean:message key="Product.Balance" bundle="sysele"/></th>
 	</tr>
+	</thead>
 	<c:forEach var="resultsCN" items="${receiptForm.cns}" varStatus="rowsCN">
 	<c:choose>
 		<c:when test="${rowsCN.index %2 == 0}">
@@ -55,3 +59,4 @@
 		<td align="left" colspan="8" class="footer">&nbsp;</td>
 	</tr>
 </table>
+</div>

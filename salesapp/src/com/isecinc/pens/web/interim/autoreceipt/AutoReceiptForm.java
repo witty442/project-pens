@@ -7,7 +7,6 @@ import org.apache.struts.upload.FormFile;
 
 import com.isecinc.core.web.I_Form;
 import com.isecinc.pens.interim.bean.IOrderToReceipt;
-import com.isecinc.pens.web.sales.OrderCriteria;
 
 public class AutoReceiptForm extends I_Form {
 
@@ -15,7 +14,6 @@ public class AutoReceiptForm extends I_Form {
 
 	private FormFile invoiceFile;
 	
-	private OrderCriteria criteria = new OrderCriteria();
 	
 	private List<IOrderToReceipt> results = new ArrayList<IOrderToReceipt>();
 
@@ -27,13 +25,6 @@ public class AutoReceiptForm extends I_Form {
 		this.invoiceFile = invoiceFile;
 	}
 
-	public OrderCriteria getCriteria() {
-		return criteria;
-	}
-
-	public void setCriteria(OrderCriteria criteria) {
-		this.criteria = criteria;
-	}
 
 	public List<IOrderToReceipt> getResults() {
 		return results;

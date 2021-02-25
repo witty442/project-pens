@@ -23,8 +23,6 @@ public class ReceiptForm extends I_Form {
 
 	private static final long serialVersionUID = 8932109820314224488L;
 
-	private ReceiptCriteria criteria = new ReceiptCriteria();
-
 	private List<ReceiptLine> lines = null;
 
 	private List<ReceiptBy> bys = null;
@@ -38,6 +36,9 @@ public class ReceiptForm extends I_Form {
 	private String deletedRecpById = "";
 
 	private String deleteCNId = "";
+	private Receipt receipt = new Receipt();
+
+	
 
 	@SuppressWarnings("unchecked")
 	public ReceiptForm() {
@@ -64,22 +65,14 @@ public class ReceiptForm extends I_Form {
 
 	}
 
-	public ReceiptCriteria getCriteria() {
-		return criteria;
-	}
-
-	public void setCriteria(ReceiptCriteria criteria) {
-		this.criteria = criteria;
-	}
-
 	public Receipt getReceipt() {
-		return criteria.getReceipt();
+		return receipt;
 	}
 
 	public void setReceipt(Receipt receipt) {
-		criteria.setReceipt(receipt);
+		this.receipt = receipt;
 	}
-
+	
 	public List<ReceiptLine> getLines() {
 		return lines;
 	}

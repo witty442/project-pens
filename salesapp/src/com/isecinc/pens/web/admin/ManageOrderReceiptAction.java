@@ -33,10 +33,12 @@ public class ManageOrderReceiptAction extends I_Action {
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ManageOrderReceiptForm manageOrderReceiptForm = (ManageOrderReceiptForm) form;
 		try {
+			User user = (User) request.getSession(true).getAttribute("user");
+			
 			manageOrderReceiptForm.setOrders(new ManageOrderReceiptProcess().getOrders(manageOrderReceiptForm
-					.getDocumentDate()));
+					.getDocumentDate(),user));
 			manageOrderReceiptForm.setReceipts(new ManageOrderReceiptProcess().getReceipt(manageOrderReceiptForm
-					.getDocumentDate()));
+					.getDocumentDate(),user));
 			manageOrderReceiptForm.setOrderSize(manageOrderReceiptForm.getOrders().size());
 			manageOrderReceiptForm.setReceiptSize(manageOrderReceiptForm.getReceipts().size());
 
@@ -70,8 +72,11 @@ public class ManageOrderReceiptAction extends I_Action {
 						order.setDocStatus(Order.DOC_VOID);
 						new MOrder().save(order, user.getId(), conn);
 						// cancel receipt @ order
-						String sql = "update t_receipt set doc_status = 'VO' where receipt_id in (";
-						sql += "select receipt_id from t_receipt_line where order_id = " + id + ")";
+						String sql = "update pensonline.t_receipt set doc_status = 'VO' ";
+						sql += " where receipt_id in (";
+						sql += " select receipt_id from pensonline.t_receipt_line ";
+						sql += " where order_id = " + id + ")";
+						
 						stmt = conn.createStatement();
 						stmt.execute(sql);
 					}
@@ -88,16 +93,18 @@ public class ManageOrderReceiptAction extends I_Action {
 								l.getOrder().setPayment("N");
 								l.getOrder().setIsCash("N");
 								new MOrder().save(l.getOrder(), user.getId(), conn);
-								if (l.getOrderLine() == null || l.getOrderLine().getId() == 0) {
+								
+								if (l.getOrder().getInvoiceId() == 0) {
 									List<OrderLine> orliLines = new MOrderLine().lookUp(l.getOrder().getId());
 									for (OrderLine orliLine : orliLines) {
 										orliLine.setPayment("N");
 										new MOrderLine().save(orliLine, user.getId(), conn);
 									}
 								} else {
-									if (l.getOrderLine().getId() != 0) {
-										l.getOrderLine().setPayment("N");
-										new MOrderLine().save(l.getOrderLine(), user.getId(), conn);
+									if (l.getOrder().getInvoiceId() != 0) {
+										//OrderLine ol = new OrderLine();
+										//ol.setPayment("N");
+										//new MOrderLine().save(ol, user.getId(), conn);
 									}
 								}
 							}
@@ -122,9 +129,9 @@ public class ManageOrderReceiptAction extends I_Action {
 			}
 
 			manageOrderReceiptForm.setOrders(new ManageOrderReceiptProcess().getOrders(manageOrderReceiptForm
-					.getDocumentDate()));
+					.getDocumentDate(),user));
 			manageOrderReceiptForm.setReceipts(new ManageOrderReceiptProcess().getReceipt(manageOrderReceiptForm
-					.getDocumentDate()));
+					.getDocumentDate(),user));
 			manageOrderReceiptForm.setOrderSize(manageOrderReceiptForm.getOrders().size());
 			manageOrderReceiptForm.setReceiptSize(manageOrderReceiptForm.getReceipts().size());
 

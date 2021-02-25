@@ -3,7 +3,7 @@ package com.isecinc.pens.inf.manager.process;
 import java.io.Serializable;
 import java.util.List;
 
-import com.isecinc.pens.inf.bean.ImageFileBean;
+import com.isecinc.pens.bean.ImageFileBean;
 
 public class ExportBean implements Serializable{
 	

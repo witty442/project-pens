@@ -2,7 +2,7 @@
 <%@page import="com.isecinc.pens.web.salesspecial.OrderSpecialForm"%>
 <%@page import="util.SessionGen"%>
 <%@page import="com.pens.util.CustomerReceiptFilterUtils"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>

@@ -146,7 +146,7 @@ public abstract class I_Model<T> implements Serializable {
 	 * @return
 	 * @throws Exception
 	 */
-	protected boolean save(String tableName, String[] columns, Object[] values, int valueID, Connection conn)
+	protected boolean save(String tableName, String[] columns, Object[] values, long valueID, Connection conn)
 			throws Exception {
 		//logger.debug("Save " + this.getClass());
 		if (valueID == 0) return saveNew(tableName, columns, values, valueID, conn);
@@ -165,7 +165,7 @@ public abstract class I_Model<T> implements Serializable {
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean saveNew(String tableName, String[] columns, Object[] values, int valueID, Connection conn)
+	private boolean saveNew(String tableName, String[] columns, Object[] values, long valueID, Connection conn)
 			throws Exception {
 		PreparedStatement pstmt = null;
 		try {
@@ -213,7 +213,7 @@ public abstract class I_Model<T> implements Serializable {
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean saveUpdate(String tableName, String[] columns, Object[] values, int valueID, Connection conn)
+	private boolean saveUpdate(String tableName, String[] columns, Object[] values, long valueID, Connection conn)
 			throws Exception {
 		//logger.debug("Save Update " + this.getClass());
 		PreparedStatement pstmt = null;
@@ -329,7 +329,7 @@ public abstract class I_Model<T> implements Serializable {
 	 * @throws Exception
 	 */
 	public boolean checkDocumentDuplicate(String tableName, String columnId, String columnDoc, String documentNo,
-			int id, Connection conn) throws Exception {
+			long id, Connection conn) throws Exception {
 		//logger.debug(String.format("Check Duplicate %s[%s] - %s[%s]", tableName, columnId, columnDoc, documentNo));
 		Statement stmt = null;
 		ResultSet rst = null;

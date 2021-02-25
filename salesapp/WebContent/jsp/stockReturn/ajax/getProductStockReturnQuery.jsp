@@ -1,7 +1,7 @@
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.bean.Product"%>
 <%@page import="com.isecinc.pens.model.MProduct"%>

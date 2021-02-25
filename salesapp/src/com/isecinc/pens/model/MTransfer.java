@@ -10,16 +10,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.MoveOrder;
-import com.isecinc.pens.bean.Stock;
 import com.isecinc.pens.bean.TransferBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
-import com.isecinc.pens.process.SequenceProcess;
-import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 
 public class MTransfer {
@@ -76,7 +75,7 @@ public class MTransfer {
 		try {
 			
 			StringBuffer sql = new StringBuffer("");
-			sql.append(" delete from t_bank_transfer where line_id in("+Utils.converToTextSqlIn(lineIdDelete)+") \n");
+			sql.append(" delete from t_bank_transfer where line_id in("+SQLHelper.converToTextSqlIn(lineIdDelete)+") \n");
 			logger.debug("SQL:"+sql);
 
 			ps = conn.prepareStatement(sql.toString());
@@ -156,7 +155,7 @@ public class MTransfer {
 			int index = 0;
 			ps = conn.prepareStatement(sql.toString());
 			
-			ps.setInt(++index, SequenceProcess.getNextValue("t_bank_transfer"));
+			ps.setInt(++index, SequenceProcessAll.getIns().getNextValue("t_bank_transfer.line_id").intValue());
 			ps.setDate(++index, new java.sql.Date(DateToolsUtil.convertToTimeStamp(model.getTransferDate()).getTime()));
 			ps.setString(++index, Utils.isNull(model.getTransferType()));
 			ps.setString(++index, Utils.isNull(model.getTransferBank()));
@@ -200,15 +199,15 @@ public class MTransfer {
 			sql.append("\n  where 1=1 ");
 			sql.append("\n  and  h.user_id ='"+mCriteria.getUserId()+"'");
 			if( !Utils.isNull(mCriteria.getCreateDate()).equals("")){
-				sql.append(" and h.create_date = str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getCreateDate(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				sql.append(" and h.create_date = str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getCreateDate(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 			}
 			if( !Utils.isNull(mCriteria.getTransferDateFrom()).equals("")
 				&&	!Utils.isNull(mCriteria.getTransferDateTo()).equals("")	){
-				  sql.append(" and h.transfer_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getTransferDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-				  sql.append(" and h.transfer_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getTransferDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				  sql.append(" and h.transfer_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getTransferDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				  sql.append(" and h.transfer_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getTransferDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 			}else if( !Utils.isNull(mCriteria.getTransferDateFrom()).equals("")
 					&&	Utils.isNull(mCriteria.getTransferDateTo()).equals("")	){
-				 sql.append(" and h.transfer_date = str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getTransferDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				 sql.append(" and h.transfer_date = str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getTransferDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 			}
 
 			logger.debug("sql:"+sql);
@@ -256,15 +255,15 @@ public class MTransfer {
 				sql.append("\n  where 1=1 ");
 				sql.append("\n  and  h.user_id ='"+mCriteria.getUserId()+"'");
 				if( !Utils.isNull(mCriteria.getCreateDate()).equals("")){
-					sql.append(" and h.create_date = str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getCreateDate(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					sql.append(" and h.create_date = str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getCreateDate(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 				if( !Utils.isNull(mCriteria.getTransferDateFrom()).equals("")
 					&&	!Utils.isNull(mCriteria.getTransferDateTo()).equals("")	){
-					  sql.append(" and h.transfer_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getTransferDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.transfer_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getTransferDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.transfer_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getTransferDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.transfer_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getTransferDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}else if( !Utils.isNull(mCriteria.getTransferDateFrom()).equals("")
 						&&	Utils.isNull(mCriteria.getTransferDateTo()).equals("")	){
-					 sql.append(" and h.transfer_date = str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getTransferDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					 sql.append(" and h.transfer_date = str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getTransferDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 				sql.append("\n  ORDER BY h.create_date desc \n");
 			    sql.append("\n   )A ");
@@ -288,13 +287,13 @@ public class MTransfer {
 				  }
 				  m.setTransferBank(Utils.isNull(rst.getString("transfer_bank")));
 				  m.setTransferBankLabel(Utils.isNull(rst.getString("transfer_bank_label")));
-				  m.setTransferDate(Utils.stringValue(rst.getDate("transfer_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setTransferDate(DateUtil.stringValue(rst.getDate("transfer_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  m.setTransferTime(Utils.isNull(rst.getString("transfer_time")));
 				  
 				  m.setAmount(Utils.decimalFormat(rst.getDouble("amount"),Utils.format_current_2_disgit));
 				  m.setChequeNo(Utils.isNull(rst.getString("cheque_no")));
-				  m.setChequeDate(Utils.stringValueNull(rst.getDate("cheque_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				  m.setCreateDate(Utils.stringValue(rst.getDate("create_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setChequeDate(DateUtil.stringValueChkNull(rst.getDate("cheque_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setCreateDate(DateUtil.stringValue(rst.getDate("create_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  
 				  m.setStatus(rst.getString("status"));
 				  m.setStatusLabel(STATUS_VOID.equals(m.getStatus())?"ยกเลิก":"ใช้งาน");
@@ -334,7 +333,7 @@ public class MTransfer {
 				sql.append("\n  where 1=1 ");
 				sql.append("\n  and  h.user_id ='"+mCriteria.getUserId()+"'");
 				if( !Utils.isNull(mCriteria.getCreateDate()).equals("")){
-					sql.append(" and h.create_date = str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getCreateDate(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					sql.append(" and h.create_date = str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getCreateDate(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 				logger.debug("sql:"+sql);
 				

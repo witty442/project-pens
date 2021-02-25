@@ -9,16 +9,17 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.FTPFileBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.FTPFileBean;
-import com.isecinc.pens.inf.bean.TableBean;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.ImportHelper;
-import com.isecinc.pens.inf.helper.Utils;
 import com.pens.util.ControlCode;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
+import com.pens.util.Utils;
 import com.pens.util.meter.MonitorTime;
 
 public class ImportProcess {
@@ -72,10 +73,10 @@ public class ImportProcess {
 	    				  if(ControlCode.canExecuteMethod("ImportProcess", "checkSalesTargetSameMonthYear")){
 		    				 // logger.debug("dataTextLineArr[0]:"+dataTextLineArr[0]);
 		    				  String[] lineArrTemp = dataTextLineArr[0].split(Constants.delimeterPipe);
-			    		      Date targetDate = Utils.parse(lineArrTemp[1],Utils.DD_MM_YYYY_WITHOUT_SLASH);
+			    		      Date targetDate = DateUtil.parse(lineArrTemp[1],DateUtil.DD_MM_YYYY_WITHOUT_SLASH);
 			    		      //logger.debug("targetDate:"+lineArrTemp[1]);
 			    		      //logger.debug("targetDate2:"+targetDate);
-			    		      Date currentDate = Utils.getCurrentDate();
+			    		      Date currentDate = DateUtil.getCurrentDate();
 			    		      boolean inSameMonthYear = DateToolsUtil.compareDateInSameMonthYear(targetDate, currentDate);
 			    		      logger.info("inSameMonthYear SalesTarget:"+inSameMonthYear);
 			    		      if(inSameMonthYear){

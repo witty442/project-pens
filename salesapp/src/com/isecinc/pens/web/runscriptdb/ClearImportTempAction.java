@@ -1,28 +1,12 @@
 package com.isecinc.pens.web.runscriptdb;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.SystemProperties;
-import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.dao.InterfaceDAO;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.inf.manager.FTPManager;
-import com.pens.util.ControlCode;
+import com.pens.util.DBConnection;
 
 public class ClearImportTempAction {
 	protected static  Logger logger = Logger.getLogger("PENS");

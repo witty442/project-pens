@@ -12,7 +12,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 
 
@@ -116,13 +117,13 @@ public class InterfaceDB {
 							}
 						}else if(config.getType().toLowerCase().startsWith(("date"))){
 							if(rsSelect.getDate(config.getField()) != null){
-							   values +="TO_DATE('"+Utils.stringValue(rsSelect.getDate(config.getField()),Utils.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
+							   values +="TO_DATE('"+DateUtil.stringValue(rsSelect.getDate(config.getField()),DateUtil.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
 							}else{
 							   values += "NULL,";
 							}
 						}else if(config.getType().toLowerCase().startsWith(("timstamp"))){
 							if(rsSelect.getDate(config.getField()) != null){
-							   values +="TO_DATE('"+Utils.stringValue(rsSelect.getDate(config.getField()),Utils.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
+							   values +="TO_DATE('"+DateUtil.stringValue(rsSelect.getDate(config.getField()),DateUtil.DD_MM_YYYY_WITHOUT_SLASH )+"','ddmmyyyy'),";
 							}else{
 							   values += "NULL,";
 							}
@@ -138,13 +139,13 @@ public class InterfaceDB {
 							values +="'"+replaceSingleQuote(Utils.isNull(rsSelect.getString(config.getField())))+"',";
 						}else if(config.getType().toLowerCase().startsWith(("date"))){
 							if(rsSelect.getDate(config.getField()) != null){
-							   values +="STR_TO_DATE('"+Utils.stringValue(rsSelect.getDate(config.getField()),Utils.DD_MM_YYYY_WITHOUT_SLASH )+"','%d%m%Y'),";
+							   values +="STR_TO_DATE('"+DateUtil.stringValue(rsSelect.getDate(config.getField()),DateUtil.DD_MM_YYYY_WITHOUT_SLASH )+"','%d%m%Y'),";
 							}else{
 							   values += "NULL,";
 							}
 						}else if(config.getType().toLowerCase().startsWith(("timstamp"))){
 							if(rsSelect.getDate(config.getField()) != null){
-							   values +="STR_TO_DATE('"+Utils.stringValue(rsSelect.getDate(config.getField()),Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH )+"','%d%m%Y %H%i%s'),";
+							   values +="STR_TO_DATE('"+DateUtil.stringValue(rsSelect.getDate(config.getField()),DateUtil.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH )+"','%d%m%Y %H%i%s'),";
 							}else{
 							   values += "NULL,";
 							}

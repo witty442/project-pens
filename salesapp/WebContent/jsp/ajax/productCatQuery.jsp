@@ -1,5 +1,5 @@
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
-<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.DBConnection"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.model.MCustomer"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -107,9 +107,10 @@ if(productCatL != null && productCatL.size() > 0){
 	<td id="<%=productCatCode%>" class="catalog" <%=style%> width="20%">
 	  <table border='0'>
 	  <tr><td>
-	      <a href="">
-		    <img src="${pageContext.request.contextPath}/images/pc<%=productCatCode%>.jpg" height="60" width="120" onerror="imgError(this);" 
-						onclick="loadProducts(<%=productCatCode%>)"/>
+	     <a data-dismiss="modal" data-toggle="modal" href="#lost">
+		    <img src="${pageContext.request.contextPath}/images/pc<%=productCatCode%>.jpg" 
+		     height="60" width="120" onerror="imgError(this);" 
+			 onclick="loadProductsByBrand(<%=productCatCode%>)"/>
 		   </a> 
 	   </td></tr>
 	   <tr><td>
@@ -121,13 +122,17 @@ if(productCatL != null && productCatL.size() > 0){
 <% } %>
 	<tr></tr>
 </table>
+
+
 <% } else { %>
 <span id="msg" class="errormsg">
 No Record Found!
 </span>
-<%
-   } 
 
+
+<%} %>
+   
+<%
 }catch(Exception e){
 	e.printStackTrace();
 }finally{ 
@@ -137,10 +142,4 @@ No Record Found!
 }
 
 %>
-<script>
-function imgError(source){
-    source.src = '${pageContext.request.contextPath}/images/img_not_found.jpg';
-    source.onerror = "";
-    return true;
-}
-</script>
+

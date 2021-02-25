@@ -2,21 +2,15 @@
 package com.pens.util;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
@@ -26,13 +20,10 @@ import com.isecinc.pens.bean.User;
  *	@author Witty
  */
 public class Utils {
-	private static Logger logger = Logger.getLogger("PENS");
-	public static final Locale local_th= new Locale("th","TH");
+	protected static Logger logger = Logger.getLogger("PENS");
+
 	
-	@SuppressWarnings("unused")
-	private static String DECIMAL_FORMAT ="#.00000000000000000000";
-	private static String CURRENCY_FORMAT ="#,##0.00";
-	private static String NUMBER_FORMAT ="#,##0";
+	public static final Locale local_th= new Locale("th","TH");
 	
 	public static final String format_number_no_disgit = "###0";
 	public static final String format_current_no_disgit = "#,##0";
@@ -40,21 +31,63 @@ public class Utils {
     public static final String format_current_5_digit = "#,##0.00000";
 	public static final String format_current_6_digit = "#,##0.000000";
 	
+	
+	//private static String DECIMAL_FORMAT ="#.00000000000000000000";
+	public static final String format_num_no_disgit = "#";
+	private static String CURRENCY_FORMAT ="#,##0.00";
+	private static String CURRENCY_NODIGIT_FORMAT ="#,##0";
+	private static String NUMBER_FORMAT ="#,##0";
+	      
 	public static void main(String[] args){
-	    try{	       
-	        String date = "ดูข้อมูลได้ทั้งหมด";
-	        System.out.println(toUnicodeChar(date));
+	    try{	
+	    	//String input ="BME ME1D33B2NN เสื้อชั้นในบีมี590";
+	    	//System.out.println(input.substring(input.indexOf(" ")+1,input.lastIndexOf(" ")));
+	        System.out.println("101:"+(1%100));
+	        System.out.println("100:"+(100%100));
+	        System.out.println("200:"+(200%100));
 	    }catch(Exception e){
 	        e.printStackTrace();
 	    }
 	}
-	public static int convertStrToInt(String str) {
-		if (str ==null || "".equals(str)){
-			return 0;
-		}
-		str= str.replaceAll("\\,", "");
-		return Integer.parseInt(str);
+	
+	public static boolean userInRole(User user,String[] roles){
+		boolean r = false;
+		for(int i=0;i<roles.length;i++){
+			String roleCheck = roles[i].toLowerCase().trim();
+			String userRoleTemp = user.getRole().getKey().toLowerCase().trim();
+			String userRoles[] = userRoleTemp.split("\\|");
+
+			for(int j =0;j<userRoles.length;j++){
+				String userRole = userRoles[j];
+				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
+				
+				if( roleCheck.equalsIgnoreCase(userRole)){
+					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
+					r =  true;
+					break;
+				}
+			}//for 2
+			
+		}//for 1
+		return r;
 	}
+	
+	public static boolean stringInStringArr(String str,String[] array){
+		boolean r = false;
+		for(int i=0;i<array.length;i++){
+			String arrCheck = array[i].toLowerCase().trim();
+			//logger.debug(str+":"+arrCheck);
+			if(str.equalsIgnoreCase(arrCheck)){
+				//logger.debug("equals");
+				r= true;
+				break;
+			}
+
+		}//for 1
+		return r;
+	}
+	
+   
 	public static int calcTotalPage(int totalRow,int maxPerPage){
 		double totalPageF = new Double(totalRow)/new Double(maxPerPage);
 		//System.out.println("totalPageF:"+totalPageF);
@@ -64,68 +97,197 @@ public class Utils {
 		return totalPage.intValue();
 	}
 	
-	public static int calcStartNoInPage(int currentPage,int maxPerPage){
-		return (((currentPage-1)*maxPerPage))+1;
+	public static int calcStartNoInPage(int currentPage,int pageSize){
+		logger.debug("currentPage:"+currentPage+",pageSize:"+pageSize+",startNo:"+((((currentPage-1)*pageSize))+1));
+		return (((currentPage-1)*pageSize))+1;
 	}
- 
-	public static double convertStrToDouble(String str){
-		if(isNull(str).equals("")){
-			return 0;
+	
+	public static String genFileName(String prefix){
+		String fileName = "";
+		try{
+		  String dateTimeStr = DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_HH_mm_WITHOUT_SLASH , local_th);
+		  fileName = prefix+"-"+dateTimeStr;
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return fileName;
+	}
+	
+	public static BigDecimal isNullToZero(BigDecimal str) {
+		if (str ==null){
+			//return new BigDecimal("0");// comment by tutiya
+			return BigDecimal.ZERO;// modify by tutiya
+		}
+		return str;
+	}
+	
+	public static String convertDigitToDisplay(String columnDisyplay , Object s) {
+		//logger.debug("columnDisyplay:"+columnDisyplay);
+		
+		if("QTY".equalsIgnoreCase(columnDisyplay) || "QTY".equalsIgnoreCase(columnDisyplay)){
+			if( s instanceof BigDecimal){
+				return convertToNumberStr((BigDecimal)s);
+			}else {
+				return convertToNumberStr((Double)s);
+			}
 		}else{
-			//logger.debug("doubleStr:"+str);
+			if( s instanceof BigDecimal){
+				return convertToCurrencyStr((BigDecimal)s);
+			}else {
+				return convertToCurrencyStr((Double)s);
+			}
 		}
-		str = str.replaceAll(",", "");
-		return new Double(str).doubleValue();
-	}
-	public static long convertStrToLong(String str,long defaults){
-		if(isNull(str).equals("")){
-			return defaults;
-		}
-		str = str.replaceAll(",", "");
-		return new Long(str).longValue();
-	}
-	public static long convertStrToLong(String str){
-		if(isNull(str).equals("")){
-			return 0;
-		}
-		str = str.replaceAll(",", "");
-		return new Long(str).longValue();
-	}
-	public static double convertStrToDouble2Digit(String str){
-		if(isNull(str).equals("")){
-			return 0;
-		}
-		str = str.replaceAll(",", "");
-		return new Double(str).doubleValue();
 	}
 	
-	public static String convertStrDoubleToStr(String str,String format){
-		if(isNull(str).equals("")){
-			return "";
+	public static String convertDigitToDisplay(Object s) {
+		//logger.debug("columnDisyplay:"+columnDisyplay);
+		if( s instanceof BigDecimal){
+			return convertToCurrencyStr((BigDecimal)s);
+		}else {
+			return convertToCurrencyStr((Double)s);
 		}
-		str = str.replaceAll(",", "");
-		return  decimalFormat(new Double(str).doubleValue(),format);
 	}
 	
-	public static boolean statusInCheck(String status,String[] statusCheckArr){
-		boolean r = false;
-		for(int i=0;i<statusCheckArr.length;i++){
-			String statusCheck = statusCheckArr[i].toLowerCase().trim();
-			String statusArr[] = status.split("\\/");
-
-			for(int j =0;j<statusArr.length;j++){
-				String statusArrTemp = statusArr[j];
-				//logger.debug("roleCheck:["+i+"]["+roleCheck+"]["+userRole+"]");
-				
-				if( statusCheck.equalsIgnoreCase(statusArrTemp)){
-					//logger.debug("EQ =roleCheck["+roleCheck+"]:["+i+"]["+userRole+"]");
-					r =  true;
-					break;
+	public static String convertToNumberStr(BigDecimal s) {
+		String currencyStr = "0";
+		try{
+			 if(s == null){
+				 s = new BigDecimal("0");
+			 }
+			 Double d = new Double(s.doubleValue());
+			 DecimalFormat dc=new DecimalFormat();
+		     dc.applyPattern(NUMBER_FORMAT);
+		     currencyStr =dc.format(d);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return currencyStr;
+	}
+	
+	public static String convertToStr(double s) {
+		String str = "0";
+		try{
+			str = String.valueOf(s);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return str;
+	}
+	public static String convertToNumberStr(double s) {
+		String currencyStr = "0";
+		try{
+			 Double d = new Double(s);
+			 DecimalFormat dc=new DecimalFormat();
+		     dc.applyPattern(NUMBER_FORMAT);
+		     currencyStr =dc.format(d);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return currencyStr;
+	}
+	
+	public static String convertToCurrencyStr(String s) {
+		String currencyStr = "0.00";
+		try{
+			if( !Utils.isNull(s).equals("")){
+				 Double d = new Double(Utils.isNull(s));
+				 DecimalFormat dc=new DecimalFormat();
+			     dc.applyPattern(CURRENCY_FORMAT);
+			     currencyStr =dc.format(d);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return currencyStr;
+	}
+	
+	public static String convertToCurrencyNoDigitStr(String s) {
+		String currencyStr = "0.00";
+		try{
+			if( !Utils.isNull(s).equals("")){
+				if(s.indexOf(",") != -1){
+					s = s.replaceAll(",", "");
 				}
-			}//for 2
-			
-		}//for 1
-		return r;
+				 Double d = new Double(Utils.isNull(s));
+				 DecimalFormat dc=new DecimalFormat();
+			     dc.applyPattern(CURRENCY_NODIGIT_FORMAT);
+			     currencyStr =dc.format(d);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return currencyStr;
+	}
+	
+	
+	public static String convertToCurrencyStr(BigDecimal s) {
+		String currencyStr = "0.00";
+		try{
+			 if(s == null){
+				 s = new BigDecimal("0");
+			 }
+			 Double d = new Double(s.doubleValue());
+			 DecimalFormat dc=new DecimalFormat();
+		     dc.applyPattern(CURRENCY_FORMAT);
+		     currencyStr =dc.format(d);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return currencyStr;
+	}
+	
+	public static String convertToCurrencyStr(double s) {
+		String currencyStr = "0.00";
+		try{
+			 Double d = new Double(s);
+			 DecimalFormat dc=new DecimalFormat();
+		     dc.applyPattern(CURRENCY_FORMAT);
+		     currencyStr =dc.format(d);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return currencyStr;
+	}
+	
+	public static String convertToCurrencyStr(int s) {
+		String currencyStr = "0.00";
+		try{
+			 Double d = new Double(s);
+			 DecimalFormat dc=new DecimalFormat();
+		     dc.applyPattern(CURRENCY_FORMAT);
+		     currencyStr =dc.format(d);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return currencyStr;
+	}
+	
+
+	public static int convertToYearBushdish(int christYear){
+		return christYear+543;
+	}
+	
+	public static boolean isDouble(String str) {  
+		  try {  
+			  BigDecimal obj = new BigDecimal(str);
+		  }catch(NumberFormatException nfe)  {  
+		    return false;  
+		  }  
+		  return true;  
+		}
+	
+	public static boolean isNumeric(String str) {  
+	  try {  
+	      double d = Double.parseDouble(str);  
+	  }catch(NumberFormatException nfe)  {  
+	    return false;  
+	  }  
+	  return true;  
+	}
+	// Round halfup  2.979 -> 2.98
+	public static String decimalFormat(double num){
+		NumberFormat formatter = new DecimalFormat(format_current_2_disgit);
+		return formatter.format(num);
 	}
 	
 	// Round halfup  2.979 -> 2.98
@@ -149,13 +311,59 @@ public class Utils {
 		formatter.setRoundingMode(java.math.RoundingMode.DOWN);
 		return formatter.format(num);
 	}
-	
-	// Round Up  2.11 -> 3
-	public static String decimalFormatRoundUp(double num,String format){
-		NumberFormat formatter = new DecimalFormat(format);
-		formatter.setRoundingMode(RoundingMode.UP);
-		return formatter.format(num);
+		
+	public static double strToDouble(String s){
+		if(s == null || "".equals(s)){
+			return Double.parseDouble("0");
+		}
+		//logger.debug("s.indexOf(,):"+s.indexOf(","));
+		if(s.indexOf(",") != -1){
+			s = s.replaceAll(",", "");	
+		}
+		//logger.debug("s:"+s);
+	   return Double.parseDouble(s);
 	}
+	
+	// Create Utility for rounding double value
+	public static double round(double d, int decimalPlace,int roundType){
+	    BigDecimal bd = new BigDecimal(Double.toString(d));
+	    bd = bd.setScale(decimalPlace,roundType);
+	    return bd.doubleValue();
+	  }
+	/**
+	 * 
+	 * @param provinceName  Exception Chrecter "จ."
+	 * @return
+	 */
+	public static String replaceProvinceNameNotMatch(String provinceName){
+		String result ="";
+		try{
+			if(Utils.isNull(provinceName).equals("")) return "";
+			result = provinceName.replaceAll("[จ][.]", "");
+			
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return result.trim();
+	}
+	
+	/**
+	 * 
+	 * @param districtName Exception Chrecter "อ.", "เขต."
+	 * @return
+	 */
+	public static String replaceDistrictNameNotMatch(String districtName){
+		String result ="";
+		try{
+			if(Utils.isNull(districtName).equals("")) return "";
+			result = districtName.replaceAll("[อ][.]", "");
+			result = result.replaceAll("[เขต][.]", "");
+		}catch(Exception e){
+			logger.error(e.getMessage(),e);
+		}
+		return result.trim();
+	}
+	
 	
 	public static String isNull(String str) {
 		if (str ==null){
@@ -164,35 +372,223 @@ public class Utils {
 		return str.trim();
 	}
 	
-	public static String isNullDoubleStrToZero(String doubleStr) {
-		if (doubleStr ==null || isNull(doubleStr).equals("")){
-			return "0.00";
-		}
-		return doubleStr;
-	}
-	public static String isNullDoubleStrToBlank(String doubleStr) {
-		if (doubleStr ==null || isNull(doubleStr).equals("")
-			|| isNull(doubleStr).equals("0") || isNull(doubleStr).equals("0.00")){
+	public static String isNull(int str) {
+		if (str ==0){
 			return "";
 		}
-		return doubleStr;
+		return String.valueOf(str);
 	}
+	
 	public static String isNull(Object str) {
 		if (str ==null){
 			return "";
 		}
-		if(str instanceof Double){
-		  return String.valueOf(((Double)str));
+		if(str instanceof String){
+			return ((String)str).trim();
+		}else if(str instanceof Double){
+			return ((Double)str).toString().trim();
+		}else{
+			return ((String)str).trim();
 		}
-		return (String)str;
 	}
 	
-	public static BigDecimal isNullToZero(BigDecimal str) {
-		if (str ==null){
-			//return new BigDecimal("0");// comment by tutiya
-			return BigDecimal.ZERO;// modify by tutiya
+	//input 111.0 
+	//output 111
+	public static String convertDoubleToStrNoDigit(Object str) {
+		String strNoDigit = "";
+		strNoDigit = isNull(str);
+		if(strNoDigit.indexOf(".") != -1){
+			strNoDigit = strNoDigit.substring(0,strNoDigit.indexOf("."));
 		}
-		return str;
+		
+		return strNoDigit;
+	}
+	
+	public static int convertToInt(String str) throws Exception{
+		//logger.debug("xx:"+str);
+		if(str == null || Utils.isNull(str).equals("")){
+			return 0;
+		}
+		return Integer.parseInt(str);
+	}
+	
+	public static int convertCurrentcyToInt(String str) throws Exception{
+		int output = 0;
+		if(str == null || Utils.isNull(str).equals("")){
+			return 0;
+		}
+		output =(new Double(str.replaceAll(",", ""))).intValue();
+		logger.debug("input:"+str+",output:"+output);
+		return output;
+	}
+	
+	public static double convertToDouble(String str) throws Exception{
+		if(str == null || isNull(str).equals("")){
+			return 0;
+		}
+		return Double.parseDouble(str);
+	}
+	
+	public static long convertToLong(String str) throws Exception{
+		if(str == null || isNull(str).equals("")){
+			return 0;
+		}
+		return Long.parseLong(str);
+	}
+
+	//in :8.850009281274E12
+	//out:8850009281274
+	public static String convertStrToDoubleStr(String doubleStr){
+		if(doubleStr == null){
+			return "";
+		}
+		BigDecimal dd = new BigDecimal(doubleStr);
+		doubleStr = String.valueOf(dd.longValue());
+		//logger.debug("doubleStr:"+doubleStr);
+		if(doubleStr.indexOf(".") != -1){
+		  doubleStr = doubleStr.substring(0,doubleStr.indexOf("."));
+		}
+		//logger.debug("return doubleStr:"+doubleStr);
+		return doubleStr;
+	}
+	//input  1.0 
+	//output 1
+	public static String convertDoubleStrToStr(String doubleStr){
+		if(doubleStr == null){
+			return "";
+		}
+		//logger.debug("doubleStr:"+doubleStr);
+		if(doubleStr.indexOf(".") != -1){
+		  doubleStr = doubleStr.substring(0,doubleStr.indexOf("."));
+		}
+		//logger.debug("return doubleStr:"+doubleStr);
+		return doubleStr;
+	}
+	
+	public static String convertDoubleToStr(Double double1){
+		if(double1 == null){
+			return "";
+		}
+		String doubleStr = double1.longValue()+"";
+		//logger.debug("doubleStr:"+doubleStr);
+		
+		if(doubleStr.indexOf(".") != -1){
+		  doubleStr = doubleStr.substring(0,doubleStr.indexOf("."));
+		}
+		//logger.debug("return doubleStr:"+doubleStr);
+		return doubleStr;
+	}
+	
+	/**
+	 * 
+	 * @param double1
+	 * @return
+	 * Case1 input 100.20 return 100.20
+	 * case2 input 100.00 return 100
+	 */
+	public static String convertToNumberSpecial(BigDecimal double1){
+
+		String doubleStr = double1.toString();
+		//logger.debug("doubleStr:"+doubleStr);
+		
+		if(doubleStr.indexOf(".") != -1){
+		   String num1 = doubleStr.substring(0,doubleStr.indexOf("."));
+		   String num2 ="0";
+		   if( (doubleStr.length()) > (doubleStr.indexOf(".")+3) ){
+	        	num2= doubleStr.substring(doubleStr.indexOf(".")+1,(doubleStr.indexOf(".")+3));
+	        }else{
+	        	num2= doubleStr.substring((doubleStr.indexOf(".")+1),(doubleStr.indexOf(".")+2));
+	        }
+		  
+		  // logger.debug("num1="+num1+",num2="+num2);
+		   return num1+"."+num2;
+		}
+		return doubleStr;
+	}
+	
+	
+	public static double convertStrToDouble(String str){
+		if(isNull(str).equals("")){
+			return 0;
+		}
+		str = str.replaceAll(",", "");
+		return new Double(str).doubleValue();
+	}
+	
+	public static double convertStrToDouble2Digit(String str){
+		if(isNull(str).equals("")){
+			return 0;
+		}
+		str = str.replaceAll(",", "");
+		return new Double(str).doubleValue();
+	}
+	
+	public static String isNull(Double str) {
+		if (str ==null){
+			return "";
+		}
+		return str.toString();
+	}
+	
+	public static Double isDoubleNull(Object str) {
+		if (str ==null || isNull(str).equals("")){
+			return new Double(0);
+		}
+		logger.debug("str:"+str);
+		return ((Double)str);
+	}
+	
+	public static Double isDoubleNoDigitNull(Object str) {
+		if (str ==null || isNull(str).equals("")){
+			return new Double(0);
+		}
+		//logger.debug("str:"+str);
+		return ((Double)str);
+	}
+	
+	public static Double isDoubleNull2Digit(Object str) {
+		if (str ==null || isNull(str).equals("")){
+			return new Double(0);
+		}
+		String strTemp = str.toString();
+		int diff  = strTemp.length() - strTemp.indexOf(".");
+		strTemp = strTemp.substring(0,strTemp.indexOf(".")+diff);
+		//logger.debug("isDoubleNull:"+(new Double(strTemp)));
+		return new Double(strTemp);
+	}
+	
+	public static Double isDoubleNull(String str) {
+		if (str ==null || isNull(str).equals("")){
+			return new Double(0);
+		}
+		str = str.replaceAll(",", "");
+		//logger.debug("isDoubleNull:"+(new Double(str)));
+		return (new Double(str));
+	}
+	
+	public static int convertStrToInt(String str) {
+		if (str ==null || "".equals(str)){
+			return 0;
+		}
+		str= str.replaceAll("\\,", "");
+		return Integer.parseInt(str);
+	}
+	
+	public static BigDecimal convertStrToBigDecimal(String str) {
+		if (str ==null || "".equals(str)){
+			return new BigDecimal("0");
+		}
+		str= str.replaceAll("\\,", "");
+		return new BigDecimal(str.trim());
+	}
+	
+	public static int convertStrToInt(String str,int defaultInt) {
+		if (str.equalsIgnoreCase("null") || str ==null || "".equals(str)){
+			return defaultInt;
+		}
+		str= str.replaceAll("\\,", "");
+	
+		return Integer.parseInt(str);
 	}
 	
 	public static boolean isBlank(Object o) {
@@ -333,177 +729,112 @@ public class Utils {
 		return str.replaceAll("\\D", "").trim();
 	}
 	
-	public static String convertDigitToDisplay(String columnDisyplay , Object s) {
-		//logger.debug("columnDisyplay:"+columnDisyplay);
+	
+	
 		
-		if("CALL".equalsIgnoreCase(columnDisyplay) || "CALL NEW".equalsIgnoreCase(columnDisyplay)){
-			if( s instanceof BigDecimal){
-				return convertToNumberStr((BigDecimal)s);
-			}else {
-				return convertToNumberStr((Double)s);
-			}
+	/**
+	 * 
+	 * @param value
+	 * @param fixLength
+	 * @return
+	 * @throws Exception
+	 * Ex: value:100 ,FixLength :10
+	 * Result:[XXXXXXX100]
+	 */
+	public static String appendLeft(String value,String cAppend ,int fixLength) throws Exception{
+		int i = 0;
+		String newValue  ="";
+		int loopAppend = 0;
+		if(value.length() < fixLength){
+			loopAppend = fixLength - value.length();
+		}
+		if(value.length()> fixLength){
+			value = value.substring(0,fixLength);
 		}else{
-			if( s instanceof BigDecimal){
-				return convertToCurrencyStr((BigDecimal)s);
-			}else {
-				return convertToCurrencyStr((Double)s);
+			for(i=0;i<loopAppend;i++){
+				newValue +=cAppend;
 			}
 		}
+		newValue +=value;
+		return newValue;
 	}
-	
-	public static String convertToNumberStr(BigDecimal s) {
-		String currencyStr = "0";
-		try{
-			 if(s == null){
-				 s = new BigDecimal("0");
-			 }
-			 Double d = new Double(s.doubleValue());
-			 DecimalFormat dc=new DecimalFormat();
-		     dc.applyPattern(NUMBER_FORMAT);
-		     currencyStr =dc.format(d);
-		}catch(Exception e){
-			e.printStackTrace();
+	/**
+	 * 
+	 * @param value
+	 * @param fixLength
+	 * @return
+	 * @throws Exception
+	 * Ex: value:100 ,FixLength :10
+	 * Result:[100XXXXXXX]
+	 */
+	public static String appendRight(String value,String cAppend ,int fixLength) throws Exception{
+		int i = 0;
+		int loopAppend = 0;
+		if(value.length() < fixLength){
+			loopAppend = fixLength - value.length();
 		}
-		return currencyStr;
-	}
-	
-	public static String convertToNumberStr(double s) {
-		String currencyStr = "0";
-		try{
-			 Double d = new Double(s);
-			 DecimalFormat dc=new DecimalFormat();
-		     dc.applyPattern(NUMBER_FORMAT);
-		     currencyStr =dc.format(d);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return currencyStr;
-	}
-	
-	public static String convertToCurrencyStr(String s) {
-		String currencyStr = "0.00";
-		try{
-			if( !Utils.isNull(s).equals("")){
-				 Double d = new Double(Utils.isNull(s));
-				 DecimalFormat dc=new DecimalFormat();
-			     dc.applyPattern(CURRENCY_FORMAT);
-			     currencyStr =dc.format(d);
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return currencyStr;
-	}
-	
-	public static String convertToCurrencyStr(BigDecimal s) {
-		String currencyStr = "0.00";
-		try{
-			 if(s == null){
-				 s = new BigDecimal("0");
-			 }
-			 Double d = new Double(s.doubleValue());
-			 DecimalFormat dc=new DecimalFormat();
-		     dc.applyPattern(CURRENCY_FORMAT);
-		     currencyStr =dc.format(d);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return currencyStr;
-	}
-	
-	public static String convertToCurrencyStr(double s) {
-		String currencyStr = "0.00";
-		try{
-			 Double d = new Double(s);
-			 DecimalFormat dc=new DecimalFormat();
-		     dc.applyPattern(CURRENCY_FORMAT);
-		     currencyStr =dc.format(d);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return currencyStr;
-	}
-	
-	
-		
-	public static int convertToInt(String s){
-		int r = 0;
-		try{
-			if( !"".equalsIgnoreCase(isNull(s))){
-				s = s.replaceAll(",", "");
-				r = Integer.parseInt(s);
-			}
-		}catch(Exception e){
-		  logger.error(e.getMessage(),e);
-		}
-		return r;
-	}
-	
-	
-	public static String protectSpecialCharacters(String originalUnprotectedString) {
-		if (originalUnprotectedString == null) {
-			return null;
-		}
-		boolean anyCharactersProtected = false;
-
-		StringBuffer stringBuffer = new StringBuffer();
-		for (int i = 0; i < originalUnprotectedString.length(); i++) {
-			char ch = originalUnprotectedString.charAt(i);
-
-			boolean controlCharacter = ch < 32;
-			boolean unicodeButNotAscii = ch > 126;
-			boolean characterWithSpecialMeaningInXML = ch == '<' || ch == '&' || ch == '>';
-
-			if (characterWithSpecialMeaningInXML || unicodeButNotAscii || controlCharacter) {
-				stringBuffer.append("&#" + (int) ch + ";");
-				anyCharactersProtected = true;
-			} else {
-				stringBuffer.append(ch);
+		if(value.length()> fixLength){
+			value = value.substring(0,fixLength);
+		}else{
+			for(i=0;i<loopAppend;i++){
+				value +=cAppend;
 			}
 		}
-		if (anyCharactersProtected == false) {
-			return originalUnprotectedString;
+		return value;
+	}
+
+ //Case null retun ""
+ 	public static String stringValueSpecial2(long dateBigdecimal, String format ,Locale locale) throws Exception {
+ 		String dateStr = "";		
+ 		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+ 		try {
+ 			logger.debug("dateBigdecimal:"+dateBigdecimal);
+ 			if(dateBigdecimal != 0.0){
+ 			   Timestamp ti = new Timestamp(dateBigdecimal);
+ 			   logger.debug("date timestamp>>"+ti);
+ 			   dateStr = ft.format(ti);
+ 			}
+ 		} catch (Exception e) {
+ 		}
+ 		return dateStr;
+ 	}
+ 	public static String[] isNullArray(Object obj){
+		if(obj == null)
+		  return null;
+		String[] str = (String[]) obj;
+		return str;
+	}
+	public static Date getDate(String strDateTime, String pattern) {
+		try {
+		if (strDateTime != null && strDateTime.length() > 0) {
+		SimpleDateFormat format = new SimpleDateFormat(pattern, Locale.US);
+		Date dtDate = format.parse(strDateTime);
+
+		return dtDate;
+
+		} else {
+		return null;
 		}
-
-		String r = stringBuffer.toString();
-		// replace \n
-		r = r.replace("&#10;", "<br>");
-
-		return r;
+		} catch (Exception ex) {
+		ex.printStackTrace();
+		}
+		return null;
+		}
+	
+	
+	public static String isNullDefaultZero(Object obj){
+		if(obj == null)
+		  return "0";
+		String str = (String) obj;
+		return str.trim();
+	}
+	public static String isNullDefault(Object obj,String defaultStr){
+		if(obj == null || (obj != null && isNull(obj).equals("")))
+		  return defaultStr;
+		String str = (String) obj;
+		return str.trim();
 	}
 	
- public static double convMeterToKilometer(String meter, int scale){
-	  BigDecimal temp = new BigDecimal(Utils.convertStrToDouble(meter)/1000);
-	 return temp.setScale(scale,BigDecimal.ROUND_HALF_UP).doubleValue();
-  }
-  public static boolean isNumeric(String str) {  
-	  try {  
-	      double d = Double.parseDouble(str);  
-	  }catch(NumberFormatException nfe)  {  
-	    return false;  
-	  }  
-	  return true;  
-	}
-	public static Double isDoubleNull(Object str) {
-		if (str ==null || isNull(str).equals("")){
-			return new Double(0);
-		}
-		logger.debug("str:"+str);
-		return ((Double)str);
-	}
-	public static String convertDoubleToStr(Double double1){
-		if(double1 == null){
-			return "";
-		}
-		String doubleStr = double1.longValue()+"";
-		//logger.debug("doubleStr:"+doubleStr);
-		
-		if(doubleStr.indexOf(".") != -1){
-		  doubleStr = doubleStr.substring(0,doubleStr.indexOf("."));
-		}
-		//logger.debug("return doubleStr:"+doubleStr);
-		return doubleStr;
-	}
 	public static String convertSciToDecimal(String scientificNotation){
 		//String scientificNotation = "8.854922341299E12";
 		Double scientificDouble = Double.parseDouble(scientificNotation);
@@ -512,5 +843,92 @@ public class Utils {
 		
 		//System.out.println(decimalString);
 		return decimalString;
+	}
+	
+	// Create Utility for rounding double value
+	public static double round1(double d, int decimalPlace,int roundType){
+	    BigDecimal bd = new BigDecimal(Double.toString(d));
+	    bd = bd.setScale(decimalPlace,roundType);
+	    return bd.doubleValue();
+	 }
+	
+	public static String convertIntToStrDefault(int d,String defaultStr) {
+		//logger.debug("d["+d+"]");
+		if (d ==0 ){
+			return defaultStr;
+		}
+		return decimalFormat(d,format_current_no_disgit);
+	}
+	//NODIGIT
+	public static String convertDoubleToStrDefaultNoDigit(double d,String defaultStr) {
+		//logger.debug("d["+d+"]");
+		if (d ==0 || 0.0==d){
+			return defaultStr;
+		}
+		return decimalFormat(d,format_current_no_disgit);
+	}
+	public static boolean isLocationValid(String str) {
+		boolean r= true;
+		if (str ==null || Utils.isNull(str).equals("")){
+			return false;
+		}
+		//logger.debug("before 1str:"+str);
+		str = str.replaceAll("\\,", "");
+		//logger.debug("before 2str:"+str);
+		str = str.replaceAll("\\.", "");
+		//logger.debug("before 3str:"+str);
+		str = str.replaceAll(" ", "");
+		//logger.debug("after str:"+str.trim());
+		try{
+			BigDecimal c = new BigDecimal(str);
+		}catch(Exception e){
+			//e.printStackTrace();
+			r= false;
+		}
+		return r;
+	}
+	public static int excUpdateReInt(Connection conn,String sql) {
+		  return excUpdateModelReInt(conn,sql);
+	}
+	public static int excUpdateModelReInt(Connection conn,String sql) {
+	    PreparedStatement ps =null;
+	    int recordUpdate = 0;
+		try{  
+			String[] sqlArr = sql.split("\\;");
+			if(sqlArr != null && sqlArr.length>0){
+			   for(int i=0;i<sqlArr.length;i++){
+				 if( !isNull(sqlArr[i]).equals("")){
+				     ps = conn.prepareStatement(sqlArr[i]);
+				      recordUpdate = ps.executeUpdate();
+			     }
+			   }
+			}
+		}catch(Exception e){
+	      e.printStackTrace();
+		}finally{
+			try{
+				if(ps != null){
+				   ps.close();ps = null;
+				}
+				
+			}catch(Exception e){
+				logger.error(e.getMessage(),e);
+			}
+		}
+		return recordUpdate;
+  }
+	public static String convertDoubleToStr(double d,String format) {
+		//logger.debug("d["+d+"]");
+		if (d ==0 || 0.0==d){
+			return "";
+		}
+		return decimalFormat(d,format);
+	}
+	public static BigDecimal convertStrToBig(String str) {
+		if (str ==null || "0".equals(str) || "0.00".equals(str) || isNull(str).equals("")){
+			return null;
+		}
+		str = str.replaceAll(",", "");
+		return new BigDecimal(str);
 	}
 }

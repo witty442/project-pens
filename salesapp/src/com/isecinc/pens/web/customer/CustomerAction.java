@@ -1,4 +1,4 @@
-package com.isecinc.pens.web.customer;
+ package com.isecinc.pens.web.customer;
 
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
@@ -25,29 +25,30 @@ import com.isecinc.pens.bean.District;
 import com.isecinc.pens.bean.Trip;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MContact;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MDistrict;
+import com.isecinc.pens.model.MProvince;
 import com.isecinc.pens.model.MTrip;
 import com.isecinc.pens.model.MTrxHistory;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.ExcelHeader;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 /**
  * Customer Action Class
  * 
- * @author Aneak.t
- * @version $Id: ProductAction.java,v 1.0 06/10/2010 00:00:00 aneak.t Exp $
+ * @author Witty
+ * @version $Id: CustomerAction.java ,16/02/2021
  * 
- *          atiz.b : edit for customer prefix code
  */
 
 public class CustomerAction extends I_Action {
@@ -63,7 +64,7 @@ public class CustomerAction extends I_Action {
 		Customer customer = null;
 		User user = (User) request.getSession(true).getAttribute("user");
 		try {
-			customer = new MCustomer().find(id);
+			customer = new MCustomer().findOpt(id);
 			if (customer == null) {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 			}
@@ -71,9 +72,7 @@ public class CustomerAction extends I_Action {
 			if(Utils.isNull(customer.getPrintType()).equals("")){
 				customer.setPrintType("H");//Printype HEAD BRANCH
 			}
-			
-			customerForm.setAddresses(new MAddress().lookUp(customer.getId()));
-			customerForm.setContacts(new MContact().lookUp(customer.getId()));
+		
 			customerForm.setCustomer(customer);
 			String whereCause = " AND CUSTOMER_ID = " + customer.getId() + " AND USER_ID = " + user.getId();
 			whereCause += " ORDER BY TRIP_ID DESC ";
@@ -81,18 +80,8 @@ public class CustomerAction extends I_Action {
 			if (trips != null) customerForm.getCustomer().setTrip(trips[0].getTripDateFrom());
 
 			// get back search key
-			if (customerForm.getCriteria().getSearchKey() == null) {
-				if (request.getSession(true).getAttribute("CMSearchKey") != null) {
-					customerForm.getCriteria().setSearchKey(
-							(String) request.getSession(true).getAttribute("CMSearchKey"));
-				} else {
-					customerForm.getCriteria()
-							.setSearchKey((String) request.getSession(true).getAttribute("searchKey"));
-				}
-			} else {
-				request.getSession(true).removeAttribute("CMSearchKey");
-			}
-            
+			
+       
 			// Save Token
 			saveToken(request);
 		} catch (Exception e) {
@@ -130,8 +119,14 @@ public class CustomerAction extends I_Action {
 			// default to trip
 			customer.setTrip(DateToolsUtil.getCurrentDateTime("dd/MM/yyyy"));
 			customer.setPaymentTerm("IM");
-
+			
+			customer.setProvince("-1");
 			customer.setDistrict("-1");
+			if(user.getType().equals(User.VAN) || user.getType().equals(User.TT)) {
+			   customer.setTerritory(user.getTerritory());
+			}else {
+			   customer.setTerritory("-1");
+			}
 			customerForm.setCustomer(customer);
 
 			//default TripDay1 = day of currentDate
@@ -159,59 +154,19 @@ public class CustomerAction extends I_Action {
         int totalPage = 0;
         int start = 0;
         int end = 50;
-
 		try {
 			//clear session
 			request.getSession().removeAttribute("tripPageMap");
 			
-			CustomerCriteria criteria = getSearchCriteria(request, customerForm.getCriteria(), this.getClass().toString());
-			customerForm.setCriteria(criteria);
-			String whereCause = "";
-			if (customerForm.getCustomer().getTerritory() != null
-					&& !customerForm.getCustomer().getTerritory().trim().equals("")) {
-				whereCause += "\n AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
-			}
-			if (customerForm.getCustomer().getCode() != null && !customerForm.getCustomer().getCode().trim().equals("")) {
-				whereCause += "\n AND m_customer.CODE LIKE '%"
-						+ customerForm.getCustomer().getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
-						+ "%' ";
-			}
-			if (customerForm.getCustomer().getName() != null && !customerForm.getCustomer().getName().trim().equals("")) {
-				whereCause += "\n AND m_customer.NAME LIKE '%"
-						+ customerForm.getCustomer().getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
-						+ "%' ";
-			}
-			if (customerForm.getCustomer().getIsActive() != null
-					&& !customerForm.getCustomer().getIsActive().equals("")) {
-				whereCause += "\n AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
-			}
-			// WIT EDIT :04/08/2554 
-			if(!User.ADMIN.equals(user.getType())){
-			   whereCause += "\n AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
-			   whereCause += "\n AND m_customer.USER_ID = " + user.getId();
-			}
-			
-			if ( !"".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) && !"0".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) ){
-				whereCause += "\n AND m_address.district_id = " + customerForm.getCustomer().getDistrict() + "";
-			}
-			
-			if (customerForm.getCustomer().getSearchProvince() != 0) {
-				whereCause += "\n AND m_customer.CUSTOMER_ID IN (select customer_id ";
-				whereCause += "\n from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
-						 + ")";
-			}
-			
 			//Check Disp have Trip Or no
 			request.getSession().setAttribute("dispHaveTrip", "N");
 			if (  !Utils.isNull(customerForm.getCustomer().getDispHaveTrip()).equals("") ) {
-				whereCause +="\n AND ( m_customer.trip_day <> 0 or m_customer.trip_day2 <>0 or m_customer.trip_day3 <> 0) ";
 			    request.getSession().setAttribute("dispHaveTrip", "Y");
 			}
+			//gen where sql
+			String whereCause = new MCustomer().genWhereSQL(customerForm.getCustomer(), user);
+
 			conn = new DBCPConnectionProvider().getConnection(conn);
-			
-			//** get From Session **/
-			//currPage = customerForm.getCurPage();
-			//totalRow = customerForm.getTotalRow();
 			
 			/** Get Case Trip **/
 			if ( Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equalsIgnoreCase("Y")) {
@@ -230,11 +185,8 @@ public class CustomerAction extends I_Action {
 			    			currPage =Integer.parseInt(tripPageList.get(i).getTripDay());
 			    			break;
 			    		}
-			    	}
-			    	/*if(tripBySearchSqlIn.length() >0){
-			    		tripBySearchSqlIn = tripBySearchSqlIn.substring(0,tripBySearchSqlIn.length()-1);
-			    	}*/
-			    }
+			    	}//for
+			    }//if
 			    
 			}else{
 				totalRow = new MCustomer().getTotalRowCustomer(conn, whereCause, user);
@@ -271,12 +223,7 @@ public class CustomerAction extends I_Action {
 			customerForm.setCurPage(currPage);
 			
 			Customer customer = customerForm.getCustomer();
-			logger.debug("customer getDistrict:"+customer.getDistrict());
-			
-			//customer.setDistrict(district)
-
 			if (results != null) {
-				customerForm.getCriteria().setSearchResult(results.length);
 			} else {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 			}
@@ -303,46 +250,9 @@ public class CustomerAction extends I_Action {
         int start = 0;
         int end = 50;
 		try {
-			CustomerCriteria criteria = getSearchCriteria(request, customerForm.getCriteria(), this.getClass().toString());
-			customerForm.setCriteria(criteria);
-			String whereCause = "";
-			if (customerForm.getCustomer().getTerritory() != null
-					&& !customerForm.getCustomer().getTerritory().trim().equals("")) {
-				whereCause += "\n AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
-			}
-			if (customerForm.getCustomer().getCode() != null && !customerForm.getCustomer().getCode().trim().equals("")) {
-				whereCause += "\n AND m_customer.CODE LIKE '%"
-						+ customerForm.getCustomer().getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
-						+ "%' ";
-			}
-			if (customerForm.getCustomer().getName() != null && !customerForm.getCustomer().getName().trim().equals("")) {
-				whereCause += "\n AND m_customer.NAME LIKE '%"
-						+ customerForm.getCustomer().getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
-						+ "%' ";
-			}
-			if (customerForm.getCustomer().getIsActive() != null
-					&& !customerForm.getCustomer().getIsActive().equals("")) {
-				whereCause += "\n AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
-			}
-			// WIT EDIT :04/08/2554 
-			if(!User.ADMIN.equals(user.getType())){
-			   whereCause += "\n AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
-			   whereCause += "\n AND m_customer.USER_ID = " + user.getId();
-			}
-			
-			if ( !"".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) && !"0".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) ){
-				whereCause += "\n AND m_address.district_id = " + customerForm.getCustomer().getDistrict() + "";
-			}
-			
-			if (customerForm.getCustomer().getSearchProvince() != 0) {
-				whereCause += "\n AND m_customer.CUSTOMER_ID IN (select customer_id ";
-				whereCause += "\n from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
-						 + ")";
-			}
-			
-			if ( Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equals("Y") ) {
-			    whereCause +="\n AND ( m_customer.trip_day <> 0 or m_customer.trip_day2 <>0 or m_customer.trip_day3 <> 0) ";
-			}
+		
+			String whereCause = new MCustomer().genWhereSQL(customerForm.getCustomer(), user);
+		
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			
 			//** get From Session **/
@@ -375,9 +285,6 @@ public class CustomerAction extends I_Action {
 			customerForm.setTotalRow(totalRow);
 			customerForm.setCurPage(currPage);
 			
-			if (results != null) {
-				customerForm.getCriteria().setSearchResult(results.length);
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
@@ -394,6 +301,37 @@ public class CustomerAction extends I_Action {
 		return mapping.findForward("search"); 
 	}
 	
+	public ActionForward prepareCustTrip(ActionMapping mapping, ActionForm form, HttpServletRequest request,HttpServletResponse response) {
+		logger.debug("prepareCustTrip");
+		CustomerForm customerForm = (CustomerForm) form;
+		User user = (User) request.getSession().getAttribute("user");
+		Connection conn = null;
+		try {
+			conn = new DBCPConnectionProvider().getConnection(conn);
+			
+			String whereCause = new MCustomer().genWhereSQL(customerForm.getCustomer(), user);
+
+			String currTrip = "'"+DateUtil.getDayOfDate(new Date())+"'"; //day
+			Customer[] results  = new MCustomer().searchOptByTrip(conn,whereCause,user,currTrip,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
+		
+			logger.debug("currTrip:"+results); 
+			
+			customerForm.setResults(results);
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
+					+ e.getMessage());
+		}finally{
+			try{
+				if(conn != null){
+					conn.close();conn=null;
+				}
+			}catch(Exception e){
+				
+			}
+		}
+		return mapping.findForward("prepareCustTrip"); 
+	}
 	
 	public ActionForward exportToExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) {
@@ -401,48 +339,7 @@ public class CustomerAction extends I_Action {
 		Connection conn = null;
 		CustomerForm customerForm = (CustomerForm) form;
 		try {
-			CustomerCriteria criteria = getSearchCriteria(request, customerForm.getCriteria(), this.getClass().toString());
-			customerForm.setCriteria(criteria);
-			String whereCause = "";
-			if (customerForm.getCustomer().getTerritory() != null
-					&& !customerForm.getCustomer().getTerritory().trim().equals("")) {
-				whereCause += "\n AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
-			}
-			if (customerForm.getCustomer().getCode() != null && !customerForm.getCustomer().getCode().trim().equals("")) {
-				whereCause += "\n AND m_customer.CODE LIKE '%"
-						+ customerForm.getCustomer().getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
-						+ "%' ";
-			}
-			if (customerForm.getCustomer().getName() != null && !customerForm.getCustomer().getName().trim().equals("")) {
-				whereCause += "\n AND m_customer.NAME LIKE '%"
-						+ customerForm.getCustomer().getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
-						+ "%' ";
-			}
-			if (customerForm.getCustomer().getIsActive() != null
-					&& !customerForm.getCustomer().getIsActive().equals("")) {
-				whereCause += "\n AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
-			}
-			// WIT EDIT :04/08/2554 
-			if(!User.ADMIN.equals(user.getType())){
-			   whereCause += "\n AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
-			   whereCause += "\n AND m_customer.USER_ID = " + user.getId();
-			}
-			
-			if ( !"".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) && !"0".equals(Utils.isNull(customerForm.getCustomer().getDistrict())) ){
-				whereCause += "\n AND m_address.district_id = " + customerForm.getCustomer().getDistrict() + "";
-			}
-			
-			if (customerForm.getCustomer().getSearchProvince() != 0) {
-				whereCause += "\n AND m_customer.CUSTOMER_ID IN (select customer_id ";
-				whereCause += "\n from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
-						 + ")";
-			}
-			
-			if ( Utils.isNull(request.getSession().getAttribute("dispHaveTrip")).equals("Y") ) {
-			    whereCause +="\n AND ( m_customer.trip_day <> 0 or m_customer.trip_day2 <>0 or m_customer.trip_day3 <> 0) ";
-			}
-			whereCause +=" order by m_customer.code asc";
-			//logger.debug("whereCause:"+whereCause);
+			String whereCause = new MCustomer().genWhereSQL(customerForm.getCustomer(), user);
 			
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			Customer[] results  = new MCustomer().searchOpt(conn,whereCause,user,0,"dispTotalInvoice");
@@ -533,64 +430,6 @@ public class CustomerAction extends I_Action {
 		}
 		return mapping.findForward("toCreateNewReqpromotion"); 
 	}
-	
-	protected String search_V1(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		logger.debug("Customer Search");
-		CustomerForm customerForm = (CustomerForm) form;
-		User user = (User) request.getSession().getAttribute("user");
-
-		try {
-			CustomerCriteria criteria = getSearchCriteria(request, customerForm.getCriteria(), this.getClass().toString());
-			customerForm.setCriteria(criteria);
-			String whereCause = "";
-			if (customerForm.getCustomer().getTerritory() != null
-					&& !customerForm.getCustomer().getTerritory().trim().equals("")) {
-				whereCause += " AND m_customer.TERRITORY = '" + customerForm.getCustomer().getTerritory().trim() + "'";
-			}
-			if (customerForm.getCustomer().getCode() != null && !customerForm.getCustomer().getCode().trim().equals("")) {
-				whereCause += " AND m_customer.CODE LIKE '%"
-						+ customerForm.getCustomer().getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
-						+ "%' ";
-			}
-			if (customerForm.getCustomer().getName() != null && !customerForm.getCustomer().getName().trim().equals("")) {
-				whereCause += " AND m_customer.NAME LIKE '%"
-						+ customerForm.getCustomer().getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
-						+ "%' ";
-			}
-			if (customerForm.getCustomer().getIsActive() != null
-					&& !customerForm.getCustomer().getIsActive().equals("")) {
-				whereCause += " AND m_customer.ISACTIVE = '" + customerForm.getCustomer().getIsActive() + "'";
-			}
-			// WIT EDIT :04/08/2554 
-			if(User.ADMIN.equals(user.getType())){
-				
-			}else{
-			   whereCause += " AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
-			   whereCause += " AND m_customer.USER_ID = " + user.getId();
-			}
-			
-			if (customerForm.getCustomer().getSearchProvince() != 0) {
-				whereCause += " AND m_customer.CUSTOMER_ID IN (select customer_id ";
-				whereCause += "from m_address where province_id = " + customerForm.getCustomer().getSearchProvince()
-						+ ")";
-			}
-
-			//Customer[] results = new MCustomer().search(whereCause);
-			Customer[] results = new MCustomer().searchOpt(whereCause,user,0,customerForm.getCustomer().getDispTotalInvoice());//new method optimize
-			customerForm.setResults(results);
-
-			if (results != null) {
-				customerForm.getCriteria().setSearchResult(results.length);
-			} else {
-				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
-			}
-		} catch (Exception e) {
-			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
-					+ e.getMessage());
-			throw e;
-		}
-		return "search";
-	}
 
 	/**
 	 * Save
@@ -598,7 +437,7 @@ public class CustomerAction extends I_Action {
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
 		CustomerForm customerForm = (CustomerForm) form;
-		int customerId = 0;
+		long customerId = 0;
 		EnvProperties env = EnvProperties.getInstance();
 		try {
 			customerId = customerForm.getCustomer().getId();
@@ -615,8 +454,9 @@ public class CustomerAction extends I_Action {
 
 			Customer customer = customerForm.getCustomer();
 			
-			if(!User.ADMIN.equals(userActive.getRole().getKey()))
+			if(!User.ADMIN.equals(userActive.getRole().getKey())) {
 				customer.setCustomerType(userActive.getCustomerType().getKey());
+			}
 
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			// Begin Transaction
@@ -632,8 +472,8 @@ public class CustomerAction extends I_Action {
 					if (a.getPurpose().equalsIgnoreCase("S")) {
 						d = new MDistrict().find(String.valueOf(a.getDistrict().getId()));
 						if (d.getCode().length() == 0) d.setCode("99");
-						codePrefix += new DecimalFormat("00").format(a.getProvince().getId() - 100);
-						customer.setProvince(new DecimalFormat("00").format(a.getProvince().getId() - 100));
+						codePrefix += new DecimalFormat("00").format(Utils.convertStrToInt(a.getProvince().getId()) - 100);
+						customer.setProvince(new DecimalFormat("00").format(Utils.convertStrToInt(a.getProvince().getId()) - 100));
 						customer.setDistrict(d.getCode());
 						baddr = true;
 						break;
@@ -644,8 +484,8 @@ public class CustomerAction extends I_Action {
 						if (a.getPurpose().equalsIgnoreCase("B")) {
 							d = new MDistrict().find(String.valueOf(a.getDistrict().getId()));
 							if (d.getCode().length() == 0) d.setCode("99");
-							codePrefix += new DecimalFormat("00").format(a.getProvince().getId() - 100);
-							customer.setProvince(new DecimalFormat("00").format(a.getProvince().getId() - 100));
+							codePrefix += new DecimalFormat("00").format(Utils.convertStrToInt(a.getProvince().getId()) - 100);
+							customer.setProvince(new DecimalFormat("00").format(Utils.convertStrToInt(a.getProvince().getId()) - 100));
 							customer.setDistrict(d.getCode());
 							break;
 						}
@@ -672,8 +512,7 @@ public class CustomerAction extends I_Action {
 			if(printHeadBranchDesc.equals("")){
 				customer.setPrintHeadBranchDesc("N");
 			}
-			
-			
+
 			// Save Customer
 			if (!new MCustomer().save(customer, userActive.getId(),userActive.getUserName(), conn)) {
 				// return with duplicate Document no
@@ -704,24 +543,42 @@ public class CustomerAction extends I_Action {
 				new MTrip().save(trip, userActive.getId(), conn);
 			}
 
-			// Save Address
-			for (Address address : customerForm.getAddresses()) {
-				address.setCustomerId(customer.getId());
-				new MAddress().save(address, userActive.getId(), conn);
-			}
-
+			// Save Address BillTo (B)
+			Address addressB = customer.getAddress(); 
+			addressB.setCustomerId(customer.getId());
+			addressB.setId(customerForm.getCustomer().getShipToAddressId());
+			addressB.setPurpose("B");
+			addressB.setIsActive("Y");
+			addressB.setProvince(new MProvince().find(customer.getProvince()));
+			addressB.setDistrict(new MDistrict().find(customer.getDistrict()));
+			new MAddress().save(addressB, userActive.getId(), conn);
+			//set billToAddressId
+			customerForm.getCustomer().setBillToAddressId(addressB.getId());
+			
+			// Save Address ShipTo (S)
+			Address addressS = customer.getAddress(); 
+			addressS.setCustomerId(customer.getId());
+			addressS.setId(customerForm.getCustomer().getShipToAddressId());
+			addressS.setPurpose("S");
+			addressS.setIsActive("Y");
+			addressS.setProvince(new MProvince().find(customer.getProvince()));
+			addressS.setDistrict(new MDistrict().find(customer.getDistrict()));
+			new MAddress().save(addressS, userActive.getId(), conn);
+			//set shipToAddressId
+			customerForm.getCustomer().setShipToAddressId(addressS.getId());
+			
 			// Save Contact
-			for (Contact contact : customerForm.getContacts()) {
-				contact.setCustomerId(customer.getId());
-				new MContact().save(contact, userActive.getId(), conn);
-			}
+			Contact contact = customer.getContact();
+			contact.setCustomerId(customer.getId());
+			contact.setIsActive("Y");
+			new MContact().save(contact, userActive.getId(), conn);
 			
 			// Trx History
 			TrxHistory trx = new TrxHistory();
 			trx.setTrxModule(TrxHistory.MOD_CUSTOMER);
 			if (customerId == 0) trx.setTrxType(TrxHistory.TYPE_INSERT);
 			else trx.setTrxType(TrxHistory.TYPE_UPDATE);
-			trx.setRecordId(customer.getId());
+			trx.setRecordId(new Double(customer.getId()).intValue());
 			trx.setUser(userActive);
 			new MTrxHistory().save(trx, userActive.getId(), conn);
 			// Trx History --end--
@@ -789,7 +646,7 @@ public class CustomerAction extends I_Action {
 			HttpServletResponse response) {
 		Connection conn = null;
 		CustomerForm customerForm = (CustomerForm) form;
-		int customerId = 0;
+		long customerId = 0;
 		EnvProperties env = EnvProperties.getInstance();
 		try {
 			customerId = customerForm.getCustomer().getId();
@@ -902,7 +759,7 @@ public class CustomerAction extends I_Action {
 			HttpServletResponse response) {
 		Connection conn = null;
 		CustomerForm customerForm = (CustomerForm) form;
-		int customerId = 0;
+		long customerId = 0;
 		EnvProperties env = EnvProperties.getInstance();
 		try {
 			customerId = customerForm.getCustomer().getId();
@@ -977,8 +834,6 @@ public class CustomerAction extends I_Action {
 
 	@Override
 	protected void setNewCriteria(ActionForm form) {
-		CustomerForm customerForm = (CustomerForm) form;
-		customerForm.setCriteria(new CustomerCriteria());
 	}
 
 	@Override

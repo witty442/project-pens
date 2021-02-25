@@ -10,14 +10,15 @@ import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 /**
  * InvoiceDetailReportProcess Report
@@ -95,7 +96,7 @@ public class InvoiceDetailReportProcess extends I_ReportProcess<InvoiceDetailRep
 					item.setCustomerName(orderLine.getCustomerName());
 					item.setCustomerCode(orderLine.getCustomerCode());
 					item.setOrderDate(orderLine.getOrderDate());
-					item.setOrderDateStr(Utils.stringValue(orderLine.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					item.setOrderDateStr(DateUtil.stringValue(orderLine.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 
 					//item.setLineAmount1(orderLine.getLineAmount());
 					item.setTotalAmount1(orderLine.getLineAmount()-orderLine.getDiscount());

@@ -30,19 +30,18 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.FTPFileBean;
+import com.isecinc.pens.bean.FileImportTransBean;
+import com.isecinc.pens.bean.ImageFileBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.FTPFileBean;
-import com.isecinc.pens.inf.bean.ImageFileBean;
-import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.exception.FTPException;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.helper.ExportHelper;
-import com.isecinc.pens.inf.helper.FileUtil;
 import com.isecinc.pens.inf.helper.ImportHelper;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.inf.manager.process.bean.FileImportTransBean;
-import com.isecinc.pens.inf.manager.process.bean.KeyNoImportTransBean;
+import com.pens.util.EnvProperties;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 /**
  * @author WITTY
@@ -189,7 +188,7 @@ public class FTPManager {
 	 * @return
 	 * @throws Exception
 	 */
-	public int downloadFileMappingToTable(User user, LinkedHashMap<String, TableBean> controlTableMap, String path,
+	public int downloadFileMappingToTableBySales(User user, LinkedHashMap<String, TableBean> controlTableMap, String path,
 			User userBean, String transType, boolean importAll) throws Exception {
 		FTPClient ftp = null;
 		String ftpResponse = "";
@@ -231,8 +230,7 @@ public class FTPManager {
 								typeName = ftpFileName.substring(ftpFileName.indexOf(".") + 1, ftpFileName.length());
 							}
 							if (typeName.equalsIgnoreCase("txt")) {
-								canGetFtpFile = ImportHelper.canGetFtpFile(userBean, transType, tableBean, ftpFileName,
-										importAll);
+								canGetFtpFile = ImportHelper.canGetFtpFile(userBean, transType, tableBean, ftpFileName,importAll);
 							}
 						}
 						// logger.info("Table["+tableName+"]fileFtpname["+ftpFileName+"]canGetFtpFile["+canGetFtpFile+"]");
@@ -358,6 +356,172 @@ public class FTPManager {
 		}
 	}
 
+	public int downloadFileMappingToTableAllSales(LinkedHashMap<String, TableBean> controlTableMap, String path,
+			String transType, boolean importAll) throws Exception {
+		FTPClient ftp = null;
+		String ftpResponse = "";
+		int i = 0;
+		int countFileMap = 0;
+		try {
+			ftp = new FTPClient();
+			ftp.connect(server);
+			ftp.enterLocalPassiveMode();
+			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			if (!ftp.login(userFtp, passwordFtp)) {
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+
+			ftp.changeWorkingDirectory(path);
+			FTPFile[] ftpFiles = ftp.listFiles(path);
+			ftpResponse = ftp.getReplyString();
+
+			if (ftpFiles != null && ftpResponse.startsWith("226")) {
+				logger.debug("Start init FTP File ");
+
+				List<FTPFileBean> outStreamList = null;
+				for (i = 0; i < ftpFiles.length; i++) {
+					FTPFile file = (FTPFile) ftpFiles[i];
+					// logger.debug("FTP fileName:"+file.getName());
+
+					Set s = controlTableMap.keySet();
+					Iterator it = s.iterator();
+					boolean canGetFtpFile = false;
+					for (int j = 1; it.hasNext(); j++) {
+						canGetFtpFile = false;
+						String tableName = (String) it.next();
+						TableBean tableBean = (TableBean) controlTableMap.get(tableName);
+						String ftpFileName = Utils.isNull(file.getName());
+
+						if (!file.getName().equals(".") && !file.getName().equals("..")) {
+							String typeName = "";
+							if (!ftpFileName.equals("") && ftpFileName.indexOf(".") != -1) {
+								typeName = ftpFileName.substring(ftpFileName.indexOf(".") + 1, ftpFileName.length());
+							}
+							if (typeName.equalsIgnoreCase("txt")) {
+								canGetFtpFile = ImportHelper.canGetFtpFileAllSales(transType, tableBean, ftpFileName,importAll);
+							}
+						}
+						// logger.info("Table["+tableName+"]fileFtpname["+ftpFileName+"]canGetFtpFile["+canGetFtpFile+"]");
+
+						if (canGetFtpFile == true) {
+
+							countFileMap++;
+							/** Set Full File Name **/
+							tableBean.setFileFtpNameFull(ftpFileName);
+							// logger.debug("canGetFtpFile No["+countFileMap+"]put
+							// FtpName:"+tableBean.getFileFtpNameFull());
+							// ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+							/** 1 Write file to Path */
+							// ftp.retrieveFile(file.getName(),out);
+							// String dataStreamStr = out.toString();
+
+							/** 2 **/
+							String dataStreamStr = convertStreamToString(ftp.retrieveFileStream(ftpFileName), tableName,null);
+							ftp.completePendingCommand();
+							// logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
+
+							/** 3 **/
+							/*
+							 * InputStream in =ftp.retrieveFileStream(file.getName());
+							 * ftp.completePendingCommand(); String dataStreamStr = ""; int c ; byte[]
+							 * bufferByte = new byte[1024]; while((c=in.read()) != -1){ dataStreamStr
+							 * +=Character.valueOf((char)c); }
+							 */
+							// in.close();
+							// in.reset();
+
+							// logger.debug("dataStreamStrXX:"+dataStreamStr);
+
+							/** Store DataStream in TableBean **/
+
+							String[] dataLineTextArr = new String(dataStreamStr).trim().split(Constants.newLine);
+							/** Case one table have more one file **/
+							if (tableBean.getDataLineList() == null) {
+								outStreamList = new ArrayList<FTPFileBean>();
+								FTPFileBean ftpBean = new FTPFileBean();
+								ftpBean.setFileName(file.getName());
+								ftpBean.setDataLineText(dataLineTextArr);
+								ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
+								ftpBean.setFileCount(
+										Utils.isNull(dataStreamStr).equals("") ? 0 : dataLineTextArr.length);
+								outStreamList.add(ftpBean);
+								tableBean.setDataLineList(outStreamList);
+							} else {
+								FTPFileBean ftpBean = new FTPFileBean();
+								ftpBean.setFileName(file.getName());
+								ftpBean.setDataLineText(dataLineTextArr);
+								ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
+								ftpBean.setFileCount(
+										Utils.isNull(dataStreamStr).equals("") ? 0 : dataLineTextArr.length);
+								tableBean.getDataLineList().add(ftpBean);
+							}
+							/** Case Get Ftp File Master ,Product,C4 get Latest One File only **/
+							/** Exm 201308051515-UOMCVS.txt **/
+							if (("Y").equals(tableBean.getCheckDupFile())) {
+								// logger.info("GetFileFtp CheckDupFile["+tableBean.getCheckDupFile()+"]
+								// tabelName["+tableBean.getTableName()+"]");
+								if (tableBean.getDataLineList() != null && tableBean.getDataLineList().size() > 1) {
+									long fileNameLongLatest = 0;
+									long fileNameLongTemp = 0;
+									FTPFileBean ftpBeanLastest = null;
+
+									for (int n = 0; n < tableBean.getDataLineList().size(); n++) {
+										FTPFileBean ftpBean = (FTPFileBean) tableBean.getDataLineList().get(n);
+										String fileNameLongStr = ftpBean.getFileName().substring(0,
+												ftpBean.getFileName().indexOf("-") - 1);
+
+										fileNameLongTemp = Long.parseLong(fileNameLongStr);
+										// logger.info("fileNameLongStr["+fileNameLongStr+"]fileNameLongTemp["+fileNameLongTemp+"]");
+										if (n == 0) {
+											fileNameLongLatest = fileNameLongTemp;
+											ftpBeanLastest = ftpBean;
+										} else {
+											if (fileNameLongTemp > fileNameLongLatest) {
+												fileNameLongLatest = fileNameLongTemp;
+												ftpBeanLastest = ftpBean;
+											}
+										}
+									}
+
+									// set On file to dataLineList
+									List<FTPFileBean> fileBeanList = new ArrayList<FTPFileBean>();
+									fileBeanList.add(ftpBeanLastest);
+
+									tableBean.setDataLineList(fileBeanList);
+								}
+							}
+
+							/** put to Map Main **/
+							controlTableMap.put(tableBean.getTableName(), tableBean);
+
+							// out.flush();
+							// out.close();
+						} // if
+					} // for 2
+				} // for 1
+			}
+
+			logger.debug("End init FTP File Total Add To Map:" + countFileMap);
+
+			return countFileMap;
+		} catch (SocketException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if (ftp != null && ftp.isConnected()) {
+				ftp.disconnect();
+				// logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+
+		}
+	}
 	/**
 	 * getFTPFileByName
 	 * 
@@ -1004,7 +1168,7 @@ public class FTPManager {
 	}
 
 	/** Process Work on Window 8(tablet not work V107(tablet) **/
-	private void uploadAllFileToFTP_BY_FILE(String path, TableBean tableBean) throws Exception {
+	public void uploadAllFileToFTP_BY_FILE(String path, TableBean tableBean) throws Exception {
 		FTPClient ftp = null;
 		String reply = "";
 		Writer w = null;
@@ -2529,6 +2693,462 @@ public class FTPManager {
 				// logger.info("ftp disconnect : "+ftp.getReplyString());
 				ftp = null;
 			}
+		}
+	}
+	
+	
+	public int downloadFileMappingToTableReceipt(User user,LinkedHashMap<String,TableBean> controlTableMap ,String path,User userBean,String transType,boolean importAll) throws Exception
+	{
+		FTPClient ftp = null;
+		String ftpResponse = "";
+		int i = 0;
+		int countFileMap = 0;
+		try {			
+			logger.info("server:"+server+",user:"+userFtp+",password:"+passwordFtp);
+			ftp = new FTPClient();
+			ftp.connect(server);
+			ftp.enterLocalPassiveMode();
+			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			logger.debug("path:"+path);
+			ftp.changeWorkingDirectory(path);
+			FTPFile[] ftpFiles = ftp.listFiles(path);
+			ftpResponse = ftp.getReplyString();
+			logger.debug("ftpResponse:"+ftpResponse);
+			
+			if (ftpFiles != null && ftpResponse.startsWith("226")) {
+				logger.debug("Start init FTP File ");
+				
+				List<FTPFileBean> outStreamList = null;
+                for(i=0;i<ftpFiles.length;i++){
+                	FTPFile file = (FTPFile)ftpFiles[i];
+                	logger.debug("FTP list fileName:"+file.getName());
+                	
+                	Set s = controlTableMap.keySet();
+    				Iterator it = s.iterator();
+    				boolean canGetFtpFile = false;
+    				for (int j = 1; it.hasNext(); j++) {
+    					canGetFtpFile = false; 
+    					String tableName = (String) it.next();
+    					TableBean tableBean = (TableBean) controlTableMap.get(tableName);
+                        String ftpFileName = Utils.isNull(file.getName());
+                        
+    					if(!file.getName().equals(".") && !file.getName().equals("..")){
+    					   String typeName = "";
+    					   if( !ftpFileName.equals("") && ftpFileName.indexOf(".") != -1){
+    						   typeName = ftpFileName.substring(ftpFileName.indexOf(".")+1,ftpFileName.length());
+    					   }
+    					   if(typeName.equalsIgnoreCase("txt")){
+    						   if( ftpFileName.indexOf(tableBean.getFileFtpName()) != -1 
+     								  && ImportHelper.isCanGetFtpFileReceipt(user, tableBean, ftpFileName,importAll)){
+     								canGetFtpFile = true;
+     							}
+    					   }
+    					}
+    					logger.debug("Table["+tableName+"]fileFtpname["+ftpFileName+"]canGetFtpFile["+canGetFtpFile+"]");
+    					
+    					if(canGetFtpFile==true){
+    						
+    						countFileMap++;
+	                		/** Set Full File Name **/
+	                		tableBean.setFileFtpNameFull(ftpFileName);
+	                		//logger.debug("canGetFtpFile No["+countFileMap+"]put FtpName:"+tableBean.getFileFtpNameFull());
+		              
+		                	/** 2 **/
+		                	String dataStreamStr = convertStreamToString(ftp.retrieveFileStream(ftpFileName),tableName,userBean);
+		                	ftp.completePendingCommand();
+		                	//logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
+		                
+		                    /** Store DataStream in TableBean **/
+
+		                	String[] dataLineTextArr =  new String(dataStreamStr).trim().split(Constants.newLine);
+		                	/** Case one table have more one file **/
+		                	if(tableBean.getDataLineList() ==null){
+		                		outStreamList = new ArrayList<FTPFileBean>();
+		                		FTPFileBean ftpBean = new FTPFileBean();
+		                		ftpBean.setFileName(file.getName());
+		                		ftpBean.setDataLineText(dataLineTextArr);
+		                		ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
+		                		ftpBean.setFileCount(Utils.isNull(dataStreamStr).equals("")?0:dataLineTextArr.length);
+		                		outStreamList.add(ftpBean);
+		                		tableBean.setDataLineList(outStreamList);
+		                	}else{
+		                		FTPFileBean ftpBean = new FTPFileBean();
+		                		ftpBean.setFileName(file.getName());
+		                		ftpBean.setDataLineText(dataLineTextArr);
+		                		ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
+		                		ftpBean.setFileCount(Utils.isNull(dataStreamStr).equals("")?0:dataLineTextArr.length);
+		                		tableBean.getDataLineList().add(ftpBean);
+		                	}
+		                	/** Case Get Ftp File Master ,Product,C4 get Latest One File only **/
+		                	/** Exm 201308051515-UOMCVS.txt **/
+		                	if(("Y").equals(tableBean.getCheckDupFile())){
+		                		//logger.info("GetFileFtp CheckDupFile["+tableBean.getCheckDupFile()+"] tabelName["+tableBean.getTableName()+"]");
+		                		if(tableBean.getDataLineList() != null && tableBean.getDataLineList().size()>1){
+		                			long fileNameLongLatest = 0;
+		                			long fileNameLongTemp = 0;
+		                			FTPFileBean ftpBeanLastest = null;
+		                			
+		                			for(int n=0;n<tableBean.getDataLineList().size();n++){
+		                				FTPFileBean ftpBean = (FTPFileBean)tableBean.getDataLineList().get(n);
+		                				String fileNameLongStr = ftpBean.getFileName().substring(0,ftpBean.getFileName().indexOf("-")-1);
+		                				
+		                				fileNameLongTemp = Long.parseLong(fileNameLongStr);
+		                				//logger.info("fileNameLongStr["+fileNameLongStr+"]fileNameLongTemp["+fileNameLongTemp+"]");
+		                				if(n==0){
+		                					fileNameLongLatest = fileNameLongTemp;
+		                					ftpBeanLastest = ftpBean;
+		                				}else{
+		                					if(fileNameLongTemp > fileNameLongLatest){
+		                						fileNameLongLatest = fileNameLongTemp;
+		                						ftpBeanLastest = ftpBean;
+		                					}
+		                				}
+		                			}
+		                			
+		                			//set On file to dataLineList
+		                			List<FTPFileBean> fileBeanList = new ArrayList<FTPFileBean>();
+		                			fileBeanList.add(ftpBeanLastest);
+		                			
+		                			tableBean.setDataLineList(fileBeanList);
+		                		}
+		                	}
+		                	
+		                	/** put to Map Main **/
+		                	controlTableMap.put(tableBean.getTableName(), tableBean);
+		                	
+		                	//out.flush();
+		                	//out.close();
+	                	}//if
+    				}//for 2
+                }//for 1
+			}
+			
+			logger.debug("End init FTP File Total Add To Map:"+countFileMap);
+
+			return countFileMap;
+		} catch (SocketException e) {
+			e.printStackTrace();
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null && ftp.isConnected()) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+			
+		}
+	}
+	public int downloadFileMappingToTableOrder(User user,LinkedHashMap<String,TableBean> controlTableMap ,String path,User userBean,String transType,boolean importAll) throws Exception
+	{
+		FTPClient ftp = null;
+		String ftpResponse = "";
+		int i = 0;
+		int countFileMap = 0;
+		try {			
+			logger.info("server:"+server+",user:"+userFtp+",password:"+passwordFtp);
+			ftp = new FTPClient();
+			ftp.connect(server);
+			ftp.enterLocalPassiveMode();
+			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			logger.debug("path:"+path);
+			ftp.changeWorkingDirectory(path);
+			FTPFile[] ftpFiles = ftp.listFiles(path);
+			ftpResponse = ftp.getReplyString();
+			logger.debug("ftpResponse:"+ftpResponse);
+			
+			if (ftpFiles != null && ftpResponse.startsWith("226")) {
+				logger.debug("Start init FTP File ");
+				
+				List<FTPFileBean> outStreamList = null;
+                for(i=0;i<ftpFiles.length;i++){
+                	FTPFile file = (FTPFile)ftpFiles[i];
+                	logger.debug("FTP list fileName:"+file.getName());
+                	
+                	Set s = controlTableMap.keySet();
+    				Iterator it = s.iterator();
+    				boolean canGetFtpFile = false;
+    				for (int j = 1; it.hasNext(); j++) {
+    					canGetFtpFile = false; 
+    					String tableName = (String) it.next();
+    					TableBean tableBean = (TableBean) controlTableMap.get(tableName);
+                        String ftpFileName = Utils.isNull(file.getName());
+                        
+    					if(!file.getName().equals(".") && !file.getName().equals("..")){
+    					   String typeName = "";
+    					   if( !ftpFileName.equals("") && ftpFileName.indexOf(".") != -1){
+    						   typeName = ftpFileName.substring(ftpFileName.indexOf(".")+1,ftpFileName.length());
+    					   }
+    					   
+    					   if(   typeName.equalsIgnoreCase("txt")
+    						  && ftpFileName.indexOf(tableBean.getFileFtpName()) != -1 
+    						  && ImportHelper.isCanGetFtpFileOrder(user, tableBean, ftpFileName,importAll)
+    						 ){
+    							canGetFtpFile = true;
+    					   }
+    					}
+    					logger.debug("Table["+tableName+"]fileFtpname["+ftpFileName+"]canGetFtpFile["+canGetFtpFile+"]");
+    					
+    					if(canGetFtpFile==true){
+    						
+    						countFileMap++;
+	                		/** Set Full File Name **/
+	                		tableBean.setFileFtpNameFull(ftpFileName);
+	                		//logger.debug("canGetFtpFile No["+countFileMap+"]put FtpName:"+tableBean.getFileFtpNameFull());
+		              
+		                	/** 2 **/
+		                	String dataStreamStr = convertStreamToString(ftp.retrieveFileStream(ftpFileName),tableName,userBean);
+		                	ftp.completePendingCommand();
+		                	//logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
+		                
+		                    /** Store DataStream in TableBean **/
+
+		                	String[] dataLineTextArr =  new String(dataStreamStr).trim().split(Constants.newLine);
+		                	/** Case one table have more one file **/
+		                	if(tableBean.getDataLineList() ==null){
+		                		outStreamList = new ArrayList<FTPFileBean>();
+		                		FTPFileBean ftpBean = new FTPFileBean();
+		                		ftpBean.setFileName(file.getName());
+		                		ftpBean.setDataLineText(dataLineTextArr);
+		                		ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
+		                		ftpBean.setFileCount(Utils.isNull(dataStreamStr).equals("")?0:dataLineTextArr.length);
+		                		outStreamList.add(ftpBean);
+		                		tableBean.setDataLineList(outStreamList);
+		                	}else{
+		                		FTPFileBean ftpBean = new FTPFileBean();
+		                		ftpBean.setFileName(file.getName());
+		                		ftpBean.setDataLineText(dataLineTextArr);
+		                		ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
+		                		ftpBean.setFileCount(Utils.isNull(dataStreamStr).equals("")?0:dataLineTextArr.length);
+		                		tableBean.getDataLineList().add(ftpBean);
+		                	}
+		                	/** Case Get Ftp File Master ,Product,C4 get Latest One File only **/
+		                	/** Exm 201308051515-UOMCVS.txt **/
+		                	if(("Y").equals(tableBean.getCheckDupFile())){
+		                		//logger.info("GetFileFtp CheckDupFile["+tableBean.getCheckDupFile()+"] tabelName["+tableBean.getTableName()+"]");
+		                		if(tableBean.getDataLineList() != null && tableBean.getDataLineList().size()>1){
+		                			long fileNameLongLatest = 0;
+		                			long fileNameLongTemp = 0;
+		                			FTPFileBean ftpBeanLastest = null;
+		                			
+		                			for(int n=0;n<tableBean.getDataLineList().size();n++){
+		                				FTPFileBean ftpBean = (FTPFileBean)tableBean.getDataLineList().get(n);
+		                				String fileNameLongStr = ftpBean.getFileName().substring(0,ftpBean.getFileName().indexOf("-")-1);
+		                				
+		                				fileNameLongTemp = Long.parseLong(fileNameLongStr);
+		                				//logger.info("fileNameLongStr["+fileNameLongStr+"]fileNameLongTemp["+fileNameLongTemp+"]");
+		                				if(n==0){
+		                					fileNameLongLatest = fileNameLongTemp;
+		                					ftpBeanLastest = ftpBean;
+		                				}else{
+		                					if(fileNameLongTemp > fileNameLongLatest){
+		                						fileNameLongLatest = fileNameLongTemp;
+		                						ftpBeanLastest = ftpBean;
+		                					}
+		                				}
+		                			}
+		                			
+		                			//set On file to dataLineList
+		                			List<FTPFileBean> fileBeanList = new ArrayList<FTPFileBean>();
+		                			fileBeanList.add(ftpBeanLastest);
+		                			
+		                			tableBean.setDataLineList(fileBeanList);
+		                		}
+		                	}
+		                	
+		                	/** put to Map Main **/
+		                	controlTableMap.put(tableBean.getTableName(), tableBean);
+		                	
+		                	//out.flush();
+		                	//out.close();
+	                	}//if
+    				}//for 2
+                }//for 1
+			}
+			
+			logger.debug("End init FTP File Total Add To Map:"+countFileMap);
+
+			return countFileMap;
+		} catch (SocketException e) {
+			e.printStackTrace();
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null && ftp.isConnected()) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+			
+		}
+	}
+	
+	public int downloadFileMappingToTableTransaction(User user,LinkedHashMap<String,TableBean> controlTableMap 
+			,String path,User userBean,String transType,boolean importAll) throws Exception
+	{
+		FTPClient ftp = null;
+		String ftpResponse = "";
+		int i = 0;
+		int countFileMap = 0;
+		try {			
+			logger.info("server:"+server+",user:"+userFtp+",password:"+passwordFtp);
+			ftp = new FTPClient();
+			ftp.connect(server);
+			ftp.enterLocalPassiveMode();
+			ftp.setFileType(FTPClient.BINARY_FILE_TYPE);
+			if(!ftp.login(userFtp, passwordFtp)){
+				throw new FTPException("FTP Username or password invalid! ");
+			}
+			logger.debug("path:"+path);
+			ftp.changeWorkingDirectory(path);
+			FTPFile[] ftpFiles = ftp.listFiles(path);
+			ftpResponse = ftp.getReplyString();
+			logger.debug("ftpResponse:"+ftpResponse);
+			
+			if (ftpFiles != null && ftpResponse.startsWith("226")) {
+				logger.debug("Start init FTP File ");
+				
+				List<FTPFileBean> outStreamList = null;
+                for(i=0;i<ftpFiles.length;i++){
+                	FTPFile file = (FTPFile)ftpFiles[i];
+                	logger.debug("FTP list fileName:"+file.getName());
+                	
+                	Set s = controlTableMap.keySet();
+    				Iterator it = s.iterator();
+    				boolean canGetFtpFile = false;
+    				for (int j = 1; it.hasNext(); j++) {
+    					canGetFtpFile = false; 
+    					String tableName = (String) it.next();
+    					TableBean tableBean = (TableBean) controlTableMap.get(tableName);
+                        String ftpFileName = Utils.isNull(file.getName());
+                        
+    					if(!file.getName().equals(".") && !file.getName().equals("..")){
+    					   String typeName = "";
+    					   if( !ftpFileName.equals("") && ftpFileName.indexOf(".") != -1){
+    						   typeName = ftpFileName.substring(ftpFileName.indexOf(".")+1,ftpFileName.length());
+    					   }
+    					   
+    					   if(typeName.equalsIgnoreCase("txt")){
+    							if( ftpFileName.indexOf(tableBean.getFileFtpName()) != -1 
+    								  && ImportHelper.isCanGetFtpFileTransaction(user, tableBean, ftpFileName,importAll)){
+    								canGetFtpFile = true;
+    							}
+    					   }
+    					}
+    					logger.debug("Table["+tableName+"]fileFtpname["+ftpFileName+"]canGetFtpFile["+canGetFtpFile+"]");
+    					
+    					if(canGetFtpFile==true){
+    						
+    						countFileMap++;
+	                		/** Set Full File Name **/
+	                		tableBean.setFileFtpNameFull(ftpFileName);
+	                		//logger.debug("canGetFtpFile No["+countFileMap+"]put FtpName:"+tableBean.getFileFtpNameFull());
+		              
+		                	/** 2 **/
+		                	String dataStreamStr = convertStreamToString(ftp.retrieveFileStream(ftpFileName),tableName,userBean);
+		                	ftp.completePendingCommand();
+		                	//logger.debug("FTP Response "+ftp.getControlEncoding()+" :"+ftpResponse);
+		                
+		                    /** Store DataStream in TableBean **/
+
+		                	String[] dataLineTextArr =  new String(dataStreamStr).trim().split(Constants.newLine);
+		                	/** Case one table have more one file **/
+		                	if(tableBean.getDataLineList() ==null){
+		                		outStreamList = new ArrayList<FTPFileBean>();
+		                		FTPFileBean ftpBean = new FTPFileBean();
+		                		ftpBean.setFileName(file.getName());
+		                		ftpBean.setDataLineText(dataLineTextArr);
+		                		ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
+		                		ftpBean.setFileCount(Utils.isNull(dataStreamStr).equals("")?0:dataLineTextArr.length);
+		                		outStreamList.add(ftpBean);
+		                		tableBean.setDataLineList(outStreamList);
+		                	}else{
+		                		FTPFileBean ftpBean = new FTPFileBean();
+		                		ftpBean.setFileName(file.getName());
+		                		ftpBean.setDataLineText(dataLineTextArr);
+		                		ftpBean.setFileSize(FileUtils.byteCountToDisplaySize(file.getSize()));
+		                		ftpBean.setFileCount(Utils.isNull(dataStreamStr).equals("")?0:dataLineTextArr.length);
+		                		tableBean.getDataLineList().add(ftpBean);
+		                	}
+		                	/** Case Get Ftp File Master ,Product,C4 get Latest One File only **/
+		                	/** Exm 201308051515-UOMCVS.txt **/
+		                	if(("Y").equals(tableBean.getCheckDupFile())){
+		                		//logger.info("GetFileFtp CheckDupFile["+tableBean.getCheckDupFile()+"] tabelName["+tableBean.getTableName()+"]");
+		                		if(tableBean.getDataLineList() != null && tableBean.getDataLineList().size()>1){
+		                			long fileNameLongLatest = 0;
+		                			long fileNameLongTemp = 0;
+		                			FTPFileBean ftpBeanLastest = null;
+		                			
+		                			for(int n=0;n<tableBean.getDataLineList().size();n++){
+		                				FTPFileBean ftpBean = (FTPFileBean)tableBean.getDataLineList().get(n);
+		                				String fileNameLongStr = ftpBean.getFileName().substring(0,ftpBean.getFileName().indexOf("-")-1);
+		                				
+		                				fileNameLongTemp = Long.parseLong(fileNameLongStr);
+		                				//logger.info("fileNameLongStr["+fileNameLongStr+"]fileNameLongTemp["+fileNameLongTemp+"]");
+		                				if(n==0){
+		                					fileNameLongLatest = fileNameLongTemp;
+		                					ftpBeanLastest = ftpBean;
+		                				}else{
+		                					if(fileNameLongTemp > fileNameLongLatest){
+		                						fileNameLongLatest = fileNameLongTemp;
+		                						ftpBeanLastest = ftpBean;
+		                					}
+		                				}
+		                			}
+		                			
+		                			//set On file to dataLineList
+		                			List<FTPFileBean> fileBeanList = new ArrayList<FTPFileBean>();
+		                			fileBeanList.add(ftpBeanLastest);
+		                			
+		                			tableBean.setDataLineList(fileBeanList);
+		                		}
+		                	}
+		                	
+		                	/** put to Map Main **/
+		                	controlTableMap.put(tableBean.getTableName(), tableBean);
+		                	
+		                	//out.flush();
+		                	//out.close();
+	                	}//if
+    				}//for 2
+                }//for 1
+			}
+			
+			logger.debug("End init FTP File Total Add To Map:"+countFileMap);
+
+			return countFileMap;
+		} catch (SocketException e) {
+			e.printStackTrace();
+			throw new FTPException("Could not connect to FTP server");
+		} catch (UnknownHostException e) {
+			throw new FTPException("Could not connect to FTP server");
+		} catch (IOException e) {
+			throw new FTPException(e.getMessage());
+		} catch (Exception e) {
+			throw new FTPException(e.getMessage());
+		} finally {
+			if(ftp != null && ftp.isConnected()) {
+				ftp.disconnect();
+				//logger.info("ftp disconnect : "+ftp.getReplyString());
+				ftp = null;
+			}
+			
 		}
 	}
 }

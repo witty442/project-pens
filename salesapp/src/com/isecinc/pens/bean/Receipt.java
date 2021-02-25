@@ -56,15 +56,16 @@ public class Receipt extends I_PO {
 		setExported(rst.getString("EXPORTED"));
 
 		setInternalBank(ConvertNullUtil.convertToString(rst.getString("INTERNAL_BANK")));
-
+		setBillToAddressId(rst.getInt("bill_to_address_id"));
+		
 		// Lookup Lines
 		setReceiptLines(new MReceiptLine().lookUp(getId()));
-
-		// Lookup Bys
-		setReceiptBys(new MReceiptBy().lookUp(getId()));
-
+		
 		// Lookup CNs
 		setReceiptCNs(new MReceiptCN().lookUp(getId()));
+		
+		// Lookup Bys
+		setReceiptBys(new MReceiptBy().lookUp(getId()));
 
 		// set display
 		setDisplayLabel();
@@ -112,8 +113,9 @@ public class Receipt extends I_PO {
 	private String orderType;
 
 	/** CUSTOMER_ID */
-	private int customerId;
-
+	private long customerId;
+	private long oracleCustId;
+	
 	/** CUSTOMER_NAME */
 	private String customerName;
 
@@ -194,7 +196,24 @@ public class Receipt extends I_PO {
 	private String pdPaymentMethod;
 	
 	private String paymentType;
+    private int billToAddressId;
 	
+    
+	public long getOracleCustId() {
+		return oracleCustId;
+	}
+
+	public void setOracleCustId(long oracleCustId) {
+		this.oracleCustId = oracleCustId;
+	}
+
+	public int getBillToAddressId() {
+		return billToAddressId;
+	}
+
+	public void setBillToAddressId(int billToAddressId) {
+		this.billToAddressId = billToAddressId;
+	}
 	
 
 	public String getPaymentType() {
@@ -245,11 +264,11 @@ public class Receipt extends I_PO {
 		this.orderType = orderType;
 	}
 
-	public int getCustomerId() {
+	public long getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
 

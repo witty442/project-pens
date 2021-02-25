@@ -133,12 +133,12 @@ function openPopup(path,pageName,nextStep){
 	nextStepObj.value = nextStep;
 	
 	if("CustomerStockMC" == pageName){
-		param +="&hideAll=true&customerCode="+form.customerCode.value;
+		param +="&hideAll=true&filterUser=true&customerCode="+form.customerCode.value;
 	}else if("BranchStockMC" == pageName){
 		//check input customerCode;
 		var customerCode  = document.getElementById("customerCode");
 		if(customerCode.value != ""){
-		   param +="&hideAll=true&customerCode="+form.customerCode.value;
+		   param +="&hideAll=true&filterUser=true&customerCode="+form.customerCode.value;
 		}else{
 		   alert("กรุณาระบุห้าง ");
 		   customerCode.focus();

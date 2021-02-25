@@ -2,24 +2,37 @@ package com.isecinc.pens.web.report.performance_subreport;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.math.BigDecimal;
 import java.sql.Connection;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import com.isecinc.core.bean.Messages;
+import com.isecinc.core.web.I_Action;
+import com.isecinc.pens.bean.User;
+import com.isecinc.pens.init.InitialMessages;
+import com.isecinc.pens.report.performance.PerformanceReport;
+import com.isecinc.pens.report.performance.PerformanceReportProcess;
+import com.isecinc.pens.web.report.transfer.BankTransferReport;
+import com.isecinc.pens.web.report.transfer.BankTransferReportProcess;
+import com.lowagie.text.pdf.BaseFont;
+import com.pens.util.DBConnection;
+import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
+
 import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
@@ -28,48 +41,7 @@ import net.sf.jasperreports.engine.export.FontKey;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.PdfFont;
 import net.sf.jasperreports.engine.util.JRLoader;
-
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-
 import util.BeanParameter;
-
-import com.isecinc.core.bean.Messages;
-import com.isecinc.core.report.I_ReportAction;
-import com.isecinc.core.web.I_Action;
-import com.isecinc.pens.bean.Address;
-import com.isecinc.pens.bean.Contact;
-import com.isecinc.pens.bean.Customer;
-import com.isecinc.pens.bean.District;
-import com.isecinc.pens.bean.Trip;
-import com.isecinc.pens.bean.TrxHistory;
-import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.init.InitialMessages;
-import com.isecinc.pens.model.MAddress;
-import com.isecinc.pens.model.MContact;
-import com.isecinc.pens.model.MCustomer;
-import com.isecinc.pens.model.MDistrict;
-import com.isecinc.pens.model.MTrip;
-import com.isecinc.pens.model.MTrxHistory;
-import com.isecinc.pens.report.performance.PerformanceReport;
-import com.isecinc.pens.report.performance.PerformanceReportProcess;
-import com.isecinc.pens.web.customer.CustomerCriteria;
-import com.isecinc.pens.web.customer.CustomerForm;
-import com.isecinc.pens.web.report.creditpaid.CreditNoPaidReportForm;
-import com.isecinc.pens.web.report.creditpaid.CreditPaidReport;
-import com.isecinc.pens.web.report.performance.PerformanceReportCriteria;
-import com.isecinc.pens.web.report.performance.PerformanceReportForm;
-import com.isecinc.pens.web.report.transfer.BankTransferReport;
-import com.isecinc.pens.web.report.transfer.BankTransferReportProcess;
-import com.lowagie.text.pdf.BaseFont;
-import com.pens.util.ConvertNullUtil;
-import com.pens.util.DBCPConnectionProvider;
-import com.pens.util.DateToolsUtil;
 
 /**
  * Performance Report Action
@@ -89,7 +61,7 @@ public class PerformanceReportActionSubReport extends I_Action  {
 		try {
 			if(Utils.isNull(request.getParameter("action")).equals("new")){
 				  PerformanceReport bean = new PerformanceReport();
-				  bean.setOrderDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  bean.setOrderDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  reportForm.setFileType("PDF");
 				  reportForm.setBean(bean);
 			}
@@ -112,7 +84,7 @@ public class PerformanceReportActionSubReport extends I_Action  {
 		try {
 			if(Utils.isNull(request.getParameter("action")).equals("new")){
 				  PerformanceReport bean = new PerformanceReport();
-				  bean.setOrderDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  bean.setOrderDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  reportForm.setBean(bean);
 			}
 			// Save Token

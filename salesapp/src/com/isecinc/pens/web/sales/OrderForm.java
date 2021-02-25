@@ -23,8 +23,7 @@ public class OrderForm extends I_Form {
 
 	private static final long serialVersionUID = -427868075358525185L;
 
-	private OrderCriteria criteria = new OrderCriteria();
-
+	
 	private Order[] results = null;
 
 	private List<OrderLine> lines = null;
@@ -49,6 +48,25 @@ public class OrderForm extends I_Form {
 	private String receiptCreditFlag;//1 :can,0 : cannot,-1 :no pay prev bill
 	private double custCreditLimit;
 	private String mode ="";
+
+	private Order order = new Order();
+	private Receipt autoReceipt = new Receipt();
+	
+	public Order getOrder() {
+		return order;
+	}
+
+	public void setOrder(Order order) {
+		this.order = order;
+	}
+
+	public Receipt getAutoReceipt() {
+		return autoReceipt;
+	}
+
+	public void setAutoReceipt(Receipt autoReceipt) {
+		this.autoReceipt = autoReceipt;
+	}
 
 	public double getCustCreditLimit() {
 		return custCreditLimit;
@@ -98,36 +116,12 @@ public class OrderForm extends I_Form {
 		bys = LazyList.decorate(new ArrayList<ReceiptBy>(), factory2);
 	}
 
-	public Receipt getAutoReceipt() {
-		return criteria.getAutoReceipt();
-	}
-
-	public void setAutoReceipt(Receipt autoReceipt) {
-		criteria.setAutoReceipt(autoReceipt);
-	}
-
-	public OrderCriteria getCriteria() {
-		return criteria;
-	}
-
-	public void setCriteria(OrderCriteria criteria) {
-		this.criteria = criteria;
-	}
-
 	public Order[] getResults() {
 		return results;
 	}
 
 	public void setResults(Order[] results) {
 		this.results = results;
-	}
-
-	public Order getOrder() {
-		return criteria.getOrder();
-	}
-
-	public void setOrder(Order order) {
-		criteria.setOrder(order);
 	}
 
 	public List<OrderLine> getLines() {

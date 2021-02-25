@@ -21,15 +21,16 @@ import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.ReceiptMatch;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.interim.bean.IOrderToReceipt;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.ReceiptDocumentProcess;
 import com.isecinc.pens.web.pd.PDReceiptForm;
 import com.pens.util.ConvertNullUtil;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * Receipt Model
@@ -86,6 +87,85 @@ public class MReceipt extends I_Model<Receipt> {
 		return array;
 	}
 
+	public Receipt[] searchOpt(String whereCause) throws Exception {
+		Connection conn = null;
+		try {
+		   conn = DBConnection.getInstance().getConnection();
+		   return searchOpt(conn, whereCause);
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				conn.close();
+			} catch (Exception e2) {}
+		}
+	}
+	public Receipt[] searchOpt(Connection conn,String whereCause) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		List<Receipt> pos = new ArrayList<Receipt>();
+		Receipt o = null;
+		try{
+			
+			String sql ="\n select o.*"
+					  + "\n from pensonline.t_receipt o "
+					  + "\n  where 1=1 \n"+whereCause ;
+			
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){
+				o = new Receipt();
+				o.setId(rst.getInt("RECEIPT_ID"));
+				o.setReceiptNo(rst.getString("RECEIPT_NO").trim());
+				o.setReceiptDate(DateToolsUtil.convertToString(rst.getTimestamp("RECEIPT_DATE")));
+				o.setOrderType(rst.getString("ORDER_TYPE").trim());
+				o.setCustomerId(rst.getInt("CUSTOMER_ID"));
+				o.setCustomerName(rst.getString("CUSTOMER_NAME").trim());
+				o.setPaymentMethod(ConvertNullUtil.convertToString(rst.getString("PAYMENT_METHOD")).trim());
+				o.setBank(ConvertNullUtil.convertToString(rst.getString("BANK")).trim());
+				o.setChequeNo(ConvertNullUtil.convertToString(rst.getString("CHEQUE_NO")).trim());
+				o.setChequeDate("");
+				if (rst.getTimestamp("CHEQUE_DATE") != null)
+					o.setChequeDate(DateToolsUtil.convertToString(rst.getTimestamp("CHEQUE_DATE")));
+				o.setReceiptAmount(rst.getDouble("RECEIPT_AMOUNT"));
+				o.setInterfaces(rst.getString("INTERFACES").trim());
+				o.setDocStatus(rst.getString("DOC_STATUS").trim());
+				o.setSalesRepresent(new MUser().find(rst.getString("USER_ID")));
+				o.setCreditCardType(ConvertNullUtil.convertToString(rst.getString("CREDIT_CARD_TYPE")).trim());
+				o.setDescription(ConvertNullUtil.convertToString(rst.getString("DESCRIPTION")).trim());
+				o.setPrepaid(rst.getString("PREPAID").trim());
+				o.setApplyAmount(rst.getDouble("APPLY_AMOUNT"));
+
+				o.setExported(rst.getString("EXPORTED"));
+
+				o.setInternalBank(ConvertNullUtil.convertToString(rst.getString("INTERNAL_BANK")));
+				o.setBillToAddressId(rst.getInt("bill_to_address_id"));
+				
+				// Lookup Lines
+				o.setReceiptLines(new MReceiptLine().lookUp(o.getId()));
+				
+				// Lookup CNs
+				o.setReceiptCNs(new MReceiptCN().lookUp(o.getId()));
+				
+				// Lookup Bys
+				o.setReceiptBys(new MReceiptBy().lookUp(o.getId()));
+
+			
+				pos.add(o);
+			}
+			Receipt[] array = new Receipt[pos.size()];
+			array = pos.toArray(array);
+			return array;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+	}
 public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws Exception {
 	Connection conn = null;
 	Statement stmt = null;
@@ -99,8 +179,8 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 		logger.debug("vanDateFix:"+creditDateFix);
 		String dateCheck = "";
 		if( !"".equalsIgnoreCase(creditDateFix)){
-			java.util.Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-			dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
+			java.util.Date d = DateUtil.parse(creditDateFix, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			dateCheck = "str_to_date('"+DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
 		}
 		
 		String orderNoFrom = pdForm.getReceipt().getOrderNoFrom();
@@ -203,7 +283,8 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	public boolean save(Receipt receipt, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (receipt.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			//id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt.receipt_id").intValue();
 			String prefix = "";
 			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
 				receipt.setReceiptNo("R"
@@ -246,7 +327,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	public boolean saveWOCheckDup(Receipt receipt, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (receipt.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt.receipt_id").intValue();
 			String prefix = "";
 			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
 				receipt.setReceiptNo("R"
@@ -276,7 +357,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	public boolean saveWOCheckDup_PDPAID(Receipt receipt, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (receipt.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt.receipt_id").intValue();
 			String prefix = "";
 			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
 				receipt.setReceiptNo("R"
@@ -304,7 +385,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	public boolean updateReceiptFromPDReceipt(Receipt receipt, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (receipt.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt.receipt_id").intValue();
 			String prefix = "";
 			if (ConvertNullUtil.convertToString(receipt.getReceiptNo()).trim().length() == 0)
 				receipt.setReceiptNo("R"
@@ -322,7 +403,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 				DateToolsUtil.convertToTimeStamp(receipt.getReceiptDate()),
 				ConvertNullUtil.convertToString(receipt.getOrderType()).trim(), receipt.getCustomerId(),
 				ConvertNullUtil.convertToString(receipt.getCustomerName()).trim(), null, null,
-				 null ,Utils.parseCheckNull(receipt.getChequeDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th) ,
+				 null ,DateUtil.parseCheckNull(receipt.getChequeDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th) ,
 				receipt.getReceiptAmount(), receipt.getInterfaces(), receipt.getDocStatus(),
 				receipt.getSalesRepresent().getId(), activeUserID, activeUserID, null,
 				ConvertNullUtil.convertToString(receipt.getDescription()).trim(), receipt.getPrepaid(),
@@ -348,8 +429,8 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 			int index = 0;
 			ps = conn.prepareStatement(sql);
 			ps.setString(++index, r.getReceiptNo());
-			ps.setDate(++index, new java.sql.Date(Utils.parse(r.getReceiptDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
-			ps.setInt(++index, r.getCustomerId());
+			ps.setDate(++index, new java.sql.Date(DateUtil.parse(r.getReceiptDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			ps.setLong(++index, r.getCustomerId());
 			ps.setDouble(++index, r.getReceiptAmount());
 			if( !Utils.isNull(r.getPdPaidDate()).equals("")){
 			  Timestamp d=DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(r.getPdPaidDate())) ;
@@ -361,7 +442,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 			ps.setTimestamp(++index, new java.sql.Timestamp(new Date().getTime()));
 			ps.setInt(++index, user.getId());
 			if( !Utils.isNull(r.getChequeDate()).equals("")){
-			   ps.setDate(++index, new java.sql.Date(Utils.parse(r.getChequeDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			   ps.setDate(++index, new java.sql.Date(DateUtil.parse(r.getChequeDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
 			}else{
 			   ps.setDate(++index, null);
 			}
@@ -389,8 +470,8 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 			int index = 0;
 			ps = conn.prepareStatement(sql);
 			ps.setString(++index, r.getReceiptNo());
-			ps.setDate(++index, new java.sql.Date(Utils.parse(r.getReceiptDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
-			ps.setInt(++index, r.getCustomerId());
+			ps.setDate(++index, new java.sql.Date(DateUtil.parse(r.getReceiptDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			ps.setLong(++index, r.getCustomerId());
 			ps.setDouble(++index, r.getReceiptAmount());
 			if( !Utils.isNull(r.getPdPaidDate()).equals("")){
 			  Timestamp d=DateToolsUtil.convertToTimeStamp(ConvertNullUtil.convertToString(r.getPdPaidDate())) ;
@@ -403,7 +484,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 			ps.setInt(++index, user.getId());
 			ps.setString(++index, "N");
 			if( !Utils.isNull(r.getChequeDate()).equals("")){
-			   ps.setDate(++index, new java.sql.Date(Utils.parse(r.getChequeDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			   ps.setDate(++index, new java.sql.Date(DateUtil.parse(r.getChequeDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
 			}else{
 			   ps.setDate(++index, null);
 			}
@@ -424,7 +505,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	 * @return
 	 * @throws Exception
 	 */
-	public String getLastestReceiptFromOrder(int orderId) throws Exception {
+	public String getLastestReceiptFromOrder(long orderId) throws Exception {
 		String receiptNo = "";
 		String whereCause = "  and doc_status = 'SV' ";
 		whereCause += "  and receipt_id in (select receipt_id from t_receipt_line where order_id = " + orderId + ") ";
@@ -441,7 +522,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 	 * @return
 	 * @throws Exception
 	 */
-	public int cancelReceiptByID(Connection conn,int receiptId,String remark,int userId) throws Exception {
+	public int cancelReceiptByID(Connection conn,long receiptId,String remark,int userId) throws Exception {
 		PreparedStatement ps = null;
 		try {
 			String sql = "UPDATE "+TABLE_NAME+" SET  DOC_STATUS = ? ,REASON = ?,UPDATED_BY =? ,UPDATED = CURRENT_TIMESTAMP  WHERE receipt_id = ? ";
@@ -452,7 +533,7 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 			ps.setString(++index,Order.DOC_VOID);
 			ps.setString(++index, "-"+remark);
 			ps.setInt(++index, userId);
-			ps.setInt(++index, receiptId);
+			ps.setLong(++index, receiptId);
 			
 			return ps.executeUpdate();
 		} catch (Exception ex) {
@@ -602,6 +683,65 @@ public Receipt[] searchOptCasePDPAID_NO(PDReceiptForm pdForm ,User user) throws 
 		}
 		return receiptId;
 	}
-	
-	
+	public int getTotalRowReceipt(Connection conn,String whereCause) throws Exception {
+		Statement stmt = null;
+		ResultSet rst = null;
+		int totalRec = 0;
+		try{
+			String sql ="\n select count(*) as c"
+					  + "\n from pensonline.t_receipt o where 1=1 \n"+whereCause ;
+			logger.debug("sql:"+sql);
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			if(rst.next()){
+				totalRec = rst.getInt("c");
+			}
+			
+			return totalRec;
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				stmt.close();
+			} catch (Exception e2) {}
+		}
+	}
+	public String genWhereSQLSearch(Receipt o,User user) throws Exception{
+		String whereCause = "";
+		if (o.getReceiptNo() != null && !o.getReceiptNo().equals("")) {
+			whereCause += " AND ORDER_NO LIKE '%"
+					+ o.getReceiptNo().trim().replace("\'", "\\\'").replace("\"", "\\\"") + "%'";
+		}
+
+		if ( !Utils.isNull(o.getDocStatus()).equals("")) {
+			whereCause += " AND DOC_STATUS = '" + o.getDocStatus() + "'";
+		}
+
+		if (!Utils.isNull(o.getReceiptDateFrom()).equals("")) {
+			whereCause += " AND RECEIPT_DATE >= '"
+					+ DateToolsUtil.convertToTimeStamp(o.getReceiptDateFrom().trim()) + "'";
+		}
+		if (!Utils.isNull(o.getReceiptDateTo()).equals("")) {
+			whereCause += " AND RECEIPT_DATE <= '"
+					+ DateToolsUtil.convertToTimeStamp(o.getReceiptDateTo().trim()) + "'";
+		}
+
+		if( !user.getType().equalsIgnoreCase(User.ADMIN)) {
+		    whereCause += " AND ORDER_TYPE = '" + user.getOrderType().getKey() + "' ";
+		    whereCause += " AND USER_ID = " + user.getId();
+		}
+		if(o.getCustomerId() != 0) {
+		  whereCause += " AND CUSTOMER_ID = " + o.getCustomerId() + " ";
+		}
+		if (o.getSearchInvoiceNo() != null
+				&& !o.getSearchInvoiceNo().equals("")) {
+			whereCause += "  AND RECEIPT_ID IN (SELECT RECEIPT_ID FROM t_receipt_line WHERE AR_INVOICE_NO LIKE '"
+					+ o.getSearchInvoiceNo().trim() + "%' )";
+		}
+
+		whereCause += " ORDER BY RECEIPT_DATE DESC ,RECEIPT_NO DESC ";
+		
+		return whereCause;
+	}
 }

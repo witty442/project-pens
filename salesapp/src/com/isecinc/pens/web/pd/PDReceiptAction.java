@@ -18,8 +18,6 @@ import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
@@ -27,7 +25,9 @@ import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.isecinc.pens.web.sales.OrderForm;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.Utils;
 /**
  * Receipt Action
  * 

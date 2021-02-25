@@ -14,13 +14,13 @@ import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.web.moveorder.MoveOrderProductCatalog;
 import com.isecinc.pens.web.requisitionProduct.RequisitionProductCatalog;
 import com.isecinc.pens.web.sales.bean.ProductCatalog;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 /**
  * MProduct Class

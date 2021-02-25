@@ -9,7 +9,7 @@ import java.util.List;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.UOM;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 
 /**
  * Unit Of Measure

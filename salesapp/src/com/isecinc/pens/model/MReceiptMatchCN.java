@@ -8,8 +8,8 @@ import java.util.List;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.ReceiptMatchCN;
-import com.isecinc.pens.process.SequenceProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * Receipt Match CN Model
@@ -66,9 +66,9 @@ public class MReceiptMatchCN extends I_Model<ReceiptMatchCN> {
 	 * @throws Exception
 	 */
 	public boolean save(ReceiptMatchCN receiptMatchCN, int activeUserID, Connection conn) throws Exception {
-		int id = 0;
+		long id = 0;
 		if (receiptMatchCN.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt_match_cn.receipt_match_cn_id").longValue();
 		} else {
 			id = receiptMatchCN.getId();
 		}

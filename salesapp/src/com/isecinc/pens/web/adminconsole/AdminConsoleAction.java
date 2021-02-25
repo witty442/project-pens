@@ -15,12 +15,12 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.web.runscriptdb.RunScriptDBAction;
+import com.pens.util.DBConnection;
+import com.pens.util.EnvProperties;
 import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
 import com.pens.util.manual.cleardb.ClearDB;
 import com.pens.util.manual.cleardb.ClearDupDB;
 
@@ -171,7 +171,7 @@ public class AdminConsoleAction extends I_Action {
 				System.out.println("eSQL:"+eSQL);
 				
 			    if( !eSQL.equals("")){
-			    	eOutput =  Utils.excUpdate(eSQL);
+			    	eOutput =  SQLHelper.excUpdate(eSQL);
 			    	
 			    	System.out.println("eOutput:"+eOutput);
 			    }	

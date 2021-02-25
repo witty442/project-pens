@@ -128,7 +128,7 @@ function save(path,type){
 										     onClick="javascript:addText('${pageContext.request.contextPath}')" />
 									  </td>
 									  <td width="60%" align="left" nowrap valign="bottom"> 
-									     <input type="text" name="textRemove" size="30" value="<%=com.isecinc.pens.inf.helper.Utils.removeStringEnter(request.getParameter("textRemove")) %>"/>
+									     <input type="text" name="textRemove" size="30" value="<%=com.pens.util.Utils.removeStringEnter(request.getParameter("textRemove"))%>"/>
 									  </td>
 								   </tr>
 								    <tr>

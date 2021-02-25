@@ -6,9 +6,9 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DBConnection;
 import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
 
 public class ProcessAfterAction {
 	/** Logger */
@@ -29,29 +29,30 @@ public class ProcessAfterAction {
 		Connection conn = null;
 		logger.info("processAfterAction Name["+actionName+"]keyValueDB["+keyValueDB+"]");
 		try{
-			conn = DBConnection.getInstance().getConnection();
-			//Get sqlMethod 
-			ProcessAfterBean pBean = getSql(conn, actionName);
-			if(pBean != null){
-				logger.info("found Process After Save["+actionName+"] sql:"+pBean.getSql());
-				
-				//replace key_db $request_number to keyValueDB
-				String sql = pBean.getSql();
-				logger.debug("before sql:"+sql);
-				//replace key_db $request_number to keyValueDB (S0016305001)
-				
-				logger.debug("index of $"+pBean.getKeyDB()+":"+sql.indexOf("$"+pBean.getKeyDB()));
-				if(sql.indexOf("$"+pBean.getKeyDB()) != -1 && !Utils.isNull(keyValueDB).equals("")){
-					sql = sql.replaceAll("\\$"+pBean.getKeyDB(), "'"+keyValueDB+"'");
+			if(1==2) {
+				conn = DBConnection.getInstance().getConnection();
+				//Get sqlMethod 
+				ProcessAfterBean pBean = getSql(conn, actionName);
+				if(pBean != null){
+					logger.info("found Process After Save["+actionName+"] sql:"+pBean.getSql());
+					
+					//replace key_db $request_number to keyValueDB
+					String sql = pBean.getSql();
+					logger.debug("before sql:"+sql);
+					//replace key_db $request_number to keyValueDB (S0016305001)
+					
+					logger.debug("index of $"+pBean.getKeyDB()+":"+sql.indexOf("$"+pBean.getKeyDB()));
+					if(sql.indexOf("$"+pBean.getKeyDB()) != -1 && !Utils.isNull(keyValueDB).equals("")){
+						sql = sql.replaceAll("\\$"+pBean.getKeyDB(), "'"+keyValueDB+"'");
+					}
+					logger.debug("after sql:"+sql);
+					if( !Utils.isNull(sql).equals("")){
+						SQLHelper.excUpdate(conn, sql);
+					}
+				}else{
+					logger.info("No Process After["+actionName+"] Save");
 				}
-				logger.debug("after sql:"+sql);
-				if( !Utils.isNull(sql).equals("")){
-					SQLHelper.excUpdate(conn, sql);
-				}
-			}else{
-				logger.info("No Process After["+actionName+"] Save");
 			}
-			
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}finally{

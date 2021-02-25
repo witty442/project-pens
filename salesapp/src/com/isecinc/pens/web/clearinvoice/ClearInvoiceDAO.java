@@ -11,8 +11,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class ClearInvoiceDAO {
 
@@ -67,8 +68,8 @@ public class ClearInvoiceDAO {
 				if( !Utils.isNull(c.getOrderDateFrom()).equals("")
 						&&	!Utils.isNull(c.getOrderDateTo()).equals("")	){
 						
-					sql.append("\n 		and order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') ");
-					sql.append("\n 		and order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') ");
+					sql.append("\n 		and order_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(c.getOrderDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') ");
+					sql.append("\n 		and order_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(c.getOrderDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') ");
 				}
 				sql.append("\n  		and user_id ="+user.getId());
 				

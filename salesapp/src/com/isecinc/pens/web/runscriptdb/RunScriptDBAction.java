@@ -12,19 +12,18 @@ import java.util.Locale;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.SystemProperties;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
-import com.pens.util.ControlCode;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 public class RunScriptDBAction {
 	protected static  Logger logger = Logger.getLogger("PENS");
@@ -113,7 +112,7 @@ public class RunScriptDBAction {
 		File file = null;
 		try{
 			//get CurrentYYYYMM  
-			cur_YYYYMM = Utils.stringValue(new Date(), "yyyyMM");
+			cur_YYYYMM = DateUtil.stringValue(new Date(), "yyyyMM");
 			logger.debug("cur_YYYYMM:"+cur_YYYYMM);
 			
 			//delete all file in Folder Method 1
@@ -236,7 +235,7 @@ public class RunScriptDBAction {
 				ftpManager.deleteFileFTP(env.getProperty("path.manual.BySales")+prefix+"/", "script_"+user.getUserName()+".sql");
 			
 				//rename fileName
-				String fileName = "script_"+user.getUserName()+"_"+Utils.format(new Date(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
+				String fileName = "script_"+user.getUserName()+"_"+DateUtil.format(new Date(), DateUtil.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
 				ftpManager.uploadFileToFTP(env.getProperty("path.manual.BySales")+prefix+"/"+"In-Processed/", fileName, resultStr, "TIS-620");
 			}
 			
@@ -299,7 +298,7 @@ public class RunScriptDBAction {
 				ftpManager.deleteFileFTP(env.getProperty("path.manual.BySales")+prefix+"/", "script_"+user.getUserName()+".sql");
 			
 				//rename fileName
-				String fileName = "script_"+user.getUserName()+"_"+Utils.format(new Date(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
+				String fileName = "script_"+user.getUserName()+"_"+DateUtil.format(new Date(), DateUtil.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
 				ftpManager.uploadFileToFTP(env.getProperty("path.manual.BySales")+prefix+"/"+"In-Processed/", fileName, resultStr, "TIS-620");
 			}
 			
@@ -395,7 +394,7 @@ public class RunScriptDBAction {
 				ftpManager.deleteFileFTP(env.getProperty("path.manual.BySales")+prefix+"/", "script_"+userName+".sql");
 			
 				//rename fileName
-				String fileName = "script_"+userName+"_"+Utils.format(new Date(), Utils.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
+				String fileName = "script_"+userName+"_"+DateUtil.format(new Date(), DateUtil.YYYY_MM_DD_WITHOUT_SLASH)+".sql";
 				ftpManager.uploadFileToFTP(env.getProperty("path.manual.BySales")+prefix+"/"+"In-Processed/", fileName, resultStr, "TIS-620");
 			
 			}

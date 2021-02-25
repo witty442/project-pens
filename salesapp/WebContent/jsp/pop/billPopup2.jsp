@@ -1,7 +1,9 @@
-<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.DBConnection"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.model.MAdjust"%>
-<%@page import="util.SessionGen"%>
+<%@page import="com.pens.util.SIdUtils"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
@@ -20,24 +22,29 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%
-String selected = request.getParameter("selected");
-if(selected==null)selected="";
+String selectedInvoiceId = Utils.isNull(request.getParameter("selectedInvoiceId"));
 String custId = request.getParameter("cust");
+String oracleCustId = request.getParameter("oracleCustId");//=customer_id(oarcle)
+String billToAddressId = request.getParameter("billToAddressId");
 User user = (User) session.getAttribute("user");
 Connection conn = null;
 try{
 	//init Connection 
-	conn = DBConnection.getInstance().getConnection();
-	
-	List<Order> ordersAll = new MOrder().lookUpByOrderAR(conn,user.getId(),Integer.parseInt(custId) ,user.getOrderType().getKey(),"not in",selected);
+	conn = DBConnection.getInstance().getConnection(); 
+	System.out.println("oracleCustId:"+oracleCustId);
+	List<Order> invoicesAll = new MOrder().lookUpByOrderAR(conn,user.getId(),Utils.convertToLong(oracleCustId) ,Utils.convertToLong(billToAddressId) 
+			,user.getOrderType().getKey(),"not in",selectedInvoiceId);
+			
 	double totalCreditNoteAmt = 0; 
 	double totalAdjustAmt = 0; 
 	 
+	System.out.println("invoicesAll :"+invoicesAll.size());
+	
 	List<Order> orders  = new ArrayList<Order>();
 	MCreditNote creditNote = new MCreditNote();
 	MAdjust adjust = new MAdjust();
 	
-	for(Order r : ordersAll){
+	for(Order r : invoicesAll){
 		r.setCreditAmount(new MReceiptLine().calculateCreditAmount(conn,r));
 		
 		totalCreditNoteAmt = creditNote.getTotalCreditNoteAmt(conn,r.getArInvoiceNo());
@@ -48,7 +55,7 @@ try{
 		r.setAdjustAmt(totalAdjustAmt);
 		r.setOpenAmt();
 		
-		//System.out.println("OpenAmt(remain_amt):"+r.getOpenAmt());
+		System.out.println("OpenAmt(remain_amt):"+r.getOpenAmt());
 		//remove zero credit
 		if(r.getOpenAmt() > 0.01){
 			orders.add(r);
@@ -68,16 +75,16 @@ try{
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <style type="text/css">
 <!--
 .style1 {color: #004a80}
 -->
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript">
@@ -99,7 +106,7 @@ try{
 			if (objchk[c].checked) {
 				bill = new Object();
 				bill.rows=0;
-				bill.orderId = document.getElementsByName('orderId')[c].value;
+				bill.invoiceId = document.getElementsByName('invoiceId')[c].value;
 				bill.invoiceNo = document.getElementsByName('arInvoiceNo')[c].value;
 				bill.salesOrderNo = document.getElementsByName('salesOrderNo')[c].value;
 				bill.netAmount = document.getElementsByName('netAmount')[c].value;
@@ -114,6 +121,13 @@ try{
 		window.opener.addBill('${pageContext.request.contextPath}',retArry);
 		window.close();
 	}
+function chkAllFlag(chkAll){
+	var invoiceIdS = document.getElementsByName('invoiceId');
+	var objchk = document.getElementsByName('chkReceipts');
+	for (var c = 0; c < invoiceIdS.length; c++) {
+		objchk[c].checked = chkAll.checked;
+	}	
+}
 </script>
 </head>
 <body onload="loadMe();" topmargin="0" bottommargin="0" leftmargin="0" rightmargin="0" class="popbody">
@@ -134,16 +148,16 @@ try{
 <!-- <div style="overflow:auto;height:300px;"> -->
 		<table align="center" border="0" cellpadding="0" cellspacing="1" width="100%" class="result">
 			<tr>
-				<th><bean:message key="Bill.No" bundle="sysele"/></th>
-				<th><bean:message key="Order.No" bundle="sysele"/></th>
-				<th><bean:message key="TotalAmount" bundle="sysele"/></th>
-				<th><bean:message key="CreditNoteAmt" bundle="sysele"/></th>
-				<th><bean:message key="Order.Behindhand" bundle="sysele"/>.</th>
-				<th><bean:message key="Order.Payment" bundle="sysele"/></th>
-				<!-- 
-				<th><bean:message key="Amount" bundle="sysele"/></th>
-				<th><bean:message key="Product.Balance" bundle="sysele"/></th>
-				 -->
+				<th>เลขที่ใบแจ้งหนี้</th>
+				<th>เลขที่รายการขาย</th>
+				<th>ยอดเงินรวม</th>
+				<th>ลดหนี้</th>
+				<th>ค้างชำระ.</th>
+				<th>รับชำระ <p>
+				   <input type="checkbox" id="chkAll" name="chkAll" onclick="chkAllFlag(this)"/>
+				 </p>
+				</th>
+				
 			</tr>
 			<c:forEach var="results" items="${orders}" varStatus="rows">
 				<c:choose>
@@ -158,7 +172,7 @@ try{
 					<td>
 						${results.arInvoiceNo}
 						<input type="hidden" name="arInvoiceNo" value="${results.arInvoiceNo}">
-						<input type="hidden" name="orderId" value="${results.id}">
+						<input type="hidden" name="invoiceId" value="${results.invoiceId}">
 					</td>
 					<td>
 						${results.salesOrderNo}
@@ -176,17 +190,12 @@ try{
 						<fmt:formatNumber pattern="#,##0.00" value="${results.openAmt}"/>
 						<input type="hidden" name="creditAmount" value="${results.creditAmount}">
 						<input type="hidden" name="paidAmount"  value="${results.paidAmount}"/>
-						<!-- Comment Out : Cannot 
-						input type="hidden" name="remainAmount"  value="${results.remainAmount}"/-->
 						<input type="hidden" name="remainAmount"  value="${results.openAmt}"/>
 					</td>
 					<td>
-						<input type="checkbox" name="chkReceipts">
+						<input type="checkbox" name="chkReceipts" >
 					</td>
-					<!-- 
-					<td><input type="text" name="paidAmount" onblur="calculateRemain();" onkeydown="return isNum0to9andpoint(this, event);" readonly="readonly" size="10;" style="text-align: right;" class="disableText" ></td>
-					<td><input type="text" name="remainAmount" readonly="readonly" size="10;" style="text-align: right;" class="disableText" ></td>
-					 -->
+				
 				</tr>
 			</c:forEach>
 			<tr>

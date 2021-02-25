@@ -1,6 +1,8 @@
 package com.isecinc.pens.init;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -9,8 +11,10 @@ import com.isecinc.core.Database;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.init.I_Initial;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.isecinc.pens.model.MProductCategory;
+import com.pens.util.DBConnection;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
 
 /**
  * Initial References
@@ -178,4 +182,48 @@ public class InitialReferences extends I_Initial {
 		return refList;
 	}
 
+	/** keyAll is null get all record by code **/
+	public static List<References>  getReferenesByManual(String code,String keyAll) {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		StringBuilder sql = new StringBuilder();
+		List<References> refList = new ArrayList<References>();
+		try {
+			conn = DBConnection.getInstance().getConnection();
+			
+			sql.append("SELECT * FROM pensonline.c_reference \n");
+			sql.append("WHERE ISACTIVE = 'Y' and code ='"+code+"' \n");
+			if( !Utils.isNull(keyAll).equals("")){
+			  sql.append("AND value in("+SQLHelper.converToTextSqlIn(keyAll)+") \n");
+			}
+			sql.append(" order by reference_id asc");
+			logger.debug("sql:"+sql.toString());
+			
+			ps = conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			
+			//(String code, String key, String name)
+			while(rs.next()){
+			    References r = new References();//(Utils.isNull(rs.getString("code")),Utils.isNull(rs.getString("value")),Utils.isNull(rs.getString("name")));
+				
+			    r.setCode(rs.getString("CODE"));
+				r.setKey(rs.getString("VALUE"));
+				r.setName(rs.getString("NAME"));
+				r.setDesc(rs.getString("DESCRIPTION"));
+			   
+			   refList.add(r);
+			}
+		} catch (Exception e) {
+			logger.error(e.toString());
+			e.printStackTrace();
+		}finally{
+			try{
+				if(conn !=null){
+					conn.close();
+				}
+			}catch(Exception ee){}
+		}
+		return refList;
+	}
 }

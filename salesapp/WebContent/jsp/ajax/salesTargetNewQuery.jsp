@@ -1,4 +1,4 @@
-<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+<%@page import="com.pens.util.DBConnection"%>
 <%@page import="java.sql.Connection"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>

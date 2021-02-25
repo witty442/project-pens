@@ -23,13 +23,14 @@ import com.isecinc.pens.bean.Stock;
 import com.isecinc.pens.bean.StockLine;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.StockDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 
 public class MStock {
@@ -57,7 +58,7 @@ public class MStock {
 		
 			if("".equals(head.getRequestNumber())){
 				
-				Date requestDate = Utils.parse(head.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date requestDate = DateUtil.parse(head.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
 			
 				requestNumber = new StockDocumentProcess().getNextDocumentNo(requestDate,user.getCode(),user.getId(), conn);
 				
@@ -101,7 +102,7 @@ public class MStock {
 			Calendar currentDate = Calendar.getInstance();
 			
 			String requestDateStr = "01/12/2555";
-			Date requestDateObj = Utils.parse(requestDateStr, Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+			Date requestDateObj = DateUtil.parse(requestDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th);
 			Calendar requestDate = Calendar.getInstance();
 			requestDate.setTime(requestDateObj);
 			int dayInMonthOfRequestDate = requestDate.get(Calendar.DATE);
@@ -169,7 +170,7 @@ public class MStock {
 			ps = conn.prepareStatement(sql.toString());
 			ps.setDate(++index, new java.sql.Date(DateToolsUtil.convertToTimeStamp(head.getRequestDate()).getTime()));//request_date
 			ps.setString(++index, Utils.isNull(head.getDescription()));
-			ps.setDate(++index, Utils.getCurrentSqlDate());//updated
+			ps.setDate(++index, DateUtil.getCurrentSqlDate());//updated
 			ps.setString(++index, head.getUpdateBy());//updated_by
 			ps.setString(++index, head.getRequestNumber());//request_number
 
@@ -206,7 +207,7 @@ public class MStock {
 			ps = conn.prepareStatement(sql.toString());
 			ps.setString(++index, head.getStatus());//status
 			ps.setString(++index, Utils.isNull(head.getDescription()));//Description
-			ps.setDate(++index, Utils.getCurrentSqlDate());//updated
+			ps.setDate(++index, DateUtil.getCurrentSqlDate());//updated
 			ps.setString(++index, head.getUpdateBy());//updated_by
 			ps.setString(++index, head.getRequestNumber());//request_number
 
@@ -251,7 +252,7 @@ public class MStock {
 			ps.setString(++index, model.getUserId());
 			ps.setDate(++index, new java.sql.Date(new Date().getTime()));
 			ps.setString(++index, model.getCreatedBy());
-			ps.setInt(++index, model.getCustomerId());
+			ps.setLong(++index, model.getCustomerId());
 			ps.setInt(++index, Utils.convertStrToInt(model.getBackAvgMonth()));
 			
 			int ch = ps.executeUpdate();
@@ -325,10 +326,10 @@ public class MStock {
 			
 			ps.setString(++index, STATUS_NO_EXPORTED);//exported
 			ps.setString(++index, head.getUserId());//USER_ID
-			ps.setDate(++index, Utils.getCurrentSqlDate());
+			ps.setDate(++index, DateUtil.getCurrentSqlDate());
 			ps.setString(++index, line.getCreatedBy());//CREATED_BY
 			if( !Utils.isNull(line.getCreateDate()).equals("")){
-			   ps.setDate(++index, new java.sql.Date(Utils.parse(line.getCreateDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			   ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getCreateDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			}else{
 			   ps.setNull(++index,java.sql.Types.DATE);
 			}
@@ -342,20 +343,20 @@ public class MStock {
 			//expire 1
 			if( !Utils.isNull(line.getExpireDate()).equals("")){
 				logger.debug("expirDate:"+line.getExpireDate());
-				ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
-				logger.debug("expirDate:"+Utils.parse(line.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getExpireDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				logger.debug("expirDate:"+DateUtil.parse(line.getExpireDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			}else{
 				ps.setNull(++index,java.sql.Types.DATE);
 			}
 			//expire 2
 			if( !Utils.isNull(line.getExpireDate2()).equals("")){
-				ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate2(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getExpireDate2(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			}else{
 				ps.setNull(++index,java.sql.Types.DATE);
 			}
 			//expire 3
 			if( !Utils.isNull(line.getExpireDate3()).equals("")){
-				ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate3(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getExpireDate3(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			}else{
 				ps.setNull(++index,java.sql.Types.DATE);
 			}
@@ -394,11 +395,11 @@ public class MStock {
 			ps.setBigDecimal(++index, new BigDecimal(line.getQty()));//primary_quantity
 			ps.setString(++index, line.getUom().getId());//uom
 			
-			ps.setDate(++index, new java.sql.Date(Utils.parse(line.getCreateDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
-			ps.setDate(++index, new java.sql.Date(Utils.parse(line.getExpireDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+			ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getCreateDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
+			ps.setDate(++index, new java.sql.Date(DateUtil.parse(line.getExpireDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th).getTime()));
 			
 			ps.setString(++index, head.getUserId());//USER_ID
-			ps.setDate(++index, Utils.getCurrentSqlDate());
+			ps.setDate(++index, DateUtil.getCurrentSqlDate());
 			ps.setString(++index, line.getUpdateBy());//UPDATE_BY
 			
 			ps.setString(++index, head.getRequestNumber());//request_number
@@ -434,7 +435,7 @@ public class MStock {
 			
 			ps.setString(++index, line.getStatus());//status
 			ps.setString(++index, head.getUserId());//USER_ID
-			ps.setDate(++index, Utils.getCurrentSqlDate());
+			ps.setDate(++index, DateUtil.getCurrentSqlDate());
 			ps.setString(++index, line.getUpdateBy());//UPDATE_BY
 			
 			ps.setString(++index, line.getRequestNumber());//request_number
@@ -502,8 +503,8 @@ public class MStock {
 				if( !Utils.isNull(mCriteria.getRequestDateFrom()).equals("")
 					&&	!Utils.isNull(mCriteria.getRequestDateTo()).equals("")	){
 						
-					  sql.append(" and h.request_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.request_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.request_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getRequestDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.request_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getRequestDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 				sql.append("\n  ORDER BY h.request_number desc \n");
 				
@@ -517,7 +518,7 @@ public class MStock {
 				  Stock m = new Stock();
 				  m.setNo(no+"");
 				  m.setRequestNumber(rst.getString("request_number"));
-				  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  m.setDescription(rst.getString("description"));
 
 				  m.setStatus(rst.getString("status"));
@@ -530,8 +531,8 @@ public class MStock {
 				  m.setCreatedBy(rst.getString("created_by"));
 				  m.setUpdateBy(rst.getString("updated_by"));
 				  
-				  m.setCreated(Utils.stringValue(rst.getDate("created"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				  m.setUpdated(Utils.stringValue(rst.getDate("updated"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setCreated(DateUtil.stringValue(rst.getDate("created"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setUpdated(DateUtil.stringValue(rst.getDate("updated"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  
 				  //Check canEdit
 				  if((STATUS_SAVE.equals(m.getStatus()) && STATUS_NO_EXPORTED.equals(m.getExported()) ) 
@@ -582,8 +583,8 @@ public class MStock {
 			  m = mCriteria;
 			  m.setCustomerId(rst.getInt("customer_id"));
 			  m.setRequestNumber(rst.getString("request_number"));
-			  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			  requestDate = Utils.parse(m.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+			  m.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  requestDate = DateUtil.parse(m.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
 			  //Check 
 			  if(requestDate != null){
 				  if(currentDate.before(requestDate)){
@@ -603,8 +604,8 @@ public class MStock {
 			  m.setCreatedBy(rst.getString("created_by"));
 			  m.setUpdateBy(rst.getString("updated_by"));
 			  
-			  m.setCreated(Utils.stringValue(rst.getDate("created"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			  m.setUpdated(Utils.stringValue(rst.getDate("updated"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));			  
+			  m.setCreated(DateUtil.stringValue(rst.getDate("created"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  m.setUpdated(DateUtil.stringValue(rst.getDate("updated"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));			  
 			  
 			  //Check canEdit
 			  if(  (STATUS_SAVE.equals(m.getStatus()) && STATUS_NO_EXPORTED.equals(m.getExported()) ) 
@@ -682,18 +683,18 @@ public class MStock {
 				  m.setStatusLabel("Y".equals(m.getStatus())?"ใช้งาน":"ยกเลิก");
 				  m.setExported(rst.getString("exported"));
 				  
-				  m.setExpireDate(Utils.stringValueDefault(rst.getDate("expire_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th,""));
-				  m.setExpireDate2(Utils.stringValueDefault(rst.getDate("expire_date2"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th,""));
-				  m.setExpireDate3(Utils.stringValueDefault(rst.getDate("expire_date3"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th,""));
+				  m.setExpireDate(DateUtil.stringValueDefault(rst.getDate("expire_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th,""));
+				  m.setExpireDate2(DateUtil.stringValueDefault(rst.getDate("expire_date2"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th,""));
+				  m.setExpireDate3(DateUtil.stringValueDefault(rst.getDate("expire_date3"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th,""));
 				  
 				  m.setUserId(rst.getString("user_id"));
 				  m.setCreatedBy(rst.getString("created_by"));
 				  
-				  m.setCreated(Utils.stringValue(rst.getDate("created"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				  m.setUpdated(Utils.stringValue(rst.getDate("updated"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setCreated(DateUtil.stringValue(rst.getDate("created"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setUpdated(DateUtil.stringValue(rst.getDate("updated"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  
-				  m.setCreateDate(Utils.stringValue(rst.getDate("create_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				  m.setExpireDate(Utils.stringValue(rst.getDate("expire_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setCreateDate(DateUtil.stringValue(rst.getDate("create_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setExpireDate(DateUtil.stringValue(rst.getDate("expire_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  
 				  //logger.debug("updated_long["+rst.getLong("updated_long")+"]");
 				  m.setActionDate(m.getCreated());
@@ -735,7 +736,7 @@ public class MStock {
 				arInvoieNoMonth ="";
 				for(int i=0;i<Utils.convertStrToInt(mCriteria.getBackAvgMonth());i++){
 					cal.add(Calendar.MONTH, -1);
-					yyMM = Utils.stringValue(cal.getTime(), Utils.YY_MM,Utils.local_th);
+					yyMM = DateUtil.stringValue(cal.getTime(), DateUtil.YY_MM,Utils.local_th);
 					arInvoieNoMonth +="'"+yyMM+"',";
 				}
 				if( !Utils.isNull(arInvoieNoMonth).equals("")){
@@ -821,7 +822,7 @@ public class MStock {
 				  m.setExported("N");
 				  m.setUserId(user.getId()+"");
 				  m.setCreatedBy(mCriteria.getCreatedBy());
-				  m.setCreated(Utils.stringValue(new Date(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setCreated(DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  m.setActionDate(m.getCreated());
 			      m.setCanEdit(true);
 

@@ -6,9 +6,6 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-
 public class ControlCode {
 	public static Logger logger = Logger.getLogger("PENS");
 	

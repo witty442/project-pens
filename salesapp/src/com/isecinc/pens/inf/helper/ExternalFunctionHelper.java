@@ -10,9 +10,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.ColumnBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.ColumnBean;
 import com.isecinc.pens.process.document.MemberDocumentProcess;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * @author WITTY 
@@ -161,7 +164,7 @@ public class ExternalFunctionHelper {
 			}else if(Utils.isNull(colBean.getExternalFunction()).startsWith("GET_SEQ")){
 				//VALUE :GET-SEQ|TABLE_NAME
 				 String[] values = Utils.isNull(colBean.getExternalFunction()).split(Constants.delimeterPipe);
-				 id = SequenceHelper.getNextValue(values[1]).toString();
+				 id = SequenceProcessAll.getIns().getNextValue(values[1]).toString();
 				 exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("FIND_PURPOSE")){	
 				if("BILL_TO".equalsIgnoreCase(value)){
@@ -174,7 +177,7 @@ public class ExternalFunctionHelper {
 				id = "Y";
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_DATE")){	
-				id = Utils.format(new Date(), Utils.DD_MM_YYYY_WITHOUT_SLASH);
+				id = DateUtil.format(new Date(), DateUtil.DD_MM_YYYY_WITHOUT_SLASH);
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_UPDATED_BY_ORCL")){	
 				id = "9999";
@@ -236,7 +239,7 @@ public class ExternalFunctionHelper {
 						
 						//** Case not found Receipt Id and Insert new receipt  Gen new receipt_id **/
 						if("".equals(Utils.isNull(id))){
-							id = String.valueOf(SequenceHelper.getNextValue("t_receipt"));
+							id = String.valueOf(SequenceProcessAll.getIns().getNextValue("t_receipt.receipt_id"));
 							RECEIPT_MAP.put(Utils.isNull(value), id);//Put New ReceiptId for use in receiptId Line
 						}else{
 							RECEIPT_MAP.put(Utils.isNull(value), id);
@@ -391,10 +394,10 @@ public class ExternalFunctionHelper {
 				exe = false;
 				
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_TIMESTAMP")){	
-				id = Utils.format(new Date(), Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH);
+				id = DateUtil.format(new Date(), DateUtil.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH);
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_CURRENT_SHORT_TIMESTAMP")){	
-				id = Utils.format(new Date(), Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH);
+				id = DateUtil.format(new Date(), DateUtil.DD_MM_YYYY_HH_mm_WITHOUT_SLASH);
 				exe = false;
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GEN_CUST_CODE")){
 				// String prefix = new DecimalFormat("00").format(Integer.parseInt(member.getTerritory()));

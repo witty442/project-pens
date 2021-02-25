@@ -20,9 +20,10 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Detailed Sales Report Action.
@@ -65,8 +66,8 @@ public class CreditPaidReportAction extends I_ReportAction<CreditPaidReport>{
 		//Initial parameter
 		try{
 			//convert date to display
-			Date dateDisp = Utils.parse(reportForm.getBean().getMonth()+"01", "yyyyMMdd");
-			String dateDispStr = Utils.stringValue(dateDisp, Utils.MMMM_YYYY,Utils.local_th);
+			Date dateDisp = DateUtil.parse(reportForm.getBean().getMonth()+"01", "yyyyMMdd");
+			String dateDispStr = DateUtil.stringValue(dateDisp, DateUtil.MMMM_YYYY,DateUtil.local_th);
 			
 			parameterMap.put("monthDisp",dateDispStr);
 			parameterMap.put("user_code",user.getCode());
@@ -268,8 +269,8 @@ public CreditPaidReport getDataCreditPaid_NoPDReportProcess(CreditPaidReport t, 
 	    	String mmmyyyyDisp = "";
 	    	Calendar c = Calendar.getInstance();
 	    	for(int i=0;i<=12;i++){
-	    		yyyymm = Utils.stringValue(c.getTime(), Utils.YYYY_MM);
-	    		mmmyyyyDisp = Utils.stringValue(c.getTime(), Utils.MMMM_YYYY,Utils.local_th);
+	    		yyyymm = DateUtil.stringValue(c.getTime(), DateUtil.YYYY_MM);
+	    		mmmyyyyDisp = DateUtil.stringValue(c.getTime(), DateUtil.MMMM_YYYY,Utils.local_th);
 	    		ref = new References(yyyymm,mmmyyyyDisp);
 	    		monthList.add(ref);
 	    		//step prev month

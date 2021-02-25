@@ -10,9 +10,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-
 public class SQLHelper {
 	private static Logger logger = Logger.getLogger("PENS");
 	

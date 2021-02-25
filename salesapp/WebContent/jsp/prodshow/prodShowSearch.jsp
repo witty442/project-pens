@@ -7,8 +7,8 @@
 <%@page import="com.isecinc.pens.model.MOrder"%>
 <%@page import="com.isecinc.pens.bean.Order"%>
 <%@page import="java.sql.Connection"%>
-<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.DBConnection"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="com.isecinc.pens.web.prodshow.ProdShowForm"%>
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.bean.ProdShowBean"%>

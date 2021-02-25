@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.apache.struts.action.ActionForm;
 
+import com.isecinc.pens.bean.User;
+
 
 
 /**
@@ -29,9 +31,16 @@ public class PopupForm extends ActionForm implements Serializable{
     private String desc;
     private String desc2;
     private String desc3;
+    private User user;
     
     
-    public String getDesc2() {
+    public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
+	public String getDesc2() {
 		return desc2;
 	}
 	public void setDesc2(String desc2) {

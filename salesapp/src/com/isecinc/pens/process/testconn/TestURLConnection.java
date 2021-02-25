@@ -6,11 +6,11 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.pens.util.ControlCode;
+import com.pens.util.DBConnection;
+import com.pens.util.EnvProperties;
+import com.pens.util.Utils;
 
 public class TestURLConnection {
    
@@ -58,7 +58,7 @@ public class TestURLConnection {
 			 conn = DBConnection.getInstance().getConnection();
 			 
 			logger.info("Start check url:"+url);
-			 boolean isInternetConnect = Utils.isInternetConnect(url);
+			 boolean isInternetConnect = false;//Utils.isInternetConnect(url);
 			 logger.info("End check url["+url+"] is connected["+isInternetConnect+"]");
 			 
 			 if(isInternetConnect){

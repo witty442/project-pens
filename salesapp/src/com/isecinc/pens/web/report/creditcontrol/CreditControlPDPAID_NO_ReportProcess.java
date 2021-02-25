@@ -10,10 +10,11 @@ import org.apache.commons.lang.StringUtils;
 
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentAllReport;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentReport;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Detailed Sales Report
@@ -82,8 +83,8 @@ public class CreditControlPDPAID_NO_ReportProcess extends I_ReportProcess<Credit
 			sql.append("\n  AND o.order_id not in( select order_id from t_receipt_line)   ");
 			sql.append("\n  AND o.order_no not in( select receipt_no from t_receipt)   ");
 			sql.append("\n  AND o.order_no not in( select order_no from t_receipt_pdpaid_no)   ");
-			sql.append("\n  AND DATE(o.ORDER_DATE) >= '" + Utils.stringValue(Utils.parseToBudishDate(t.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH) ,Utils.YYYY_MM_DD_WITH_LINE) +"'");
-			sql.append("\n  AND DATE(o.ORDER_DATE) <= '" + Utils.stringValue(Utils.parseToBudishDate(t.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH) ,Utils.YYYY_MM_DD_WITH_LINE) +"'");
+			sql.append("\n  AND DATE(o.ORDER_DATE) >= '" + DateUtil.stringValue(DateUtil.parseToBudishDate(t.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH) ,DateUtil.YYYY_MM_DD_WITH_LINE) +"'");
+			sql.append("\n  AND DATE(o.ORDER_DATE) <= '" + DateUtil.stringValue(DateUtil.parseToBudishDate(t.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH) ,DateUtil.YYYY_MM_DD_WITH_LINE) +"'");
 			sql.append("\n  group by o.order_no,o.order_date ,cus.CODE ,cus.NAME ");
 			
 			sql.append("\n  UNION ALL ");
@@ -102,8 +103,8 @@ public class CreditControlPDPAID_NO_ReportProcess extends I_ReportProcess<Credit
 			sql.append("\n   where 1=1 ");
 			sql.append("\n   and o.CUSTOMER_ID = cus.CUSTOMER_ID ");
 			sql.append("\n   and o.CREATED_BY = " + user.getId());
-			sql.append("\n   and DATE(o.ORDER_DATE) >= '" + Utils.stringValue(Utils.parseToBudishDate(t.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH) ,Utils.YYYY_MM_DD_WITH_LINE) +"'");
-			sql.append("\n   and DATE(o.ORDER_DATE) <= '" + Utils.stringValue(Utils.parseToBudishDate(t.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH) ,Utils.YYYY_MM_DD_WITH_LINE) +"'");
+			sql.append("\n   and DATE(o.ORDER_DATE) >= '" + DateUtil.stringValue(DateUtil.parseToBudishDate(t.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH) ,DateUtil.YYYY_MM_DD_WITH_LINE) +"'");
+			sql.append("\n   and DATE(o.ORDER_DATE) <= '" + DateUtil.stringValue(DateUtil.parseToBudishDate(t.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH) ,DateUtil.YYYY_MM_DD_WITH_LINE) +"'");
 			sql.append("\n   group by o.order_no,o.order_date ,cus.CODE ,cus.NAME ,o.pdpaid_date ,o.PD_PAYMENTMETHOD ");
 			sql.append("\n )A ORDER BY A.order_no  ");
 			
@@ -167,8 +168,8 @@ public class CreditControlPDPAID_NO_ReportProcess extends I_ReportProcess<Credit
 			sql.append("\n   and o.CUSTOMER_ID = cus.CUSTOMER_ID ");
 			sql.append("\n   and o.CREATED_BY = " + user.getId());
 		
-			sql.append("\n   and DATE(o.PDPAID_DATE) >= '" + Utils.stringValue(Utils.parseToBudishDate(t.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH) ,Utils.YYYY_MM_DD_WITH_LINE) +"'" );
-			sql.append("\n   and DATE(o.PDPAID_DATE) <= '" + Utils.stringValue(Utils.parseToBudishDate(t.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH) ,Utils.YYYY_MM_DD_WITH_LINE)  +"'");
+			sql.append("\n   and DATE(o.PDPAID_DATE) >= '" + DateUtil.stringValue(DateUtil.parseToBudishDate(t.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH) ,DateUtil.YYYY_MM_DD_WITH_LINE) +"'" );
+			sql.append("\n   and DATE(o.PDPAID_DATE) <= '" + DateUtil.stringValue(DateUtil.parseToBudishDate(t.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH) ,DateUtil.YYYY_MM_DD_WITH_LINE)  +"'");
 			logger.debug("sql:"+sql.toString());
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql.toString());
@@ -200,8 +201,8 @@ public class CreditControlPDPAID_NO_ReportProcess extends I_ReportProcess<Credit
 			sql.append("\n  FROM (");
 			sql.append("\n   SELECT o.customer_id FROM  t_receipt_pdpaid_no o ");;
 			sql.append("\n   WHERE o.created_by = " + user.getId());
-			sql.append("\n   and DATE(o.ORDER_DATE) >= '" + Utils.stringValue(Utils.parseToBudishDate(t.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH) ,Utils.YYYY_MM_DD_WITH_LINE)  +"'");
-			sql.append("\n   and DATE(o.ORDER_DATE) <= '" + Utils.stringValue(Utils.parseToBudishDate(t.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH) ,Utils.YYYY_MM_DD_WITH_LINE)  +"'");
+			sql.append("\n   and DATE(o.ORDER_DATE) >= '" + DateUtil.stringValue(DateUtil.parseToBudishDate(t.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH) ,DateUtil.YYYY_MM_DD_WITH_LINE)  +"'");
+			sql.append("\n   and DATE(o.ORDER_DATE) <= '" + DateUtil.stringValue(DateUtil.parseToBudishDate(t.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH) ,DateUtil.YYYY_MM_DD_WITH_LINE)  +"'");
 			sql.append("\n   UNION");
 			sql.append("\n   SELECT o.customer_id FROM t_order o ");
 			sql.append("\n   WHERE 1=1 ");
@@ -211,8 +212,8 @@ public class CreditControlPDPAID_NO_ReportProcess extends I_ReportProcess<Credit
 			sql.append("\n   AND order_id not in( select order_id from t_receipt_line)  ");
 			sql.append("\n   AND order_no not in( select receipt_no from t_receipt) ");
 			sql.append("\n   AND order_no not in( select order_no from t_receipt_pdpaid_no) ");
-            sql.append("\n   and DATE(o.ORDER_DATE) >= '" + Utils.stringValue(Utils.parseToBudishDate(t.getStartDate(), Utils.DD_MM_YYYY_WITH_SLASH) ,Utils.YYYY_MM_DD_WITH_LINE)  +"'");
-			sql.append("\n   and DATE(o.ORDER_DATE) <= '" + Utils.stringValue(Utils.parseToBudishDate(t.getEndDate(), Utils.DD_MM_YYYY_WITH_SLASH) ,Utils.YYYY_MM_DD_WITH_LINE)  +"'");
+            sql.append("\n   and DATE(o.ORDER_DATE) >= '" + DateUtil.stringValue(DateUtil.parseToBudishDate(t.getStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH) ,DateUtil.YYYY_MM_DD_WITH_LINE)  +"'");
+			sql.append("\n   and DATE(o.ORDER_DATE) <= '" + DateUtil.stringValue(DateUtil.parseToBudishDate(t.getEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH) ,DateUtil.YYYY_MM_DD_WITH_LINE)  +"'");
 			sql.append("\n  )A ");
 			
 			logger.debug("sql:"+sql.toString());

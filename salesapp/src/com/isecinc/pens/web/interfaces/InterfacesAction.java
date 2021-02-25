@@ -13,22 +13,22 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
+import com.isecinc.pens.bean.MonitorItemDetailBean;
 import com.isecinc.pens.bean.Trip;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.ExportManager;
 import com.isecinc.pens.inf.manager.FTPManager;
-import com.isecinc.pens.inf.manager.ImportManager;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MUser;
 import com.pens.util.ControlCode;
+import com.pens.util.EnvProperties;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
 
 /**
  * ConversionAction Class
@@ -212,7 +212,7 @@ public class InterfacesAction extends I_Action {
 		logger.debug("Import :synchronizeFromOracle");
 		InterfacesForm interfacesForm = (InterfacesForm) form;
 		User userLogin = (User) request.getSession().getAttribute("user");
-		ImportManager importManager =  new ImportManager();
+		//ImportManager importManager =  new ImportManager();
 		User userRequest = new User();
 		boolean canRunBatch = false;
 		try {
@@ -259,7 +259,7 @@ public class InterfacesAction extends I_Action {
 			    logger.debug("requestTable:"+interfacesForm.getMonitorBean().getRequestTable());
 				logger.debug("User Request:"+userRequest.getId()+",UserName Request:"+userRequest.getRole());
 				     
-				MonitorBean m = importManager.importMain(userLogin,userRequest,requestTable,request,interfacesForm.getMonitorBean().isImportAll(),requestTableTransType);
+				MonitorBean m = null;//importManager.importMain(userLogin,userRequest,requestTable,request,interfacesForm.getMonitorBean().isImportAll(),requestTableTransType);
 				interfacesForm.setMonitorBean(m);
 				
 				/** Set for Progress Bar Popup **/
@@ -359,7 +359,7 @@ public class InterfacesAction extends I_Action {
 		logger.debug("clearControl");
 		try {
 		    String sql = "delete from monitor; delete from monitor_item;delete from monitor_item_detail;";
-		    String log = Utils.excUpdate(sql);
+		    String log = SQLHelper.excUpdate(sql);
 		    logger.debug("log:"+log);
 			request.setAttribute("Message","Clear Control Import Export Success กรุณา ดึงข้อมูล หรือ Export ใหม่ ");
 			

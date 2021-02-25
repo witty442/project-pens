@@ -15,11 +15,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 /**
  * @author WITTY
@@ -186,7 +187,7 @@ public class DBBackUpManager {
 				
 				logger.debug("Write File to d:/DB_Backup/");
 				/** Create file SQl **/
-				FileUtil.writeFile(pathSqlFull,scriptStr,"utf-8");
+				FileUtil.writeFile(pathSqlFull,scriptStr.toString(),"utf-8");
 				
 				logger.debug("Zip File to d:/DB_Backup/");
 				/** Zip Sql File **/
@@ -351,7 +352,7 @@ public class DBBackUpManager {
 				
 				logger.debug("Write File to d:/DB_Backup/");
 				/** Create file SQl **/
-				FileUtil.writeFile(pathSqlFull,scriptStr,"utf-8");
+				FileUtil.writeFile(pathSqlFull,scriptStr.toString(),"utf-8");
 				
 				logger.debug("Zip File to d:/DB_Backup/");
 				/** Zip Sql File **/
@@ -398,7 +399,7 @@ public class DBBackUpManager {
 	private  String getFileName(String schema,User user,String typeFile){
 		String fileName= "";
 		try{
-			fileName = Utils.format(new Date(), "yyyyMMddHHmm")+"_"+user.getUserName()+"."+typeFile;
+			fileName = DateUtil.format(new Date(), "yyyyMMddHHmm")+"_"+user.getUserName()+"."+typeFile;
 		}catch(Exception e){
 			logger.error(e.getMessage(),e);
 		}

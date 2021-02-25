@@ -1,32 +1,32 @@
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
-
-<%
-
-%>  
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
-	<tr height="137px;" >
-		<td width="27px;"><img src="${pageContext.request.contextPath}/images2/header_left.png" border="0"/>
-		</td>
-        <td width="341px;" background="${pageContext.request.contextPath}/images2/header01.png">&nbsp;
-            <div class="userlabel">
-        	   ${user.code} : ${user.name} / ${user.role.name}
-        	</div>
-        	<div class="itlabel"> 
-        	   ITSUPPORT:087-8016837,083-3061296
-        	</div>
-        </td>
-        <td background="${pageContext.request.contextPath}/images2/header_bg.png">&nbsp;
-          <a href="#" onclick="window.location='${pageContext.request.contextPath}/jsp/softwareUpdater/SalesAppUpdater.jsp';">
-			  <font size="3" color="red"><%//msg1[0]%></font> 
-		  </a>
-         </td>
-        <td width="523px;" background="${pageContext.request.contextPath}/images2/header02.png" align="right" valign="top">
-        
-        	<a href="${pageContext.request.contextPath}/login.do?do=logoff" onmouseout="MM_swapImgRestore()" 
-        	  onmouseover="MM_swapImage('Image14','','${pageContext.request.contextPath}/images2/button_logout2.png',1)">
-        	  <img src="${pageContext.request.contextPath}/images2/button_logout1.png" name="Image14" width="46" height="46" border="0" id="Image14" />
-        	</a>
-        </td>
-        <td width="31px;"><img src="${pageContext.request.contextPath}/images2/header_right.png" border="0"/></td>
-	</tr>
-</table>
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+      <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+           <a class="navbar-brand" href="mainpage.jsp">PENS </a>
+           <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#">
+             <i class="fas fa-bars"></i>
+           </button>
+          
+          <!-- Navbar header-->
+          <!--  <ul class="navbar-nav ml-auto ml-md-0">
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                    
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="login.html">Logout</a>
+                  </div>
+              </li>
+          </ul>  -->
+         
+      </nav>
+    
+    <div id="layoutSidenav" >
+      <div id="layoutSidenav_nav" >
+         <!-- Menu -->
+         <jsp:include page="menu.jsp"  flush="true"/>
+      </div>
+      
+      <!-- Content -->
+      <div id="layoutSidenav_content">
+         <main>
+	       <div class="container-fluid">
+      

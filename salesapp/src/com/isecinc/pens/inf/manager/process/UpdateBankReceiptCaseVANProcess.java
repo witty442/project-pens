@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 
 public class UpdateBankReceiptCaseVANProcess {
 	

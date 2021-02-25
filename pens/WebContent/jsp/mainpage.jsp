@@ -16,7 +16,6 @@ if(request.getSession().getAttribute("appVersionCheckMsg") != null){
 }
 
 %>
-
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620" />
 <title>PENS SALESYSTEM</title>

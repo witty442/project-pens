@@ -9,7 +9,7 @@
 <%
 List<Province> provinces = new ArrayList<Province>();
 Province pBlank = new Province();
-pBlank.setId(0);
+pBlank.setId("0");
 pBlank.setName("");
 provinces.add(pBlank);
 provinces.addAll(new MProvince().lookUp());

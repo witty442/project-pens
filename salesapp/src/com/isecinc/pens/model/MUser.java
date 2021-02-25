@@ -3,13 +3,14 @@ package com.isecinc.pens.model;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.pens.util.ConvertNullUtil;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 /**
  * I_Model Class
@@ -93,6 +94,38 @@ public class MUser extends I_Model<User> {
 		}
 		return userDefault;
 	}
+	public List<User>  getSalesList(String salesCode) {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Connection conn = null;
+		User user = null;
+		List<User>  salesList = new ArrayList<User>();
+		try{
+			String sql ="\n select * from ad_user where user_name <> 'admin' and isactive ='Y'" ;
+            if( !Utils.isNull(salesCode).equals("")) {
+            	sql +="\n and code ='"+salesCode+"'";
+            }
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){ 
+				user = new User(rst);
+				salesList.add(user);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close(); 
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return salesList;
+	}
 	public User  getActiveUserName() {
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -128,6 +161,34 @@ public class MUser extends I_Model<User> {
 			} catch (Exception e2) {}
 		}
 		return userDefault;
+	}
+	public User  getUserByUserName(String userName) {
+		Statement stmt = null;
+		ResultSet rst = null;
+		Connection conn = null;
+		User user = new User();
+
+		try{
+			String sql ="\n select * from ad_user where user_name = '"+userName+"'" ;
+			       
+			logger.debug("sql:"+sql);
+			conn = DBConnection.getInstance().getConnection();
+			stmt = conn.createStatement();
+			rst = stmt.executeQuery(sql);
+			while(rst.next()){ 
+				user = new User(rst);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e);
+		} finally {
+			try {
+				rst.close();
+				stmt.close(); 
+				conn.close();
+			} catch (Exception e2) {}
+		}
+		return user;
 	}
 	/**
 	 * Save

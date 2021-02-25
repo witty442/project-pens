@@ -7,7 +7,6 @@ import java.util.Comparator;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MOrder;
@@ -15,16 +14,17 @@ import com.isecinc.pens.model.MReceiptLine;
 import com.isecinc.pens.model.MUser;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.Utils;
 import com.isecinc.pens.model.MReceiptSummary;
 
 
 /**
  * Customer
  * 
- * @author Aneak.t
- * @version $Id: Customer.java,v 1.0 07/10/2010 15:52:00 aneak.t Exp $
+ * @author Witty
+ * @version $Id: Customer.java,v 1.0 15/02/2021 
  * 
- *          atiz.b : code prefix transient
+ *      
  * 
  */
 public class Customer extends I_PO implements Serializable,Comparable<Customer> {
@@ -35,6 +35,78 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 	public static final String CREDIT = "CT";
 	public static final String CASH = "CV";
 	public static final String DIREC_DELIVERY = "DD";
+	
+
+	private int no;
+	private long id;
+	private long oracleCustId;//=customerId(oracle)
+	private String lat;
+	private String lng;
+	private String dispTotalInvoice;
+	private String tripDay;
+	private String tripDay2;
+	private String tripDay3;
+	private String custGroup;
+	private int shipToAddressId;
+	private int billToAddressId;
+	private String code;
+	private String name;
+	private String name2;
+	private String customerType;
+	private String taxNo;
+	private String territory;
+	private String website;
+	private String businessType;
+	private long parentID;
+	private String parentCode;
+	private String parentName;
+	private String birthDay;
+	private String creditCheck;
+	private String paymentTerm;
+	private String paymentMethod;
+	private String vatCode;
+	private String shippingMethod;
+	private String shippingRoute;
+	private String transitName;
+	private double creditLimit;
+	private double totalInvoice;
+	private User salesRepresent = new User();
+	private String isActive;
+	private String creditLimitLabel;
+	private String totalInvoiceLabel;
+	private int searchProvince;
+	private int searchDistrict;
+	private int orderAmount = 0;
+	private String interfaces;
+	private String partyType;
+	private String exported;
+	private String codePrefix;
+	private String province;
+	private String district;
+	private String trip;
+	public String addressSummary;
+	public String displayExported;
+	public String displayInterfaces;
+	public String displayActionEditCust;
+	public boolean canActionEditCust;
+	public String displayActionEditCust2;
+	public boolean canActionEditCust2;
+	public String displayActionReceipt;
+	public String displayActionView;
+	public String displayActionEdit;
+	private String printType;
+	private String printBranchDesc;
+	private String printHeadBranchDesc;
+	private String printTax;
+	private String airpayFlag;
+	private String location;
+	private String dispHaveTrip;
+    private String imageFileName;
+    private String preOrderFlag;
+    private Address address = new Address();
+	private Contact contact = new Contact();
+	 /** api message **/
+    private String statusMessage;
 
 	/**
 	 * Default Constructor
@@ -53,7 +125,7 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		no++;
 		// Mandatory
 		setId(rst.getInt("CUSTOMER_ID"));
-		setReferencesID(rst.getInt("REFERENCE_ID"));
+		setOracleCustId(rst.getInt("oracle_cust_id"));
 		setCustomerType(rst.getString("CUSTOMER_TYPE").trim());
 		setCode(rst.getString("CODE").trim());
 		setName(rst.getString("NAME").trim());
@@ -63,12 +135,13 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		setTerritory(ConvertNullUtil.convertToString(rst.getString("TERRITORY")).trim());
 		setBusinessType(ConvertNullUtil.convertToString(rst.getString("BUSINESS_TYPE")).trim());
 		// System.out.println(rst.getString("PARENT_CUSTOMER_ID"));
-		if (rst.getInt("PARENT_CUSTOMER_ID") != 0 && rst.getString("PARENT_CUSTOMER_ID") != null) {
-			Customer c = new MCustomer().find(rst.getString("PARENT_CUSTOMER_ID"));
-			setParentID(c.getId());
-			setParentCode(c.getCode());
-			setParentName((c.getName() + " " + c.getName2()).trim());
-		}
+		/*
+		 * if (rst.getInt("PARENT_CUSTOMER_ID") != 0 &&
+		 * rst.getString("PARENT_CUSTOMER_ID") != null) { Customer c = new
+		 * MCustomer().find(rst.getString("PARENT_CUSTOMER_ID"));
+		 * setParentID(c.getId()); setParentCode(c.getCode());
+		 * setParentName((c.getName() + " " + c.getName2()).trim()); }
+		 */
 		setBirthDay("");
 		if (rst.getTimestamp("BIRTHDAY") != null) {
 			setBirthDay(DateToolsUtil.convertToString(rst.getTimestamp("BIRTHDAY")));
@@ -133,25 +206,67 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		setTotalInvoiceLabel(new DecimalFormat("#,##0.00").format(getTotalInvoice()));
 	}
 
+	
+	public long getOracleCustId() {
+		return oracleCustId;
+	}
+
+	public void setOracleCustId(long oracleCustId) {
+		this.oracleCustId = oracleCustId;
+	}
+
 	public String toString() {
 		return String.format("Customer[%s] %s %s", getId(), getName(), getName2());
 	}
 
-	private int no;
-	/** ID */
-	private int id;
+    public String getPreOrderFlag() {
+		return preOrderFlag;
+	}
 
-	/** Reference from ORCL */
-	private int referencesID;
-	private String lat;
-	private String lng;
-	private String dispTotalInvoice;
-	private String tripDay;
-	private String tripDay2;
-	private String tripDay3;
-	private String custGroup;
-	
-	
+	public void setPreOrderFlag(String preOrderFlag) {
+		this.preOrderFlag = preOrderFlag;
+	}
+
+	public String getStatusMessage() {
+		return statusMessage;
+	}
+
+	public void setStatusMessage(String statusMessage) {
+		this.statusMessage = statusMessage;
+	}
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+
+	public Contact getContact() {
+		return contact;
+	}
+
+	public void setContact(Contact contact) {
+		this.contact = contact;
+	}
+
+	public int getShipToAddressId() {
+		return shipToAddressId;
+	}
+
+	public void setShipToAddressId(int shipToAddressId) {
+		this.shipToAddressId = shipToAddressId;
+	}
+
+	public int getBillToAddressId() {
+		return billToAddressId;
+	}
+
+	public void setBillToAddressId(int billToAddressId) {
+		this.billToAddressId = billToAddressId;
+	}
+
 	public String getCustGroup() {
 		return custGroup;
 	}
@@ -183,133 +298,6 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 	public void setTripDay3(String tripDay3) {
 		this.tripDay3 = tripDay3;
 	}
-
-	/** CODE */
-	private String code;
-
-	/** NAME */
-	private String name;
-
-	/** NAME2 */
-	private String name2;
-
-	/** CUSTOMER TYPE */
-	private String customerType;
-
-	/** TAX NO */
-	private String taxNo;
-
-	/** TERRITORY */
-	private String territory;
-
-	/** Web site */
-	private String website;
-
-	/** Business Type */
-	private String businessType;
-
-	/** Parent */
-	private int parentID;
-	private String parentCode;
-	private String parentName;
-
-	/** Birthday */
-	private String birthDay;
-
-	/** Credit Check */
-	private String creditCheck;
-
-	/** Payment Term */
-	private String paymentTerm;
-
-	/** Payment Method */
-	private String paymentMethod;
-
-	/** Vat Code */
-	private String vatCode;
-
-	/** Shipping Method */
-	private String shippingMethod;
-
-	/** Shipping Route */
-	private String shippingRoute;
-
-	/** TRANSIT NAME */
-	private String transitName;
-
-	/** CREDIT LIMIT */
-	private double creditLimit;
-
-	/** TOTAL INVOICE */
-	private double totalInvoice;
-
-	/** Sales Represent */
-	private User salesRepresent = new User();
-
-	/** ISACTIVE */
-	private String isActive;
-
-	/** CREDIT LIMIT LABEL */
-	private String creditLimitLabel;
-
-	/** TOTAL INVOICE LABEL */
-	private String totalInvoiceLabel;
-
-	/** Search Province */
-	private int searchProvince;
-	
-	private int searchDistrict;
-
-	/** Order Amount */
-	private int orderAmount = 0;
-
-	/** Interfaces */
-	private String interfaces;
-
-	/** PARTY_TYPE */
-	private String partyType;
-
-	/** EXPORTED */
-	private String exported;
-
-	// Transient
-	/** Code Prefix */
-	private String codePrefix;
-
-	/** PROVINCE */
-	private String province;
-
-	/** DISTRICT */
-	private String district;
-	
-	/** TRIP **/
-	private String trip;
-	
-	public String addressSummary;
-
-	public String displayExported;
-	public String displayInterfaces;
-	
-	public String displayActionEditCust;
-	public boolean canActionEditCust;
-	
-	public String displayActionEditCust2;
-	public boolean canActionEditCust2;
-	
-	public String displayActionReceipt;
-	public String displayActionView;
-	public String displayActionEdit;
-
-	private String printType;
-	private String printBranchDesc;
-	private String printHeadBranchDesc;
-	private String printTax;
-	private String airpayFlag;
-	private String location;
-	private String dispHaveTrip;
-    
-    private String imageFileName;
-    
 	public String getDispHaveTrip() {
 		return dispHaveTrip;
 	}
@@ -430,22 +418,15 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		this.canActionEditCust2 = canActionEditCust2;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public int getReferencesID() {
-		return referencesID;
-	}
-
-	public void setReferencesID(int referencesID) {
-		this.referencesID = referencesID;
-	}
-
+	
 	public String getCode() {
 		return code;
 	}
@@ -510,11 +491,11 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		this.businessType = businessType;
 	}
 
-	public int getParentID() {
+	public long getParentID() {
 		return parentID;
 	}
 
-	public void setParentID(int parentID) {
+	public void setParentID(long parentID) {
 		this.parentID = parentID;
 	}
 

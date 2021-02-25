@@ -28,15 +28,15 @@ import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.ProdShowBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.dao.ProdShowDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MProductCategory;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -93,7 +93,7 @@ public class ProdShowAction extends I_Action {
 					    }
 					 }else{
 						bean.setCanSave(true);
-						bean.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+						bean.setDocDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 						bean.setMode("add"); 
 					 }
 					 aForm.setBean(bean);

@@ -1,5 +1,6 @@
 package com.pens.util;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -33,6 +34,7 @@ public class DateUtil {
 	public static final String DD_MM_YYYY_HH_MM_SS_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
 	public static final String DD_MM_YYYY__HH_mm_ss_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss";
 	public static final String DD_MM_YYYY_HH_MM_WITH_SLASH = "dd/MM/yyyy HH:mm";
+	public static final String DD_MM_YYYY__HH_mm_ss_SSSSSS_WITH_SLASH = "dd/MM/yyyy  HH:mm:ss:SSSSSS";
 	
 	public static final Locale local_th= new Locale("th","TH");
 	
@@ -41,6 +43,11 @@ public class DateUtil {
 	public static final String DD_MMM_YYYY = "dd-MMM-yyyy";
 	public static final String MMM_YY = "MMM-yy";
 	public static final String MMMM_YYYY = "MMMM-yyyy";
+	public static final String YYYY_MM = "yyyyMM";
+	public static final String DD_MM_YYYY_HH_mm_ss_WITH_SLASH = "dd/MM/yyyy HH:mm:ss";
+	public static final String DD_MM_YYYY_HHmmss_WITHOUT_SLASH = "ddMMyyyyHHmmss";
+	public static final String YY_MM = "yyMM";
+	public static final String YYYY_MM_DD_WITH_LINE = "yyyy-MM-dd";
 	
 	public static void main(String[] args) {
 		//System.out.println(isFromToDateCorrect("15/11/2553", "15/11/2553"));
@@ -723,5 +730,91 @@ public class DateUtil {
 			throw e;
 		}
 		return christDate;
+	}
+	public static BigDecimal getCurrentTimestampLong() throws Exception{
+		long curr = System.currentTimeMillis();
+		Timestamp ti = new Timestamp(curr);
+		System.out.println("currMil:"+curr +" new Big:"+new BigDecimal(curr));
+		//String dateLong = stringValue(ti, YYYYMMDDHH_mm_ss_SSSSSS);
+		//System.out.println("dateLong:"+dateLong+",BigDecimal["+(new BigDecimal(dateLong))+"]");
+		return new BigDecimal(curr);
+	}
+	
+	public static String stringValueSpecial(long dateBigdecimal, String format ,Locale locale) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			Timestamp ti = new Timestamp(dateBigdecimal);
+			//logger.debug("date timestamp>>"+ti);
+			dateStr = ft.format(ti);
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
+	//Case null retun ""
+	public static String stringValueSpecial2(long dateBigdecimal, String format ,Locale locale) throws Exception {
+		String dateStr = "";		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			//logger.debug("dateBigdecimal:"+dateBigdecimal);
+			if(dateBigdecimal != 0.0){
+			   Timestamp ti = new Timestamp(dateBigdecimal);
+			   //logger.debug("date timestamp>>"+ti);
+			   dateStr = ft.format(ti);
+			}
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
+	public static java.sql.Date getCurrentSqlDate() throws Exception{
+		return new java.sql.Date(new Date().getTime());
+	}
+	public static String stringValueDefault(Date date, String format ,Locale locale,String defaultS) throws Exception {
+		String dateStr = null;		
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			if(date==null){
+				return defaultS;
+			}
+			dateStr = ft.format(date);
+		} catch (Exception e) {
+		}
+		return dateStr;
+	}
+	
+	public static Date parseCheckNull(String dateString, String format) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, Locale.US);
+		try {
+			if( !Utils.isNull(dateString).equals(""))
+			 date = ft.parse(dateString);
+		} catch (Exception e) {	
+		}
+		return date;
+	}
+	public static Date parseCheckNull(String dateString, String format ,Locale locale) throws Exception {
+		Date date = null;
+		SimpleDateFormat ft = new SimpleDateFormat(format, locale);
+		try {
+			if( !Utils.isNull(dateString).equals(""))
+			  date = ft.parse(dateString);
+		} catch (Exception e) {
+			
+		}
+		return date;
+	}
+	public static String[] getCurrentDatebuddhistSplitDDMMYYYY(){
+		String[] d = new String[3];
+		Calendar c = Calendar.getInstance(Locale.US);
+		logger.debug("currentYear:"+String.valueOf(c.get(Calendar.YEAR)));
+		try{
+			d[0] = String.valueOf(c.get(Calendar.DATE)).length()==1?"0"+String.valueOf(c.get(Calendar.DATE)):String.valueOf(c.get(Calendar.DATE));
+			d[1] = String.valueOf(c.get(Calendar.MONTH)).length()==1?"0"+String.valueOf(c.get(Calendar.MONTH)+1):String.valueOf(c.get(Calendar.MONTH)+1);
+			d[2] = String.valueOf(c.get(Calendar.YEAR)).length()==1?"0"+String.valueOf(c.get(Calendar.YEAR)+543):String.valueOf(c.get(Calendar.YEAR)+543);
+			
+		}catch(Exception e){
+			
+		}
+		return d;
 	}
 }

@@ -114,7 +114,7 @@ function gotoStockMCMSearch(){
 			<html:form action="/jsp/stockMCAction">
 			<jsp:include page="../error.jsp"/>
 			
-			stockMCMSearchDetail
+			
 			<!-- Hidden -->
 			 <input type="hidden" name="selectHeaderId" id="selectHeaderId"/>
              <input type="hidden" name="selectLineId" id="selectLineId"/>
@@ -126,6 +126,7 @@ function gotoStockMCMSearch(){
              <input type="hidden" name="path" id="path" value="${pageContext.request.contextPath}"/>
                <!-- Head -->
                <div class="card mb-1 shadow-sm">
+                 <div class="card-header bg-info"><b>ประวัติบันทึกสต๊อกห้าง</b></div>
 			     <div class="card-header">วันที่นับสต๊อก: ${stockMCForm.bean.stockDate}</div>
 			     <div class="card-header">ห้าง: ${stockMCForm.bean.customerCode}-${stockMCForm.bean.customerName}</div>
 		         <div class="card-header">สาขา: ${stockMCForm.bean.storeCode}-${stockMCForm.bean.storeName}</div>

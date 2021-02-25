@@ -10,14 +10,15 @@ import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 /**
  * InvoiceDetailReportProcess Report
@@ -102,7 +103,7 @@ public class CancelDetailReportProcess extends I_ReportProcess<CancelDetailRepor
 					item.setCustomerName(orderLine.getCustomerName());
 					item.setCustomerCode(orderLine.getCustomerCode());
 					item.setOrderDate(orderLine.getOrderDate());
-					item.setCancelDate(Utils.stringValue(orderLine.getOrderDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					item.setCancelDate(DateUtil.stringValue(orderLine.getOrderDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 
 					//item.setLineAmount1(orderLine.getLineAmount());
 					item.setTotalAmount1(orderLine.getLineAmount()-orderLine.getDiscount());
@@ -175,7 +176,7 @@ public class CancelDetailReportProcess extends I_ReportProcess<CancelDetailRepor
 			while (rst.next()) {
 				dataArr = new String[2];
 				dataArr[0] = rst.getString("order_no");
-				dataArr[1] =  Utils.stringValue(rst.getDate("updated"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dataArr[1] =  DateUtil.stringValue(rst.getDate("updated"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				pos.add(dataArr);
 			}
 			

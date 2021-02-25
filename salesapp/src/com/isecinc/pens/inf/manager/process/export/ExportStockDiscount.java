@@ -8,9 +8,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.ColumnBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.ColumnBean;
-import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ExportHelper;
 

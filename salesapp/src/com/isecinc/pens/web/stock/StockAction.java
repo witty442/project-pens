@@ -25,13 +25,14 @@ import com.isecinc.pens.bean.Stock;
 import com.isecinc.pens.bean.StockLine;
 import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MStock;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -359,7 +360,7 @@ public class StockAction extends I_Action {
 			 bean.setCustomerId(customer.getId());
 			 bean.setCustomerName(customer.getCode() +"-"+customer.getName()+" "+customer.getName2());
 			 
-			 bean.setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			 bean.setRequestDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 bean.setCanEdit(true);
 			//init priceListId by User Type
 			 bean.setPriceListId((new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId())+"");

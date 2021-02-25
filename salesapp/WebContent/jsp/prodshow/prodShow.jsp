@@ -7,8 +7,8 @@
 <%@page import="com.isecinc.pens.model.MOrder"%>
 <%@page import="com.isecinc.pens.bean.Order"%>
 <%@page import="java.sql.Connection"%>
-<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.DBConnection"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="com.isecinc.pens.web.prodshow.ProdShowForm"%>
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.bean.ProdShowBean"%>
@@ -61,7 +61,7 @@ if("new".equalsIgnoreCase(action)){
 			 prodShowBean = new ProdShowBean();
 			 prodShowBean.setOrderNo(orderNo);
 			 prodShowBean.setOrderId(order.getId());
-			 
+			  
 			 //get Customer Detail
 			 Customer cus = new MCustomer().findByWhereCond(conn, " where customer_id ="+order.getCustomerId());
 			 if(cus != null){
@@ -88,7 +88,7 @@ if("new".equalsIgnoreCase(action)){
 			    }
 			 }else{
 				 prodShowBean.setCanSave(true);
-				 prodShowBean.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				 prodShowBean.setDocDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				 prodShowBean.setMode("add"); 
 			 }
 		  }
@@ -134,7 +134,7 @@ if("new".equalsIgnoreCase(action)){
 		    }
 		 }else{
 			 prodShowBean.setCanSave(true);
-			 prodShowBean.setDocDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			 prodShowBean.setDocDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 prodShowBean.setMode("add"); 
 		 }
 		 

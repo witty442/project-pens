@@ -1,10 +1,10 @@
+<%@page import="com.pens.util.EnvProperties"%>
 <%@page import="com.isecinc.pens.process.testconn.TestURLConnection"%>
 <%@page import="com.isecinc.pens.inf.manager.batchwork.URLTestConnectionWorker"%>
 <%@page import="com.isecinc.pens.inf.exception.FTPException"%>
 <%@page import="com.isecinc.pens.inf.manager.FTPManager"%>
 <%@page import="java.net.InetAddress"%>
-<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 
 <%

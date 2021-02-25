@@ -13,10 +13,11 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.DocSequence;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MDocSequence;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * DocSeq Action Class
@@ -57,7 +58,7 @@ public class DocSequenceAction extends I_Action {
 	 */
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		DocSequenceForm docSequenceForm = (DocSequenceForm) form;
-		String[] currentDateStrArr = Utils.getCurrentDatebuddhistSplitDDMMYYYY();
+		String[] currentDateStrArr = DateUtil.getCurrentDatebuddhistSplitDDMMYYYY();
 		try {
 			User user = (User) request.getSession(true).getAttribute("user");
 			String whereCause = "";

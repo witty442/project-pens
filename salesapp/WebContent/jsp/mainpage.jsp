@@ -1,91 +1,119 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<%@page import="util.SessionGen"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
-<%@page import="com.isecinc.pens.bean.User"%><html xmlns="http://www.w3.org/1999/xhtml">
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<%@page import="com.pens.util.SIdUtils"%>
+<%@page import="com.pens.util.Utils"%> 
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<jsp:useBean id="tempForm" class="com.isecinc.pens.web.temp.TempForm" scope="session" />
 <%
-String role = ((User)session.getAttribute("user")).getType();
+try{
+int tabIndex = 0;
 User user = (User)session.getAttribute("user");
-
-
+String pageName = Utils.isNull(request.getParameter("pageName")); 
+String mobile = Utils.isNull(request.getParameter("mobile")); 
+String action = Utils.isNull(request.getParameter("action")); 
 %>
-
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=TIS-620" />
-<title>PENS SALESYSTEM</title>
+ <meta charset="tis-620" />
+ <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+ <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+ <meta name="description" content="" />
+<title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-ui-1.7.3.custom.min.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css" />
 
-<style type="text/css">
-<!--
-body {
-	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
-	/**background-repeat: repeat;**/
-}
-.style1 {color: #004a80}
--->
+<!-- Include Bootstrap Resource  -->
+ <jsp:include page="resourceBootstrap.jsp"  flush="true"/>
+ <!-- /Include Bootstrap Resource -->
+ 
+<style>
 </style>
-</head>
-<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
-<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
-	<tr>
-		<td colspan="3"><jsp:include page="header.jsp"/></td>
-	</tr>
-  	<tr id="framerow">
-  		<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
-    	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
-    		<div style="height: 60px;">
-    		<!-- MENU -->
-	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
-				<tr>
-			        <td>
-			        	<jsp:include page="menu.jsp"/>
-			       	</td>
-				</tr>
-	    	</table>
-	    	</div>
-	    	
-    	</td>
-    	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
-    </tr>
-    <tr>
-    	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
-    	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
-    		<jsp:include page="contentbottom.jsp"/>
-        </td>
-        
-        
-        <td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
-    </tr>
-    <tr>
-    	<td colspan="3"><jsp:include page="footer.jsp"/></td>
-  	</tr>
-</table>
+<script type="text/javascript">
 
-<div id="dialog" title="คำแนะนำ">
-	<p><font size="4"><b>กรุณาดึงข้อมูลจากส่วนกลาง อย่างน้อยวันละหนึ่งครั้ง  ก่อนทำ รายการขาย/รายการรับเงิน   เพื่อที่ข้อมูลจะได้ถูกต้อง</b></font></p>
-	<p align="center"> <a href="javascript:close();"><input class="freeBtn"  type="submit" onclick="linkToInterfaces('<%=request.getContextPath() %>');" value="ไปยังหน้าดึงข้อมูลจากส่วนกลาง"/></a>&nbsp;&nbsp;
-	 <a href="javascript:close();"><input class="freeBtn"  type="submit" onclick="close();" value="ปิดหน้าจอ"/></a></p>
-</div>
-
-<script>
-  $(function() {
-	$("#dialog").dialog({ height: 300,width:600,modal:false });
-  });
- 
- function close(){
-	 $("#dialog").dialog('close');
- }
- 
- function linkToInterfaces(path){
-	window.location = path+"/jsp/interfaces/interfaces.jsp";
- }
 </script>
+</head>
+<body class="sb-nav-fixed">
+
+	   <!-- Include Header Mobile  -->
+       <jsp:include page="header.jsp"  flush="true"/>
+       <!-- /Include Header Mobile -->
+       
+	    <!-- Content -->
+        <div class="container-fluid">
+             <h1 class="mt-4">Sales Information</h1>
+             <ol class="breadcrumb mb-4">
+                 <li class="breadcrumb-item active"><%=user.getCode() %>-<%=user.getName() %></li>
+             </ol>
+             <div class="row">
+                 <div class="col-xl-3 col-md-6">
+                     <div class="card bg-wrainig text-white mb-4">
+                         <div class="card-body" >
+                          <a href="${pageContext.request.contextPath}/jsp/customerAction.do?do=prepareCustTrip">ลูกค้า</a>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xl-3 col-md-6">
+                     <div class="card bg-wrainig text-white mb-4">
+                         <div class="card-body">
+                            <a href="${pageContext.request.contextPath}/jsp/customerAction.do?do=prepare">สร้างลูกค้าใหม่</a>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="col-xl-3 col-md-6">
+                     <div class="card bg-primary text-white mb-4">
+                         <div class="card-body">ทริป</div>
+                     </div>
+                 </div>
+                 <div class="col-xl-3 col-md-6">
+                     <div class="card bg-primary text-white mb-4">
+                         <div class="card-body">เบิกสินค้าจาก จาก PD</div>
+                     </div>
+                 </div>
+                 <div class="col-xl-3 col-md-6">
+                     <div class="card bg-primary text-white mb-4">
+                         <div class="card-body">คืนสินค้าจาก จาก PD</div>
+                     </div>
+                 </div>
+                 <div class="col-xl-3 col-md-6">
+                     <div class="card bg-primary text-white mb-4">
+                         <div class="card-body">รับ Bill-T</div>
+                     </div>
+                 </div>
+                 <div class="col-xl-3 col-md-6">
+                     <div class="card bg-primary text-white mb-4">
+                         <div class="card-body">บันทึกเก็บเงิน การขายเชื่อ</div>
+                     </div>
+                 </div>
+                 <div class="col-xl-3 col-md-6">
+                     <div class="card bg-primary text-white mb-4">
+                         <div class="card-body">ใบคุมเอกสาร ที่จัดส่งเข้าบริษัท</div>
+                     </div>
+                 </div>
+                 <div class="col-xl-3 col-md-6">
+                     <div class="card bg-primary text-white mb-4">
+                         <div class="card-body">บันทึกส่งเงิน โอนเข้าบริษัท</div>
+                     </div>
+                 </div>
+                 <div class="col-xl-3 col-md-6">
+                     <div class="card bg-primary text-white mb-4">
+                         <div class="card-body">รายงาน</div>
+                         
+                     </div>
+                 </div>
+             </div> 
+         </div>
+        
+    <!-- Include Footer Mobile  -->
+     <jsp:include page="footer.jsp" flush="true"/>
+    <!-- /Include Footer Mobile -->	
 </body>
 </html>
+<%}catch(Exception e){
+  e.printStackTrace();
+}
+	%>
+

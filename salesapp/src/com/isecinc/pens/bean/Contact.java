@@ -84,7 +84,7 @@ public class Contact extends I_PO implements Serializable {
 	private String isActive;
 
 	/** CUSTOMER ID */
-	private int customerId;
+	private long customerId;
 
 	/** PHONE */
 	private String phone2;
@@ -149,11 +149,11 @@ public class Contact extends I_PO implements Serializable {
 		this.isActive = isActive;
 	}
 
-	public int getCustomerId() {
+	public long getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
 

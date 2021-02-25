@@ -39,7 +39,8 @@ import javax.print.attribute.standard.OrientationRequested;
 import javax.print.attribute.standard.PageRanges;
 import javax.print.attribute.standard.RequestingUserName;
 
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 
 public class TestPrinterMZ320 implements Printable {
@@ -79,7 +80,7 @@ public class TestPrinterMZ320 implements Printable {
 	    	p = new PageData();
 	    	p.setPage(2);
 	    	line1 = new LineData("normal","ลูกค้า:1490300001-ชัยเจริญ",-4);
-	    	line2 = new LineData("normal","ที่อยู่ :9/1 ม.8 ตำบลม่องต่อง อำเภอ                                             วันที่:"+Utils.stringValue(new Date(), Utils.DD_MM_YYYY_HH_mm_ss_WITH_SLASH),-3);
+	    	line2 = new LineData("normal","ที่อยู่ :9/1 ม.8 ตำบลม่องต่อง อำเภอ                                             วันที่:"+DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_HH_mm_ss_WITH_SLASH),-3);
 	    	line3 = new LineData("normal","ลพบุรี 10240",-3);
 	    	p.getData().add(line1);
 	    	p.getData().add(line2);

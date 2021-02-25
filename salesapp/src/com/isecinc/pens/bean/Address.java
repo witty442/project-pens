@@ -136,7 +136,7 @@ public class Address extends I_PO implements Serializable {
 	private String isActive;
 
 	/** CUSTOMER ID */
-	private int customerId;
+	private long customerId;
 	
 	/** Reference ID (Oracle Address ID)*/
 	private int referenceId;
@@ -237,11 +237,11 @@ public class Address extends I_PO implements Serializable {
 		this.purposeLabel = purposeLabel;
 	}
 
-	public int getCustomerId() {
+	public long getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
 

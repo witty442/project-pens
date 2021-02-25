@@ -42,8 +42,6 @@ import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MCreditNote;
@@ -68,25 +66,23 @@ import com.pens.util.ControlCode;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.CustomerReceiptFilterUtils;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
 import com.pens.util.Debug;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 
 /**
  * Order Action
  * 
- * @author atiz.b
- * @version $Id: OrderAction.java,v 1.0 14/10/2010 00:00:00 atiz.b Exp $
- * 
- *          Modifier : A-neak.t Add : method addDate, calShippingDate, calWeekByRoundtrip, generateLine Edit: method
- *          save
- * 
- *          atiz.b : set current sales reps
+ * @author witty
+ * @version $Id: OrderAction.java,v 1.0 23/02/2021
  */
 public class OrderAction extends I_Action {
 
 	public Debug debug = new Debug(true);
+	private int MAX_ROW_PAGE = 50;
 	/**
 	 * Prepare without ID
 	 */
@@ -103,9 +99,8 @@ public class OrderAction extends I_Action {
 			request.getSession().setAttribute("debug_mode", debug.isDebugEnable());
 			
 			User user = (User) request.getSession(true).getAttribute("user");
-		//	int orderId = orderForm.getOrder().getId();
 
-			int customerId = 0;
+			long customerId = 0;
 			if (request.getParameter("customerId") != null) {
 				// go search
 				forward = "search";
@@ -120,10 +115,7 @@ public class OrderAction extends I_Action {
 			/* Wit Edit: 13072558 :Edit shortcut From CustomerSerach **/
 			}else if (request.getParameter("shotcut_customerId") != null) {
 				customerId = Integer.parseInt(request.getParameter("shotcut_customerId"));
-				
-				OrderCriteria criteria = new OrderCriteria();
-				//criteria.setSearchKey(searchKey)
-				orderForm.setCriteria(criteria);
+			
 			} else {
 				// go add for customer/member
 				customerId = orderForm.getOrder().getCustomerId();
@@ -131,7 +123,8 @@ public class OrderAction extends I_Action {
 			//prepare Connection 
 			conn = new DBCPConnectionProvider().getConnection(conn);
 			// get Customer Info
-			Customer customer = new MCustomer().find(String.valueOf(customerId));
+			Customer customer = new MCustomer().findOpt(String.valueOf(customerId));
+			
 			//Check Case VanSale Old order(PayCredit) No Pay disable Pay Credit ALL
 			boolean canSaveCasePayPrevBill = true;
 			if(User.VAN.equals(user.getType())){
@@ -146,9 +139,9 @@ public class OrderAction extends I_Action {
 				if("Y".equalsIgnoreCase(canReceiptChequeFlag) || "Y".equalsIgnoreCase(canReceiptCreditFlag)){
 					//Check Prev bill is pay
 					if(canSaveCasePayPrevBill==false){
-				       orderForm.setReceiptCreditFlag("-1");//no pay prev bill
+				        orderForm.setReceiptCreditFlag("-1");//no pay prev bill
 					}else{
-					   orderForm.setReceiptCreditFlag("1");//Can pay Credit
+					    orderForm.setReceiptCreditFlag("1");//Can pay Credit
 					}
 				}else{
 				   orderForm.setReceiptCreditFlag("0");//cannot pay credit
@@ -344,7 +337,7 @@ public class OrderAction extends I_Action {
 			//Find Order by order_id
 			String id = Utils.isNull(request.getParameter("id"));
 			roundTrip = orderForm.getOrder().getRoundTrip();
-			order = new MOrder().find(id);
+			order = new MOrder().findByWhereCond(" where order_id="+id);
 			if (order == null) {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 				return mapping.findForward("prepare");
@@ -423,6 +416,8 @@ public class OrderAction extends I_Action {
 			/** Manage Mode (add,edit,view) **/
 			orderForm.setMode("edit");
 			
+			//Set Prev Step Action
+			ControlOrderPage.setPrevOrderStepAction(request, ControlOrderPage.STEP_ORDER_1);
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
@@ -759,7 +754,7 @@ public class OrderAction extends I_Action {
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
 		OrderForm orderForm = (OrderForm) form;
-		int orderId = 0;
+		long orderId = 0;
 		String msg = InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc();
 		String org = "";
 		String subInv ="";
@@ -949,7 +944,7 @@ public class OrderAction extends I_Action {
 			trx.setTrxModule(TrxHistory.MOD_ORDER);
 			if (orderId == 0) trx.setTrxType(TrxHistory.TYPE_INSERT);
 			else trx.setTrxType(TrxHistory.TYPE_UPDATE);
-			trx.setRecordId(order.getId());
+			trx.setRecordId(new Double(order.getId()).intValue());
 			trx.setUser(user);
 			new MTrxHistory().save(trx, user.getId(), conn);
 			// Trx History --end--
@@ -1133,54 +1128,42 @@ public class OrderAction extends I_Action {
 	protected String search(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		OrderForm orderForm = (OrderForm) form;
 		User user = (User) request.getSession().getAttribute("user");
+		MOrder mOrder = new MOrder();
+		int currPage = 1;
+        int totalRow = 0;
+        int totalPage = 0;
+        int start = 0;
+        int end = 50;
+		Connection conn = null;
 		try {
-
 			request.getSession().removeAttribute("isAdd");
+            conn = DBConnection.getInstance().getConnection();
+            
+			String whereCause = mOrder.genWhereSQLSearch(orderForm.getOrder(), user);
+			
+		    if(Utils.isNull(request.getParameter("action")).equalsIgnoreCase("newsearch")) {
+			   totalRow = mOrder.getTotalRowOrder(conn, whereCause);
+		       totalPage = Utils.calcTotalPage(totalRow, MAX_ROW_PAGE);
+		    }
+		    currPage = Utils.isNull(request.getParameter("currPage")).equals("")?1:Utils.convertStrToInt(request.getParameter("currPage"));
+		    
+		    start = Utils.calcStartNoInPage(currPage, MAX_ROW_PAGE)-1;
+		    end = (start-1)+50;
+		    
+			whereCause +="\n limit "+start+","+end;
+			Order[] results = mOrder.searchOpt(whereCause);
 
-			OrderCriteria criteria = getSearchCriteria(request, orderForm.getCriteria(), this.getClass().toString());
-			orderForm.setCriteria(criteria);
-			String whereCause = "";
-			if (orderForm.getOrder().getOrderNo() != null && !orderForm.getOrder().getOrderNo().equals("")) {
-				whereCause += " AND ORDER_NO LIKE '%"
-						+ orderForm.getOrder().getOrderNo().trim().replace("\'", "\\\'").replace("\"", "\\\"") + "%'";
-			}
-			if (orderForm.getOrder().getSalesOrderNo() != null && !orderForm.getOrder().getSalesOrderNo().equals("")) {
-				whereCause += " AND SALES_ORDER_NO LIKE '%"
-						+ orderForm.getOrder().getSalesOrderNo().trim().replace("\'", "\\\'").replace("\"", "\\\"")
-						+ "%'";
-			}
-			if (orderForm.getOrder().getArInvoiceNo() != null && !orderForm.getOrder().getArInvoiceNo().equals("")) {
-				whereCause += " AND AR_INVOICE_NO LIKE '%"
-						+ orderForm.getOrder().getArInvoiceNo().trim().replace("\'", "\\\'").replace("\"", "\\\"")
-						+ "%'";
-			}
-			if (orderForm.getOrder().getDocStatus().length() > 0) {
-				whereCause += " AND DOC_STATUS = '" + orderForm.getOrder().getDocStatus() + "'";
-			}
-
-			if (orderForm.getOrder().getOrderDateFrom().trim().length() > 0) {
-				whereCause += " AND ORDER_DATE >= '"
-						+ DateToolsUtil.convertToTimeStamp(orderForm.getOrder().getOrderDateFrom().trim()) + "'";
-			}
-			if (orderForm.getOrder().getOrderDateTo().trim().length() > 0) {
-				whereCause += " AND ORDER_DATE <= '"
-						+ DateToolsUtil.convertToTimeStamp(orderForm.getOrder().getOrderDateTo().trim()) + "'";
-			}
-
-			whereCause += " AND ORDER_TYPE = '" + user.getOrderType().getKey() + "' ";
-			whereCause += " AND CUSTOMER_ID = " + orderForm.getOrder().getCustomerId() + " ";
-			whereCause += " AND USER_ID = " + user.getId();
-
-			whereCause += " ORDER BY ORDER_DATE DESC,ORDER_NO DESC ";
-			Order[] results = new MOrder().searchOpt(whereCause);
-
-			// results = fillLinesShow(results);
-			if(results != null)
+			if(results != null) {
 				results = checkCreditNote(results);
+			}
 
 			orderForm.setResults(results);
+			orderForm.setResults(results);
+			orderForm.setTotalPage(totalPage);
+			orderForm.setTotalRecord(totalRow);
+			orderForm.setCurrPage(currPage);
+			
 			if (results != null) {
-				orderForm.getCriteria().setSearchResult(results.length);
 			} else {
 				request.setAttribute("Message", InitialMessages.getMessages().get(Messages.RECORD_NOT_FOUND).getDesc());
 			}
@@ -1188,6 +1171,10 @@ public class OrderAction extends I_Action {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()
 					+ e.getMessage());
 			throw e;
+		}finally {
+			if(conn !=null) {
+				conn.close();conn=null;
+			}
 		}
 		return "search";
 	}
@@ -1227,23 +1214,7 @@ public class OrderAction extends I_Action {
 	 * @throws Exception
 	 */
 	protected void setNewCriteria(ActionForm form) throws Exception {
-		OrderForm orderForm = (OrderForm) form;
-		String pricelistlabel = orderForm.getOrder().getPricelistLabel();
-		int pricelistid = orderForm.getOrder().getPriceListId();
-		if (!orderForm.getOrder().getOrderType().equalsIgnoreCase(Customer.DIREC_DELIVERY)) {
-			// VAN && TT
-			Customer customer = new MCustomer().find(String.valueOf(orderForm.getOrder().getCustomerId()));
-			orderForm.setCriteria(new OrderCriteria());
-			orderForm.getOrder().setCustomerId(customer.getId());
-			orderForm.getOrder().setCustomerName((customer.getCode() + "-" + customer.getName()).trim());
-		} 
-		orderForm.getOrder().setPricelistLabel(pricelistlabel);
-		orderForm.getOrder().setPriceListId(pricelistid);
-
-		// No Pricelist msg
-		if (orderForm.getOrder().getPriceListId() == 0) {
-			orderForm.getOrder().setPricelistLabel(InitialMessages.getMessages().get(Messages.NO_PRICELIST).getDesc());
-		}
+		
 	}
 
 	/**

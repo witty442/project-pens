@@ -19,24 +19,16 @@ String action = Utils.isNull(request.getParameter("action"));
 <html>
 <head>
  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <meta name="description" content="" />
+ <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+ <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+ <meta name="description" content="" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script>
-
-
-<!-- Bootstrap -->
- <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap/bootstrap-4.5.2.min.css?v=<%=SIdUtils.getInstance().getIdSession()%>">
-<script src="${pageContext.request.contextPath}/js/bootstrap/bootstrap-4.5.2.min.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/bootstrap/grid.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/bootstrap_styles.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
-
+ <!-- Include Bootstrap Resource  -->
+ <jsp:include page="../resourceBootstrap.jsp"  flush="true"/>
+ <!-- /Include Bootstrap Resource -->
+       
 <style>
 </style>
 <script type="text/javascript">
@@ -46,10 +38,9 @@ String action = Utils.isNull(request.getParameter("action"));
 <body class="sb-nav-fixed">
 
 	   <!-- Include Header Mobile  -->
-       <jsp:include page="../templates/header.jsp"  flush="true"/>
+       <jsp:include page="../header.jsp"  flush="true"/>
        <!-- /Include Header Mobile -->
        
-      
 	    <!-- Content -->
 		<div id="layoutSidenav_content">
            <main>
@@ -90,7 +81,7 @@ String action = Utils.isNull(request.getParameter("action"));
          <!-- BODY -->
    
      <!-- Include Footer Mobile  -->
-     <jsp:include page="../templates/footer.jsp" flush="true"/>
+     <jsp:include page="../footer.jsp" flush="true"/>
     <!-- /Include Footer Mobile -->	
 		     
      

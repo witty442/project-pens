@@ -387,6 +387,7 @@ public class StockMCAction extends I_Action {
 			if("new".equalsIgnoreCase(action)){
 			   bean = new StockMCBean();
 			   bean.setStockDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
+
 			}else if("back".equalsIgnoreCase(action)){
 			   bean = aForm.getBean();
 			}
@@ -399,6 +400,8 @@ public class StockMCAction extends I_Action {
 			//////////////////////////////
 			
 			aForm.setBean(bean);
+			//list route By User Login
+			aForm.setRouteList( new StockMCDAO().searchRouteList(user));
 		} catch (Exception e) {
 			request.setAttribute("Message", InitialMessages.getMessages().get(Messages.FETAL_ERROR).getDesc()+ e.getMessage());
 			throw e;
@@ -712,6 +715,8 @@ public class StockMCAction extends I_Action {
 				 
 				 //set parameter
 				itemBean.setLegQty(Utils.isNull(request.getParameter("legQty")));
+				itemBean.setFloorQty(Utils.isNull(request.getParameter("floorQty")));
+				itemBean.setDeepQty(Utils.isNull(request.getParameter("deepQty")));
 				itemBean.setInStoreQty(Utils.isNull(request.getParameter("inStoreQty")));
 				itemBean.setBackendQty(Utils.isNull(request.getParameter("backendQty")));
 				itemBean.setUom(Utils.isNull(request.getParameter("uom")));
@@ -752,6 +757,8 @@ public class StockMCAction extends I_Action {
 				//insert new
 				 //set parameter
 			    headerBean.setLegQty(Utils.isNull(request.getParameter("legQty")));
+			    headerBean.setFloorQty(Utils.isNull(request.getParameter("floorQty")));
+			    headerBean.setDeepQty(Utils.isNull(request.getParameter("deepQty")));
 			    headerBean.setInStoreQty(Utils.isNull(request.getParameter("inStoreQty")));
 			    headerBean.setBackendQty(Utils.isNull(request.getParameter("backendQty")));
 			    headerBean.setUom(Utils.isNull(request.getParameter("uom")));
@@ -781,7 +788,6 @@ public class StockMCAction extends I_Action {
 				}
 				//save Mobile By Product
 				headerBean = new StockMCDAO().saveByProduct(headerBean);
-				
 			}
 	
 			//save image

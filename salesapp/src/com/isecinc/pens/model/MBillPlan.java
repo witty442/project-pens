@@ -23,13 +23,14 @@ import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.document.MoveOrderReqDocumentProcess;
 import com.isecinc.pens.process.document.MoveOrderReturnDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 public class MBillPlan {
 
@@ -57,7 +58,7 @@ public class MBillPlan {
 			ps = conn.prepareStatement(sql.toString());
 			ps.setString(++index, head.getStatus());//request_date
 			if( !Utils.isNull(head.getBillPlanRequestDate()).equals("")){
-			   ps.setTimestamp(++index, new java.sql.Timestamp( (Utils.parse(head.getBillPlanRequestDate(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()) );
+			   ps.setTimestamp(++index, new java.sql.Timestamp( (DateUtil.parse(head.getBillPlanRequestDate(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()) );
 			}else{
 			   ps.setTimestamp(++index,null);	
 			}
@@ -109,8 +110,8 @@ public class MBillPlan {
 				if( !Utils.isNull(mCriteria.getBillPlanDateFrom()).equals("")
 					&&	!Utils.isNull(mCriteria.getBillPlanDateTo()).equals("")	){
 						
-					  sql.append(" and h.bill_plan_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getBillPlanDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.bill_plan_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getBillPlanDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.bill_plan_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getBillPlanDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.bill_plan_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getBillPlanDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 				sql.append("\n  ORDER BY h.bill_plan_date desc \n");
 				
@@ -124,9 +125,9 @@ public class MBillPlan {
 				  BillPlan m = new BillPlan();
 				  m.setNo(no+"");
 				  m.setBillPlanNo(rst.getString("bill_plan_no"));
-				  m.setBillPlanDate(Utils.stringValue(rst.getDate("bill_plan_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setBillPlanDate(DateUtil.stringValue(rst.getDate("bill_plan_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  if( !Utils.isNull(rst.getString("bill_plan_request_date")).equals("")){
-					  m.setBillPlanRequestDate(Utils.stringValue(rst.getDate("bill_plan_request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					  m.setBillPlanRequestDate(DateUtil.stringValue(rst.getDate("bill_plan_request_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  }
 				  m.setSalesCode(rst.getString("sales_code"));
 				  m.setSalesDesc(rst.getString("sales_desc"));
@@ -188,10 +189,10 @@ public class MBillPlan {
 			  no++;
 			  m.setNo(no+"");
 			  m.setBillPlanNo(rst.getString("bill_plan_no"));
-			  m.setBillPlanDate(Utils.stringValue(rst.getDate("bill_plan_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  m.setBillPlanDate(DateUtil.stringValue(rst.getDate("bill_plan_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  
 			  if( !Utils.isNull(rst.getString("bill_plan_request_date")).equals("")){
-				  m.setBillPlanRequestDate(Utils.stringValue(rst.getDate("bill_plan_request_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setBillPlanRequestDate(DateUtil.stringValue(rst.getDate("bill_plan_request_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  }
 
 			  m.setSalesCode(rst.getString("sales_code"));

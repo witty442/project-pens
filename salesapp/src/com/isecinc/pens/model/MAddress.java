@@ -8,13 +8,10 @@ import java.util.List;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Address;
-import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.District;
 import com.isecinc.pens.bean.Province;
-import com.isecinc.pens.bean.User;
-import com.isecinc.pens.process.SequenceProcess;
 import com.pens.util.ConvertNullUtil;
-import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MAddress Class
@@ -74,7 +71,8 @@ public class MAddress extends I_Model<Address> {
 	public boolean save(Address address, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (address.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			//id = SequenceProcess.getNextValue(TABLE_NAME);
+			id =SequenceProcessAll.getIns().getNextValue("m_address.address_id").intValue();
 		} else {
 			id = address.getId();
 		}
@@ -95,7 +93,7 @@ public class MAddress extends I_Model<Address> {
 	/**
 	 * Look Up
 	 */
-	public List<Address> lookUp(int customerId) {
+	public List<Address> lookUp(long customerId) {
 		List<Address> pos = new ArrayList<Address>();
 		try {
 			String whereCause = " AND CUSTOMER_ID = " + customerId + " ORDER BY ADDRESS_ID ";

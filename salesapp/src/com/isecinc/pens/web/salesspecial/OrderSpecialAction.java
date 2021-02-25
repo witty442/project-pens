@@ -41,8 +41,6 @@ import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptBy;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MCreditNote;
@@ -65,9 +63,11 @@ import com.pens.util.ControlCode;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.CustomerReceiptFilterUtils;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
 import com.pens.util.Debug;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 /**
  * Order Special Action
@@ -98,7 +98,7 @@ public class OrderSpecialAction extends I_Action {
 			
 			User user = (User) request.getSession(true).getAttribute("user");
 
-			int customerId = 0;
+			long customerId = 0;
 			if (request.getParameter("customerId") != null) {
 				// go search
 				forward = "search";
@@ -780,7 +780,7 @@ public class OrderSpecialAction extends I_Action {
 	protected String save(ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		Connection conn = null;
 		OrderSpecialForm orderForm = (OrderSpecialForm) form;
-		int orderId = 0;
+		long orderId = 0;
 		String msg = InitialMessages.getMessages().get(Messages.SAVE_SUCCESS).getDesc();
 		String org = "";
 		String subInv ="";
@@ -991,7 +991,7 @@ public class OrderSpecialAction extends I_Action {
 			trx.setTrxModule(TrxHistory.MOD_ORDER);
 			if (orderId == 0) trx.setTrxType(TrxHistory.TYPE_INSERT);
 			else trx.setTrxType(TrxHistory.TYPE_UPDATE);
-			trx.setRecordId(order.getId());
+			trx.setRecordId(new Double(order.getId()).intValue());
 			trx.setUser(userActive);
 			new MTrxHistory().save(trx, userActive.getId(), conn);
 			// Trx History --end--

@@ -6,9 +6,6 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
-
 
 public class CustomerReceiptFilterUtils {
 
@@ -29,7 +26,7 @@ public class CustomerReceiptFilterUtils {
 	 * @return
 	 * :for van 
 	 */
-	public  static String canReceiptCheque(Connection conn,int customerId){
+	public  static String canReceiptCheque(Connection conn,long customerId){
 		String canFlag = "N";
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -64,7 +61,7 @@ public class CustomerReceiptFilterUtils {
 		return canFlag;
 	}
 	
-	public  static String canReceiptCredit(Connection conn,int customerId){
+	public  static String canReceiptCredit(Connection conn,long customerId){
 		String canFlag = "N";
 		PreparedStatement ps = null;
 		ResultSet rs = null;

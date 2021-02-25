@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.FileUtil"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.web.sales.bean.ProductCatalog"%>
 <%@page import="com.isecinc.pens.web.sales.bean.Basket"%>
@@ -7,7 +8,9 @@ String custId = request.getParameter("custId");
 String productId = request.getParameter("pId");
 String productCode = request.getParameter("pCode");
 String productName = request.getParameter("pName");
-//System.out.println(productName);
+//FileUtil.writeFile("d://dev_temp//name1.txt", productName,"TIS-620");
+//productName = new String(productName.getBytes(), "TIS-620");
+//FileUtil.writeFile("d://dev_temp//name2.txt", productName,"TIS-620");
 
 String uom1 = request.getParameter("uom1");
 String uom2 = request.getParameter("uom2");

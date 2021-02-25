@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Contact;
-import com.isecinc.pens.process.SequenceProcess;
 import com.pens.util.ConvertNullUtil;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MContact Class
@@ -67,7 +67,8 @@ public class MContact extends I_Model<Contact> {
 	public boolean save(Contact contact, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (contact.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			//id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("m_contact.contact_id").intValue();
 		} else {
 			id = contact.getId();
 		}
@@ -90,7 +91,7 @@ public class MContact extends I_Model<Contact> {
 	/**
 	 * Look Up
 	 */
-	public List<Contact> lookUp(int customerId) {
+	public List<Contact> lookUp(long customerId) {
 		List<Contact> pos = new ArrayList<Contact>();
 		try {
 			String whereCause = " AND CUSTOMER_ID = " + customerId + " ORDER BY CONTACT_ID ";

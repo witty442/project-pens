@@ -29,19 +29,25 @@ public class CustomerForm extends I_Form implements Serializable{
 
 	private static final long serialVersionUID = 9066506758859129582L;
 
-	private CustomerCriteria criteria = new CustomerCriteria();
-
 	private Customer[] results = null;
 	private FormFile imageFile;
 
 	List<Address> addresses = null;
-
 	List<Contact> contacts = null;
 	
 	private int curPage;
 	private int totalRow;
 	private int totalPage;
+    private Customer customer = new Customer();
 
+	
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
 
 	public FormFile getImageFile() {
 		return imageFile;
@@ -51,30 +57,17 @@ public class CustomerForm extends I_Form implements Serializable{
 		this.imageFile = imageFile;
 	}
 
-	@SuppressWarnings("unchecked")
-	public CustomerForm() {
-		Factory factory = new Factory() {
-			public Object create() {
-				return new Address();
-			}
-		};
-		addresses = LazyList.decorate(new ArrayList<Address>(), factory);
+	/*
+	 * @SuppressWarnings("unchecked") public CustomerForm() { Factory factory = new
+	 * Factory() { public Object create() { return new Address(); } }; addresses =
+	 * LazyList.decorate(new ArrayList<Address>(), factory);
+	 * 
+	 * Factory factory2 = new Factory() { public Object create() { return new
+	 * Contact(); } }; contacts = LazyList.decorate(new ArrayList<Contact>(),
+	 * factory2); }
+	 */
 
-		Factory factory2 = new Factory() {
-			public Object create() {
-				return new Contact();
-			}
-		};
-		contacts = LazyList.decorate(new ArrayList<Contact>(), factory2);
-	}
-
-	public CustomerCriteria getCriteria() {
-		return criteria;
-	}
-
-	public void setCriteria(CustomerCriteria criteria) {
-		this.criteria = criteria;
-	}
+	
 
 	public Customer[] getResults() {
 		return results;
@@ -84,13 +77,6 @@ public class CustomerForm extends I_Form implements Serializable{
 		this.results = results;
 	}
 
-	public Customer getCustomer() {
-		return criteria.getCustomer();
-	}
-
-	public void setCustomer(Customer customer) {
-		criteria.setCustomer(customer);
-	}
 
 	public List<Address> getAddresses() {
 		return addresses;

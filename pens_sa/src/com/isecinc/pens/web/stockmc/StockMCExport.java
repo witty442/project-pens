@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
 import com.pens.util.PageingGenerate;
+import com.pens.util.Utils;
 import com.pens.util.excel.ExcelHeader;
 
 public class StockMCExport {
@@ -28,7 +29,7 @@ public class StockMCExport {
 		 if(excel){
 			 h.append(ExcelHeader.EXCEL_HEADER);
 			 h.append("<table border='1'> \n");
-			 h.append("   <tr><td colspan='25'><b>รายงาน  เช็คสินค้าห้าง </b></td></tr> \n");
+			 h.append("   <tr><td colspan='27'><b>รายงาน  เช็คสินค้าห้าง </b></td></tr> \n");
 			 h.append("</table> \n");
 			 h.append("<table border='1'> \n");
 			 
@@ -36,7 +37,7 @@ public class StockMCExport {
 			 textCenter ="text_center";
 			 number ="num";
 		 }else{
-			 //Gen Pageing
+			 //Gen Paging
 			 h.append(PageingGenerate.genPageing(totalPage, totalRecord, currPage, startRec, endRec, no));
 			 
 			 h.append("<div style='height:450px;width:"+(new Double(user.getScreenWidth())).intValue()+"px;' >\n");
@@ -56,7 +57,9 @@ public class StockMCExport {
 		 h.append("<th >ชื่อสินค้า</th>\n");
 		 
 		 h.append("<th >มี(YES)</th>\n");
-		 h.append("<th >ขา</th>\n");
+		 h.append("<th >ขาที่มี</th>\n");
+		 h.append("<th >ชั้น</th>\n");
+		 h.append("<th >ลึก</th>\n");
 		 h.append("<th >จำนวน(1)</th>\n");
 		 h.append("<th >หน่วย(1)</th>\n");
 		 h.append("<th >หมดอายุ(1)</th>\n");
@@ -77,7 +80,7 @@ public class StockMCExport {
 		 h.append("</tr> \n");
 		 h.append("</thead> \n");
 		 h.append("<tbody> \n");
-		 String leg = "",qty1="",uom1="",expire1="",qty2="",uom2="",expire2="";
+		 String leg = "",floor = "",deep = "",qty1="",uom1="",expire1="",qty2="",uom2="",expire2="";
 		 String noteY="",noteN="",noteD="";
 		 String flagY="",flagN="",flagD="";
 		 String reasonNDesc = "",dateInStore="",dateInStoreQty = "";
@@ -88,8 +91,11 @@ public class StockMCExport {
 			 h.append("<tr> \n");
 			 if(!excel){ 
 			    h.append("<td class='"+textCenter+"' width='5%'> \n");
-			    h.append("<a herf='#' onclick=openImageFile('"+p.getStockDate().replaceAll("\\/", "")+"','"+p.getCustomerCode()+"','"+p.getStoreCode()+"','"+p.getBrand()+"') >");
-			    h.append("ดูรูปภาพ</a></td>\n");
+			    if( !Utils.isNull(p.getImageFileName()).equals("")){
+			       h.append("<a herf='#' onclick=openImageFile('"+p.getStockDate().replaceAll("\\/", "")+"','"+p.getCustomerCode()+"','"+p.getStoreCode()+"','"+p.getBrand()+"') >");
+			       h.append("<b>ดูรูปภาพ</b></a></td>\n");
+			    }
+			    h.append("</td>\n");
 			 }
 			 h.append("<td class='"+textCenter+"' width='2%'> "+(i+1)+"</td>\n");
 			 h.append("<td class='"+text+"' width='10%'> "+p.getCustomerName()+"</td>\n");
@@ -100,7 +106,7 @@ public class StockMCExport {
 			 h.append("<td class='"+textCenter+"' width='5%'> "+p.getProductCode()+"</td>\n");
 			 h.append("<td class='"+text+"' width='10%'> "+p.getProductName()+"</td>\n");
 			 
-			 leg = "";qty1="";uom1="";expire1="";qty2="";uom2="";expire2="";
+			 leg = "";floor = "";deep = "";qty1="";uom1="";expire1="";qty2="";uom2="";expire2="";
 			 flagY="";flagN="";flagD="";
 			 noteY="";noteN="";noteD="";
 			 reasonNDesc = "";dateInStore="";dateInStoreQty = "";
@@ -108,6 +114,8 @@ public class StockMCExport {
 			 if(p.getItemCheck().equals("Y")){
 				 flagY = "X";
 				 leg = p.getLegQty();
+				 floor = p.getFloorQty();
+				 deep = p.getDeepQty();
 				 qty1=p.getFrontendQty1();
 				 uom1=p.getUom1();
 				 expire1=p.getExpireDate1();
@@ -128,6 +136,8 @@ public class StockMCExport {
 			 }
 			 h.append("<td class='"+textCenter+"' width='3%'> "+flagY+"</td>\n");
 			 h.append("<td class='"+text+"' width='3%'> "+leg+"</td>\n");
+			 h.append("<td class='"+text+"' width='3%'> "+floor+"</td>\n");
+			 h.append("<td class='"+text+"' width='3%'> "+deep+"</td>\n");
 			 h.append("<td class='"+number+"' width='5%'> "+qty1+"</td>\n");
 			 h.append("<td class='"+textCenter+"' width='3%'> "+uom1+"</td>\n");
 			 h.append("<td class='"+textCenter+"' width='5%'> "+expire1+"</td>\n");

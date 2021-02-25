@@ -14,6 +14,7 @@ import com.isecinc.pens.init.InitialParameter;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.init.InitialSystemConfig;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 
 /**
  * WebInitialServlet Class for Initial Web Parameter and Configuration
@@ -28,9 +29,11 @@ public class WebInitialServlet extends HttpServlet {
 	private Logger logger = Logger.getLogger("PENS");
 
 	public void init() throws ServletException {
-		logger.info("Initial PENS..."); Connection conn = null; 
-		try { conn = new
-			  DBCPConnectionProvider().getConnection(conn);
+		logger.info("Initial PENS..."); 
+		Connection conn = null; 
+		try { 
+			 // conn = new DBCPConnectionProvider().getConnection(conn);
+			  conn = DBConnection.getInstance().getConnection();
 			  
 			  I_Initial initial; 
 			  logger.info("Initial References"); initial = new

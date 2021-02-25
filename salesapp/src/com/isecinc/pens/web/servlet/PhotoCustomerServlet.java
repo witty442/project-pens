@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Customer;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MCustomer;
+import com.pens.util.Utils;
 
 @SuppressWarnings( { "static-access", "serial", "deprecation" })
 public class PhotoCustomerServlet extends HttpServlet {

@@ -64,14 +64,9 @@
              <forward name="pass_user" path="/jsp/salesAnalystReportAction.do?do=prepare&amp;action=new&amp;reportName=SalesAnalyst" redirect="true" /> 
              <forward name="pass_user_new" path="/jsp/aReportAction.do?do=prepare&amp;action=new&amp;reportName=SalesAnalyst" redirect="true" /> 
              <forward name="pass_salestarget" path="/jsp/mainpage.jsp" redirect="true" /> 
-             <forward name="pass_mcentry" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new&amp;pageName=STOCKMC" redirect="true" /> 
-			 
-			 <!-- Version 1 -->
-			 <!--  <forward name="pass_mcentryMobile" path="/jsp/stockMCAction.do?do=prepareSearch&amp;action=new&amp;pageName=STOCKMC" redirect="true" /> 
- 		  -->
- 		  
-             <!-- Version 2 -->
-			  <forward name="pass_mcentryMobile" path="/jsp/stockMCAction.do?do=stockMCMStep1&amp;action=new" redirect="true" /> 
+             
+			 <forward name="pass_mcentry" path="/jsp/stockMCAction.do?do=stockMCMStep1&amp;action=new" redirect="true" /> 
+			 <forward name="pass_mcentryMobile" path="/jsp/stockMCAction.do?do=stockMCMStep1&amp;action=new" redirect="true" /> 
 			  
 			 <forward name="pathRedirect" path="/redirectPage.jsp" /> 
 			 <forward name="fail" path="/index.jsp" /> 

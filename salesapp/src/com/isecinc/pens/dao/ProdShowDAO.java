@@ -1,7 +1,6 @@
 package com.isecinc.pens.dao;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -11,9 +10,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.ProdShowBean;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
-import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class ProdShowDAO {
 	private static Logger logger = Logger.getLogger("PENS");
@@ -37,7 +35,7 @@ public class ProdShowDAO {
 					bean.setOrderNo(Utils.isNull(rst.getString("order_no")));
 					bean.setCustomerCode(Utils.isNull(rst.getString("customer_no")));
 					bean.setCustomerName(Utils.isNull(rst.getString("customer_name")));
-					bean.setDocDate(Utils.stringValue(rst.getDate("doc_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					bean.setDocDate(DateUtil.stringValue(rst.getDate("doc_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					bean.setRemark(Utils.isNull(rst.getString("remark")));
 					bean.setExport(Utils.isNull(rst.getString("exported")));
 					if( !"Y".equalsIgnoreCase(bean.getExport())){
@@ -82,7 +80,7 @@ public class ProdShowDAO {
 					bean.setOrderNo(Utils.isNull(rst.getString("order_no")));
 					bean.setCustomerCode(Utils.isNull(rst.getString("customer_no")));
 					bean.setCustomerName(Utils.isNull(rst.getString("customer_name")));
-					bean.setDocDate(Utils.stringValue(rst.getDate("doc_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					bean.setDocDate(DateUtil.stringValue(rst.getDate("doc_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					bean.setRemark(Utils.isNull(rst.getString("remark")));
 					bean.setExport(Utils.isNull(rst.getString("exported")));
 					itemList.add(bean);
@@ -217,7 +215,7 @@ public class ProdShowDAO {
 				ps = conn.prepareStatement(sql.toString());
 				ps.setString(++index, bean.getOrderNo());
 				ps.setString(++index, bean.getCustomerCode());
-				ps.setDate(++index, new java.sql.Date(Utils.parse(bean.getDocDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
+				ps.setDate(++index, new java.sql.Date(DateUtil.parse(bean.getDocDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th).getTime()));
 				ps.setString(++index, bean.getRemark());
 				ps.setTimestamp(++index, new java.sql.Timestamp(new java.util.Date().getTime()));
 				ps.setString(++index, bean.getCreatedBy());

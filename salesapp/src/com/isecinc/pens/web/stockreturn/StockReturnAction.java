@@ -35,8 +35,6 @@ import com.isecinc.pens.bean.RequestPromotionLine;
 import com.isecinc.pens.bean.StockReturn;
 import com.isecinc.pens.bean.StockReturnLine;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MAddress;
@@ -47,6 +45,9 @@ import com.isecinc.pens.model.MStockReturn;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 import com.isecinc.pens.web.reqPromotion.RequestPromotionForm;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Stock Return Action
@@ -269,7 +270,7 @@ public class StockReturnAction extends I_Action {
 			   curdate.add(Calendar.MONTH, -1*Integer.parseInt(refbackDate.getKey()));
 			   
 			   logger.debug("DateStart:"+curdate.getTime());
-			   backDate = Utils.stringValue(curdate.getTime(),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			   backDate = DateUtil.stringValue(curdate.getTime(),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			   //set to 01/mm/yyyy
 			   backDate = "01/"+backDate.substring(3,backDate.length());
 			   logger.debug("backDate:"+backDate);
@@ -280,7 +281,7 @@ public class StockReturnAction extends I_Action {
 			List<References> reasonReturnList = InitialReferences.getReferenceListByCode(conn,InitialReferences.REASON_RETURN);
 			request.getSession().setAttribute("reasonReturnList", reasonReturnList);
 			
-			bean.setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			bean.setRequestDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			bean.setCanEdit(true);
 		
 			//set Btn Display

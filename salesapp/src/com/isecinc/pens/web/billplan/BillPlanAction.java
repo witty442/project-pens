@@ -17,11 +17,12 @@ import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.BillPlan;
 import com.isecinc.pens.bean.MoveOrder;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MBillPlan;
 import com.isecinc.pens.web.moveorder.MoveOrderForm;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -152,7 +153,7 @@ public class BillPlanAction extends I_Action {
 			//Search
 			mCriteria = mDAO.searchBillPlan(mCriteria, user);
 			if(Utils.isNull(mCriteria.getBillPlanRequestDate()).equals("")){
-			    String currentDate = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			    String currentDate = DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			    mCriteria.setBillPlanRequestDate(currentDate);
 			}
 			mForm.setBillPlan(mCriteria);
@@ -208,7 +209,7 @@ public class BillPlanAction extends I_Action {
 			 
             Calendar currentDate = Calendar.getInstance();
 			
-			Date requestDateObj = Utils.parse(head.getBillPlanRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+			Date requestDateObj = DateUtil.parse(head.getBillPlanRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
 			Calendar requestDate = Calendar.getInstance();
 			requestDate.setTime(requestDateObj);
 			int dayInMonthOfRequestDate = requestDate.get(Calendar.DATE);
@@ -234,7 +235,7 @@ public class BillPlanAction extends I_Action {
 				currentDate.add(Calendar.MONTH, 1);//next Month or NextYear 
 				currentDate.set(Calendar.DATE, 1);//set to 01/xx/xxxx
 				
-				String requestDateStr = Utils.stringValue(currentDate.getTime(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String requestDateStr = DateUtil.stringValue(currentDate.getTime(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				head.setBillPlanRequestDate(requestDateStr);
 				System.out.println("requestDate :"+head.getBillPlanRequestDate());
 			}

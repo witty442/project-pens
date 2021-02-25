@@ -7,8 +7,14 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <jsp:useBean id="receiptForm" class="com.isecinc.pens.web.receipt.ReceiptForm" scope="request"/>
-<div align="left">&nbsp;&nbsp;<input type="button" id="cr_btn" value="เพิ่มใบแจ้งหนี้" class ="newPosBtn" onclick="open_bill('${pageContext.request.contextPath}', 0);"/></div>
-<table id="tblBill" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+<div align="left">&nbsp;&nbsp;
+  <input type="button" id="cr_btn" value="เพิ่มใบแจ้งหนี้" class ="btn btn-primary" 
+    onclick="open_bill('${pageContext.request.contextPath}', 0);"/>
+</div>
+<div class="table-responsive">
+  <table class="table table-bordered table-striped table-light"
+     id="tblBill" width="100%" cellspacing="0">
+    <thead class="thead-dark">
 	<tr>
 		<th class="order"><bean:message key="No"  bundle="sysprop"/></th>
 		<th class="checkBox">
@@ -22,6 +28,7 @@
 		<th class="costprice"><bean:message key="Product.Balance" bundle="sysele"/></th>
 		<!-- <th class="status"><bean:message key="Edit" bundle="sysprop"/></th> -->
 	</tr>
+	</thead>
 	<c:forEach var="results" items="${receiptForm.lines}" varStatus="rows1">
 	<c:choose>
 		<c:when test="${rows1.index %2 == 0}">
@@ -37,7 +44,7 @@
 		<td align="center">
 			${results.arInvoiceNo}
 			<input type="hidden" name='bill.id' value='${results.id}'>
-			<input type='hidden' name='bill.orderId' value='${results.order.id}' >
+			<input type='hidden' name='bill.invoiceId' value='${results.order.invoiceId}' >
 			<input type='hidden' name='bill.invoiceNo' value='${results.arInvoiceNo}'>
 			<input type='hidden' name='bill.salesOrderNo' value='${results.salesOrderNo}'>
 			<input type='hidden' name='bill.netAmt' value='${results.invoiceAmount}'>
@@ -58,13 +65,15 @@
 		 -->
 	</tr>
 	</c:forEach>							
-</table>
-<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+  </table>
+
+<table align="left" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
-		<td align="left" colspan="8" class="footer">&nbsp;
+		<td align="left" colspan="8">&nbsp;
 			<a href="javascript:deleteBill('${pageContext.request.contextPath}');"> 
 			<img border=0 src="${pageContext.request.contextPath}/icons/doc_inactive.gif"> ลบรายการ</a>
 		</td>
 	</tr>
 </table>
+</div>
 								

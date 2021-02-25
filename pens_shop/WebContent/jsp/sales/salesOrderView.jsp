@@ -418,6 +418,8 @@ function changePaymentMethod(paymentMethod){
 									              <input type="text"  value="AliPay" class="disableBoldText" readonly size="10"/>
 									         <%}else if(orderForm.getOrder().getPaymentMethod().equalsIgnoreCase("WE")) {%>
 									             <input type="text"  value="WeChat" class="disableBoldText" readonly size="10"/>
+									         <%}else if(orderForm.getOrder().getPaymentMethod().equalsIgnoreCase("QR")) {%>
+									             <input type="text"  value="QRCODE" class="disableBoldText" readonly size="10"/>
 									         <%}else if(orderForm.getOrder().getPaymentMethod().equalsIgnoreCase("GOV")) {%>
 									             <input type="text"  value="ªÔÁªçÍ»ãªé" class="disableBoldText" readonly size="10"/>
 									         <%}else if(orderForm.getOrder().getPaymentMethod().equalsIgnoreCase("CR")) {%>

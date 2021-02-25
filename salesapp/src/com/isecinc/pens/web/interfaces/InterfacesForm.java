@@ -1,9 +1,9 @@
 package com.isecinc.pens.web.interfaces;
 
 import com.isecinc.core.web.I_Form;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemDetailBean;
 import com.isecinc.pens.bean.Trip;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
 
 /**
  * Trip Form

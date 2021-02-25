@@ -138,6 +138,7 @@ function openImageFile(){
 		   <input type="hidden" name="selectBarcode" id="selectBarcode"/>
 				
 				<div class="card mb-1 shadow-sm">
+				    <div class="card-header bg-info"><b>บันทึกสต๊อกห้าง</b></div>
 				    <div class="card-header">วันที่นับสต๊อก: ${stockMCForm.bean.stockDate}</div>
 				    <div class="card-header">ห้าง: ${stockMCForm.bean.customerCode}-${stockMCForm.bean.customerName}</div>
 			        <div class="card-header">สาขา: ${stockMCForm.bean.storeCode}-${stockMCForm.bean.storeName}</div>

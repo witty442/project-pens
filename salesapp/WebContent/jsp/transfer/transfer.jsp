@@ -1,6 +1,6 @@
 <%@page import="com.isecinc.pens.bean.TransferBean"%>
 <%@page import="util.SessionGen"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -27,20 +27,18 @@
 <meta http-equiv="Expires" content="0" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
 <link rel="shortcut icon" href="${pageContext.request.contextPath}/icons/favicon.ico">
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/table_style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <style type="text/css">
 
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/number.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+
+<!-- Include Bootstrap Resource  -->
+<jsp:include page="../resourceBootstrap.jsp"  flush="true"/>
+<!-- /Include Bootstrap Resource -->
 
 <script type="text/javascript">
 
@@ -342,266 +340,225 @@ function sumTotal(){
 
 </script>
 </head>
-<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe('${pageContext.request.contextPath}');MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
-<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
-  	<tr>
-		<td colspan="3"><jsp:include page="../header.jsp"/></td>
-	</tr>
-  	<tr id="framerow">
-  		<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
-    	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
-    		<div style="height: 60px;">
-    		<!-- MENU -->
-	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
+<body class="sb-nav-fixed" onload="loadMe()">
+     <!-- Include Header Mobile  -->
+     <jsp:include page="../header.jsp"  flush="true"/>
+     <!-- /Include Header Mobile -->
+     
+   	<!-- PROGRAM HEADER -->
+     	<jsp:include page="../program.jsp">
+		<jsp:param name="function" value="Transfer"/>
+		<jsp:param name="code" value=""/>
+	</jsp:include>
+	      	
+	<!-- BODY -->
+	<html:form action="/jsp/transferAction">
+	<jsp:include page="../error.jsp"/>
+						
+			<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
 				<tr>
-			        <td width="100%">
-			        	<jsp:include page="../menu.jsp"/>
-			       	</td>
+					<td colspan="4" align="center">
+				        <font color="black" size="5"> <b> บันทึกการโอนเงิน</b> </font>
+				    </td>
 				</tr>
-	    	</table>
-	    	</div>
-	    	<!-- PROGRAM HEADER -->
-	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="Transfer"/>
-				<jsp:param name="code" value=""/>
-			</jsp:include>
-	      	<!-- TABLE BODY -->
-	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
-	      		<tr style="height: 9px;">
-		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_1.gif"/></td>
-		            <td width="832px;" background="${pageContext.request.contextPath}/images2/boxcont1_5.gif"/></td>
-		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_2.gif"/></td>
-	      		</tr>
-	      		<tr>
-		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_8.gif"></td>
-		            <td bgcolor="#f8f8f8">
-						<!-- BODY -->
-						<html:form action="/jsp/transferAction">
-						<jsp:include page="../error.jsp"/>
-						
-						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-							<tr>
-								<td colspan="4" align="center">
-							        <font color="black" size="5"> <b> บันทึกการโอนเงิน</b> </font>
-							    </td>
-							</tr>
-							<tr>
-								<td colspan="4" align="center">
-								<div align="left" style="margin-left:13px;">
-								   <%//if( !"view".equalsIgnoreCase(request.getParameter("action"))){ %>
-								      <div align="left">
-								          <input type="button" class="newPosBtn" value="เพิ่มรายการ" onclick="addRow('${pageContext.request.contextPath}');"/>
-								           <input type="button" class="newPosBtn" value="ลบรายการ" onclick="removeRow('${pageContext.request.contextPath}');"/>	
-							           </div>
-							        <%//} %>
-								     <%-- </c:if> --%>
-								     <div align="center">
-								     <font color="black" size="3">วันที่บันทึกข้อมูล :&nbsp;
-								       <html:text property="bean.createDate" size="10" readonly="true" styleId="createDate"  styleClass="disableText"/>
-								     </font>
-								     </div>
-								</div>
-						
-						<!--  Results  -->
-						<table id="tblProduct" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
-							<tr>
-							    <th>
-							     <!--   <input type="checkbox" name="chkAll"
-									onclick="checkSelect(this,document.getElementsByName('lineids'));" /> -->
-								</th>
-								<th>ประเภทการโอน</th>
-								<th>ธนาคารของ PENS</th>
-								<th>วันที่โอน</th>
-								<th>เวลาที่โอน <br/>(รูปแบบเวลา 24 ชม . 08:30)</th>
-								<th>ยอดเงินที่โอน</th>
-								<th>เลขที่เช็ค</th>
-								<th>วันที่หน้าเช็ค</th>
-							</tr>
-							<% 	
-							List<TransferBean> resultList = transferForm.getLines();
-							String keyData = "";
-							String tabclass ="";
-							String rowDisablestyle = "";
-							String rowDisbleCommand = "";
-							if(resultList != null && resultList.size() >0){
-							    for(int n=0;n<resultList.size();n++){
-							       TransferBean mc = (TransferBean)resultList.get(n);
-								   if(n%2==0){ 
-									 tabclass="lineO";
-								   }
-								   keyData = ""+mc.getLineId();
-								   //defalut
-								   rowDisablestyle = "";
-								   rowDisbleCommand = "";
-								   //check can edit row
-								   if( !mc.isCanEdit()){
-									   rowDisablestyle = "disableText";
-									   rowDisbleCommand = "readonly";
-								   }
-								   
-                             %>
-								<tr class="<%=tabclass%>">
-								   <% if( mc.isCanEdit()){%>
-									    <td class = "td_text_center" width="5%">
-										  <input type="checkbox" name="lineChk" id="lineChk" value="<%=mc.getKeyData() %>" <%=rowDisbleCommand %> >
-								          <input type="hidden" name="keyData" id="keyData" value="<%=mc.getKeyData() %>" />
-								          <input type="hidden" name="rowId" id="rowId" value="<%=n%>" />
-								          <input type="hidden" name="row_can_edit" id="row_can_edit" value="<%=mc.isCanEdit()%>" />
-								          <input type="hidden" name="lineId" id="lineId" value="<%=mc.getLineId()%>" />
-										</td>
-										 <td class = "td_text_center" width="10%">
-										   <select name="transferType" id="transferType">
-										      <option value=""></option>
-										      <option value="CS" <%=Utils.isNull(mc.getTransferType()).equals("CS")?"selected":"" %>>เงินสด</option>
-										      <option value="CH" <%=Utils.isNull(mc.getTransferType()).equals("CH")?"selected":"" %>>เช็ค</option>
-										   </select>
-										   
-										 </td> 
-										 <td class = "td_text" width="35%">
-											 <select name="transferBank" id="transferBank"  <%=rowDisbleCommand %> style="width: 300px;">
-											      <option value=""></option>
-											      <%
-											      String selected = "";
-											      if(transferBankVanList != null && transferBankVanList.size()>0){
-											    	  for(int i=0;i<transferBankVanList.size();i++){
-											    		  References ref = transferBankVanList.get(i);
-											    		  selected = ref.getKey().equals(Utils.isNull(mc.getTransferBank()))?"selected":"";
-											    	  %>
-											           <option value="<%=ref.getKey()%>" <%=selected%>><%=ref.getName() %></option>
-											      <%}} %>
-											   </select>
-										 </td> 
-										 <td class ="td_text_center" width="10%">
-										    <input type="text" name="transferDate" size= "10"  onmouseover='popCalendar(this,this)' 
-										    readonly="true" id="transferDate" value="<%=Utils.isNull(mc.getTransferDate())%>"  <%=rowDisbleCommand %>  />
-										 </td>
-										 <td class ="td_text_center" width="10%">
-										    <input type="text" name="transferTime" size= "6"  onkeypress='inputTimeM(event, this);' onkeyup='inputTimeM(event, this);'
-										     onchange="validateInputTime(this)"
-										     autocomplete="off" id="transferTime" value="<%=Utils.isNull(mc.getTransferTime())%>"  <%=rowDisbleCommand %> />
-										 </td>
-										 <td class ="td_number" width="10%">
-										    <input type="text" name="amount" size= "15"  onblur="checkFloat(this)" class="enableNumber"
-										    autocomplete="off" id="amount" value="<%=Utils.isNull(mc.getAmount()) %>"  <%=rowDisbleCommand %> />
-										 </td>
-	
-										<td class ="td_text_center" width="10%">
-										    <input type="text" name="chequeNo" size= "20"  autocomplete="off" id="chequeNo" 
-										    value="<%=Utils.isNull(mc.getChequeNo()) %>"  <%=rowDisbleCommand %> onkeydown="return isNum0to9andpoint(this,event);" />
-										 </td>
-										 <td class ="td_text_center" width="10%">
-										    <input type="text" name="chequeDate" size= "10"  onmouseover='popCalendar(this,this)' 
-										     readonly id="chequeDate" value="<%=Utils.isNull(mc.getChequeDate()) %>"  <%=rowDisbleCommand %> />
-										 </td>
-									 
-									<%}else{ %>
-									  <td class = "td_text_center" width="5%">
-										  <label class="checkbox"><input type="checkbox" name="lineChk" id="lineChk" value="<%=mc.getKeyData() %>" style="opacity:0; position:absolute; left:99px;"></label>
-										  
-								          <input type="hidden" name="keyData" id="keyData" value="<%=mc.getKeyData() %>" />
-								          <input type="hidden" name="rowId" id="rowId" value="<%=n%>" />
-								          <input type="hidden" name="row_can_edit" id="row_can_edit" value="<%=mc.isCanEdit()%>" />
-								          <input type="hidden" name="lineId" id="rowId" value="<%=mc.getLineId()%>" />
-										</td>
-									     <td class = "td_text_center" width="10%">
-										      <input type="text" name="transferTypeLabel"  class="disableText" size= "5" value="<%=Utils.isNull(mc.getTransferTypeLabel()) %>" /> 
-					  					      <input type="hidden" name="transferType"  value="<%=Utils.isNull(mc.getTransferType()) %>"/> 
-										 </td> 
-										 <td class = "td_text" width="35%">
-											 <input type="text" name="transferBankLabel" readonly class="disableText" size= "40" value="<%=Utils.isNull(mc.getTransferBankLabel()) %>" /> 
-					  					     <input type="hidden" name="transferBank"  value="<%=Utils.isNull(mc.getTransferBank()) %>"/> 
-										 </td> 
-										 <td class ="td_text_center" width="10%">
-										    <input type="text" name="transferDate" size= "10" class="disableText"
-										    readonly id="transferDate" value="<%=Utils.isNull(mc.getTransferDate())%>" />
-										 </td>
-										 <td class ="td_text_center" width="10%">
-										    <input type="text" name="transferTime" size= "6"  class="disableText" readonly 
-										    id="transferTime" value="<%=Utils.isNull(mc.getTransferTime())%>"  />
-										 </td>
-										 <td class ="td_number" width="10%">
-										    <input type="text" name="amount" size= "15" readonly class="disableNumber"  id="amount" value="<%=Utils.isNull(mc.getAmount()) %>"  <%=rowDisbleCommand %> />
-										 </td>
-										<td class ="td_text_center" width="10%">
-										    <input type="text" name="chequeNo" size= "20"  readonly  class="disableText" id="chequeNo" 
-										    value="<%=Utils.isNull(mc.getChequeNo()) %>"  />
-										 </td>
-										 <td class ="td_text_center" width="10%">
-										    <input type="text" name="chequeDate" size= "10"  readonly  class="disableText" 
-										      id="chequeDate" value="<%=Utils.isNull(mc.getChequeDate()) %>" />
-										 </td>
-									<%} %>
-								</tr>
-							     <%} }%>
-								</table>
-								<!--  Results -->
-								<!-- Summary -->
-								<table id="tblProductSummary" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
-								  <tr>
-								   <td colspan="5" align="right" width="65%"><b>ยอดรวม</b></td>
-								   <td width="10%" class="td_number">
-								    <input type="text" name="totalAmount" size="12" readonly id="totalAmount" class="disableNumberBold"/>
-								    </td>
-								   <td colspan="2"  width="20%"></td>
-								  </tr>
-								</table>
-								
-								</td></tr>
-						</table>
-						<br>
-						<!-- BUTTON -->
-						<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
-							<tr>
-								<td align="center">
-								   <c:if test="${transferForm.bean.canEdit =='true'}">
-									<a href="#" onclick="return save('${pageContext.request.contextPath}');">
-									  <input type="button" value="บันทึกรายการ" class="newPosBtnLong">
-									</a>	
-								   </c:if>	
-									<a href="#" onclick="clearForm('${pageContext.request.contextPath}');">
-										<input type="button" value=" Clear "  class="newPosBtnLong">
-								    </a>
-									  
-									<a href="#" onclick="backsearch('${pageContext.request.contextPath}');">
-										<input type="button" value="ปิดหน้าจอ"  class="newPosBtnLong">
-									 </a>
-								</td>
-							</tr>
-						</table>
-						
-						<!-- Hidden Field -->
-						
-						<html:hidden property="deletedId"/>
-						<html:hidden property="lineNoDeleteArray"/>
-						<!-- Hidden -->
-		                <input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
+				<tr>
+					<td colspan="4" align="center">
+					<div align="left" style="margin-left:13px;">
+					   <%//if( !"view".equalsIgnoreCase(request.getParameter("action"))){ %>
+					      <div align="left">
+					          <input type="button" class="newPosBtn" value="เพิ่มรายการ" onclick="addRow('${pageContext.request.contextPath}');"/>
+					           <input type="button" class="newPosBtn" value="ลบรายการ" onclick="removeRow('${pageContext.request.contextPath}');"/>	
+				           </div>
+				        <%//} %>
+					     <%-- </c:if> --%>
+					     <div align="center">
+					     <font color="black" size="3">วันที่บันทึกข้อมูล :&nbsp;
+					       <html:text property="bean.createDate" size="10" readonly="true" styleId="createDate"  styleClass="disableText"/>
+					     </font>
+					     </div>
+					</div>
+			
+			<!--  Results  -->
+		     <div class="table-responsive">
+              <table class="table table-bordered table-striped table-light"
+                   id="tblProduct" width="100%" cellspacing="0">
+                 <thead class="thead-dark">
+				<tr>
+				    <th>
+				     <!--   <input type="checkbox" name="chkAll"
+						onclick="checkSelect(this,document.getElementsByName('lineids'));" /> -->
+					</th>
+					<th>ประเภทการโอน</th>
+					<th>ธนาคารของ PENS</th>
+					<th>วันที่โอน</th>
+					<th>เวลาที่โอน <br/>(รูปแบบเวลา 24 ชม . 08:30)</th>
+					<th>ยอดเงินที่โอน</th>
+					<th>เลขที่เช็ค</th>
+					<th>วันที่หน้าเช็ค</th>
+				</tr>
+				</thead>
+				<% 	
+				List<TransferBean> resultList = transferForm.getLines();
+				String keyData = "";
+				String tabclass ="";
+				String rowDisablestyle = "";
+				String rowDisbleCommand = "";
+				if(resultList != null && resultList.size() >0){
+				    for(int n=0;n<resultList.size();n++){
+				       TransferBean mc = (TransferBean)resultList.get(n);
+					   if(n%2==0){ 
+						 tabclass="lineO";
+					   }
+					   keyData = ""+mc.getLineId();
+					   //defalut
+					   rowDisablestyle = "";
+					   rowDisbleCommand = "";
+					   //check can edit row
+					   if( !mc.isCanEdit()){
+						   rowDisablestyle = "disableText";
+						   rowDisbleCommand = "readonly";
+					   }
+					   
+                          %>
+					<tr class="<%=tabclass%>">
+					   <% if( mc.isCanEdit()){%>
+						    <td class = "td_text_center" width="5%">
+							  <input type="checkbox" name="lineChk" id="lineChk" value="<%=mc.getKeyData() %>" <%=rowDisbleCommand %> >
+					          <input type="hidden" name="keyData" id="keyData" value="<%=mc.getKeyData() %>" />
+					          <input type="hidden" name="rowId" id="rowId" value="<%=n%>" />
+					          <input type="hidden" name="row_can_edit" id="row_can_edit" value="<%=mc.isCanEdit()%>" />
+					          <input type="hidden" name="lineId" id="lineId" value="<%=mc.getLineId()%>" />
+							</td>
+							 <td class = "td_text_center" width="10%">
+							   <select name="transferType" id="transferType">
+							      <option value=""></option>
+							      <option value="CS" <%=Utils.isNull(mc.getTransferType()).equals("CS")?"selected":"" %>>เงินสด</option>
+							      <option value="CH" <%=Utils.isNull(mc.getTransferType()).equals("CH")?"selected":"" %>>เช็ค</option>
+							   </select>
+							   
+							 </td> 
+							 <td class = "td_text" width="35%">
+								 <select name="transferBank" id="transferBank"  <%=rowDisbleCommand %> style="width: 300px;">
+								      <option value=""></option>
+								      <%
+								      String selected = "";
+								      if(transferBankVanList != null && transferBankVanList.size()>0){
+								    	  for(int i=0;i<transferBankVanList.size();i++){
+								    		  References ref = transferBankVanList.get(i);
+								    		  selected = ref.getKey().equals(Utils.isNull(mc.getTransferBank()))?"selected":"";
+								    	  %>
+								           <option value="<%=ref.getKey()%>" <%=selected%>><%=ref.getName() %></option>
+								      <%}} %>
+								   </select>
+							 </td> 
+							 <td class ="td_text_center" width="10%">
+							    <input type="text" name="transferDate" size= "10"  onmouseover='popCalendar(this,this)' 
+							    readonly="true" id="transferDate" value="<%=Utils.isNull(mc.getTransferDate())%>"  <%=rowDisbleCommand %>  />
+							 </td>
+							 <td class ="td_text_center" width="10%">
+							    <input type="text" name="transferTime" size= "6"  onkeypress='inputTimeM(event, this);' onkeyup='inputTimeM(event, this);'
+							     onchange="validateInputTime(this)"
+							     autocomplete="off" id="transferTime" value="<%=Utils.isNull(mc.getTransferTime())%>"  <%=rowDisbleCommand %> />
+							 </td>
+							 <td class ="td_number" width="10%">
+							    <input type="text" name="amount" size= "15"  onblur="checkFloat(this)" class="enableNumber"
+							    autocomplete="off" id="amount" value="<%=Utils.isNull(mc.getAmount()) %>"  <%=rowDisbleCommand %> />
+							 </td>
+
+							<td class ="td_text_center" width="10%">
+							    <input type="text" name="chequeNo" size= "20"  autocomplete="off" id="chequeNo" 
+							    value="<%=Utils.isNull(mc.getChequeNo()) %>"  <%=rowDisbleCommand %> onkeydown="return isNum0to9andpoint(this,event);" />
+							 </td>
+							 <td class ="td_text_center" width="10%">
+							    <input type="text" name="chequeDate" size= "10"  onmouseover='popCalendar(this,this)' 
+							     readonly id="chequeDate" value="<%=Utils.isNull(mc.getChequeDate()) %>"  <%=rowDisbleCommand %> />
+							 </td>
+						 
+						<%}else{ %>
+						  <td class = "td_text_center" width="5%">
+							  <label class="checkbox"><input type="checkbox" name="lineChk" id="lineChk" value="<%=mc.getKeyData() %>" style="opacity:0; position:absolute; left:99px;"></label>
+							  
+					          <input type="hidden" name="keyData" id="keyData" value="<%=mc.getKeyData() %>" />
+					          <input type="hidden" name="rowId" id="rowId" value="<%=n%>" />
+					          <input type="hidden" name="row_can_edit" id="row_can_edit" value="<%=mc.isCanEdit()%>" />
+					          <input type="hidden" name="lineId" id="rowId" value="<%=mc.getLineId()%>" />
+							</td>
+						     <td class = "td_text_center" width="10%">
+							      <input type="text" name="transferTypeLabel"  class="disableText" size= "5" value="<%=Utils.isNull(mc.getTransferTypeLabel()) %>" /> 
+		  					      <input type="hidden" name="transferType"  value="<%=Utils.isNull(mc.getTransferType()) %>"/> 
+							 </td> 
+							 <td class = "td_text" width="35%">
+								 <input type="text" name="transferBankLabel" readonly class="disableText" size= "40" value="<%=Utils.isNull(mc.getTransferBankLabel()) %>" /> 
+		  					     <input type="hidden" name="transferBank"  value="<%=Utils.isNull(mc.getTransferBank()) %>"/> 
+							 </td> 
+							 <td class ="td_text_center" width="10%">
+							    <input type="text" name="transferDate" size= "10" class="disableText"
+							    readonly id="transferDate" value="<%=Utils.isNull(mc.getTransferDate())%>" />
+							 </td>
+							 <td class ="td_text_center" width="10%">
+							    <input type="text" name="transferTime" size= "6"  class="disableText" readonly 
+							    id="transferTime" value="<%=Utils.isNull(mc.getTransferTime())%>"  />
+							 </td>
+							 <td class ="td_number" width="10%">
+							    <input type="text" name="amount" size= "15" readonly class="disableNumber"  id="amount" value="<%=Utils.isNull(mc.getAmount()) %>"  <%=rowDisbleCommand %> />
+							 </td>
+							<td class ="td_text_center" width="10%">
+							    <input type="text" name="chequeNo" size= "20"  readonly  class="disableText" id="chequeNo" 
+							    value="<%=Utils.isNull(mc.getChequeNo()) %>"  />
+							 </td>
+							 <td class ="td_text_center" width="10%">
+							    <input type="text" name="chequeDate" size= "10"  readonly  class="disableText" 
+							      id="chequeDate" value="<%=Utils.isNull(mc.getChequeDate()) %>" />
+							 </td>
+						<%} %>
+					</tr>
+				     <%} }%>
+					</table>
+					</div>
+					<!--  Results -->
+					<!-- Summary -->
+					<table id="tblProductSummary" align="center" border="0" cellpadding="3" cellspacing="2" class="tableSearchNoWidth" width="100%">
+					  <tr>
+					   <td colspan="5" align="right" width="65%"><b>ยอดรวม</b></td>
+					   <td width="10%" class="td_number">
+					    <input type="text" name="totalAmount" size="12" readonly id="totalAmount" class="disableNumberBold"/>
+					    </td>
+					   <td colspan="2"  width="20%"></td>
+					  </tr>
+					</table>
+			
+			<br>
+			<!-- BUTTON -->
+			<table align="center" border="0" cellpadding="3" cellspacing="0" class="body">
+				<tr>
+					<td align="center">
+					   <c:if test="${transferForm.bean.canEdit =='true'}">
+						<a href="#" onclick="return save('${pageContext.request.contextPath}');">
+						  <input type="button" value="บันทึกรายการ" class="newPosBtnLong">
+						</a>	
+					   </c:if>	
+						<a href="#" onclick="clearForm('${pageContext.request.contextPath}');">
+							<input type="button" value=" Clear "  class="newPosBtnLong">
+					    </a>
 						  
-						<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
-						</html:form>
-						<!-- BODY -->
 					</td>
-					<td width="6px;" background="${pageContext.request.contextPath}/images2/boxcont1_6.gif"></td>
 				</tr>
-				<tr style="height: 9px;">
-		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_4.gif"/></td>
-		            <td background="${pageContext.request.contextPath}/images2/boxcont1_7.gif"></td>
-		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_3.gif"/></td>
-	          	</tr>
-    		</table>
-    	</td>
-    	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
-    </tr>
-    <tr>
-    	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
-    	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
-   			<jsp:include page="../contentbottom.jsp"/>
-        </td>
-        <td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
-    </tr>
-    <tr>
-    	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
-  	</tr>
-</table>
+			</table>
+			
+			<!-- Hidden Field -->
+			
+			<html:hidden property="deletedId"/>
+			<html:hidden property="lineNoDeleteArray"/>
+			<!-- Hidden -->
+               <input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
+			  
+			<%-- <jsp:include page="../searchCriteria.jsp"></jsp:include> --%>
+		</html:form>
+		<!-- BODY -->
+			
+     <!-- Include Footer Mobile  -->
+    <jsp:include page="../footer.jsp" flush="true"/>
+    <!-- /Include Footer Mobile -->			
 </body>
 </html>
  <!-- Control Save Lock Screen -->

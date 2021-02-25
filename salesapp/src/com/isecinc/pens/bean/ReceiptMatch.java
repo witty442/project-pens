@@ -26,9 +26,9 @@ public class ReceiptMatch extends I_PO {
 	 * @param rst
 	 */
 	public ReceiptMatch(ResultSet rst) throws Exception {
-		setId(rst.getInt("RECEIPT_MATCH_ID"));
-		setReceiptById(rst.getInt("RECEIPT_BY_ID"));
-		setReceiptLineId(rst.getInt("RECEIPT_LINE_ID"));
+		setId(rst.getLong("RECEIPT_MATCH_ID"));
+		setReceiptById(rst.getLong("RECEIPT_BY_ID"));
+		setReceiptLineId(rst.getLong("RECEIPT_LINE_ID"));
 		setPaidAmount(rst.getInt("PAID_AMOUNT"));
 
 		setDisplayLabel();
@@ -39,41 +39,41 @@ public class ReceiptMatch extends I_PO {
 	}
 
 	/** RECEIPT_MATCH_ID */
-	private int id;
+	private long id;
 
 	/** RECEIPT_BY_ID */
-	private int receiptById;
+	private long receiptById;
 
 	/** RECEIPT_LINE_ID */
-	private int receiptLineId;
+	private long receiptLineId;
 
 	/** RECEIPT_ID */
-	private int receiptId;
+	private long receiptId;
 
 	/** PAID_AMOUNT */
 	private double paidAmount;
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public int getReceiptById() {
+	public long getReceiptById() {
 		return receiptById;
 	}
 
-	public void setReceiptById(int receiptById) {
+	public void setReceiptById(long receiptById) {
 		this.receiptById = receiptById;
 	}
 
-	public int getReceiptLineId() {
+	public long getReceiptLineId() {
 		return receiptLineId;
 	}
 
-	public void setReceiptLineId(int receiptLineId) {
+	public void setReceiptLineId(long receiptLineId) {
 		this.receiptLineId = receiptLineId;
 	}
 
@@ -85,11 +85,11 @@ public class ReceiptMatch extends I_PO {
 		this.paidAmount = paidAmount;
 	}
 
-	public int getReceiptId() {
+	public long getReceiptId() {
 		return receiptId;
 	}
 
-	public void setReceiptId(int receiptId) {
+	public void setReceiptId(long receiptId) {
 		this.receiptId = receiptId;
 	}
 

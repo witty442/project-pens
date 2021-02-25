@@ -7,7 +7,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 
-import com.isecinc.pens.inf.helper.EnvProperties;
 
 public class DBCPConnectionProvider {
 

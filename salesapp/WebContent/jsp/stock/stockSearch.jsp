@@ -16,7 +16,7 @@
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>
 <%@page import="com.isecinc.pens.init.InitialReferences"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="java.util.ArrayList"%>
 <jsp:useBean id="stockForm" class="com.isecinc.pens.web.stock.StockForm" scope="request" />
 <%

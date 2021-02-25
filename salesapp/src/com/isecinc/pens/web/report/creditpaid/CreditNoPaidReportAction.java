@@ -20,9 +20,10 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.bean.References;
 import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Detailed Sales Report Action.
@@ -41,7 +42,7 @@ public class CreditNoPaidReportAction extends I_ReportAction<CreditPaidReport>{
 		try {
 			if(Utils.isNull(request.getParameter("action")).equals("new")){
 			   CreditPaidReport bean = new CreditPaidReport();
-			   bean.setOrderDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			   bean.setOrderDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			   reportForm.setBean(bean);
 			}
 		} catch (Exception e) {

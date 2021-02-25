@@ -10,8 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.Utils;
+import com.mchange.v2.sql.SqlUtils;
+import com.pens.util.EnvProperties;
+import com.pens.util.SQLHelper;
+import com.pens.util.Utils;
 
 
 public class AdminConsoleServlet  extends HttpServlet{
@@ -127,10 +129,10 @@ public class AdminConsoleServlet  extends HttpServlet{
 				
 				 if( !q1.equals("")){
 				    System.out.println("Query");
-				    resultQ1 =  Utils.excQuery(q1);
+				    resultQ1 =  SQLHelper.excQuery(q1);
 				 } 
 				 if( !q2.equals("")){
-					 resultQ2 =  Utils.excQuery(q2);
+					 resultQ2 =  SQLHelper.excQuery(q2);
 				 }
 				 request.getSession().setAttribute("q1", q1);
 				 request.getSession().setAttribute("q2", q2);
@@ -151,7 +153,7 @@ public class AdminConsoleServlet  extends HttpServlet{
 				System.out.println("eSQL:"+eSQL);
 				
 			    if( !eSQL.equals("")){
-			    	eOutput =  Utils.excUpdate(eSQL);
+			    	eOutput =  SQLHelper.excUpdate(eSQL);
 			    	
 			    	System.out.println("eOutput:"+eOutput);
 			    }	

@@ -2,7 +2,6 @@ package com.isecinc.pens.inf.helper;
 
 import java.io.BufferedReader;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -14,10 +13,14 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
+import com.isecinc.pens.bean.ColumnBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.ColumnBean;
-import com.isecinc.pens.inf.bean.TableBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
+import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 public class ExportHelper {
 
@@ -47,8 +50,8 @@ public class ExportHelper {
 		}
 	}
 	
-	public static  LinkedHashMap<String,TableBean> initExportConfig(String path,String controlFileName,Connection conn,String transactionType,User userBean,String requestTable)throws Exception {
-		logger.debug("Init table Config");
+	public static  LinkedHashMap<String,TableBean> initExportConfig(String path,String controlFileName,Connection conn,User userBean)throws Exception {
+		logger.debug("Init table Config Sales:"+userBean.getCode());
 		BufferedReader br = FileUtil.getBufferReaderFromClassLoader(path+controlFileName); // Seq, Procedure, Source, Destination
 		LinkedHashMap<String,TableBean>  tableMap = new LinkedHashMap<String,TableBean> ();
 		try {
@@ -79,7 +82,7 @@ public class ExportHelper {
 								    //Sale App To Oracle
 									tableBean.setExportPath(EnvProperties.getInstance().getProperty("path.master.sales.out"));
 								}
-							// Tansaction Type
+							// Transaction Type
 							}else{
 								if( Utils.isNull(tableBean.getSource()).equalsIgnoreCase(Constants.TYPE_SALES) && Utils.isNull(tableBean.getDestination()).equalsIgnoreCase(Constants.TYPE_CENTER)){
 									//From Pens center to Sale App
@@ -93,14 +96,11 @@ public class ExportHelper {
 							/** Gen File Name **/
 							tableBean.setFileFtpNameFull(ExportHelper.genFileName(tableBean,userBean));
 							
-							boolean canAccess = isCanAccess(userBean, tableBean);
+							boolean canAccess = true;//isCanAccess(userBean, tableBean);
 							
-							logger.debug("tableName:"+tableBean.getTableName()+",userRole:"+userBean.getType()+",canAccess:"+canAccess+",transType:"+transactionType+"");
-//                          logger.debug("requestTable:"+requestTable+",transactionType:"+tableBean.getTransactionType());
-                            
-							if(    ( Utils.isNull(requestTable).equals(tableBean.getTableName()) || Utils.isNull(requestTable).equals(""))
-								&&	canAccess 
-								&& (transactionType.equals(tableBean.getTransactionType())) ){
+							//logger.debug("tableName:"+tableBean.getTableName()+",userRole:"+userBean.getType()+",canAccess:"+canAccess);
+                           
+							if( canAccess){
 							    
 								logger.debug("CanExport :"+tableBean.getTableName());
 								
@@ -202,7 +202,7 @@ public class ExportHelper {
 	}
 	
 	public static  List<ColumnBean> initColumn(TableBean tableBean) throws Exception {
-		String pathControl ="inf-config/table-mapping-export/";
+		String pathControl ="inf-config/config-all-export/";
         return initColumn(pathControl,tableBean);
 	}
 	public static  List<ColumnBean> initColumn(String path ,TableBean tableBean) throws Exception {
@@ -326,7 +326,7 @@ public class ExportHelper {
 	
 	public static String genFileName(TableBean tableBean,User user) throws Exception{
 		String strGen = "";
-		String dateStr = Utils.format(new Date(), "yyyyMMddHHmm");
+		String dateStr = DateUtil.format(new Date(), "yyyyMMddHHmm");
 
 		if(tableBean.getTransactionType().equals(Constants.TRANSACTION_MASTER_TYPE)){
 			if("CUST".equalsIgnoreCase(tableBean.getFileFtpName())){
@@ -349,7 +349,7 @@ public class ExportHelper {
 	
 	public static String genFileNameMTrip(TableBean tableBean,User user) throws Exception{
 		String strGen = "";
-		String dateStr = Utils.format(new Date(), "yyyyMMddHHmm");
+		String dateStr = DateUtil.format(new Date(), "yyyyMMddHHmm");
 		strGen = dateStr+"-"+user.getUserName()+"-"+tableBean.getFileFtpName()+".txt";
 		return strGen;
 	}
@@ -417,11 +417,11 @@ public class ExportHelper {
 				
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
-					   dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), colBean.getDefaultValue());
+					   dataConvertStr = DateUtil.format(rs.getDate(colBean.getColumnName()), colBean.getDefaultValue());
 					}
 				}else{
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
-				       dataConvertStr = Utils.format(rs.getDate(colBean.getColumnName()), "ddMMyyyy");
+				       dataConvertStr = DateUtil.format(rs.getDate(colBean.getColumnName()), "ddMMyyyy");
 					}
 				}
 			}else if(colBean.getColumnType().equalsIgnoreCase("INT")){
@@ -455,34 +455,34 @@ public class ExportHelper {
 			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP")){
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
-					   dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss");
+					   dataConvertStr = DateUtil.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss");
 					}
 				}else{
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
-				      dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss");
+				      dataConvertStr = DateUtil.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmmss");
 					}
 				}
 			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP_NO_SS")){
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
-					   dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmm");
+					   dataConvertStr = DateUtil.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmm");
 					}
 				}else{
 					if( !Utils.isNull(rs.getString(colBean.getColumnName())).equals("")){
-				       dataConvertStr = Utils.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmm");
+				       dataConvertStr = DateUtil.format(rs.getTimestamp(colBean.getColumnName()), "ddMMyyyyHHmm");
 					}
 				}
 			}else if(colBean.getColumnType().equalsIgnoreCase("TIMESTAMP_LONG_NO_SS")){
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
-					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
+					 dataConvertStr = DateUtil.stringValueSpecial2(rs.getLong(colBean.getColumnName()),DateUtil.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
 				}else{
-					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
+					 dataConvertStr = DateUtil.stringValueSpecial2(rs.getLong(colBean.getColumnName()),DateUtil.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
 				}
 			}else if(colBean.getColumnType().equalsIgnoreCase("LONG_TIMESTAMP_LONG_NO_SS")){
 				if(!"".equalsIgnoreCase(colBean.getDefaultValue())){
-					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HHmmss_WITHOUT_SLASH,Locale.US);
+					 dataConvertStr = DateUtil.stringValueSpecial2(rs.getLong(colBean.getColumnName()),DateUtil.DD_MM_YYYY_HHmmss_WITHOUT_SLASH,Locale.US);
 				}else{
-					 dataConvertStr = Utils.stringValueSpecial2(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HHmmss_WITHOUT_SLASH,Locale.US);
+					 dataConvertStr = DateUtil.stringValueSpecial2(rs.getLong(colBean.getColumnName()),DateUtil.DD_MM_YYYY_HHmmss_WITHOUT_SLASH,Locale.US);
 				}
 			}else{
 				 dataConvertStr = Utils.isNull(rs.getString(Utils.removeStringEnter(colBean.getColumnName())));
@@ -497,7 +497,7 @@ public class ExportHelper {
 		String dataConvertStr = "";
 		try{
 		   if(Utils.isNull(colBean.getExternalFunction()).equals("CONVERT_LONG_TO_TIMESTAMP")){
-			   dataConvertStr = Utils.stringValueSpecial(rs.getLong(colBean.getColumnName()),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
+			   dataConvertStr = DateUtil.stringValueSpecial(rs.getLong(colBean.getColumnName()),DateUtil.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Locale.US);
 			   
 			}else if(Utils.isNull(colBean.getExternalFunction()).equals("GET_USER_ID")){	
 				logger.debug("User:"+user.getUserName()+":id:"+user.getId());

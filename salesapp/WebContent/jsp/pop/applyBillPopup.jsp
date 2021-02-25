@@ -1,4 +1,16 @@
-<%@page import="util.SessionGen"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.SIdUtils"%>
+<%@page import="java.util.Locale"%>
+<%@page import="com.isecinc.pens.SystemProperties"%>
+<%@page import="com.isecinc.pens.bean.User"%>
+<%@page import="java.util.List"%>
+<%@page import="com.isecinc.pens.bean.Order"%>
+<%@page import="com.isecinc.pens.model.MOrder"%>
+<%@page import="com.isecinc.pens.model.MReceiptLine"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.text.DecimalFormat"%>
+<%@page import="com.isecinc.pens.model.MCreditNote"%>
+<%@page import="com.isecinc.pens.bean.CreditNote"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
@@ -8,33 +20,42 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%
-String selected = request.getParameter("selected");
-if(selected==null)selected="";
+try{
+String selectedInvoiceId = Utils.isNull(request.getParameter("selectedInvoiceId"));
 String recAmt = request.getParameter("rec");
 String type = request.getParameter("type");
-type= new String(type.getBytes("ISO8859_1"), "TIS-620");
+//type= new String(type.getBytes("ISO8859_1"), "TIS-620");
 String seed = request.getParameter("seed");
 String row = request.getParameter("row");
 String custId = request.getParameter("cust");
-
+String oracleCustId = request.getParameter("oracleCustId");
+String billToAddressId = request.getParameter("billToAddressId");
 String writeOff = request.getParameter("writeOff");
+
+System.out.println("oracleCustId="+oracleCustId);
+System.out.println("billToAddressId="+billToAddressId);
+System.out.println("selectedInvoiceId="+selectedInvoiceId);
 
 User user = (User) session.getAttribute("user");
 
 List<Order> zero = new ArrayList<Order>();
+  
+List<Order> invoices = new MOrder().lookUpByOrderAR(user.getId(),Utils.convertToLong(oracleCustId),Utils.convertToInt(billToAddressId)
+		,user.getOrderType().getKey(),"in",selectedInvoiceId);
 
-List<Order> orders = new MOrder().lookUp(user.getId(),Integer.parseInt(custId),user.getOrderType().getKey(),"in",selected);
-for(Order r : orders){
+
+for(Order r : invoices){
 	r.setCreditAmount(new MReceiptLine().calculateCreditAmount(r)); 
 	if(r.getCreditAmount()==0)
 		zero.add(r);
 }
+
 //remove zero credit
 for(Order r : zero){
 	//orders.remove(r);
 }
 
-pageContext.setAttribute("orders",orders,PageContext.PAGE_SCOPE);
+pageContext.setAttribute("invoices",invoices,PageContext.PAGE_SCOPE);
 pageContext.setAttribute("seed",seed,PageContext.PAGE_SCOPE);
 
 //CreditNote...
@@ -42,34 +63,19 @@ String cns = request.getParameter("cns");
 List<CreditNote> creditNotes = new MCreditNote().lookUpForPaid(cns,custId);
 pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 
-%>
-<%@page import="java.util.Locale"%>
-<%@page import="com.isecinc.pens.SystemProperties"%>
 
-<%@page import="com.isecinc.pens.bean.User"%>
-<%@page import="java.util.List"%>
-<%@page import="com.isecinc.pens.bean.Order"%>
-<%@page import="com.isecinc.pens.model.MOrder"%>
-<%@page import="com.isecinc.pens.model.MReceiptLine"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="java.text.DecimalFormat"%>
-<%@page import="com.isecinc.pens.model.MCreditNote"%>
-<%@page import="com.isecinc.pens.bean.CreditNote"%><html>
+%>
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME %>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
+<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SIdUtils.getInstance().getIdSession()%>" type="text/css" />
 <style type="text/css">
-<!--
-.style1 {color: #004a80}
--->
 </style>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession()%>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SIdUtils.getInstance().getIdSession()%>"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-3.4.1.min.js"></script>
 <script type="text/javascript">
 	var prepaid=0;
 	var gpp=0;
@@ -82,7 +88,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		//alert("prepaid:"+prepaid);
 
 		//get paid at opener
-		var orders = window.opener.document.getElementsByName('bill.orderId');
+		var invoices = window.opener.document.getElementsByName('bill.invoiceId');
 		var netamts=window.opener.document.getElementsByName('bill.netAmt');
 		var creditamts=window.opener.document.getElementsByName('bill.creditAmt');
 		var paidamts = window.opener.document.getElementsByName('bill.paidAmt');
@@ -93,18 +99,18 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 
 		//local variable
 		var tbl =document.getElementById('tblBillToApply');
-		var bills = document.getElementsByName('orderId');
+		var bills = document.getElementsByName('invoiceId');
 		var nets = document.getElementsByName('netAmount');
 		var crds = document.getElementsByName('creditAmount');
 		var paids2 = document.getElementsByName('paidAmount');
 		var remains = document.getElementsByName('remainAmount');
 		var chk = document.getElementsByName('chkReceipts');
 
-		for(i=0;i<orders.length;i++){
-			//alert(orders[i].value);
+		for(i=0;i<invoices.length;i++){
+			//alert(invoices[i].value);
 			//alert(paids[i].value);
 			for(j=0;j<bills.length;j++){
-				if(orders[i].value==bills[j].value){
+				if(invoices[i].value==bills[j].value){
 					//crds[j].value = Number(nets[j].value)-Number(paids[i].value);
 					crds[j].value = Number(creditamts[i].value) - Number(paidamts[i].value);
 					crds[j].value =(Number(crds[j].value).toFixed(2));
@@ -151,7 +157,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		var cnchk = document.getElementsByName('chkCNs');
 
 		for(i=0;i<cns.length;i++){
-			//alert(orders[i].value);
+			//alert(invoices[i].value);
 			//alert(paids[i].value);
 			for(j=0;j<cnbills.length;j++){
 				if(cns[i].value==cnbills[j].value){
@@ -204,7 +210,16 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		totalCNAmount = getTotalCNAmount();
 		calculateRemain();
 	}
-
+	
+	function chkAllFlag(chkAll){
+		var objchk = document.getElementsByName('chkReceipts');
+		for (var c = 0; c < objchk.length; c++) {
+			objchk[c].checked = chkAll.checked;
+			
+			changeReceiptText(c);
+		}	
+	}
+	
 	function changeReceiptText(row) {
 		var objchk = document.getElementsByName('chkReceipts');
 		var objtxt = document.getElementsByName('paidAmount');
@@ -249,6 +264,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 				allPaid+=Number(objtxt[i].value);
 				if(Number(objtxt[i].value)>Number(objcdr[i].value)){
 					alert("จำนวนเงินไม่ถูกต้อง จำนวนเงินรับชำระมากกว่า จำนวนเงินค้างชำระ");
+					objtxt[i].value = objcdr[i].value;
 					objtxt[i].focus();
 					return;
 				}
@@ -264,8 +280,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		for (i = 0; i < objtxtCN.length; i++) {
 			if (objtxtCN[i].value != '') {
 				allCNPaid+=Number(objtxtCN[i].value);
-				if(Number(objcdrCN[i].value)<0)
-				{
+				if(Number(objcdrCN[i].value)<0){
 					//neg value
 					if(Number(objtxtCN[i].value)>0){
 						alert("ห้ามใส่จำนวนเงินมากกว่า 0");
@@ -274,6 +289,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 					}
 					if(Number(objtxtCN[i].value)<Number(objcdrCN[i].value)){
 						alert("จำนวนเงินไม่ถูกต้อง จำนวนเงินรับชำระมากกว่า จำนวนเงินค้างชำระ");
+						objtxtCN[i].value = objcdrCN[i].value;
 						objtxtCN[i].focus();
 						return;
 					}
@@ -284,8 +300,9 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 						objtxtCN[i].focus();
 						return;
 					}
-					if(Number(objtxtCN[i].value)>Number(objcdrCN[i].value)){
+					if(Number(objtxtCN[i].value)> Number(objcdrCN[i].value)){
 						alert("จำนวนเงินไม่ถูกต้อง จำนวนเงินรับชำระมากกว่า จำนวนเงินค้างชำระ");
+						objtxtCN[i].value = objcdrCN[i].value;
 						objtxtCN[i].focus();
 						return;
 					}
@@ -327,7 +344,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 					return false;
 				}
 
-				allBillId+=','+document.getElementsByName('orderId')[i].value;
+				allBillId+=','+document.getElementsByName('invoiceId')[i].value;
 				allPaid+='|'+document.getElementsByName('paidAmount')[i].value;
 				totalPaid= eval(Number(totalPaid)+Number(document.getElementsByName('paidAmount')[i].value));
 			}
@@ -472,11 +489,15 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 		<th><bean:message key="Order.No" bundle="sysele"/></th>
 		<th><bean:message key="TotalAmount" bundle="sysele"/></th>
 		<th><bean:message key="Order.Behindhand" bundle="sysele"/></th>
-		<th><bean:message key="Order.Payment" bundle="sysele"/></th>
+		<th><bean:message key="Order.Payment" bundle="sysele"/> &nbsp;
+		   <input type="checkbox" id="chkAll" name="chkAll" onclick="chkAllFlag(this)"/>
+		</th>
 		<th><bean:message key="Amount" bundle="sysele"/></th>
-		<th><bean:message key="Product.Balance" bundle="sysele"/></th>
+		<th><bean:message key="Product.Balance" bundle="sysele"/>
+		
+		</th>
 	</tr>
-	<c:forEach var="results" items="${orders}" varStatus="rows">
+	<c:forEach var="results" items="${invoices}" varStatus="rows">
 		<c:choose>
 			<c:when test="${rows.index %2 == 0}">
 				<c:set var="tabclass" value="lineO"/>
@@ -489,7 +510,7 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 			<td>
 				${results.arInvoiceNo}
 				<input type="hidden" name="arInvoiceNo" value="${results.arInvoiceNo}">
-				<input type="hidden" name="orderId" value="${results.id}">
+				<input type="hidden" name="invoiceId" value="${results.invoiceId}">
 				<input type="hidden" name="salesOrderNo" value="${results.salesOrderNo}">
 				<input type="hidden" name="netAmount" value="${results.netAmount}">
 				<input type="hidden" name="creditAmount" value="${results.creditAmount}">
@@ -572,5 +593,11 @@ pageContext.setAttribute("creditnotes",creditNotes,PageContext.PAGE_SCOPE);
 <input type="hidden" id="billId" name="billId">
 <input type="hidden" id="addressRow" name="addressRow">
 <br/>
+
+<%
+}catch(Exception e){
+	e.printStackTrace();
+}
+%>
 </body>
 </html>

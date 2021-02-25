@@ -13,18 +13,19 @@ import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
+import com.pens.util.FileUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 public class MReceiptSummary {
 	/** Logger */
 	public static Logger logger = Logger.getLogger("PENS");
 	public static String amtDebug = "";
 	
-	public static double lookCreditAmtByCustomerId(int customerId) throws Exception {
+	public static double lookCreditAmtByCustomerId(long customerId) throws Exception {
 		Connection conn = null;
 		String creditDateFix = "";
 		try{
@@ -44,7 +45,7 @@ public class MReceiptSummary {
 		}
 	}
 	
-	public static double lookCreditAmtByCustomerId(Connection conn,int customerId ,String creditDateFix) throws Exception {
+	public static double lookCreditAmtByCustomerId(Connection conn,long customerId ,String creditDateFix) throws Exception {
         double totalCreditAmt = 0;
         String orderType  ="CR";
 		try{
@@ -65,7 +66,7 @@ public class MReceiptSummary {
 		return totalCreditAmt;
 	}
 	
-	private static double lookUpByOrderAR(Connection conn,int customerId, String orderType)
+	private static double lookUpByOrderAR(Connection conn,long customerId, String orderType)
 			throws Exception {
 		double creditAmt = 0;
 		PreparedStatement ps = null;
@@ -82,8 +83,8 @@ public class MReceiptSummary {
 			logger.debug("creditDateFix:"+creditDateFix);
 			String dateCheck = "";
 			if( !"".equalsIgnoreCase(creditDateFix)){
-				java.util.Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
+				java.util.Date d = DateUtil.parse(creditDateFix, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateCheck = "str_to_date('"+DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
 			}
 		
 			String whereCause = " select order_id, round(net_amount,2) as net_amount,ar_invoice_no from t_order where 1=1 \n";
@@ -139,7 +140,7 @@ public class MReceiptSummary {
 		return creditAmt;
     }
 	
-	private static double lookUpCNForReceipt(Connection conn,int customerId)  {
+	private static double lookUpCNForReceipt(Connection conn,long customerId)  {
 		double creditAmt = 0;
 		double creditAmtTemp = 0;
 		String whereCause = "";
@@ -207,8 +208,8 @@ public class MReceiptSummary {
 		String dateCheck = "";
 		try {
 			if( !"".equalsIgnoreCase(creditDateFix)){
-				Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
+				Date d = DateUtil.parse(creditDateFix, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				dateCheck = "str_to_date('"+DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
 			}
 			StringBuffer sql = new StringBuffer("");
 			

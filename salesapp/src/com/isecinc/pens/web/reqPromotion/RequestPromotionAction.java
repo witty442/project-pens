@@ -28,7 +28,6 @@ import com.isecinc.pens.bean.RequestPromotion;
 import com.isecinc.pens.bean.RequestPromotionCost;
 import com.isecinc.pens.bean.RequestPromotionLine;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MCustomer;
@@ -36,6 +35,8 @@ import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MRequestPromotion;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -177,7 +178,7 @@ public class RequestPromotionAction extends I_Action {
 			 
 			 //init Parametor By RequestPromotionType
 			 f.getRequestPromotion().setPriceListId((new MPriceList().getCurrentPriceList(user.getOrderType().getKey()).getId())+"");
-			 f.getRequestPromotion().setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			 f.getRequestPromotion().setRequestDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 f.getRequestPromotion().setUser(user);
 			 f.getRequestPromotion().setCanEdit(true);
 			 f.getRequestPromotion().setCanGenFile(false);

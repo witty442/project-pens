@@ -13,21 +13,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.Order;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
+import com.isecinc.pens.bean.MonitorItemDetailBean;
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
-import com.isecinc.pens.inf.bean.TableBean;
-import com.isecinc.pens.inf.exception.ExceptionHandle;
+import com.isecinc.pens.exception.ExceptionHandle;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.SequenceHelper;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * @author WITTY
@@ -43,6 +42,24 @@ public class InterfaceDAO {
 		// TODO Auto-generated method stub
 
 	}
+	public void updateTaskStatus(BigDecimal transactionId,BigDecimal monitorId,String status) {
+    	Connection conn = null;
+    	try {
+           InterfaceDAO dao = new InterfaceDAO();
+           conn = DBConnection.getInstance().getConnection();
+           dao.updateControlStatusMonitor(conn,transactionId,monitorId,status);
+        } catch (Exception e) {
+        	e.printStackTrace();
+        }finally{
+        	try{
+	        	if(conn != null){
+	        	   conn.close();conn=null;
+	        	}
+        	}catch(Exception e){
+        		e.printStackTrace();
+        	}
+        }
+    }
 	
 	 /** c_monitor **/
     public void updateControlMonitor(BigDecimal transactionId,String type) {
@@ -85,10 +102,10 @@ public class InterfaceDAO {
 			  
 			logger.debug("SQL:"+sql);
 			if(model.getTransactionId() ==null){
-				   model.setTransactionId(new BigDecimal(SequenceHelper.getNextValue("monitor")));
+				model.setTransactionId(SequenceProcessAll.getIns().getNextValue("monitor.transaction_id"));
 			}
 			if(model.getMonitorId() ==null){
-				   model.setMonitorId(new BigDecimal(SequenceHelper.getNextValue("monitor_2")));
+				model.setMonitorId(SequenceProcessAll.getIns().getNextValue("monitor.monitor_id"));
 			}
 			logger.debug("id:"+model.getTransactionId());
 
@@ -145,7 +162,7 @@ public class InterfaceDAO {
 			//logger.debug("SQL:"+sql);
 			//logger.debug("SucessCound:"+model.getSuccessCount());
 			if(model.getId() ==null){
-				 model.setId(new BigDecimal(SequenceHelper.getNextValue("monitor_item")));
+				 model.setId(SequenceProcessAll.getIns().getNextValue("monitor_item.id"));
 			}
 			
 			int index = 0;
@@ -180,34 +197,34 @@ public class InterfaceDAO {
 		return model;
 	}
 	
-	public MonitorItemBean insertMonitorItemDetail(Connection conn ,MonitorItemDetailBean[] monitorItemDetailBean ) throws Exception {
+	public MonitorItemBean insertMonitorItemDetail(Connection conn ,MonitorItemBean modelItem,MonitorItemDetailBean[] monitorItemDetailBean ) throws Exception {
 		PreparedStatement psIns = null;
 		ResultSet rs =null;
 		int index = 0;
 		int countReceord = 0;
+		BigDecimal id = null;
 		try {
 			logger.debug("*** insertMonitorItemDetail **********");
 			
-			String sql = "INSERT INTO monitor_item_detail(" +
-			" MONITOR_ITEM_ID," +
-			" customer_code ," +
-			" customer_name ," +
-			" code  ," +
-			" type ," +
-			" amount )" +
-			" VALUES ((select max(id) from monitor_item),?,?,?,?,?) ";
+			String sql = "INSERT INTO pensonline.monitor_item_detail(" +
+			" ID, MONITOR_ITEM_ID," +
+			" customer_code ,customer_name ," +
+			" code , type , amount ) " +
+			" VALUES (?,?,?,?,?,?,?) ";
 			  
 			logger.debug("SQL:"+sql);
-			
-			
+
 			
 			if( monitorItemDetailBean != null && monitorItemDetailBean.length >0){
 				psIns = conn.prepareStatement(sql);
 				for(int i=0;i<monitorItemDetailBean.length;i++){
 					
 					MonitorItemDetailBean item = monitorItemDetailBean[i];  
+					id = SequenceProcessAll.getIns().getNextValue("monitor_item_detail.id");
 					
 					logger.info("customeName:"+item.getCustomerName());
+					psIns.setBigDecimal(++index, id);//id running
+					psIns.setBigDecimal(++index, modelItem.getId());//monitor_item.monitor_item_id
 				    psIns.setString(++index, item.getCustomerCode());
 				    psIns.setString(++index, item.getCustomerName());
 				    psIns.setString(++index, item.getCode());
@@ -506,7 +523,7 @@ public class InterfaceDAO {
 	public void updateControlMonitor(Connection conn,BigDecimal transactionId,String type) throws Exception {
 		PreparedStatement ps = null;
 		try {
-			String sql = "UPDATE c_monitor SET  transaction_id = ? WHERE action = ?";
+			String sql = "UPDATE pensonline.c_monitor SET  transaction_id = ? WHERE action = ?";
 			//logger.info("SQL:"+sql);
 			int index = 0;
 			ps = conn.prepareStatement(sql);
@@ -514,10 +531,12 @@ public class InterfaceDAO {
 			ps.setString(++index,type);
 			
 			int r = ps.executeUpdate();
+			ps.close();
 			if(r==0){
 				//insert 
-				sql = "insert into c_monitor(action,transaction_id)values(?,?)";
+				sql = "insert into pensonline.c_monitor(action,transaction_id)values(?,?)";
 				index = 0;
+				
 				ps = conn.prepareStatement(sql);
 				ps.setString(++index,type);
 				ps.setBigDecimal(++index, transactionId);
@@ -760,10 +779,10 @@ public class InterfaceDAO {
 			   sql.append(" and monitor.create_user LIKE '%"+mc.getUserName()+"%' \n");
 			}
             if( !Utils.isNull(mc.getSubmitDateFrom()).equals("")){
-            	sql.append(" and date(monitor.submit_date) >= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
+            	sql.append(" and date(monitor.submit_date) >= STR_TO_DATE('"+DateUtil.format(DateUtil.parseToBudishDate(mc.getSubmitDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
 			}
             if( !Utils.isNull(mc.getSubmitDateTo()).equals("")){
-            	sql.append(" and date(monitor.submit_date) <= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
+            	sql.append(" and date(monitor.submit_date) <= STR_TO_DATE('"+DateUtil.format(DateUtil.parseToBudishDate(mc.getSubmitDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
 			}
             if( !Utils.isNull(mc.getRequestTable()).equals("")){
             	sql.append(" and monitor_item.table_name LIKE '%"+mc.getRequestTable()+"%' \n");
@@ -880,10 +899,10 @@ public class InterfaceDAO {
 			   sql.append(" and monitor.create_user LIKE '%"+mc.getUserName()+"%' \n");
 			}
             if( !Utils.isNull(mc.getSubmitDateFrom()).equals("")){
-            	sql.append(" and date(monitor.submit_date) >= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
+            	sql.append(" and date(monitor.submit_date) >= STR_TO_DATE('"+DateUtil.format(DateUtil.parseToBudishDate(mc.getSubmitDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
 			}
             if( !Utils.isNull(mc.getSubmitDateTo()).equals("")){
-            	sql.append(" and date(monitor.submit_date) <= STR_TO_DATE('"+Utils.format(Utils.parseToBudishDate(mc.getSubmitDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
+            	sql.append(" and date(monitor.submit_date) <= STR_TO_DATE('"+DateUtil.format(DateUtil.parseToBudishDate(mc.getSubmitDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");	
 			}
             if( !Utils.isNull(mc.getRequestTable()).equals("")){
             	sql.append(" and monitor_item.table_name LIKE '%"+mc.getRequestTable()+"%' \n");
@@ -1197,7 +1216,7 @@ public class InterfaceDAO {
   * 
   * Store LastFileName import for Check new import 
   */
- public  LinkedHashMap<String ,TableBean> mapFileNameLastImportToTableMap(Connection conn,LinkedHashMap<String ,TableBean> configMap,User user ,boolean importAll) throws Exception{
+ public  LinkedHashMap<String ,TableBean> mapFileNameLastImportToTableMap(Connection conn,LinkedHashMap<String ,TableBean> configMap,boolean importAll) throws Exception{
 	PreparedStatement ps =null;
 	ResultSet rs = null;
 	try{
@@ -1213,7 +1232,6 @@ public class InterfaceDAO {
 		sql.append("    and monitor_item.status <> "+Constants.STATUS_FAIL+" \n");
 		sql.append("    and monitor.monitor_id = monitor_item.monitor_id \n");
 		sql.append("    and monitor.type ='"+Constants.TYPE_IMPORT+"' \n");
-		sql.append("    and monitor.create_user Like '%"+user.getUserName()+"%' \n");
 		sql.append("    and monitor.transaction_type ='"+Constants.TRANSACTION_MASTER_TYPE+"' \n");
 		if(importAll){
 		   sql.append("      and monitor_item.file_name Like '%-ALL%' \n");
@@ -1237,7 +1255,6 @@ public class InterfaceDAO {
 		sql.append("    and monitor_item.status <> "+Constants.STATUS_FAIL+" \n");
 		sql.append("    and monitor.monitor_id = monitor_item.monitor_id \n");
 		sql.append("    and monitor.type ='"+Constants.TYPE_IMPORT+"' \n");
-		sql.append("    and monitor.create_user Like '%"+user.getUserName()+"%' \n");
 		sql.append("    and monitor.transaction_type in('"+Constants.TRANSACTION_UTS_TRANS_TYPE+"','"+Constants.TRANSACTION_TRANS_TYPE+"','"+Constants.TRANSACTION_WEB_MEMBER_TYPE+"') \n");
 		if(importAll){
 		   sql.append("     and monitor_item.file_name Like '%-ALL%' \n");

@@ -6,7 +6,6 @@
 <%@page import="com.isecinc.pens.inf.dao.InterfaceDAO" %>
 
 <%@page import="com.isecinc.pens.inf.helper.*" %>
-<%@page import="com.isecinc.pens.inf.bean.*" %>
 <%
 String threadName = (String) request.getParameter("threadName");
 try{

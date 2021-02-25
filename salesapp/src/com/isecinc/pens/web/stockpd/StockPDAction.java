@@ -24,12 +24,13 @@ import com.isecinc.pens.bean.MoveOrder;
 import com.isecinc.pens.bean.MoveOrderLine;
 import com.isecinc.pens.bean.StockPD;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MMoveOrder;
 import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.model.MStockPD;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -141,7 +142,7 @@ public class StockPDAction extends I_Action {
 			 String moveOrderType = Utils.isNull(request.getParameter("moveOrderType"));
 			 
 			 //init Parametor By moveOrderType
-			 f.getStockPD().setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			 f.getStockPD().setRequestDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			 f.getStockPD().setSalesCode(user.getCode());
 			 f.getStockPD().setCanEdit(true);
 			//init priceListId by User Type

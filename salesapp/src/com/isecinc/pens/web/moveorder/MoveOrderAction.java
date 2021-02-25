@@ -23,12 +23,13 @@ import com.isecinc.pens.bean.BillPlan;
 import com.isecinc.pens.bean.MoveOrder;
 import com.isecinc.pens.bean.MoveOrderLine;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MMoveOrder;
 import com.isecinc.pens.model.MPriceList;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -151,7 +152,7 @@ public class MoveOrderAction extends I_Action {
 			 String moveOrderType = Utils.isNull(request.getParameter("moveOrderType"));
 			 
 			 //init Parametor By moveOrderType
-			 moveOrderForm.getMoveOrder().setRequestDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			 moveOrderForm.getMoveOrder().setRequestDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 			 moveOrderForm.getMoveOrder().setSalesCode(user.getCode());
 			 moveOrderForm.getMoveOrder().setMoveOrderType(moveOrderType);
 			 moveOrderForm.getMoveOrder().setMoveOrderTypeLabel(MMoveOrder.MOVE_ORDER_TYPE_MAP.get(moveOrderType));
@@ -456,10 +457,10 @@ public class MoveOrderAction extends I_Action {
         
     	if("".equals(m.getRequestNumber())){
     		//create 
-    		m.setCreatedLong(Utils.getCurrentTimestampLong());
+    		m.setCreatedLong(DateUtil.getCurrentTimestampLong());
     	}else{
     		//update
-    		m.setUpdatedLong(Utils.getCurrentTimestampLong());
+    		m.setUpdatedLong(DateUtil.getCurrentTimestampLong());
     	}
     	m.setOrganizationId(MMoveOrder.ORG_ID_DEFAULT);	//84
     	
@@ -487,7 +488,7 @@ public class MoveOrderAction extends I_Action {
     	m.setUserId(user.getId()+"");
     	m.setCreatedBy(user.getUserName());
     	m.setUpdateBy(user.getUserName());
-    	m.setUpdatedLong(Utils.getCurrentTimestampLong());
+    	m.setUpdatedLong(DateUtil.getCurrentTimestampLong());
     	
     	if( !Utils.isNull(mForm.getLineNoDeleteArray()).equals("")){
     		String[] lineNoDeleteSplit = Utils.isNull(mForm.getLineNoDeleteArray()).split("\\,");
@@ -512,7 +513,7 @@ public class MoveOrderAction extends I_Action {
     	m.setStatus(MMoveOrder.STATUS_VOID);//Cancel MoveOrder
     	m.setUserId(user.getId()+"");
     	m.setUpdateBy(user.getUserName());
-    	m.setUpdatedLong(Utils.getCurrentTimestampLong());
+    	m.setUpdatedLong(DateUtil.getCurrentTimestampLong());
     	
 		return m;
 	}
@@ -521,7 +522,7 @@ public class MoveOrderAction extends I_Action {
     	MoveOrder m = mForm.getMoveOrder();
     	logger.debug("moveOrder:"+mForm.getMoveOrder().getSalesCode()+","+mForm.getMoveOrder().getPdCode()+",");
     	m.setUserId(user.getId()+"");
-    	m.setPrintDateLong(Utils.getCurrentTimestampLong());
+    	m.setPrintDateLong(DateUtil.getCurrentTimestampLong());
     	
 		return m;
 	}

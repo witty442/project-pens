@@ -11,9 +11,9 @@ import org.apache.struts.action.ActionForm;
 
 import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.report.detailedsales.DetailedSalesReport;
 import com.isecinc.pens.report.detailedsales.DetailedSalesReportProcess;
+import com.pens.util.Utils;
 
 /**
  * CreditControlReportAction

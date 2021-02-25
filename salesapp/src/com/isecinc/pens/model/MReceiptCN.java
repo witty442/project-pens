@@ -10,8 +10,8 @@ import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptCN;
-import com.isecinc.pens.process.SequenceProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MAddress Class
@@ -54,7 +54,7 @@ public class MReceiptCN extends I_Model<ReceiptCN> {
 	public boolean save(ReceiptCN receiptCN, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (receiptCN.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt_cn.receipt_cn_id").intValue();
 		} else {
 			id = receiptCN.getId();
 		}

@@ -16,12 +16,13 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.TransferBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MTransfer;
 import com.isecinc.pens.web.externalprocess.ProcessAfterAction;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -79,7 +80,7 @@ public class TransferAction extends I_Action {
 		User user = (User) request.getSession(true).getAttribute("user");
 		MTransfer mDAO = new MTransfer();
 		Connection conn = null;
-		Date currentDate = Utils.parse(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH), Utils.DD_MM_YYYY_WITH_SLASH);
+		Date currentDate = DateUtil.parse(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH), DateUtil.DD_MM_YYYY_WITH_SLASH);
 		try {
 			 logger.debug("prepare action:"+action);
 			 String createDate = Utils.isNull(request.getParameter("createDate"));
@@ -87,7 +88,7 @@ public class TransferAction extends I_Action {
 			 
 			 if("new".equalsIgnoreCase(action)){
 				TransferBean mCri = new TransferBean();
-				mCri.setCreateDate(Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				mCri.setCreateDate(DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				mCri.setUserId(user.getId()+"");
 				mCri.setCanEdit(true);
 				
@@ -117,7 +118,7 @@ public class TransferAction extends I_Action {
 				List<TransferBean> transferList = mDAO.searchTransferList(conn,mCri,true,0,0);
 				
 				//compare createDate >= currentDate the canEdit
-				Date createDateValid = Utils.parse(mCri.getCreateDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date createDateValid = DateUtil.parse(mCri.getCreateDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				if( createDateValid.equals(currentDate) || createDateValid.after(currentDate)){
 				   mCri.setCanEdit(true);
 				}
@@ -131,7 +132,7 @@ public class TransferAction extends I_Action {
 				 List<TransferBean> transferList = mDAO.searchTransferList(conn,mCri,true,0,0);
 				 
 				//compare createDate >= currentDate the canEdit
-				 Date createDateValid = Utils.parse(mCri.getCreateDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				 Date createDateValid = DateUtil.parse(mCri.getCreateDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				 if( createDateValid.equals(currentDate) || createDateValid.after(currentDate)){
 				    mCri.setCanEdit(true);
 				 }

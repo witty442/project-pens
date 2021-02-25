@@ -4,7 +4,7 @@
 <%@page import="com.isecinc.pens.web.sales.OrderForm"%>
 <%@page import="java.util.Date"%>
 <%@page import="com.pens.util.DateToolsUtil"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.core.bean.References"%>

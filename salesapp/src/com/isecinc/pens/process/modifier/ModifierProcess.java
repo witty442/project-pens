@@ -24,8 +24,6 @@ import com.isecinc.pens.bean.ProductCategory;
 import com.isecinc.pens.bean.ProductPrice;
 import com.isecinc.pens.bean.Qualifier;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MModifier;
 import com.isecinc.pens.model.MModifierAttr;
@@ -40,6 +38,8 @@ import com.pens.util.ControlCode;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 /**
  * Modifier Process Class

@@ -8,8 +8,8 @@ import java.util.List;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.Qualifier;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 /**
  * MQualifier Class

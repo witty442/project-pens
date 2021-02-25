@@ -15,6 +15,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.InetAddress;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -96,6 +99,37 @@ public class FileUtil {
 	       throw e;
 	    }
 	}
+	public static String readFile(String fileName,String encoding)  {
+	    
+		   InputStream is = null;
+		   Writer writer = new StringWriter();
+	       try{
+	    	   is = new FileInputStream(fileName);
+	           Reader reader = null;
+		       char[] buffer = new char[1024];
+	            try {
+	            	reader = new BufferedReader(new InputStreamReader(is,encoding));
+	                int n;
+	                while ((n = reader.read(buffer)) != -1) {
+	                     writer.write(buffer, 0, n);
+	                 }
+	            }finally {
+	                if(is != null){
+	                	is.close();
+	                	is =null;
+	                }
+	                if(reader != null){
+	                  reader.close();
+	                  reader = null;
+	                }
+	                writer.flush();
+	            }
+		            
+	       }catch(Exception e){
+	    	   logger.error(e.getMessage(),e);
+	       }
+	       return writer.toString();
+	    }
 	public static byte[] readFileToByte(InputStream is) throws IOException{
 		byte[] bytes = null;
 		try {
@@ -454,16 +488,4 @@ public class FileUtil {
 		return "";
 	}
 	
-	public static boolean isFileExist(String pathFileName){
-		boolean ex = false;
-		try{
-			File f = new File(pathFileName);
-			if(f.exists() && !f.isDirectory()) { 
-			    ex = true;
-			}
-		}catch(Exception e){
-			logger.error(e.getMessage(),e);
-		}
-		return ex;
-	}
 }

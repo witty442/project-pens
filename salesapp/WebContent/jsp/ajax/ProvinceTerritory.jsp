@@ -5,12 +5,13 @@
 <%@page import="com.isecinc.pens.model.MProvince"%>
 <%
 String refId = (String)request.getParameter("refId");
-//System.out.println(refId);
+System.out.println(refId);
 List<Province> provinces = new ArrayList<Province>();
 try{
 	if(refId != null && refId.length()>0){
 		provinces = new MProvince().lookUp(Integer.parseInt(refId));
 	}
+	System.out.println("provinces:"+provinces.size());
 }catch(Exception e){
 	e.printStackTrace();
 }finally{

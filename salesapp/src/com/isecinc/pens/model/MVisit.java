@@ -5,10 +5,10 @@ import java.util.List;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Visit;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.VisitDocumentProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MVisit Class
@@ -70,7 +70,7 @@ public class MVisit extends I_Model<Visit> {
 	public boolean save(Visit visit, String userCode, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (visit.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("t_visit.visit_id").intValue();
 			String prefix = "";
 			visit.setCode(new VisitDocumentProcess().getNextDocumentNo(userCode, prefix, activeUserID, conn));
 		} else {

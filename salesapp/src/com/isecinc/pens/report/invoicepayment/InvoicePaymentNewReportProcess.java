@@ -11,9 +11,9 @@ import org.jfree.util.Log;
 
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.Utils;
 
 /**
  * Invoice Payment Report Process

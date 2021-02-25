@@ -3,7 +3,8 @@ package com.isecinc.pens.bean;
 import java.util.Date;
 import java.util.List;
 
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class StockDiscount {
     
@@ -106,7 +107,7 @@ public class StockDiscount {
 
 	public String getCurrentDate() {
 		try{
-			currentDate = Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+			currentDate = DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 		}catch(Exception e){
 			
 		}

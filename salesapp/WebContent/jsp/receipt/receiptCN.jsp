@@ -7,8 +7,14 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <jsp:useBean id="receiptForm" class="com.isecinc.pens.web.receipt.ReceiptForm" scope="request"/>
-<div align="left">&nbsp;&nbsp;<input type="button"  id="cn_btn"  value="เพิ่มใบลดหนี้" class="newPosBtn" onclick="openCn('${pageContext.request.contextPath}','${receiptForm.receipt.customerId }');"/></div>
-<table id="tblCN" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+<div align="left">&nbsp;&nbsp;
+<input type="button"  id="cn_btn"  value="เพิ่มใบลดหนี้" class="btn btn-primary" 
+onclick="openCn('${pageContext.request.contextPath}','${receiptForm.receipt.customerId }');"/>
+</div>
+<div class="table-responsive">
+  <table class="table table-bordered table-striped table-light"
+     id="tblCN" width="100%" cellspacing="0">
+    <thead class="thead-dark">
 	<tr>
 		<th class="order"><bean:message key="No"  bundle="sysprop"/></th>
 		<th class="checkBox">
@@ -21,6 +27,7 @@
 		<th class="costprice"><bean:message key="AmountReceived" bundle="sysele"/></th>
 		<th class="costprice"><bean:message key="Product.Balance" bundle="sysele"/></th>
 	</tr>
+	</thead>
 	<c:forEach var="resultsCN" items="${receiptForm.cns}" varStatus="rowsCN">
 	<c:choose>
 		<c:when test="${rowsCN.index %2 == 0}">
@@ -52,7 +59,7 @@
 	</tr>
 	</c:forEach>							
 </table>
-<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+<table align="left" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
 		<td align="left" colspan="8" class="footer">&nbsp;
 			<a href="javascript:deleteCN('${pageContext.request.contextPath}');"> 
@@ -60,3 +67,4 @@
 		</td>
 	</tr>
 </table>
+</div>

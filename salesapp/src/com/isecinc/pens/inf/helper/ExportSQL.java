@@ -2,8 +2,8 @@ package com.isecinc.pens.inf.helper;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.TableBean;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.TableBean;
 
 public class ExportSQL {
 
@@ -26,7 +26,7 @@ public class ExportSQL {
 						" INNER JOIN m_address A 	\n"+
 						" ON M.CUSTOMER_ID = A.CUSTOMER_ID 	\n"+
 						" WHERE  M.user_id = "+userBean.getId() +"\n"+
-						" AND   (M.reference_id is null or M.reference_id =0) \n"+
+						" AND   (M.oracle_cust_id is null or M.oracle_cust_id =0) \n"+
 						" AND   A.PURPOSE IS NOT NULL \n"+
 					    //New Version in 072559
 						" AND (M.EXPORTED  ='N' OR M.EXPORTED IS NULL OR TRIM(M.EXPORTED) ='') \n"+

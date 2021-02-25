@@ -14,9 +14,10 @@ import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.Summary;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 public class MSummary {
 
@@ -96,8 +97,8 @@ public class MSummary {
 				if( !Utils.isNull(c.getOrderDateFrom()).equals("")
 						&&	!Utils.isNull(c.getOrderDateTo()).equals("")	){
 						
-					  sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.order_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(c.getOrderDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.order_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(c.getOrderDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 				sql.append("\n  and h.user_id ="+user.getId());
 				
@@ -168,8 +169,8 @@ public class MSummary {
 				  if( !Utils.isNull(c.getOrderDateFrom()).equals("")
 						&&	!Utils.isNull(c.getOrderDateTo()).equals("")	){
 						
-					sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					sql.append(" and h.order_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(c.getOrderDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					sql.append(" and h.order_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(c.getOrderDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 				  sql.append("\n  and h.user_id ="+user.getId());
 				
@@ -183,18 +184,18 @@ public class MSummary {
 				
 				while (rst.next()) {
 					Summary item = new Summary();
-					item.setOrderDate(Utils.format(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH));
+					item.setOrderDate(DateUtil.format(rst.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH));
 					item.setProductCode(rst.getString("code"));
 					item.setProductName(rst.getString("name"));
 					
-					String[] product = findProductDetail(conn,c, Utils.format(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH), rst.getString("PRODUCT_ID"),user);
+					String[] product = findProductDetail(conn,c, DateUtil.format(rst.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH), rst.getString("PRODUCT_ID"),user);
 					
 					if(product != null && product.length >0){
 					   item.setFullUOM(Utils.isNull(product[0]));
 					   item.setQty(Utils.isNull(product[1]));
 					}
 					
-					String[] productPromotion = findProductPromotionDetail(conn,c, Utils.format(rst.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH), rst.getString("PRODUCT_ID"),user);
+					String[] productPromotion = findProductPromotionDetail(conn,c, DateUtil.format(rst.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH), rst.getString("PRODUCT_ID"),user);
 					if(productPromotion != null && productPromotion.length >0){
 						 if(Utils.isNull(item.getFullUOM()).equals("")){
 							item.setFullUOM(Utils.isNull(productPromotion[0]));
@@ -239,8 +240,8 @@ public class MSummary {
 			    if( !Utils.isNull(c.getOrderDateFrom()).equals("")
 						&&	!Utils.isNull(c.getOrderDateTo()).equals("")	){
 						
-					  sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.order_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(c.getOrderDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.order_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(c.getOrderDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 			    
 			    sql.append(" group by l.product_id,l.uom_id  \n");
@@ -317,8 +318,8 @@ public class MSummary {
 			    if( !Utils.isNull(c.getOrderDateFrom()).equals("")
 						&&	!Utils.isNull(c.getOrderDateTo()).equals("")	){
 						
-					  sql.append(" and h.order_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.order_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(c.getOrderDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.order_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(c.getOrderDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.order_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(c.getOrderDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 			    
 			    sql.append(" group by l.product_id,l.uom_id  \n");

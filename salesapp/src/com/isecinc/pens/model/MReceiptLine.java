@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.isecinc.core.bean.References;
@@ -15,13 +14,14 @@ import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptLine;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
-import com.isecinc.pens.process.SequenceProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * Receipt Line Model
@@ -37,8 +37,8 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 	public static String COLUMN_ID = "RECEIPT_LINE_ID";
 
 	private String[] columns = { COLUMN_ID, "LINE_NO", "RECEIPT_ID", "AR_INVOICE_NO", "SALES_ORDER_NO",
-			"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "ORDER_ID", "CREATED_BY", "UPDATED_BY",
-			"DESCRIPTION", "ORDER_LINE_ID", /** "COMPLETE" **/
+			"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "INVOICE_ID", "CREATED_BY", "UPDATED_BY",
+			"DESCRIPTION" 
 	};
 
 	/**
@@ -79,21 +79,23 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 	 * @throws Exception
 	 */
 	public boolean save(ReceiptLine line, int activeUserID, Connection conn) throws Exception {
-		int id = 0;
+		long id = 0;
 		if (line.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt_line.receipt_line_id").longValue();
 		} else {
 			id = line.getId();
 		}
-		int lineId = 0;
-		if (line.getOrderLine() != null) {
-			lineId = line.getOrderLine().getId();
-		}
-		Object[] values = { id, line.getLineNo(), line.getReceiptId(), line.getArInvoiceNo(), line.getSalesOrderNo(),
-				line.getInvoiceAmount(), line.getCreditAmount(), line.getPaidAmount(), line.getRemainAmount(),
-				line.getOrder().getId(), activeUserID, activeUserID,
-				ConvertNullUtil.convertToString(line.getDescription()).trim(), lineId == 0 ? null : lineId,
-		/** line.getComplete() **/
+		
+		String[] columns = { COLUMN_ID, "LINE_NO", "RECEIPT_ID", "AR_INVOICE_NO",
+		  "SALES_ORDER_NO", "INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT",
+		  "REMAIN_AMOUNT", "INVOICE_ID", "CREATED_BY", "UPDATED_BY"
+		  ,"DESCRIPTION" };
+		 
+				
+		Object[] values = { id, line.getLineNo(), line.getReceiptId(), line.getArInvoiceNo(),
+				line.getSalesOrderNo(),line.getInvoiceAmount(), line.getCreditAmount(), line.getPaidAmount(),
+			    line.getRemainAmount(),line.getOrder().getInvoiceId(), activeUserID, activeUserID
+				,Utils.isNull(line.getDescription())
 		};
 		if (super.save(TABLE_NAME, columns, values, line.getId(), conn)) {
 			line.setId(id);
@@ -103,22 +105,18 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 
 	public boolean saveCaseImportReceipt(ReceiptLine line, int activeUserID, Connection conn) throws Exception {
 		 String[] columnsSaveImport = { COLUMN_ID, "LINE_NO", "RECEIPT_ID", "AR_INVOICE_NO", "SALES_ORDER_NO",
-				"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "ORDER_ID", "CREATED_BY", "UPDATED_BY",
-				"DESCRIPTION", "ORDER_LINE_ID", "IMPORT_TRANS_ID"};
-		int id = 0;
+				"INVOICE_AMOUNT", "CREDIT_AMOUNT", "PAID_AMOUNT", "REMAIN_AMOUNT", "INVOICE_ID", "CREATED_BY", "UPDATED_BY",
+				"DESCRIPTION", "IMPORT_TRANS_ID"};
+		long id = 0;
 		if (line.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			SequenceProcessAll.getIns().getNextValue("t_receipt_line.receipt_line_id").intValue();
 		} else {
 			id = line.getId();
 		}
-		int lineId = 0;
-		if (line.getOrderLine() != null) {
-			lineId = line.getOrderLine().getId();
-		}
+	
 		Object[] values = { id, line.getLineNo(), line.getReceiptId(), line.getArInvoiceNo(), line.getSalesOrderNo(),
 				line.getInvoiceAmount(), line.getCreditAmount(), line.getPaidAmount(), line.getRemainAmount(),
-				line.getOrder().getId(), activeUserID, activeUserID,
-				ConvertNullUtil.convertToString(line.getDescription()).trim(), lineId == 0 ? null : lineId,
+				line.getOrder().getInvoiceId(), activeUserID, activeUserID,
 		        line.getImportTransId()
 		};
 		if (super.save(TABLE_NAME, columnsSaveImport, values, line.getId(), conn)) {
@@ -188,17 +186,15 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 		//logger.debug("Start creditAmt :"+creditAmt+", ar_invoice_no:"+order.getArInvoiceNo());
 		try {
 			String sql = "\n select COALESCE(SUM(rl.PAID_AMOUNT),0) as PAID_AMOUNT ";
-			sql += "\n  from t_receipt_line rl, t_order o ";
-			
-			sql += "\n  where rl.order_id = " + order.getId();
-			sql += "\n  and rl.ORDER_ID = o.ORDER_ID ";
-			sql += "\n  and o.DOC_STATUS = '" + Order.DOC_SAVE + "' ";
-			sql += "\n  and rl.receipt_id in (select receipt_id "
-					+ " from " + MReceipt.TABLE_NAME 
-					+"  where doc_status = '"
-					+   Receipt.DOC_SAVE + "' ) ";
-
-			//logger.debug("sql:\n"+sql);
+			sql += "\n  from pensonline.t_receipt_line rl, pensonline.t_invoice o ";
+			sql += "\n  where rl.invoice_id = " + order.getInvoiceId();
+			sql += "\n  and rl.INVOICE_ID = o.INVOICE_ID ";
+			sql += "\n  and rl.receipt_id in (";
+			sql += "\n     select receipt_id ";
+			sql += "\n     from pensonline." + MReceipt.TABLE_NAME ;
+			sql += "\n     where doc_status = '"+Receipt.DOC_SAVE +"'";
+			sql += "\n  ) ";
+			logger.debug("sql:\n"+sql); 
 			
 			stmt = conn.createStatement();
 			rst = stmt.executeQuery(sql);
@@ -307,8 +303,8 @@ public class MReceiptLine extends I_Model<ReceiptLine> {
 			String  creditDateFix = refConfigCreditDateFix!=null?refConfigCreditDateFix.getKey():"";
 			String dateCheck = "";
 			if( !"".equalsIgnoreCase(creditDateFix)){
-				java.util.Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-				dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
+				java.util.Date d = DateUtil.parse(creditDateFix, DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th);
+				dateCheck = "str_to_date('"+DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
 			}
 			
 			String sql = "\n select order_id,order_no,sales_order_no,ar_invoice_no, round(net_amount,2) as net_amount ";

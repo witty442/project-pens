@@ -8,10 +8,11 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.pens.util.ControlCode;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class OrderUtils {
 	public static Logger logger = Logger.getLogger("PENS");
@@ -19,7 +20,7 @@ public class OrderUtils {
 	public static void mian(String[] a){
 		
 	}
-	public static boolean canSaveCreditVan(Connection conn,User user,int customerId){
+	public static boolean canSaveCreditVan(Connection conn,User user,long customerId){
 		if(ControlCode.canExecuteMethod("OrderUtils", "canSaveCreditVan")){
 		   return canSaveCreditVanModel(conn, user, customerId);
 		}
@@ -27,7 +28,7 @@ public class OrderUtils {
 	}
 	
 	
-	public static boolean canSaveCreditVanModel(Connection conn,User user,int customerId){
+	public static boolean canSaveCreditVanModel(Connection conn,User user,long customerId){
 		boolean canSave = true;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -41,15 +42,18 @@ public class OrderUtils {
 				sql.append("\n   ,( ");
 				sql.append("\n     select l.order_id  ,h.payment_method  ");
 				sql.append("\n     ,h.PDPAID_DATE ,h.PD_PAYMENTMETHOD  as PAYMENT_METHOD2 ");
-				sql.append("\n     from t_receipt h, t_receipt_line l ,t_receipt_match m, t_receipt_by b ");
+				sql.append("\n     ,v.ref_order as order_no ");
+				sql.append("\n     from pensonline.t_receipt h, pensonline.t_receipt_line l ");
+				sql.append("\n     ,pensonline.t_receipt_match m, pensonline.t_receipt_by b ,pensonline.t_invoice v ");
 				sql.append("\n     where h.receipt_id = l.receipt_id  ");
 				sql.append("\n     and m.RECEIPT_LINE_ID = l.RECEIPT_LINE_ID  ");
 				sql.append("\n     and b.RECEIPT_BY_ID = m.RECEIPT_BY_ID  ");
+				sql.append("\n     and l.invoice_id = v.invoice_id  ");
 				sql.append("\n     and h.ISPDPAID = 'N' "); //No Pay
 				sql.append("\n   ) r ");
 				sql.append("\n   where 1=1 ");
 				sql.append("\n   and o.CUSTOMER_ID = cus.CUSTOMER_ID ");
-				sql.append("\n   and o.order_id = r.order_id ");
+				sql.append("\n   and o.order_no = r.order_no ");
 				sql.append("\n   and o.DOC_STATUS ='SV' ");
 				sql.append("\n   and o.ORDER_TYPE = '" + user.getOrderType().getKey() + "' ");
 				sql.append("\n   and o.USER_ID = " + user.getId());
@@ -61,13 +65,13 @@ public class OrderUtils {
 				logger.debug("vanDateFix:"+creditDateFix);
 				String dateCheck = "";
 				if( !"".equalsIgnoreCase(creditDateFix)){
-					java.util.Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
+					java.util.Date d = DateUtil.parse(creditDateFix, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					dateCheck = "str_to_date('"+DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
 				}
 				
 				sql.append("\n   SELECT  ");
 				sql.append("\n   count(*) as c");
-				sql.append("\n   from t_order o, m_customer cus  ");
+				sql.append("\n   from pensonline.t_order o, pensonline.m_customer cus  ");
 				sql.append("\n   where 1=1 ");
 				sql.append("\n   and o.CUSTOMER_ID = cus.CUSTOMER_ID ");
 				sql.append("\n   and o.DOC_STATUS ='SV' ");
@@ -75,9 +79,12 @@ public class OrderUtils {
 				sql.append("\n   and o.USER_ID = " + user.getId());
 				sql.append("\n   and o.CUSTOMER_ID = " + customerId);
 				sql.append("\n   and o.order_date >= " + dateCheck);
-				sql.append("\n   AND order_id not in( select order_id from t_receipt_line)  ");
-				sql.append("\n   AND order_no not in( select receipt_no from t_receipt)  ");
-				sql.append("\n   AND order_no not in( select order_no from t_receipt_pdpaid_no)  ");
+				sql.append("\n   AND order_no not in( ");
+				sql.append("\n     select v.ref_order from pensonline.t_receipt_line l,pensonline.t_invoice v");
+				sql.append("\n     where l.invoice_no = v.invoice_no   ");
+				sql.append("\n   )  ");
+				sql.append("\n   AND order_no not in( select receipt_no from pensonline.t_receipt)  ");
+				sql.append("\n   AND order_no not in( select order_no from pensonline.t_receipt_pdpaid_no)  ");
 			}
 			
 			logger.debug("sql:"+sql.toString());
@@ -152,8 +159,8 @@ public class OrderUtils {
 				logger.debug("vanDateFix:"+creditDateFix);
 				String dateCheck = "";
 				if( !"".equalsIgnoreCase(creditDateFix)){
-					java.util.Date d = Utils.parse(creditDateFix, Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
-					dateCheck = "str_to_date('"+Utils.stringValue(d, Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
+					java.util.Date d = DateUtil.parse(creditDateFix, DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+					dateCheck = "str_to_date('"+DateUtil.stringValue(d, DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y')" ;
 				}
 				
 				sql.append("\n   SELECT  ");

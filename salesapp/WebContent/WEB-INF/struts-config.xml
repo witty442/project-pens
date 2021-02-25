@@ -206,6 +206,11 @@
 		<form-bean name="transferForm" type="com.isecinc.pens.web.transfer.TransferForm" />
 		<form-bean name="stockReturnForm" type="com.isecinc.pens.web.stockreturn.StockReturnForm" />
 		<form-bean name="stockDiscountForm" type="com.isecinc.pens.web.stockdiscount.StockDiscountForm" />
+		
+		<form-bean name="batchTaskForm" type="com.isecinc.pens.web.batchtask.BatchTaskForm"/>
+		<!-- Schedule -->
+		<form-bean name="scheduleForm" type="com.isecinc.pens.scheduler.forms.ScheduleForm"/>
+		<form-bean name="searchTaskForm" type="com.isecinc.pens.scheduler.forms.SearchTaskForm"/>
 	</form-beans>
 
 	<action-mappings>
@@ -233,8 +238,8 @@
 		<!-- LOGIN -->
 		<action name="loginForm" path="/login" parameter="do" scope="request"
 			type="com.isecinc.pens.web.login.LoginAction">
-			<!-- <forward name="pass" path="/jsp/mainpage.jsp" redirect="true" /> -->
-			<forward name="pass" path="/jsp/customer/customerSearch.jsp?showMsg=true" redirect="true" />
+			<forward name="pass" path="/jsp/mainpage.jsp" redirect="true" />
+			<!-- <forward name="pass" path="/jsp/customer/customerSearch.jsp?showMsg=true" redirect="true" /> -->
 			<forward name="pathRedirect" path="/redirectPage.jsp" /> 
 			<forward name="fail" path="/index.jsp" />
 			<forward name="logoff" path="/index.jsp" /> 
@@ -298,12 +303,13 @@
 			forward="/jsp/customer/customerSearch.jsp" />
 		<action name="customerForm" path="/jsp/customerAction"
 			parameter="do" scope="request" type="com.isecinc.pens.web.customer.CustomerAction">
+			<forward name="prepareCustTrip" path="/jsp/customer/customerTrip.jsp" />
 			<forward name="search" path="/jsp/customer/customerSearch.jsp" />
 			<forward name="prepare" path="/jsp/customer/customer.jsp" />
 			<forward name="re-search" path="/jsp/customer/customerSearch.jsp" />
 			<forward name="clearform" path="/jsp/customer/customerSearch.jsp" />
-			<forward name="view" path="/jsp/customer/customerView.jsp" />
-			<forward name="viewEdit" path="/jsp/customer/customerViewEdit.jsp" />
+			<forward name="view" path="/jsp/customer/customer.jsp" />
+			<forward name="viewEdit" path="/jsp/customer/customer.jsp" />
 		</action>
 
 		<!-- CUSTOMER VISIT -->
@@ -848,6 +854,26 @@
 		<action name="prodShowForm" path="/jsp/prodShowAction" parameter="do" scope="session" type="com.isecinc.pens.web.prodshow.ProdShowAction" >
 			<forward name="prepare" path="/jsp/prodshow/prodShow.jsp" />
 		</action>
+		
+		<!-- Batch Task -->
+		<action  name="batchTaskForm" path="/jsp/batchTaskAction" parameter="do" 
+		   scope="session" type="com.isecinc.pens.web.batchtask.BatchTaskAction" >
+           <forward name="search" path="/jsp/batchtask/batchTask.jsp"></forward>
+           <forward name="batchFromPopup" path="/jsp/batchtask/batchTaskPopup.jsp"></forward>
+           <forward name="batchFromPopupNoWait" path="/jsp/batchtask/batchTaskPopupNoWait.jsp"></forward>
+        </action>
+        
+		 <!-- Schedule -->
+        <action  name="scheduleForm" path="/jsp/schedule" parameter="do" scope="request" type="com.isecinc.pens.scheduler.actions.ScheduleAction" >
+           <forward name="Success" path="/jsp/schedule/mainSchedule.jsp"></forward>
+           <forward name="Regen" path="/jsp/schedule/popupRegen.jsp"></forward>
+		   <forward name="Fail" path="/jsp/error.jsp"></forward>
+        </action>
+        
+        <action  name="searchTaskForm" path="/jsp/searchTask" parameter="do" scope="request" type="com.isecinc.pens.scheduler.actions.SearchTaskAction" >
+           <forward name="Success" path="/jsp/schedule/monitorSchedule.jsp"></forward>
+		   <forward name="Fail" path="/jsp/error.jsp"></forward>
+        </action>
 	</action-mappings>
 
 	<message-resources key="sysprop" parameter="SystemProperties" />

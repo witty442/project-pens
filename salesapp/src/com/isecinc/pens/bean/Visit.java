@@ -83,7 +83,7 @@ public class Visit extends I_PO implements Serializable {
 	private String code;
 	private String visitDate;
 	private String visitTime;
-	private int customerId;
+	private long customerId;
 	private String salesClose;
 	private String interfaces;
 	private String unClosedReason;
@@ -135,11 +135,11 @@ public class Visit extends I_PO implements Serializable {
 		this.visitTime = visitTime;
 	}
 
-	public int getCustomerId() {
+	public long getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
 

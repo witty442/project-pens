@@ -104,6 +104,7 @@ function gotoStockMCMStep4(){
 	
 		<span title="StockMCMStep3">...</span>
          <div class="card mb-1 shadow-sm">
+                <div class="card-header bg-info"><b>บันทึกสต๊อกห้าง</b></div>
                 <div class="card-header">วันที่นับสต๊อก: ${stockMCForm.bean.stockDate}
 			         <html:hidden property="bean.stockDate" styleId="stockDate" />
 			    </div>

@@ -49,7 +49,9 @@ public class ProductCatalog implements Comparable{
 
 	public String getProductName() {
 		try {
-			return new String(this.productName.getBytes("ISO8859-1"), "TIS-620");
+			//return new String(this.productName.getBytes("ISO8859-1"), "UTF-8");
+			//return new String(this.productName.getBytes("ISO8859-1"), "TIS-620");
+			return productName;
 		} catch (Exception ex) {
 			return "";
 		}

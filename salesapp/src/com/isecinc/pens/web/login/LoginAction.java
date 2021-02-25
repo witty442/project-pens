@@ -17,13 +17,13 @@ import util.SessionGen;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.pens.SystemMessages;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.batchwork.AppversionVerifyWorker;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.process.login.LoginProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 /**
  * Login Action Class
@@ -57,7 +57,8 @@ public class LoginAction extends DispatchAction {
 			request.getSession(true).removeAttribute("user");
 			loginForm = (LoginForm) form;
 			User user = null;
-			conn = new DBCPConnectionProvider().getConnection(conn);
+			//conn = new DBCPConnectionProvider().getConnection(conn);
+			conn = DBConnection.getInstance().getConnection();
 			user = new LoginProcess().login(loginForm.getUserName(), loginForm.getPassword(), conn);
 			if (user == null) {
 				request.setAttribute("errormsg", SystemMessages.getCaption(SystemMessages.INVALID_CREDENTIAL, Locale

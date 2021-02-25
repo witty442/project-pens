@@ -1,3 +1,4 @@
+<%@page import="com.pens.util.DBConnection"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.process.testconn.TestURLConnection"%>
 <%@page import="java.util.Date"%>
@@ -7,12 +8,11 @@
 <%@page import="com.isecinc.pens.inf.dao.InterfaceDAO" %>
 
 <%@page import="com.isecinc.pens.inf.helper.*" %>
-<%@page import="com.isecinc.pens.inf.bean.*" %>
 <%
 String threadName = (String) request.getParameter("threadName");
 String status = "";
 Connection conn = null;
-try{
+try{ 
 	conn = DBConnection.getInstance().getConnection();
 	status = TestURLConnection.getStatusOfThread(conn,threadName);
 	System.out.println("Chk Status Date["+(new Date())+"]thread["+threadName+"]Status["+status+"]");

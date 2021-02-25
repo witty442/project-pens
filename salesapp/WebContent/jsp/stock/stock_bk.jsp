@@ -1,5 +1,5 @@
 <%@page import="util.SessionGen"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="com.isecinc.pens.bean.PD"%>
 <%@page import="com.isecinc.pens.model.MPD"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>

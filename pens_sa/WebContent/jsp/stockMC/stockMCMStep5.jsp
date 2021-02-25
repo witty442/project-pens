@@ -214,7 +214,8 @@ function openImageFile(){
 			   <html:hidden property="bean.productCode" styleId="productCode"/>
 			   <html:hidden property="fromPage"/>
                 <div class="card mb-1 shadow-sm">
-				     <div class="card-header">วันที่นับสต๊อก:${stockMCForm.bean.stockDate}</div>
+                     <div class="card-header bg-info"><b>บันทึกสต๊อกห้าง</b></div>
+				     <div class="card-header ">วันที่นับสต๊อก:${stockMCForm.bean.stockDate}</div>
 					 <div class="card-header">
 					                  ห้าง:${stockMCForm.bean.customerCode}-${stockMCForm.bean.customerName}
 				     </div>
@@ -299,17 +300,39 @@ function openImageFile(){
 								  class="form-control" />	 
 							  </div> --%>
 							  
-					       <div class="input-group">
-							    <div class="input-group-prepend">
-							      <span class="input-group-text">ขา ที่มีอยู่ :</span>
-							    </div>
-							     <%tabIndex++; %>
-								 <input  type="number" size="5"  name="legQty" tabindex="<%=tabIndex %>" id="legQty" 
-									 value ="<%=Utils.isNull(stockMCBean.getLegQty())%>" size="1"  
-									 onkeydown="return isNum0to9andpoint(this,event);" 
-									 autocomplete="off" class="form-control"/>	 
-							  </div>
-							  
+							  <div class="form-row">
+                                   <div class="col-md-4">
+                                       <div class="form-group">
+                                           <label class="input-group-text" for="legQty">ขา ที่มีอยู่ :</label>
+                                           <%tabIndex++; %>
+										   <input  type="number"   name="legQty" tabindex="<%=tabIndex %>" id="legQty" 
+											 value ="<%=Utils.isNull(stockMCBean.getLegQty())%>" size="1"  
+											 onkeydown="return isNum0to9andpoint(this,event);" 
+											 autocomplete="off" class="form-control"/>	
+                                       </div>
+                                   </div>
+                                   <div class="col-md-4">
+                                       <div class="form-group">
+                                           <label class="input-group-text" for="floorQty">ชั้น </label>
+                                             <%tabIndex++; %>
+										 <input  type="number"  name="floorQty" tabindex="<%=tabIndex %>" id="floorQty" 
+											 value ="<%=Utils.isNull(stockMCBean.getFloorQty())%>" size="1"  
+											 onkeydown="return isNum0to9andpoint(this,event);" 
+											 autocomplete="off" class="form-control"/>	
+                                       </div>
+                                   </div>
+                                   <div class="col-md-4">
+                                       <div class="form-group">
+                                           <label class="input-group-text" for="deepQty">ลึก </label>
+                                             <%tabIndex++; %>
+									      <input  type="number"  name="deepQty" tabindex="<%=tabIndex %>" id="deepQty" 
+										  value ="<%=Utils.isNull(stockMCBean.getDeepQty())%>" size="1"  
+										  onkeydown="return isNum0to9andpoint(this,event);" 
+										  autocomplete="off" class="form-control"/>	
+                                       </div>
+                                   </div>
+                               </div>
+					    
 							 <div class="input-group">
 							    <div class="input-group-prepend">
 							      <span class="input-group-text">จำนวน :</span>

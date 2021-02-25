@@ -10,14 +10,15 @@ import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.OrderLine;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.process.order.OrderProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 /**
  * InvoiceDetailReportProcess Report
@@ -77,7 +78,7 @@ public class MoveOrderReportProcess extends I_ReportProcess<MoveOrderReport> {
 				item.setQty2(rst.getDouble("qty2"));
 				  
 				item.setRequestNumber(rst.getString("request_number"));
-				item.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				item.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				item.setDocStatus("VO".equals(rst.getString("status"))?"ยกเลิก":"ใช้งาน");
 				item.setInterfaces("Y".equals(rst.getString("exported"))?"ส่งข้อมูลแล้ว":"ยังไม่ส่งข้อมูล");
 				item.setTotalAmount(rst.getDouble("total_amount"));

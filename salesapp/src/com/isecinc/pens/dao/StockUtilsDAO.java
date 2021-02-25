@@ -5,9 +5,9 @@ import java.sql.Connection;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.UOMConversion;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MUOMConversion;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 public class StockUtilsDAO {
 	private static Logger logger = Logger.getLogger("PENS");

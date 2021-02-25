@@ -2,7 +2,6 @@ package com.isecinc.pens.web.interfaces;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,17 +13,17 @@ import org.apache.struts.action.ActionMapping;
 import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.SystemElements;
+import com.isecinc.pens.bean.MonitorBean;
+import com.isecinc.pens.bean.MonitorItemBean;
+import com.isecinc.pens.bean.MonitorItemDetailBean;
 import com.isecinc.pens.bean.Trip;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.bean.MonitorItemBean;
-import com.isecinc.pens.inf.bean.MonitorItemDetailBean;
 import com.isecinc.pens.inf.dao.InterfaceDAO;
 import com.isecinc.pens.inf.helper.Constants;
 import com.isecinc.pens.inf.helper.ConvertUtils;
-import com.isecinc.pens.inf.helper.EnvProperties;
 import com.isecinc.pens.inf.manager.FTPManager;
 import com.isecinc.pens.init.InitialMessages;
+import com.pens.util.EnvProperties;
 
 /**
  * ConversionAction Class

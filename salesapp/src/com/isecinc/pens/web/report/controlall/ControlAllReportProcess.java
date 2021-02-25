@@ -12,10 +12,11 @@ import org.apache.commons.lang.StringUtils;
 
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentAllReport;
 import com.isecinc.pens.report.invoicepayment.InvoicePaymentReport;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Detailed Sales Report
@@ -85,7 +86,7 @@ public class ControlAllReportProcess extends I_ReportProcess<ControlAllReport>{
 				detailedSales.setRecordType("");
 				
 				if(chkDup.get(rs.getString("request_date"))==null){
-					detailedSales.setDate(Utils.stringValue(rs.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					detailedSales.setDate(DateUtil.stringValue(rs.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				}else{
 					detailedSales.setDate("");
 				}
@@ -156,7 +157,7 @@ public class ControlAllReportProcess extends I_ReportProcess<ControlAllReport>{
 				detailedSales.setRecordType("");
 			
 				if(chkDup.get(rs.getString("order_date"))==null){
-					detailedSales.setDate(Utils.stringValue(rs.getDate("order_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					detailedSales.setDate(DateUtil.stringValue(rs.getDate("order_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				}else{
 					detailedSales.setDate("");
 				}

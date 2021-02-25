@@ -18,9 +18,10 @@ import com.isecinc.core.bean.Messages;
 import com.isecinc.core.web.I_Action;
 import com.isecinc.pens.bean.Summary;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialMessages;
 import com.isecinc.pens.model.MSummary;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Summary Action
@@ -156,7 +157,7 @@ public class SummaryAction extends I_Action {
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");
-			h.append("<td align='left' colspan='9' >พนักงานขาย :"+user.getSourceName()+"("+user.getRole().getName()+") วันที่แสดงข้อมูล :"+Utils.format(new Date(), Utils.DD_MM_YYYY__HH_mm_ss_WITH_SLASH)+"</td>\n");
+			h.append("<td align='left' colspan='9' >พนักงานขาย :"+user.getSourceName()+"("+user.getRole().getName()+") วันที่แสดงข้อมูล :"+DateUtil.format(new Date(), DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH)+"</td>\n");
 			h.append("</tr> \n");
 			
 			h.append("<tr> \n");

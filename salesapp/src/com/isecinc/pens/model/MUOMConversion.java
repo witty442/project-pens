@@ -8,7 +8,7 @@ import com.isecinc.pens.bean.MoveOrderLine;
 import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.UOMConversion;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.Utils;
 
 public class MUOMConversion extends I_Model<UOMConversion> {
 

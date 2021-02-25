@@ -2,7 +2,7 @@
 <%@page import="com.isecinc.pens.bean.Customer"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.model.MCustomer"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -15,7 +15,7 @@ if(customerList != null && customerList.size() >0){
       for(int r=0;r<customerList.size();r++){
 	   	   Customer c = customerList.get(r);
 	   	   //System.out.println("Location:"+c.getLocation());
-	   	   
+	   	    
 	   	   if(Utils.isLocationValid(c.getLocation())){
 		   	   if(r==customerList.size()-1){
 		   	      locations +="['"+c.getName()+"', "+c.getLocation()+", "+r+"] \n";

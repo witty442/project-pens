@@ -1,7 +1,7 @@
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.model.MCustomer"%>
 <%@page import="com.isecinc.pens.bean.Customer"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

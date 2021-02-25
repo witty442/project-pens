@@ -12,10 +12,11 @@ import util.ReportHelper;
 import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MSalesTargetNew;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 /**
  * Performance Report
@@ -66,14 +67,14 @@ public class BankTransferReportProcess extends I_ReportProcess<BankTransferRepor
 				  m.setTransferType("àªç¤"); 
 			  }
 			  m.setTransferBank(Utils.isNull(rst.getString("transfer_bank_label")));
-			  m.setTransferDate(Utils.stringValue(rst.getDate("transfer_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  m.setTransferDate(DateUtil.stringValue(rst.getDate("transfer_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  m.setTransferTime(Utils.isNull(rst.getString("transfer_time")));
 			  
 			  m.setAmount(Utils.decimalFormat(rst.getDouble("amount"),Utils.format_current_2_disgit));
 			  m.setAmountDouble(rst.getDouble("amount"));
 			  m.setChequeNo(Utils.isNull(rst.getString("cheque_no")));
-			  m.setChequeDate(Utils.stringValueNull(rst.getDate("cheque_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			  m.setCreateDate(Utils.stringValue(rst.getDate("create_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  m.setChequeDate(DateUtil.stringValueChkNull(rst.getDate("cheque_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  m.setCreateDate(DateUtil.stringValue(rst.getDate("create_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  totalAmount += rst.getDouble("amount");
 			  pos.add(m);
 			}

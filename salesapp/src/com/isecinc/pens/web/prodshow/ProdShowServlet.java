@@ -22,11 +22,11 @@ import org.apache.log4j.Logger;
 import com.isecinc.pens.bean.ProdShowBean;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.ProdShowDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.process.document.ProdShowDocumentProcess;
+import com.pens.util.DBConnection;
+import com.pens.util.EnvProperties;
+import com.pens.util.FileUtil;
+import com.pens.util.Utils;
 
 
 public class ProdShowServlet  extends HttpServlet{
@@ -354,20 +354,24 @@ public class ProdShowServlet  extends HttpServlet{
 	
 	private static void deleteFileCaseRollBack(List<ProdShowBean> itemList){
 	    String imageLocalProdShowPath = EnvProperties.getInstance().getProperty("path.image.prodshow.local");//"D:/SalesApp/Images-prodshow/";
-		  if(itemList != null && itemList.size() >0){
-	         for(int i=0;i<itemList.size();i++){
-	        	 ProdShowBean bean = itemList.get(i);
-	        	 if( !Utils.isNull(bean.getInputFileNamePic1()).equals("")){
-	        	    FileUtil.deleteFile(imageLocalProdShowPath+bean.getInputFileNamePic1());
-	        	 }
-	        	 if( !Utils.isNull(bean.getInputFileNamePic2()).equals("")){
-		        	FileUtil.deleteFile(imageLocalProdShowPath+bean.getInputFileNamePic2());
+		try { 
+		    if(itemList != null && itemList.size() >0){
+		         for(int i=0;i<itemList.size();i++){
+		        	 ProdShowBean bean = itemList.get(i);
+		        	 if( !Utils.isNull(bean.getInputFileNamePic1()).equals("")){
+		        	    FileUtil.deleteFile(imageLocalProdShowPath+bean.getInputFileNamePic1());
+		        	 }
+		        	 if( !Utils.isNull(bean.getInputFileNamePic2()).equals("")){
+			        	FileUtil.deleteFile(imageLocalProdShowPath+bean.getInputFileNamePic2());
+			         }
+		        	 if( !Utils.isNull(bean.getInputFileNamePic3()).equals("")){
+			        	FileUtil.deleteFile(imageLocalProdShowPath+bean.getInputFileNamePic3());
+			         }
 		         }
-	        	 if( !Utils.isNull(bean.getInputFileNamePic3()).equals("")){
-		        	FileUtil.deleteFile(imageLocalProdShowPath+bean.getInputFileNamePic3());
-		         }
-	         }
-		  }
+			  }
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//order-brand-no

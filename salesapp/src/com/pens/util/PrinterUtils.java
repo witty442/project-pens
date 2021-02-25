@@ -9,7 +9,6 @@ import javax.print.PrintServiceLookup;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.inf.helper.Utils;
 import com.profesorfalken.wmi4java.WMI4Java;
 import com.profesorfalken.wmi4java.WMIClass;
 

@@ -1,5 +1,5 @@
+<%@page import="com.pens.util.EnvProperties"%>
 <%@page import="java.net.InetAddress"%>
-<%@page import="com.isecinc.pens.inf.helper.EnvProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>
 <%@page import="com.pens.util.EncyptUtils"%>
 <%@page import="util.SessionGen"%>

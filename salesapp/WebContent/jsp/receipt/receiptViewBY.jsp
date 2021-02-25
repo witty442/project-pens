@@ -12,23 +12,22 @@ User user = (User) session.getAttribute("user");
 
 <%@page import="com.isecinc.pens.bean.User"%><jsp:useBean id="receiptForm" class="com.isecinc.pens.web.receipt.ReceiptForm" scope="request"/>
 <div align="left">&nbsp;&nbsp;ประเภทการชำระเงิน</div>
-<table id="tblRecpBy" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+<div class="table-responsive">
+  <table class="table table-bordered table-striped table-light"
+     id="tblRecpBy" width="100%" cellspacing="0">
+    <thead class="thead-dark">
 	<tr>
 		<th class="order"><bean:message key="No"  bundle="sysprop"/></th>
 		<th><bean:message key="Profile.PaymentMethod" bundle="sysele"/></th>
 		<th class="costprice"><bean:message key="Receipt.Amount" bundle="sysele"/></th>
 		<th class="name"><bean:message key="Bank" bundle="sysele"/> </th>
-		<th>
-		เลขที่เช็ค/หมายเลขบัตรเครดิต/เลขที่ชำระแอร์เพย์
-	<%-- 	<bean:message key="Check.No" bundle="sysele"/>/<bean:message key="CreditCardNo" bundle="sysele"/> --%>
-		</th>
-		<th> วันที่หน้าเช็ค/วันที่โอนเงิน <!-- bean:message key="Check.Date" bundle="sysele"/--></th>
+		<th>เลขที่เช็ค/หมายเลขบัตรเครดิต/เลขที่ชำระแอร์เพย์</th>
+		<th> วันที่หน้าเช็ค/วันที่โอนเงิน </th>
 		<th class="costprice"><bean:message key="CreditCardType" bundle="sysele"/></th>
 		<th>เซลล์จ่าย</th>
-		<%if(!user.getType().equalsIgnoreCase(User.DD)){ %>
 		<th class="status"><bean:message key="Receipt.Paid" bundle="sysele"/></th>
-		<%} %>
 	</tr>
+	</thead>
 	<c:forEach var="bys" items="${receiptForm.bys}" varStatus="rows2">
 	<c:choose>
 		<c:when test="${rows2.index %2 == 0}">
@@ -71,12 +70,10 @@ User user = (User) session.getAttribute("user");
 			<input type="checkbox" name="pb.writeOff" value="Y" disabled="disabled" style="disableText"/>
 			</c:if>
 		</td>
-		<%if(!user.getType().equalsIgnoreCase(User.DD)){ %>
 		<td align="center">
 			<a href="#" onclick="applyBillView('${pageContext.request.contextPath}',${rows2.index+1},'${bys.paymentMethodName}',${bys.receiptAmount},'${bys.seedId}');">
 			<img border=0 src='${pageContext.request.contextPath}/icons/lookup.gif'  align='absmiddle'></a>
 		</td>
-		<%} %>
 	</tr>
 	</c:forEach>							
 </table>
@@ -85,3 +82,4 @@ User user = (User) session.getAttribute("user");
 		<td align="left" class="footer">&nbsp;</td>
 	</tr>
 </table>
+</div>

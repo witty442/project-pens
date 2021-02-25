@@ -18,8 +18,6 @@ import com.isecinc.pens.bean.Product;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MAddress;
 import com.isecinc.pens.model.MProduct;
@@ -27,7 +25,10 @@ import com.isecinc.pens.model.MStockDiscount;
 import com.isecinc.pens.model.MStockReturn;
 import com.isecinc.pens.model.MUOMConversion;
 import com.isecinc.pens.web.popup.PopupForm;
+import com.pens.util.DBConnection;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 public class PopupDAO {
 
@@ -225,7 +226,7 @@ public class PopupDAO {
 				   curdate.add(Calendar.MONTH, -1*Integer.parseInt(refbackDate.getKey()));
 				   
 				   logger.debug("DateStart:"+curdate.getTime());
-				   dateStart = Utils.stringValue(curdate.getTime(), Utils.DD_MM_YYYY_WITH_SLASH);
+				   dateStart = DateUtil.stringValue(curdate.getTime(), DateUtil.DD_MM_YYYY_WITH_SLASH);
 				   logger.debug("DateStart:"+dateStart);
 				}
 				
@@ -281,7 +282,7 @@ public class PopupDAO {
 					PopupForm item = new PopupForm();
 					item.setNo(no);
 					item.setCode(Utils.isNull(rst.getString("ar_invoice_no")));
-					item.setStringDate(Utils.stringValue(rst.getDate("order_date"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+					item.setStringDate(DateUtil.stringValue(rst.getDate("order_date"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 					item.setDesc(Utils.isNull(rst.getString("qty")));
 					pos.add(item);
 					

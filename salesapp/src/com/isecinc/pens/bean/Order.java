@@ -6,13 +6,14 @@ import java.sql.ResultSet;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.model.MCustomer;
 import com.isecinc.pens.model.MUser;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 import com.isecinc.pens.model.MOrgRule;
 
 /**
@@ -94,10 +95,10 @@ public class Order extends I_PO implements Serializable {
 		//System.out.println("print_datetime_pick:"+rst.getBigDecimal("print_datetime_pick"));
 		//System.out.println("print_datetime_rcp:"+rst.getBigDecimal("print_datetime_rcp"));
 		
-		setPrintDateTimePick(Utils.stringValueSpecial2(rst.getLong("print_datetime_pick"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
+		setPrintDateTimePick(DateUtil.stringValueSpecial2(rst.getLong("print_datetime_pick"),DateUtil.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
 		setPrintCountPick(rst.getInt("print_count_pick"));
 		
-		setPrintDateTimeRcp(Utils.stringValueSpecial2(rst.getLong("print_datetime_rcp"),Utils.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
+		setPrintDateTimeRcp(DateUtil.stringValueSpecial2(rst.getLong("print_datetime_rcp"),DateUtil.DD_MM_YYYY_HH_mm_WITHOUT_SLASH,Utils.local_th));
 		setPrintCountRcp(rst.getInt("print_count_rcp"));
 		
 		setPoNumber(Utils.isNull(rst.getString("po_number")));
@@ -117,7 +118,8 @@ public class Order extends I_PO implements Serializable {
 	}
 
 	/** ID */
-	private int id;
+	private long id;
+	private long invoiceId;
 
 	/** Order No */
 	private String orderNo;
@@ -132,7 +134,7 @@ public class Order extends I_PO implements Serializable {
 	private String orderType;
 
 	/** Customer ID */
-	private int customerId;
+	private long customerId;
 
 	/** Customer Name */
 	private String customerName;
@@ -264,6 +266,14 @@ public class Order extends I_PO implements Serializable {
     private String printReportPDF;
 	
     
+	public long getInvoiceId() {
+		return invoiceId;
+	}
+
+	public void setInvoiceId(long invoiceId) {
+		this.invoiceId = invoiceId;
+	}
+
 	public String getPrintReportPDF() {
 		return printReportPDF;
 	}
@@ -410,11 +420,11 @@ public class Order extends I_PO implements Serializable {
 		this.created = created;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -442,11 +452,11 @@ public class Order extends I_PO implements Serializable {
 		this.orderType = orderType;
 	}
 
-	public int getCustomerId() {
+	public long getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(int customerId) {
+	public void setCustomerId(long customerId) {
 		this.customerId = customerId;
 	}
 

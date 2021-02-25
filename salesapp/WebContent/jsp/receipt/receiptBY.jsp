@@ -11,8 +11,14 @@ User user = (User) session.getAttribute("user");
 %>
 
 <%@page import="com.isecinc.pens.bean.User"%><jsp:useBean id="receiptForm" class="com.isecinc.pens.web.receipt.ReceiptForm" scope="request"/>
-<div align="left">&nbsp;&nbsp;<input type="button" value="เพิ่มประเภทการชำระเงิน" class="newPosBtn" onclick="open_recpBy('${pageContext.request.contextPath}', 0);"/></div>
-<table id="tblRecpBy" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+<div align="left">&nbsp;&nbsp;
+	<input type="button" value="เพิ่มประเภทการชำระเงิน" class="btn btn-primary" 
+	onclick="open_recpBy('${pageContext.request.contextPath}', 0);"/>
+</div>
+<div class="table-responsive">
+  <table class="table table-bordered table-striped table-light"
+     id="tblRecpBy" width="100%" cellspacing="0">
+    <thead class="thead-dark">
 	<tr>
 		<th class="order"><bean:message key="No"  bundle="sysprop"/></th>
 		<th class="checkBox">
@@ -21,17 +27,12 @@ User user = (User) session.getAttribute("user");
 		<th><bean:message key="Profile.PaymentMethod" bundle="sysele"/></th>
 		<th class="costprice"><bean:message key="Receipt.Amount" bundle="sysele"/></th>
 		<th class="name"><bean:message key="Bank" bundle="sysele"/> </th>
-		<th>
-		เลขที่เช็ค<!-- /หมายเลขบัตรเครดิต/เลขที่ชำระแอร์เพย์ -->
-		<%-- <bean:message key="Check.No" bundle="sysele"/>/<bean:message key="CreditCardNo" bundle="sysele"/> --%>
-		</th>
-		<th> วันที่หน้าเช็ค/วันที่โอนเงิน <!-- bean:message key="Check.Date" bundle="sysele"/--></th>
-		<th class="costprice">วันที่รับเงินจากลูกค้า 
-		    <%-- <bean:message key="CreditCardType" bundle="sysele"/> --%>
-		</th>
+		<th>เลขที่เช็ค<!-- /หมายเลขบัตรเครดิต/เลขที่ชำระแอร์เพย์ --></th>
+		<th> วันที่หน้าเช็ค/วันที่โอนเงิน </th>
+		<th class="costprice">วันที่รับเงินจากลูกค้า </th>
 		<th>เซลล์จ่าย</th>
 		<%if(!user.getType().equalsIgnoreCase(User.DD)){ %>
-		<th class="status"><bean:message key="Receipt.Paid" bundle="sysele"/></th>
+		 <th class="status"><bean:message key="Receipt.Paid" bundle="sysele"/></th>
 		<%} %>
 	</tr>
 	<c:forEach var="bys" items="${receiptForm.bys}" varStatus="rows2">
@@ -80,16 +81,14 @@ User user = (User) session.getAttribute("user");
 		</c:choose>
 		
 		<td align="center"><input type="checkbox" <c:out value='${writeoffValue}'/> name="pb.writeOff" value="Y" onClick="validateCNForWriteOff('${bys.seedId}')"></td>
-		<%if(!user.getType().equalsIgnoreCase(User.DD)){ %>
 		<td align="center">
 			<a href="#" onclick="applyBill('${pageContext.request.contextPath}',${rows2.index+1},'${bys.paymentMethodName}',${bys.receiptAmount},'${bys.seedId}');">
 			<img border=0 src='${pageContext.request.contextPath}/icons/doc_edit.gif'  align='absmiddle'></a>
 		</td>
-		<%} %>
 	</tr>
 	</c:forEach>							
 </table>
-<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+<table align="left" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
 		<td align="left" class="footer">&nbsp;
 			<a href="javascript:deleteRecpBy('${pageContext.request.contextPath}');"> 
@@ -97,3 +96,4 @@ User user = (User) session.getAttribute("user");
 		</td>
 	</tr>
 </table>
+</div>

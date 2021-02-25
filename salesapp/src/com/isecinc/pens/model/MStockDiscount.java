@@ -20,14 +20,15 @@ import com.isecinc.pens.bean.StockDiscountLine;
 import com.isecinc.pens.bean.User;
 import com.isecinc.pens.dao.StockBeanUtils;
 import com.isecinc.pens.dao.StockUtilsDAO;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.StockDiscountDocumentProcess;
 import com.isecinc.pens.web.popup.PopupForm;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 
 public class MStockDiscount {
@@ -58,8 +59,8 @@ public class MStockDiscount {
 		
 			if( !Utils.isNull(bean.getRequestDateFrom()).equals("")
 				&&	!Utils.isNull(bean.getRequestDateTo()).equals("")	){
-				  sql.append(" and h.request_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(bean.getRequestDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-				  sql.append(" and h.request_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(bean.getRequestDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				  sql.append(" and h.request_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(bean.getRequestDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				  sql.append(" and h.request_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(bean.getRequestDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 			}
 			logger.debug("sql:"+sql.toString());
 			
@@ -101,8 +102,8 @@ public class MStockDiscount {
 			if( !Utils.isNull(mCriteria.getRequestDateFrom()).equals("")
 				&&	!Utils.isNull(mCriteria.getRequestDateTo()).equals("")	){
 					
-				  sql.append(" and h.request_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-				  sql.append(" and h.request_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				  sql.append(" and h.request_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getRequestDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+				  sql.append(" and h.request_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getRequestDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 			}
 			sql.append("\n  ORDER BY h.request_number desc \n");
 			sql.append("\n )A ");
@@ -116,7 +117,7 @@ public class MStockDiscount {
 			  StockDiscount m = new StockDiscount();
 			  m.setNo(no+"");
 			  m.setRequestNumber(rst.getString("request_number"));
-			  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  m.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  m.setDescription(Utils.isNull(rst.getString("description")));
 			  m.setCustomerId(rst.getInt("customer_id"));
 			  m.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
@@ -133,8 +134,8 @@ public class MStockDiscount {
 			  m.setCreatedBy(rst.getString("created_by"));
 			  m.setUpdateBy(rst.getString("updated_by"));
 			  
-			  m.setCreated(Utils.stringValue(rst.getDate("created"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			  m.setUpdated(Utils.stringValue(rst.getDate("updated"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  m.setCreated(DateUtil.stringValue(rst.getDate("created"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  m.setUpdated(DateUtil.stringValue(rst.getDate("updated"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			  
 			  //Check canEdit
 			  if((STATUS_SAVE.equals(m.getStatus()) && STATUS_NO_EXPORTED.equals(m.getExported()) ) 
@@ -195,7 +196,7 @@ public class MStockDiscount {
 		
 			if("".equals(head.getRequestNumber())){
 				
-				Date requestDate = Utils.parse(head.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date requestDate = DateUtil.parse(head.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 			
 				requestNumber = new StockDiscountDocumentProcess().getNextDocumentNo(requestDate,user.getCode(),user.getId(), conn);
 				
@@ -310,7 +311,7 @@ public class MStockDiscount {
 			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalLineAmount()));
 			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalVatAmount()));
 			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalNetAmount()));
-			ps.setDate(++index, Utils.getCurrentSqlDate());//updated
+			ps.setDate(++index, DateUtil.getCurrentSqlDate());//updated
 			ps.setString(++index, head.getUpdateBy());//updated_by
 			ps.setString(++index, head.getVatRate());
 			ps.setString(++index, head.getRequestNumber());//request_number
@@ -348,7 +349,7 @@ public class MStockDiscount {
 			ps = conn.prepareStatement(sql.toString());
 			ps.setString(++index, head.getStatus());//status
 			ps.setString(++index, Utils.isNull(head.getDescription()));//Description
-			ps.setDate(++index, Utils.getCurrentSqlDate());//updated
+			ps.setDate(++index, DateUtil.getCurrentSqlDate());//updated
 			ps.setString(++index, head.getUpdateBy());//updated_by
 			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalLineAmount()));
 			ps.setDouble(++index, Utils.convertStrToDouble(head.getTotalVatAmount()));
@@ -403,7 +404,7 @@ public class MStockDiscount {
 			ps.setDouble(++index, Utils.convertStrToDouble(model.getTotalVatAmount()));
 			ps.setDouble(++index, Utils.convertStrToDouble(model.getTotalNetAmount()));
 			ps.setString(++index, Utils.isNull(model.getVatRate()));
-			ps.setDate(++index, new java.sql.Date((Utils.parse(model.getBackDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
+			ps.setDate(++index, new java.sql.Date((DateUtil.parse(model.getBackDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)).getTime()));
 			ps.setNull(++index,java.sql.Types.TIMESTAMP);//updated 
 			
 			int ch = ps.executeUpdate();
@@ -557,7 +558,7 @@ public class MStockDiscount {
 			
 			ps.setString(++index, line.getStatus());//status
 			ps.setString(++index, head.getUserId());//USER_ID
-			ps.setDate(++index, Utils.getCurrentSqlDate());
+			ps.setDate(++index, DateUtil.getCurrentSqlDate());
 			ps.setString(++index, line.getUpdateBy());//UPDATE_BY
 			
 			ps.setString(++index, line.getRequestNumber());//request_number
@@ -706,8 +707,8 @@ public class MStockDiscount {
 			while (rst.next()) {
 				m = mCriteria;
 				m.setRequestNumber(rst.getString("request_number"));
-			    m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			    m.setBackDate(Utils.stringValue(rst.getDate("back_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			    m.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			    m.setBackDate(DateUtil.stringValue(rst.getDate("back_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			    m.setDescription(rst.getString("description"));
 			    m.setCustomerId(rst.getInt("customer_id"));
 				m.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
@@ -729,8 +730,8 @@ public class MStockDiscount {
 			    m.setCreatedBy(rst.getString("created_by"));
 			    m.setUpdateBy(rst.getString("updated_by"));
 			  
-			    m.setCreated(Utils.stringValue(rst.getDate("created"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			    m.setUpdated(Utils.stringValue(rst.getDate("updated"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			    m.setCreated(DateUtil.stringValue(rst.getDate("created"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			    m.setUpdated(DateUtil.stringValue(rst.getDate("updated"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 			    
 			    m.setTotalLineAmount(Utils.convertDoubleToStr(rst.getDouble("line_amount"),Utils.format_current_2_disgit));
 			    m.setTotalVatAmount(Utils.convertDoubleToStr(rst.getDouble("vat_amount"),Utils.format_current_2_disgit));
@@ -849,8 +850,8 @@ public class MStockDiscount {
 				  m.setUserId(rst.getString("user_id"));
 				  m.setCreatedBy(rst.getString("created_by"));
 				  
-				  m.setCreated(Utils.stringValue(rst.getDate("created"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				  m.setUpdated(Utils.stringValue(rst.getDate("updated"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setCreated(DateUtil.stringValue(rst.getDate("created"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setUpdated(DateUtil.stringValue(rst.getDate("updated"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  
 				  //logger.debug("updated_long["+rst.getLong("updated_long")+"]");
 				  m.setActionDate(m.getCreated());
@@ -1001,7 +1002,7 @@ public class MStockDiscount {
 				//Case requestNumber is not null get back from stockDiscount
 				if( !Utils.isNull(c.getRequestNumber()).equals("")){
 					Date backDateObj = new MStockDiscount().getBackDate(conn, Utils.isNull(c.getRequestNumber()));
-					backDate = Utils.stringValue(backDateObj, Utils.DD_MM_YYYY_WITH_SLASH);
+					backDate = DateUtil.stringValue(backDateObj, DateUtil.DD_MM_YYYY_WITH_SLASH);
 				}else{
 					// get back_date(from c_reference) for get data
 					List<References> backDateInvoiceStockDiscountList = InitialReferences.getReferenceListByCode(conn,InitialReferences.BACKDATE_INVOICE_STOCKDISCOUNT);
@@ -1011,7 +1012,7 @@ public class MStockDiscount {
 					   curdate.add(Calendar.MONTH, -1*Integer.parseInt(refbackDate.getKey()));
 					   
 					   logger.debug("backDate:"+curdate.getTime());
-					   backDate = Utils.stringValue(curdate.getTime(), Utils.DD_MM_YYYY_WITH_SLASH);
+					   backDate = DateUtil.stringValue(curdate.getTime(), DateUtil.DD_MM_YYYY_WITH_SLASH);
 					   //set to 01/mm/yyyy
 					   backDate = "01/"+backDate.substring(3,backDate.length());
 					   logger.debug("backDate:"+backDate);
@@ -1310,7 +1311,7 @@ public class MStockDiscount {
 				if(Utils.isNull(backDate).equals("")){
 					if( !Utils.isNull(c.getRequestNumber()).equals("")){
 						Date backDateObj = new MStockDiscount().getBackDate(conn, Utils.isNull(c.getRequestNumber()));
-						backDate = Utils.stringValue(backDateObj, Utils.DD_MM_YYYY_WITH_SLASH);
+						backDate = DateUtil.stringValue(backDateObj, DateUtil.DD_MM_YYYY_WITH_SLASH);
 					}else{
 						// get back_date(from c_reference) for get data
 						List<References> backDateInvoiceStockDiscountList = InitialReferences.getReferenceListByCode(conn,InitialReferences.BACKDATE_INVOICE_STOCKDISCOUNT);
@@ -1320,7 +1321,7 @@ public class MStockDiscount {
 						   curdate.add(Calendar.MONTH, -1*Integer.parseInt(refbackDate.getKey()));
 						   
 						   logger.debug("backDate:"+curdate.getTime());
-						   backDate = Utils.stringValue(curdate.getTime(), Utils.DD_MM_YYYY_WITH_SLASH);
+						   backDate = DateUtil.stringValue(curdate.getTime(), DateUtil.DD_MM_YYYY_WITH_SLASH);
 						   //set to 01/mm/yyyy
 						   backDate = "01/"+backDate.substring(3,backDate.length());
 						   logger.debug("backDate:"+backDate);

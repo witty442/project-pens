@@ -1,7 +1,8 @@
+<%@page import="com.pens.util.DateUtil"%>
 <%@page import="com.isecinc.pens.report.invoicepayment.InvoicePaymentReport"%>
 <%@page import="com.isecinc.pens.web.report.invoicepayment.InvoicePaymentReportForm"%>
 <%@page import="java.util.Date"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="util.SessionGen"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
@@ -42,7 +43,7 @@ function loadMe(){
 	new Epoch('epoch_popup','th',document.getElementById('receiptDate'));
 	
 	<%if(Utils.isNull(invoicePaymentReportForm.getInvoicePaymentReport().getReceiptDate()).equals("")){ %>
-	  $('#receiptDate').val('<%=Utils.stringValue(new Date(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)%>')
+	  $('#receiptDate').val('<%=DateUtil.stringValue(new Date(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)%>')
    <%}%>
 }
 

@@ -25,7 +25,6 @@ import com.isecinc.pens.bean.ReceiptMatch;
 import com.isecinc.pens.bean.TrxHistory;
 import com.isecinc.pens.bean.UOM;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MProduct;
@@ -41,6 +40,7 @@ import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
 import com.pens.util.DateToolsUtil;
 import com.pens.util.Debug;
+import com.pens.util.Utils;
 
 /**
  * Order Process Class

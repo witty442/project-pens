@@ -10,24 +10,24 @@
 	User user = (User)session.getAttribute("user");
 %>
 
-<%@page import="com.isecinc.pens.bean.User"%><jsp:useBean id="receiptForm" class="com.isecinc.pens.web.receipt.ReceiptForm" scope="request"/>
+<%@page import="com.isecinc.pens.bean.User"%>
+<jsp:useBean id="receiptForm" class="com.isecinc.pens.web.receipt.ReceiptForm" scope="request"/>
 <div align="left">&nbsp;&nbsp;ใบแจ้งหนี้</div>
-<table id="tblBill" align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+<div class="table-responsive">
+  <table class="table table-bordered table-striped table-light"
+     id="tblBill" width="100%" cellspacing="0">
+    <thead class="thead-dark">
 	<tr>
-		<th class="order"><bean:message key="No"  bundle="sysprop"/></th>
-		<%if(!user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
-		<th class="code"><bean:message key="Bill.No"  bundle="sysele"/></th>
-		<th class="code"><bean:message key="Order.No"  bundle="sysele"/></th>
-		<%} %>
-		<%if(user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
-		<th class="code"><bean:message key="Order.No"  bundle="sysele"/></th>
-		<%} %>
+		<th><bean:message key="No"  bundle="sysprop"/></th>
+		<th><bean:message key="Bill.No"  bundle="sysele"/></th>
+		<th><bean:message key="Order.No"  bundle="sysele"/></th>
 		<th><bean:message key="Description" bundle="sysele"/></th>
-		<th class="costprice"><bean:message key="TotalAmount"  bundle="sysele"/></th>
-		<th class="costprice"><bean:message key="Order.Behindhand" bundle="sysele"/></th>
-		<th class="costprice"><bean:message key="AmountReceived" bundle="sysele"/></th>
-		<th class="costprice"><bean:message key="Product.Balance" bundle="sysele"/></th>
+		<th><bean:message key="TotalAmount"  bundle="sysele"/></th>
+		<th><bean:message key="Order.Behindhand" bundle="sysele"/></th>
+		<th><bean:message key="AmountReceived" bundle="sysele"/></th>
+		<th><bean:message key="Product.Balance" bundle="sysele"/></th>
 	</tr>
+	</thead>
 	<c:forEach var="results" items="${receiptForm.lines}" varStatus="rows">
 	<c:choose>
 		<c:when test="${rows.index %2 == 0}">
@@ -39,17 +39,12 @@
 	</c:choose>
 	<tr class="<c:out value='${tabclass}'/>">
 		<td align="center">${rows.index+1}</td>
-		<%if(!user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
 		<td align="center">${results.arInvoiceNo}</td>
 		<td align="center">${results.salesOrderNo}</td>
-		<%} %>
-		<%if(user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
-		<td align="center">${results.order.orderNo}</td>
-		<%} %>
 		<td align="left">
 			${results.description}
 			<input type="hidden" name='bill.id' value='${results.id}'>
-			<input type='hidden' name='bill.orderId' value='${results.order.id}' >
+			<input type='hidden' name='bill.invoiceId' value='${results.order.invoiceId}' >
 			<input type='hidden' name='bill.invoiceNo' value='${results.arInvoiceNo}'>
 			<input type='hidden' name='bill.salesOrderNo' value='${results.salesOrderNo}'>
 			<input type='hidden' name='bill.netAmt' value='${results.invoiceAmount}'>
@@ -64,12 +59,9 @@
 	</tr>
 	</c:forEach>
 </table>
+</div>
 <table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
 	<tr>
-		<%if(!user.getRole().getKey().equalsIgnoreCase(User.DD)){ %>
 		<td align="left" colspan="8" class="footer">&nbsp;</td>
-		<%}else{ %>
-		<td align="left" colspan="6" class="footer">&nbsp;</td>
-		<%} %>
 	</tr>
 </table>

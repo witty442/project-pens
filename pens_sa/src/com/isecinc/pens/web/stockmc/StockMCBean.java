@@ -50,6 +50,8 @@ public class StockMCBean implements Serializable{
 	private String inStoreQty;
 	private String backendQty;
 	private String uom;
+	private String floorQty;
+	private String deepQty;
 	
 	private String frontendQty1;
 	private String uom1;
@@ -84,7 +86,27 @@ public class StockMCBean implements Serializable{
 
     private String imageFileName;
     private String typeSearch;
+    private String routeName;
     
+    
+	public String getRouteName() {
+		return routeName;
+	}
+	public void setRouteName(String routeName) {
+		this.routeName = routeName;
+	}
+	public String getFloorQty() {
+		return floorQty;
+	}
+	public void setFloorQty(String floorQty) {
+		this.floorQty = floorQty;
+	}
+	public String getDeepQty() {
+		return deepQty;
+	}
+	public void setDeepQty(String deepQty) {
+		this.deepQty = deepQty;
+	}
 	public String getStatusFlag() {
 		return statusFlag;
 	}

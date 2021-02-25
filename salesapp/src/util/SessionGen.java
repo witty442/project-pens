@@ -2,7 +2,8 @@ package util;
 
 import java.util.Date;
 
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class SessionGen {
     private static SessionGen _instance;
@@ -10,7 +11,7 @@ public class SessionGen {
 	
     public SessionGen(){
     	try{
-    		idSession = Utils.stringValue(new Date(),Utils.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH);
+    		idSession = DateUtil.stringValue(new Date(),DateUtil.DD_MM_YYYY_HH_mm_ss_WITHOUT_SLASH);
 		}catch(Exception e){
 		}
     }

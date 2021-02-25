@@ -1,3 +1,5 @@
+<%@page import="com.isecinc.pens.web.stockmc.StockMCBean"%>
+<%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="com.pens.util.SIdUtils"%>
@@ -12,15 +14,6 @@
 try{
 int tabIndex = 0;
 User user = (User)session.getAttribute("user");
-String screenWidth = "";
-if(session.getAttribute("screenWidth") != null){ 
-	screenWidth = (String)session.getAttribute("screenWidth");
-	int screenW = new Double(screenWidth).intValue();
-	if(screenW <=800){
-		screenW = 800;
-	}
-	//screenWidth = ""+(screenW-50);
-}
 String pageName = Utils.isNull(request.getParameter("pageName")); 
 String mobile = Utils.isNull(request.getParameter("mobile")); 
 String action = Utils.isNull(request.getParameter("action")); 
@@ -61,6 +54,13 @@ window.onhashchange=function(){window.location.hash="no-back-button";}
 
 function loadMe(){
 	
+}
+function gotoStockMCMStep3Select(customerCode,storeCode,customerName,storeName){
+	document.getElementById("customerCode").value =customerCode;
+	document.getElementById("storeCode").value=storeCode;
+	document.getElementById("customerName").value =customerName;
+	document.getElementById("storeName").value=storeName;
+	gotoStockMCMStep3();
 }
 //NextStep
 function gotoStockMCMStep3(){
@@ -110,9 +110,10 @@ function gotoStockMCMStep1(){
 
 		 <span title="StockMCMStep2">...</span>
 		 <div class="card mb-1 shadow-sm">
+		       <div class="card-header bg-info"><b>บันทึกสต๊อกห้าง</b></div>
 		       <div class="card-header">
 		                         วันที่นับสต๊อก: ${stockMCForm.bean.stockDate}
-			         <html:hidden property="bean.stockDate" styleId="stockDate" />
+			      <html:hidden property="bean.stockDate" styleId="stockDate" />
 		      </div> 
 		      <div class="card-header">
 		          <input type="button" name="x1" value="   เลือกห้าง   " class="btn btn-primary"
@@ -128,28 +129,71 @@ function gotoStockMCMStep1(){
 		           <input type="button" name="x2" value="   เลือกสาขา   " class="btn btn-primary"
 						  onclick="openPopup('${pageContext.request.contextPath}','BranchStockMC','true')"/>
 		      </div>
-		       <div class="card-header">
+		      <div class="card-header">
 		           <html:text property="bean.storeCode" styleId="storeCode" size="3" readonly="true"
 					     styleClass="disableText"/>-
 				   <html:text property="bean.storeName" styleId="storeName"  readonly="true"
 					     styleClass="disableText" />
 		      </div>
-		       <div class="card-header">
+		      <div class="card-header">
 		           <input type="button" name="backBT" value=" ย้อนกลับ   " class="btn btn-primary"
 					      onclick="gotoStockMCMStep1()"/> 
 				   <input type="button" name="nextBT" value=" หน้าถัดไป   " class="btn btn-success"
 					      onclick="gotoStockMCMStep3()"/>
 		      </div>
 		       <div class="card-header">
-		           
 		      </div>
 		</div>
-    
-	<!-- Hidden Field -->
-	 <input type="hidden" name="pageName" value="<%=pageName %>"/>
-	 <input type="hidden" name="mobile" value="<%=mobile %>"/>
-     <input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
-	<input type="hidden" id="nextStep" name="nextStep"/>
+  <%
+	if(1==1 && stockMCForm.getRouteList() != null && stockMCForm.getRouteList().size() >0){ %>
+      <div class="table-responsive">
+			 <table id="tblProduct" class="table table-hover table-fixed">
+			    <thead>
+			      <tr>
+			         <th class="bg-info">ชื่อเส้นทาง </th>	
+			         <th class="bg-info">ห้าง/สาขา</th>	
+				 </tr>
+				</thead>
+			  <!-- /Head Table -->
+			  <!-- Row Table -->
+			   <tbody>
+			  <%
+				 List<StockMCBean> results = stockMCForm.getRouteList();
+				 String tabclass = "";
+				 StockMCBean b = null;
+				 for(int i=0;i<results.size();i++){
+					b = results.get(i);
+					tabclass=i%2==0?"bg-light":"";
+					%>
+				<tr class="<%=tabclass%>">
+				  <td  width="30%" nowrap>
+				        <div>
+				          <%=b.getRouteName()%>               
+				        </div>
+					 </td>
+			       <td  width="30%" nowrap>
+				       <div>
+				           <a  href="#" 
+				             onclick ="gotoStockMCMStep3Select('<%=b.getCustomerCode()%>','<%=b.getStoreCode()%>'
+				             ,'<%=b.getCustomerName()%>','<%=b.getStoreName()%>')">
+				             
+				              <%=b.getCustomerCode()%>-<%=b.getCustomerName()%><br/> 
+				              / <%=b.getStoreCode()%>-<%=b.getStoreName()%>
+				          </a>
+				        </div>
+					 </td>
+				</tr>				
+			 <%} %>	
+			<!-- /Row Table -->
+			 </tbody>
+		   </table>
+		</div>
+	  <%} %>		
+	  <!-- Hidden Field -->
+	  <input type="hidden" name="pageName" value="<%=pageName %>"/>
+	  <input type="hidden" name="mobile" value="<%=mobile %>"/>
+      <input type="hidden" id="path" name="path" value="${pageContext.request.contextPath}"/>
+	  <input type="hidden" id="nextStep" name="nextStep"/>
 	</html:form>
 	<!-- BODY -->
 	

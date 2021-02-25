@@ -11,10 +11,11 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.bean.Stock;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.ExcelHeader;
+import com.pens.util.Utils;
 
 public class StockReport {
 
@@ -143,7 +144,7 @@ public class StockReport {
 				h.append("<tr class='"+classTRName+"'> \n");
 			    h.append("<td class='"+className+"' width='5%'>"+Utils.isNull(rs.getString("CODE"))+"</td> \n");
 				h.append("<td class='"+className+"' width='8%'>"+Utils.isNull(rs.getString("NAME"))+"</td> \n");
-				h.append("<td class='"+className+"' width='5%'>"+Utils.stringValue(rs.getDate("REQUEST_DATE"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td> \n");
+				h.append("<td class='"+className+"' width='5%'>"+DateUtil.stringValue(rs.getDate("REQUEST_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th)+"</td> \n");
 				h.append("<td class='"+className+"' width='5%'>"+Utils.isNull(rs.getString("REQUEST_NUMBER"))+"</td> \n");
 				h.append("<td class='"+className+"' width='3%'>"+Utils.isNull(rs.getString("STATUS"))+"</td> \n");
 				h.append("<td class='"+className+"' width='5%'>"+Utils.isNull(rs.getString("inventory_item_code"))+"</td> \n");
@@ -152,15 +153,15 @@ public class StockReport {
 				
 				h.append("<td class='"+classNameNumber+"' width='4%'>"+Utils.decimalFormat(rs.getDouble("QTY"),Utils.format_current_no_disgit)+"</td> \n");
 				h.append("<td class='"+classNameNumber+"' width='4%'>"+Utils.decimalFormat(rs.getDouble("sub"),Utils.format_current_no_disgit)+"</td> \n");
-				h.append("<td class='"+className+"' width='5%'>"+Utils.stringValueDefault(rs.getDate("EXPIRE_DATE"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th,"")+"</td> \n");
+				h.append("<td class='"+className+"' width='5%'>"+DateUtil.stringValueDefault(rs.getDate("EXPIRE_DATE"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th,"")+"</td> \n");
 				
 				h.append("<td class='"+classNameNumber+"' width='4%'>"+Utils.decimalFormat(rs.getDouble("QTY2"),Utils.format_current_no_disgit)+"</td> \n");
 				h.append("<td class='"+classNameNumber+"' width='4%'>"+Utils.decimalFormat(rs.getDouble("sub2"),Utils.format_current_no_disgit)+"</td> \n");
-				h.append("<td class='"+className+"' width='5%'>"+Utils.stringValueDefault(rs.getDate("EXPIRE_DATE2"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th,"")+"</td> \n");
+				h.append("<td class='"+className+"' width='5%'>"+DateUtil.stringValueDefault(rs.getDate("EXPIRE_DATE2"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th,"")+"</td> \n");
 				
 				h.append("<td class='"+classNameNumber+"' width='4%'>"+Utils.decimalFormat(rs.getDouble("QTY3"),Utils.format_current_no_disgit)+"</td> \n");
 				h.append("<td class='"+classNameNumber+"' width='4%'>"+Utils.decimalFormat(rs.getDouble("sub3"),Utils.format_current_no_disgit)+"</td> \n");
-				h.append("<td class='"+className+"' width='5%'>"+Utils.stringValueDefault(rs.getDate("EXPIRE_DATE3"), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th,"")+"</td> \n");
+				h.append("<td class='"+className+"' width='5%'>"+DateUtil.stringValueDefault(rs.getDate("EXPIRE_DATE3"), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th,"")+"</td> \n");
 				
 				h.append("</tr> \n");
 				

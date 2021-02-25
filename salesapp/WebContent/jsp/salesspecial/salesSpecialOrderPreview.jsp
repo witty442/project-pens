@@ -3,7 +3,7 @@
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.isecinc.pens.web.salesspecial.OrderSpecialForm"%>
 <%@page import="util.SessionGen"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="java.util.Locale"%>
 <%@page import="com.isecinc.pens.SystemProperties"%>
 <%@page import="com.isecinc.pens.bean.User"%>

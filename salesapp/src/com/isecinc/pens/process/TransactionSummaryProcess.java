@@ -144,7 +144,7 @@ public class TransactionSummaryProcess {
 	 * @param customerId
 	 * @return
 	 */
-	private String createSQL(TransactionSummary criteria, int customerId) throws Exception {
+	private String createSQL(TransactionSummary criteria, long customerId) throws Exception {
 		String sql = "";
 
 		sql += "select * from ( ";

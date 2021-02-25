@@ -10,15 +10,13 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.bean.CustomerSequence;
 import com.isecinc.pens.bean.DocSequence;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.model.MCustomerSequence;
 import com.isecinc.pens.model.MDocSequence;
 import com.isecinc.pens.model.MUser;
-import com.isecinc.pens.process.SequenceProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * DocumentSequenceProcess Class
@@ -86,10 +84,7 @@ public abstract class DocumentSequenceProcess {
 			if (user.getType().equalsIgnoreCase(User.TT) || user.getType().equalsIgnoreCase(User.VAN)) {
 				whereCause.append("\n AND sales_code = '" + salesCode + "' ");
 			}
-			if (user.getType().equalsIgnoreCase(User.DD)) {
-				whereCause.append("\n AND sales_code = '' ");
-			}
-
+			
 			logger.debug("sql:"+whereCause.toString());
 			
 			DocSequence[] seq = new MDocSequence().search(whereCause.toString());
@@ -104,9 +99,6 @@ public abstract class DocumentSequenceProcess {
 				whereCause.append("\n  AND doctype_id = " + docTypeId);
 				if (user.getType().equalsIgnoreCase(User.TT) || user.getType().equalsIgnoreCase(User.VAN)) {
 					whereCause.append("\n AND sales_code = '" + salesCode + "' ");
-				}
-				if (user.getType().equalsIgnoreCase(User.DD)) {
-					whereCause.append("\n AND sales_code = '' ");
 				}
 				DocSequence[] docSeqFindOrderType = new MDocSequence().search(whereCause.toString());
 				
@@ -1490,7 +1482,7 @@ public int getNexSeqAndChkDuplicate(Connection conn,String tableName,String colu
 		Statement stmt = null;
 		ResultSet rst = null;
 		try {
-			currSeq = SequenceProcess.getNextValue(tableName);//Add Next Seq
+			currSeq = SequenceProcessAll.getIns().getNextValue(tableName).intValue();//Add Next Seq
 			stmt = conn.createStatement();
 			String sql = "SELECT "+columnSeqName+" FROM "+tableName;
 			sql += " WHERE "+columnSeqName+"=" + currSeq + " ";

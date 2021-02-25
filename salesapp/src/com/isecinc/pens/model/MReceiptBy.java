@@ -8,9 +8,9 @@ import java.util.List;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ReceiptBy;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * Receipt BY Model
@@ -68,9 +68,9 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 	 * @throws Exception
 	 */
 	public boolean save(ReceiptBy receiptBy, int activeUserID, Connection conn) throws Exception {
-		int id = 0;
+		long id = 0;
 		if (receiptBy.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("t_receipt_by.receipt_by_id").longValue();
 		} else {
 			id = receiptBy.getId();
 		}
@@ -128,7 +128,7 @@ public class MReceiptBy extends I_Model<ReceiptBy> {
 	}
 
 	public boolean checkChqueNoDuplicate(String tableName, String columnId,
-			String columnDoc, String documentNo, int id, Connection conn)
+			String columnDoc, String documentNo, long id, Connection conn)
 			throws Exception {
 		logger.debug(String.format("Check Duplicate %s[%s] - %s[%s]", tableName, columnId, columnDoc, documentNo));
 		Statement stmt = null;

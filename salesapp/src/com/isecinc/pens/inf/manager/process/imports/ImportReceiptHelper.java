@@ -14,12 +14,12 @@ import com.isecinc.pens.bean.Adjust;
 import com.isecinc.pens.bean.CreditNote;
 import com.isecinc.pens.bean.Receipt;
 import com.isecinc.pens.bean.ReceiptLine;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.process.imports.ImportReceiptFunction.ReceiptFunctionBean;
 import com.isecinc.pens.model.MCreditNote;
 import com.isecinc.pens.model.MReceipt;
 import com.isecinc.pens.model.MReceiptLine;
+import com.pens.util.DBConnection;
+import com.pens.util.Utils;
 
 public class ImportReceiptHelper {
 

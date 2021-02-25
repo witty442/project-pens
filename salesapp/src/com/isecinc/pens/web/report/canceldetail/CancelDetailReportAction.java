@@ -12,12 +12,12 @@ import org.apache.struts.action.ActionForm;
 import com.isecinc.core.report.I_ReportAction;
 import com.isecinc.pens.bean.Order;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MOrder;
 import com.isecinc.pens.report.canceldetail.CancelDetailReport;
 import com.isecinc.pens.report.canceldetail.CancelDetailReportProcess;
 import com.isecinc.pens.report.invoicedetail.InvoiceDetailReport;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.Utils;
 
 
 /**

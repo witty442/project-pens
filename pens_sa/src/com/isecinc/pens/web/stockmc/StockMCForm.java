@@ -14,6 +14,7 @@ public class StockMCForm extends I_Form {
 
 	private static final long serialVersionUID = 8932109820314224488L;
     private List<StockMCBean> results = new ArrayList<StockMCBean>();
+    private List<StockMCBean> routeList = new ArrayList<StockMCBean>();
     private String pageName;
     private StockMCBean bean ;
     private StockMCBean beanCriteria ;
@@ -22,6 +23,12 @@ public class StockMCForm extends I_Form {
     private FormFile imageFile;
     
     
+	public List<StockMCBean> getRouteList() {
+		return routeList;
+	}
+	public void setRouteList(List<StockMCBean> routeList) {
+		this.routeList = routeList;
+	}
 	public FormFile getImageFile() {
 		return imageFile;
 	}

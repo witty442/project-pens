@@ -1271,16 +1271,19 @@ public class PopupDAO {
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
 		String customerCode = "";
+		String filterUser = "";
 		try {
 			conn = DBConnection.getInstance().getConnectionApps();
 			logger.debug("searchCustomerStockMC");
 
 			//criteria
 			if(c.getCriteriaMap() != null){
+			   filterUser = Utils.isNull(c.getCriteriaMap().get("filterUser"));
 			   customerCode = Utils.isNull(c.getCriteriaMap().get("customerCode"));
 			}else{
 			   customerCode = Utils.isNull(c.getCodeSearch());
 			}
+			logger.debug("filterUser:"+filterUser);
 			logger.debug("customerCode:"+customerCode);
 			
 			sql.append("\n select c.customer_code ,c.customer_name,c.cust_type ");
@@ -1293,7 +1296,12 @@ public class PopupDAO {
 			if( !Utils.isNull(c.getDescSearch()).equals("")){
 				sql.append("\n and c.customer_name LIKE '%"+c.getDescSearch()+"%' ");
 			}
-			
+			if(filterUser.equalsIgnoreCase("true")){
+				sql.append("\n and c.customer_code in( ");
+				sql.append("\n   select customer_code from PENSBI.MC_CUST_ROUTE ");
+				sql.append("\n   where user_name = '"+c.getUser().getUserName()+"' ");
+				sql.append("\n ) ");
+			}
 			sql.append("\n  ORDER BY c.customer_code asc ");
 			
 			logger.debug("sql:"+sql);
@@ -1329,13 +1337,15 @@ public class PopupDAO {
 		StringBuilder sql = new StringBuilder();
 		Connection conn = null;
 		String customerCode = "";
+		String filterUser = "";
 		try {
 			conn = DBConnection.getInstance().getConnectionApps();
 			logger.debug("searchBranchStockMC");
 
 			//criteria
 			if(c.getCriteriaMap() != null){
-			   customerCode = Utils.isNull(c.getCriteriaMap().get("customerCode"));
+				filterUser = Utils.isNull(c.getCriteriaMap().get("filterUser"));
+			    customerCode = Utils.isNull(c.getCriteriaMap().get("customerCode"));
 			}
 			logger.debug("customerCode:"+customerCode);
 			
@@ -1351,7 +1361,12 @@ public class PopupDAO {
 			if( !Utils.isNull(c.getDescSearch()).equals("")){
 				sql.append("\n and c.branch_name LIKE '%"+c.getDescSearch()+"%' ");
 			}
-			
+			if(filterUser.equalsIgnoreCase("true")){
+				sql.append("\n and (c.customer_code,c.branch_no) in( ");
+				sql.append("\n   select customer_code ,branch_no from PENSBI.MC_CUST_ROUTE ");
+				sql.append("\n   where user_name = '"+c.getUser().getUserName()+"' ");
+				sql.append("\n ) ");
+			}
 			sql.append("\n  ORDER BY c.branch_no asc ");
 			
 			logger.debug("sql:"+sql);

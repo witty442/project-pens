@@ -9,7 +9,7 @@ import java.util.List;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Adjust;
 import com.isecinc.pens.bean.CreditNote;
-import com.isecinc.pens.inf.helper.DBConnection;
+import com.pens.util.DBConnection;
 
 /**
  * Credit Note Model

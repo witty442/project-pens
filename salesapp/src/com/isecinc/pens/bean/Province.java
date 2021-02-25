@@ -25,21 +25,21 @@ public class Province implements Serializable {
 	 * @throws Exception
 	 */
 	public Province(ResultSet rst) throws Exception {
-		setId(rst.getInt("PROVINCE_ID"));
+		setId(rst.getString("PROVINCE_ID"));
 		setName(rst.getString("NAME").trim());
 	}
 
 	/** ID */
-	private int id;
+	private String id;
 
 	/** NAME */
 	private String name;
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

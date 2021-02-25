@@ -1,5 +1,5 @@
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
-<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+<%@page import="com.pens.util.Utils"%>
+<%@page import="com.pens.util.DBConnection"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="com.isecinc.pens.model.MCustomer"%>
 <%@page import="com.isecinc.pens.bean.User"%>

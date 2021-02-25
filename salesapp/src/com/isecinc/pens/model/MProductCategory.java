@@ -10,9 +10,9 @@ import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.ProductCategory;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 
 /**
  * MProductCategory Class

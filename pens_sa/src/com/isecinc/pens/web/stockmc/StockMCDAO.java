@@ -5,12 +5,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.isecinc.pens.bean.User;
 import com.pens.util.DBConnection;
 import com.pens.util.DateUtil;
+import com.pens.util.EnvProperties;
 import com.pens.util.FileUtil;
 import com.pens.util.SQLHelper;
 import com.pens.util.Utils;
@@ -32,6 +36,13 @@ public class StockMCDAO {
 			sql.append("\n   ,B.BRANCH_NO,B.BRANCH_NAME ");
 			sql.append("\n   FROM PENSBI.MC_CUST C ,PENSBI.MC_CUST_BRANCH B");
 			sql.append("\n   WHERE C.customer_code = B.customer_code ");
+			//filter by user login
+			if( !o.getCreateUser().equalsIgnoreCase("admin")){
+				sql.append("\n  and (B.customer_code,B.branch_no) in( ");
+				sql.append("\n    select customer_code ,branch_no from PENSBI.MC_CUST_ROUTE ");
+				sql.append("\n    where user_name = '"+o.getCreateUser()+"' ");
+				sql.append("\n  ) ");
+			}
 			sql.append("\n )C ");
 			sql.append("\n WHERE H.customer_code = C.customer_code ");
 			sql.append("\n AND H.store_code = C.branch_no ");
@@ -75,6 +86,13 @@ public class StockMCDAO {
 			sql.append("\n   ,B.BRANCH_NO,B.BRANCH_NAME ");
 			sql.append("\n   FROM PENSBI.MC_CUST C ,PENSBI.MC_CUST_BRANCH B");
 			sql.append("\n   WHERE C.customer_code = B.customer_code ");
+			//filter by user login
+			if( !o.getCreateUser().equalsIgnoreCase("admin")){
+				sql.append("\n  and (B.customer_code,B.branch_no) in( ");
+				sql.append("\n    select customer_code ,branch_no from PENSBI.MC_CUST_ROUTE ");
+				sql.append("\n    where user_name = '"+o.getCreateUser()+"' ");
+				sql.append("\n  ) ");
+			}
 			sql.append("\n )C ");
 			sql.append("\n WHERE H.customer_code = C.customer_code ");
 			sql.append("\n AND H.store_code = C.branch_no ");
@@ -235,6 +253,8 @@ public class StockMCDAO {
 			   h.setRetailPriceBF(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit)));
 			   h.setPromotionPrice(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("PROMOTION_PRICE"), Utils.format_current_2_disgit)));
 			   h.setLegQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("LEG_QTY"), Utils.format_current_no_disgit)));
+			   h.setFloorQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FLOOR_QTY"), Utils.format_current_no_disgit)));
+			   h.setDeepQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("DEEP_QTY"), Utils.format_current_no_disgit)));
 			   h.setBackendQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("BACKEND_QTY"), Utils.format_current_no_disgit)));
 			   h.setInStoreQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("IN_STORE_QTY"), Utils.format_current_no_disgit)));
 			   h.setUom(Utils.isNull(rst.getString("uom")));
@@ -331,6 +351,8 @@ public class StockMCDAO {
 			   h.setPromotionPrice(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("PROMOTION_PRICE"), Utils.format_current_2_disgit)));
 			   h.setMasterLegQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("MASTER_LEG_QTY"), Utils.format_current_no_disgit)));
 			   h.setLegQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("LEG_QTY"), Utils.format_current_no_disgit)));
+			   h.setFloorQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FLOOR_QTY"), Utils.format_current_no_disgit)));
+			   h.setDeepQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("DEEP_QTY"), Utils.format_current_no_disgit)));
 			   h.setBackendQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("BACKEND_QTY"), Utils.format_current_no_disgit)));
 			   h.setInStoreQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("IN_STORE_QTY"), Utils.format_current_no_disgit)));
 			   h.setUom(Utils.isNull(rst.getString("uom")));
@@ -375,6 +397,9 @@ public class StockMCDAO {
 		StockMCBean h = null;
 		List<StockMCBean> items = new ArrayList<StockMCBean>();
 		int no =0;
+		String imageFileName ="";
+		String pathImage = EnvProperties.getInstance().getProperty("path.stockmc.photo");
+		Map<String, String> imageCheckMap = new HashMap<String, String>();
 		try {
 			sql.append("\n select ");
 			sql.append("\n  H.stock_date,H.customer_code,H.store_code,H.create_user");
@@ -510,6 +535,8 @@ public class StockMCDAO {
 			   h.setRetailPriceBF(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("RETAIL_PRICE_BF"), Utils.format_current_2_disgit)));
 			   h.setPromotionPrice(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("PROMOTION_PRICE"), Utils.format_current_2_disgit)));
 			   h.setLegQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("LEG_QTY"), Utils.format_current_no_disgit)));
+			   h.setFloorQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("FLOOR_QTY"), Utils.format_current_no_disgit)));
+			   h.setDeepQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("DEEP_QTY"), Utils.format_current_no_disgit)));
 			   h.setBackendQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("BACKEND_QTY"), Utils.format_current_no_disgit)));
 			   h.setInStoreQty(Utils.isNullDoubleStrToBlank(Utils.decimalFormat(rst.getDouble("IN_STORE_QTY"), Utils.format_current_no_disgit)));
 			   h.setUom(Utils.isNull(rst.getString("uom")));
@@ -534,6 +561,16 @@ public class StockMCDAO {
 			   h.setReasonDDesc(Utils.isNull(rst.getString("reason_d_desc")));
 			   h.setNote(Utils.isNull(rst.getString("note")));
 			   
+			   //check image file exist show image
+			   imageFileName  = h.getStockDate().replaceAll("\\/", "")+"-"+h.getCustomerCode();
+		       imageFileName +="-"+h.getStoreCode()+"-"+h.getBrand()+".jpg";
+		       if(imageCheckMap.get(imageFileName)==null){//for check no dup check
+			       if(FileUtil.isFileExist(pathImage+imageFileName)){
+			          h.setImageFileName(imageFileName);
+				   }
+		       }
+		       imageCheckMap.put(imageFileName, "checkedImage");
+		       
 			   items.add(h);
 			}//while
 
@@ -847,6 +884,8 @@ public class StockMCDAO {
 			}else if(line.getItemCheck().equals("N")){
 				//clear Y
 				line.setLegQty("");
+				line.setFloorQty("");
+				line.setDeepQty("");
 				line.setInStoreQty("");
 				line.setBackendQty("");
 				line.setUom("");
@@ -865,6 +904,8 @@ public class StockMCDAO {
 			}else if(line.getItemCheck().equals("D")){
 				//clear Y
 				line.setLegQty("");
+				line.setFloorQty("");
+				line.setDeepQty("");
 				line.setInStoreQty("");
 				line.setBackendQty("");
 				line.setUom("");
@@ -992,12 +1033,12 @@ public class StockMCDAO {
 			sql.append(" FRONTEND_QTY_1, UOM_1, EXPIRE_DATE_1,FRONTEND_QTY_2,UOM_2, \n");//16
 			sql.append(" EXPIRE_DATE_2, FRONTEND_QTY_3, UOM_3, EXPIRE_DATE_3,CREATE_DATE  \n");//
 			sql.append(" ,CREATE_USER,BARCODE,ITEM_CHECK,date_In_Store,date_In_Store_qty,reason_n_id,reason_d_id");
-			sql.append(" ,note)");
+			sql.append(" ,note,FLOOR_QTY ,DEEP_QTY)");
 			sql.append(" VALUES (?,?,?,?,?,?,"
 					          + "?,?,?,?,?,?,"
 					          + "?,?,?,?,?,?,"
 					          + "?,?,?,?,?,?,"
-					          + "?,?,?,?,?) \n");//
+					          + "?,?,?,?,?,?,?) \n");//
 
 			logger.debug("SQL:"+sql);
 			
@@ -1054,6 +1095,9 @@ public class StockMCDAO {
 			ps.setString(++index, Utils.isNull(line.getReasonNId()));//27
 			ps.setString(++index, Utils.isNull(line.getReasonDId()));//28
 			ps.setString(++index, Utils.isNull(line.getNote()));//29
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getFloorQty()));//
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getDeepQty()));//
+			
 			int ch = ps.executeUpdate();
 			result = ch>0?true:false;
 			
@@ -1079,7 +1123,7 @@ public class StockMCDAO {
 			sql.append(" FRONTEND_QTY_1=? , UOM_1=? , EXPIRE_DATE_1=? ,FRONTEND_QTY_2=? ,UOM_2=? , \n");//10
 			sql.append(" EXPIRE_DATE_2=? , FRONTEND_QTY_3=? , UOM_3=? , EXPIRE_DATE_3=? ,UPDATE_DATE=? ,UPDATE_USER =? , \n");//16
 			sql.append(" ITEM_CHECK=? ,date_In_Store=? ,date_In_Store_qty = ? ,reason_n_id = ? ,reason_d_id = ?, \n");
-			sql.append(" NOTE=? \n");
+			sql.append(" NOTE=? ,FLOOR_QTY = ? ,DEEP_QTY = ?  \n");
 			sql.append(" WHERE ID = ? AND LINE_ID = ? \n");//18
 
 			//logger.debug("SQL:"+sql);
@@ -1131,6 +1175,9 @@ public class StockMCDAO {
 			ps.setString(++index, Utils.isNull(line.getReasonDId()));
 			ps.setString(++index, Utils.isNull(line.getNote()));
 			
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getFloorQty()));//
+			ps.setDouble(++index, Utils.convertStrToDouble(line.getDeepQty()));//
+			
 			//key update
 			ps.setInt(++index, line.getId());
 			ps.setLong(++index, line.getLineId());//18
@@ -1172,5 +1219,62 @@ public class StockMCDAO {
 			}
 		}
 		return result;
+	}
+	public List<StockMCBean> searchRouteList(User user) throws Exception {
+		Connection conn = null;
+		try{
+			conn = DBConnection.getInstance().getConnection();
+			return searchRouteList(conn,user);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();
+		}
+	}
+	public List<StockMCBean> searchRouteList(Connection conn,User user) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rst = null;
+		StringBuilder sql = new StringBuilder();
+		StockMCBean h = null;
+		List<StockMCBean> routeList = new ArrayList<StockMCBean>();
+		try {
+			sql.append("\n select H.route_name ,H.customer_code ,H.branch_no");
+			sql.append("\n ,C.customer_name ,C.branch_name");
+			sql.append("\n FROM PENSBI.MC_CUST_ROUTE H");
+			sql.append("\n ,( ");
+			sql.append("\n   SELECT DISTINCT C.CUSTOMER_CODE,C.CUSTOMER_NAME ");
+			sql.append("\n   ,B.BRANCH_NO,B.BRANCH_NAME ");
+			sql.append("\n   FROM PENSBI.MC_CUST C ,PENSBI.MC_CUST_BRANCH B");
+			sql.append("\n   WHERE C.customer_code = B.customer_code ");
+			sql.append("\n )C ");
+			sql.append("\n WHERE H.customer_code = C.customer_code ");
+			sql.append("\n AND H.branch_no = C.branch_no ");
+			sql.append("\n AND H.user_name ='"+user.getUserName()+"'");
+			sql.append("\n ORDER BY C.customer_name ,C.branch_name");
+			
+			logger.debug("sql:"+sql);
+			
+			ps = conn.prepareStatement(sql.toString());
+			rst = ps.executeQuery();
+			while(rst.next()) {
+			   h = new StockMCBean();
+			   h.setRouteName(Utils.isNull(rst.getString("route_name")));
+			   h.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
+			   h.setCustomerName(Utils.isNull(rst.getString("customer_name")));
+			   h.setStoreCode(Utils.isNull(rst.getString("branch_no")));
+			   h.setStoreName(Utils.isNull(rst.getString("branch_name")));
+			   
+			   routeList.add(h);
+			}//while
+
+		} catch (Exception e) {
+			throw e;
+		} finally {
+			try {
+				rst.close();
+				ps.close();
+			} catch (Exception e) {}
+		}
+		return routeList;
 	}
 }

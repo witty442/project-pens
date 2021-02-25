@@ -14,15 +14,16 @@ import com.isecinc.core.report.I_ReportProcess;
 import com.isecinc.pens.bean.SalesTargetNew;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MSalesTargetNew;
 import com.isecinc.pens.model.MOrderLine;
 import com.isecinc.pens.model.MSalesTargetPeriod;
 import com.isecinc.pens.model.MUOM;
 import com.isecinc.pens.model.MUOMConversion;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 
 /**
@@ -77,7 +78,7 @@ public class SalesTargetSummaryReportProcess extends I_ReportProcess<SalesTarget
 		String p_productCodeFrom = report.getProductCodeFrom();
 		String p_productCodeTo = report.getProductCodeTo();
 		Calendar c = Calendar.getInstance(Locale.US);
-		c.setTime(Utils.parse(p_dateFrom,Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+		c.setTime(DateUtil.parse(p_dateFrom,DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 	
 		int month = c.get(Calendar.MONTH)+1;
 		int year = c.get(Calendar.YEAR);

@@ -1524,6 +1524,8 @@ public class OrderAction extends I_Action {
 				pReceiptByMsg = "AliPay";	
 			}else if("WE".equals(order.getPaymentMethod())){
 				pReceiptByMsg = "WeChat";	
+			}else if("QR".equals(order.getPaymentMethod())){
+				pReceiptByMsg = "QRCODE";
 			}else{
 				String creditCardNo = "";
 				if( !Utils.isNull(order.getCreditCardNo()).equals("")){

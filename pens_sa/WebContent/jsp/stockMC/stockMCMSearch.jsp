@@ -135,7 +135,7 @@ function gotoPage(currPage){
 			<jsp:include page="../error.jsp"/>
 			
 			 <span title="stockMCMSearch(new)">...</span>
-			  
+			 <div class="card-header bg-info"><b>ค้นหาประวัติบันทึกสต๊อกห้าง</b></div>
 			 <div class="card-header">
 			          วันที่ :
 			       <html:text property="bean.stockDate" styleId="stockDate" 

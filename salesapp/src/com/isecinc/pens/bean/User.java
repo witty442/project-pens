@@ -9,9 +9,9 @@ import java.util.List;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_PO;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.jcraft.jsch.Logger;
+import com.pens.util.Utils;
 
 /**
  * User
@@ -197,8 +197,17 @@ public class User extends I_PO implements Serializable {
 	private String pdPaid;
     /** moneyToPens */
     private String moneyToPens;
+    private boolean mobile;
     
     
+	public boolean isMobile() {
+		return mobile;
+	}
+
+	public void setMobile(boolean mobile) {
+		this.mobile = mobile;
+	}
+
 	public String getMoneyToPens() {
 		return moneyToPens;
 	}

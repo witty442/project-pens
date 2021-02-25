@@ -1,4 +1,4 @@
-<%@page import="com.isecinc.pens.inf.helper.DBConnection"%>
+<%@page import="com.pens.util.DBConnection"%>
 <%@page import="java.sql.Connection"%>
 <%@page import="util.SessionGen"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>

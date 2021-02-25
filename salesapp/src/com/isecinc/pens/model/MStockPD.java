@@ -18,13 +18,14 @@ import com.isecinc.pens.bean.StockPD;
 import com.isecinc.pens.bean.StockPDLine;
 import com.isecinc.pens.bean.UOMConversion;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.MoveOrderReqDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
 import com.pens.util.NumberToolsUtil;
+import com.pens.util.Utils;
 
 public class MStockPD {
 
@@ -51,7 +52,7 @@ public class MStockPD {
 				
 				//Validate requestDate Case diff day(month end date - request date) = 2  set request date = 01/nextMonth/nextYear
 				head = checkRequestDate(head);
-				Date requestDate = Utils.parse(head.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				Date requestDate = DateUtil.parse(head.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				
 				requestNumber = new MoveOrderReqDocumentProcess().getNextDocumentNo(requestDate,user.getCode(), head.getPdCode(),user.getId(), conn);
 				
@@ -105,7 +106,7 @@ public class MStockPD {
 			Calendar currentDate = Calendar.getInstance();
 			
 			String requestDateStr = "01/12/2555";
-			Date requestDateObj = Utils.parse(requestDateStr, Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+			Date requestDateObj = DateUtil.parse(requestDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
 			Calendar requestDate = Calendar.getInstance();
 			requestDate.setTime(requestDateObj);
 			int dayInMonthOfRequestDate = requestDate.get(Calendar.DATE);
@@ -148,7 +149,7 @@ public class MStockPD {
 			
             Calendar currentDate = Calendar.getInstance();
 			
-			Date requestDateObj = Utils.parse(head.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+			Date requestDateObj = DateUtil.parse(head.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
 			Calendar requestDate = Calendar.getInstance();
 			requestDate.setTime(requestDateObj);
 			int dayInMonthOfRequestDate = requestDate.get(Calendar.DATE);
@@ -173,7 +174,7 @@ public class MStockPD {
 				currentDate.add(Calendar.MONTH, 1);//next Month or NextYear 
 				currentDate.set(Calendar.DATE, 1);//set to 01/xx/xxxx
 				
-				String requestDateStr = Utils.stringValue(currentDate.getTime(), Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
+				String requestDateStr = DateUtil.stringValue(currentDate.getTime(), DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th);
 				head.setRequestDate(requestDateStr);
 				System.out.println("requestDate :"+head.getRequestDate());
 			}
@@ -485,8 +486,8 @@ public class MStockPD {
 				if( !Utils.isNull(mCriteria.getRequestDateFrom()).equals("")
 					&&	!Utils.isNull(mCriteria.getRequestDateTo()).equals("")	){
 						
-					  sql.append(" and h.request_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.request_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.request_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getRequestDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.request_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getRequestDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 				sql.append("\n  ORDER BY h.request_date desc \n");
 				
@@ -500,7 +501,7 @@ public class MStockPD {
 				  StockPD m = new StockPD();
 				  m.setNo(no+"");
 				  m.setRequestNumber(rst.getString("request_number"));
-				  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				  m.setOrganizationId(rst.getString("organization_id"));
 				  
 				  m.setSalesCode(rst.getString("sales_code"));
@@ -576,8 +577,8 @@ public class MStockPD {
 			while (rst.next()) {
 			  m = mCriteria;
 			  m.setRequestNumber(rst.getString("request_number"));
-			  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-			  requestDate = Utils.parse(m.getRequestDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+			  m.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+			  requestDate = DateUtil.parse(m.getRequestDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
 			  //Check 
 			  if(requestDate != null){
 				  if(currentDate.before(requestDate)){

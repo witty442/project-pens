@@ -16,12 +16,13 @@ import com.isecinc.pens.bean.RequestPromotion;
 import com.isecinc.pens.bean.RequestPromotionCost;
 import com.isecinc.pens.bean.RequestPromotionLine;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
 import com.isecinc.pens.process.document.ReqPromotionDocumentProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.DateUtil;
+import com.pens.util.Utils;
 
 public class MRequestPromotion {
 
@@ -130,7 +131,7 @@ public class MRequestPromotion {
 			Calendar currentDate = Calendar.getInstance();
 			
 			String requestDateStr = "01/12/2555";
-			Date requestDateObj = Utils.parse(requestDateStr, Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+			Date requestDateObj = DateUtil.parse(requestDateStr, DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
 			Calendar requestDate = Calendar.getInstance();
 			requestDate.setTime(requestDateObj);
 			int dayInMonthOfRequestDate = requestDate.get(Calendar.DATE);
@@ -190,11 +191,11 @@ public class MRequestPromotion {
 			ps.setString(++index, head.getPhone());//
 			
 			if( !Utils.isNull(head.getPromotionStartDate()).equals("")){
-				Date d = Utils.parse(head.getPromotionStartDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+				Date d = DateUtil.parse(head.getPromotionStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th);
 				ps.setDate(++index,new java.sql.Date(d.getTime()));//
 			}
 			if( !Utils.isNull(head.getPromotionEndDate()).equals("")){
-				Date d = Utils.parse(head.getPromotionEndDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+				Date d = DateUtil.parse(head.getPromotionEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, DateUtil.local_th);
 				ps.setDate(++index,new java.sql.Date(d.getTime()));//
 			}
 			
@@ -358,11 +359,11 @@ public class MRequestPromotion {
 			ps.setString(++index, model.getRemark());//
 			
 			if( !Utils.isNull(model.getPromotionStartDate()).equals("")){
-				Date d = Utils.parse(model.getPromotionStartDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+				Date d = DateUtil.parse(model.getPromotionStartDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
 				ps.setDate(++index,new java.sql.Date(d.getTime()));//
 			}
 			if( !Utils.isNull(model.getPromotionEndDate()).equals("")){
-				Date d = Utils.parse(model.getPromotionEndDate(), Utils.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
+				Date d = DateUtil.parse(model.getPromotionEndDate(), DateUtil.DD_MM_YYYY_WITH_SLASH, Utils.local_th);
 				ps.setDate(++index,new java.sql.Date(d.getTime()));//
 			}
 			ps.setString(++index, model.getStatus());//
@@ -601,8 +602,8 @@ public class MRequestPromotion {
 				if( !Utils.isNull(mCriteria.getRequestDateFrom()).equals("")
 					&&	!Utils.isNull(mCriteria.getRequestDateTo()).equals("")	){
 						
-					  sql.append(" and h.request_date >= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateFrom(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
-					  sql.append(" and h.request_date <= str_to_date('"+Utils.format(Utils.parseToBudishDate(mCriteria.getRequestDateTo(),Utils.DD_MM_YYYY_WITH_SLASH),Utils.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.request_date >= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getRequestDateFrom(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
+					  sql.append(" and h.request_date <= str_to_date('"+DateUtil.format(DateUtil.parseToBudishDate(mCriteria.getRequestDateTo(),DateUtil.DD_MM_YYYY_WITH_SLASH),DateUtil.DD_MM_YYYY_WITH_SLASH)+"','%d/%m/%Y') \n");
 				}
 				sql.append("\n  ORDER BY h.request_no desc \n");
 				
@@ -616,7 +617,7 @@ public class MRequestPromotion {
 				  RequestPromotion m = new RequestPromotion();
 				  m.setNo(no+"");
 				  m.setRequestNo(rst.getString("request_no"));
-				  m.setRequestDate(Utils.stringValue(rst.getDate("request_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setRequestDate(DateUtil.stringValue(rst.getDate("request_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,DateUtil.local_th));
 				  m.setUser(user);
 				  m.setStatus(Utils.isNull(rst.getString("status")));
 				  m.setStatusDesc(getStatusDesc(m.getStatus()));
@@ -630,8 +631,8 @@ public class MRequestPromotion {
 				  m.setCustomerCode(Utils.isNull(rst.getString("customer_code")));
 				  m.setCustomerName(Utils.isNull(rst.getString("customer_name")));
 				  
-				  m.setPromotionStartDate(Utils.stringValue(rst.getDate("promotion_start_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
-				  m.setPromotionEndDate(Utils.stringValue(rst.getDate("promotion_end_date"),Utils.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setPromotionStartDate(DateUtil.stringValue(rst.getDate("promotion_start_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
+				  m.setPromotionEndDate(DateUtil.stringValue(rst.getDate("promotion_end_date"),DateUtil.DD_MM_YYYY_WITH_SLASH,Utils.local_th));
 				  m.setRemark(Utils.isNull(rst.getString("remark")));
 				  m.setExported(Utils.isNull(rst.getString("exported")));
 				  
@@ -640,7 +641,7 @@ public class MRequestPromotion {
 				  m.setTerritory(territory);
 				  
 				  if(rst.getDate("print_date") != null)
-				     m.setPrintDate(Utils.stringValue(rst.getTimestamp("print_date"),Utils.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,Utils.local_th));
+				     m.setPrintDate(DateUtil.stringValue(rst.getTimestamp("print_date"),DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,DateUtil.local_th));
 				  
 				  //Check canEdit
 				  if(STATUS_VOID.equals(m.getStatus()) ){

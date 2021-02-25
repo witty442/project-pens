@@ -1,3 +1,4 @@
+/** tableSearch **/
 .tableSearch {
 	background-color: #D3D3D3;
 	COLOR: #FFFFFF;
@@ -20,6 +21,7 @@ TABLE.tableSearch TD {
 	font-size: 13px;
 }
 
+/** tableSearchNoWidth **/
 .tableSearchNoWidth {
 	background-color: #D3D3D3;
 	COLOR: #FFFFFF;
@@ -40,40 +42,226 @@ TABLE.tableSearchNoWidth TD {
 	height: 25px;
 	font-size: 13px;
 }
+/** tableSearchNoWidthNoOverflow **/
+.tableSearchNoWidthNoOverflow {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+}
+
+TABLE.tableSearchNoWidthNoOverflow TH {
+	background-color: #03A4B6;
+	text-align: center;
+}
+
+TABLE.tableSearchNoWidthNoOverflow TD {
+	color: #000000;
+	font-size: 13px;
+}
+/** tableSearchNoSetTH **/
+.tableSearchNoSetTH {
+	background-color: #D3D3D3;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 100%;
+	min-height: 50px;
+	max-height: 700px;
+	overflow: scroll;
+}
+
+TABLE.tableSearchNoSetTH TH {
+	background-color: #03A4B6;
+	height: 30px;
+}
+
+TABLE.tableSearchNoSetTH TD {
+	color: #000000;
+	height: 25px;
+	font-size: 13px;
+}
+
+.tableSearchNoSet {
+	height: 30px;
+}
+TABLE.tableSearchNoSet TH {
+	background-color: #03A4B6;
+	height: 30px;
+}
+TABLE.tableSearchNoSet TD {
+	height: 25px;
+	font-size: 13px;
+}
+
+.table_hilight {
+	background-color: #909090;
+	COLOR: #FFFFFF;
+	text-align: center;
+	width: 100%;
+	max-height: 700px;
+	overflow: scroll;
+}
 
 .hilight_text {
 	background-color: #909090;
 	height: 30px;
+	font-weight: bold;
+}
+.row_hilight {
+	background-color: #909090;
+	font-weight: bold;
 }
 
+.header_text {
+	height: 30px;
+	font-weight: bold;
+	font-size: 16px;
+}
+.tr_with_bt_line{
+    padding: 10px;
+    border-bottom: 4px solid black;
+}
 .td_text{
 	text-align: left;
-
+}
+.td_text_with_bt_line{
+	text-align: left;
+    border-bottom: 3px solid black;
+}
+.td_text_bold{
+	text-align: left;
+	font-weight: bold;
 }
 .td_text_center{
+	text-align: center;
 	align:center;
 }
-.td_text_right{
-	text-align:right;
+.td_text_center_bold{
+	align:center;
+	text-align: center;
+	font-weight: bold;
+}
+table.tableSearchNoWidth td.td_text_right {
+   text-align: right;
+   align:right;
+}
+
+table.tableSearch td.td_text_right {
+  text-align: right;
+  align:right;
+}
+.number_small{
+  text-align:right;
+  font-size: 10px;
+}
+.text_small{
+  font-size: 10px;
 }
 .td_number{
 	text-align:right;
 }
-.normalTextInput {
-	background-color: #FFFFFF;
-	border: 1px solid;
-	border-color: #BEBEBE;
+.td_number_with_bt_line{
+	text-align:right;
+    border-bottom: 3px solid black;
 }
-.errorTextInput {
-	background-color: red;
-	border: 1px solid;
-	border-color: #BEBEBE;
-	color: #000000;
+.td_number_bold{
+	text-align:right;
+	font-weight: bold;
 }
-.errorNumberInput {
-	background-color: red;
-	border: 1px solid;
-	border-color: #BEBEBE;
-	color: #000000;
-	text-align: right;
+.td_number_bold_with_bt_line{
+	text-align:right;
+	font-weight: bold;
+    border-bottom: 3px solid black;
+}
+
+/** for Paging css ************************/
+.pagination {
+  display: inline-block;
+  font-size:16px;
+}
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 12px;
+  text-decoration: none;
+  transition: background-color .3s;
+  border: 1px solid #ddd;
+  margin: 0 4px;
+}
+.pagination span {
+  font-size:16px;
+  color: black;
+  float: left;
+  padding: 8px 10px;
+  text-decoration: none;
+  transition: background-color .3s;
+  border: 1px solid #ddd;
+  margin: 0 4px;
+}
+.pagination a.active {
+  background-color: #4CAF50;
+  color: white;
+  border: 1px solid #4CAF50;
+}
+.pagination a:hover:not(.active) {background-color: #ddd;}
+
+/**********************************************************/
+
+input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+
+input[type=radio]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  padding: 10px;
+}
+
+/** tooltips **/
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }

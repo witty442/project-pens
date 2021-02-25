@@ -1,5 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="net.sf.json.JSONObject"%>
-<%@ page language="java" contentType="text/javascript; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@page import="com.isecinc.pens.web.sales.bean.ProductCatalog"%>
 <%@page import="com.isecinc.pens.web.sales.bean.Basket"%>
 <%@page import="com.isecinc.pens.bean.User"%>

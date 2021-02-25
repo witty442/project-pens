@@ -74,10 +74,10 @@ import org.apache.log4j.Logger;
 
 import com.isecinc.pens.SystemElements;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.Utils;
 import com.lowagie.text.pdf.BaseFont;
 import com.pens.util.BundleUtil;
 import com.pens.util.PrinterUtils;
+import com.pens.util.Utils;
 
 @SuppressWarnings( { "static-access", "serial", "deprecation" })
 public class ReportUtilServlet extends HttpServlet {

@@ -37,6 +37,77 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 	public static final String CASH = "CV";
 	public static final String DIREC_DELIVERY = "DD";
 
+	private int no;
+	private long id;
+	private int referencesID;
+	private String lat;
+	private String lng;
+	private String dispTotalInvoice;
+	private String tripDay;
+	private String tripDay2;
+	private String tripDay3;
+	private String custGroup;
+	private int shipToAddressId;
+	private int billToAddressId;
+	private String code;
+	private String name;
+	private String name2;
+	private String customerType;
+	private String taxNo;
+	private String territory;
+	private String website;
+	private String businessType;
+	private long parentID;
+	private String parentCode;
+	private String parentName;
+	private String birthDay;
+	private String creditCheck;
+	private String paymentTerm;
+	private String paymentMethod;
+	private String vatCode;
+	private String shippingMethod;
+	private String shippingRoute;
+	private String transitName;
+	private double creditLimit;
+	private double totalInvoice;
+	private User salesRepresent = new User();
+	private String isActive;
+	private String creditLimitLabel;
+	private String totalInvoiceLabel;
+	private int searchProvince;
+	private int searchDistrict;
+	private int orderAmount = 0;
+	private String interfaces;
+	private String partyType;
+	private String exported;
+	private String codePrefix;
+	private String province;
+	private String district;
+	private String trip;
+	public String addressSummary;
+	public String displayExported;
+	public String displayInterfaces;
+	public String displayActionEditCust;
+	public boolean canActionEditCust;
+	public String displayActionEditCust2;
+	public boolean canActionEditCust2;
+	public String displayActionReceipt;
+	public String displayActionView;
+	public String displayActionEdit;
+	private String printType;
+	private String printBranchDesc;
+	private String printHeadBranchDesc;
+	private String printTax;
+	private String airpayFlag;
+	private String location;
+	private String dispHaveTrip;
+    private String imageFileName;
+    private String preOrderFlag;
+    private Address address = new Address();
+	private Contact contact = new Contact();
+	 /** api message **/
+    private String statusMessage;
+
 	/**
 	 * Default Constructor
 	 */
@@ -118,7 +189,6 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 		setTripDay2( Utils.isNull(rst.getString("TRIP_DAY2")));
 		setTripDay3( Utils.isNull(rst.getString("TRIP_DAY3")));
 		setCustGroup( Utils.isNull(rst.getString("cust_group")));
-
 	}
 
 	/**
@@ -137,150 +207,48 @@ public class Customer extends I_PO implements Serializable,Comparable<Customer> 
 
 	public String toString() {
 		return String.format("Customer[%s] %s %s", getId(), getName(), getName2());
+	}    
+    
+	public int getShipToAddressId() {
+		return shipToAddressId;
 	}
 
-	private int no;
-	/** ID */
-	private long id;
+	public void setShipToAddressId(int shipToAddressId) {
+		this.shipToAddressId = shipToAddressId;
+	}
 
-	/** Reference from ORCL */
-	private int referencesID;
-	private String lat;
-	private String lng;
-	private String dispTotalInvoice;
-	private String tripDay;
-	private String tripDay2;
-	private String tripDay3;
-	private String custGroup;
+	public int getBillToAddressId() {
+		return billToAddressId;
+	}
 
-	/** CODE */
-	private String code;
+	public void setBillToAddressId(int billToAddressId) {
+		this.billToAddressId = billToAddressId;
+	}
 
-	/** NAME */
-	private String name;
+	public Address getAddress() {
+		return address;
+	}
 
-	/** NAME2 */
-	private String name2;
+	public void setAddress(Address address) {
+		this.address = address;
+	}
 
-	/** CUSTOMER TYPE */
-	private String customerType;
+	public Contact getContact() {
+		return contact;
+	}
 
-	/** TAX NO */
-	private String taxNo;
+	public void setContact(Contact contact) {
+		this.contact = contact;
+	}
 
-	/** TERRITORY */
-	private String territory;
+	public String getStatusMessage() {
+		return statusMessage;
+	}
 
-	/** Web site */
-	private String website;
+	public void setStatusMessage(String statusMessage) {
+		this.statusMessage = statusMessage;
+	}
 
-	/** Business Type */
-	private String businessType;
-
-	/** Parent */
-	private long parentID;
-	private String parentCode;
-	private String parentName;
-
-	/** Birthday */
-	private String birthDay;
-
-	/** Credit Check */
-	private String creditCheck;
-
-	/** Payment Term */
-	private String paymentTerm;
-
-	/** Payment Method */
-	private String paymentMethod;
-
-	/** Vat Code */
-	private String vatCode;
-
-	/** Shipping Method */
-	private String shippingMethod;
-
-	/** Shipping Route */
-	private String shippingRoute;
-
-	/** TRANSIT NAME */
-	private String transitName;
-
-	/** CREDIT LIMIT */
-	private double creditLimit;
-
-	/** TOTAL INVOICE */
-	private double totalInvoice;
-
-	/** Sales Represent */
-	private User salesRepresent = new User();
-
-	/** ISACTIVE */
-	private String isActive;
-
-	/** CREDIT LIMIT LABEL */
-	private String creditLimitLabel;
-
-	/** TOTAL INVOICE LABEL */
-	private String totalInvoiceLabel;
-
-	/** Search Province */
-	private int searchProvince;
-	
-	private int searchDistrict;
-
-	/** Order Amount */
-	private int orderAmount = 0;
-
-	/** Interfaces */
-	private String interfaces;
-
-	/** PARTY_TYPE */
-	private String partyType;
-
-	/** EXPORTED */
-	private String exported;
-
-	// Transient
-	/** Code Prefix */
-	private String codePrefix;
-
-	/** PROVINCE */
-	private String province;
-
-	/** DISTRICT */
-	private String district;
-	
-	/** TRIP **/
-	private String trip;
-	
-	public String addressSummary;
-
-	public String displayExported;
-	public String displayInterfaces;
-	
-	public String displayActionEditCust;
-	public boolean canActionEditCust;
-	
-	public String displayActionEditCust2;
-	public boolean canActionEditCust2;
-	
-	public String displayActionReceipt;
-	public String displayActionView;
-	public String displayActionEdit;
-
-	private String printType;
-	private String printBranchDesc;
-	private String printHeadBranchDesc;
-	private String printTax;
-	private String airpayFlag;
-	private String location;
-	private String dispHaveTrip;
-    
-    private String imageFileName;
-    private String preOrderFlag;
-    
-    
 	public String getPreOrderFlag() {
 		return preOrderFlag;
 	}

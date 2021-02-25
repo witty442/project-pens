@@ -15,7 +15,6 @@ import java.util.ResourceBundle;
 import org.apache.log4j.Logger;
 
 import com.isecinc.pens.SystemElements;
-import com.isecinc.pens.inf.helper.Utils;
 
 public class DateToolsUtil {
 	protected static Logger logger = Logger.getLogger("PENS");
@@ -659,8 +658,8 @@ public class DateToolsUtil {
 	}
 	
 	public static boolean compareDateInSameMonthYear(Date date1,Date date2) throws Exception{
-		int YYYYMM1 =  Integer.parseInt(Utils.stringValue(date1, Utils.YYYY_MM));
-		int YYYYMM2 =  Integer.parseInt(Utils.stringValue(date2, Utils.YYYY_MM));
+		int YYYYMM1 =  Integer.parseInt(DateUtil.stringValue(date1, DateUtil.YYYY_MM));
+		int YYYYMM2 =  Integer.parseInt(DateUtil.stringValue(date2, DateUtil.YYYY_MM));
 		if(YYYYMM1 != YYYYMM2){
 			return false;
 		}

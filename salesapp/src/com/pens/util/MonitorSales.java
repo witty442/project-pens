@@ -1,27 +1,14 @@
 package com.pens.util;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Date;
-import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
-import com.isecinc.pens.SystemMessages;
-import com.isecinc.pens.SystemProperties;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.bean.MonitorBean;
-import com.isecinc.pens.inf.helper.Constants;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.EnvProperties;
-import com.isecinc.pens.inf.helper.FileUtil;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.inf.manager.FTPManager;
 
 public class MonitorSales {
@@ -73,7 +60,7 @@ public class MonitorSales {
 				FileUtil.writeFile(path+"Lastest-app-version.txt", "");
 			}
 			
-			String dateStr  = Utils.format(new Date(), "yyyyMM");
+			String dateStr  = DateUtil.format(new Date(), "yyyyMM");
             String fileName = u.getCode()+".txt";
             
             if(!currentAppVersion.equalsIgnoreCase(latestAppVersion)){
@@ -97,7 +84,7 @@ public class MonitorSales {
 			FTPManager ftpManager = new FTPManager(env.getProperty("ftp.ip.server"), env.getProperty("ftp.username"), env.getProperty("ftp.password"));
 			String path = "D:/SalesApp/";
 			
-			String yyyymm = Utils.format(new Date(), "yyyyMM");
+			String yyyymm = DateUtil.format(new Date(), "yyyyMM");
 			
 			StringBuffer data = ftpManager.downloadAllFileInFolder("/Manual-script/Monitor-Sales/SalesAppVersion/"+yyyymm+"/");
 			
@@ -136,7 +123,7 @@ public class MonitorSales {
 			if(rs.next()){
 				m.append("\n "+rs.getString("create_user")+",");
 				m.append(rs.getString("Transaction")+",");
-				m.append(Utils.stringValue(rs.getTimestamp("create_date"), Utils.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,Utils.local_th)+",");
+				m.append(DateUtil.stringValue(rs.getTimestamp("create_date"), DateUtil.DD_MM_YYYY__HH_mm_ss_WITH_SLASH,DateUtil.local_th)+",");
 				m.append(convertStatusToDesc(rs.getInt("status"))+",");
 				m.append(Utils.isNull(rs.getString("error"))+",");
 			}

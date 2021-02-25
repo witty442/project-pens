@@ -788,6 +788,7 @@ function applyBill(path, rowNo, type , recAmount, seedId) {
 			}
 		}
 	}
+	
 	var param = "";
 	if (rowNo == null){
 		param  = "selected="+selected+"&rec="+recAmount+"&type="+type;
@@ -818,7 +819,6 @@ function fillApply(seed,allbill,allpaid){
 			break;
 		}
 	}
-	
 	
 	calculateAll();
 }

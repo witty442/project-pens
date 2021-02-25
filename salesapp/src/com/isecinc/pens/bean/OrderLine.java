@@ -5,12 +5,12 @@ import java.sql.ResultSet;
 import java.util.Date;
 
 import com.isecinc.core.model.I_PO;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.model.MProduct;
 import com.isecinc.pens.model.MUOM;
 import com.jcraft.jsch.Logger;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.Utils;
 
 /**
  * OrderLine
@@ -35,9 +35,9 @@ public class OrderLine extends I_PO implements Serializable {
 	 * @throws Exception
 	 */
 	public OrderLine(ResultSet rst) throws Exception {
-		setId(rst.getInt("ORDER_LINE_ID"));
+		setId(rst.getLong("ORDER_LINE_ID"));
 		setLineNo(rst.getInt("LINE_NO"));
-		setOrderId(rst.getInt("ORDER_ID"));
+		setOrderId(rst.getLong("ORDER_ID"));
 		if(rst.getString("PRODUCT_ID")==null || Utils.isNull(rst.getString("PRODUCT_ID")).equals("")){
 		   System.out.println("OrderId["+rst.getInt("ORDER_ID")+"] Find ProductId:"+rst.getString("PRODUCT_ID")+" IS NULL");
 		}
@@ -94,13 +94,13 @@ public class OrderLine extends I_PO implements Serializable {
 	}
 
 	/** ID */
-	private int id;
+	private long id;
 
 	/** Line No */
 	private int lineNo;
 
 	/** Order Id */
-	private int orderId;
+	private long orderId;
 
 	/** Product */
 	private Product product = new Product();
@@ -286,11 +286,11 @@ public class OrderLine extends I_PO implements Serializable {
 		this.customerName = customerName;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -310,11 +310,11 @@ public class OrderLine extends I_PO implements Serializable {
 		this.lineNo = lineNo;
 	}
 
-	public int getOrderId() {
+	public long getOrderId() {
 		return orderId;
 	}
 
-	public void setOrderId(int orderId) {
+	public void setOrderId(long orderId) {
 		this.orderId = orderId;
 	}
 

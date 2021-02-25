@@ -54,7 +54,8 @@ public class DetailedSalesReportProcess extends I_ReportProcess<DetailedSalesRep
 			sql.append("\n AND o.ORDER_DATE <= '" + DateToolsUtil.convertToTimeStamp(t.getEndDate()) + "' ");
 			
 			if( Utils.isNull(t.getOrderType()).equals(Constants.PAYMT_CASH)){
-				sql.append("\n AND o.payment_method = '"+Constants.PAYMT_CASH+"' ");
+				sql.append("\n AND o.payment_method in( 'CS','ALI','WE','GOV','QR') ");
+				
 			}else if( Utils.isNull(t.getOrderType()).equals(Constants.PAYMT_CREDITCARD)){
 				sql.append("\n AND o.payment_method = '"+Constants.PAYMT_CREDITCARD+"' ");
 			}
@@ -96,8 +97,31 @@ public class DetailedSalesReportProcess extends I_ReportProcess<DetailedSalesRep
 				detailedSales.setInterfaces(rs.getString("INTERFACES"));
 				detailedSales.setExported(rs.getString("EXPORTED"));
 				detailedSales.setDocStatus(rs.getString("DOC_STATUS"));
-				detailedSales.setIsCash(rs.getString("IsCash"));
 				detailedSales.setPaymentMethod(rs.getString("payment_method"));
+				if(  Utils.isNull(detailedSales.getPaymentMethod()).equals("CS")
+				   ||Utils.isNull(detailedSales.getPaymentMethod()).equals("ALI")
+				   ||Utils.isNull(detailedSales.getPaymentMethod()).equals("WE")
+				   ||Utils.isNull(detailedSales.getPaymentMethod()).equals("GOV")
+				   ||Utils.isNull(detailedSales.getPaymentMethod()).equals("QR")
+						){
+				   detailedSales.setIsCash("Y");
+				}else{
+				   detailedSales.setIsCash("N");
+				}
+				
+				if(  Utils.isNull(detailedSales.getPaymentMethod()).equals("CS")){
+					detailedSales.setPaymentMethodDesc("เงินสด");
+				}else if(Utils.isNull(detailedSales.getPaymentMethod()).equals("ALI")){
+					detailedSales.setPaymentMethodDesc("Alipay");
+			    }else if(Utils.isNull(detailedSales.getPaymentMethod()).equals("WE")){
+			    	detailedSales.setPaymentMethodDesc("WeChat");
+		        }else if(Utils.isNull(detailedSales.getPaymentMethod()).equals("GOV")){
+		        	detailedSales.setPaymentMethodDesc("GOV");
+			    }else if(Utils.isNull(detailedSales.getPaymentMethod()).equals("QR")){
+			    	detailedSales.setPaymentMethodDesc("QRCODE");
+			    }else if(Utils.isNull(detailedSales.getPaymentMethod()).equals("CR")){
+			    	detailedSales.setPaymentMethodDesc("บัตรเครดิต");
+                }
 				//detailedSales.setIsPDPaid(rs.getString("IsPDPaid"));
 				
 				lstData.add(detailedSales);

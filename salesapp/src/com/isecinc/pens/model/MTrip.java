@@ -11,9 +11,9 @@ import java.util.Locale;
 
 import com.isecinc.core.model.I_Model;
 import com.isecinc.pens.bean.Trip;
-import com.isecinc.pens.inf.helper.Utils;
-import com.isecinc.pens.process.SequenceProcess;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DateUtil;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MTrip Class
@@ -75,7 +75,7 @@ public class MTrip extends I_Model<Trip> {
 	public boolean save(Trip trip, int activeUserID, Connection conn) throws Exception {
 		int id = 0;
 		if (trip.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("m_trip.trip_id").intValue();
 		} else {
 			id = trip.getId();
 		}
@@ -189,7 +189,7 @@ public class MTrip extends I_Model<Trip> {
 			pstmt = conn.prepareStatement("select distinct year  from m_trip where 1=1 order by year desc");
 			rst = pstmt.executeQuery();
 			
-			String currentYear = Utils.stringValue(new Date(), "yyyy",new  Locale("TH","th"));
+			String currentYear = DateUtil.stringValue(new Date(), "yyyy",new  Locale("TH","th"));
 			System.out.println("year:"+currentYear);
 			
 			while(rst.next()){

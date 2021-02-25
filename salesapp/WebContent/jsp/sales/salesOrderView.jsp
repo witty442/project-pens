@@ -2,7 +2,7 @@
 <%@page import="util.SessionGen"%>
 <%@page import="com.isecinc.pens.web.sales.OrderForm"%>
 <%@page import="java.text.DecimalFormat"%>
-<%@page import="com.isecinc.pens.inf.helper.Utils"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="java.util.List"%>
 <%@page import="com.isecinc.pens.bean.Address"%>
 <%@page import="java.util.ArrayList"%>
@@ -58,26 +58,22 @@ pageContext.setAttribute("vanPaymentMethod",vanPaymentMethod,PageContext.PAGE_SC
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=TIS-620;">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 <title><bean:message bundle="sysprop" key="<%=SystemProperties.PROJECT_NAME%>"/></title>
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/style.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
-<link rel="StyleSheet" href="${pageContext.request.contextPath}/css/webstyle.css?v=<%=SessionGen.getInstance().getIdSession() %>" type="text/css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/epoch_styles.css" />
 <style type="text/css">
-<!--
-body {
-	background-image: url(${pageContext.request.contextPath}/images2/bggrid.jpg);
-	/**background-repeat: repeat;**/
-}
-.style1 {color: #004a80}
--->
+
 </style>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/webstyle.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/strfunc.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/salesOrder.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/javascript.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/pages/salesOrder.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/input.js?v=<%=SessionGen.getInstance().getIdSession() %>"></script>
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/epoch_classes.js"></script>
+
+<!-- Include Bootstrap Resource  -->
+<jsp:include page="../resourceBootstrap.jsp"  flush="true"/>
+<!-- /Include Bootstrap Resource -->
+
 <script type="text/javascript">
 function loadMe(){
 	var totalAmountHaveVat = Number(document.getElementsByName("order.totalAmount")[0].value)
@@ -196,457 +192,415 @@ function stampPrint(){
 }
 </script>
 </head>
-<body topmargin="0" rightmargin="0" leftmargin="0" bottommargin="0" onload="loadMe();MM_preloadImages('${pageContext.request.contextPath}/images2/button_logout2.png')" style="height: 100%;">
-<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="bottom: 0;height: 100%;" id="maintab">
-  	<tr>
-		<td colspan="3"><jsp:include page="../header.jsp"/></td>
-	</tr>
-  	<tr id="framerow">
-  		<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
-    	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
-    		<div style="height: 60px;">
-    		<!-- MENU -->
-	    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
+<body  class="sb-nav-fixed" onload="loadMe();">
+
+   <!-- Include Header Mobile  -->
+     <jsp:include page="../header.jsp"  flush="true"/>
+    <!-- /Include Header Mobile -->
+    
+   	<!-- PROGRAM HEADER -->
+     <jsp:include page="../program.jsp">
+		<jsp:param name="function" value="SalesOrder"/>
+		<jsp:param name="code" value="${orderForm.order.orderNo}"/>
+	</jsp:include>
+  	
+	<!-- BODY -->
+	<html:form action="/jsp/saleOrderAction">
+	<jsp:include page="../error.jsp"/>
+						
+                    <div id="divOrderView" style="">
+			<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+				<%if(User.TT.equals(user.getType())){%>
 				<tr>
-			        <td width="100%">
-			        	<jsp:include page="../menu.jsp"/>
-			       	</td>
+					<td width="30%" align="right">ระบุเลขที่ PO ลูกค้า(ถ้ามี) </td>
+					<td width="25%"><html:text property="order.poNumber" size="20"  readonly="true" styleClass="disableText"/></td>
+					<td width="15%"></td>
+					<td></td>
 				</tr>
-	    	</table>
-	    	</div>
-	    	<!-- PROGRAM HEADER -->
-	      	<jsp:include page="../program.jsp">
-				<jsp:param name="function" value="SalesOrder"/>
-				<jsp:param name="code" value="${orderForm.order.orderNo}"/>
-			</jsp:include>
-	      	<!-- TABLE BODY -->
-	      	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="txt1">
-	      		<tr style="height: 9px;">
-		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_1.gif"/></td>
-		            <td width="832px;" background="${pageContext.request.contextPath}/images2/boxcont1_5.gif"/></td>
-		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_2.gif"/></td>
-	      		</tr>
-	      		<tr>
-		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_8.gif"></td>
-		            <td bgcolor="#f8f8f8">
-						<!-- BODY -->
-						<html:form action="/jsp/saleOrderAction">
-						<jsp:include page="../error.jsp"/>
-						
-                       <div id="divOrderView" style="">
-						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-							<%if(User.TT.equals(user.getType())){%>
-							<tr>
-								<td width="30%" align="right">ระบุเลขที่ PO ลูกค้า(ถ้ามี) </td>
-								<td width="25%"><html:text property="order.poNumber" size="20"  readonly="true" styleClass="disableText"/></td>
-								<td width="15%"></td>
-								<td></td>
-							</tr>
-							<%}else{ %>
-							    <tr>
-									<td width="30%" align="right"></td>
-									<td width="25%"></td>
-									<td width="15%"></td>
-									<td></td>
-								</tr>
-							 <%} %>
-							<tr>
-								<td align="right"></td>
-								<td align="left"></td>
-								<td align="right"><bean:message key="DocumentNo" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:hidden property="order.orderNo" />
-									<%
-									 String orderNo1 = "";
-									 String orderNo2 = "";
-									 if(orderForm.getOrder() != null){
-										 String orderNoTemp = orderForm.getOrder().getOrderNo();
-										 if(orderNoTemp.length()==12){
-											orderNo1 =  orderNoTemp.substring(0,8);
-											orderNo2 =  orderNoTemp.substring(8,12);
-										 }
-									 }
-									%>
-									<b><span><%=orderNo1%></span></b><span class="labelBigSize"><%=orderNo2%></span>
-								</td>
-							</tr>
-							<tr>
-								<td></td><td></td>
-								<td align="right"><bean:message key="TransactionDate" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text property="order.orderDate" maxlength="10" size="18" readonly="true" styleClass="disableText"/>
-								</td>
-							</tr>
-							<tr>
-								<td align="right">
-									<bean:message key="Customer" bundle="sysprop"/>&nbsp;&nbsp;
-								</td>
-								<td align="left" colspan="3">
-									<html:text property="order.customerName" size="80" readonly="true" styleClass="disableText"/>
-									<html:hidden property="order.customerId"/>
-								</td>
-							</tr>
-							<tr>
-								<td align="right"><bean:message key="Order.DeliveryAddress" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left" colspan="3">
-									<html:select property="order.shipAddressId" style="width:80%" disabled="true" styleClass="disableText">
-										<html:options collection="addresses" property="id" labelProperty="lineString"/>
-									</html:select>
-								</td>
-							</tr>
-							<tr>
-								<td align="right"><bean:message key="Order.DeliveryDocAddress" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left" colspan="3">
-									<html:select property="order.billAddressId" style="width:80%" disabled="true" styleClass="disableText">
-										<html:options collection="addresses" property="id" labelProperty="lineString"/>
-									</html:select>
-								</td>
-							</tr>
-							<tr>
-								<td align="right"><bean:message key="Profile.CreditTerm" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:select property="order.paymentTerm" disabled="true" styleClass="disableText">
-										<html:options collection="paymentTerm" property="key" labelProperty="name"/>
-									</html:select>
-								</td>
-								<td align="right"><bean:message key="Profile.TaxRate" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:select property="order.vatCode" disabled="true" onchange="calculatePrice();" styleClass="disableText">
-										<html:options collection="vatcodes" property="key" labelProperty="name"/>
-									</html:select>
-									
-									<html:hidden property="order.priceListId"/>
-									<html:hidden property="order.vatCode"/>
-									<html:hidden property="order.paymentTerm"/>
-									<html:hidden property="order.paymentMethod"/>
-								</td>
-							</tr>
-							
-							<tr>
-								<td colspan="4" align="center">
-								<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
-									<tr>
-										<th class="order"><bean:message key="No" bundle="sysprop"/></th>
-										<th><bean:message key="Product.Name" bundle="sysele"/></th>
-										<th><bean:message key="Product.UOM" bundle="sysele"/></th>
-										<th><bean:message key="Quantity" bundle="sysele"/></th>
-										<th><bean:message key="Price.Unit" bundle="sysele"/></th>
-										<th><bean:message key="Total" bundle="sysele"/></th>
-										<th><bean:message key="Discount" bundle="sysele"/></th>
-										<th><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
-										<th><bean:message key="Order.ShipmentDate" bundle="sysele"/></th>										
-										<th><bean:message key="Order.RequiredDate" bundle="sysele"/></th>
-										<th>ภาษี</th>
-										<th><bean:message key="Promotion" bundle="sysele"/></th>
-									</tr>
-									<c:forEach var="lines1" items="${orderForm.lines}" varStatus="rows1">
-									<c:choose>
-										<c:when test="${rows1.index %2 == 0}">
-											<c:set var="tabclass" value="lineO"/>
-										</c:when>
-										<c:otherwise>
-											<c:set var="tabclass" value="lineE"/>
-										</c:otherwise>
-									</c:choose>
-									<tr class="${tabclass}">
-										<td>${rows1.index + 1}</td>
-										<td align="left">${lines1.product.code} ${lines1.product.name}</td>
-										<td align="center">
-											<c:choose>
-												<c:when test="<%=orderForm.getOrder().getOrderType().equals(User.DD) %>">
-													${lines1.uom.code}&nbsp;${lines1.uom1.code}
-												</c:when>
-												<c:otherwise>
-													${lines1.fullUom}	
-												</c:otherwise>
-											</c:choose>
-										</td>
-										<td align="right">
-											
-											<c:choose>
-												<c:when test="${lines1.promotion=='Y'}">
-													<c:choose>
-														<c:when test="${(lines1.product.uom.id==lines1.uom1.id && lines1.product.uom.id==lines1.uom2.id) || (lines1.product.uom.id!=lines1.uom1.id && lines1.product.uom.id!=lines1.uom2.id)}">
-															<fmt:formatNumber pattern="#,##0" value="${lines1.qty1 + lines1.qty2}"/>
-														</c:when>
-														<c:otherwise>
-															<fmt:formatNumber pattern="#,##0" value="${lines1.qty1}"/>/
-															<fmt:formatNumber pattern="#,##0" value="${lines1.qty2}"/>
-														</c:otherwise>
-													</c:choose>
-												</c:when>
-												<c:otherwise>
-													<fmt:formatNumber pattern="#,##0" value="${lines1.qty1}"/>/
-													<fmt:formatNumber pattern="#,##0" value="${lines1.qty2}"/>												
-												</c:otherwise>
-											</c:choose>
-											
-										</td>
-										<td align="right">
-											
-											<c:choose>
-												<c:when test="${lines1.promotion=='Y'}">
-													<fmt:formatNumber pattern="#,##0.00000" value="0"/>
-												</c:when>
-												<c:otherwise>
-													<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price1}"/>/
-													<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price2}"/>												
-												</c:otherwise>
-											</c:choose>											
-										
-										</td>
-										<td align="right">
-											<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount}"/>
-										</td>
-										<td align="right">
-											<fmt:formatNumber pattern="#,##0.00" value="${lines1.discount}"/>
-										</td>
-										<td align="right">
-											<fmt:formatNumber pattern="#,##0.00" value="${lines1.lineAmount - lines1.discount}"/>
-										</td>
-										
-										<td align="center">${lines1.shippingDate}</td>
-										<td align="center">${lines1.requestDate}</td>
-										<td align="center">
-											<c:if test="${lines1.taxable=='Y'}">
-												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-											</c:if>
-										</td>
-										<td align="center">
-											<c:if test="${lines1.promotion=='Y'}">
-												<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
-											</c:if>
-										</td>
-									</tr>
-									</c:forEach>
-								</table>
-								<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
-									<tr>
-										<td align="left" class="footer"></td>
-									</tr>
-								</table>
-								</td>
-							</tr>
-							<tr>
-								<td></td><td></td>
-								<td align="right">ยอดรวมก่อนภาษี &nbsp;&nbsp;</td>
-								<td align="left">
-									<input type="text" id="tempTotalAmount" name="tempTotalAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
-									<html:hidden property="order.totalAmount"/>
-								</td>
-							</tr>
-							<tr>
-								<td></td><td></td>
-								<td align="right"><bean:message key="Tax" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<input type="text" id="tempVatAmount" name="tempVatAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
-									<html:hidden property="order.vatAmount"/>
-								</td>
-							</tr>
-							<tr>
-								<td></td><td></td>
-								<td align="right">ยอดเงินรวมที่ไม่เสียภาษี&nbsp;&nbsp;</td>
-								<td align="left">
-									<input type="text" id="tempTotalAmountNonVat" name="tempTotalAmountNonVat" readonly="readonly" class="disableText" style="text-align: right;"/>
-									<html:hidden property="order.totalAmountNonVat"/>
-								</td>
-							</tr>
-							<tr>
-								<td></td><td></td>
-								<td align="right"><bean:message key="Net" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<input type="text" id="tempNetAmount" name="tempNetAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
-									<html:hidden property="order.netAmount"/>
-								</td>
-							</tr>
-							<tr>
-								<td></td>
-								<td><!--<html:checkbox property="order.paymentCashNow" value="Y" disabled="true" styleClass="disableText"/> บันทึกรับเงินสดทันที -->
-								 <b>ชำระโดย
-									 <html:select property="order.vanPaymentMethod" styleClass="disableText" disabled="true">
-										<html:options collection="vanPaymentMethod" property="key" labelProperty="name"/>
-									</html:select></b> 
-								</td>
-								
-								<td></td>
-								<td valign="top">
-									<html:checkbox property="order.payment" value="Y" disabled="true" styleClass="disableText"/><bean:message key="Order.Paid" bundle="sysele"/>
-								</td>
-							</tr>
-							<tr>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td valign="top">
-									<html:checkbox property="order.exported" value="Y" disabled="true" styleClass="disableText"/><bean:message key="Exported" bundle="sysele"/>
-								</td>
-							</tr>
-							<tr>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td valign="top">
-									<html:checkbox property="order.interfaces" value="Y" disabled="true" styleClass="disableText"/><bean:message key="Interfaces" bundle="sysele"/>
-								</td>
-							</tr>
-							<tr>
-								<td align="right"><bean:message key="Order.No"  bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text property="order.salesOrderNo" size="20" readonly="true" styleClass="disableText"/>
-								</td>
-								<td align="right"><bean:message key="Bill.No"  bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text property="order.arInvoiceNo" size="20" readonly="true" styleClass="disableText"/>
-								</td>
-							</tr>
-							<tr>
-								<td align="right"><bean:message key="Order.SalesRepresent"  bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td align="left">
-									<html:text property="order.salesRepresent.name" size="30" readonly="true" styleClass="disableText"/>
-									<html:hidden property="order.salesRepresent.id"/>
-									<html:hidden property="order.salesRepresent.code"/>
-								</td>
-								<td align="right"><bean:message key="Status" bundle="sysele"/>&nbsp;&nbsp;</td>
-								<td valign="top">
-									<html:select property="order.docStatus" disabled="true" styleClass="disableText">
-										<html:options collection="docstatus" property="key" labelProperty="name"/>
-									</html:select>
-								</td>
-							</tr>
-						</table>
-						<!-- BUTTON -->
-						<br />
-						<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
-						   <%if(role.equals(User.VAN)){ %>
-							    <tr>
-									<td align="right" width="10%"></td>
-									<td align="left">
-										<input type="checkbox" id="printReportPDF" name="printReportPDF" value ="PDF"/>
-										<font color="red">**พิมพ์ PDF (กรณีพิมพ์ข้อมูลออก Printer ไม่ได้)</font>
-									</td>
-								</tr>
-							<%} %>
-							<tr>
-								<td align="right" width="10%"></td>
-								<td align="left">
-							       <%if(role.equals(User.VAN)){ %>
-									   <input type="button" value="ทำบันทึกตั้งกอง" class="newPosBtnLong" onclick="manageProdShow('${pageContext.request.contextPath}','<%=orderForm.getOrder().getOrderNo()%>');">
-									<%} %>
-									
-									<%if(!isAdd.equals("N") || ((String)session.getAttribute("memberVIP")).equalsIgnoreCase("Y")){ %>
-										
-										<input type="button" value="สร้างรายการใหม่" class="newPosBtnLong" onclick="prepare('${pageContext.request.contextPath}','add');">
-										
-									<%} %>
-									
-								    <c:if test="${orderForm.mode=='edit'}">
-										<c:if test="${orderForm.order.exported=='N'}">
-											<c:if test="${orderForm.order.docStatus=='SV'}">
-											<c:if test="${orderForm.order.payment=='N'}">
-												
-												<input type="button" value="แก้ไขรายการ" class="newPosBtnLong" onclick="prepare('${pageContext.request.contextPath}','edit','${orderForm.order.id}');">
-												
-											</c:if>
-											</c:if>
-										</c:if>
-								   </c:if>
-									
-									<%if(role.equals(User.VAN)){ %>
-									   
-										<c:if test="${orderForm.order.docStatus=='SV'}">
-										     <c:if test="${orderForm.order.isCash=='Y'}">
-											    <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy','','');">
-					                            <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original','','');">
-	                                          </c:if>
-	                                          
-	                                          <c:if test="${orderForm.order.isCash=='N'}">
-											     <input type="button" id ="reportBtn" value="พิมพ์ใบส่งของ/ใบกำกับภาษี" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','tax','${orderForm.order.orderNo}','');">
-					                             <input type="button" id ="reportBtn" value="พิมพ์ใบเสร็จรับเงิน" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','bill','${orderForm.order.orderNo}','');">
-	                                          </c:if>
-											  <input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
-										</c:if>
-										
-										<c:if test="${orderForm.order.docStatus=='VO'}">
-											   <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy','','VO');">
-										</c:if>
-									<%} %>
-									
-								</td>
-								<td align="right">
-									<input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
-								</td>
-								<td width="10%">&nbsp;</td>
-							</tr>
-						</table>
-					    <span title="SalesOrderView">...</span>
-					    <span title="<%=Utils.isNull(request.getSession().getAttribute("PREV_STEP_ORDER_ACTION")) %>">...</span>
-						<!--  -->
-						<html:hidden property="order.payment" styleId="payment"/>
-						<html:hidden property="deletedId"/>
-						<html:hidden property="order.orderType"/>
-						<html:hidden property="order.id"/>
-						<html:hidden property="order.customerId"/>
-						<html:hidden property="order.exported"/>
-						<html:hidden property="order.isCash"/>
-						
-						<!--  Can Receipt Credit (VAN)-->
-						<html:hidden property="receiptCreditFlag"/>
-						<html:hidden property="custCreditLimit"/>
-						
-						<!-- AUTO RECEIPT -->
-						<html:hidden property="autoReceiptFlag"/>
-						<html:hidden property="autoReceipt.bank"/>
-						<html:hidden property="autoReceipt.chequeNo"/>
-						<html:hidden property="autoReceipt.chequeDate"/>
-						<html:hidden property="autoReceipt.creditCardType"/>	    
-						<html:hidden property="autoReceipt.internalBank"/>
-						<html:hidden property="autoReceipt.paymentMethod"/>
-						
-						<input type="hidden" name="fileType" id="fileType"/>
-						<input type="hidden" name="nextVisitDate">
-						<input type="hidden" name="memberVIP" value="${memberVIP}"/>
-						
-						<div id="productList" style="display: none;"></div>
-						<div id="ByList" style="display: none;"></div>
-						
-						<input type="hidden" name="orderDate" id="orderDate" value="${orderForm.order.orderDate}"/>
-						
-						<html:hidden property="order.printDateTimePick"/><br/>
-						<html:hidden property="order.printCountPick"/><br/>
-						<html:hidden property="order.printDateTimeRcp"/><br/>
-						<html:hidden property="order.printCountRcp"/>
-						
-						<jsp:include page="../searchCriteria.jsp"></jsp:include>
-						<jsp:include page="../trxhist.jsp">
-							<jsp:param name="module" value="<%=TrxHistory.MOD_ORDER%>"/>
-							<jsp:param name="id" value="${orderForm.order.id}"/>
-						</jsp:include>
-					  </div>
-	                  SalesOrderView
-						</html:form>
-						<!-- BODY -->
+				<%}else{ %>
+				    <tr>
+						<td width="30%" align="right"></td>
+						<td width="25%"></td>
+						<td width="15%"></td>
+						<td></td>
+					</tr>
+				 <%} %>
+				<tr>
+					<td align="right"></td>
+					<td align="left"></td>
+					<td align="right"><bean:message key="DocumentNo" bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left">
+						<html:hidden property="order.orderNo" />
+						<%
+						 String orderNo1 = "";
+						 String orderNo2 = "";
+						 if(orderForm.getOrder() != null){
+							 String orderNoTemp = orderForm.getOrder().getOrderNo();
+							 if(orderNoTemp.length()==12){
+								orderNo1 =  orderNoTemp.substring(0,8);
+								orderNo2 =  orderNoTemp.substring(8,12);
+							 }
+						 }
+						%>
+						<b><span><%=orderNo1%></span></b><span class="labelBigSize"><%=orderNo2%></span>
 					</td>
-					<td width="6px;" background="${pageContext.request.contextPath}/images2/boxcont1_6.gif"></td>
 				</tr>
-				<tr style="height: 9px;">
-		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_4.gif"/></td>
-		            <td background="${pageContext.request.contextPath}/images2/boxcont1_7.gif"></td>
-		            <td width="5px;" background="${pageContext.request.contextPath}/images2/boxcont1_3.gif"/></td>
-	          	</tr>
-    		</table>
-    	</td>
-    	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
-    </tr>
-    <tr>
-    	<td width="25px;" background="${pageContext.request.contextPath}/images2/content_left.png"></td>
-    	<td background="${pageContext.request.contextPath}/images2/content01.png" valign="top">
-   			<jsp:include page="../contentbottom.jsp"/>
-        </td>
-        <td width="25px;" background="${pageContext.request.contextPath}/images2/content_right.png"></td>
-    </tr>
-    <tr>
-    	<td colspan="3"><jsp:include page="../footer.jsp"/></td>
-  	</tr>
-</table>
+				<tr>
+					<td></td><td></td>
+					<td align="right"><bean:message key="TransactionDate" bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left">
+						<html:text property="order.orderDate" maxlength="10" size="18" readonly="true" styleClass="disableText"/>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<bean:message key="Customer" bundle="sysprop"/>&nbsp;&nbsp;
+					</td>
+					<td align="left" colspan="3">
+						<html:text property="order.customerName" size="80" readonly="true" styleClass="disableText"/>
+						<html:hidden property="order.customerId"/>
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><bean:message key="Order.DeliveryAddress" bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left" colspan="3">
+						<html:select property="order.shipAddressId" style="width:80%" disabled="true" styleClass="disableText">
+							<html:options collection="addresses" property="id" labelProperty="lineString"/>
+						</html:select>
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><bean:message key="Order.DeliveryDocAddress" bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left" colspan="3">
+						<html:select property="order.billAddressId" style="width:80%" disabled="true" styleClass="disableText">
+							<html:options collection="addresses" property="id" labelProperty="lineString"/>
+						</html:select>
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><bean:message key="Profile.CreditTerm" bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left">
+						<html:select property="order.paymentTerm" disabled="true" styleClass="disableText">
+							<html:options collection="paymentTerm" property="key" labelProperty="name"/>
+						</html:select>
+					</td>
+					<td align="right"><bean:message key="Profile.TaxRate" bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left">
+						<html:select property="order.vatCode" disabled="true" onchange="calculatePrice();" styleClass="disableText">
+							<html:options collection="vatcodes" property="key" labelProperty="name"/>
+						</html:select>
+						
+						<html:hidden property="order.priceListId"/>
+						<html:hidden property="order.vatCode"/>
+						<html:hidden property="order.paymentTerm"/>
+						<html:hidden property="order.paymentMethod"/>
+					</td>
+				</tr>
+				
+				<tr>
+					<td colspan="4" align="center">
+					<div class="table-responsive">
+					<table id="tblProduct" class="table table-bordered table-striped table-light">
+					    <thead class="thead-dark">
+						<tr>
+							<th class="order"><bean:message key="No" bundle="sysprop"/></th>
+							<th><bean:message key="Product.Name" bundle="sysele"/></th>
+							<th><bean:message key="Product.UOM" bundle="sysele"/></th>
+							<th><bean:message key="Quantity" bundle="sysele"/></th>
+							<th><bean:message key="Price.Unit" bundle="sysele"/></th>
+							<th><bean:message key="Total" bundle="sysele"/></th>
+							<th><bean:message key="Discount" bundle="sysele"/></th>
+							<th><bean:message key="TotalExcludeDiscount" bundle="sysele"/></th>
+							<th>ภาษี</th>
+							<th><bean:message key="Promotion" bundle="sysele"/></th>
+						</tr>
+						</thead>
+						<c:forEach var="lines1" items="${orderForm.lines}" varStatus="rows1">
+						<c:choose>
+							<c:when test="${rows1.index %2 == 0}">
+								<c:set var="tabclass" value="lineO"/>
+							</c:when>
+							<c:otherwise>
+								<c:set var="tabclass" value="lineE"/>
+							</c:otherwise>
+						</c:choose>
+						<tr class="${tabclass}">
+							<td>${rows1.index + 1}</td>
+							<td align="left">${lines1.product.code} ${lines1.product.name}</td>
+							<td align="center">
+								<c:choose>
+									<c:when test="<%=orderForm.getOrder().getOrderType().equals(User.DD) %>">
+										${lines1.uom.code}&nbsp;${lines1.uom1.code}
+									</c:when>
+									<c:otherwise>
+										${lines1.fullUom}	
+									</c:otherwise>
+								</c:choose>
+							</td>
+							<td align="right">
+								
+								<c:choose>
+									<c:when test="${lines1.promotion=='Y'}">
+										<c:choose>
+											<c:when test="${(lines1.product.uom.id==lines1.uom1.id && lines1.product.uom.id==lines1.uom2.id) || (lines1.product.uom.id!=lines1.uom1.id && lines1.product.uom.id!=lines1.uom2.id)}">
+												<fmt:formatNumber pattern="#,##0" value="${lines1.qty1 + lines1.qty2}"/>
+											</c:when>
+											<c:otherwise>
+												<fmt:formatNumber pattern="#,##0" value="${lines1.qty1}"/>/
+												<fmt:formatNumber pattern="#,##0" value="${lines1.qty2}"/>
+											</c:otherwise>
+										</c:choose>
+									</c:when>
+									<c:otherwise>
+										<fmt:formatNumber pattern="#,##0" value="${lines1.qty1}"/>/
+										<fmt:formatNumber pattern="#,##0" value="${lines1.qty2}"/>												
+									</c:otherwise>
+								</c:choose>
+								
+							</td>
+							<td align="right">
+								
+								<c:choose>
+									<c:when test="${lines1.promotion=='Y'}">
+										<fmt:formatNumber pattern="#,##0.00000" value="0"/>
+									</c:when>
+									<c:otherwise>
+										<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price1}"/>/
+										<fmt:formatNumber pattern="#,##0.00000" value="${lines1.price2}"/>												
+									</c:otherwise>
+								</c:choose>											
+							
+							</td>
+							<td align="right">
+								<fmt:formatNumber pattern="#,##0.00000" value="${lines1.lineAmount}"/>
+							</td>
+							<td align="right">
+								<fmt:formatNumber pattern="#,##0.00" value="${lines1.discount}"/>
+							</td>
+							<td align="right">
+								<fmt:formatNumber pattern="#,##0.00" value="${lines1.lineAmount - lines1.discount}"/>
+							</td>
+							
+							<td align="center">
+								<c:if test="${lines1.taxable=='Y'}">
+									<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+								</c:if>
+							</td>
+							<td align="center">
+								<c:if test="${lines1.promotion=='Y'}">
+									<img border=0 src="${pageContext.request.contextPath}/icons/check.gif">
+								</c:if>
+							</td>
+						</tr>
+						</c:forEach>
+					</table>
+					</div>
+					<table align="center" border="0" cellpadding="3" cellspacing="1" class="result">
+						<tr>
+							<td align="left" class="footer"></td>
+						</tr>
+					</table>
+					</td>
+				</tr>
+				<tr>
+					<td></td><td></td>
+					<td align="right">ยอดรวมก่อนภาษี &nbsp;&nbsp;</td>
+					<td align="left">
+						<input type="text" id="tempTotalAmount" name="tempTotalAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
+						<html:hidden property="order.totalAmount"/>
+					</td>
+				</tr>
+				<tr>
+					<td></td><td></td>
+					<td align="right"><bean:message key="Tax" bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left">
+						<input type="text" id="tempVatAmount" name="tempVatAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
+						<html:hidden property="order.vatAmount"/>
+					</td>
+				</tr>
+				<tr>
+					<td></td><td></td>
+					<td align="right">ยอดเงินรวมที่ไม่เสียภาษี&nbsp;&nbsp;</td>
+					<td align="left">
+						<input type="text" id="tempTotalAmountNonVat" name="tempTotalAmountNonVat" readonly="readonly" class="disableText" style="text-align: right;"/>
+						<html:hidden property="order.totalAmountNonVat"/>
+					</td>
+				</tr>
+				<tr>
+					<td></td><td></td>
+					<td align="right"><bean:message key="Net" bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left">
+						<input type="text" id="tempNetAmount" name="tempNetAmount" readonly="readonly" class="disableText" style="text-align: right;"/>
+						<html:hidden property="order.netAmount"/>
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><!--<html:checkbox property="order.paymentCashNow" value="Y" disabled="true" styleClass="disableText"/> บันทึกรับเงินสดทันที -->
+					 <b>ชำระโดย
+						 <html:select property="order.vanPaymentMethod" styleClass="disableText" disabled="true">
+							<html:options collection="vanPaymentMethod" property="key" labelProperty="name"/>
+						</html:select></b> 
+					</td>
+					
+					<td></td>
+					<td valign="top">
+						<html:checkbox property="order.payment" value="Y" disabled="true" styleClass="disableText"/><bean:message key="Order.Paid" bundle="sysele"/>
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td valign="top">
+						<html:checkbox property="order.exported" value="Y" disabled="true" styleClass="disableText"/><bean:message key="Exported" bundle="sysele"/>
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td valign="top">
+						<html:checkbox property="order.interfaces" value="Y" disabled="true" styleClass="disableText"/><bean:message key="Interfaces" bundle="sysele"/>
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><bean:message key="Order.No"  bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left">
+						<html:text property="order.salesOrderNo" size="20" readonly="true" styleClass="disableText"/>
+					</td>
+					<td align="right"><bean:message key="Bill.No"  bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left">
+						<html:text property="order.arInvoiceNo" size="20" readonly="true" styleClass="disableText"/>
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><bean:message key="Order.SalesRepresent"  bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td align="left">
+						<html:text property="order.salesRepresent.name" size="30" readonly="true" styleClass="disableText"/>
+						<html:hidden property="order.salesRepresent.id"/>
+						<html:hidden property="order.salesRepresent.code"/>
+					</td>
+					<td align="right"><bean:message key="Status" bundle="sysele"/>&nbsp;&nbsp;</td>
+					<td valign="top">
+						<html:select property="order.docStatus" disabled="true" styleClass="disableText">
+							<html:options collection="docstatus" property="key" labelProperty="name"/>
+						</html:select>
+					</td>
+				</tr>
+			</table>
+			<!-- BUTTON -->
+			<br />
+			<table align="center" border="0" cellpadding="3" cellspacing="0" width="100%">
+			   <%if(role.equals(User.VAN)){ %>
+				    <tr>
+						<td align="right" width="10%"></td>
+						<td align="left">
+							<input type="checkbox" id="printReportPDF" name="printReportPDF" value ="PDF"/>
+							<font color="red">**พิมพ์ PDF (กรณีพิมพ์ข้อมูลออก Printer ไม่ได้)</font>
+						</td>
+					</tr>
+				<%} %>
+				<tr>
+					<td align="right" width="10%"></td>
+					<td align="left">
+				       <%if(role.equals(User.VAN)){ %>
+						   <input type="button" value="ทำบันทึกตั้งกอง" class="newPosBtnLong" onclick="manageProdShow('${pageContext.request.contextPath}','<%=orderForm.getOrder().getOrderNo()%>');">
+						<%} %>
+						
+						<%if(!isAdd.equals("N") || ((String)session.getAttribute("memberVIP")).equalsIgnoreCase("Y")){ %>
+							
+							<input type="button" value="สร้างรายการใหม่" class="newPosBtnLong" onclick="prepare('${pageContext.request.contextPath}','add');">
+							
+						<%} %>
+						
+					    <c:if test="${orderForm.mode=='edit'}">
+							<c:if test="${orderForm.order.exported=='N'}">
+								<c:if test="${orderForm.order.docStatus=='SV'}">
+								<c:if test="${orderForm.order.payment=='N'}">
+									
+									<input type="button" value="แก้ไขรายการ" class="newPosBtnLong" onclick="prepare('${pageContext.request.contextPath}','edit','${orderForm.order.id}');">
+									
+								</c:if>
+								</c:if>
+							</c:if>
+					   </c:if>
+						
+						<%if(role.equals(User.VAN)){ %>
+						   
+							<c:if test="${orderForm.order.docStatus=='SV'}">
+							     <c:if test="${orderForm.order.isCash=='Y'}">
+								    <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy','','');">
+		                            <input type="button" id ="reportBtn" value="พิมพ์ ใบกำกับภาษี(จริง)" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','original','','');">
+                                        </c:if>
+                                        
+                                        <c:if test="${orderForm.order.isCash=='N'}">
+								     <input type="button" id ="reportBtn" value="พิมพ์ใบส่งของ/ใบกำกับภาษี" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','tax','${orderForm.order.orderNo}','');">
+		                             <input type="button" id ="reportBtn" value="พิมพ์ใบเสร็จรับเงิน" class="newPosBtn" onclick="gotoSummaryReport('${pageContext.request.contextPath}','bill','${orderForm.order.orderNo}','');">
+                                        </c:if>
+								  <input type="button" id ="reportBtn" value="พิมพ์" class="newPosBtn" onclick="gotoReport('${pageContext.request.contextPath}','<%=role %>');">
+							</c:if>
+							
+							<c:if test="${orderForm.order.docStatus=='VO'}">
+								   <input type="button" id ="reportBtn" value="พิมพ์ ใบส่งสินค้า/ใบเสร็จรับเงินชั่วคราว" class="newPosBtn" onclick="stampPrint();gotoSummaryReport('${pageContext.request.contextPath}','copy','','VO');">
+							</c:if>
+						<%} %>
+						
+					</td>
+					<td align="right">
+						<input type="button" value="ปิดหน้าจอ" class="newNegBtn" onclick="backsearch('${pageContext.request.contextPath}','${orderForm.order.customerId}');">
+					</td>
+					<td width="10%">&nbsp;</td>
+				</tr>
+			</table>
+		    <span title="SalesOrderView">...</span>
+		    <span title="<%=Utils.isNull(request.getSession().getAttribute("PREV_STEP_ORDER_ACTION")) %>">...</span>
+			<!--  -->
+			<html:hidden property="order.payment" styleId="payment"/>
+			<html:hidden property="deletedId"/>
+			<html:hidden property="order.orderType"/>
+			<html:hidden property="order.id"/>
+			<html:hidden property="order.customerId"/>
+			<html:hidden property="order.exported"/>
+			<html:hidden property="order.isCash"/>
+			
+			<!--  Can Receipt Credit (VAN)-->
+			<html:hidden property="receiptCreditFlag"/>
+			<html:hidden property="custCreditLimit"/>
+			
+			<!-- AUTO RECEIPT -->
+			<html:hidden property="autoReceiptFlag"/>
+			<html:hidden property="autoReceipt.bank"/>
+			<html:hidden property="autoReceipt.chequeNo"/>
+			<html:hidden property="autoReceipt.chequeDate"/>
+			<html:hidden property="autoReceipt.creditCardType"/>	    
+			<html:hidden property="autoReceipt.internalBank"/>
+			<html:hidden property="autoReceipt.paymentMethod"/>
+			
+			<input type="hidden" name="fileType" id="fileType"/>
+			<input type="hidden" name="nextVisitDate">
+			<input type="hidden" name="memberVIP" value="${memberVIP}"/>
+			
+			<div id="productList" style="display: none;"></div>
+			<div id="ByList" style="display: none;"></div>
+			
+			<input type="hidden" name="orderDate" id="orderDate" value="${orderForm.order.orderDate}"/>
+			
+			<html:hidden property="order.printDateTimePick"/><br/>
+			<html:hidden property="order.printCountPick"/><br/>
+			<html:hidden property="order.printDateTimeRcp"/><br/>
+			<html:hidden property="order.printCountRcp"/>
+			
+			<jsp:include page="../trxhist.jsp">
+				<jsp:param name="module" value="<%=TrxHistory.MOD_ORDER%>"/>
+				<jsp:param name="id" value="${orderForm.order.id}"/>
+			</jsp:include>
+		  </div>
+           SalesOrderView
+		</html:form>
+		
+	<!-- Include Footer Mobile  -->
+    <jsp:include page="../footer.jsp" flush="true"/>
+    <!-- /Include Footer Mobile -->	
 </body>
 </html>

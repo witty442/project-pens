@@ -16,16 +16,18 @@ import org.jfree.util.Log;
 
 import com.isecinc.core.bean.References;
 import com.isecinc.core.model.I_Model;
+import com.isecinc.pens.bean.Address;
+import com.isecinc.pens.bean.Contact;
 import com.isecinc.pens.bean.Customer;
 import com.isecinc.pens.bean.User;
-import com.isecinc.pens.inf.helper.DBConnection;
-import com.isecinc.pens.inf.helper.Utils;
 import com.isecinc.pens.init.InitialReferences;
-import com.isecinc.pens.process.SequenceProcess;
 import com.isecinc.pens.process.document.CustomerDocumentProcess;
 import com.pens.util.ConvertNullUtil;
 import com.pens.util.DBCPConnectionProvider;
+import com.pens.util.DBConnection;
 import com.pens.util.DateToolsUtil;
+import com.pens.util.Utils;
+import com.pens.util.seq.SequenceProcessAll;
 
 /**
  * MCustomer Class
@@ -61,7 +63,60 @@ public class MCustomer extends I_Model<Customer> {
 	public Customer find(String id) throws Exception {
 		return super.find(id, TABLE_NAME, COLUMN_ID, Customer.class);
 	}
-
+	public Customer findOpt(String id) throws Exception {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Customer cust = null;
+		Address address = null;
+		Contact contact = null;
+		StringBuffer sql = new StringBuffer("");
+		try{
+			sql.append("\n select c.* ");
+			sql.append("\n ,(select aa.address_id from pensonline.m_address aa where");
+			sql.append("\n  c.customer_id = aa.customer_id and aa.purpose='B') as bill_to_address_id");
+			sql.append("\n ,(select aa.address_id from pensonline.m_address aa where");
+			sql.append("\n  c.customer_id = aa.customer_id and aa.purpose='S') as ship_to_address_id");
+			sql.append("\n ,a.line1,a.line2,a.line3,a.line4,a.province_id,a.district_id ,a.postal_code");
+			sql.append("\n ,t.contact_to,t.mobile ");
+			sql.append("\n from pensonline.m_customer c ");
+			sql.append("\n left join pensonline.m_address a on c.customer_id = a.customer_id and a.purpose='B'");
+			sql.append("\n left join pensonline.m_contact t on c.customer_id = t.customer_id");
+			sql.append("\n where c.customer_id = "+id);
+			logger.debug(sql.toString());
+			
+			conn = DBConnection.getInstance().getConnection();
+			ps =conn.prepareStatement(sql.toString());
+			rs = ps.executeQuery();
+			if(rs.next()) {
+				cust = new Customer(rs);
+				cust.setBillToAddressId(rs.getInt("bill_to_address_id"));
+				cust.setShipToAddressId(rs.getInt("ship_to_address_id"));
+				cust.setProvince(Utils.isNull(rs.getString("province_id")));
+				cust.setDistrict(Utils.isNull(rs.getString("district_id")));
+				
+				address = new Address();
+				address.setLine1(Utils.isNull(rs.getString("line1")));
+				address.setLine2(Utils.isNull(rs.getString("line2")));
+				address.setLine3(Utils.isNull(rs.getString("line3")));
+				address.setLine4(Utils.isNull(rs.getString("line4")));
+				address.setPostalCode(Utils.isNull(rs.getString("postal_code")));
+				cust.setAddress(address);
+				
+				contact = new Contact();
+				contact.setContactTo(Utils.isNull(rs.getString("contact_to")));
+				contact.setMobile(Utils.isNull(rs.getString("mobile")));
+				cust.setContact(contact);
+			}
+			return cust;
+		}catch(Exception e){
+			throw e;
+		}finally{
+			conn.close();
+			ps.close();
+			rs.close();
+		}
+	}
 	public Customer findByWhereCond(String whereSql) throws Exception {
 		Connection conn = null;
 		try{
@@ -95,7 +150,7 @@ public class MCustomer extends I_Model<Customer> {
 			} catch (Exception e2) {}
 		}
 	}
-	public String getCustGroup(int customerId) throws Exception {
+	public String getCustGroup(long customerId) throws Exception {
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rst = null;
@@ -174,7 +229,8 @@ public class MCustomer extends I_Model<Customer> {
 		int totalRow = 0;
 		try{
 			String sql ="\n select count(*) total_row  from("+
-			            "\n   select distinct m_customer.* from m_customer ,m_address  where 1=1 and m_customer.customer_id = m_address.customer_id " +
+			            "\n   select distinct m_customer.* from m_customer ,m_address  "+
+					    "\n   where 1=1 and m_customer.customer_id = m_address.customer_id " +
 					    "\n   and m_address.purpose ='B' "+whereCause+
 					    "\n  )A";
 			
@@ -251,6 +307,48 @@ public class MCustomer extends I_Model<Customer> {
 		return list;
 	}
 	
+	public String genWhereSQL(Customer customer,User user) {
+		String whereCause = "";
+		if (customer.getTerritory() != null
+				&& !customer.getTerritory().trim().equals("")) {
+			whereCause += "\n AND m_customer.TERRITORY = '" + customer.getTerritory().trim() + "'";
+		}
+		if (customer.getCode() != null && !customer.getCode().trim().equals("")) {
+			whereCause += "\n AND m_customer.CODE LIKE '%"
+					+ customer.getCode().trim().replace("\'", "\\\'").replace("\"", "\\\"")
+					+ "%' ";
+		}
+		if (customer.getName() != null && !customer.getName().trim().equals("")) {
+			whereCause += "\n AND m_customer.NAME LIKE '%"
+					+ customer.getName().trim().replace("\'", "\\\'").replace("\"", "\\\"")
+					+ "%' ";
+		}
+		if (customer.getIsActive() != null
+				&& !customer.getIsActive().equals("")) {
+			whereCause += "\n AND m_customer.ISACTIVE = '" + customer.getIsActive() + "'";
+		}
+		// WIT EDIT :04/08/2554 
+		if(!User.ADMIN.equals(user.getType())){
+		   whereCause += "\n AND m_customer.CUSTOMER_TYPE = '" + user.getCustomerType().getKey() + "'";
+		   whereCause += "\n AND m_customer.USER_ID = " + user.getId();
+		}
+		
+		if ( !"".equals(Utils.isNull(customer.getDistrict())) && !"0".equals(Utils.isNull(customer.getDistrict())) ){
+			whereCause += "\n AND m_address.district_id = " + customer.getDistrict() + "";
+		}
+		
+		if (customer.getSearchProvince() != 0) {
+			whereCause += "\n AND m_customer.CUSTOMER_ID IN (select customer_id ";
+			whereCause += "\n from m_address where province_id = " + customer.getSearchProvince()
+					 + ")";
+		}
+		
+		if (  !Utils.isNull(customer.getDispHaveTrip()).equals("") ) {
+			whereCause +="\n AND ( m_customer.trip_day <> 0 or m_customer.trip_day2 <>0 or m_customer.trip_day3 <> 0) ";
+		  
+		}
+		return whereCause;
+	}
 	public Customer getImageFileName(String customerId) throws Exception {
 
 		Statement stmt = null;
@@ -417,7 +515,7 @@ public class MCustomer extends I_Model<Customer> {
 				m.setNo(start);
 				// Mandatory
 				m.setId(rst.getInt("CUSTOMER_ID"));
-				m.setReferencesID(rst.getInt("REFERENCE_ID"));
+				m.setOracleCustId(rst.getLong("oracle_cust_id"));
 				m.setCustomerType(rst.getString("CUSTOMER_TYPE").trim());
 				m.setCode(rst.getString("CODE").trim());
 				m.setName(rst.getString("NAME").trim());
@@ -621,7 +719,7 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 				m.setNo(no);
 				// Mandatory
 				m.setId(rst.getInt("CUSTOMER_ID"));
-				m.setReferencesID(rst.getInt("REFERENCE_ID"));
+				m.setOracleCustId(rst.getLong("oracle_cust_id"));
 				m.setCustomerType(rst.getString("CUSTOMER_TYPE").trim());
 				m.setCode(rst.getString("CODE").trim());
 				m.setName(rst.getString("NAME").trim());
@@ -818,7 +916,7 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 				m.setNo(start);
 				// Mandatory
 				m.setId(rst.getInt("CUSTOMER_ID"));
-				m.setReferencesID(rst.getInt("REFERENCE_ID"));
+				m.setOracleCustId(rst.getLong("oracle_cust_id"));
 				m.setCustomerType(rst.getString("CUSTOMER_TYPE").trim());
 				m.setCode(rst.getString("CODE").trim());
 				m.setName(rst.getString("NAME").trim());
@@ -950,12 +1048,13 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 	 * @return
 	 * @throws Exception
 	 */
-	private int id = 0;
+	private long id = 0;
 
 	public boolean save(Customer customer, int activeUserID,String salesCode, Connection conn) throws Exception {
 
 		if (customer.getId() == 0) {
-			id = SequenceProcess.getNextValue(TABLE_NAME);
+			//id = SequenceProcess.getNextValue(TABLE_NAME);
+			id = SequenceProcessAll.getIns().getNextValue("m_customer.customer_id").intValue();
 			customer.setCode(new CustomerDocumentProcess().getNextDocumentNo(salesCode, activeUserID, conn));
 		} else {
 			id = customer.getId();
@@ -1145,11 +1244,11 @@ private Customer[] searchOptByTripModel(Connection conn,String whereCause,User u
 		return invoiceAmt;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

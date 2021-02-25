@@ -1,3 +1,5 @@
+<%@page import="com.pens.util.DBConnection"%>
+<%@page import="com.pens.util.Utils"%>
 <%@page import="java.util.Date"%>
 <%@ page language="java" contentType="text/html; charset=TIS-620" pageEncoding="TIS-620"%>
 <%@page import="com.isecinc.pens.model.MUser"%>
@@ -5,9 +7,8 @@
 <%@page import="com.isecinc.pens.inf.dao.InterfaceDAO" %>
 
 <%@page import="com.isecinc.pens.inf.helper.*" %>
-<%@page import="com.isecinc.pens.inf.bean.*" %>
 <%
-String id = (String) request.getParameter("id");
+String id = (String)request.getParameter("id");
 
 String whereCause = "";
 String status = "";
